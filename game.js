@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v27.4
+// 都市浮生记 - Game Engine v27.5
 // ============================================
 
 // === GAME STATE ===
@@ -13899,6 +13899,87 @@ const EVENTS = [
         { label:'接受了AI面试，成功入职', hint:'+💰 +🧠', fn: g => { g.flags.aiJobInterview=true; return{intel:3,mood:3}; }},
         { label:'觉得太荒谬了，拒绝AI面试', hint:'+✨ -💰', fn: g => { g.flags.aiJobInterview=true; g.flags.rejectAIInterview=true; return{charm:5,mood:-3}; }},
       ]},
+    // v27.5: 信息茧房 + 算法推荐 + 数字成瘾
+    { id:'algorithm_bubble', icon:'🫧', title:'信息茧房', category:'psychology',
+      body:'你发现——你和你的朋友——活在不同的世界里。\n\n你的抖音：\n- 职场焦虑\n- 理财知识\n- 数码产品\n- 程序员段子\n\n你女朋友的抖音：\n- 美妆教程\n- 穿搭推荐\n- 情感故事\n- 猫咪视频\n\n你爸的抖音：\n- 国际局势\n- 养生知识\n- 钓鱼技巧\n- 抗日神剧\n\n你们三个人——用同一个APP——但看到的——是完全不同的世界。\n\n你开始想：\n- 你以为的「世界」——只是算法觉得你想看的\n- 你以为的「真相」——只是算法推荐给你的\n- 你以为的「大多数人的想法」——只是你周围人的想法\n\n你开始理解：信息茧房——不是「你在选择信息」——是「信息在选择你」。\n\n你以为你在看世界——其实你在看一面镜子。\n\n「信息茧房：你以为你在了解世界——其实你只是在了解自己。」',
+      cond: g => g.age >= 18 && !g.flags.algorithmBubble && g.intel >= 25,
+      choices:[
+        { label:'开始主动接触不同观点', hint:'+🧠 +✨ -😊', fn: g => { g.flags.algorithmBubble=true; g.flags.bubbleBreaker=true; return{intel:10,charm:3,mood:-3}; }},
+        { label:'意识到了，但没改变什么', hint:'+🧠', fn: g => { g.flags.algorithmBubble=true; return{intel:5}; }},
+        { label:'觉得算法推荐挺准的，继续看', hint:'+😊 -🧠', fn: g => { g.flags.algorithmBubble=true; g.flags.comfortableBubble=true; return{mood:3,intel:-3}; }},
+      ]},
+    { id:'short_video_addiction_v27_5', icon:'📱', title:'短视频成瘾', category:'psychology',
+      body:'你打开了抖音——「就看5分钟」。\n\n5分钟后——\n- 你还在刷\n- 你已经忘了你为什么要打开\n\n30分钟后——\n- 你刷了47条视频\n- 你记住了0条\n- 你的眼睛有点酸\n\n1小时后——\n- 你终于放下了手机\n- 你感到了深深的空虚\n- 你做了个决定：「明天不刷了」\n\n第二天——\n- 你又刷了1小时\n\n你查了手机使用时间：\n- 日均屏幕时间：6小时32分\n- 抖音：3小时18分\n- 微信：1小时45分\n- 其他：1小时29分\n\n你开始理解：短视频成瘾——不是「你意志力差」——是「算法比你更了解你自己」。\n\n每一个视频——都是精心设计的——让你「再看一个」。\n\n你不是在娱乐——你是在被「喂养」。\n\n「短视频成瘾：你不是在杀时间——是时间在杀你。」',
+      cond: g => g.age >= 16 && !g.flags.shortVideoAddiction && g.mood < 60,
+      choices:[
+        { label:'卸载了所有短视频APP', hint:'+🧠 +😊 +❤️ -✨', fn: g => { g.flags.shortVideoAddiction=true; g.flags.deletedShortVideo=true; return{intel:8,mood:5,health:3,charm:-3}; }},
+        { label:'设了每日1小时限制', hint:'+🧠 +😊', fn: g => { g.flags.shortVideoAddiction=true; g.flags.limitedScreenTime=true; return{intel:5,mood:3}; }},
+        { label:'知道不好但停不下来', hint:'-🧠 -😊 -❤️', fn: g => { g.flags.shortVideoAddiction=true; return{intel:-3,mood:-5,health:-3}; }},
+      ]},
+    { id:'echo_chamber_v27_5', icon:'📢', title:'回音壁效应', category:'society',
+      body:'你在微信群里发了一篇文章。\n\n标题：《为什么房价还会涨》\n\n群里炸了——\n\n支持你的人说：\n- 「说得太对了！」\n- 「房价永远涨！」\n- 「不买后悔一辈子！」\n\n反对你的人说：\n- 「你收了开发商的钱吧？」\n- 「无脑看多，韭菜命」\n- 「泡沫迟早破！」\n\n你发现：\n- 支持你的人——都有房（或者想买房）\n- 反对你的人——都没房（或者买不起房）\n- 没有人在讨论「事实」——每个人都在表达「立场」\n\n你开始理解：回音壁效应——不是「你在找真相」——是「你在找认同」。\n\n你看到的「客观分析」——只是你愿意看到的「主观观点」。\n\n你不是在思考——你是在「确认偏误」。\n\n「回音壁效应：你以为你在讨论——其实你只是在找跟你想法一样的人。」',
+      cond: g => g.age >= 20 && !g.flags.echoChamber && g.social >= 20,
+      choices:[
+        { label:'开始有意识地接触反对意见', hint:'+🧠 +✨', fn: g => { g.flags.echoChamber=true; g.flags.seekingDissent=true; return{intel:8,charm:3}; }},
+        { label:'意识到自己也有偏见', hint:'+🧠 +😊', fn: g => { g.flags.echoChamber=true; return{intel:5,mood:3}; }},
+        { label:'退了群，不想跟人争论了', hint:'-🤝 +😊', fn: g => { g.flags.echoChamber=true; g.flags.leftTheGroup=true; return{social:-5,mood:3}; }},
+      ]},
+    { id:'attention_economy', icon:'👁️', title:'注意力经济', category:'society',
+      body:'你算了一下——你今天被多少东西「争夺」了注意力：\n\n早上：\n- 5条APP推送\n- 3个公众号文章\n- 2条朋友圈广告\n\n中午：\n- 10条短视频推荐\n- 3个电商广告\n- 1个弹窗\n\n晚上：\n- 15条朋友圈\n- 8条群消息\n- 5条营销短信\n\n你今天——被「争夺」了：\n- 51次注意力\n- 每次平均30秒\n- 总计：25分钟\n\n这25分钟——你做了什么？\n- 你看了：一条猫的视频\n- 你买了：一双不需要的鞋\n- 你焦虑了：看到别人的工资比你高\n\n你开始理解：注意力经济——不是「你在消费内容」——是「你的注意力在被消费」。\n\n你是用户——也是产品。\n\n你的注意力——被卖给了广告商。\n\n「注意力经济：你不是在花钱买快乐——你是在用注意力换焦虑。」',
+      cond: g => g.age >= 18 && !g.flags.attentionEconomy && g.intel >= 20,
+      choices:[
+        { label:'关闭了所有推送通知', hint:'+🧠 +😊 +❤️', fn: g => { g.flags.attentionEconomy=true; g.flags.notificationsOff=true; return{intel:5,mood:5,health:3}; }},
+        { label:'开始有意识地减少屏幕时间', hint:'+🧠 +😊', fn: g => { g.flags.attentionEconomy=true; return{intel:3,mood:3}; }},
+        { label:'觉得无所谓，继续刷', hint:'-🧠 -😊', fn: g => { g.flags.attentionEconomy=true; return{intel:-3,mood:-3}; }},
+      ]},
+    { id:'doomscrolling', icon:'🌊', title:'刷屏焦虑', category:'psychology',
+      body:'你在睡前刷了手机。\n\n你看到了：\n- 「35岁程序员被裁后送外卖」\n- 「研究生毕业月薪3000」\n- 「90后存款中位数不到5万」\n- 「北京房价跌了20%」\n- 「AI将替代50%的工作」\n- 「全球经济增长放缓」\n- 「年轻人失业率创新高」\n\n你越看越焦虑——\n\n但你停不下来——\n\n你继续刷：\n- 「某网红月入百万」\n- 「某大学生创业融资千万」\n- 「某95后年薪百万」\n\n你更焦虑了——\n\n你开始理解：刷屏焦虑——不是「世界变差了」——是「坏消息比好消息更容易传播」。\n\n算法知道——你的恐惧——比你的快乐——更能让你停留。\n\n你不是在获取信息——你是在被「贩卖焦虑」。\n\n「刷屏焦虑：你越焦虑——你越刷——你越刷——你越焦虑。这就是算法想要的。」',
+      cond: g => g.age >= 18 && !g.flags.doomscrolling && g.mood < 55,
+      choices:[
+        { label:'睡前1小时不碰手机', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.doomscrolling=true; g.flags.noPhoneBeforeBed=true; return{mood:8,health:5,intel:3}; }},
+        { label:'取关了所有贩卖焦虑的账号', hint:'+🧠 +😊', fn: g => { g.flags.doomscrolling=true; g.flags.unfollowedAnxiety=true; return{intel:5,mood:5}; }},
+        { label:'知道不好但还是忍不住', hint:'-😊 -❤️', fn: g => { g.flags.doomscrolling=true; return{mood:-5,health:-3}; }},
+      ]},
+    { id:'deepfake_encounter', icon:'🎭', title:'AI换脸骗局', category:'society',
+      body:'你妈给你打了电话。\n\n「儿子，你爸出车祸了，需要5万块手术费，快转到这个账户。」\n\n你慌了——你准备转账——\n\n但你多问了一句：「妈，我爸在哪出的车祸？」\n\n你妈说：「在你公司附近。」\n\n你一愣——你公司附近——没有大马路。\n\n你挂了电话——打给你爸——\n\n你爸接了：「啥车祸？我在家里看电视呢。」\n\n你回拨刚才的号码——空号。\n\n你意识到——你差点被AI换脸骗了。\n\n你查了新闻：\n- AI换脸技术：越来越逼真\n- AI语音克隆：只需3秒录音\n- 全国被骗金额：年增300%\n\n你开始理解：在AI时代——「眼见不一定为实，耳听不一定为真」。\n\n你差一点——就信了。\n\n「AI换脸骗局：当技术让谎言变得逼真——真相就成了最稀缺的东西。」',
+      cond: g => g.age >= 18 && !g.flags.deepfakeEncounter && g.money >= 5000,
+      choices:[
+        { label:'跟家人约定了暗号防骗', hint:'+🧠 +✨', fn: g => { g.flags.deepfakeEncounter=true; g.flags.familyCodeWord=true; return{intel:8,charm:3}; }},
+        { label:'差点被骗，长了一个教训', hint:'+🧠 -😊', fn: g => { g.flags.deepfakeEncounter=true; return{intel:5,mood:-3}; }},
+        { label:'没多想就转了账', hint:'-💰 -🧠', fn: g => { g.flags.deepfakeEncounter=true; g.money -= 50000; return{intel:-5,mood:-10}; }},
+      ]},
+    { id:'data_privacy_shock', icon:'🔐', title:'隐私泄露', category:'society',
+      body:'你收到了一条短信：\n\n「张先生您好，您在XX小区的房子现在估值380万，要不要考虑出售？」\n\n你懵了——\n\n你没在任何地方留过这个小区的地址。\n\n你查了查——你发现：\n- 你的名字、手机号、身份证号——在暗网上卖500元/条\n- 你的家庭住址、车辆信息——卖300元/条\n- 你的消费记录、通话记录——卖200元/条\n\n你的全部隐私——打包价：1000元。\n\n你开始想：\n- 谁泄露了你的信息？\n- 快递公司？外卖平台？银行？政府？\n- 还是你自己——在某个网站上——随手填了？\n\n你开始理解：在数字时代——你不是「用户」——你是「数据」。\n\n你的隐私——不值钱。\n\n但你的隐私被泄露后造成的损失——可能很值钱。\n\n「隐私泄露：你的信息已经被卖了——但你一分钱也没拿到。」',
+      cond: g => g.age >= 18 && !g.flags.dataPrivacyShock && g.money >= 100,
+      choices:[
+        { label:'开始全面保护个人隐私', hint:'+🧠 +✨ -😊', fn: g => { g.flags.dataPrivacyShock=true; g.flags.privacyGuardian=true; return{intel:8,charm:3,mood:-3}; }},
+        { label:'举报了泄露方，但没什么用', hint:'+🧠 -😊', fn: g => { g.flags.dataPrivacyShock=true; return{intel:3,mood:-5}; }},
+        { label:'觉得无所谓，反正也防不住', hint:'-🧠 +😊', fn: g => { g.flags.dataPrivacyShock=true; g.flags.privacyResigned=true; return{intel:-3,mood:3}; }},
+      ]},
+    { id:'filter_bubble_news', icon:'📰', title:'假新闻陷阱', category:'psychology',
+      body:'你在朋友圈看到一篇文章：\n\n「震惊！这种食物致癌率高达90%！你每天都在吃！」\n\n你转发了——给你妈。\n\n你妈转发了——给她的群。\n\n3天后——\n\n你看到了辟谣：「该文章已被证实为假新闻。所谓研究来自一个野鸡机构。」\n\n但你妈的群里——已经传开了——\n\n你妈开始：\n- 不让你吃那个食物\n- 买了「防癌保健品」（500元）\n- 转发了更多类似文章\n\n你开始想：\n- 你妈相信朋友圈——超过相信你\n- 假新闻传播速度——是真相的6倍\n- 你也是传播者——你也转发了\n\n你开始理解：假新闻——不是「骗老人」——是「骗所有人」。\n\n区别是——年轻人被骗了会查证——老人被骗了会转发。\n\n「假新闻陷阱：真相还在穿鞋——谣言已经跑遍了全世界。」',
+      cond: g => g.age >= 18 && !g.flags.filterBubbleNews && g.social >= 15,
+      choices:[
+        { label:'开始教父母辨别假新闻', hint:'+🧠 +🤝 +✨', fn: g => { g.flags.filterBubbleNews=true; g.flags.newsLiteracyAdvocate=true; return{intel:5,social:5,charm:3}; }},
+        { label:'以后看到先查证再转发', hint:'+🧠 +😊', fn: g => { g.flags.filterBubbleNews=true; return{intel:5,mood:3}; }},
+        { label:'不管了，反正也没人在乎真假', hint:'-🧠 -😊', fn: g => { g.flags.filterBubbleNews=true; return{intel:-3,mood:-3}; }},
+      ]},
+    { id:'online_offline_gap', icon:'🎭', title:'人设与现实', category:'social',
+      body:'你参加了一个同学聚会。\n\n你在朋友圈看到的同学：\n- 同学A：「今天又签了一个大单💪」\n- 同学B：「带娃去了马尔代夫🏖️」\n- 同学C：「新提的车🚗」\n- 同学D：「升总监了🎉」\n\n你见面后——\n\n同学A（喝醉了）：「其实那个大单——只有3万块——我吹的」\n同学B（私聊）：「马尔代夫是跟团游——住的三星酒店」\n同学C（酒后吐真言）：「车是贷款买的——月供8000——快还不起了」\n同学D（悄悄说）：「升总监——工资涨了500——但活多了3倍」\n\n你开始理解：朋友圈——不是「生活」——是「人设」。\n\n每个人都在表演——每个人都在看别人表演——\n\n然后——每个人都觉得自己过得不如别人。\n\n你不是在跟真实的人比较——你是在跟「精心编辑的版本」比较。\n\n「人设与现实：朋友圈里的人生——都是P过的。」',
+      cond: g => g.age >= 22 && !g.flags.onlineOfflineGap && g.social >= 15,
+      choices:[
+        { label:'减少了社交媒体使用', hint:'+😊 +🧠 -🤝', fn: g => { g.flags.onlineOfflineGap=true; g.flags.reducedSocialMedia=true; return{mood:8,intel:5,social:-3}; }},
+        { label:'开始真实地分享生活', hint:'+✨ +🤝 -😊', fn: g => { g.flags.onlineOfflineGap=true; g.flags.authenticSharing=true; g.reputation.social += 3; return{charm:5,social:3,mood:-3}; }},
+        { label:'继续维护自己的人设', hint:'+✨ -🧠', fn: g => { g.flags.onlineOfflineGap=true; return{charm:3,intel:-3}; }},
+      ]},
+    { id:'digital_detox_retreat', icon:'🏕️', title:'数字排毒营', category:'hobby',
+      body:'你报了一个「数字排毒营」。\n\n规则：\n- 7天不碰手机/电脑/平板\n- 住在山里的小木屋\n- 每天：读书、散步、冥想、写日记\n- 费用：5000元\n\n第1天：\n- 你很不适应——手一直往口袋里摸\n- 你觉得「错过了什么」\n- 你很焦虑\n\n第3天：\n- 你开始享受安静\n- 你读完了2本书\n- 你写了10页日记\n\n第7天：\n- 你感到前所未有的平静\n- 你发现：没有手机——世界没有崩塌\n- 你发现：你有了很多「自己的想法」\n\n你回到城市——\n\n你打开手机——有387条未读消息——\n\n你发现：没有你——世界照样运转。\n\n你开始理解：数字排毒——不是「戒手机」——是「找回被屏幕偷走的自己」。\n\n「数字排毒营：你不是在休息——你是在学习「不在线也可以」。」',
+      cond: g => g.age >= 20 && !g.flags.digitalDetoxRetreat && g.money >= 5000 && g.mood < 60,
+      choices:[
+        { label:'回来后保持了低屏幕时间的习惯', hint:'+😊 +🧠 +❤️ +✨', fn: g => { g.flags.digitalDetoxRetreat=true; g.flags.sustainedDetox=true; g.money -= 5000; return{mood:10,intel:8,health:5,charm:3}; }},
+        { label:'体验很好但回来后又恢复了', hint:'+😊 -💰', fn: g => { g.flags.digitalDetoxRetreat=true; g.money -= 5000; return{mood:5}; }},
+        { label:'觉得太无聊了，提前退营了', hint:'-💰 -😊', fn: g => { g.flags.digitalDetoxRetreat=true; g.money -= 3000; return{mood:-3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -15126,6 +15207,14 @@ const ACHIEVEMENTS = [
     { id:'full_lying_flat_ach', icon:'🏃‍♂️', name:'彻底躺平', desc:'逃离内卷选择了慢生活', check: g => g.flags.fullLyingFlat },
     { id:'ai_interview_hacker_ach', icon:'🎯', name:'AI面试专家', desc:'专门研究AI面试技巧', check: g => g.flags.aiInterviewHacker },
     { id:'livestream_ops_ach', icon:'🎬', name:'直播幕后', desc:'转型做直播运营找到了新出路', check: g => g.flags.livestreamOps },
+    // v27.5: 信息茧房 + 数字成瘾成就
+    { id:'bubble_breaker_ach', icon:'🫧', name:'破茧者', desc:'主动打破信息茧房接触不同观点', check: g => g.flags.bubbleBreaker },
+    { id:'deleted_short_video_ach', icon:'📱', name:'戒断成功', desc:'卸载了所有短视频APP', check: g => g.flags.deletedShortVideo },
+    { id:'notifications_off_ach', icon:'🔕', name:'关闭通知', desc:'关闭了所有推送通知夺回注意力', check: g => g.flags.notificationsOff },
+    { id:'news_literacy_ach', icon:'📰', name:'真相守护者', desc:'教父母辨别假新闻', check: g => g.flags.newsLiteracyAdvocate },
+    { id:'privacy_guardian_ach', icon:'🔐', name:'隐私卫士', desc:'全面保护个人隐私', check: g => g.flags.privacyGuardian },
+    { id:'sustained_detox_ach', icon:'🏕️', name:'数字排毒达人', desc:'排毒营后保持了低屏幕时间习惯', check: g => g.flags.sustainedDetox },
+    { id:'authentic_sharing_ach', icon:'🎭', name:'真实分享', desc:'不再维护人设开始真实分享生活', check: g => g.flags.authenticSharing },
 ];
 
 // === ENDINGS === (order matters: first match wins)
