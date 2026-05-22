@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v3.0
+// 都市浮生记 - Game Engine v3.1
 // ============================================
 
 // === GAME STATE ===
@@ -2625,6 +2625,57 @@ const EVENTS = [
         { label:'用来社交破冰', hint:'+👥 +✨', fn: g => { g.flags.mbti=true; return{social:10,charm:5}; }},
         { label:'不信这个', hint:'+🧠', fn: g => { g.flags.mbti=true; return{intel:5}; }},
       ]},
+    // === v3.1 EVENTS - 职场热梗 ===
+    { id:'paid_toilet', icon:'🚽', title:'带薪拉屎',
+      body:'你发现了一个上班的秘密：带薪拉屎。\n\n每天早上，你在厕所里待20分钟，刷抖音、看小说、发呆。\n\n你算了一笔账：月薪8000，每天带薪拉屎20分钟，一年下来相当于白赚4000块。\n\n你在群里分享了这个发现，同事回复："你以为老板不知道？他只是不想拆穿你最后的快乐。"\n\n"带薪拉屎是打工人的小确幸——虽然有点臭，但是是香的。"',
+      cond: g => g.job!=='待业中' && !g.flags.paidToilet && g.mood<60,
+      choices:[
+        { label:'每天坚持带薪拉屎', hint:'+💰 +😊', fn: g => { g.flags.paidToilet=true; return{money:200,mood:10}; }},
+        { label:'被发现了，尴尬', hint:'-😊', fn: g => { g.flags.paidToilet=true; return{mood:-10,charm:-3}; }},
+        { label:'分享给同事', hint:'+👥 +😊', fn: g => { g.flags.paidToilet=true; return{social:8,mood:8}; }},
+      ]},
+    { id:'office_roles', icon:'🎭', title:'办公室角色',
+      body:'你在抖音看到一个视频："你是办公室里的哪个角色？"\n\n- 办公室申公豹：卷王，永远在加班，"收到"是口头禅\n- 办公室哪吒：摸鱼达人，黑眼圈重度患者\n- 办公室敖丙：暖男，但压力山大\n- 办公室敖光：领导，永远在开会\n\n你照了照镜子，发现自己像申公豹。\n\n"职场是个大戏台，每个人都在演自己的角色。"',
+      cond: g => g.job!=='待业中' && !g.flags.officeRoles && g.months>=6,
+      choices:[
+        { label:'我是申公豹，继续卷', hint:'+💰 -❤️', fn: g => { g.flags.officeRoles=true; return{money:3000,health:-8,mood:-5}; }},
+        { label:'我要做哪吒，摸鱼', hint:'+😊 -💰', fn: g => { g.flags.officeRoles=true; return{mood:15,money:-1000}; }},
+        { label:'争取当敖光，升职', hint:'+💰 +✨ 🎲', fn: g => { g.flags.officeRoles=true; if(g.intel>=70&&g.social>=60){return{money:8000,charm:10}}else{return{mood:-10}} }},
+        { label:'辞职，不演了', hint:'+😊 -💰', fn: g => { g.flags.officeRoles=true; setJob(g,'待业中',0); return{mood:20,money:-5000}; }},
+      ]},
+    { id:'crispy_worker', icon:'🥟', title:'脆皮打工人',
+      body:'你在B站看到一个视频播放量过千万："脆皮打工人，老板一骂就碎。"\n\n你笑了，然后哭了。\n\n你发现：\n- 加班到凌晨，第二天还要笑着开会\n- 被客户骂完，转身跟同事说"没事"\n- 工资条到手，扣完五险一金只剩一半\n\n你发了一条朋友圈："我是脆皮打工人，但我还没碎。"\n\n"脆皮不是软弱，是承受了太多。"',
+      cond: g => g.job!=='待业中' && !g.flags.crispyWorker && g.mood<50,
+      choices:[
+        { label:'接受脆皮，继续撑', hint:'+😊 +🧠', fn: g => { g.flags.crispyWorker=true; return{mood:10,intel:5}; }},
+        { label:'变硬皮，学会拒绝', hint:'+✨ +😊', fn: g => { g.flags.crispyWorker=true; return{charm:8,mood:12}; }},
+        { label:'碎了，辞职', hint:'+😊 -💰', fn: g => { g.flags.crispyWorker=true; setJob(g,'待业中',0); return{mood:25,money:-3000}; }},
+        { label:'找人倾诉', hint:'+👥 +😊', fn: g => { g.flags.crispyWorker=true; return{social:10,mood:15}; }},
+      ]},
+    { id:'worker_influencer', icon:'📱', title:'职人网红',
+      body:'你的同事小王开始拍抖音了。\n\n他每天拍自己上班的日常：\n- 早上挤地铁\n- 中午吃食堂\n- 下午开会打瞌睡\n- 晚上加班吃外卖\n\n三个月后，他粉丝过万，开始接广告了。\n\n你心想：我是不是也可以？\n\n"职人网红是打工人的Plan B——用上班的时间，赚下班的钱。"',
+      cond: g => g.job!=='待业中' && !g.flags.workerInfluencer && g.charm>=50 && g.age>=22 && g.age<=35,
+      choices:[
+        { label:'我也拍！', hint:'+✨ +💰 🎲', fn: g => { g.flags.workerInfluencer=true; if(g.charm>=70&&Math.random()>0.5){g.flags.influencer=true;return{money:5000,charm:12,mood:15}}else{return{charm:5,mood:5}} }},
+        { label:'算了，没那才华', hint:'+😊', fn: g => { g.flags.workerInfluencer=true; return{mood:5}; }},
+        { label:'帮他拍', hint:'+👥 +✨', fn: g => { g.flags.workerInfluencer=true; return{social:10,charm:5}; }},
+      ]},
+    { id:'gamify_work', icon:'🎮', title:'职场游戏化',
+      body:'你的公司开始实行"职场游戏化"：\n\n- 完成任务获得"经验值"\n- 加班获得"金币"\n- 表现好获得"勋章"\n- 月度MVP获得"称号"\n\n你看着手里的500金币（价值50块超市卡），陷入了沉思。\n\n"职场游戏化让加班变得有趣——但本质上，你还是那个NPC。"',
+      cond: g => g.job!=='待业中' && !g.flags.gamifyWork && g.months>=12,
+      choices:[
+        { label:'积极参与，冲MVP', hint:'+💰 +✨ -❤️', fn: g => { g.flags.gamifyWork=true; return{money:2000,charm:8,health:-10}; }},
+        { label:'佛系参与', hint:'+😊', fn: g => { g.flags.gamifyWork=true; return{mood:8}; }},
+        { label:'拒绝被游戏化', hint:'+🧠 +😊', fn: g => { g.flags.gamifyWork=true; return{intel:8,mood:10}; }},
+      ]},
+    { id:'anti_pua', icon:'🛡️', title:'反PUA心法',
+      body:'你在豆瓣看到一个帖子："2025职场黑话翻译指南"\n\n- 老板说"年轻人要多学习"＝"这活不想给钱"\n- HR说"我们像大家庭"＝"准备让你多干活"\n- 领导说"我看好你"＝"暂时找不到更便宜的"\n\n你笑了，然后哭了。\n\n你开始修炼"反PUA心法"：\n- 把"福报"当笑话听\n- 把"画饼"当零食吃\n- 把"情怀"当厕纸用\n\n"反PUA不是反抗，是清醒。"',
+      cond: g => g.job!=='待业中' && !g.flags.antiPUA && g.intel>=60,
+      choices:[
+        { label:'修炼反PUA心法', hint:'+🧠 +😊 +✨', fn: g => { g.flags.antiPUA=true; return{intel:10,mood:15,charm:5}; }},
+        { label:'分享给同事', hint:'+👥 +😊', fn: g => { g.flags.antiPUA=true; return{social:10,mood:10}; }},
+        { label:'算了，我还是配合吧', hint:'+💰 -😊', fn: g => { g.flags.antiPUA=true; return{money:1000,mood:-8}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -2672,6 +2723,12 @@ const ACHIEVEMENTS = [
     { id:'survivor_2025', icon:'📊', name:'2025幸存者', desc:'度过就业寒冬', check: g => g.flags.youthUnemployment },
     { id:'remote_worker', icon:'💻', name:'数字游民', desc:'享受远程办公', check: g => g.flags.remoteWork },
     { id:'mbti_believer', icon:'🧠', name:'MBTI专家', desc:'了解自己和他人', check: g => g.flags.mbti },
+    { id:'paid_toilet_master', icon:'🚽', name:'带薪拉屎大师', desc:'掌握打工人小确幸', check: g => g.flags.paidToilet },
+    { id:'office_actor', icon:'🎭', name:'职场演员', desc:'找到自己的角色', check: g => g.flags.officeRoles },
+    { id:'crispy_survivor', icon:'🥟', name:'脆皮幸存者', desc:'脆皮但没碎', check: g => g.flags.crispyWorker },
+    { id:'worker_star', icon:'📱', name:'职人网红', desc:'用上班赚下班的钱', check: g => g.flags.workerInfluencer },
+    { id:'game_player', icon:'🎮', name:'职场玩家', desc:'游戏化工作', check: g => g.flags.gamifyWork },
+    { id:'anti_pua_master', icon:'🛡️', name:'反PUA大师', desc:'看穿职场黑话', check: g => g.flags.antiPUA },
     { id:'photographer', icon:'📷', name:'摄影师', desc:'爱上摄影', check: g => g.flags.photographyHobby },
     { id:'viral_star', icon:'🌟', name:'网红初体验', desc:'意外走红', check: g => g.flags.viralMoment },
     { id:'freelancer', icon:'💻', name:'自由职业者', desc:'成为自由职业者', check: g => g.flags.freelancer },
