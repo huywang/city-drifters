@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v3.5
+// 都市浮生记 - Game Engine v3.6
 // ============================================
 
 // === GAME STATE ===
@@ -2799,6 +2799,23 @@ const EVENTS = [
         { label:'约朋友一起', hint:'-💰 +👥 +😊', fn: g => { g.flags.weekendTravel=true; return{money:-1200,social:10,mood:15}; }},
         { label:'太累了，下次吧', hint:'+💰 -😊', fn: g => { g.flags.weekendTravel=true; return{money:500,mood:-5}; }},
       ]},
+    // === v3.6 EVENTS - 直播经济 ===
+    { id:'live_streaming', icon:'📱', title:'直播带货',
+      body:'你在抖音开了个直播间，开始带货。\n\n你的粉丝从0涨到1000，再到10000。\n\n你每天直播3小时，讲解产品、回答问题、喊"家人们"。\n\n一个月后，你的收入：\n- 直播佣金：5000\n- 平台奖励：2000\n- 粉丝打赏：1000\n\n你开始想：这比上班赚得多啊！\n\n"直播带货是新时代的个体经济——但也是最卷的赛道。"',
+      cond: g => !g.flags.liveStreaming && g.charm>=60 && g.age>=22 && g.age<=35 && g.intel>=55,
+      choices:[
+        { label:'全职做主播', hint:'+💰 +✨ -❤️', fn: g => { g.flags.liveStreaming=true; g.flags.influencer=true; setJob(g,'主播',0); return{money:8000,charm:12,health:-8}; }},
+        { label:'兼职做', hint:'+💰 +😊', fn: g => { g.flags.liveStreaming=true; return{money:5000,mood:10}; }},
+        { label:'放弃，太累了', hint:'+❤️ +😊', fn: g => { g.flags.liveStreaming=true; return{health:5,mood:5}; }},
+      ]},
+    { id:'influencer_scandal', icon:'💥', title:'网红翻车',
+      body:'你关注的一个大网红翻车了。\n\n原因是：\n- 带货的产品被曝光是假货\n- 偷税漏税\n- 虚假宣传\n\n粉丝从1000万掉到100万，品牌方纷纷解约。\n\n你在评论区看到："网红经济就是割韭菜。"\n\n"网红的生命周期越来越短——今天是顶流，明天就翻车。"',
+      cond: g => g.flags.influencer && !g.flags.influencerScandal && g.months>=12,
+      choices:[
+        { label:'引以为戒，谨慎经营', hint:'+🧠 +😊', fn: g => { g.flags.influencerScandal=true; return{intel:10,mood:8}; }},
+        { label:'继续做，但更注重品质', hint:'+✨ +👥', fn: g => { g.flags.influencerScandal=true; return{charm:8,social:5}; }},
+        { label:'退出直播圈', hint:'+😊 -💰', fn: g => { g.flags.influencerScandal=true; g.flags.influencer=false; return{mood:15,money:-5000}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -2866,6 +2883,8 @@ const ACHIEVEMENTS = [
     { id:'concert_fan', icon:'🎤', name:'演唱会粉丝', desc:'抢到演唱会门票', check: g => g.flags.concertTicket },
     { id:'china_travel_host', icon:'✈️', name:'China Travel大使', desc:'推广中国旅游', check: g => g.flags.chinaTravel },
     { id:'weekend_traveler', icon:'🚄', name:'周末特种兵', desc:'周末旅游打卡', check: g => g.flags.weekendTravel },
+    { id:'live_streamer', icon:'📱', name:'直播带货达人', desc:'成为主播', check: g => g.flags.liveStreaming },
+    { id:'scandal_survivor', icon:'💥', name:'网红翻车幸存者', desc:'经历网红翻车', check: g => g.flags.influencerScandal },
     { id:'photographer', icon:'📷', name:'摄影师', desc:'爱上摄影', check: g => g.flags.photographyHobby },
     { id:'viral_star', icon:'🌟', name:'网红初体验', desc:'意外走红', check: g => g.flags.viralMoment },
     { id:'freelancer', icon:'💻', name:'自由职业者', desc:'成为自由职业者', check: g => g.flags.freelancer },
