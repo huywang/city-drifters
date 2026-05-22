@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v6.1
+// 都市浮生记 - Game Engine v6.2
 // ============================================
 
 // === GAME STATE ===
@@ -3182,6 +3182,34 @@ const EVENTS = [
         { label:'写漫游指南', hint:'+✨ +🧠 +😊', fn: g => { g.flags.citywalk=true; g.flags.citywalkWriter=true; return{charm:15,intel:12,mood:18}; }},
         { label:'拍照发小红书', hint:'+✨ +👥 +😊', fn: g => { g.flags.citywalk=true; g.flags.citywalkPhotographer=true; return{charm:12,social:12,mood:15}; }},
       ]},
+    // === v6.2 EVENTS - 剧本杀与密室逃脱 ===
+    { id:'murder_mystery', icon:'🎭', title:'剧本杀',
+      body:'朋友拉你去玩剧本杀："来吗？6人本，差一个。"\n\n你看了看价格：128元/人，4小时。\n\n"剧本杀——当代年轻人的'角色扮演'，花128块钱体验另一种人生。"\n\n你抽到的角色：民国时期的富家千金，卷入一桩谋杀案。\n\n4小时后，你发现：你演得比上班还认真。同事说："你刚才的表情，比年终汇报精彩多了。"\n\n2025年，中国沉浸式娱乐市场规模突破200亿元，剧本杀门店超过3万家。\n\n"我们不是逃避现实，而是在游戏中找到现实中没有的体验——推理、表演、社交。"',
+      cond: g => !g.flags.murderMystery && g.age>=18 && g.age<=35,
+      choices:[
+        { label:'参加6人本', hint:'-💰 +😊 +👥', fn: g => { g.flags.murderMystery=true; g.flags.murderMysteryPlayer=true; return{money:-128,mood:20,social:15}; }},
+        { label:'玩硬核推理本', hint:'-💰 +🧠 +😊', fn: g => { g.flags.murderMystery=true; g.flags.detectiveFan=true; return{money:-158,intel:15,mood:18}; }},
+        { label:'当DM（主持人）', hint:'-💰 +✨ +👥', fn: g => { g.flags.murderMystery=true; g.flags.dmRole=true; return{money:-80,charm:15,social:12,mood:15}; }},
+        { label:'太贵了，不玩', hint:'+💰', fn: g => { g.flags.murderMystery=true; return{mood:-5}; }},
+      ]},
+    { id:'escape_room', icon:'🔐', title:'密室逃脱',
+      body:'你和朋友去密室逃脱：恐怖主题，198元/人。\n\n进去前，你说："我不怕鬼。"\n\n进去后，你发现：你不仅怕鬼，还怕黑、怕封闭空间、怕突然出现的NPC。\n\n你的表现：全程尖叫，抱住朋友不撒手，最后被NPC"请"出了密室。\n\n"密室逃脱——花钱买惊吓，当代年轻人的'受虐'消费。"\n\n但你也体验到了：团队合作、解谜的成就感、肾上腺素飙升的快感。\n\n安全隐患频出：消防通道被锁、紧急出口找不到、玩家被困。\n\n"200亿市场野蛮生长，安全不能'逃脱'。"',
+      cond: g => !g.flags.escapeRoom && g.age>=18 && g.age<=30,
+      choices:[
+        { label:'挑战恐怖主题', hint:'-💰 +😊 +❤️', fn: g => { g.flags.escapeRoom=true; g.flags.horrorFan=true; return{money:-198,mood:22,health:-3,charm:5}; }},
+        { label:'选解谜主题', hint:'-💰 +🧠 +😊', fn: g => { g.flags.escapeRoom=true; g.flags.puzzleMaster=true; return{money:-168,intel:18,mood:20}; }},
+        { label:'组队竞技模式', hint:'-💰 +👥 +😊', fn: g => { g.flags.escapeRoom=true; g.flags.teamPlayer=true; return{money:-188,social:18,mood:15}; }},
+        { label:'看别人玩直播', hint:'+😊', fn: g => { g.flags.escapeRoom=true; return{mood:8}; }},
+      ]},
+    { id:'immersive_theater', icon:'🎪', title:'沉浸式演出',
+      body:'你抢到一张沉浸式演出的票：580元。\n\n《不眠之夜》——你在5层楼的老建筑里自由探索，演员就在你身边表演。\n\n你可以：跟随主角、偷听对话、打开抽屉、翻阅信件。\n\n"沉浸式演出——观众不再是观众，而是故事的一部分。"\n\n你遇到了其他观众：有人cosplay，有人拍照，有人真的在看戏。\n\n你突然理解：这不就是高级版的剧本杀吗？只不过，你是观众，也是演员。\n\n"从剧本杀到沉浸式演出，年轻人追求的不是娱乐，而是'参与感'和'在场感'。"',
+      cond: g => !g.flags.immersiveTheater && g.age>=22 && g.age<=35 && g.money>=1000,
+      choices:[
+        { label:'深度体验剧情', hint:'-💰 +😊 +🧠', fn: g => { g.flags.immersiveTheater=true; g.flags.theaterExplorer=true; return{money:-580,mood:25,intel:12}; }},
+        { label:'写剧评发豆瓣', hint:'-💰 +✨ +🧠', fn: g => { g.flags.immersiveTheater=true; g.flags.theaterCritic=true; return{money:-580,charm:15,intel:10,mood:18}; }},
+        { label:'二刷三刷', hint:'-💰💰 +😊', fn: g => { g.flags.immersiveTheater=true; g.flags.theaterFan=true; return{money:-1500,mood:30}; }},
+        { label:'太贵了，看评价就好', hint:'+🧠', fn: g => { g.flags.immersiveTheater=true; return{intel:3,mood:5}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3434,6 +3462,12 @@ const ACHIEVEMENTS = [
     { id:'zen_seeker', icon:'🏯', name:'佛系青年', desc:'去寺庙寻求心灵慰藉', check: g => g.flags.templeVisit },
     // v6.1 achievements
     { id:'city_explorer_pro', icon:'🚶', name:'城市漫步者', desc:'体验Citywalk', check: g => g.flags.citywalk },
+    // v6.2 achievements
+    { id:'murder_mystery_pro', icon:'🎭', name:'剧本杀玩家', desc:'体验剧本杀', check: g => g.flags.murderMystery },
+    { id:'detective_fan', icon:'🔍', name:'推理达人', desc:'玩硬核推理本', check: g => g.flags.detectiveFan },
+    { id:'escape_master', icon:'🔐', name:'密室逃脱者', desc:'体验密室逃脱', check: g => g.flags.escapeRoom },
+    { id:'puzzle_master', icon:'🧩', name:'解谜高手', desc:'完成解谜主题密室', check: g => g.flags.puzzleMaster },
+    { id:'immersive_fan', icon:'🎪', name:'沉浸式体验家', desc:'观看沉浸式演出', check: g => g.flags.immersiveTheater },
 ];
 
 // === ENDINGS === (order matters: first match wins)
