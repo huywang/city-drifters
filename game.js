@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v14.2
+// 都市浮生记 - Game Engine v14.3
 // ============================================
 
 // === GAME STATE ===
@@ -7352,6 +7352,103 @@ const EVENTS = [
         { label:'分享给更多人', hint:'+✨ +👥', fn: g => { g.flags.petLifestyle=true; return{charm:10,social:8,mood:8}; }},
         { label:'保持现状', hint:'+😊', fn: g => { g.flags.petLifestyle=true; return{mood:10}; }},
       ]},
+    // === v14.3 老年生活 + 退休规划 + 人生回顾 ===
+    { id:'retirement_planning_v2', icon:'🏖️', title:'退休规划',
+      body:'你突然意识到自己离退休并不远了。\n\n同事老王上个月退休了，他说：「我算了一下，我的养老金只够每个月吃两顿火锅。」\n\n你开始认真思考自己的退休生活。你查了一下社保——数字让你沉默了。\n\n你的同事劝你：「趁年轻多存点钱。」你的父母说：「养儿防老。」你的猫说：「喵。」\n\n"退休规划：不是为老了做准备——是为了老了不慌张。"',
+      cond: g => g.age >= 40 && !g.flags.retirementPlanning,
+      choices:[
+        { label:'开始存养老金', hint:'-💰 +🧠', fn: g => { g.flags.retirementPlanning=true; g.flags.pensionSaver=true; return{money:-5000,intel:10,mood:5}; }},
+        { label:'买商业养老保险', hint:'-💰💰 +🛡️', fn: g => { g.flags.retirementPlanning=true; g.flags.commercialPension=true; return{money:-10000,intel:8,mood:8}; }},
+        { label:'车到山前必有路', hint:'+😊', fn: g => { g.flags.retirementPlanning=true; return{mood:3}; }},
+      ]},
+    { id:'square_dancing', icon:'💃', title:'广场舞江湖',
+      body:'你路过小区广场，一群大妈在跳广场舞。\n\n音乐是凤凰传奇的《最炫民族风》，分贝堪比装修电钻。你的窗户正对广场。\n\n你曾经投诉过噪音。大妈们说：「我们跳舞是为了健康。」你说：「我失眠是为了活着。」\n\n今天，一个阿姨递给你一把扇子：「年轻人，一起跳？」\n\n"广场舞：中国最硬核的全民健身——没有之一。"',
+      cond: g => g.age >= 35 && !g.flags.squareDancing,
+      choices:[
+        { label:'加入广场舞', hint:'+💪 +👥 +😊', fn: g => { g.flags.squareDancing=true; return{health:8,social:10,mood:8}; }},
+        { label:'成为领舞', hint:'+✨ +👥', fn: g => { g.flags.squareDancing=true; g.flags.squareDanceLeader=true; return{charm:10,social:12,mood:5}; }},
+        { label:'婉拒，回家关窗', hint:'+🧠', fn: g => { g.flags.squareDancing=true; return{intel:3}; }},
+      ]},
+    { id:'senior_university', icon:'🎓', title:'老年大学',
+      body:'你的妈妈报名了老年大学。\n\n她学书法、学国画、学摄影、学智能手机。她比你还在努力学新东西。\n\n她发来一张书法作品的照片，写着「岁月静好」。你放大一看——那是从网上抄的。\n\n她说：「老年大学的老师说我很有天赋。」你说：「妈，你连毛笔都拿反了。」\n\n她说：「你管我，我开心就好。」\n\n"老年大学：不是学知识——是学快乐。"',
+      cond: g => g.age >= 30 && g.flags.hasParents && !g.flags.seniorUniversity,
+      choices:[
+        { label:'支持妈妈继续学', hint:'+😊 +👥', fn: g => { g.flags.seniorUniversity=true; return{mood:8,social:5}; }},
+        { label:'给妈妈买画具', hint:'-💰 +😊', fn: g => { g.flags.seniorUniversity=true; g.flags.artSupplies=true; return{money:-500,mood:10}; }},
+        { label:'自己也去旁听', hint:'+🧠 +😊', fn: g => { g.flags.seniorUniversity=true; g.flags.selfLearning=true; return{intel:8,mood:5}; }},
+      ]},
+    { id:'health_crisis_elder', icon:'🏥', title:'体检报告',
+      body:'年度体检报告出来了。\n\n你打开报告，发现上面的红色标记比去年多了3个。血压偏高、血糖偏高、胆固醇偏高。\n\n医生说：「你要注意饮食了。」你说：「我每天都吃沙拉。」医生说：「沙拉酱也是高热量。」\n\n你的同事看到你的报告说：「你这个年纪有这些指标很正常。」你不确定这是安慰还是诅咒。\n\n"中年体检：每一次打开报告，都是一次人生审判。"',
+      cond: g => g.age >= 40 && !g.flags.healthCrisisElder && g.health < 60,
+      choices:[
+        { label:'认真改善饮食', hint:'+💪 +🧠', fn: g => { g.flags.healthCrisisElder=true; g.flags.healthyDiet=true; return{health:10,intel:5,mood:-3}; }},
+        { label:'办健身卡', hint:'-💰 +💪', fn: g => { g.flags.healthCrisisElder=true; g.flags.gymMember=true; return{money:-3000,health:12}; }},
+        { label:'算了，该吃吃该喝喝', hint:'+😊 -💪', fn: g => { g.flags.healthCrisisElder=true; return{mood:5,health:-8}; }},
+      ]},
+    { id:'empty_nest_v2', icon:'🏠', title:'空巢时刻',
+      body:'你的孩子去外地上大学了。\n\n你站在空荡荡的房间里，发现客厅安静得能听到冰箱的嗡嗡声。你不用再做三个人的饭了。\n\n你给孩子发微信：「吃了吗？」三小时后收到回复：「吃了。」\n\n你的配偶说：「我们终于有时间过二人世界了。」你说：「可我已经忘了二人世界怎么过了。」\n\n你突然觉得——这个家，太大了。\n\n"空巢不是孤独——是学会和自己重新相处。"',
+      cond: g => g.age >= 45 && g.flags.hasChild && !g.flags.emptyNest,
+      choices:[
+        { label:'培养新爱好', hint:'+😊 +🧠', fn: g => { g.flags.emptyNest=true; g.flags.newHobby=true; return{mood:10,intel:8}; }},
+        { label:'重新经营夫妻关系', hint:'+💑 +😊', fn: g => { g.flags.emptyNest=true; g.flags.marriageRenewal=true; return{mood:12,charm:5}; }},
+        { label:'疯狂给孩子打电话', hint:'+👥 -😊', fn: g => { g.flags.emptyNest=true; g.flags.helicopterParent=true; return{social:5,mood:-5}; }},
+      ]},
+    { id:'life_review', icon:'📖', title:'人生回顾',
+      body:'一个深夜，你翻看年轻时的照片。\n\n你看到了20岁的自己：眼神明亮、笑容灿烂、头发浓密。你想：那个人是怎么变成现在这个样子的？\n\n你翻到了第一份工作的工牌、第一次旅行的车票、第一间出租屋的照片。每一件都让你想起一段故事。\n\n你打开备忘录，写了一句话：「如果重来一次……」然后删掉了。\n\n因为没有如果。但有现在。\n\n"人生回顾：不是后悔——是和过去的自己和解。"',
+      cond: g => g.age >= 45 && !g.flags.lifeReview,
+      choices:[
+        { label:'写回忆录', hint:'+🧠 +😊', fn: g => { g.flags.lifeReview=true; g.flags.memoirist=true; return{intel:12,mood:10}; }},
+        { label:'和老友重聚', hint:'+👥 +😊', fn: g => { g.flags.lifeReview=true; g.flags.oldFriendsReunion=true; return{social:15,mood:12}; }},
+        { label:'删掉所有照片', hint:'-😊 +🧠', fn: g => { g.flags.lifeReview=true; g.flags.digitalDetox=true; return{mood:-5,intel:8}; }},
+      ]},
+    { id:'grandparent_role', icon:'👴', title:'隔代育儿',
+      body:'你的父母主动请缨要帮你带孩子。\n\n你的妈妈说：「你小时候就是这么被我带大的，有什么问题？」你的孩子说：「奶奶给我吃糖！」\n\n你的教育理念是「科学育儿」，你妈的教育理念是「我养了你这么大不也好好的」。\n\n你的孩子现在会说方言了。他叫你「爸/妈」的时候带着一股河南味。\n\n你哭笑不得。\n\n"隔代育儿：不是谁对谁错——是两代人的爱的方式不同。"',
+      cond: g => g.age >= 35 && g.flags.hasChild && g.flags.hasParents && !g.flags.grandparentRole,
+      choices:[
+        { label:'接受父母帮忙', hint:'+👥 +😊 -🧠', fn: g => { g.flags.grandparentRole=true; g.flags.acceptHelp=true; return{social:10,mood:8,intel:-3}; }},
+        { label:'坚持自己带', hint:'+🧠 -💪', fn: g => { g.flags.grandparentRole=true; g.flags.selfParenting=true; return{intel:8,health:-5,mood:-3}; }},
+        { label:'制定育儿规则', hint:'+🧠 +👥', fn: g => { g.flags.grandparentRole=true; g.flags.parentingRules=true; return{intel:10,social:5}; }},
+      ]},
+    { id:'elder_travel', icon:'✈️', title:'老年旅行团',
+      body:'你参加了一个中老年旅行团。\n\n团里平均年龄55岁。每天早上6点起床，7点集合，8点到景区——然后拍照、拍照、拍照。\n\n你的阿姨拍了300张照片，每一张都用了美颜。她说：「你看我像40岁吗？」你说：「像40岁的阿姨开了美颜。」\n\n导游带大家去了一个玉石博物馆。你知道这意味着什么——购物。\n\n但你不得不承认：和大妈们一起旅游，真的很开心。\n\n"中老年旅行团：不是在旅行——是在用集体活动对抗孤独。"',
+      cond: g => g.age >= 45 && !g.flags.elderTravel,
+      choices:[
+        { label:'享受集体旅行', hint:'+😊 +👥', fn: g => { g.flags.elderTravel=true; return{mood:12,social:10}; }},
+        { label:'成为团里的摄影师', hint:'+✨ +👥', fn: g => { g.flags.elderTravel=true; g.flags.groupPhotographer=true; return{charm:8,social:12,mood:8}; }},
+        { label:'下次自己自由行', hint:'+🧠', fn: g => { g.flags.elderTravel=true; g.flags.freeTraveler=true; return{intel:5,mood:3}; }},
+      ]},
+    { id:'legacy_thinking_v2', icon:'🌟', title:'遗产与传承',
+      body:'你开始思考：这辈子留下了什么？\n\n你没有做出什么惊天动地的大事。你只是一个普通人：上过班、养过家、爱过人、失去过。\n\n但你的孩子会记得你教他骑自行车的样子。你的朋友会记得你深夜陪他喝酒的日子。你的父母会记得你每年春节回家的笑脸。\n\n你突然觉得：也许传承不是遗产——是记忆。\n\n"人生的意义不在于你留下了什么——在于你活过的每一个瞬间都值得被记住。"',
+      cond: g => g.age >= 50 && !g.flags.legacyThinking,
+      choices:[
+        { label:'给家人写信', hint:'+😊 +👥', fn: g => { g.flags.legacyThinking=true; g.flags.legacyLetters=true; return{mood:15,social:8}; }},
+        { label:'做一本家庭相册', hint:'-💰 +😊', fn: g => { g.flags.legacyThinking=true; g.flags.familyAlbum=true; return{money:-200,mood:12,charm:5}; }},
+        { label:'活在当下就好', hint:'+😊', fn: g => { g.flags.legacyThinking=true; return{mood:10}; }},
+      ]},
+    { id:'digital_elder', icon:'📱', title:'数字鸿沟',
+      body:'你发现自己越来越搞不懂手机了。\n\n医院挂号要用App、银行办事要用小程序、买菜要扫码。你曾经是最懂科技的那批人，现在变成了需要孩子教你用手机的那批人。\n\n你的孩子不耐烦地说：「爸/妈，这个我教了你三遍了。」你说：「你小时候学说话我也教了你三遍。」\n\n他沉默了。然后耐心地教了你第四遍。\n\n"数字鸿沟：不是我们变笨了——是世界变得太快。"',
+      cond: g => g.age >= 50 && !g.flags.digitalElder,
+      choices:[
+        { label:'认真学习新技术', hint:'+🧠 +💪', fn: g => { g.flags.digitalElder=true; g.flags.techLearner=true; return{intel:10,mood:5}; }},
+        { label:'让孩子当老师', hint:'+👥 +😊', fn: g => { g.flags.digitalElder=true; return{social:8,mood:8}; }},
+        { label:'坚持用老方法', hint:'-🧠 +😊', fn: g => { g.flags.digitalElder=true; g.flags.traditionalist=true; return{intel:-3,mood:5}; }},
+      ]},
+    { id:'elder_friendship', icon:'🤝', title:'忘年之交',
+      body:'你在小区里认识了一个70岁的老大爷。\n\n他每天在长椅上看书，你每天在长椅上发呆。他主动和你搭话：「年轻人，想什么呢？」\n\n他说他年轻时是大学教授，退休后每天来这里看书。他给你讲了很多人生道理，大多数你都忘了。\n\n但有一句话你记住了：「人这辈子最重要的不是赚了多少钱——是有多少人愿意和你坐在一张长椅上。」\n\n"忘年之交：年龄不是距离——经历才是共鸣。"',
+      cond: g => g.age >= 35 && !g.flags.elderFriendship,
+      choices:[
+        { label:'经常去看望他', hint:'+👥 +😊 +🧠', fn: g => { g.flags.elderFriendship=true; return{social:12,mood:10,intel:8}; }},
+        { label:'请他来家里吃饭', hint:'+👥 +😊', fn: g => { g.flags.elderFriendship=true; g.flags.elderGuest=true; return{social:10,mood:12}; }},
+        { label:'保持点头之交', hint:'+👥', fn: g => { g.flags.elderFriendship=true; return{social:5}; }},
+      ]},
+    { id:'hobby_rediscovery', icon:'🎨', title:'重拾爱好',
+      body:'你在整理储物间时，发现了一把落灰的吉他。\n\n那是你20岁时买的。你曾经梦想当一个歌手，后来变成了一个加班到凌晨的打工人。\n\n你试着弹了一下。手指已经不听使唤了，和弦也忘了大半。但当你弹出一个完整的C和弦时——你笑了。\n\n那种纯粹的、因为做了一件喜欢的事而开心的感觉，你已经很久没有了。\n\n"重拾爱好：不是回到过去——是在现在找回自己。"',
+      cond: g => g.age >= 40 && !g.flags.hobbyRediscovery,
+      choices:[
+        { label:'每天练习30分钟', hint:'+😊 +💪 +🧠', fn: g => { g.flags.hobbyRediscovery=true; g.flags.dailyPractice=true; return{mood:12,health:5,intel:8}; }},
+        { label:'加入社区乐队', hint:'+👥 +😊', fn: g => { g.flags.hobbyRediscovery=true; g.flags.communityBand=true; return{social:12,mood:10}; }},
+        { label:'挂回墙上，改天再说', hint:'+🧠', fn: g => { g.flags.hobbyRediscovery=true; return{intel:3}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -8032,6 +8129,19 @@ const ACHIEVEMENTS = [
     { id:'pet_business_ach', icon:'🏪', name:'宠物创业', desc:'进入了宠物行业', check: g => g.flags.petBusiness },
     { id:'pet_community_ach', icon:'👥', name:'宠物社群', desc:'加入了宠物社群', check: g => g.flags.petCommunity },
     { id:'pet_lifestyle_ach', icon:'🌈', name:'宠物生活方式', desc:'宠物成为生活的一部分', check: g => g.flags.petLifestyle },
+    // === v14.3 新增成就（老年生活） ===
+    { id:'retirement_planner_ach', icon:'🏖️', name:'退休规划师', desc:'开始规划退休生活', check: g => g.flags.retirementPlanning },
+    { id:'square_dancer_ach', icon:'💃', name:'广场舞达人', desc:'加入了广场舞大军', check: g => g.flags.squareDancing },
+    { id:'senior_uni_ach', icon:'🎓', name:'老年大学', desc:'体验了老年大学', check: g => g.flags.seniorUniversity },
+    { id:'health_conscious_ach', icon:'🥗', name:'健康觉醒', desc:'开始重视身体健康', check: g => g.flags.healthCrisisElder },
+    { id:'empty_nest_ach', icon:'🏠', name:'空巢适应者', desc:'适应了空巢生活', check: g => g.flags.emptyNest },
+    { id:'memoirist_ach', icon:'📖', name:'回忆录作者', desc:'开始写回忆录', check: g => g.flags.memoirist },
+    { id:'grandparent_ach', icon:'👴', name:'隔代育儿', desc:'经历了隔代育儿', check: g => g.flags.grandparentRole },
+    { id:'elder_traveler_ach', icon:'✈️', name:'银发旅行家', desc:'参加了老年旅行团', check: g => g.flags.elderTravel },
+    { id:'legacy_thinker_ach', icon:'🌟', name:'传承思考者', desc:'思考了人生传承', check: g => g.flags.legacyThinking },
+    { id:'digital_elder_ach', icon:'📱', name:'数字银发族', desc:'面对了数字鸿沟', check: g => g.flags.digitalElder },
+    { id:'elder_friend_ach', icon:'🤝', name:'忘年之交', desc:'交了老年朋友', check: g => g.flags.elderFriendship },
+    { id:'hobby_rediscoverer_ach', icon:'🎨', name:'重拾爱好', desc:'找回了年轻时的爱好', check: g => g.flags.hobbyRediscovery },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -8254,6 +8364,11 @@ const ENDINGS = [
     { id:'pet_soulmate_end', badge:'💕', title:'灵魂伴侣', desc:'你和你的宠物，成了这个城市里最亲密的伙伴。\n\n它陪你度过了失恋、加班、失眠、孤独的每一个夜晚。它不会说话，但它知道你什么时候需要被抱着。\n\n你的朋友圈里都是它的照片。你的相册里90%是它。你的手机壁纸是它打哈欠的样子。\n\n有人说：「你太溺爱你的宠物了。」你说：「它值得。」\n\n"宠物不是宠物——是在大城市里，那个永远等你回家的家人。"', cond: g => g.flags.petCompanion && g.flags.petLifestyle && g.mood >= 70 && g.age >= 28 },
     { id:'pet_healer_end', badge:'🌈', title:'治愈之手', desc:'你从宠物的离去中，学会了如何面对失去。\n\n你的宠物离开了这个世界。你哭了整整一周。你删掉了手机里所有的照片——然后又偷偷恢复了。\n\n你去了流浪动物收容所做志愿者。你说：「我不能再养了。」但你还是没忍住，又领养了一只。\n\n你终于明白：悲伤不是结束——是新的开始的序曲。\n\n"宠物的离去教会我们：爱过就是永远——即使它已经不在身边。"', cond: g => g.flags.petLoss && g.flags.petCommunity && g.mood >= 55 && g.age >= 30 },
     { id:'pet_community_leader_end', badge:'👥', title:'宠物社群领袖', desc:'你从一个普通养宠人，变成了社区宠物圈的灵魂人物。\n\n你组织了遛狗团、养宠交流群、宠物义诊日。你的微信群有500个人，每天都有人在群里晒猫晒狗。\n\n你的邻居说：「自从有了你，我们小区的流浪猫都过上了好日子。」你笑着说：「那当然，它们也是社区的一份子。」\n\n你被评为「社区最美志愿者」。你把这个奖放在了宠物的玩具箱旁边。\n\n"宠物社群：不是人在社交——是宠物在帮我们找到彼此。"', cond: g => g.flags.petCommunity && g.flags.petSocial && g.social >= 70 && g.age >= 28 },
+    // --- v14.3 NEW ENDINGS (老年生活) ---
+    { id:'golden_retirement_end', badge:'🏖️', title:'金色晚年', desc:'你规划了一场完美的退休生活。\n\n你有足够的存款、健康的身体、和睦的家庭。你每天看书、散步、和老伴下棋。偶尔和老朋友聚聚。\n\n你的孩子每周来看你一次，带着孙子孙女。你的孙子说：「爷爷/奶奶，你年轻的时候是做什么的？」你笑着说：「活着。」\n\n你的人生没有惊天动地的故事。但每一天都过得很踏实。\n\n"金色晚年：不是因为有钱——是因为有准备。"', cond: g => g.flags.retirementPlanning && g.flags.healthyDiet && g.mood >= 70 && g.age >= 55 && g.money >= 80000 },
+    { id:'wisdom_elder_end', badge:'📚', title:'智慧长者', desc:'你成了一个有智慧的老人。\n\n你退休后开始写回忆录、上老年大学、和年轻人交朋友。你的故事被一个记者写成了文章，标题是「70岁的人生课堂」。\n\n你收到了很多读者的来信。有人说：「你的故事让我重新思考了人生。」你说：「人生不需要重新思考——需要重新活过。」\n\n你的回忆录出版了。虽然只卖了300本，但每一本都送给了你在乎的人。\n\n"智慧长者：不是活得久——是活得明白。"', cond: g => g.flags.memoirist && g.flags.seniorUniversity && g.flags.elderFriendship && g.intel >= 80 && g.age >= 55 },
+    { id:'community_pillar_end', badge:'🏛️', title:'社区支柱', desc:'你成了社区里最受欢迎的人。\n\n你是广场舞的领舞、社区乐队的吉他手、老年大学的志愿者。每个人都认识你，每个人都喜欢你。\n\n你的邻居说：「你是我们社区的灵魂。」你说：「我只是喜欢热闹。」\n\n你70岁生日那天，整个小区给你办了生日会。你感动得哭了——但你说是被风吹的。\n\n"社区支柱：不是被需要——是被爱。"', cond: g => g.flags.squareDanceLeader && g.flags.communityBand && g.social >= 80 && g.age >= 55 },
+    { id:'life_reconciliation_end', badge:'🕊️', title:'人生和解', desc:'你和过去和解了。\n\n你曾经有很多遗憾：没有好好陪家人、没有坚持自己的梦想、没有说出心里的话。\n\n但在人生的后半段，你做了所有你曾经不敢做的事。你给老友打了电话、给孩子写了信、重新弹起了那把落灰的吉他。\n\n你对着镜子说：「你好，老朋友。」镜子里的你笑了——那是你很久没见过的、发自内心的笑。\n\n"人生和解：不是原谅一切——是接受一切。"', cond: g => g.flags.lifeReview && g.flags.legacyThinking && g.flags.hobbyRediscovery && g.mood >= 65 && g.age >= 50 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
