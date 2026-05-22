@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v11.3
+// 都市浮生记 - Game Engine v11.4
 // ============================================
 
 // === GAME STATE ===
@@ -5412,6 +5412,63 @@ const EVENTS = [
         { label:'买书回家看', hint:'-💰 +🧠', fn: g => { return{money:-50,intel:3,mood:5}; }},
         { label:'下次再来', hint:'+😊', fn: g => { return{mood:5}; }},
       ]},
+    // === v11.4 社交媒体/网红经济/网络时代 ===
+    { id:'viral_post', icon:'🔥', title:'爆款帖子',
+      body:'你在小红书/微博发了一篇帖子，一夜之间获得了10万+阅读。\n\n评论区炸了：有人夸你写得好，有人骂你蹭热点，有人说你收了钱。\n\n你第一次体验到了"红"的感觉——也第一次体验到了"被骂"的感觉。\n\n"网络是放大器：你的快乐被放大，你的痛苦也被放大。"',
+      cond: g => g.charm >= 40 && g.months > 6,
+      choices:[
+        { label:'继续创作', hint:'+✨ +👥', fn: g => { g.flags.contentCreator=true; return{charm:10,social:8,mood:5}; }},
+        { label:'删帖保平安', hint:'+🧠', fn: g => { return{intel:3,mood:-5}; }},
+        { label:'回复每一条', hint:'+👥', fn: g => { return{social:5,mood:-3,health:-2}; }},
+      ]},
+    { id:'cyberbullying', icon:'😡', title:'网络暴力',
+      body:'你的一条发言被截图传播，评论区里全是骂你的人。\n\n有人说你"三观不正"，有人说你"滚出网络"，有人人肉了你的个人信息。\n\n你关了手机，躺在床上，心跳加速。你知道这些人是陌生人，但每一句骂声都像扎在心上的刺。\n\n"网络暴力的本质：一群人在屏幕后面，用键盘做着现实中不敢做的事。"',
+      cond: g => g.flags.contentCreator && g.months > 12,
+      choices:[
+        { label:'正面回应', hint:'+🧠 +👥', fn: g => { return{intel:5,social:3,mood:-10}; }},
+        { label:'卸载App', hint:'+💪 +🧠', fn: g => { return{health:5,intel:5,mood:5}; }},
+        { label:'寻求心理咨询', hint:'-💰 +😊', fn: g => { g.flags.sawTherapist=true; return{money:-300,mood:8}; }},
+      ]},
+    { id:'livestream_sell', icon:'📺', title:'直播带货',
+      body:'朋友邀请你一起直播带货。你紧张地对着镜头说："家人们，这款产品真的超级好用！"\n\n一晚上卖了5000块，你分了1000。\n\n你发现：原来你也有当"李佳琦"的潜力。\n\n"直播带货是新时期的叫卖——只是从街头搬到了屏幕前。"',
+      cond: g => g.charm >= 45 && g.flags.triedLivestream && g.money > 500,
+      choices:[
+        { label:'定期直播', hint:'+💰 +✨', fn: g => { g.flags.livestreamSeller=true; return{money:3000,charm:5,mood:8}; }},
+        { label:'偶尔帮忙', hint:'+💰', fn: g => { return{money:1000,charm:3}; }},
+        { label:'不适合我', hint:'+🧠', fn: g => { return{intel:2}; }},
+      ]},
+    { id:'fan_economy', icon:'💖', title:'粉丝经济',
+      body:'你的小红书/抖音有了5000个粉丝。开始有品牌找你合作推广。\n\n一条广告报价500块。你觉得不可思议：你只是分享了一下日常生活。\n\n品牌方说："你的粉丝画像很好，年轻女性为主，消费力强。"\n\n你突然觉得自己的粉丝不是人，是"流量"。\n\n"粉丝经济的真相：你卖的不是产品，是人设。"',
+      cond: g => g.flags.contentCreator && g.charm >= 50 && g.months > 18,
+      choices:[
+        { label:'接广告', hint:'+💰 +✨', fn: g => { return{money:2000,charm:5}; }},
+        { label:'只推好物', hint:'+💰 +🧠', fn: g => { g.flags.ethicalCreator=true; return{money:500,charm:8,intel:3}; }},
+        { label:'拒绝广告', hint:'+🧠', fn: g => { return{intel:5,mood:5}; }},
+      ]},
+    { id:'online_friend', icon:'🌐', title:'网友见面',
+      body:'你在网上认识了一个人，聊了半年，决定线下见面。\n\n见面前你紧张得要死：万一是个骗子怎么办？万一照片是P的怎么办？\n\n见面后你发现：TA比照片好看，聊得比网上还开心。\n\n你们约了下周再见。\n\n"网友见面的勇气，比相亲还大。因为你连对方真实姓名都不知道。"',
+      cond: g => g.social >= 30 && g.age >= 20 && g.age <= 35,
+      choices:[
+        { label:'继续发展', hint:'+👥 +😊', fn: g => { return{social:10,mood:10}; }},
+        { label:'当网友就好', hint:'+👥', fn: g => { return{social:5}; }},
+        { label:'见面后失望', hint:'+🧠', fn: g => { return{intel:2,mood:-3}; }},
+      ]},
+    { id:'digital_footprint', icon:'👣', title:'数字足迹',
+      body:'你在网上搜索了一个老同学的名字。\n\n你发现了TA的微博、知乎、豆瓣、小红书、领英……你花了两个小时看完了TA的近况。\n\n然后你意识到：别人也可以这样搜索你。\n\n"互联网没有遗忘——你发的每一条评论、每一张照片，都在那里。"',
+      cond: g => g.months > 12 && g.intel >= 40,
+      choices:[
+        { label:'清理社交媒体', hint:'+🧠', fn: g => { g.flags.cleanedDigital=true; return{intel:5,mood:3}; }},
+        { label:'无所谓', hint:'+😊', fn: g => { return{mood:2}; }},
+        { label:'设置隐私', hint:'+🧠', fn: g => { return{intel:3,mood:5}; }},
+      ]},
+    { id:'echo_chamber', icon:'🔁', title:'信息茧房',
+      body:'你发现你的推荐页全是同质化的内容：你喜欢的观点、你认同的看法、你想看的东西。\n\n你试着搜索了一些不同的观点，发现算法不推荐给你了。\n\n你突然意识到：你以为你在看世界，其实你在看一面镜子。\n\n"信息茧房最可怕的地方：你不知道你在茧房里。"',
+      cond: g => g.intel >= 50 && g.months > 12,
+      choices:[
+        { label:'主动打破', hint:'+🧠', fn: g => { return{intel:8,mood:3}; }},
+        { label:'无所谓', hint:'+😊', fn: g => { return{mood:3}; }},
+        { label:'减少刷手机', hint:'+💪 +🧠', fn: g => { return{intel:5,health:3,mood:5}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'first_job', icon:'💼', name:'职场新人', desc:'找到第一份工作', check: g => g.flags.gotFirstJob },
@@ -5875,6 +5932,11 @@ const ACHIEVEMENTS = [
     { id:'food_blogger_ach', icon:'📸', name:'美食博主', desc:'开始在小红书分享美食', check: g => g.flags.foodBlogger },
     { id:'rooftop_regular', icon:'🍸', name:'天台常客', desc:'找到了秘密酒吧', check: g => g.flags.rooftopRegular },
     { id:'bookworm_ach', icon:'📖', name:'书虫', desc:'成为独立书店会员', check: g => g.flags.bookstoreMember },
+    // === v11.4 新增成就 ===
+    { id:'content_creator_ach', icon:'🔥', name:'内容创作者', desc:'创作了爆款内容', check: g => g.flags.contentCreator },
+    { id:'ethical_creator', icon:'💖', name:'良心博主', desc:'只推荐好东西', check: g => g.flags.ethicalCreator },
+    { id:'livestream_seller', icon:'📺', name:'带货主播', desc:'尝试了直播带货', check: g => g.flags.livestreamSeller },
+    { id:'digital_clean', icon:'🧹', name:'数字清洁工', desc:'清理了社交媒体', check: g => g.flags.cleanedDigital },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -6019,6 +6081,8 @@ const ENDINGS = [
     { id:'festival_lover_end', badge:'🏮', title:'生活家', desc:'你把每一个平凡的日子都过成了节日。\n\n春节你会包饺子、贴春联。中秋你会赏月、吃月饼。国庆你会出去浪。双11你会买买买。\n\n你的朋友说："跟你在一起，每天都有意思。"\n\n"生活不在于有多少大事件，在于你能不能把小事过得有滋味。"', cond: g => g.mood >= 70 && g.charm >= 45 && g.age >= 28 && g.social >= 50 },
     // --- v11.3 NEW ENDINGS ---
     { id:'foodie_end', badge:'🍜', title:'城市美食家', desc:'你吃遍了这座城市的每一个角落。\n\n从路边摊到米其林，从早餐铺到深夜食堂。你知道哪条巷子有最好的小面，哪个小区藏着最正宗的川菜。\n\n你在小红书上有了1万粉丝，他们叫你"城市胃王"。\n\n"美食是城市最好的名片——你用味蕾读完了这座城市的每一页。"', cond: g => g.flags.foodExplorer && g.flags.foodBlogger && g.charm >= 50 && g.mood >= 60 },
+    // --- v11.4 NEW ENDINGS ---
+    { id:'influencer_end', badge:'📱', title:'网红人生', desc:'你成了一个小网红。\n\n粉丝不多不少，刚好够养活自己。你接广告、做直播、写测评。你把自己的生活变成了一种"内容"。\n\n有人说你"活得很累"，因为你要时刻维护人设。但你觉得：能把喜欢的事变成工作，已经很幸运了。\n\n"网红的真相：你展示的是精心编排的人生，但观众需要的是真实。"', cond: g => g.flags.contentCreator && g.charm >= 55 && g.money >= 30000 && g.age >= 25 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
