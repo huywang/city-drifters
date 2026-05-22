@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v21.5
+// 都市浮生记 - Game Engine v21.6
 // ============================================
 
 // === GAME STATE ===
@@ -10254,6 +10254,87 @@ const EVENTS = [
         { label:'喜欢这里的氛围，常来常往', hint:'+👥 +😊', fn: g => { g.flags.coffeeCommunity=true; return{social:5,mood:5}; }},
         { label:'觉得太吵了，还是喜欢独处', hint:'', fn: g => { g.flags.coffeeCommunity=true; return{mood:2}; }},
       ]},
+    // === v21.6 新增事件（户外生活） ===
+    { id:'first_camping', icon:'⛺', title:'第一次露营', category:'hobby',
+      body:'朋友拉你去露营。你犹豫了：「睡地上？不脏吗？」\n\n但到了营地，你发现：这不是你想象中的露营。\n\n帐篷、天幕、折叠桌椅、卡式炉、咖啡壶——这是一整套生活方式。\n\n你花了3000块买了全套装备。你发了朋友圈：「入坑了。」\n\n晚上，你坐在天幕下，看着满天星星。在城市里你从来没见过这么多星星。\n\n虫鸣声代替了汽车喇叭。篝火的光映在朋友们的脸上。\n\n你突然觉得：原来生活可以这样慢。\n\n「露营的本质：花3000块钱，换一个没有wifi的周末——然后发现，这才是最奢侈的。」',
+      cond: g => !g.flags.firstCamping && g.age >= 22 && g.money >= 3000,
+      choices:[
+        { label:'爱上了露营，成了户外达人', hint:'+😊 +❤️ +💰-', fn: g => { g.flags.firstCamping=true; g.flags.campingLover=true; return{mood:15,health:5,money:-3000}; }},
+        { label:'体验不错，偶尔会去', hint:'+😊 +❤️', fn: g => { g.flags.firstCamping=true; return{mood:10,health:3,money:-3000}; }},
+        { label:'蚊虫太多，下次住酒店', hint:'+😊', fn: g => { g.flags.firstCamping=true; return{mood:5,money:-3000}; }},
+      ]},
+    { id:'hiking_challenge', icon:'🏔️', title:'徒步挑战', category:'health',
+      body:'你在小红书上看到一条徒步路线：15公里，累计爬升800米。\n\n你心想：我也行吧？\n\n你报了名。出发那天，你发现自己是最菜的——别人穿着专业装备，你穿着运动鞋。\n\n前半程你还跟得上。后半程你的腿开始发抖，膝盖开始抗议。\n\n但你没有放弃。最后1公里，你几乎是爬上去的。\n\n站在山顶的那一刻——你看到了整个城市。高楼变得像积木，你平时住的地方只是一个点。\n\n你突然觉得：在大自然面前，你的焦虑、你的房贷、你的KPI——都变得微不足道。\n\n你发了朋友圈，配文：「征服了一座山——也征服了那个想放弃的自己。」\n\n「徒步不是为了征服山——是为了找回那个不怕累的自己。」',
+      cond: g => !g.flags.hikingChallenge && g.age >= 22 && g.health >= 40,
+      choices:[
+        { label:'坚持走完全程，发现了徒步的乐趣', hint:'+❤️ +😊 +✨', fn: g => { g.flags.hikingChallenge=true; g.flags.hikingLover=true; return{health:8,mood:12,charm:3}; }},
+        { label:'走完了但膝盖疼了很久', hint:'+❤️ +😊', fn: g => { g.flags.hikingChallenge=true; return{health:3,mood:8}; }},
+        { label:'半路放弃了，下次选短一点的', hint:'+😊', fn: g => { g.flags.hikingChallenge=true; return{mood:3,health:-3}; }},
+      ]},
+    { id:'nature_healing', icon:'🌿', title:'自然疗愈', category:'psychology',
+      body:'你最近压力很大。一个做心理咨询师的朋友建议你试试「森林浴」。\n\n「就是去树林里待着，」她说，「不带手机，不拍照，只是感受。」\n\n你半信半疑地去了郊外的一片树林。\n\n你坐在一棵大树下。起初你很焦虑——习惯了刷手机的手不知道放哪。\n\n慢慢地，你开始听到：风吹树叶的沙沙声、远处溪水流动的声音、鸟叫……\n\n你闭上眼睛，深吸一口气。空气里有泥土和草木的味道。\n\n你在树林里待了两个小时。没有做任何事——但你出来时觉得，整个人轻了很多。\n\n日本有一个词叫「森林浴」——科学研究表明，在森林中待2小时可以降低皮质醇水平。\n\n「城市让你紧绷——自然让你松开。你不需要做什么，只需要在那里。」',
+      cond: g => (g.mood <= 45 || g.flags.hadAnxiety || g.flags.burnout) && !g.flags.natureHealing && g.age >= 24,
+      choices:[
+        { label:'开始定期去自然中放松', hint:'+😊 +❤️', fn: g => { g.flags.natureHealing=true; g.flags.natureRegular=true; return{mood:15,health:8}; }},
+        { label:'确实感受到了治愈的力量', hint:'+😊 +❤️', fn: g => { g.flags.natureHealing=true; return{mood:12,health:5}; }},
+        { label:'效果一般，可能不适合你', hint:'+😊', fn: g => { g.flags.natureHealing=true; return{mood:3}; }},
+      ]},
+    { id:'outdoor_gear', icon:'🎒', title:'户外装备坑', category:'finance',
+      body:'你开始对户外装备产生了执念。\n\n你研究了始祖鸟、北面、哥伦比亚……你发现：一件冲锋衣可以卖到5000块。\n\n你的购物车里堆了：帐篷（2800）、睡袋（800）、登山杖（350）、头灯（200）、速干衣（300）……\n\n你算了一下：全套下来8000+。\n\n你的同事看到你的购物车，说了一句让你破防的话：「你花8000块去吃苦——我花8000块去三亚躺酒店。」\n\n但你还是买了。因为你发现：装备是户外的一部分。研究装备本身就是一种乐趣。\n\n你发了一条小红书：「户外装备入坑指南——穷玩和富玩的区别。」获得了500个赞。\n\n「户外装备的价格曲线：从「够用就行」到「一步到位」——中间隔着你三个月的工资。」',
+      cond: g => (g.flags.firstCamping || g.flags.hikingLover) && !g.flags.outdoorGear && g.money >= 5000,
+      choices:[
+        { label:'一步到位买了全套，从此装备党', hint:'-💰💰 +✨', fn: g => { g.flags.outdoorGear=true; g.flags.gearHead=true; return{money:-8000,charm:5,mood:8}; }},
+        { label:'只买了必需品，够用就行', hint:'-💰 +😊', fn: g => { g.flags.outdoorGear=true; return{money:-3000,mood:5}; }},
+        { label:'买了二手装备，省钱也实用', hint:'-💰 +🧠', fn: g => { g.flags.outdoorGear=true; return{money:-1500,intel:3,mood:5}; }},
+      ]},
+    { id:'trail_running', icon:'🏃', title:'越野跑', category:'health',
+      body:'你从跑步升级到了越野跑。\n\n第一次在山路上跑的感觉——和城市里完全不同。上坡时你的肺像要爆炸，下坡时你的膝盖在尖叫。\n\n但风景在变。从城市天际线变成了山谷、溪流、云海。\n\n你参加了一个10公里越野赛。你的目标不是名次——是完赛。\n\n最后2公里你已经走不动了。旁边一个60岁的大爷超过了你，回头说：「小伙子，跟上！」\n\n你咬牙跟上了。冲过终点线的时候——你哭了。不是因为累，是因为感动。\n\n你发现：越野跑让你重新认识了自己的身体。它比你以为的更强大。\n\n「越野跑是一场和自己的对话：每一步都在问——你还能不能继续？每一步都在回答——能。」',
+      cond: g => g.flags.hikingLover && g.health >= 55 && !g.flags.trailRunning,
+      choices:[
+        { label:'完成了越野赛，找到了新的热爱', hint:'+❤️ +😊 +✨', fn: g => { g.flags.trailRunning=true; return{health:10,mood:12,charm:5}; }},
+        { label:'跑完了但受了点伤，需要恢复', hint:'+❤️ +😊', fn: g => { g.flags.trailRunning=true; return{health:3,mood:8}; }},
+        { label:'太虐了，还是城市跑舒服', hint:'+😊', fn: g => { g.flags.trailRunning=true; return{mood:5,health:3}; }},
+      ]},
+    { id:'glamping_v21_6', icon:'🏕️', title:'精致露营', category:'hobby',
+      body:'你发现了一种新的露营方式：精致露营（Glamping）。\n\n不用自己搭帐篷——营地已经准备好了球形帐篷、实木床、氛围灯、投影仪。\n\n还有现成的烧烤食材、手冲咖啡套装、篝火区。\n\n价格：800元/晚。比野营贵了5倍——但你不用带任何装备。\n\n你约了朋友去体验。晚上你们在天幕下喝红酒、看星星、聊天到凌晨。\n\n你发了朋友圈。评论区分成了两派：\n- 「这才是生活！」\n- 「这不算露营，这是住酒店换了个地方。」\n\n你不在乎。你享受的是那个瞬间——和重要的人在一起，头顶是星空。\n\n「精致露营的争议本质是：户外应该吃苦还是享受？答案是：开心就好。」',
+      cond: g => g.flags.firstCamping && !g.flags.glamping && g.money >= 2000,
+      choices:[
+        { label:'爱上了精致露营，成了常客', hint:'+😊 +💰-', fn: g => { g.flags.glamping=true; return{mood:10,money:-2000,social:3}; }},
+        { label:'体验不错，但更喜欢野营的真实感', hint:'+😊', fn: g => { g.flags.glamping=true; return{mood:8,money:-2000}; }},
+        { label:'太贵了，这不是露营', hint:'', fn: g => { g.flags.glamping=true; return{mood:3,money:-2000}; }},
+      ]},
+    { id:'outdoor_community_v21_6', icon:'👥', title:'户外社群', category:'social',
+      body:'你加入了一个户外俱乐部。\n\n群里200多人，每周都有活动：周末徒步、月度露营、季度长线。\n\n你认识了一群有意思的人：\n- 一个IT总监，周末是持证导游\n- 一个会计，目标是走完中国十大徒步线路\n- 一个全职妈妈，带着5岁的孩子走遍了郊区\n\n你发现：户外社群和城市社交不一样。在山上，没人问你是做什么的、赚多少钱。\n\n你们只关心：今天走多远、天气怎么样、谁带了零食。\n\n你交了几个真正的朋友——不是因为工作关系，而是因为共同的热爱。\n\n「户外社交的魅力：在山里，所有人都是平等的。你的社会身份消失了——只剩下一个徒步者。」',
+      cond: g => (g.flags.firstCamping || g.flags.hikingLover) && !g.flags.outdoorCommunity,
+      choices:[
+        { label:'成了户外社群的活跃成员', hint:'+👥 +😊', fn: g => { g.flags.outdoorCommunity=true; return{social:12,mood:8}; }},
+        { label:'参加了几次活动，认识了新朋友', hint:'+👥 +😊', fn: g => { g.flags.outdoorCommunity=true; return{social:8,mood:5}; }},
+        { label:'更喜欢一个人走，享受独处', hint:'+😊', fn: g => { g.flags.outdoorCommunity=true; return{mood:5}; }},
+      ]},
+    { id:'city_park', icon:'🌳', title:'城市公园发现', category:'city',
+      body:'你偶然走进了一个以前从没注意过的城市公园。\n\n它就在你家两站地铁以外——但你每天经过都没有进去过。\n\n里面有湖、有草坪、有老人在打太极、有小孩在追蝴蝶。\n\n你坐在湖边的长椅上。阳光穿过树叶，在地面上画出了斑驳的光影。\n\n你突然意识到：你在这个城市生活了这么多年，居然不知道这里有个公园。\n\n你开始每周来这里散步。你的步数从3000变成了8000。\n\n你在公园里遇到了一个退休的植物学教授。他教你认识了十几种你从没注意过的植物。\n\n「城市里不缺自然——缺的是慢下来的你。最好的公园，可能就在家门口。」',
+      cond: g => !g.flags.cityParkDiscovery && g.age >= 23 && g.mood <= 55,
+      choices:[
+        { label:'成了公园常客，找到了城市中的绿洲', hint:'+😊 +❤️', fn: g => { g.flags.cityParkDiscovery=true; return{mood:10,health:5}; }},
+        { label:'偶尔来散步，心情好了很多', hint:'+😊 +❤️', fn: g => { g.flags.cityParkDiscovery=true; return{mood:8,health:3}; }},
+        { label:'来了一次，觉得没什么特别的', hint:'', fn: g => { g.flags.cityParkDiscovery=true; return{mood:2}; }},
+      ]},
+    { id:'sunrise_hike', icon:'🌅', title:'凌晨登山看日出', category:'hobby',
+      body:'你在网上看到一组日出照片——是在你所在城市的一座山上拍的。\n\n你决定：我也要去看一次。\n\n你凌晨3点起床，4点到山脚。天还是黑的，你打着手电筒往上走。\n\n山路上只有你一个人。你有点害怕——但更多的是兴奋。\n\n5:40，你到了山顶。天开始变亮。先是鱼肚白，然后是粉色，然后是金色——\n\n太阳从地平线上升起。整座城市被点亮了。\n\n你站在那里，说不出话。你拍了照片——但你知道，照片拍不出你此刻感受的万分之一。\n\n你发了朋友圈，只写了一个字：「值。」\n\n「有些东西必须亲眼看到——比如日出，比如大海，比如你自己到底能走多远。」',
+      cond: g => g.flags.hikingChallenge && !g.flags.sunriseHike && g.health >= 45,
+      choices:[
+        { label:'被日出的壮观震撼了，决定定期登山', hint:'+😊 +❤️ +✨', fn: g => { g.flags.sunriseHike=true; return{mood:15,health:5,charm:3}; }},
+        { label:'很美，但凌晨起床太痛苦了', hint:'+😊', fn: g => { g.flags.sunriseHike=true; return{mood:8}; }},
+        { label:'天气不好，没看到日出', hint:'', fn: g => { g.flags.sunriseHike=true; return{mood:-3,health:3}; }},
+      ]},
+    { id:'wilderness_survival', icon:'🔥', title:'野外生存课', category:'education',
+      body:'你报了一个野外生存体验课。两天一夜，学基本的野外生存技能。\n\n教官是个退伍军人。他教你们：\n- 如何用打火石生火\n- 如何找到干净的水源\n- 如何搭建临时庇护所\n- 如何辨别方向\n\n你第一次用打火石生起了火。火苗跳动的那一刻，你感到了一种原始的快乐。\n\n教官说：「在城市里你什么都方便——但你已经忘了这些本能。如果你被困在野外，你的手机救不了你。」\n\n你突然意识到：你虽然活在2024年——但你的生存能力可能不如一个石器时代的人。\n\n这堂课改变了你对「能力」的理解。不是会写代码就叫能力——能在任何环境中活下去，才是。\n\n「文明让你变强——也让你变脆弱。真正的安全感不是来自银行卡余额——是来自你自己。」',
+      cond: g => g.flags.hikingLover && !g.flags.wildernessSurvival && g.age >= 23 && g.money >= 1500,
+      choices:[
+        { label:'学到了很多生存技能，自信了很多', hint:'+🧠 +❤️ +💰-', fn: g => { g.flags.wildernessSurvival=true; return{intel:8,health:5,mood:10,money:-1500}; }},
+        { label:'体验很有意义，但希望永远用不上', hint:'+🧠 +😊', fn: g => { g.flags.wildernessSurvival=true; return{intel:5,mood:8,money:-1500}; }},
+        { label:'太苦了，我还是适合城市生活', hint:'+😊', fn: g => { g.flags.wildernessSurvival=true; return{mood:3,money:-1500}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -11210,6 +11291,12 @@ const ACHIEVEMENTS = [
     { id:'latte_artist_ach', icon:'🎨', name:'拉花艺术家', desc:'掌握了咖啡拉花技巧', check: g => g.flags.latteArt },
     { id:'coffee_shop_owner_ach', icon:'🏪', name:'咖啡店老板', desc:'投资开了一家咖啡店', check: g => g.flags.coffeeShopOwner },
     { id:'third_space_ach', icon:'🏘️', name:'第三空间探索者', desc:'找到了属于自己的第三空间', check: g => g.flags.coffeeCommunity },
+    // === v21.6 新增成就（户外生活） ===
+    { id:'camper_ach_v21_6', icon:'⛺', name:'露营达人', desc:'体验了露营并爱上了户外', check: g => g.flags.campingLover },
+    { id:'hiker_ach', icon:'🏔️', name:'徒步者', desc:'完成了第一次徒步挑战', check: g => g.flags.hikingLover },
+    { id:'trail_runner_ach', icon:'🏃', name:'越野跑者', desc:'完成了一场越野跑比赛', check: g => g.flags.trailRunning },
+    { id:'sunrise_chaser_ach', icon:'🌅', name:'追日者', desc:'凌晨登山看到了日出', check: g => g.flags.sunriseHike },
+    { id:'nature_healer_ach', icon:'🌿', name:'自然疗愈师', desc:'通过自然找到了内心的平静', check: g => g.flags.natureRegular },
 ];
 
 // === ENDINGS === (order matters: first match wins)
