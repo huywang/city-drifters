@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v26.9
+// 都市浮生记 - Game Engine v27.0
 // ============================================
 
 // === GAME STATE ===
@@ -25,6 +25,8 @@ const G = {
     delayedEffects: [],
     // v9.2: 投资理财系统
     investments: {},
+    // v27.0: 城市声望系统
+    reputation: { career: 0, social: 0, culture: 0, economy: 0, luck: 50 },
 };
 
 // === BACKGROUNDS ===
@@ -13492,6 +13494,87 @@ const EVENTS = [
         { label:'拍了一些照片，挺有感觉', hint:'+🧠 +✨', fn: g => { g.flags.nightPhotography=true; return{intel:3,charm:3}; }},
         { label:'拍了几张就回家了', hint:'+🧠', fn: g => { g.flags.nightPhotography=true; return{intel:2}; }},
       ]},
+    // v27.0: 城市声望事件 - 声望影响生活体验
+    { id:'reputation_vip', icon:'👑', title:'VIP待遇', category:'career',
+      body:'你走进了一家高端餐厅。\n\n服务员看到你的穿着和气质——\n\n「先生/女士，请问您是我们的VIP会员吗？」\n\n你：「不是。」\n\n但经理过来了：「这位是我们的贵宾，请安排最好的位置。」\n\n你被带到了包间。\n\n你发现：在这个城市——你的「面子」比你的「钱」更有用。\n\n你开始理解：声望——是一种「隐形的货币」。\n\n它不写在银行卡上——但它能打开很多门。\n\n「VIP待遇：不是因为你花了多少钱——是因为你在这个城市「值」多少钱。」',
+      cond: g => g.reputation && (g.reputation.career >= 60 || g.reputation.economy >= 60) && !g.flags.reputationVip && g.age >= 25,
+      choices:[
+        { label:'享受了VIP待遇，信心大增', hint:'+😊 +✨', fn: g => { g.flags.reputationVip=true; g.reputation.luck += 5; return{mood:8,charm:5}; }},
+        { label:'觉得不好意思，正常点了餐', hint:'+🧠', fn: g => { g.flags.reputationVip=true; g.money -= 500; return{intel:3,mood:3}; }},
+        { label:'发了朋友圈炫耀', hint:'+✨ -🧠', fn: g => { g.flags.reputationVip=true; return{charm:5,intel:-2}; }},
+      ]},
+    { id:'reputation_network', icon:'🕸️', title:'人脉变现', category:'social',
+      body:'有人通过朋友找到你——\n\n「听说你在这个行业很有经验，能帮我介绍几个客户吗？」\n\n你想了想——你的人脉里确实有几个合适的人。\n\n你打了个电话——\n\n「老张，我有个朋友做这个，你们认识一下？」\n\n一周后——\n\n你的朋友做成了生意。他给你转了5000元「茶水费」。\n\n你发现：你的人脉——值钱了。\n\n你开始理解：在这个城市——「认识谁」和「谁认识你」——同样重要。\n\n你的人脉——不是「通讯录里的名字」——是「信任的网络」。\n\n「人脉变现：不是你有多少朋友——是有多少人「信」你。」',
+      cond: g => g.reputation && g.reputation.social >= 50 && !g.flags.reputationNetwork && g.age >= 25,
+      choices:[
+        { label:'开始有意识地经营人脉', hint:'+🤝 +💰 +🧠', fn: g => { g.flags.reputationNetwork=true; g.money += 5000; g.reputation.social += 5; return{social:5,intel:3}; }},
+        { label:'帮了忙，没收钱', hint:'+🤝 +😊 -💰', fn: g => { g.flags.reputationNetwork=true; g.reputation.social += 8; return{social:5,mood:3}; }},
+        { label:'觉得利用人脉不好，拒绝了', hint:'+🧠 -🤝', fn: g => { g.flags.reputationNetwork=true; return{intel:3,social:-3}; }},
+      ]},
+    { id:'reputation_media', icon:'📺', title:'被采访', category:'society',
+      body:'有个记者找到你——\n\n「我们正在做一个关于「大城市青年」的专题报道，能采访一下您吗？」\n\n你犹豫了。\n\n你同意了。\n\n采访那天：\n- 你穿了最好的衣服\n- 你准备了很多话\n- 你说了你的故事\n\n报道出来后——\n\n有人评论：「说得太好了。」\n有人评论：「这就是我们的生活。」\n有人评论：「终于有人说了。」\n\n你突然发现：你的故事——不只是你的——也是很多人的。\n\n你开始理解：在这个城市——每个人都有故事——但很少有人「被听到」。\n\n你被听到了。\n\n「被采访：不是你的故事特别——是你的「勇气」让它特别。」',
+      cond: g => g.reputation && (g.reputation.culture >= 40 || g.reputation.social >= 40) && !g.flags.reputationMedia && g.age >= 22,
+      choices:[
+        { label:'开始写公众号，成了小V', hint:'+✨ +🧠 +💰', fn: g => { g.flags.reputationMedia=true; g.flags.blogger=true; g.reputation.culture += 10; return{charm:8,intel:5}; }},
+        { label:'接受了一次采访，挺有成就感', hint:'+✨ +😊', fn: g => { g.flags.reputationMedia=true; g.reputation.culture += 5; return{charm:5,mood:3}; }},
+        { label:'拒绝了采访，不喜欢曝光', hint:'+🧠 -✨', fn: g => { g.flags.reputationMedia=true; return{intel:3,charm:-2}; }},
+      ]},
+    { id:'reputation_door', icon:'🚪', title:'门路', category:'career',
+      body:'你遇到了一件麻烦事——\n\n你的房东要涨房租。从3000涨到5000。\n\n你付不起。\n\n你开始找新房子——但好的房子太贵，便宜的房子太远。\n\n你的朋友说：「我认识一个人，他手上有一套空房子，便宜租给你。」\n\n你去看了——\n- 地段好\n- 装修好\n- 租金只要2000\n\n你搬进去了。\n\n你发现：在这个城市——「门路」比「能力」更能解决实际问题。\n\n你的朋友——就是你的「门路」。\n\n你开始理解：大城市不是靠「规则」运转的——是靠「关系」运转的。\n\n「门路：不是你在找机会——是「机会通过朋友找到了你」。」',
+      cond: g => g.reputation && g.reputation.social >= 40 && !g.flags.reputationDoor && g.age >= 22 && g.money >= 1000,
+      choices:[
+        { label:'感激地搬进去了，请朋友吃了饭', hint:'-💰 +🤝 +😊', fn: g => { g.flags.reputationDoor=true; g.money -= 500; g.reputation.social += 5; return{mood:5,social:3}; }},
+        { label:'不好意思接受，自己找了房子', hint:'-💰 -🤝 +🧠', fn: g => { g.flags.reputationDoor=true; g.money -= 3000; return{intel:3,social:-2}; }},
+        { label:'觉得欠人情不好，坚持找便宜房', hint:'-😊 +🧠', fn: g => { g.flags.reputationDoor=true; return{mood:-3,intel:2}; }},
+      ]},
+    { id:'reputation_trust', icon:'🤝', title:'信任', category:'social',
+      body:'你的同事要出国了。\n\n他有一套房子——想找人帮忙看管。\n\n他没有找中介——他找了你。\n\n「我信你。」他说。\n\n你搬进了他的房子——免费的。\n\n你帮他：\n- 交水电费\n- 打扫卫生\n- 收快递\n- 修小家电\n\n两年后他回来了。\n\n他说：「谢谢你。这套房子——我卖给你吧，比市场价低20%。」\n\n你发现：信任——是最贵的货币。\n\n它不能存银行——但它能买到银行买不到的东西。\n\n「信任：不是别人给你机会——是别人相信你会「对得起」那个机会。」',
+      cond: g => g.reputation && g.reputation.social >= 55 && !g.flags.reputationTrust && g.age >= 25 && g.months >= 24,
+      choices:[
+        { label:'买下了房子，终于在大城市安了家', hint:'-💰 +😊 +🤝', fn: g => { g.flags.reputationTrust=true; g.flags.hasHouse=true; g.money -= 500000; g.reputation.social += 10; return{mood:15,social:5}; }},
+        { label:'住了两年但没买，帮他保管了房子', hint:'+🤝 +😊', fn: g => { g.flags.reputationTrust=true; g.reputation.social += 8; return{mood:5,social:5}; }},
+        { label:'觉得欠太多人情，提前搬出来了', hint:'-🤝 +🧠', fn: g => { g.flags.reputationTrust=true; return{intel:3,social:-3}; }},
+      ]},
+    { id:'reputation_invisible', icon:'👻', title:'城市隐形人', category:'psychology',
+      body:'你在这个城市生活了5年了。\n\n但你发现：你几乎是「隐形」的。\n\n- 没有人在乎你是谁\n- 没有人记得你的名字\n- 你走在街上——没人看你\n- 你在社交媒体上——没人在意\n\n你开始想：\n- 我在这个城市——留下了什么？\n- 如果我明天消失了——有人会发现吗？\n\n你做了一个实验：\n\n你在朋友圈发了一条：「我今天心情不好。」\n\n3小时后——2个人点赞。\n0个人评论。\n\n你开始理解：在大城市——你可以「活着」——但不一定「存在」。\n\n「城市隐形人：不是城市看不见你——是你还没有在城市「留下痕迹」。」',
+      cond: g => g.reputation && getTotalReputation() <= 20 && !g.flags.reputationInvisible && g.age >= 25 && g.months >= 36,
+      choices:[
+        { label:'决定改变，开始主动社交和表达', hint:'+🤝 +✨ +😊', fn: g => { g.flags.reputationInvisible=true; g.reputation.social += 10; return{social:5,charm:3,mood:5}; }},
+        { label:'接受了隐形状态，觉得也挺好', hint:'+🧠 +😊', fn: g => { g.flags.reputationInvisible=true; g.flags.acceptedInvisible=true; return{intel:5,mood:3}; }},
+        { label:'很难过，开始想回老家', hint:'-😊 -🤝', fn: g => { g.flags.reputationInvisible=true; return{mood:-8,social:-3}; }},
+      ]},
+    { id:'reputation_legend', icon:'🏆', title:'行业传奇', category:'career',
+      body:'你在行业里有了「名气」。\n\n猎头打电话来：\n- 「我们有一个总监的职位，年薪80万，你有兴趣吗？」\n\n你没投简历——是他们找到的你。\n\n你去面试了——\n\n面试官说：「我们看过你之前做的项目，很厉害。我们不需要面试你了——直接谈待遇吧。」\n\n你发现：当你在一个领域足够「有名」——规则就不再适用了。\n\n你不是在找工作——是工作在找你。\n\n你开始理解：声望——是比「简历」更好的「名片」。\n\n「行业传奇：不是你多厉害——是别人觉得你多厉害。」',
+      cond: g => g.reputation && g.reputation.career >= 75 && !g.flags.reputationLegend && g.age >= 30,
+      choices:[
+        { label:'接受了高薪offer，年薪80万', hint:'+💰 +✨ +😊', fn: g => { g.flags.reputationLegend=true; setJob(g, '行业总监', 66000); g.reputation.career += 10; return{mood:10,charm:8}; }},
+        { label:'拒绝了，觉得现在挺好', hint:'+😊 +🧠', fn: g => { g.flags.reputationLegend=true; g.reputation.career += 5; return{mood:5,intel:5}; }},
+        { label:'利用名气开始做咨询副业', hint:'+💰 +🧠 -❤️', fn: g => { g.flags.reputationLegend=true; g.flags.consultantSide=true; g.money += 50000; return{intel:5,health:-3}; }},
+      ]},
+    { id:'reputation_charity', icon:'💝', title:'慈善捐款', category:'social',
+      body:'你赚了一些钱了。\n\n你开始想：我能给这个城市「回馈」什么？\n\n你看到了一个公益项目：「为城市流浪者提供冬季温暖包」。\n\n目标：筹集10万元。\n\n已筹：3万元。\n\n你捐了：1万元。\n\n你的名字出现在了捐款名单上。\n\n有人评论：「好人一生平安。」\n有人评论：「有钱真好。」\n\n你看着你的名字——你突然觉得：这个城市——好像跟你「有关系」了。\n\n你不再只是「住在」这个城市——你开始「属于」这个城市。\n\n你开始理解：慈善——不是给钱——是给自己一个「归属感」。\n\n「慈善捐款：不是在帮别人——是在让自己跟这个世界「产生连接」。」',
+      cond: g => g.reputation && g.reputation.economy >= 40 && !g.flags.reputationCharity && g.money >= 10000 && g.age >= 25,
+      choices:[
+        { label:'捐了1万，开始定期做公益', hint:'-💰 +🤝 +😊 +❤️', fn: g => { g.flags.reputationCharity=true; g.flags.regularCharity=true; g.money -= 10000; g.reputation.social += 15; g.reputation.economy -= 3; return{mood:8,social:5,charm:5}; }},
+        { label:'捐了5000，心意到了', hint:'-💰 +🤝 +😊', fn: g => { g.flags.reputationCharity=true; g.money -= 5000; g.reputation.social += 8; return{mood:5,social:3}; }},
+        { label:'觉得还是先顾好自己吧', hint:'+💰 -😊', fn: g => { g.flags.reputationCharity=true; return{mood:-3}; }},
+      ]},
+    { id:'reputation_luck', icon:'🍀', title:'好运降临', category:'society',
+      body:'今天——你的运气特别好。\n\n早上：\n- 你赶上了最后一班地铁\n- 你买到了最后一杯咖啡\n- 你迟到了——但领导也迟到了\n\n下午：\n- 客户突然同意了方案\n- 领导突然表扬了你\n- 同事请你喝了奶茶\n\n晚上：\n- 你在路上捡到100元\n- 你买彩票中了200元\n\n你觉得：今天的运气——好像开了挂。\n\n你开始想：运气——是随机的吗？\n\n还是说——你平时的「积累」——终于在这一天「兑现」了？\n\n你开始理解：运气——不完全是随机的——你的声望——也在影响你的运气。\n\n「好运降临：不是天降好运——是你的「人品」终于「爆」了。」',
+      cond: g => g.reputation && g.reputation.luck >= 65 && !g.flags.reputationLuck && g.age >= 20,
+      choices:[
+        { label:'趁运气好做了大胆的决定', hint:'+💰 +✨ +😊', fn: g => { g.flags.reputationLuck=true; g.money += 10000; g.reputation.luck -= 10; return{mood:10,charm:5}; }},
+        { label:'开心了一天，买了张彩票', hint:'-💰 +😊', fn: g => { g.flags.reputationLuck=true; g.money += 500; g.reputation.luck -= 5; return{mood:5}; }},
+        { label:'觉得运气不可靠，还是靠实力', hint:'+🧠', fn: g => { g.flags.reputationLuck=true; g.reputation.luck -= 5; return{intel:5}; }},
+      ]},
+    { id:'reputation_mentor', icon:'🎓', title:'人生导师', category:'career',
+      body:'有一个年轻人找到你——\n\n「前辈，我能请教您几个问题吗？」\n\n你想了想——你有什么资格当「导师」？\n\n但你说：「可以。」\n\n你们约了咖啡。\n\n他问了你：\n- 「你觉得这个行业还有前途吗？」\n- 「我应该考研还是工作？」\n- 「你怎么处理职场PUA？」\n- 「你后悔来大城市吗？」\n\n你认真地回答了每一个问题。\n\n你发现：你在「教」他的时候——你也在「教」自己。\n\n你的经验——不是白费的——它变成了别人的「路标」。\n\n你开始理解：声望——不只是「面子」——是「你走过的路可以帮到别人」。\n\n「人生导师：不是因为你多成功——是因为你「愿意分享」。」',
+      cond: g => g.reputation && (g.reputation.career >= 50 || g.reputation.culture >= 50) && !g.flags.reputationMentor && g.age >= 28 && g.months >= 36,
+      choices:[
+        { label:'成了他的长期导师，每月见面', hint:'+🤝 +😊 +🧠', fn: g => { g.flags.reputationMentor=true; g.flags.longTermMentor=true; g.reputation.career += 8; g.reputation.social += 5; return{intel:5,social:5,mood:5}; }},
+        { label:'聊了一次，给了他一些建议', hint:'+🤝 +🧠', fn: g => { g.flags.reputationMentor=true; g.money -= 50; g.reputation.career += 3; return{intel:3,social:2}; }},
+        { label:'觉得自己还不够格，婉拒了', hint:'+🧠 -🤝', fn: g => { g.flags.reputationMentor=true; return{intel:2,social:-2}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -14685,6 +14768,12 @@ const ACHIEVEMENTS = [
     { id:'midnight_regular_ach', icon:'🍜', name:'深夜食堂常客', desc:'每晚去深夜面馆找温暖', check: g => g.flags.midnightRegular },
     { id:'night_runner_ach_v26_9', icon:'🏃', name:'夜跑达人', desc:'坚持夜跑身体变好了', check: g => g.flags.nightRunner },
     { id:'craft_beer_fan_ach', icon:'🍺', name:'精酿爱好者', desc:'爱上了精酿啤酒开始研究', check: g => g.flags.craftBeerFan },
+    // v27.0: 城市声望成就
+    { id:'reputation_network_ach', icon:'🕸️', name:'人脉变现', desc:'通过人脉获得了额外收入', check: g => g.flags.reputationNetwork },
+    { id:'reputation_legend_ach', icon:'🏆', name:'行业传奇', desc:'在行业内有了名气被猎头追捧', check: g => g.flags.reputationLegend },
+    { id:'regular_charity_ach', icon:'💝', name:'慈善家', desc:'开始定期做公益捐款', check: g => g.flags.regularCharity },
+    { id:'long_term_mentor_ach', icon:'🎓', name:'人生导师', desc:'成了年轻人的长期导师', check: g => g.flags.longTermMentor },
+    { id:'accepted_invisible_ach', icon:'👻', name:'享受隐形', desc:'接受城市隐形人状态并找到自我', check: g => g.flags.acceptedInvisible },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -15216,6 +15305,9 @@ function advanceMonth() {
 
     G.months++; G.month++;
     if (G.month > 12) { G.month = 1; G.age++; G.year++; G.flags.springFestivalThisYear = false; }
+
+    // v27.0: 每月更新城市声望
+    updateReputation();
 
     // v19.0: 人生反思系统 - 在里程碑年龄触发回顾事件
     if (G.month === 1 && [30,35,40,45,50].includes(G.age) && !G.flags['reflection_'+G.age]) {
@@ -16816,6 +16908,65 @@ function generateLifeSummary() {
     }
 
     return opening + middle + ending;
+}
+
+// v27.0: 城市声望系统 - 根据玩家行为计算城市中的声望
+function updateReputation() {
+    const g = G;
+    const rep = g.reputation;
+    // 职业声望：基于工资、工作年限、职位
+    rep.career = Math.min(100, Math.max(0,
+        Math.floor(g.jobSalary / 500) +
+        (g.flags.civilServant ? 20 : 0) +
+        (g.flags.entrepreneur ? 15 : 0) +
+        (g.flags.promoted ? 10 : 0) +
+        (g.months >= 60 ? 10 : g.months >= 24 ? 5 : 0)
+    ));
+    // 社会声望：基于社交属性、志愿活动、社区参与
+    rep.social = Math.min(100, Math.max(0,
+        Math.floor(g.social / 2) +
+        (g.flags.longTermVolunteer ? 15 : 0) +
+        (g.flags.animalVolunteer ? 10 : 0) +
+        (g.flags.neighborOrganizer ? 10 : 0) +
+        (g.flags.patientAdvocate ? 8 : 0)
+    ));
+    // 文化声望：基于智力属性、文化活动、教育背景
+    rep.culture = Math.min(100, Math.max(0,
+        Math.floor(g.intel / 2) +
+        (g.flags.heritageLover ? 10 : 0) +
+        (g.flags.photoArtist ? 8 : 0) +
+        (g.flags.bookstoreRegular ? 8 : 0) +
+        (g.flags.gradSchool ? 10 : 0) +
+        (g.flags.culturalHeritage ? 5 : 0)
+    ));
+    // 经济声望：基于财富积累
+    rep.economy = Math.min(100, Math.max(0,
+        g.money >= 1000000 ? 80 :
+        g.money >= 500000 ? 60 :
+        g.money >= 200000 ? 45 :
+        g.money >= 100000 ? 30 :
+        g.money >= 50000 ? 20 :
+        g.money >= 0 ? 10 : 0
+    ));
+    // 运气值：基于随机事件和选择（保持50为基准，波动）
+    // luck值主要由事件修改，这里只做自然衰减回均值
+    if (rep.luck > 55) rep.luck -= 1;
+    else if (rep.luck < 45) rep.luck += 1;
+}
+
+// v27.0: 获取声望等级描述
+function getReputationLevel(score) {
+    if (score >= 80) return { level: '传奇', icon: '👑', color: '#ffd700' };
+    if (score >= 60) return { level: '知名', icon: '⭐', color: '#a78bfa' };
+    if (score >= 40) return { level: '普通', icon: '📍', color: '#60a5fa' };
+    if (score >= 20) return { level: '无名', icon: '👤', color: '#94a3b8' };
+    return { level: '隐形', icon: '👻', color: '#64748b' };
+}
+
+// v27.0: 获取综合声望
+function getTotalReputation() {
+    const rep = G.reputation;
+    return Math.floor((rep.career + rep.social + rep.culture + rep.economy) / 4);
 }
 
 // v25.0: 人生阶段系统 - 根据年龄定义不同人生阶段
