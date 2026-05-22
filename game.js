@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v21.6
+// 都市浮生记 - Game Engine v22.0
 // ============================================
 
 // === GAME STATE ===
@@ -10335,6 +10335,127 @@ const EVENTS = [
         { label:'体验很有意义，但希望永远用不上', hint:'+🧠 +😊', fn: g => { g.flags.wildernessSurvival=true; return{intel:5,mood:8,money:-1500}; }},
         { label:'太苦了，我还是适合城市生活', hint:'+😊', fn: g => { g.flags.wildernessSurvival=true; return{mood:3,money:-1500}; }},
       ]},
+    // === v22.0 新增事件（人生转折） ===
+    { id:'crossroads_career', icon:'🔀', title:'职业十字路口', category:'career',
+      body:'你收到了两个offer。\n\n一个是稳定但无聊的大公司：薪资涨幅20%，朝九晚五，五险一金齐全。\n\n一个是高风险高回报的创业公司：期权、996、但如果成了——你可能财务自由。\n\n你在咖啡厅坐了一下午。你想到了那句话：\n\n「20年后，让你失望的不是你做过的事——是你没做的事。」\n\n但你也知道：创业失败的概率是90%。而你已经不是一个人了——你有房贷，有家庭（或者有想成家的计划）。\n\n你的一个朋友说：「选择没有对错——只有你愿不愿意承担后果。」\n\n「人生最大的风险不是选错——是不选。因为不选本身也是一种选择。」',
+      cond: g => !g.flags.crossroadsCareer && g.age >= 25 && g.age <= 40 && g.jobSalary >= 8000,
+      choices:[
+        { label:'选择了创业公司——赌一把', hint:'+💰 +🧠', fn: g => { g.flags.crossroadsCareer=true; g.flags.startupJoin=true; g.flags.careerTransition=true; return{money:20000,intel:10,mood:5}; }},
+        { label:'选择了大公司——稳定优先', hint:'+💰 +😊', fn: g => { g.flags.crossroadsCareer=true; return{money:15000,mood:5}; }},
+        { label:'两个都拒绝了——继续找最适合自己的', hint:'+🧠', fn: g => { g.flags.crossroadsCareer=true; return{intel:5,mood:-3}; }},
+      ]},
+    { id:'midlife_passion', icon:'🔥', title:'中年激情', category:'psychology',
+      body:'你37岁了。生活像一条直线：上班、下班、吃饭、睡觉。\n\n某天你在地铁上看到一个年轻人弹吉他。你突然想起：你大学时也弹过。\n\n你回家翻出了落灰的吉他。调了弦，弹了一首老歌。\n\n你的手指已经生疏了——但弹着弹着，你感到了一种久违的东西。那叫「激情」。\n\n你开始每天下班后弹半小时。你的邻居敲门了——但不是投诉，是想学。\n\n你的同事发现你变了：「你最近状态很好啊。」你说：「因为我找到了一件和工作无关的事。」\n\n「中年危机的解药不是换工作、换城市、换伴侣——是找回那个曾经有激情的自己。」',
+      cond: g => !g.flags.midlifePassion && g.age >= 35 && g.age <= 45 && g.mood <= 50,
+      choices:[
+        { label:'重新找到了热爱，生活有了色彩', hint:'+😊 +✨', fn: g => { g.flags.midlifePassion=true; g.flags.personalGrowth=true; return{mood:15,charm:8}; }},
+        { label:'尝试了但没坚持，生活继续平淡', hint:'+😊', fn: g => { g.flags.midlifePassion=true; return{mood:5}; }},
+        { label:'觉得太晚了，错过了最好的年纪', hint:'', fn: g => { g.flags.midlifePassion=true; return{mood:-5}; }},
+      ]},
+    { id:'parent_aging_v22', icon:'👴', title:'父母老去的瞬间', category:'family',
+      body:'你回家过年。推开门的那一刻——你愣住了。\n\n你爸的头发全白了。你妈走路开始慢悠悠的。\n\n饭桌上，你爸说了一句让你心碎的话：「你妈最近记性不太好，有时候忘了关火。」\n\n你偷偷打开手机，搜索了「父母老了怎么办」。\n\n你开始认真地想：如果有一天他们不能自理了，你怎么办？\n- 请护工？一月8000。\n- 接来同住？你的房子够大吗？\n- 送养老院？你过得了心里那道坎吗？\n\n你坐在阳台上，抽了一根烟（虽然你不抽烟）。你突然理解了那句话：\n\n「所谓父母子女一场，就是看着对方的背影渐行渐远。」\n\n「父母老去的标志不是白发——是你突然意识到：他们也会离开。而你还没准备好。」',
+      cond: g => !g.flags.parentAging && g.age >= 30 && g.age <= 50,
+      choices:[
+        { label:'开始认真规划父母的养老问题', hint:'+🧠 +😊', fn: g => { g.flags.parentAging=true; g.flags.filialPlan=true; return{intel:5,mood:5,money:-5000}; }},
+        { label:'多打电话、多回家——趁还来得及', hint:'+😊 +👥', fn: g => { g.flags.parentAging=true; g.flags.closeToParents=true; return{mood:8,social:5}; }},
+        { label:'逃避了——你还没准备好面对这件事', hint:'', fn: g => { g.flags.parentAging=true; return{mood:-8}; }},
+      ]},
+    { id:'life_regret', icon:'💭', title:'人生遗憾清单', category:'psychology',
+      body:'你在深夜失眠时，开始列一份「人生遗憾清单」。\n\n你写下了那些你没做的事：\n- 没有对暗恋的人表白\n- 没有在毕业后去旅行\n- 没有好好学习一门外语\n- 没有早点开始存钱\n- 没有好好陪伴父母\n\n你看着这份清单，心里酸酸的。\n\n但然后你在旁边又列了一份「人生庆幸清单」：\n- 庆幸来到了大城市\n- 庆幸认识了几个真朋友\n- 庆幸在最难的时候没有放弃\n- 庆幸还在努力活着\n\n你发现：遗憾和庆幸一样多——这就够了。\n\n一个哲学家说过：「完美的不是没有遗憾——是学会了和遗憾共处。」\n\n「人生不是一道数学题——没有标准答案。你的遗憾，也是你人生的一部分。」',
+      cond: g => !g.flags.lifeRegret && g.age >= 28 && g.age <= 50,
+      choices:[
+        { label:'开始弥补遗憾——去做那些一直想做但没做的事', hint:'+😊 +✨', fn: g => { g.flags.lifeRegret=true; g.flags.personalGrowth=true; return{mood:12,charm:5}; }},
+        { label:'接受了遗憾——人生就是这样', hint:'+🧠 +😊', fn: g => { g.flags.lifeRegret=true; return{intel:8,mood:8}; }},
+        { label:'越想越难受，干脆不想了', hint:'', fn: g => { g.flags.lifeRegret=true; return{mood:-5}; }},
+      ]},
+    { id:'second_act', icon:'🎭', title:'人生第二幕', category:'career',
+      body:'你38岁，在公司做到了中层。但你觉得：这不是你想要的。\n\n你开始思考「人生第二幕」——你剩余的人生里，最想做什么？\n\n你列了几个选项：\n1. 开一家小店（咖啡馆/花店/书店）\n2. 转行做教育/培训\n3. 做自由职业者\n4. 回老家，过慢生活\n5. 继续现在的工作，但调整心态\n\n你和一个做了10年自由职业的朋友聊了聊。他说：「自由职业不是自由——是另一种枷锁。但至少是你自己选的枷锁。」\n\n你笑了。你开始理解：不存在完美的选择——只有你愿意为之承担代价的选择。\n\n「人生第二幕不是重来——是终于敢按自己的想法活。」',
+      cond: g => !g.flags.secondAct && g.age >= 35 && g.age <= 45 && g.jobSalary >= 12000,
+      choices:[
+        { label:'辞职追梦，开始了人生第二幕', hint:'+😊 +✨ -💰', fn: g => { g.flags.secondAct=true; g.flags.careerTransition=true; g.flags.boldThirty=true; return{mood:15,charm:10,money:-30000}; }},
+        { label:'边工作边准备，等时机成熟再转', hint:'+🧠 +😊', fn: g => { g.flags.secondAct=true; return{intel:8,mood:5}; }},
+        { label:'想了想还是算了，房贷不允许', hint:'', fn: g => { g.flags.secondAct=true; return{mood:-5}; }},
+      ]},
+    { id:'friend_drift_v22', icon:'👋', title:'朋友渐行渐远', category:'social',
+      body:'你翻看手机通讯录，发现很多人已经很久没联系了。\n\n大学时的室友——你发了条微信：「最近怎么样？」\n\n对方回了一个「挺好的」，然后——没有然后了。\n\n你意识到：成年人的友谊不是吵散的——是慢慢淡的。\n\n你们不吵架，不翻脸。只是——各自忙碌，各自生活，话题越来越少，见面越来越难。\n\n你约了一个还联系得上的老朋友吃饭。你们聊了很多——但总觉得少了点什么。\n\n你说：「我们好像没有以前那么亲了。」他笑了：「但我们还是朋友啊。」\n\n你突然觉得：也许友谊不需要一直热烈——只需要偶尔想起时，还能约出来吃顿饭。\n\n「成年人的友谊：不是不在乎——是各自忙着在乎不同的事。」',
+      cond: g => !g.flags.friendDrift && g.age >= 28 && g.age <= 45 && g.social >= 40,
+      choices:[
+        { label:'主动维护了关系，友谊重新升温', hint:'+👥 +😊', fn: g => { g.flags.friendDrift=true; return{social:8,mood:8}; }},
+        { label:'接受了朋友的渐行渐远', hint:'+🧠 +😊', fn: g => { g.flags.friendDrift=true; return{intel:5,mood:5}; }},
+        { label:'感到孤独——但不知道该怎么办', hint:'', fn: g => { g.flags.friendDrift=true; return{mood:-8,social:-5}; }},
+      ]},
+    { id:'digital_will', icon:'📱', title:'数字遗产', category:'tech',
+      body:'你看到一条新闻：一个年轻人意外去世后，家人无法访问他的数字账户。\n\n你开始思考：你的数字遗产怎么办？\n\n你的微信聊天记录、照片、文档、社交账号、游戏账号、加密货币……\n\n如果有一天你不在了——这些东西会怎样？\n\n你开始做了一些安排：\n- 整理了重要账号和密码\n- 设置了「数字遗嘱」\n- 把云盘里的重要照片下载到了本地\n- 给最亲近的人留了一封信\n\n你的一个朋友说：「你才多大就想这些？」你说：「不是想死——是想活得明白。」\n\n「数字时代最大的讽刺：我们在网上留下了最多的痕迹——但最少有人整理。」',
+      cond: g => !g.flags.digitalWill && g.age >= 30 && g.intel >= 45,
+      choices:[
+        { label:'认真整理了数字遗产，心里踏实了', hint:'+🧠 +😊', fn: g => { g.flags.digitalWill=true; return{intel:5,mood:8}; }},
+        { label:'简单整理了一下，够用就行', hint:'+🧠', fn: g => { g.flags.digitalWill=true; return{intel:3,mood:3}; }},
+        { label:'觉得太早了，以后再说', hint:'', fn: g => { g.flags.digitalWill=true; return{mood:-2}; }},
+      ]},
+    { id:'legacy_thinking_v22', icon:'📖', title:'遗产思维', category:'psychology',
+      body:'你在一个讲座上听到一个问题：「你希望别人怎么记住你？」\n\n这个问题让你失眠了。\n\n你开始用「遗产思维」审视自己的人生——不是钱的遗产，是精神的遗产。\n\n你问自己：\n- 我教会了别人什么？\n- 我对谁的人生产生了正面影响？\n- 如果我不在了，有什么会因为我而不同？\n\n答案让你沉默了很久。你发现：你大部分时间都在「获取」——很少「留下」。\n\n你开始做一些改变：\n- 在公司里带新人\n- 在网上分享你的经验和知识\n- 参加公益活动\n\n你发现：当你开始「给予」——你反而感到更充实。\n\n「人生最大的成就不是你拥有什么——是你留下了什么。」',
+      cond: g => !g.flags.legacyThinking && g.age >= 35 && g.intel >= 50,
+      choices:[
+        { label:'开始认真做导师和志愿者', hint:'+👥 +😊 +✨', fn: g => { g.flags.legacyThinking=true; g.flags.mentor=true; return{social:10,mood:12,charm:5}; }},
+        { label:'开始在网上分享经验和知识', hint:'+🧠 +✨', fn: g => { g.flags.legacyThinking=true; return{intel:8,charm:5,mood:5}; }},
+        { label:'想了想但没行动——先把自己的事管好', hint:'', fn: g => { g.flags.legacyThinking=true; return{intel:3}; }},
+      ]},
+    { id:'downsize_life', icon:'📦', title:'断舍离', category:'psychology',
+      body:'你看了一个日本节目《断舍离》。主持人说：「你拥有的东西越多——拥有的自由越少。」\n\n你看了看自己的房间：堆满了东西。很多是你买了但从没用过的。\n\n你开始了大清理：\n- 三年没穿的衣服：捐了\n- 没用过的健身器材：卖了\n- 过期的化妆品：扔了\n- 不再联系的人的名片：也扔了\n\n清理完之后，你的房间小了一半——但你感觉空间大了一倍。\n\n你在朋友圈发了一张清理后的照片。评论：「你这是要出家吗？」\n\n你回：「不是出家——是给生活留点空白。」\n\n「断舍离不是扔东西——是扔掉那些不属于你的生活。」',
+      cond: g => !g.flags.downsizeLife && g.age >= 28 && g.mood <= 55,
+      choices:[
+        { label:'彻底清理了生活，感觉轻松了很多', hint:'+😊 +🧠 +✨', fn: g => { g.flags.downsizeLife=true; g.flags.personalGrowth=true; return{mood:15,intel:5,charm:3}; }},
+        { label:'清理了一部分，但很多东西舍不得扔', hint:'+😊', fn: g => { g.flags.downsizeLife=true; return{mood:8}; }},
+        { label:'看了看就关了——我的东西都有意义', hint:'', fn: g => { g.flags.downsizeLife=true; return{mood:2}; }},
+      ]},
+    { id:'time_awareness', icon:'⏰', title:'时间觉醒', category:'psychology',
+      body:'你在一个深夜突然算了一笔账：\n\n假设你能活到80岁——你已经过了35年。\n剩余：45年。\n换算成天数：16425天。\n\n你觉得很多吗？但你再算：\n- 减去睡觉（1/3）：10950天\n- 减去工作（1/3）：5475天\n- 减去通勤、吃饭、杂事：大约2000天\n\n你真正拥有的「自由时间」——可能只有2000天。\n\n2000天。听起来很多？但如果每天只算3小时的高质量时间——\n\n你只有6000小时。这就是你剩余的全部「自己的时间」。\n\n你突然觉得：每一分钟都变得珍贵了。\n\n你开始拒绝无意义的社交、拒绝刷短视频、拒绝把时间花在让你后悔的事上。\n\n「当你开始计算时间——你才真正开始生活。」',
+      cond: g => !g.flags.timeAwareness && g.age >= 30 && g.intel >= 40,
+      choices:[
+        { label:'深刻觉醒，开始珍惜每一分钟', hint:'+🧠 +😊', fn: g => { g.flags.timeAwareness=true; g.flags.personalGrowth=true; return{intel:10,mood:10}; }},
+        { label:'触动很大，慢慢开始改变', hint:'+🧠 +😊', fn: g => { g.flags.timeAwareness=true; return{intel:8,mood:5}; }},
+        { label:'焦虑了一阵，然后又回到了老样子', hint:'', fn: g => { g.flags.timeAwareness=true; return{mood:-5}; }},
+      ]},
+    { id:'hometown_pull_v22', icon:'🏠', title:'故乡的拉力', category:'city',
+      body:'你妈打电话来：「隔壁小张回来了，在县城买了房，在政府上班，结婚了。」\n\n你沉默了。\n\n你在大城市——月薪两万，房租五千，加班到十点，周末只想睡觉。\n\n小张在老家——月薪五千，无房贷，朝九晚五，周末烧烤钓鱼。\n\n你问自己：到底谁活得好？\n\n你回了一趟老家。你发现：\n- 小城变化很大——新商场、新公园\n- 老朋友们都结婚了——但看起来挺幸福\n- 你妈做菜的味道——还是那个味道\n\n你站在老家的阳台上，看着远处的山。你突然想：也许回来也不错。\n\n但你又想到了大城市的便利、机会、自由——你犹豫了。\n\n「故乡和城市不是选择题——是你到底在哪里更像自己。」',
+      cond: g => !g.flags.hometownPull && g.age >= 28 && g.age <= 42 && g.city !== 'hometown',
+      choices:[
+        { label:'认真考虑回老家', hint:'+🧠 +😊', fn: g => { g.flags.hometownPull=true; g.flags.considerReturn=true; return{intel:5,mood:5}; }},
+        { label:'回了一趟老家，但决定留在大城市', hint:'+😊 +🧠', fn: g => { g.flags.hometownPull=true; return{mood:8,intel:3}; }},
+        { label:'每次想回去，又被现实拽回来', hint:'', fn: g => { g.flags.hometownPull=true; return{mood:-5}; }},
+      ]},
+    { id:'meaning_crisis', icon:'🌀', title:'意义危机', category:'psychology',
+      body:'你在某个周一早上醒来，突然问自己：\n\n「我为什么要上班？」\n\n不是懒——是真的不知道意义在哪。\n\n赚钱？赚钱为了什么？\n升职？升了又怎样？\n活着？活着为了什么？\n\n你陷入了存在主义危机。你觉得一切都没有意义。\n\n你看了很多书：《西西弗斯神话》《存在与虚无》《活出生命的意义》。\n\n维克多·弗兰克尔说了一句话让你醍醐灌顶：\n\n「人不是在寻找生命的意义——而是在赋予生命意义。」\n\n你开始理解：意义不是被发现的——是被创造的。\n\n你开始重新审视你的生活：你做的每一件事，都可以是你赋予的意义。\n\n「存在主义危机的解药不是找到答案——是接受「没有标准答案」本身就是答案。」',
+      cond: g => !g.flags.meaningCrisis && g.age >= 28 && g.age <= 45 && g.intel >= 50,
+      choices:[
+        { label:'通过阅读和思考找到了自己的答案', hint:'+🧠 +😊', fn: g => { g.flags.meaningCrisis=true; g.flags.personalGrowth=true; return{intel:15,mood:10}; }},
+        { label:'还在寻找中——但至少不再焦虑了', hint:'+🧠 +😊', fn: g => { g.flags.meaningCrisis=true; return{intel:10,mood:5}; }},
+        { label:'越陷越深，觉得人生毫无意义', hint:'-😊', fn: g => { g.flags.meaningCrisis=true; return{mood:-15,intel:5}; }},
+      ]},
+    { id:'rebuild_health', icon:'💪', title:'健康重建', category:'health',
+      body:'体检报告出来了。你不敢看——但还是看了。\n\n异常项：\n- 血脂偏高\n- 脂肪肝（轻度）\n- 颈椎退行性变\n- 睡眠障碍\n\n医生说：「你才30多岁——这些问题通常是50岁才有的。」\n\n你被吓到了。你开始认真改变：\n- 每天走10000步\n- 晚上11点前上床\n- 戒掉了外卖，开始带饭\n- 每周去两次健身房\n\n三个月后——你复查了。所有指标都好了。\n\n你发了朋友圈：「从今天起，身体是第一位的。」\n\n你的一个同事评论：「你做到了我想了三年没做到的事。」\n\n「健康不是一个目标——是一种生活方式。它不需要完美——只需要持续。」',
+      cond: g => !g.flags.rebuildHealth && g.health <= 50 && g.age >= 28,
+      choices:[
+        { label:'彻底改变了生活方式', hint:'+❤️ +😊', fn: g => { g.flags.rebuildHealth=true; g.flags.lifestyleChange=true; return{health:20,mood:10}; }},
+        { label:'改变了一些，但没完全坚持', hint:'+❤️ +😊', fn: g => { g.flags.rebuildHealth=true; return{health:10,mood:5}; }},
+        { label:'吓了几天，然后又恢复了老样子', hint:'', fn: g => { g.flags.rebuildHealth=true; return{mood:-5}; }},
+      ]},
+    { id:'financial_crossroad', icon:'💰', title:'财务十字路口', category:'finance',
+      body:'你看了看自己的银行账户。你开始认真算了一笔账：\n\n收入：月薪X元\n支出：房租/房贷+吃饭+交通+娱乐+社交\n结余：每月Y元\n\n按照这个速度——你需要Z年才能攒够首付/还清房贷/退休。\n\n你开始研究不同的财务路径：\n1. 极致省钱派：每月只花3000，其余全存\n2. 投资增值派：学理财，让钱生钱\n3. 提升收入派：跳槽、升职、搞副业\n4. 极简生活派：降低物欲，减少开支\n\n你读了一本书叫《富爸爸穷爸爸》。核心思想：「穷人靠工资，富人靠资产。」\n\n你开始思考：你的「资产」是什么？\n\n「财务自由的秘密不是赚更多——是花更少。但谁又愿意为了自由牺牲当下的快乐呢？」',
+      cond: g => !g.flags.financialCrossroad && g.age >= 26 && g.age <= 40 && g.money < 200000,
+      choices:[
+        { label:'制定了严格的财务计划，开始认真理财', hint:'+💰 +🧠', fn: g => { g.flags.financialCrossroad=true; return{money:10000,intel:8}; }},
+        { label:'开始搞副业增加收入', hint:'+💰 +😊', fn: g => { g.flags.financialCrossroad=true; g.flags.sideHustle=true; return{money:8000,mood:5}; }},
+        { label:'算完账更焦虑了——钱不够花是永恒的命题', hint:'', fn: g => { g.flags.financialCrossroad=true; return{mood:-8,intel:3}; }},
+      ]},
+    { id:'solo_travel', icon:'🧳', title:'一个人的旅行', category:'hobby',
+      body:'你做了一件以前一直想做但不敢做的事：一个人去旅行。\n\n没有攻略，没有同伴，没有目的地。你买了张火车票，出发了。\n\n你在火车上看着窗外的风景。你发现：一个人旅行的好处是——你不需要迁就任何人。\n\n你想去哪就去哪，想吃啥就吃啥，想拍照就拍照。\n\n你在一个小镇上住了两天。和民宿老板聊天，听他讲小镇的故事。\n\n你发现：一个人的时候，你反而更容易和人交流。因为你没有「安全感」可以依靠——你只能靠自己。\n\n你发了条朋友圈：「一个人的旅行，不是孤独——是自由。」\n\n评论区：「好羡慕！」「注意安全！」「下次带我！」\n\n「一个人旅行最大的收获不是风景——是你终于有时间听自己说话。」',
+      cond: g => !g.flags.soloTravel && g.age >= 24 && g.age <= 45 && g.money >= 3000,
+      choices:[
+        { label:'爱上了一人旅行，找到了内心的平静', hint:'+😊 +🧠 +✨', fn: g => { g.flags.soloTravel=true; g.flags.personalGrowth=true; return{mood:15,intel:8,charm:5,money:-3000}; }},
+        { label:'体验很好，但偶尔还是想有人分享', hint:'+😊 +👥', fn: g => { g.flags.soloTravel=true; return{mood:10,social:3,money:-3000}; }},
+        { label:'太孤独了，还是喜欢结伴旅行', hint:'', fn: g => { g.flags.soloTravel=true; return{mood:3,money:-3000}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -11297,6 +11418,17 @@ const ACHIEVEMENTS = [
     { id:'trail_runner_ach', icon:'🏃', name:'越野跑者', desc:'完成了一场越野跑比赛', check: g => g.flags.trailRunning },
     { id:'sunrise_chaser_ach', icon:'🌅', name:'追日者', desc:'凌晨登山看到了日出', check: g => g.flags.sunriseHike },
     { id:'nature_healer_ach', icon:'🌿', name:'自然疗愈师', desc:'通过自然找到了内心的平静', check: g => g.flags.natureRegular },
+    // === v22.0 新增成就（人生转折） ===
+    { id:'career_sprint_ach', icon:'🏃', name:'全力冲刺者', desc:'决定用三年时间全力冲刺事业', check: g => g.flags.careerSprint },
+    { id:'life_balance_ach', icon:'⚖️', name:'生活平衡者', desc:'决定工作不是全部，要有生活', check: g => g.flags.lifeBalance },
+    { id:'bold_thirty_ach', icon:'🎯', name:'三十而勇', desc:'在30岁做出了大胆的决定', check: g => g.flags.boldThirty },
+    { id:'irreplaceable_ach', icon:'💎', name:'不可替代', desc:'开始打造自己的不可替代性', check: g => g.flags.irreplaceable },
+    { id:'time_awake_ach', icon:'⏰', name:'时间觉醒者', desc:'深刻意识到了时间的珍贵', check: g => g.flags.timeAwareness },
+    { id:'meaning_found_ach', icon:'🌀', name:'意义探寻者', desc:'经历意义危机后找到了自己的答案', check: g => g.flags.meaningCrisis && g.flags.personalGrowth },
+    { id:'legacy_builder_ach', icon:'📖', name:'遗产建设者', desc:'开始用遗产思维指导人生', check: g => g.flags.legacyThinking && g.flags.mentor },
+    { id:'solo_explorer_ach', icon:'🧳', name:'独行侠', desc:'完成了第一次独自旅行', check: g => g.flags.soloTravel },
+    { id:'downsize_ach', icon:'📦', name:'极简主义者', desc:'完成了生活的断舍离', check: g => g.flags.downsizeLife && g.flags.personalGrowth },
+    { id:'health_rebuilder_ach', icon:'💪', name:'健康重建者', desc:'因体检警告彻底改变了生活方式', check: g => g.flags.rebuildHealth && g.flags.lifestyleChange },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -11817,6 +11949,57 @@ function advanceMonth() {
             : '你回顾了过去的人生，似乎没有做出什么特别的选择。但你还在路上。';
         G.eventLog.push({ age: G.age, text: `${G.age}岁生日：${summary}` });
         G.mood = clamp(G.mood + (milestones.length >= 3 ? 10 : 5), 0, 100);
+    }
+
+    // v22.0: 人生转折系统 - 在关键年龄触发重大抉择
+    if (G.month === 1 && [25,28,30,35,40,50].includes(G.age) && !G.flags['turning_point_'+G.age]) {
+        G.flags['turning_point_'+G.age] = true;
+        const turningPoints = {
+            25: { title:'四分之一危机', body:'你25岁了。毕业三年，你开始问自己：这条路对吗？\n\n你的同学有的已经买房，有的已经结婚，有的已经升职。而你——\n\n你站在人生的十字路口。你知道：接下来的选择，会决定你30岁的样子。',
+              choices:[
+                { label:'决定拼一把——用3年时间全力冲刺事业', fn: g => { g.flags.careerSprint=true; g.intel = clamp(g.intel+10,0,100); g.mood = clamp(g.mood-5,0,100); }},
+                { label:'决定换个活法——工作不是全部，要有生活', fn: g => { g.flags.lifeBalance=true; g.mood = clamp(g.mood+10,0,100); g.health = clamp(g.health+5,0,100); }},
+                { label:'决定继续探索——还年轻，不急着定型', fn: g => { g.flags.keepExploring=true; g.charm = clamp(g.charm+5,0,100); g.social = clamp(g.social+5,0,100); }},
+              ]},
+            28: { title:'三十而立倒计时', body:'你28岁了。距离「三十而立」还有两年。\n\n你妈打电话来：「隔壁小王都生二胎了。」\n你爸叹气：「我们单位老李的儿子，去年在深圳买了房。」\n\n你挂了电话，看着窗外。你问自己：我到底想要什么？\n\n是世俗意义上的「成功」——还是自己定义的「幸福」？',
+              choices:[
+                { label:'选择了自己的定义——不被别人的标准绑架', fn: g => { g.flags.ownDefinition=true; g.mood = clamp(g.mood+15,0,100); g.intel = clamp(g.intel+5,0,100); }},
+                { label:'开始认真规划——买房、存钱、升职', fn: g => { g.flags.seriousPlanning=true; g.money += 10000; g.intel = clamp(g.intel+5,0,100); }},
+                { label:'焦虑了——但焦虑过后还是老样子', fn: g => { g.mood = clamp(g.mood-10,0,100); }},
+              ]},
+            30: { title:'三十而已', body:'你30岁了。\n\n朋友圈里，有人发了生日感言：「30岁，人生下半场开始。」\n\n你想了想自己这30年：\n- 来了大城市\n- 换了几份工作\n- 认识了一些人，也失去了一些人\n- 哭过、笑过、迷茫过\n\n你没有成为小时候想成为的人——但你成为了一个真实的自己。\n\n30岁不是终点——是另一个起点。',
+              choices:[
+                { label:'做了一个大胆的决定——创业/转行/离开', fn: g => { g.flags.boldThirty=true; g.flags.careerTransition=true; g.charm = clamp(g.charm+10,0,100); g.money -= 20000; }},
+                { label:'接受了现在的生活——平凡也有力量', fn: g => { g.flags.acceptOrdinary=true; g.mood = clamp(g.mood+15,0,100); g.health = clamp(g.health+5,0,100); }},
+                { label:'给自己一个承诺——30岁后不再将就', fn: g => { g.flags.noCompromise=true; g.intel = clamp(g.intel+8,0,100); g.charm = clamp(g.charm+5,0,100); }},
+              ]},
+            35: { title:'三十五岁现象', body:'你35岁了。\n\n你听说了太多关于「35岁危机」的故事：被裁、被嫌弃、被认为「太老了」。\n\n你打开招聘网站——很多岗位要求「35岁以下」。\n\n你照了照镜子。你并不老。但社会告诉你：你已经「不年轻」了。\n\n这是你的35岁——不是危机的年龄，是觉醒的年龄。\n\n你开始思考：什么才是真正属于你的东西？不是工作给你的，不是社会给你的——是你自己的。',
+              choices:[
+                { label:'开始打造自己的「不可替代性」', fn: g => { g.flags.irreplaceable=true; g.intel = clamp(g.intel+12,0,100); g.charm = clamp(g.charm+5,0,100); }},
+                { label:'开始做减法——不再追求所有东西', fn: g => { g.flags.doLess=true; g.mood = clamp(g.mood+12,0,100); g.health = clamp(g.health+8,0,100); }},
+                { label:'焦虑了一段时间，然后想通了', fn: g => { g.mood = clamp(g.mood-5,0,100); g.intel = clamp(g.intel+8,0,100); }},
+              ]},
+            40: { title:'不惑之年', body:'你40岁了。\n\n孔子说：「四十而不惑。」\n\n你不惑了吗？也许吧。你不再为别人的评价失眠，不再为得不到的东西焦虑。\n\n你开始理解一些以前觉得「鸡汤」的话：\n- 健康是最大的财富\n- 时间是最稀缺的资源\n- 家人是最重要的\n\n你的身体开始给你发信号：腰酸了、头发白了、爬楼喘了。\n\n你知道：人生下半场，拼的不是谁跑得快——是谁活得久。',
+              choices:[
+                { label:'开始认真对待健康——运动、饮食、作息', fn: g => { g.flags.healthFirst=true; g.health = clamp(g.health+15,0,100); g.mood = clamp(g.mood+5,0,100); }},
+                { label:'开始重新审视人生——写下想做的事', fn: g => { g.flags.lifeReview=true; g.intel = clamp(g.intel+10,0,100); g.mood = clamp(g.mood+8,0,100); }},
+                { label:'感慨了很多，然后继续原来的生活', fn: g => { g.mood = clamp(g.mood+3,0,100); }},
+              ]},
+            50: { title:'知天命', body:'你50岁了。\n\n孔子说：「五十而知天命。」\n\n你知道自己能做什么、不能做什么了。你不再和命运较劲——而是和命运和解。\n\n你开始回忆过去：\n- 22岁来到这座城市\n- 经历了那么多风风雨雨\n- 有遗憾，但没有后悔\n\n你的父母老了。你的孩子长大了（如果有的话）。你——也开始变老了。\n\n但变老不是变弱。是你终于有了足够的经验，去理解生活到底是什么。',
+              choices:[
+                { label:'开始写回忆录——留下你的人生故事', fn: g => { g.flags.memoir=true; g.intel = clamp(g.intel+10,0,100); g.mood = clamp(g.mood+10,0,100); }},
+                { label:'开始享受当下——做以前一直想做但没做的事', fn: g => { g.flags.enjoyNow=true; g.mood = clamp(g.mood+15,0,100); g.charm = clamp(g.charm+5,0,100); }},
+                { label:'把经验传给年轻人——做导师和志愿者', fn: g => { g.flags.mentor=true; g.social = clamp(g.social+10,0,100); g.mood = clamp(g.mood+8,0,100); }},
+              ]},
+        };
+        const tp = turningPoints[G.age];
+        if (tp) {
+            G.eventLog.push({ age: G.age, text: `【人生转折】${tp.title}` });
+            const choiceIdx = Math.floor(Math.random() * tp.choices.length);
+            const choice = tp.choices[choiceIdx];
+            choice.fn(G);
+            G.eventLog.push({ age: G.age, text: `你做出了选择：${choice.label}` });
+        }
     }
 
     // v20.0: 时代浪潮系统 - 根据年龄/年份激活时代背景效果
