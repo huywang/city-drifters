@@ -1642,6 +1642,76 @@ const EVENTS = [
         { label:'帮他们装好所有App', hint:'+👥 +😊', fn: g => { g.flags.digitalRefugee=true; g.relationships.family = clamp((g.relationships.family||60)+10, 0, 100); return{social:8,mood:10}; }},
         { label:'算了，他们需要的时候找你', hint:'+😊', fn: g => { g.flags.digitalRefugee=true; return{mood:5}; }},
       ]},
+    // ===== v2.22: GENDER & DEEPER RELATIONSHIPS =====
+    { id:'gender_discrimination', icon:'⚖️', title:'职场性别歧视',
+      body:'面试的时候，HR问了你一个"不该问"的问题：\n\n"你结婚了吗？""打算什么时候要孩子？""能接受出差吗？"\n\n你知道这些问题违法，但你也知道：如果你说"要孩子"，这个offer就没了。\n\n"性别歧视不是过去式，是现在进行时——只是变得更隐蔽了。"',
+      cond: g => g.age>=24 && g.age<=35 && g.job==='待业中' && !g.flags.genderDiscrimination,
+      choices:[
+        { label:'如实回答，坚持自我', hint:'+✨ -💰', fn: g => { g.flags.genderDiscrimination=true; return{charm:10,mood:-10,money:-3000}; }},
+        { label:'敷衍过去，先拿到offer', hint:'+💰 -😊', fn: g => { g.flags.genderDiscrimination=true; setJob(g,'运营专员',8000); return{mood:-5}; }},
+        { label:'当场怼回去', hint:'+✨ +😊 -💰', fn: g => { g.flags.genderDiscrimination=true; return{charm:15,mood:10,money:-5000}; }},
+        { label:'举报到劳动局', hint:'+🧠 +✨ -💰', fn: g => { g.flags.genderDiscrimination=true; return{intel:8,charm:10,mood:5,money:-8000}; }},
+      ]},
+    { id:'fertility_pressure', icon:'🤰', title:'生育歧视',
+      body:"你怀孕了，告诉公司。领导的反应是：\n\n\"那你的项目怎么办？\"\"谁能接你的工作？\"\"产假结束后还回来吗？\"\n\n你查了一下法律：公司不能因为怀孕辞退你。但你也知道：你有的是办法\"自愿\"离职。\n\n\"生育是女性的权利，也是职场的'原罪'。\"",
+      cond: g => g.flags.married && g.flags.hasChild && g.job!=='待业中' && !g.flags.fertilityDiscrimination && g.age>=26 && g.age<=38,
+      choices:[
+        { label:'坚持工作到最后一刻', hint:'+💰 -❤️', fn: g => { g.flags.fertilityDiscrimination=true; return{money:10000,health:-15,mood:-10}; }},
+        { label:'提前休产假', hint:'+❤️ -💰', fn: g => { g.flags.fertilityDiscrimination=true; return{health:10,mood:5,money:-8000}; }},
+        { label:'辞职做全职妈妈', hint:'+👨‍👩‍👧 -💰 -✨', fn: g => { g.flags.fertilityDiscrimination=true; g.relationships.family = clamp((g.relationships.family||60)+15, 0, 100); return{mood:10,money:-15000,charm:-10}; }},
+        { label:'维权，保留证据', hint:'+🧠 +✨ -👥', fn: g => { g.flags.fertilityDiscrimination=true; g.relationships.colleagues = clamp((g.relationships.colleagues||30)-15, 0, 100); return{intel:10,charm:8,mood:-5}; }},
+      ]},
+    { id:'mother_in_law', icon:'👵', title:'婆媳关系',
+      body:'你妈和你老婆/老公又吵架了。原因是：\n\n- 孩子怎么带\n- 家务谁做\n- 钱怎么花\n\n你夹在中间，两边都不敢得罪。\n\n你妈说："我养你这么大，你就听她的？"\n你老婆/老公说："你到底站哪边？"\n\n"婆媳关系是中国家庭的最大难题——没有之一。"',
+      cond: g => g.flags.married && g.flags.hasChild && g.relationships.family<70 && !g.flags.motherInLawConflict,
+      choices:[
+        { label:'站老婆/老公这边', hint:'+💑 -👨‍👩‍👧', fn: g => { g.flags.motherInLawConflict=true; g.relationships.partner = clamp((g.relationships.partner||50)+15, 0, 100); g.relationships.family = clamp((g.relationships.family||60)-15, 0, 100); return{mood:-10}; }},
+        { label:'站妈这边', hint:'+👨‍👩‍👧 -💑', fn: g => { g.flags.motherInLawConflict=true; g.relationships.family = clamp((g.relationships.family||60)+10, 0, 100); g.relationships.partner = clamp((g.relationships.partner||50)-20, 0, 100); return{mood:-15}; }},
+        { label:'和稀泥，两边哄', hint:'+😊 -❤️', fn: g => { g.flags.motherInLawConflict=true; return{mood:-5,health:-5}; }},
+        { label:'请保姆/分开住', hint:'-💰 +😊', fn: g => { g.flags.motherInLawConflict=true; return{money:-15000,mood:15,health:5}; }},
+      ]},
+    { id:'generational_gap', icon:'👴', title:'代际冲突',
+      body:'你爸说："你们这代人就是太矫情，我们那会儿……"\n\n你说："你们那会儿有房子分配，有工作分配，有医疗报销。"\n\n他说："我们那会儿苦，但我们有奔头。"\n\n你说："我们这代人苦，但看不到奔头。"\n\n沉默。\n\n"代沟不是年龄的差距，是时代的鸿沟。"',
+      cond: g => g.age>=25 && g.age<=35 && g.relationships.family<60 && !g.flags.generationalGap,
+      choices:[
+        { label:'耐心解释，让他们理解', hint:'+👨‍👩‍👧 +🧠', fn: g => { g.flags.generationalGap=true; g.relationships.family = clamp((g.relationships.family||60)+12, 0, 100); return{intel:5,mood:10}; }},
+        { label:'算了，说了也不懂', hint:'-😊 -👨‍👩‍👧', fn: g => { g.flags.generationalGap=true; g.relationships.family = clamp((g.relationships.family||60)-8, 0, 100); return{mood:-10}; }},
+        { label:'写长文/拍视频记录', hint:'+✨ +🧠', fn: g => { g.flags.generationalGap=true; return{charm:10,intel:8,mood:5}; }},
+      ]},
+    { id:'friend_betrayal', icon:'🗡️', title:'朋友背叛',
+      body:'你最好的朋友背叛了你。也许是：\n\n- 把你的秘密告诉了别人\n- 在背后说你坏话\n- 借了你的钱不还\n- 挖了你的客户/对象\n\n你发了条朋友圈："从此，我不再相信友情。"然后删了。\n\n"成年人的友情，脆弱得像纸——一撕就破。"',
+      cond: g => g.relationships.friends<40 && g.age>=25 && !g.flags.friendBetrayal,
+      choices:[
+        { label:'断交，拉黑', hint:'-👥 +😊', fn: g => { g.flags.friendBetrayal=true; g.relationships.friends = clamp((g.relationships.friends||40)-20, 0, 100); return{mood:10,social:-10}; }},
+        { label:'原谅，但保持距离', hint:'+🧠 -😊', fn: g => { g.flags.friendBetrayal=true; g.relationships.friends = clamp((g.relationships.friends||40)-10, 0, 100); return{intel:5,mood:-5}; }},
+        { label:'当面质问，要个说法', hint:'🎲', fn: g => { g.flags.friendBetrayal=true; if(Math.random()>0.5){g.relationships.friends = clamp((g.relationships.friends||40)+5, 0, 100);return{mood:15,social:5}}else{g.relationships.friends = clamp((g.relationships.friends||40)-25, 0, 100);return{mood:-20}} }},
+      ]},
+    { id:'parent_aging', icon:'🏥', title:'父母老了',
+      body:'你接到电话："你爸/妈住院了。"\n\n你连夜赶回老家，看到他们躺在病床上，头发白了很多，人也瘦了很多。\n\n医生说："年纪大了，各种毛病都来了。"\n\n你算了算：医疗费、护理费、误工费……\n\n你突然意识到：他们老了，而你还没准备好。\n\n"父母在，人生尚有来处；父母去，人生只剩归途。"',
+      cond: g => g.age>=30 && g.relationships.family>40 && !g.flags.parentAging,
+      choices:[
+        { label:'请假照顾', hint:'+👨‍👩‍👧 -💰 -❤️', fn: g => { g.flags.parentAging=true; g.relationships.family = clamp((g.relationships.family||60)+20, 0, 100); return{mood:10,money:-15000,health:-10}; }},
+        { label:'请护工，远程关心', hint:'-💰 +👨‍👩‍👧', fn: g => { g.flags.parentAging=true; g.relationships.family = clamp((g.relationships.family||60)+10, 0, 100); return{money:-20000,mood:5}; }},
+        { label:'买保险，提前规划', hint:'+🧠 -💰', fn: g => { g.flags.parentAging=true; return{intel:10,mood:8,money:-10000}; }},
+        { label:'接他们来大城市住', hint:'+👨‍👩‍👧 -💰 -😊', fn: g => { g.flags.parentAging=true; g.relationships.family = clamp((g.relationships.family||60)+25, 0, 100); return{mood:-5,money:-8000}; }},
+      ]},
+    { id:'stock_market_crash', icon:'📉', title:'股市暴跌',
+      body:'今天股市暴跌，你的股票亏了40%。\n\n你打开账户，看到一片绿（中国股市跌是绿色）。\n\n你的同事说："完了，完了，我的年终奖没了。"\n\n你的老婆/老公说："我早说了别炒股，你不听。"\n\n你想说：我只是想多赚点钱，有什么错？\n\n"股市是经济的晴雨表——但散户的心情是股市的过山车。"',
+      cond: g => g.flags.invested && g.flags.stockAmount>10000 && !g.flags.stockCrash && Math.random()>0.6,
+      choices:[
+        { label:'割肉离场', hint:'-💰 +😊', fn: g => { g.flags.stockCrash=true; const loss = Math.floor(g.flags.stockAmount*0.4); g.money -= loss; return{mood:10,money:-loss}; }},
+        { label:'加仓抄底', hint:'🎲 -💰', fn: g => { g.flags.stockCrash=true; const bet = Math.min(20000,g.money); g.money -= bet; if(Math.random()>0.5){const gain=Math.floor(bet*1.5);g.money+=bet+gain;return{money:gain,mood:20}}else{const loss=Math.floor(bet*0.6);g.money+=bet-loss;return{money:-loss,mood:-25}} }},
+        { label:'装死不动', hint:'+🧠', fn: g => { g.flags.stockCrash=true; return{intel:8,mood:-10}; }},
+      ]},
+    { id:'midlife_crisis', icon:'🎭', title:'中年危机',
+      body:'你35岁了。你开始想：\n\n- 我的事业到头了吗？\n- 我的婚姻还有激情吗？\n- 我的人生的意义是什么？\n\n你看着镜子里的自己：发际线后移了，肚子大了，眼神疲惫了。\n\n你想改变，但又不知道改变什么。\n\n"中年危机不是危机，是觉醒——你终于开始问自己：我到底想要什么？"',
+      cond: g => g.age>=34 && g.age<=40 && g.mood<55 && !g.flags.midlifeCrisis,
+      choices:[
+        { label:'换赛道，重新开始', hint:'🎲 +😊 -💰', fn: g => { g.flags.midlifeCrisis=true; if(Math.random()>0.5){return{mood:25,money:-30000,charm:10}}else{return{mood:-15,money:-50000}} }},
+        { label:'学新技能，提升自己', hint:'+🧠 +💰', fn: g => { g.flags.midlifeCrisis=true; return{intel:15,mood:10,money:-10000}; }},
+        { label:'去旅行，寻找答案', hint:'-💰 +😊 +✨', fn: g => { g.flags.midlifeCrisis=true; g.flags.worldTravel=true; return{money:-20000,mood:20,charm:8}; }},
+        { label:'接受现实，继续前行', hint:'+🧠 +😊', fn: g => { g.flags.midlifeCrisis=true; return{intel:10,mood:15}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -1705,6 +1775,15 @@ const ACHIEVEMENTS = [
     { id:'tiger_parent', icon:'📖', name:'鸡娃家长', desc:'开始鸡娃', check: g => g.flags.tigerParenting },
     { id:'digital_helper', icon:'📱', name:'数字桥梁', desc:'帮助家人跨越数字鸿沟', check: g => g.flags.digitalRefugee },
     { id:'school_district_hero', icon:'🏫', name:'学区房勇士', desc:'买了学区房', check: g => g.flags.schoolDistrictHouse },
+    // v2.22 achievements
+    { id:'gender_warrior', icon:'⚖️', name:'性别平权斗士', desc:'经历过职场性别歧视', check: g => g.flags.genderDiscrimination },
+    { id:'fertility_fighter', icon:'🤰', name:'生育权益捍卫者', desc:'经历过生育歧视', check: g => g.flags.fertilityDiscrimination },
+    { id:'family_peacemaker', icon:'👵', name:'家庭和平使者', desc:'处理过婆媳关系', check: g => g.flags.motherInLawConflict },
+    { id:'generation_bridge', icon:'👴', name:'代沟桥梁', desc:'尝试理解父母那一代', check: g => g.flags.generationalGap },
+    { id:'betrayal_survivor', icon:'🗡️', name:'背叛幸存者', desc:'经历过朋友背叛', check: g => g.flags.friendBetrayal },
+    { id:'filial_child', icon:'🏥', name:'孝顺子女', desc:'照顾过生病的父母', check: g => g.flags.parentAging },
+    { id:'stock_veteran', icon:'📉', name:'股市老兵', desc:'经历过股市暴跌', check: g => g.flags.stockCrash },
+    { id:'midlife_awakening', icon:'🎭', name:'中年觉醒', desc:'经历过中年危机', check: g => g.flags.midlifeCrisis },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -2349,7 +2428,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.21' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.22' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
