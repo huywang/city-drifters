@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v25.0
+// 都市浮生记 - Game Engine v25.1
 // ============================================
 
 // === GAME STATE ===
@@ -12238,6 +12238,87 @@ const EVENTS = [
         { label:'理解了但还没完全做到，慢慢来', hint:'+😊 +🧠', fn: g => { g.flags.acceptance=true; return{mood:8,intel:5}; }},
         { label:'觉得「接受」就是「认命」，不甘心', hint:'-😊', fn: g => { g.flags.acceptance=true; return{mood:-5}; }},
       ]},
+    // === v25.1: 社交媒体 + 新型关系 + 消费观 ===
+    { id:'social_media_fatigue', icon:'📱', title:'社交媒体倦怠', category:'psychology',
+      body:'你发现自己越来越不想发朋友圈了。\n\n以前每天发3条——现在一个月发1条。\n\n不是生活无聊——是你看透了社交媒体的本质：\n- 每个人都在表演\n- 每条动态都是精心策划的「人设」\n- 点赞数成了衡量价值的标准\n- 你的注意力被算法精准收割\n\n你做了一个实验：一周不发朋友圈、不刷社交媒体。\n\n结果：\n- 你的焦虑减少了\n- 你的注意力集中了\n- 你开始注意到身边真实发生的事情\n- 但你也错过了一些朋友的消息\n\n你在想：社交媒体——连接了世界，却隔离了真实。\n\n「社交媒体：你以为你在社交——其实你在被社交。」',
+      cond: g => g.age >= 18 && !g.flags.socialMediaFatigue,
+      choices:[
+        { label:'开始数字排毒，每天只看10分钟', hint:'+😊 +🧠 +❤️', fn: g => { g.flags.socialMediaFatigue=true; g.flags.digitalDetox=true; return{mood:12,intel:5,health:5}; }},
+        { label:'减少使用频率，但不完全戒掉', hint:'+😊 +🧠', fn: g => { g.flags.socialMediaFatigue=true; return{mood:5,intel:3}; }},
+        { label:'觉得这就是时代的一部分，接受它', hint:'+🧠', fn: g => { g.flags.socialMediaFatigue=true; return{intel:3}; }},
+      ]},
+    { id:'situationship', icon:'💕', title:'暧昧关系', category:'social',
+      body:'你和一个异性朋友之间——变得暧昧了。\n\n你们：\n- 每天聊天，比跟任何人都多\n- 一起吃饭、看电影、散步\n- 偶尔有一些超越朋友的小动作\n- 但谁都没有说「在一起」\n\n朋友问你：「你们是不是在一起了？」\n\n你说：「没有。只是朋友。」\n\n但你心里知道——不只是朋友。\n\n你们处于一种新型关系：situationship（情境式恋爱）\n- 有恋爱的感觉\n- 没有恋爱的责任\n- 不用见家长\n- 不用考虑未来\n\n很舒服——但也很脆弱。因为随时可以结束。\n\n「暧昧：不是不敢爱——是不想被定义。」',
+      cond: g => g.age >= 20 && g.age <= 35 && !g.flags.situationship && !g.flags.married,
+      choices:[
+        { label:'鼓起勇气表白，确定了关系', hint:'+😊 +🤝 ±💰', fn: g => { g.flags.situationship=true; g.flags.confessed=true; return{mood:15,social:5}; }},
+        { label:'享受当下，不想被关系定义', hint:'+😊 -🤝', fn: g => { g.flags.situationship=true; g.flags.enjoyNow=true; return{mood:8,social:-2}; }},
+        { label:'觉得没有未来，慢慢疏远了', hint:'-😊', fn: g => { g.flags.situationship=true; return{mood:-8}; }},
+      ]},
+    { id:'consumption_downgrade_v25_1', icon:'📉', title:'消费降级', category:'finance',
+      body:'你开始「消费降级」了。\n\n不是没钱——是看开了：\n- 以前穿优衣库，现在穿1688\n- 以前喝星巴克，现在瑞幸9.9\n- 以前用苹果，现在小米\n- 以前去日料，现在沙县\n- 以前健身卡200/月，现在公园跑步\n\n你发现：\n- 你的生活质量——几乎没有下降\n- 你的存款——每月多了3000元\n- 你的焦虑——明显减少了\n\n原来——你以前花的很多钱，不是为了「好」，而是为了「看起来好」。\n\n当面子不再重要——你发现自由多了很多。\n\n「消费降级：不是变穷了——是变聪明了。」',
+      cond: g => g.age >= 22 && !g.flags.consumptionDowngrade,
+      choices:[
+        { label:'彻底践行消费降级，省下的钱投资', hint:'+💰 +🧠 +😊', fn: g => { g.flags.consumptionDowngrade=true; g.flags.smartSaver=true; g.money += 10000; return{intel:8,mood:8}; }},
+        { label:'在重要事情上不降级，日常能省则省', hint:'+💰 +🧠', fn: g => { g.flags.consumptionDowngrade=true; g.money += 5000; return{intel:5}; }},
+        { label:'觉得生活品质很重要，不想降级', hint:'-💰 +😊', fn: g => { g.flags.consumptionDowngrade=true; g.money -= 2000; return{mood:3}; }},
+      ]},
+    { id:'anti_consumerism', icon:'🚫', title:'反消费主义', category:'psychology',
+      body:'你看了一部纪录片《无节制消费的元凶》。\n\n你被震惊了：\n- 灯泡故意做成短寿命（计划报废）\n- 手机故意让旧款变慢（强制更新）\n- 时尚业每年制造新趋势让你觉得「去年的衣服不能穿了」\n- 广告不是在卖产品——是在卖「你不够好」的焦虑\n\n你开始反思：\n- 你真的需要每年换新手机吗？\n- 你真的需要那些「限时折扣」的东西吗？\n- 你的欲望——有多少是真实的，多少是被制造的？\n\n你做了一个决定：30天内不买任何非必需品。\n\n30天后——你发现你什么都不缺。\n\n「反消费主义：你以为你在花钱——其实你在被花。」',
+      cond: g => g.age >= 20 && !g.flags.antiConsumerism && g.intel >= 20,
+      choices:[
+        { label:'成了反消费主义者，只买真正需要的', hint:'+💰 +😊 +🧠', fn: g => { g.flags.antiConsumerism=true; g.flags.consciousConsumer=true; g.money += 8000; return{mood:10,intel:8}; }},
+        { label:'减少了冲动消费，但不会太极端', hint:'+💰 +🧠', fn: g => { g.flags.antiConsumerism=true; g.money += 3000; return{intel:5}; }},
+        { label:'觉得消费也是经济的一部分，不能不花', hint:'+🧠', fn: g => { g.flags.antiConsumerism=true; return{intel:3}; }},
+      ]},
+    { id:'lying_flat_2', icon:'🛋️', title:'躺平2.0', category:'psychology',
+      body:'「躺平」这个词已经过时了。\n\n现在的年轻人不叫躺平——叫「低欲望生活」：\n- 不买房（买不起也不想买）\n- 不结婚（不想负责任）\n- 不升职（不想996）\n- 不社交（社恐+宅）\n- 不消费（够用就行）\n\n你看着这些数据：\n- 中国的结婚率连续8年下降\n- 年轻人的储蓄率在上升\n- 「极简生活」搜索量暴增300%\n- 「一人食」餐厅越来越多\n\n有人说这是堕落。但你看到了另一面：\n\n这不是放弃——是重新定义「成功」。\n\n不是每个人都想当CEO。有人只想安安静静地活着。\n\n这——也是一种勇气。\n\n「低欲望：不是没有欲望——是只有自己的欲望。」',
+      cond: g => g.age >= 20 && g.age <= 35 && !g.flags.lyingFlat2 && g.mood <= 50,
+      choices:[
+        { label:'开始实践低欲望生活，减少不必要的追求', hint:'+😊 +💰 +🧠', fn: g => { g.flags.lyingFlat2=true; g.flags.lowDesire=true; g.money += 5000; return{mood:12,intel:5}; }},
+        { label:'部分认同，但有些事还是想争取', hint:'+🧠 +😊', fn: g => { g.flags.lyingFlat2=true; return{intel:5,mood:5}; }},
+        { label:'觉得这就是逃避，还是要努力', hint:'-😊 +💰', fn: g => { g.flags.lyingFlat2=true; return{mood:-3,money:2000}; }},
+      ]},
+    { id:'online_dating_v25_1', icon:'💘', title:'网恋奔现', category:'social',
+      body:'你在一个交友App上认识了一个人。\n\n聊了3个月，从早安到晚安，从工作到理想。\n\n你觉得——你们很合拍。比现实中认识的大多数人都合拍。\n\n你们决定「奔现」——线下见面。\n\n见面的那天——你很紧张。\n\n对方出现了：\n- 比照片胖了一点\n- 比网上话少了很多\n- 但笑起来的样子——确实很可爱\n\n你们尴尬地吃了顿饭，然后散了步。\n\n回去后你发了条消息：「今天挺开心的。」\n\n对方回：「我也是。」\n\n你知道：这不是结束——也不是开始。只是两个孤独的人，试着靠近了一点。\n\n「网恋奔现：屏幕里的温度——到了现实中，还暖吗？」',
+      cond: g => g.age >= 20 && g.age <= 38 && !g.flags.onlineDating && !g.flags.married,
+      choices:[
+        { label:'继续发展，开始正式交往', hint:'+😊 +🤝', fn: g => { g.flags.onlineDating=true; g.flags.onlineRelationship=true; return{mood:12,social:8}; }},
+        { label:'成了朋友，觉得也挺好', hint:'+🤝 +😊', fn: g => { g.flags.onlineDating=true; return{social:5,mood:3}; }},
+        { label:'见面后觉得不合适，没再联系', hint:'-😊', fn: g => { g.flags.onlineDating=true; return{mood:-5}; }},
+      ]},
+    { id:'information_overload', icon:'📰', title:'信息过载', category:'psychology',
+      body:'你今天看了：\n- 37条新闻推送\n- 12条短视频\n- 8篇文章\n- 5条朋友圈\n- 3个群里的200+条消息\n\n你闭上眼睛，试图回忆今天看了什么——\n\n你什么都想不起来。\n\n你意识到：你每天消费的信息量——比你爷爷一辈子看的都多。\n\n但你的知识——没有增加。你的焦虑——增加了。\n\n因为：信息不等于知识。知识不等于智慧。\n\n你需要的不是更多信息——而是更少的噪音。\n\n你决定：从今天起，每天只看3个信息源。只读长文章，不刷短视频。\n\n「信息过载：你知道得太多——但理解得太少。」',
+      cond: g => g.age >= 18 && !g.flags.infoOverload && g.intel >= 15,
+      choices:[
+        { label:'开始信息断食，只看精选内容', hint:'+🧠 +😊', fn: g => { g.flags.infoOverload=true; g.flags.infoDieter=true; return{intel:10,mood:8}; }},
+        { label:'减少了刷手机的频率', hint:'+🧠', fn: g => { g.flags.infoOverload=true; return{intel:5,mood:3}; }},
+        { label:'觉得这就是现代生活，没法避免', hint:'', fn: g => { g.flags.infoOverload=true; return{mood:-3}; }},
+      ]},
+    { id:'friend_breakup', icon:'💔', title:'友情分手', category:'social',
+      body:'你和一个认识了10年的朋友——「分手」了。\n\n不是吵架，不是背叛——是渐行渐远。\n\n你们曾经：\n- 一起通宵打游戏\n- 一起穷游西藏\n- 一起失恋互相安慰\n- 说过「我们要当一辈子的朋友」\n\n但现在：\n- 你们的话题越来越少\n- 价值观越来越不同\n- 每次见面都在尬聊\n- 最后一条消息已经是3个月前了\n\n你翻着以前的聊天记录，觉得——那个人还在，但那段友情已经走了。\n\n你在想：友情——原来也是有保质期的。\n\n「友情分手：不是谁的错——是时间把你们推向了不同的方向。」',
+      cond: g => g.age >= 25 && !g.flags.friendBreakup && g.social >= 20,
+      choices:[
+        { label:'主动联系，试着修复这段友情', hint:'+🤝 +😊', fn: g => { g.flags.friendBreakup=true; g.flags.friendshipRepair=true; return{social:8,mood:5}; }},
+        { label:'接受了，有些友情就是阶段性的', hint:'+🧠 +😊', fn: g => { g.flags.friendBreakup=true; g.flags.acceptanceGrowth=true; return{intel:5,mood:3}; }},
+        { label:'很难过，觉得自己失去了什么', hint:'-😊', fn: g => { g.flags.friendBreakup=true; return{mood:-8,social:-3}; }},
+      ]},
+    { id:'slow_living_v25_1', icon:'🐢', title:'慢生活', category:'psychology',
+      body:'你搬到了一个节奏更慢的社区。\n\n不是逃离大城市——是在大城市里找到一个慢的角落。\n\n你的新日常：\n- 早上在小区花园里喝杯茶\n- 中午自己做一顿不赶时间的饭\n- 下午在阳台上看看书\n- 晚上散步，跟邻居聊聊天\n\n你发现：慢下来之后——\n- 你的味觉变灵敏了（原来米饭是甜的）\n- 你的听力变好了（原来鸟是唱歌的）\n- 你的思维变清晰了（原来很多想法一直在等你安静下来）\n\n你不是在「浪费时间」——你是在「回收时间」。\n\n「慢生活：不是做得少——是感受得多。」',
+      cond: g => g.age >= 25 && !g.flags.slowLiving,
+      choices:[
+        { label:'彻底转向慢生活，重新安排生活节奏', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.slowLiving=true; g.flags.slowLifestyle=true; return{mood:15,health:8,intel:5}; }},
+        { label:'在忙碌中穿插慢的时光', hint:'+😊 +❤️', fn: g => { g.flags.slowLiving=true; return{mood:8,health:5}; }},
+        { label:'觉得太慢了会落后，还是保持节奏', hint:'+💰', fn: g => { g.flags.slowLiving=true; return{money:1000}; }},
+      ]},
+    { id:'digital_nomad_return', icon:'🏙️', title:'回流大城市', category:'city',
+      body:'你之前离开过大城市——去了小城市/老家生活。\n\n但半年后，你又回来了。\n\n不是因为大城市好——是因为你发现：\n- 小城市的机会确实少\n- 老家的关系网让你窒息\n- 你的专业能力在小城市没有用武之地\n- 你习惯了大城市的便利和自由\n\n你在出租屋里放下行李，深吸一口气。\n\n你问自己：「这次回来——你准备好待多久？」\n\n你不知道。但你知道：大城市有一种魔力——让你又爱又恨，但永远放不下。\n\n「回流：离开是为了看清——回来是为了确认。」',
+      cond: g => g.age >= 22 && g.age <= 40 && !g.flags.nomadReturn && g.flags.nomadLife,
+      choices:[
+        { label:'这次回来就不走了，扎根大城市', hint:'+💰 +🧠 -😊', fn: g => { g.flags.nomadReturn=true; g.flags.cityCommitted=true; return{money:5000,intel:5,mood:-3}; }},
+        { label:'先试试看，不行再走', hint:'+🧠', fn: g => { g.flags.nomadReturn=true; return{intel:3,mood:3}; }},
+        { label:'回来只是暂时的，还在找方向', hint:'-😊', fn: g => { g.flags.nomadReturn=true; return{mood:-5}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -13341,6 +13422,12 @@ const ACHIEVEMENTS = [
     { id:'long_term_volunteer_ach', icon:'🤝', name:'长期志愿者', desc:'每周坚持社区志愿服务', check: g => g.flags.longTermVolunteer },
     { id:'graceful_acceptance_ach', icon:'🌈', name:'学会接受', desc:'不再跟现实较劲，练习感恩', check: g => g.flags.gracefulAcceptance },
     { id:'city_storyteller_ach', icon:'🏗️', name:'城市记录者', desc:'用文字记录城市的故事', check: g => g.flags.cityStoryteller },
+    // v25.1: 社交媒体与消费观成就
+    { id:'conscious_consumer_ach', icon:'🚫', name:'清醒消费者', desc:'成为反消费主义者，只买真正需要的', check: g => g.flags.consciousConsumer },
+    { id:'info_dieter_ach', icon:'📰', name:'信息节食者', desc:'精选信息源，拒绝信息过载', check: g => g.flags.infoDieter },
+    { id:'slow_lifestyle_ach', icon:'🐢', name:'慢生活实践者', desc:'彻底转向慢生活节奏', check: g => g.flags.slowLifestyle },
+    { id:'low_desire_ach', icon:'🛋️', name:'低欲望生活', desc:'实践低欲望生活方式', check: g => g.flags.lowDesire },
+    { id:'smart_saver_ach', icon:'📉', name:'消费降级达人', desc:'消费降级并省下钱来投资', check: g => g.flags.smartSaver },
 ];
 
 // === ENDINGS === (order matters: first match wins)
