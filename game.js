@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v33.9
+// 都市浮生记 - Game Engine v34.0
 // ============================================
 
 // === GAME STATE ===
@@ -19251,6 +19251,98 @@ const EVENTS = [
         { label:'写了一篇读书心得发到网上', hint:'+✨ +👥', fn: g => { g.flags.chinesePhilosophy=true; g.flags.philosophyWriter=true; return{charm:12,social:8}; }},
       ]},
 
+    // ===== 城市户外与小众运动 (v34.0) =====
+
+    { id:'camping_v34_0', icon:'⛺', title:'露营初体验', category:'outdoor',
+      body:'朋友拉你去露营。\n\n你们开车两个小时到了一个郊外的营地。你扛着帐篷、折叠椅、卡式炉和一堆食材，在草地上折腾了一个小时才把帐篷搭好。\n\n傍晚的时候，你们点起篝火，烤着棉花糖，喝着啤酒。天空特别干净，你看到了好久没见过的星星。\n\n朋友说：「你知道吗，这叫精致露营。以前叫野外求生。」\n\n你笑了。但笑完之后，你发现自己是真的很放松。\n\n没有微信消息，没有邮件提醒，没有外卖骑手打电话说找不到你家。只有风的声音和火苗的噼啪声。\n\n半夜你被蚊子咬醒了三次，帐篷底下硌得慌。第二天你腰酸背痛地回城，发了个朋友圈：「与自然亲密接触的一天。」\n\n底下评论：「看着好治愈！」但你没说的是，你的装备花了三千多，而那顶帐篷大概率只会用这一次。',
+      cond: g => g.age >= 20 && g.money > 5000 && g.health > 30,
+      choices:[
+        { label:'入坑了，开始研究装备', hint:'+✨ -💰', fn: g => { g.flags.camping=true; g.flags.outdoorGear=true; return{charm:8,mood:10,money:-3000}; }},
+        { label:'觉得挺好但不想再花钱了', hint:'+😊 +🧠', fn: g => { g.flags.camping=true; return{mood:8,intel:3}; }},
+        { label:'开始研究徒步露营路线', hint:'+🧠 +✨', fn: g => { g.flags.camping=true; g.flags.hikingCamping=true; return{intel:8,charm:5}; }},
+      ]},
+
+    { id:'trail_running_v34_0', icon:'🏃', title:'越野跑入门', category:'outdoor',
+      body:'你开始跑越野了。\n\n不是城市里的跑步机，不是公园里的塑胶跑道，而是真正的山路——泥巴、石头、树根、上坡、下坡。\n\n第一次跑的时候，你五公里走了三个小时。上坡喘得说不出话，下坡腿软得像面条。你摔了两跤，膝盖磕破了皮。\n\n但你看到了城市里永远看不到的东西：清晨山间的雾气、溪边喝水的小鸟、远处连绵的城市天际线。\n\n你开始理解为什么有人愿意花几百块报名一个越野赛——不是为了成绩，而是为了在山里跑的那几个小时。那是你完全属于自己的时间。\n\n三个月后，你报了人生第一个10公里越野赛。跑完的时候你的腿已经不是你的了，但你觉得你多了一双翅膀。',
+      cond: g => g.age >= 20 && g.health > 35,
+      choices:[
+        { label:'坚持每周跑山，报了比赛', hint:'+😊 +👥', fn: g => { g.flags.trailRunning=true; return{mood:12,social:5,health:10,money:-500}; }},
+        { label:'跑了几次，膝盖疼就停了', hint:'+🧠', fn: g => { g.flags.trailRunning=true; return{intel:3,health:-5}; }},
+        { label:'开始研究运动科学和装备', hint:'+🧠 +✨', fn: g => { g.flags.trailRunning=true; g.flags.sportsScience=true; return{intel:10,charm:5,money:-2000}; }},
+      ]},
+
+    { id:'frisbee_v34_0', icon:'🥏', title:'飞盘社交', category:'outdoor',
+      body:'你被拉进了一个飞盘群。\n\n群里全是年轻人，每周六下午在公园玩飞盘。你去了，发现飞盘比你想象的要累得多——跑来跑去、跳起来接盘、摔倒、再爬起来。\n\n但最神奇的是社交部分。休息的时候大家席地而坐，分享零食和饮料，聊工作、聊生活、聊最近在追的剧。你认识了律师、程序员、自由职业者、刚毕业的大学生——在飞盘场上，所有人的身份都只剩「飞盘手」。\n\n你也注意到了一个现象：飞盘场上拍照的人比打球的人多。有人穿着全套lululemon，有人带着专业摄影师，还有人全程直播。\n\n你有点无语，但也有点开心。毕竟，运动不运动不重要，重要的是你出来晒太阳了。',
+      cond: g => g.age >= 18 && g.age <= 35 && g.social > 20,
+      choices:[
+        { label:'爱上了飞盘，成了固定成员', hint:'+👥 +😊', fn: g => { g.flags.frisbee=true; return{social:12,mood:8,health:5}; }},
+        { label:'去了一次，觉得太social了', hint:'+🧠', fn: g => { g.flags.frisbee=true; return{intel:3}; }},
+        { label:'开始组织自己的飞盘局', hint:'+✨ +👥', fn: g => { g.flags.frisbee=true; g.flags.frisbeeOrganizer=true; return{charm:10,social:10,money:1000}; }},
+      ]},
+
+    { id:'paddleboard_v34_0', icon:'🏄', title:'桨板初体验', category:'outdoor',
+      body:'夏天到了，朋友约你去划桨板。\n\n你们去了一个城市边上的湖。你站在桨板上，摇摇晃晃，三秒钟就掉进了水里。爬上去，又掉下来。反复五次之后，你终于站稳了。\n\n湖面很平静，你慢慢划到了湖中央。四周只有水声和远处的鸟叫。你躺在桨板上，看着天空，觉得整个世界都慢下来了。\n\n朋友划过来，递给你一罐冰可乐。你们在湖中央碰了碰罐，什么也没说。\n\n后来你发现，桨板在小红书上的标签有300万条。你看了看自己拍的照——蓝天碧水一个人影——确实很适合发朋友圈。\n\n你发了一条，配文：「城市里的诗和远方。」\n\n你妈评论：「注意安全，别晒黑了。」',
+      cond: g => g.age >= 18 && g.health > 25 && g.money > 2000,
+      choices:[
+        { label:'买了块桨板，成了周末标配', hint:'+😊 +✨ -💰', fn: g => { g.flags.paddleboard=true; return{mood:12,charm:8,money:-2500}; }},
+        { label:'觉得太晒了，还是室内舒服', hint:'+🧠 +😊', fn: g => { g.flags.paddleboard=true; return{intel:3,mood:5}; }},
+        { label:'开始研究水上运动——皮划艇、冲浪', hint:'+✨ +🧠', fn: g => { g.flags.paddleboard=true; g.flags.waterSports=true; return{charm:8,intel:5,money:-1500}; }},
+      ]},
+
+    { id:'climbing_gym_v34_0', icon:'🧗', title:'攀岩馆', category:'outdoor',
+      body:'你第一次走进攀岩馆。\n\n十几米高的岩壁，五颜六色的岩点，穿着紧身衣的人们在墙上像蜘蛛一样移动。你仰头看着，脖子都酸了。\n\n你租了攀岩鞋，系上安全带，开始爬。前两面还算简单，你蹭蹭蹭就上去了。第三面你卡住了——手够不到下一个岩点，脚在打滑，手臂开始发抖。\n\n教练在下面喊：「别用蛮力！用腿！腿的力量比手大！」\n\n你调整了姿势，用腿蹬了一下——居然够到了！你一路爬到了顶端，拍了一下计时器。\n\n下来的时候你的手已经握不住东西了，但你觉得爽翻了。\n\n你开始每周去两次。攀岩馆里的人都很好——大家互相帮忙看线路、分享技巧、在你登顶的时候欢呼。\n\n你发现攀岩最大的魅力是：每一次登顶都是一道新的谜题。同样的岩壁，换一种方式就能上去。就像生活一样。',
+      cond: g => g.age >= 18 && g.health > 30,
+      choices:[
+        { label:'入坑了，买了攀岩鞋和粉袋', hint:'+😊 +✨ -💰', fn: g => { g.flags.climbingGym=true; return{mood:12,charm:8,money:-800,health:5}; }},
+        { label:'去了几次，怕高就不去了', hint:'+🧠', fn: g => { g.flags.climbingGym=true; return{intel:3}; }},
+        { label:'开始计划去户外攀岩', hint:'+✨ +🧠', fn: g => { g.flags.climbingGym=true; g.flags.outdoorClimbing=true; return{charm:10,intel:5,money:-3000}; }},
+      ]},
+
+    { id:'long_ride_v34_0', icon:'🚴', title:'长途骑行', category:'outdoor',
+      body:'你决定骑车去隔壁城市。\n\n全程120公里，你以前从来没骑过这么远。你花了两千块买了一辆入门公路车，还配了头盔、手套、骑行裤。\n\n出发那天是个大晴天。前30公里你感觉自己像风一样自由。50公里的时候你的屁股开始疼。80公里的时候你的腿已经不是你的了。\n\n最后20公里你几乎是在用意志力蹬。你想了无数次要不要打车，但最终你没有。\n\n到达终点的时候，你坐在路边，喝着冰可乐，觉得这是你喝过最好喝的东西。\n\n你发了一条朋友圈：「120公里，用双腿丈量世界。」获得了200个赞。\n\n回城的火车上，你把自行车拆了塞进行李架。对面的大爷看着你说：「年轻人，好样的。」\n\n你笑了笑，然后睡着了。',
+      cond: g => g.age >= 20 && g.health > 35 && g.money > 3000,
+      choices:[
+        { label:'开始挑战更长的骑行路线', hint:'+😊 +✨ -💰', fn: g => { g.flags.longRide=true; return{mood:12,charm:10,health:8,money:-2000}; }},
+        { label:'觉得太虐了，还是城市骑骑就好', hint:'+🧠 +😊', fn: g => { g.flags.longRide=true; return{intel:5,mood:5}; }},
+        { label:'开始参加骑行比赛', hint:'+👥 +✨', fn: g => { g.flags.longRide=true; g.flags.cyclingRace=true; return{social:8,charm:8,money:-1000}; }},
+      ]},
+
+    { id:'music_festival_v34_0', icon:'🎪', title:'户外音乐节', category:'outdoor',
+      body:'你抢到了音乐节的票——两天通票，1280元。\n\n现场比你想象的还要疯狂。三万人挤在一片草地上，四个舞台同时演出，音响震得你心脏都在抖。\n\n你站在人群中间，跟着几万个陌生人一起唱同一首歌。有人在你旁边开了火车（排成一列跑来跑去），有人在草地上打滚，有人举着巨大的充气恐龙。\n\n你旁边的女孩递给你一瓶水：「喝点水吧，你嗓子都哑了。」你们聊了几句，她是另一个城市的护士，专门请假来看这场音乐节。\n\n晚上压轴乐队上场的时候，全场亮起了手机灯。几万盏小灯在黑暗中摇晃，像一片人造星空。\n\n你流了眼泪。不是悲伤，是那种「活着真好」的感觉。\n\n第二天你嗓子哑了、腿酸了、晒黑了三个度。但你觉得这1280块花得太值了。',
+      cond: g => g.age >= 18 && g.age <= 35 && g.money > 2000,
+      choices:[
+        { label:'从此每年都要去音乐节', hint:'+😊 +👥 -💰', fn: g => { g.flags.musicFestival=true; return{mood:15,social:8,money:-1280}; }},
+        { label:'体验一次就够了', hint:'+🧠 +😊', fn: g => { g.flags.musicFestival=true; return{intel:5,mood:8}; }},
+        { label:'开始玩乐队了', hint:'+✨ +👥', fn: g => { g.flags.musicFestival=true; g.flags.inBand=true; return{charm:12,social:8,money:-3000}; }},
+      ]},
+
+    { id:'marathon_v34_0', icon:'🏅', title:'城市马拉松', category:'outdoor',
+      body:'你报名了城市马拉松——半程，21公里。\n\n为了这个比赛，你训练了三个月。从5公里跑到10公里，从10公里跑到15公里，每次跑完都觉得自己的膝盖在发出奇怪的声响。\n\n比赛那天凌晨五点你就起床了。站在起跑线前，你周围是两万个跟你一样紧张又兴奋的人。\n\n发令枪响，人群像潮水一样涌出去。前5公里你跑得很稳，10公里开始觉得腿沉了，15公里你开始走，18公里你又开始跑——因为终点就在前面了。\n\n最后200米，你看到了终点拱门。旁边有人在喊加油，你使出了最后的力气冲刺。\n\n过线的那一刻，你看了看计时器：2小时47分。不快，但是你自己的。\n\n志愿者把奖牌挂在你脖子上的时候，你哭了。不是因为成绩，是因为你做到了三个月前觉得不可能的事。\n\n那天晚上你把奖牌放在枕头旁边，发了条朋友圈：「21.0975公里。我和自己签的约，我履行了。」',
+      cond: g => g.age >= 20 && g.health > 40,
+      choices:[
+        { label:'开始备战全马', hint:'+😊 +✨', fn: g => { g.flags.marathon=true; g.flags.fullMarathon=true; return{mood:15,charm:10,health:10}; }},
+        { label:'半马就够了，不虐自己了', hint:'+🧠 +😊', fn: g => { g.flags.marathon=true; return{intel:5,mood:10}; }},
+        { label:'带动了三个朋友一起跑', hint:'+👥 +✨', fn: g => { g.flags.marathon=true; g.flags.runningCoach=true; return{social:10,charm:8}; }},
+      ]},
+
+    { id:'skiing_v34_0', icon:'⛷️', title:'滑雪场初体验', category:'outdoor',
+      body:'冬天来了，朋友拉你去滑雪。\n\n你花了八百块租了全套装备——雪板、雪鞋、头盔、雪镜。站在初级道上，你感觉自己像个刚学会走路的企鹅。\n\n第一趟你摔了七次。第二趟摔了五次。第三趟你终于能不摔倒地滑完初级道了。\n\n然后你膨胀了，去了中级道。\n\n结果：你在半坡上坐了下来，因为你的腿已经不听使唤了。旁边有个六岁的小孩嗖嗖地滑了过去，回头看了你一眼。\n\n你觉得受到了侮辱。\n\n但后来你站在山顶往下看的时候，被眼前的景色震住了——白茫茫的雪道延伸到远方，远处是城市的天际线，阳光照在雪面上闪闪发光。\n\n你深吸一口冰冷的空气，觉得肺里都是干净的。\n\n回城的路上，你已经在搜下个雪季要去哪里了。朋友推荐了长白山和崇礼。你看了看机票价格，沉默了。',
+      cond: g => g.age >= 18 && g.health > 30 && g.money > 3000,
+      choices:[
+        { label:'入坑了，买了全套装备', hint:'+😊 +✨ -💰', fn: g => { g.flags.skiing=true; return{mood:12,charm:10,money:-5000}; }},
+        { label:'觉得太贵了，一年去一次就好', hint:'+🧠 +😊', fn: g => { g.flags.skiing=true; return{intel:5,mood:8}; }},
+        { label:'开始研究单板——更酷', hint:'+✨ +🧠', fn: g => { g.flags.skiing=true; g.flags.snowboard=true; return{charm:12,intel:5,money:-3000}; }},
+      ]},
+
+    { id:'outdoor_philosophy_v34_0', icon:'🌄', title:'户外改变了我', category:'outdoor',
+      body:'一年过去了。你回头看看，户外运动不知不觉改变了你很多。\n\n你的身体变好了——体重减了五公斤，腰围小了，上楼不再喘了。体检报告上所有指标都正常了。\n\n你的社交圈变了——以前你的朋友都是同事和同学，现在你有了「跑友」「骑友」「攀友」「雪友」。你们不一定聊工作，但你们聊路线、聊装备、聊那次在山上看到的日出。\n\n你的消费观变了——以前你花钱买衣服、买包、买最新款手机，现在你花钱买体验。一件冲锋衣穿了三年，比任何奢侈品都让你觉得值。\n\n你的心态变了——以前你会因为堵车、加班、外卖送错了而焦虑，现在你知道，这些都不重要。重要的是你有没有好好呼吸过今天的空气。\n\n你在朋友圈写了一段话：\n\n「不是我在运动，是运动在疗愈我。不是我在看风景，是风景在重塑我。」\n\n你获得了88个赞。但你最开心的，是你真的相信了自己写的每一个字。',
+      cond: g => g.age >= 22 && (g.flags.camping || g.flags.trailRunning || g.flags.frisbee || g.flags.climbingGym || g.flags.marathon) && g.health > 40,
+      choices:[
+        { label:'把户外融入了生活方式', hint:'+😊 +✨ +🧠', fn: g => { g.flags.outdoorPhilosophy=true; g.flags.outdoorLife=true; return{mood:15,charm:12,intel:8,health:10}; }},
+        { label:'开始带新手朋友入坑', hint:'+👥 +✨', fn: g => { g.flags.outdoorPhilosophy=true; g.flags.outdoorMentor=true; return{social:12,charm:10}; }},
+        { label:'写了一本户外运动指南', hint:'+🧠 +✨', fn: g => { g.flags.outdoorPhilosophy=true; g.flags.outdoorWriter=true; return{intel:15,charm:12,money:5000}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -21118,6 +21210,17 @@ const ACHIEVEMENTS = [
     { id:'calligraphy_v33_9_ach', icon:'✍️', name:'笔墨人生', desc:'开始练毛笔字', check: g => g.flags.calligraphy },
     { id:'chinese_floral_v33_9_ach', icon:'💐', name:'中式花艺', desc:'学习了中式插花', check: g => g.flags.chineseFloral },
     { id:'chinese_philosophy_v33_9_ach', icon:'☯️', name:'东方智慧', desc:'从中国传统哲学中找到了力量', check: g => g.flags.chinesePhilosophy },
+    // --- 城市户外与小众运动 (v34.0) ---
+    { id:'camping_v34_0_ach', icon:'⛺', name:'精致露营', desc:'体验了露营的慢生活', check: g => g.flags.camping },
+    { id:'trail_running_v34_0_ach', icon:'🏃', name:'越野跑者', desc:'在山路上找到了自由', check: g => g.flags.trailRunning },
+    { id:'frisbee_v34_0_ach', icon:'🥏', name:'飞盘社交', desc:'在飞盘场上交到了新朋友', check: g => g.flags.frisbee },
+    { id:'paddleboard_v34_0_ach', icon:'🏄', name:'水上漂浮', desc:'在湖面上找到了平静', check: g => g.flags.paddleboard },
+    { id:'climbing_gym_v34_0_ach', icon:'🧗', name:'岩壁蜘蛛人', desc:'在攀岩馆完成了第一次登顶', check: g => g.flags.climbingGym },
+    { id:'long_ride_v34_0_ach', icon:'🚴', name:'百公里骑士', desc:'用双腿丈量了120公里', check: g => g.flags.longRide },
+    { id:'music_festival_v34_0_ach', icon:'🎪', name:'音乐节狂欢', desc:'在三万人中间找到了自己', check: g => g.flags.musicFestival },
+    { id:'marathon_v34_0_ach', icon:'🏅', name:'马拉松完赛', desc:'完成了人生第一个半程马拉松', check: g => g.flags.marathon },
+    { id:'skiing_v34_0_ach', icon:'⛷️', name:'雪道初体验', desc:'在雪地上摔出了勇气', check: g => g.flags.skiing },
+    { id:'outdoor_philosophy_v34_0_ach', icon:'🌄', name:'户外人生', desc:'户外运动改变了你的生活', check: g => g.flags.outdoorPhilosophy },
 ];
 
 // === ENDINGS === (order matters: first match wins)
