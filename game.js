@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v16.1
+// 都市浮生记 - Game Engine v16.2
 // ============================================
 
 // === GAME STATE ===
@@ -8097,6 +8097,79 @@ const EVENTS = [
         { label:'学做家乡菜', hint:'+😊 +👥 +🧠', fn: g => { g.flags.cookingDiscovery=true; g.flags.hometownCook=true; return{mood:15,social:5,intel:8}; }},
         { label:'偶尔做一次', hint:'+😊 +🧠', fn: g => { g.flags.cookingDiscovery=true; return{mood:8,intel:5}; }},
       ]},
+    // === v16.2 交通出行 + 通勤日常 + 城市移动 ===
+    { id:'subway_commute_v2', icon:'🚇', title:'地铁通勤',
+      body:'你的通勤时间：单程1小时15分钟。\n\n每天早上7点，你挤进地铁。你和300个人共享一节车厢。你的脸贴着别人的后脑勺，你的包夹在两个人之间。\n\n你在地铁上做了很多事：听了500集播客、看了30本小说、刷了无数短视频、睡了无数次（到站时被叫醒的那种）。\n\n你的同事说：「你怎么不住公司附近？」你说：「公司附近的房租是我工资的60%。」\n\n你算了算：一年通勤时间=750小时=31天。你把人生的一个月花在了地铁上。\n\n"地铁通勤：不是在路上——是在用时间换房租。但地铁上的你，有时候比办公室的你更自由。"',
+      cond: g => g.age >= 22 && g.job !== '待业中' && !g.flags.subwayCommute,
+      choices:[
+        { label:'利用通勤时间学习', hint:'+🧠 +💪', fn: g => { g.flags.subwayCommute=true; g.flags.commuteLearner=true; return{intel:12,health:3}; }},
+        { label:'找更近的房子', hint:'-💰 +😊 +💪', fn: g => { g.flags.subwayCommute=true; g.flags.nearbyRenter=true; return{money:-3000,mood:10,health:8}; }},
+        { label:'习惯了就好', hint:'+🧠 +💪', fn: g => { g.flags.subwayCommute=true; return{intel:5,health:3}; }},
+      ]},
+    { id:'spring_festival_rush', icon:'🚄', title:'春运抢票',
+      body:'春节还有15天，你开始抢火车票了。\n\n你开了3个闹钟、准备了2台手机、下载了4个抢票软件。12306在开售的第1秒——票就没了。\n\n你试了候补购票、试了中转方案、试了买长乘短。终于——你抢到了一张站票。\n\n24小时的站票。你带了一个小马扎、两桶泡面、三个充电宝。你在火车上站了12小时、坐了4小时（别人去厕所时蹭座）、睡了2小时（站着睡的）。\n\n到家的时候，你的腿已经不是你的了。但你妈妈做的红烧肉——让你觉得一切都值了。\n\n"春运：不是在回家——是在用身体的疲惫证明，家有多重要。"',
+      cond: g => g.age >= 20 && g.flags.hasParents && !g.flags.springFestivalRush,
+      choices:[
+        { label:'提前买机票', hint:'-💰 +😊 +💪', fn: g => { g.flags.springFestivalRush=true; g.flags.flyHome=true; return{money:-2000,mood:10,health:5}; }},
+        { label:'开车回家', hint:'-💰 +😊 +🧠', fn: g => { g.flags.springFestivalRush=true; g.flags.roadTrip=true; return{money:-1000,mood:8,intel:5}; }},
+        { label:'今年不回去了', hint:'+💰 -😊 -👥', fn: g => { g.flags.springFestivalRush=true; g.flags.stayCity=true; return{money:3000,mood:-10,social:-5}; }},
+      ]},
+    { id:'shared_bike', icon:'🚲', title:'共享单车',
+      body:'你骑共享单车去上班。\n\n早上的空气很清新，风很温柔。你穿过公园、经过河边、路过一排樱花树。你发现：骑车上班比地铁幸福100倍。\n\n但你骑到一半——下雨了。你淋着雨骑到了公司，头发湿了一半。你的同事说：「你怎么像从水里捞出来的？」\n\n你查了一下天气：今天降水概率90%。你查的时候已经迟到了。\n\n"共享单车：不是交通工具——是城市人的小确幸。当然，下雨天除外。"',
+      cond: g => g.age >= 18 && !g.flags.sharedBike,
+      choices:[
+        { label:'坚持骑车通勤', hint:'+💪 +😊 -💰', fn: g => { g.flags.sharedBike=true; g.flags.bikeCommuter=true; return{health:10,mood:8,money:-200}; }},
+        { label:'天气好就骑', hint:'+💪 +🧠', fn: g => { g.flags.sharedBike=true; g.flags.fairWeatherRider=true; return{health:5,intel:5}; }},
+        { label:'还是坐地铁吧', hint:'+🧠', fn: g => { g.flags.sharedBike=true; return{intel:3}; }},
+      ]},
+    { id:'traffic_jam', icon:'🚗', title:'堵车日常',
+      body:'你被堵在了高架上。\n\n导航显示：前方拥堵3公里，预计通行时间40分钟。你已经在这里停了20分钟了。\n\n你看着旁边车道的司机——他也在看你。你们交换了一个「同是天涯沦落人」的眼神。\n\n你打开广播，听到路况播报：「XX高架全线拥堵，建议绕行。」但所有路都堵了。\n\n你在车里听完了2集播客、回复了20条微信、吃了一包薯片。终于——车流开始动了。你到了公司，迟到了1小时。\n\n"堵车：不是你在等路——是路在等你。在大城市，堵车是一种集体修行。"',
+      cond: g => g.age >= 22 && !g.flags.trafficJam,
+      choices:[
+        { label:'错峰出行', hint:'+🧠 +😊 +💪', fn: g => { g.flags.trafficJam=true; g.flags.offPeakCommuter=true; return{intel:8,mood:5,health:3}; }},
+        { label:'改坐地铁', hint:'+🧠 +💰', fn: g => { g.flags.trafficJam=true; return{intel:5,money:300}; }},
+        { label:'在车里听完一本有声书', hint:'+🧠 +😊', fn: g => { g.flags.trafficJam=true; g.flags.audioBookFan=true; return{intel:10,mood:5}; }},
+      ]},
+    { id:'high_speed_rail', icon:'🚅', title:'高铁出差',
+      body:'你第一次坐高铁出差。\n\n350公里/小时的速度，窗外的风景像快进的电影。你从北京到上海只用了4.5小时。\n\n你在高铁上写完了PPT、看完了两份报告、吃了一盒盒饭（45元，味道约等于飞机餐打折版）。\n\n你突然感慨：以前绿皮火车要坐一夜的距离，现在只要半天。中国在提速——但你的工资没提速。\n\n你发了一条朋友圈：「高铁上的打工人。」配图是窗外的风景和你的笔记本电脑。收获了30个赞。\n\n"高铁：不是在缩短距离——是在缩短「想家」和「回家」之间的犹豫时间。"',
+      cond: g => g.age >= 22 && g.job !== '待业中' && !g.flags.highSpeedRail,
+      choices:[
+        { label:'享受高铁效率', hint:'+🧠 +✨ +😊', fn: g => { g.flags.highSpeedRail=true; g.flags.businessTraveler=true; return{intel:8,charm:5,mood:5}; }},
+        { label:'在高铁上看风景发呆', hint:'+😊 +🧠', fn: g => { g.flags.highSpeedRail=true; return{mood:8,intel:5}; }},
+        { label:'下次选卧铺火车', hint:'+😊 +💰', fn: g => { g.flags.highSpeedRail=true; return{mood:5,money:200}; }},
+      ]},
+    { id:'driving_test', icon:'🚙', title:'考驾照',
+      body:'你决定考驾照。\n\n科目一：90分通过。你觉得很简单。\n科目二：第一次倒车入库压线了。教练说：「你是来学车的还是来学压线的？」\n科目三：你忘了打转向灯。考官的表情像是看到了外星人。\n科目四：85分通过。\n\n你终于拿到了驾照。你激动得差点把驾照掉地上。\n\n但你发现：有驾照和会开车是两回事。你拿到驾照后第一次上路，被出租车司机按了5次喇叭。\n\n"考驾照：不是在学开车——是在学如何被教练骂还不还嘴。"',
+      cond: g => g.age >= 18 && !g.flags.drivingTest,
+      choices:[
+        { label:'经常练车', hint:'+💪 +🧠 +💰', fn: g => { g.flags.drivingTest=true; g.flags.hasDriversLicense=true; g.flags.regularDriver=true; return{health:3,intel:8,money:-500}; }},
+        { label:'拿到证就好', hint:'+🧠 +😊', fn: g => { g.flags.drivingTest=true; g.flags.hasDriversLicense=true; return{intel:5,mood:8}; }},
+        { label:'考虑放弃', hint:'-😊 +🧠', fn: g => { g.flags.drivingTest=true; return{mood:-5,intel:3}; }},
+      ]},
+    { id:'ebike_life', icon:'🛵', title:'电动车人生',
+      body:'你买了一辆电动车——3000块，续航60公里。\n\n你觉得这是你今年最值的投资。你不再挤地铁、不再等公交、不再被堵车困住。你骑着电动车穿梭在城市的大街小巷，风吹在脸上，自由的感觉。\n\n但你也发现了电动车的烦恼：充电要找桩、雨天不敢骑、冬天续航减半、交警查头盔。\n\n你在等红灯的时候，旁边停了20辆电动车。你们像一排待飞的鸟——绿灯一亮，齐刷刷冲出去。\n\n"电动车：不是交通工具——是大城市打工人最后的倔强。"',
+      cond: g => g.age >= 20 && !g.flags.ebikeLife,
+      choices:[
+        { label:'每天骑电动车上班', hint:'+💪 +💰 +😊', fn: g => { g.flags.ebikeLife=true; g.flags.ebikeDaily=true; return{health:8,money:1000,mood:8}; }},
+        { label:'周末骑车探索城市', hint:'+😊 +🧠 +💪', fn: g => { g.flags.ebikeLife=true; g.flags.cityExplorer=true; return{mood:12,intel:5,health:5}; }},
+        { label:'只是代步用', hint:'+💰 +🧠', fn: g => { g.flags.ebikeLife=true; return{money:500,intel:3}; }},
+      ]},
+    { id:'night_bus', icon:'🚌', title:'夜班车',
+      body:'加班到凌晨1点，你赶上了最后一班夜班车。\n\n车上只有5个人：一个打瞌睡的白领、一个看书的大学生、一个戴着耳机的年轻人、一个提着工具箱的工人，还有你。\n\n你们谁都没说话。城市的灯光从窗外流过。夜班车慢慢开过空荡荡的街道，像一艘在夜色中航行的船。\n\n你看着车窗上映出的自己——疲惫，但还在坚持。\n\n你到家的时候已经1:40了。你洗了个澡，躺在床上想：明天还要早起。\n\n"夜班车：不是最舒适的交通——但载着的都是最努力的人。"',
+      cond: g => g.age >= 22 && g.job !== '待业中' && !g.flags.nightBus,
+      choices:[
+        { label:'在车上看看书', hint:'+🧠 +😊', fn: g => { g.flags.nightBus=true; g.flags.nightReader=true; return{intel:8,mood:5}; }},
+        { label:'打个盹休息', hint:'+💪 +😊', fn: g => { g.flags.nightBus=true; return{health:5,mood:5}; }},
+        { label:'下次打车回家', hint:'-💰 +💪 +😊', fn: g => { g.flags.nightBus=true; return{money:-50,health:5,mood:8}; }},
+      ]},
+    { id:'car_buying_dilemma', icon:'🚗', title:'买车纠结',
+      body:'你纠结了3个月：要不要买车？\n\n买车的好处：自由、方便、下雨天不淋雨。买车的坏处：车牌摇号2年没中、停车费每月800、油费每月1500、保险每年5000。\n\n你算了一笔账：养一辆车一年要花3万。你一年打车才花5000。\n\n你的同事说：「车是面子。」你的理财顾问说：「车是负债。」你的妈妈说：「有辆车，过年回家方便。」\n\n你最终的决定是——\n\n"买车纠结：不是在选车——是在选生活方式。每一种选择都有代价。"',
+      cond: g => g.age >= 25 && g.money >= 50000 && !g.flags.carBuyingDilemma,
+      choices:[
+        { label:'买辆经济型车', hint:'-💰 +😊 +✨', fn: g => { g.flags.carBuyingDilemma=true; g.flags.carOwner=true; return{money:-80000,mood:12,charm:8}; }},
+        { label:'买辆二手车', hint:'-💰 +🧠 +😊', fn: g => { g.flags.carBuyingDilemma=true; g.flags.usedCarOwner=true; return{money:-30000,intel:5,mood:8}; }},
+        { label:'继续打车/骑车', hint:'+💰 +🧠', fn: g => { g.flags.carBuyingDilemma=true; g.flags.carFree=true; return{money:2000,intel:5}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -8864,6 +8937,13 @@ const ACHIEVEMENTS = [
     { id:'home_cook_ach', icon:'👨‍🍳', name:'家庭厨师', desc:'开始自己做饭', check: g => g.flags.cookingDiscovery },
     { id:'health_porridge_ach', icon:'🥣', name:'养生达人', desc:'开始喝养生粥', check: g => g.flags.healthPorridge },
     { id:'drinking_refuser_ach', icon:'🍺', name:'拒酒达人', desc:'学会了拒绝酒桌文化', check: g => g.flags.drinkingCulture },
+    // === v16.2 新增成就（交通出行） ===
+    { id:'subway_warrior_ach', icon:'🚇', name:'地铁战士', desc:'习惯了地铁通勤', check: g => g.flags.subwayCommute },
+    { id:'spring_rush_ach', icon:'🚄', name:'春运勇士', desc:'经历了春运抢票', check: g => g.flags.springFestivalRush },
+    { id:'bike_lover_ach', icon:'🚲', name:'骑行爱好者', desc:'开始骑车通勤', check: g => g.flags.sharedBike },
+    { id:'commute_optimizer_ach', icon:'🚗', name:'通勤优化师', desc:'学会了错峰出行', check: g => g.flags.trafficJam },
+    { id:'driver_license_ach', icon:'🚙', name:'持证上路', desc:'考取了驾照', check: g => g.flags.drivingTest },
+    { id:'ebike_rider_ach', icon:'🛵', name:'电动车骑士', desc:'骑上了电动车', check: g => g.flags.ebikeLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -9119,6 +9199,9 @@ const ENDINGS = [
     // --- v16.1 NEW ENDINGS (饮食文化) ---
     { id:'kitchen_master_end', badge:'👨‍🍳', title:'厨房大师', desc:'你从一个外卖废人，变成了一个热爱做饭的人。\n\n你学会了红烧肉、糖醋排骨、西红柿炒蛋、酸菜鱼。你的冰箱里永远有新鲜食材。你的厨房里永远飘着香味。\n\n你的朋友们最喜欢来你家蹭饭。你笑着说：「来可以，但要帮忙洗碗。」\n\n你的妈妈说：「你终于像个大人了。」你说：「不是——我只是像个会照顾自己的人。」\n\n"厨房大师：不是厨艺多好——是愿意为自己和爱的人做一顿饭。"', cond: g => g.flags.cookingDiscovery && g.flags.homeCook && g.flags.regularCook && g.health >= 60 && g.age >= 25 },
     { id:'healthy_living_end', badge:'🥗', title:'健康生活家', desc:'你找到了一种既健康又快乐的生活方式。\n\n你每天喝养生粥、每周做3次饭、控制咖啡和奶茶、科学饮食加规律运动。你的体重稳定了、皮肤变好了、精力充沛了。\n\n你的同事问你：「你怎么做到的？」你说：「不是自律——是爱自己。」\n\n你不再为了减肥而饿肚子、不再为了社交而喝酒、不再为了省时间而吃垃圾食品。你终于学会了——好好吃饭，是对自己最基本的尊重。\n\n"健康生活：不是苦行僧——是找到了让身体和心灵都舒服的节奏。"', cond: g => g.flags.scientificDiet && g.flags.healthPorridge && g.flags.coffeeModerator && g.health >= 70 && g.mood >= 65 && g.age >= 28 },
+    // --- v16.2 NEW ENDINGS (交通出行) ---
+    { id:'city_explorer_end', badge:'🗺️', title:'城市探索者', desc:'你比任何人都了解这个城市。\n\n你骑着电动车/自行车/走路，探索了每一条街道、每一个公园、每一家小店。你知道哪条巷子最安静、哪个路口日落最美、哪里的煎饼最好吃。\n\n你的朋友们来这个城市旅游，都找你要攻略。你说：「不用攻略——跟着我走就行。」\n\n你的地图App上标记了500多个你去过的地方。每一个标记都是一段记忆。\n\n"城市探索：不是走过多少路——是记住了多少风景。"', cond: g => g.flags.cityExplorer && g.flags.bikeCommuter && g.flags.nightCity && g.mood >= 65 && g.age >= 25 },
+    { id:'commute_master_end', badge:'🚇', title:'通勤大师', desc:'你把通勤变成了一种生活方式。\n\n你学会了利用通勤时间学习、找到了最优路线、掌握了错峰出行的秘诀。你的通勤时间不再是浪费——而是你的「第二课堂」。\n\n你在地铁上听完了一整个大学课程、在公交上看完了50本书、在堵车时写完了一部小说的初稿。\n\n你的同事问你：「你不觉得通勤很累吗？」你说：「通勤不累——是你没有给它赋予意义。」\n\n"通勤大师：不是在路上浪费时间——是在路上创造价值。"', cond: g => g.flags.commuteLearner && g.flags.offPeakCommuter && g.flags.subwayCommute && g.intel >= 70 && g.age >= 28 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
