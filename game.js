@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v7.0
+// 都市浮生记 - Game Engine v7.1
 // ============================================
 
 // === GAME STATE ===
@@ -3434,6 +3434,34 @@ const EVENTS = [
         { label:'做情感咨询', hint:'+💰 +🧠', fn: g => { g.flags.emotionalLabor=true; g.flags.emotionalCounselor=true; return{money:3000,intel:10,social:8}; }},
         { label:'不做，太累', hint:'+😊', fn: g => { g.flags.emotionalLabor=true; return{mood:5}; }},
       ]},
+    // === v7.1 EVENTS - 谷子经济与二次元文化 ===
+    { id:'goods_economy', icon:'🎌', title:'谷子经济',
+      body:'你走进了谷子店：满墙的吧唧（徽章）、立牌、流麻、手办。\n\n"谷子经济——年轻人'吃谷'，把纸片人的爱带到三次元。"\n\n你看了看价格：\n- 吧唧（徽章）：20-200元/个\n- 立牌：50-500元/个\n- 手办：200-5000元/个\n- 限量款：溢价10-20倍\n\n"谷子"是英文"goods"的音译，泛指二次元周边。"吃谷"就是购买这些周边的消费行为。\n\n2024年，中国谷子经济市场规模达1689亿元，较2023年增长40.63%，预计2029年突破3000亿元。\n\n中国泛二次元用户规模达4.9亿人——几乎每3个年轻人中就有1个是二次元用户。\n\n"为兴趣买单、为认同付费、为圈层种草——谷子经济是年轻人的'情感消费'。"\n\n但你也在思考：一个99元的盲盒，二手市场能卖2300元，这是收藏还是投机？',
+      cond: g => !g.flags.goodsEconomy2 && g.age>=16 && g.age<=30,
+      choices:[
+        { label:'入坑吃谷', hint:'-💰 +😊 +✨', fn: g => { g.flags.goodsEconomy2=true; g.flags.guziFan=true; return{money:-1500,mood:18,charm:8}; }},
+        { label:'收藏限定款', hint:'-💰💰 +✨', fn: g => { g.flags.goodsEconomy2=true; g.flags.collector=true; return{money:-5000,charm:12,mood:15}; }},
+        { label:'做谷子生意', hint:'+💰 +🧠', fn: g => { g.flags.goodsEconomy2=true; g.flags.guziSeller=true; if(Math.random()>0.5){return{money:15000,intel:10}}else{return{money:-3000,intel:5}} }},
+        { label:'不理解', hint:'+🧠', fn: g => { g.flags.goodsEconomy2=true; return{intel:3,mood:-3}; }},
+      ]},
+    { id:'cosplay', icon:'🎭', title:'Cosplay',
+      body:'你决定cosplay一个角色：从动漫、游戏、影视中选一个。\n\n你的准备：\n- 假发：100-500元\n- 服装：200-2000元\n- 道具：100-1000元\n- 化妆：自己学或请人化\n\n"Cosplay——不是扮演角色，而是成为角色。"\n\n你去了漫展：\n- 被无数人拍照\n- 认识了同好\n- 感受到了"被看见"的快乐\n\n"在二次元的世界里，你可以是任何人——英雄、公主、反派、路人。"\n\n但你也在思考：cosplay是逃避现实，还是表达自我？\n\n"三次元的世界很残酷，但二次元的世界永远温柔。"',
+      cond: g => !g.flags.cosplay && g.age>=16 && g.age<=28 && g.charm>=50,
+      choices:[
+        { label:'认真出cos', hint:'-💰 +✨ +👥', fn: g => { g.flags.cosplay=true; g.flags.cosplayer=true; return{money:-2000,charm:15,social:12,mood:18}; }},
+        { label:'参加漫展', hint:'-💰 +😊 +👥', fn: g => { g.flags.cosplay=true; g.flags.conventionGoer=true; return{money:-500,mood:20,social:15}; }},
+        { label:'做cosplay摄影师', hint:'+💰 +✨', fn: g => { g.flags.cosplay=true; g.flags.cosPhotographer=true; return{money:3000,charm:10,social:8}; }},
+        { label:'只看不玩', hint:'+😊', fn: g => { g.flags.cosplay=true; return{mood:10}; }},
+      ]},
+    { id:'ip_collaboration', icon:'🤝', title:'IP联名',
+      body:'你看到一个联名产品：某奶茶品牌 × 某动漫IP。\n\n你买了：限量版杯子、联名贴纸、周边小礼品。\n\n"IP联名——用'情怀'卖货，用'联名'收割年轻人。"\n\n你看了看案例：\n- 喜茶 × 《甄嬛传》：推出"甄嬛"奶茶，销量暴增\n- 瑞幸 × 《猫和老鼠》：Tom和Jerry杯子被抢购\n- 优衣库 × KAWS：联名T恤引发疯抢\n- 泡泡玛特 × Labubu：隐藏款溢价20倍\n\n"年轻人买的不是产品，而是'身份认同'和'圈层归属'。"\n\n但你也在思考：联名款真的值得溢价购买吗？还是只是营销噱头？\n\n"IP联名的本质：用文化符号创造情感连接，用限量制造稀缺感。"',
+      cond: g => !g.flags.ipCollaboration && g.age>=18 && g.age<=35,
+      choices:[
+        { label:'疯狂买联名', hint:'-💰 +😊 +✨', fn: g => { g.flags.ipCollaboration=true; g.flags.ipFan=true; return{money:-1000,mood:15,charm:8}; }},
+        { label:'只买实用的', hint:'-💰 +🧠', fn: g => { g.flags.ipCollaboration=true; g.flags.rationalBuyer=true; return{money:-300,intel:5,mood:8}; }},
+        { label:'做IP运营', hint:'+💰 +🧠', fn: g => { g.flags.ipCollaboration=true; g.flags.ipOperator=true; return{money:8000,intel:12,charm:5}; }},
+        { label:'不买，智商税', hint:'+💰 +🧠', fn: g => { g.flags.ipCollaboration=true; return{money:500,intel:3,mood:-5}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3735,6 +3763,10 @@ const ACHIEVEMENTS = [
     { id:'ai_friend', icon:'🤖', name:'AI朋友', desc:'使用AI陪伴', check: g => g.flags.aiCompanion },
     { id:'emotional_worker', icon:'💔', name:'情感劳动者', desc:'从事情感服务', check: g => g.flags.emotionalLabor },
     { id:'family_healer', icon:'❤️', name:'家庭疗愈者', desc:'反思亲子关系', check: g => g.flags.familyReflection },
+    // v7.1 achievements
+    { id:'guzi_collector', icon:'🎌', name:'谷子收藏家', desc:'入坑谷子经济', check: g => g.flags.goodsEconomy2 },
+    { id:'cosplayer_pro', icon:'🎭', name:'Coser', desc:'玩Cosplay', check: g => g.flags.cosplay },
+    { id:'ip_enthusiast', icon:'🤝', name:'IP联名爱好者', desc:'购买联名产品', check: g => g.flags.ipCollaboration },
 ];
 
 // === ENDINGS === (order matters: first match wins)
