@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v32.4
+// 都市浮生记 - Game Engine v32.5
 // ============================================
 
 // === GAME STATE ===
@@ -17883,6 +17883,97 @@ const EVENTS = [
         { label:'买了一本鸟类图鉴开始学习', hint:'-💰 +🧠', fn: g => { g.flags.urbanBirdwatch=true; g.flags.boughtGuide=true; g.money-=80; return{intel:8}; }},
         { label:'记录了一年的观鸟日记', hint:'+🧠 +✨', fn: g => { g.flags.urbanBirdwatch=true; g.flags.birdDiary=true; return{intel:8,charm:5}; }},
       ]},
+
+    // === v32.5 租房江湖 ===
+    { id:'rent_raise_v32_5', icon:'📈', title:'房东涨房租', category:'rental',
+      body:'房东发来消息：「下个月房租涨五百。」\n\n你看着这条消息，心跳加速了。现在的房租已经占了你工资的三分之一了，再涨就真的吃不消了。\n\n你回消息：「能不能少涨一点？我在这住了两年了，一直都是好租客。」\n\n房东说：「周围都在涨，我也没办法。你要是不想住也行，我挂出去很快就有人租。」\n\n你挂了手机，开始算账：搬家要搬家费、押金、中介费，加起来要五六千。但不搬的话，每个月多花五百，一年就是六千。\n\n你觉得在这个城市里，你连住的权利都要跟别人商量。',
+      cond: g => g.age >= 18 && !g.flags.hasHouse && g.jobSalary > 0,
+      choices:[
+        { label:'认了，继续住', hint:'-💰', fn: g => { g.flags.rentRaise=true; return{mood:-5,money:-500}; }},
+        { label:'开始找新房子搬家', hint:'-💰 -😊', fn: g => { g.flags.rentRaise=true; g.flags.movingAgain=true; g.money-=3000; return{mood:-8}; }},
+        { label:'跟房东谈判，争取少涨一点', hint:'+🧠 +👥', fn: g => { g.flags.rentRaise=true; g.flags.negotiated=true; return{intel:3,social:3,mood:-2}; }},
+      ]},
+
+    { id:'weird_roommate_v32_5', icon:'🚪', title:'奇葩室友', category:'rental',
+      body:'你的新室友搬进来了。\n\n第一周还行，大家客客气气。第二周开始，你发现他从来不洗碗，用你的锅做完饭就把锅泡在水池里，三天都不洗。\n\n第三周，你半夜被客厅的声音吵醒——他在打游戏，语音通话喊得震天响。\n\n你跟他说：「能不能小声点？」他说：「哦，好的。」第二天照旧。\n\n你开始考虑：是忍着，还是搬走？但搬走意味着又要交中介费、押金、搬家费。\n\n你觉得合租就是一场修行——你永远不知道下一个室友是什么人。',
+      cond: g => g.age >= 18 && !g.flags.hasHouse && g.social > 20,
+      choices:[
+        { label:'直接跟他谈了规矩，写了个公约', hint:'+🧠 +👥', fn: g => { g.flags.weirdRoommate=true; g.flags.madeRules=true; return{intel:3,social:3}; }},
+        { label:'买了降噪耳机，自己适应', hint:'-💰 +💪', fn: g => { g.flags.weirdRoommate=true; g.money-=300; return{health:-2}; }},
+        { label:'合同到期就搬走', hint:'-💰', fn: g => { g.flags.weirdRoommate=true; g.flags.planMove=true; return{mood:-3}; }},
+      ]},
+
+    { id:'apartment_hunting_v32_5', icon:'🔍', title:'看房日记', category:'rental',
+      body:'你今天请了一天假专门看房。\n\n第一套：照片上很宽敞，到了现场发现是个隔断间，只有一扇窗户对着隔壁的墙。中介说：「这个价位在这边算不错了。」\n\n第二套：房子确实不错，但中介费要一个月的房租，而且要签两年合同。\n\n第三套：价格合适，但你进去闻到了一股霉味。你打开柜子，里面长了霉。\n\n第四套：终于找到了一个还算满意的。但中介说：「有三个人在看，你要不今天就定？」\n\n你觉得看房比找工作还累。在这个城市里，有一个舒服的住处，好像是一种奢侈品。',
+      cond: g => g.age >= 18 && !g.flags.hasHouse,
+      choices:[
+        { label:'当天就签了第四套', hint:'-💰', fn: g => { g.flags.apartmentHunting=true; g.money-=2000; return{mood:-3}; }},
+        { label:'继续看，不信找不到更好的', hint:'+🧠 -😊', fn: g => { g.flags.apartmentHunting=true; g.flags.keepSearching=true; return{intel:3,mood:-5}; }},
+        { label:'决定先凑合住现在的', hint:'+💪', fn: g => { g.flags.apartmentHunting=true; return{mood:-2,health:-2}; }},
+      ]},
+
+    { id:'subletter_gone_v32_5', icon:'🏃', title:'二房东跑路', category:'rental',
+      body:'你交了一整年的房租给二房东。每个月三千，一次交了半年。\n\n结果第五个月的时候，真正的房东找上门了：「你们这房子的租约到期了，二房东没续。你们得搬走。」\n\n你打电话给二房东，关机了。你去找他，发现他已经不在那个地址了。\n\n你算了一下，你被骗了六千块。\n\n你去派出所报了案，警察说：「这种案子太多了，我们尽量。」你知道「尽量」的意思。\n\n你在网上查了一下，发现很多人都有过类似经历。你觉得自己又蠢又无奈。',
+      cond: g => g.age >= 18 && !g.flags.hasHouse && g.money > 5000,
+      choices:[
+        { label:'联合其他受害者一起维权', hint:'+👥 +🧠', fn: g => { g.flags.subletterGone=true; g.flags.jointAction=true; return{social:5,intel:3,mood:-5}; }},
+        { label:'认栽了，赶紧找新房子', hint:'-💰 -😊', fn: g => { g.flags.subletterGone=true; g.money-=3000; return{mood:-10}; }},
+        { label:'在网上发了警示帖', hint:'+✨ +🧠', fn: g => { g.flags.subletterGone=true; g.flags.warningPost=true; return{charm:3,intel:3,mood:-5}; }},
+      ]},
+
+    { id:'rental_renovation_v32_5', icon:'🔨', title:'租房改造', category:'rental',
+      body:'你决定改造一下你的出租屋。\n\n房东说：「随便改，别动承重墙就行。」\n\n你在网上买了一些便宜的装饰品：墙贴、窗帘、一串小灯、几个收纳盒。你花了两个周末，把房间收拾得焕然一新。\n\n你贴了新的墙纸，换了暖色调的灯泡，在窗台上放了一盆绿萝。你的出租屋突然有了「家」的感觉。\n\n你发了朋友圈：「出租屋改造完成！花了500块，效果比我想的好多了。」\n\n评论里有人问：「花了这么多钱改造别人的房子，值吗？」\n\n你觉得：住在这里的是你，舒服的是你。值不值得，你说了算。',
+      cond: g => g.age >= 20 && !g.flags.hasHouse && g.money > 1000,
+      choices:[
+        { label:'花更多钱买了好家具', hint:'-💰 +😊', fn: g => { g.flags.rentalReno=true; g.money-=2000; return{mood:10}; }},
+        { label:'适可而止，五百块够了', hint:'+💰 +😊', fn: g => { g.flags.rentalReno=true; g.money-=500; return{mood:5}; }},
+        { label:'把改造过程拍成了vlog', hint:'+✨ +👥', fn: g => { g.flags.rentalReno=true; g.flags.madeVlog=true; return{charm:5,social:3}; }},
+      ]},
+
+    { id:'moving_again_v32_5', icon:'📦', title:'第N次搬家', category:'rental',
+      body:'你又搬家了。这是你来这个城市后的第四次搬家。\n\n打包行李的时候，你发现了很多你都不记得买过的东西。你的东西越来越多，但你的生活空间越来越小。\n\n搬家师傅来了，看了一眼你的东西说：「你这不算多，我搬过一个女生，六个箱子加上一个衣柜、一张床、一台洗衣机。」\n\n你在新房子里 unpack 行李，累得瘫在地上。你看着天花板，想：什么时候才能不用搬家？\n\n你算了一下：买房首付至少要五十万，你现在的存款……还是算了。\n\n你在门上贴了一张纸条：「新的开始。」但你不确定这是第几次写这句话了。',
+      cond: g => g.months >= 24 && !g.flags.hasHouse,
+      choices:[
+        { label:'开始认真存买房的首付', hint:'+🧠 +💰', fn: g => { g.flags.movingAgain2=true; g.flags.saveForHouse=true; return{intel:5}; }},
+        { label:'断舍离，扔了很多不需要的东西', hint:'+😊 +💪', fn: g => { g.flags.movingAgain2=true; g.flags.minimized=true; return{mood:5,health:3}; }},
+        { label:'觉得搬家也是一种生活技能', hint:'+🧠', fn: g => { g.flags.movingAgain2=true; return{intel:3,mood:2}; }},
+      ]},
+
+    { id:'shared_apartment_v32_5', icon:'🏠', title:'合租生活', category:'rental',
+      body:'你和两个陌生人合租了一套三居室。\n\n你们建了一个微信群，群名叫「我们的家」。但说实话，你们之间更像是共享一个地址的陌生人。\n\n冰箱里的东西经常被拿错，谁用了谁的碗筷都能引发一场冷战。卫生间的使用时间永远是最大的冲突。\n\n但有一天，你加班到很晚回来，发现客厅的灯还亮着。室友在沙发上等你：「我给你留了点菜，在锅里。」\n\n那一刻你觉得，合租也不全是坏事。在这个城市里，有一个人在等你回来，即使是室友，也是一种温暖。',
+      cond: g => g.age >= 18 && !g.flags.hasHouse && g.social > 30,
+      choices:[
+        { label:'组织了一次合租房聚餐', hint:'+👥 +😊', fn: g => { g.flags.sharedApartment=true; g.money-=200; return{social:8,mood:8}; }},
+        { label:'跟室友成了好朋友', hint:'+👥 +😊', fn: g => { g.flags.sharedApartment=true; g.flags.roommateFriend=true; return{social:10,mood:5}; }},
+        { label:'还是更喜欢一个人住', hint:'+🧠', fn: g => { g.flags.sharedApartment=true; return{intel:3}; }},
+      ]},
+
+    { id:'rental_scam_v32_5', icon:'🕸️', title:'租房陷阱', category:'rental',
+      body:'你在网上看到一套房子，照片很漂亮，价格比周围便宜了20%。\n\n你联系了发布者，对方说：「房子太抢手了，你先交定金我给你留着。」\n\n你犹豫了一下，但对方发来一堆「房产证」和「身份证」的照片，看起来很正规。你转了三千块定金。\n\n第二天你去看房，发现那个地址根本不存在。电话打不通，微信被拉黑了。\n\n你报了警，但你知道三千块大概是要不回来了。\n\n你学到了一课：在租房这件事上，便宜就是最贵的。',
+      cond: g => g.age >= 18 && !g.flags.hasHouse,
+      choices:[
+        { label:'把经历写成攻略发在网上', hint:'+✨ +🧠', fn: g => { g.flags.rentalScam2=true; g.flags.wroteGuide=true; return{charm:5,intel:5}; }},
+        { label:'报警并配合调查', hint:'+🧠 +👥', fn: g => { g.flags.rentalScam2=true; return{intel:3,social:3,mood:-5}; }},
+        { label:'认栽了，以后只找正规中介', hint:'+🧠', fn: g => { g.flags.rentalScam2=true; g.flags.onlyAgency=true; return{intel:5,mood:-5}; }},
+      ]},
+
+    { id:'living_alone_v32_5', icon:'🔑', title:'独居生活', category:'rental',
+      body:'你终于搬进了自己的一居室。\n\n没有室友的噪音、没有抢卫生间、没有人偷吃你的酸奶。你一个人拥有整个空间。\n\n第一周你觉得自由极了——想几点睡几点睡、想吃什么做什么、想裸奔就裸奔。\n\n但第二周的某个晚上，你突然觉得很安静。太安静了。\n\n你打开电视，只是为了有点声音。你给妈妈打了个电话，聊了半个小时。挂了电话后你又觉得空了。\n\n你开始理解了一件事：自由和孤独是一枚硬币的两面。你选择了独立，就要接受偶尔的寂静。\n\n但你觉得，至少现在，这个空间是完全属于你的。',
+      cond: g => g.age >= 22 && !g.flags.hasHouse && g.money > 3000,
+      choices:[
+        { label:'享受独居，养了一盆植物', hint:'+😊 +💪', fn: g => { g.flags.livingAlone=true; g.flags.gotPlant=true; return{mood:5,health:3}; }},
+        { label:'开始经常约朋友来家里玩', hint:'+👥 +😊', fn: g => { g.flags.livingAlone=true; return{social:8,mood:5}; }},
+        { label:'有点想找人合租了', hint:'+👥', fn: g => { g.flags.livingAlone=true; g.flags.wantRoommate=true; return{social:3,mood:-3}; }},
+      ]},
+
+    { id:'buy_or_rent_v32_5', icon:'🏡', title:'买房还是租房', category:'rental',
+      body:'你跟朋友吃饭的时候聊起了买房的话题。\n\n朋友A说：「必须买啊，租房是给房东打工。」\n\n朋友B说：「别买了，现在房价这么高，买了就是接盘。不如把钱拿去理财。」\n\n你算了算：首付五十万，月供八千，要还三十年。你现在的工资……\n\n你又算了算租房：每月三千五，但随时可能被赶走。\n\n你不知道哪个选择是对的。也许根本没有「对」的选择，只有「不那么错」的选择。\n\n你想起了一句话：「在大城市买房，买的不是房子，是一张留下的门票。」\n\n但你不确定这张门票值不值得你付出三十年。',
+      cond: g => g.age >= 25 && g.money > 20000 && !g.flags.hasHouse,
+      choices:[
+        { label:'决定开始攒首付', hint:'+🧠 +💰', fn: g => { g.flags.buyOrRent=true; g.flags.savingDownPayment=true; return{intel:5}; }},
+        { label:'决定继续租房，把钱投资自己', hint:'+🧠 +💪', fn: g => { g.flags.buyOrRent=true; g.flags.investSelf=true; return{intel:5,health:3}; }},
+        { label:'先看看老家或者周边城市的房价', hint:'+🧠', fn: g => { g.flags.buyOrRent=true; g.flags.checkOtherCities=true; return{intel:5}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -19572,6 +19663,18 @@ const ACHIEVEMENTS = [
     { id:'fish_keeping_ach', icon:'🐟', name:'养鱼治愈', desc:'从养鱼中获得了平静', check: g => g.flags.fishKeeping },
     { id:'storm_animals_ach', icon:'🌧️', name:'暴雨守护', desc:'在暴雨中帮助了流浪动物', check: g => g.flags.stormAnimals },
     { id:'urban_birdwatch_ach', icon:'🔭', name:'城市观鸟人', desc:'加入了城市观鸟的行列', check: g => g.flags.urbanBirdwatch },
+
+    // --- v32.5 租房江湖成就 ---
+    { id:'rent_raise_ach', icon:'📈', name:'涨租生存者', desc:'经历了房东涨房租', check: g => g.flags.rentRaise },
+    { id:'weird_roommate_ach', icon:'🚪', name:'合租修行', desc:'和奇葩室友斗智斗勇', check: g => g.flags.weirdRoommate },
+    { id:'apartment_hunt_ach', icon:'🔍', name:'看房战士', desc:'经历了看房的疲惫', check: g => g.flags.apartmentHunting },
+    { id:'subletter_ach', icon:'🏃', name:'二房东受害者', desc:'被二房东骗了钱', check: g => g.flags.subletterGone },
+    { id:'rental_reno_ach', icon:'🔨', name:'出租屋改造师', desc:'把出租屋改造成了家', check: g => g.flags.rentalReno },
+    { id:'moving_again_ach', icon:'📦', name:'搬家达人', desc:'经历了第N次搬家', check: g => g.flags.movingAgain2 },
+    { id:'shared_apt_ach', icon:'🏠', name:'合租生活家', desc:'在合租中找到了温暖', check: g => g.flags.sharedApartment },
+    { id:'rental_scam_ach', icon:'🕸️', name:'租房避坑', desc:'识破了或经历了租房陷阱', check: g => g.flags.rentalScam2 },
+    { id:'living_alone_ach', icon:'🔑', name:'独居自由', desc:'开始了一个人的独居生活', check: g => g.flags.livingAlone },
+    { id:'buy_or_rent_ach', icon:'🏡', name:'买房还是租房', desc:'思考了买房与租房的人生选择', check: g => g.flags.buyOrRent },
 ];
 
 // === ENDINGS === (order matters: first match wins)
