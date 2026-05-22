@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v23.4
+// 都市浮生记 - Game Engine v23.5
 // ============================================
 
 // === GAME STATE ===
@@ -11590,6 +11590,87 @@ const EVENTS = [
         { label:'参与了一些社区活动，认识了一些邻居', hint:'+🤝 +😊', fn: g => { g.flags.communityBuilding=true; return{social:10,mood:8}; }},
         { label:'做了一些但没坚持', hint:'+🧠', fn: g => { g.flags.communityBuilding=true; return{social:5,intel:3}; }},
       ]},
+    // === v23.5 新增事件（环保生活 + 碳中和 + 可持续消费） ===
+    { id:'zero_waste_start', icon:'♻️', title:'零浪费入门', category:'society',
+      body:'你看了一个纪录片：《垃圾围城》。\n\n数据触目惊心：\n- 中国每年产生超过10亿吨生活垃圾\n- 其中只有30%被有效回收\n- 塑料垃圾需要500年才能降解\n- 每人每天产生约1.2公斤垃圾\n\n你决定开始「零浪费」生活。\n\n你的第一步：\n- 自带购物袋（不再用塑料袋）\n- 自带水杯（不再买瓶装水）\n- 自带餐具（不再用一次性筷子）\n- 垃圾分类（认真执行）\n\n一个月下来，你的垃圾量减少了60%。\n\n你的同事说：「一个人减少垃圾有什么用？」\n\n你说：「如果每个人都这么想，那真的没用。但如果每个人都做一点点，效果会很大。」\n\n你开始在朋友圈分享你的零浪费经验。有人嘲笑你，但也有人开始跟着你做。\n\n「零浪费不是苦行——是意识到你产生的每一件垃圾，都在为地球增加一份负担。」',
+      cond: g => g.age >= 20 && !g.flags.zeroWasteStart,
+      choices:[
+        { label:'坚持了零浪费生活，成了环保达人', hint:'+😊 +🧠', fn: g => { g.flags.zeroWasteStart=true; g.flags.ecoWarrior=true; return{mood:10,intel:8,charm:5}; }},
+        { label:'尝试了但没能完全做到', hint:'+🧠', fn: g => { g.flags.zeroWasteStart=true; return{intel:5,mood:3}; }},
+        { label:'觉得个人力量太小，开始推动社区环保', hint:'+🤝 +🧠', fn: g => { g.flags.zeroWasteStart=true; g.flags.ecoAdvocate=true; return{social:8,intel:8,mood:5}; }},
+      ]},
+    { id:'carbon_footprint', icon:'🌍', title:'计算碳足迹', category:'society',
+      body:'你在网上计算了自己的碳足迹。\n\n结果：你每年的碳排放约为8.5吨。\n\n全球平均：4.7吨/人/年\n中国平均：7.5吨/人/年\n你的目标：5吨/年\n\n你的碳排放来源：\n- 交通（开车/飞机）：40%\n- 饮食（肉类/外卖）：25%\n- 住房（电力/暖气）：20%\n- 消费（购物/包装）：15%\n\n你开始制定减碳计划：\n1. 短途出行改骑自行车/公交\n2. 减少吃肉，每周素食3天\n3. 随手关灯、调高空调温度\n4. 减少不必要的网购\n\n你的一个朋友说：「你减的碳，还不够一家工厂一天的排放。」\n\n你说：「对。但如果所有人都不减，那工厂也不会减。」\n\n「碳足迹：你活着的每一天，都在给地球留下痕迹。问题是：你想留下什么样的痕迹？」',
+      cond: g => g.age >= 22 && !g.flags.carbonFootprint && g.intel >= 25,
+      choices:[
+        { label:'认真执行了减碳计划', hint:'+🧠 +💪', fn: g => { g.flags.carbonFootprint=true; g.flags.lowCarbon=true; return{intel:10,health:5,mood:5}; }},
+        { label:'做了一些改变，但没有完全做到', hint:'+🧠', fn: g => { g.flags.carbonFootprint=true; return{intel:5,mood:3}; }},
+        { label:'觉得个人行动意义不大', hint:'', fn: g => { g.flags.carbonFootprint=true; return{intel:3}; }},
+      ]},
+    { id:'secondhand_shopping', icon:'🛍️', title:'二手购物', category:'finance',
+      body:'你开始认真逛二手市场。\n\n不是为了省钱——虽然确实省了不少。而是为了减少浪费。\n\n你的二手购物清单：\n- 手机：闲鱼买的二手iPhone，省了3000元\n- 家具：从搬家的人手里买了一套，原价1万你花了2000\n- 衣服：在Vintage店淘的，每件50-100元\n- 书籍：在多抓鱼上买的二手书，3折\n\n你发现：二手市场是一个宝藏。\n\n很多人卖的东西几乎是全新的——因为他们冲动消费后发现自己不需要。\n\n你的一个朋友说：「用二手的东西不丢人吗？」\n\n你说：「浪费才丢人。把还能用的东西扔掉——那才是真的可惜。」\n\n你开始卖出自己不需要的东西。半年下来，你在闲鱼上赚了5000元。\n\n「二手购物：不是你买不起新的——是你不愿意为消费主义买单。」',
+      cond: g => g.age >= 22 && !g.flags.secondhandShopping,
+      choices:[
+        { label:'成了二手达人，买和卖都很开心', hint:'+💰 +😊', fn: g => { g.flags.secondhandShopping=true; g.flags.secondhandMaster=true; return{money:5000,mood:10,intel:5}; }},
+        { label:'买了一些二手的东西，确实省了钱', hint:'+💰', fn: g => { g.flags.secondhandShopping=true; return{money:3000,mood:5}; }},
+        { label:'试了但觉得二手的质量不太好', hint:'', fn: g => { g.flags.secondhandShopping=true; return{mood:-3}; }},
+      ]},
+    { id:'sustainable_fashion', icon:'👗', title:'可持续时尚', category:'society',
+      body:'你了解了一个词：「快时尚的代价」。\n\n快时尚行业的数据：\n- 每年生产1000亿件服装\n- 其中60%在一年内被丢弃\n- 服装行业是全球第二大污染行业\n- 生产一件棉T恤需要2700升水（一个人三年的饮水量）\n\n你开始审视你的衣柜：\n- 超过一半的衣服你一年没穿过\n- 有些衣服你还留着吊牌\n- 你的衣柜里大概有5000块钱的衣服——但你觉得自己「没衣服穿」\n\n你决定改变：\n1. 30天不买新衣服（挑战成功）\n2. 只买质量好的、经典款的衣服\n3. 定期清理衣柜，不穿的衣服捐赠或回收\n4. 支持可持续时尚品牌\n\n你的衣柜从100件减到了30件——但你每天出门都穿得很得体。\n\n「可持续时尚：不是你穿得多贵——是你穿的每一件都有意义。」',
+      cond: g => g.age >= 22 && !g.flags.sustainableFashion,
+      choices:[
+        { label:'彻底改变了消费习惯，成了极简穿搭达人', hint:'+😊 +💰', fn: g => { g.flags.sustainableFashion=true; g.flags.capsuleWardrobe=true; return{mood:12,money:3000,charm:5}; }},
+        { label:'减少了冲动购物，衣柜精简了一半', hint:'+💰 +🧠', fn: g => { g.flags.sustainableFashion=true; return{money:2000,intel:5,mood:5}; }},
+        { label:'了解了很多但做不到改变', hint:'+🧠', fn: g => { g.flags.sustainableFashion=true; return{intel:5}; }},
+      ]},
+    { id:'plant_based_diet', icon:'🥗', title:'植物基饮食', category:'health',
+      body:'你开始尝试减少肉类消费。\n\n不是为了当素食者——是为了健康和环保。\n\n畜牧业的数据：\n- 占全球温室气体排放的14.5%\n- 生产1公斤牛肉需要15000升水\n- 全球70%的农业用地用于畜牧业\n\n你的饮食改变：\n- 周一到周五：午餐素食\n- 周末：可以正常吃肉\n- 尝试了植物肉（Beyond Meat）——味道竟然不错\n\n你的身体变化：\n- 体重减轻了3公斤\n- 消化变好了\n- 精力更充沛了\n\n你的妈妈担心：「不吃肉营养够吗？」\n\n你说：「不是不吃肉——是少吃肉。豆类、坚果、蔬菜里的蛋白质足够了。」\n\n你开始学做素食料理。你的红烧豆腐被朋友评为「比肉还好吃」。\n\n「植物基饮食：不是放弃美味——是用更聪明的方式吃饭。」',
+      cond: g => g.age >= 22 && !g.flags.plantBasedDiet && g.health < 70,
+      choices:[
+        { label:'成了弹性素食者，身体更好了', hint:'+💪 +😊', fn: g => { g.flags.plantBasedDiet=true; g.flags.flexitarian=true; return{health:12,mood:8,money:1000}; }},
+        { label:'试了一段时间，觉得还是想吃肉', hint:'+💪', fn: g => { g.flags.plantBasedDiet=true; return{health:5}; }},
+        { label:'学了更多素食料理，丰富了饮食', hint:'+🧠 +😊', fn: g => { g.flags.plantBasedDiet=true; return{intel:5,mood:5,health:8}; }},
+      ]},
+    { id:'urban_farming', icon:'🌱', title:'城市种菜', category:'hobby',
+      body:'你在阳台上种了菜。\n\n你的阳台农场：\n- 小番茄（长势喜人）\n- 薄荷（生命力顽强）\n- 辣椒（结了好多）\n- 葱（剪了又长）\n- 生菜（一周就能吃）\n\n你每天花15分钟浇水、修剪、观察它们的生长。\n\n这是你一天中最放松的时刻。\n\n你的第一个收获：一碗自己种的葱做的蛋炒饭。\n\n味道竟然格外好。也许是因为——你知道这根葱是怎么长出来的。\n\n你开始理解：为什么城市人越来越喜欢种菜。不是因为省钱——是因为在一个被混凝土包围的城市里，种菜让你重新和自然连接。\n\n你的一个邻居看到你的阳台，也开始种菜。你们交换了种子和经验。\n\n「城市种菜：在钢筋水泥的丛林中，为自己开辟一小片绿色。」',
+      cond: g => g.age >= 25 && !g.flags.urbanFarming,
+      choices:[
+        { label:'成了阳台农夫，自给自足了一些蔬菜', hint:'+😊 +💪', fn: g => { g.flags.urbanFarming=true; g.flags.balconyFarmer=true; return{mood:12,health:5,mood:5}; }},
+        { label:'种了一些，但大部分还是死了', hint:'+🧠', fn: g => { g.flags.urbanFarming=true; return{intel:3,mood:3}; }},
+        { label:'把种菜变成了社交——和朋友分享收获', hint:'+🤝 +😊', fn: g => { g.flags.urbanFarming=true; g.flags.farmingSocial=true; return{social:8,mood:10}; }},
+      ]},
+    { id:'eco_travel_green', icon:'🚲', title:'绿色出行', category:'health',
+      body:'你决定改变出行方式。\n\n以前你每天开车上班：\n- 单程30分钟（堵车时1小时）\n- 每月油费800元\n- 每年碳排放约2吨\n\n现在你改成了：\n- 5公里内：骑自行车（30分钟，免费）\n- 10公里内：坐地铁（40分钟，4元）\n- 远距离：坐高铁（而不是飞机）\n\n你买了一辆二手自行车。每天骑车上班的感觉——竟然比开车好。\n\n你看到了以前开车时看不到的东西：\n- 路边的早餐摊（豆浆油条好香）\n- 街角的老书店（已经开了20年）\n- 公园里晨练的大爷大妈（活力四射）\n\n你的身体也变好了：\n- 体重减轻了2公斤\n- 腿更有劲了\n- 不再因为堵车而暴躁\n\n「绿色出行：不是牺牲便利——是发现另一种生活节奏。」',
+      cond: g => g.age >= 22 && !g.flags.ecoTravelGreen,
+      choices:[
+        { label:'坚持了绿色出行，身体和钱包都更好了', hint:'+💪 +💰', fn: g => { g.flags.ecoTravelGreen=true; return{health:10,mood:8,money:3000}; }},
+        { label:'天气好的时候骑车，其他时候还是坐车', hint:'+💪', fn: g => { g.flags.ecoTravelGreen=true; return{health:5,mood:5}; }},
+        { label:'试了但觉得太不方便了', hint:'', fn: g => { g.flags.ecoTravelGreen=true; return{mood:-3}; }},
+      ]},
+    { id:'plastic_free_life', icon:'🚫', title:'无塑生活', category:'society',
+      body:'你开始了「无塑挑战」——一个月不用任何一次性塑料。\n\n难度超乎想象：\n- 超市的蔬菜都包着保鲜膜\n- 外卖的餐盒全是塑料\n- 快递的包装层层叠叠\n- 连买杯咖啡都是一次性杯子\n\n你的替代方案：\n- 自带玻璃饭盒去超市买菜\n- 拒绝外卖（自己做饭）\n- 用布袋代替塑料袋\n- 用不锈钢吸管代替塑料吸管\n- 用蜂蜡保鲜布代替保鲜膜\n\n一个月下来：\n- 你减少了大约300件一次性塑料\n- 你的开支增加了约500元（替代品更贵）\n- 你的生活质量……其实没有下降\n\n你的一个朋友说：「你这也太较真了吧？」\n\n你说：「不是我较真——是我们已经太习惯用一次就扔了。」\n\n「无塑生活：不是回到原始社会——是重新审视你对「方便」的定义。」',
+      cond: g => g.flags.zeroWasteStart && !g.flags.plasticFreeLife,
+      choices:[
+        { label:'坚持了无塑生活，影响了身边的人', hint:'+😊 +🤝', fn: g => { g.flags.plasticFreeLife=true; return{mood:12,social:5,charm:5}; }},
+        { label:'做到了80%，已经是很大的进步', hint:'+😊', fn: g => { g.flags.plasticFreeLife=true; return{mood:8,intel:5}; }},
+        { label:'太难了，只做到了一部分', hint:'+🧠', fn: g => { g.flags.plasticFreeLife=true; return{intel:5}; }},
+      ]},
+    { id:'eco_community', icon:'🌳', title:'环保社区', category:'social',
+      body:'你加入了一个环保社区。\n\n这里有200多个成员，都是热爱环保的人。\n\n社区活动：\n- 每月一次「净滩行动」——去海边/河边捡垃圾\n- 每季度一次「旧物交换会」\n- 每周分享环保知识和技巧\n- 组织团购环保产品\n\n你参加了第一次净滩活动。\n\n你捡了3个小时的垃圾——总共15公斤。其中最多的是塑料瓶和烟头。\n\n你看着那堆垃圾，心情很复杂：一方面你为环境做了贡献，另一方面你意识到——你捡的速度赶不上人们扔的速度。\n\n社区的创始人说：「净滩不是为了捡完所有垃圾——是为了让更多人看到问题。」\n\n你开始在社交平台上分享你的净滩照片。有人被感动了，也有人觉得你是在作秀。\n\n你不在乎。因为你知道：行动比争论更有力量。\n\n「环保社区：一个人的力量很小，一群人的力量很大。」',
+      cond: g => (g.flags.zeroWasteStart || g.flags.ecoAdvocate) && !g.flags.ecoCommunity,
+      choices:[
+        { label:'成了社区核心成员，组织了多次活动', hint:'+🤝 +😊', fn: g => { g.flags.ecoCommunity=true; g.flags.ecoLeader=true; return{social:12,mood:12,charm:8}; }},
+        { label:'参加了活动，认识了一些同好', hint:'+🤝 +😊', fn: g => { g.flags.ecoCommunity=true; return{social:8,mood:8}; }},
+        { label:'参加了几次但没有持续', hint:'+🧠', fn: g => { g.flags.ecoCommunity=true; return{intel:5,social:3}; }},
+      ]},
+    { id:'green_future', icon:'🌏', title:'绿色未来', category:'psychology',
+      body:'你开始思考一个更大的问题：个人的环保行动，真的有用吗？\n\n你研究了数据：\n- 个人行动的直接减排效果确实有限\n- 但个人行动可以影响政策和企业\n- 消费者的选择会改变市场\n- 当足够多的人改变行为，系统性变革就会发生\n\n你看到了希望：\n- 中国的可再生能源发电占比已超过50%\n- 电动车渗透率超过30%\n- 越来越多的企业开始碳中和\n- 年轻人比上一代更有环保意识\n\n你决定：不仅自己环保，还要影响更多人。\n\n你开始做的事情：\n- 在公司推动无纸化办公\n- 说服朋友一起参加净滩\n- 支持环保政策和环保企业\n- 给下一代传递环保意识\n\n你对自己说：「我不能改变世界。但我可以改变我所在的小世界。」\n\n「绿色未来：不是一个人做很多——是每个人都做一点点。」',
+      cond: g => g.flags.ecoCommunity && !g.flags.greenFuture && g.intel >= 30,
+      choices:[
+        { label:'成了环保倡导者，影响了很多人', hint:'+🤝 +😊 +🧠', fn: g => { g.flags.greenFuture=true; g.flags.ecoInfluencer=true; return{social:15,mood:15,intel:10,charm:10}; }},
+        { label:'在自己的圈子里推广环保理念', hint:'+🤝 +😊', fn: g => { g.flags.greenFuture=true; return{social:10,mood:10,intel:5}; }},
+        { label:'继续默默做着自己的环保行动', hint:'+😊 +🧠', fn: g => { g.flags.greenFuture=true; return{mood:10,intel:8}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -12645,6 +12726,12 @@ const ACHIEVEMENTS = [
     { id:'minimalist_ach_v23_4', icon:'🧹', name:'极简主义者', desc:'开始了极简生活', check: g => g.flags.minimalist },
     { id:'house_not_home_ach', icon:'🧠', name:'房子不等于家', desc:'想通了住房与幸福的关系', check: g => g.flags.houseNotHome },
     { id:'roommate_harmony_ach', icon:'🤝', name:'好室友', desc:'学会了和室友和谐相处', check: g => g.flags.roommateHarmony },
+    // === v23.5 新增成就（环保生活与可持续消费） ===
+    { id:'eco_warrior_ach', icon:'♻️', name:'环保达人', desc:'开始了零浪费生活', check: g => g.flags.ecoWarrior },
+    { id:'secondhand_master_ach', icon:'🛍️', name:'二手达人', desc:'成了二手市场的买卖高手', check: g => g.flags.secondhandMaster },
+    { id:'balcony_farmer_ach', icon:'🌱', name:'阳台农夫', desc:'在阳台上种出了自己的蔬菜', check: g => g.flags.balconyFarmer },
+    { id:'eco_leader_ach', icon:'🌳', name:'环保领袖', desc:'成了环保社区的核心成员', check: g => g.flags.ecoLeader },
+    { id:'green_future_ach', icon:'🌏', name:'绿色未来', desc:'成了有影响力的环保倡导者', check: g => g.flags.ecoInfluencer },
 ];
 
 // === ENDINGS === (order matters: first match wins)
