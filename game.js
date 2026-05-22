@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v33.0
+// 都市浮生记 - Game Engine v33.1
 // ============================================
 
 // === GAME STATE ===
@@ -18429,6 +18429,97 @@ const EVENTS = [
         { label:'还在犹豫，再想想', hint:'+🧠', fn: g => { g.flags.decideStay=true; g.flags.stillThinking=true; return{intel:5}; }},
         { label:'跟朋友说了这个决定', hint:'+👥 +😊', fn: g => { g.flags.decideStay=true; return{social:5,mood:8}; }},
       ]},
+
+    // === v33.1 县城青年 ===
+    { id:'county_classmate_v33_1', icon:'📱', title:'县城里的同学', category:'county',
+      body:'你在朋友圈看到高中同学的动态。\n\n他发了一张照片：一辆新车，配文「提车了」。定位是你老家县城的4S店。\n\n你翻了翻他的朋友圈——他在县城开了一家小超市，结了婚，孩子两岁了。每天发的都是进货、卖货、陪孩子玩的照片。\n\n你跟他聊了几句。他说：「在大城市太累了，我回来挺好。房子便宜，离家近，日子过得去。」\n\n你看了看自己——租着房、加着班、拿着比县城高的工资，但存款好像还没他多。\n\n你不知道谁的生活更好。也许没有标准答案。',
+      cond: g => g.age >= 25 && !g.flags.hasHukou,
+      choices:[
+        { label:'觉得他的生活也挺好的', hint:'+🧠 +😊', fn: g => { g.flags.countyClassmate=true; return{intel:5,mood:3}; }},
+        { label:'更加坚定了留在大城市的决心', hint:'+🧠 +💪', fn: g => { g.flags.countyClassmate=true; return{intel:3,health:2}; }},
+        { label:'开始认真思考要不要回去', hint:'+🧠', fn: g => { g.flags.countyClassmate=true; g.flags.thinkReturn=true; return{intel:5}; }},
+      ]},
+
+    { id:'hometown_change_v33_1', icon:'🏘️', title:'老家的变化', category:'county',
+      body:'你回了一趟老家。\n\n你发现县城变了：新修了一条路、开了两个商场、多了一个电影院。路边居然也有星巴克了。\n\n但你仔细看了看，商场里的品牌都是山寨的、电影院只有一个厅、星巴克里坐的人都在打牌。\n\n你妈说：「你走了这几年，县城发展了不少。但年轻人还是往外跑，留下来的都是老人和小孩。」\n\n你走在曾经熟悉的街上，觉得既熟悉又陌生。这个县城在努力变好，但好像总差了点什么。\n\n你想，也许这就是中国县城的困境——它在追赶，但追赶的速度永远赶不上大城市。',
+      cond: g => g.age >= 22 && !g.flags.hasHukou,
+      choices:[
+        { label:'拍了一组照片记录老家的变化', hint:'+✨ +🧠', fn: g => { g.flags.hometownChange=true; return{charm:5,intel:3}; }},
+        { label:'跟老家的朋友聊了一下午', hint:'+👥 +😊', fn: g => { g.flags.hometownChange=true; return{social:8,mood:5}; }},
+        { label:'觉得县城也在努力活着', hint:'+🧠 +😊', fn: g => { g.flags.hometownChange=true; return{intel:5,mood:3}; }},
+      ]},
+
+    { id:'county_housing_v33_1', icon:'🏠', title:'县城房价', category:'county',
+      body:'你在网上查了一下老家的房价。\n\n县城最好的楼盘，均价六千。你在大城市买个卫生间的钱，在县城能买一套三居室。\n\n你算了一笔账：在县城买房，月供两千多，比租房还便宜。但问题是——你的工作在县城找不到对口的。\n\n你朋友说：「要不你回来考个公务员？工资不高但稳定。」\n\n你想了想，考公务员要备考半年到一年，考上了工资可能只有现在的三分之一。\n\n你看着两个数字：大城市的工资和县城的房价。它们之间隔着一个叫「选择」的鸿沟。\n\n你不知道，到底是高工资重要，还是低房价重要。',
+      cond: g => g.age >= 25 && g.money > 10000,
+      choices:[
+        { label:'认真考虑了在县城买房', hint:'+🧠', fn: g => { g.flags.countyHousing=true; return{intel:5}; }},
+        { label:'决定先在大城市多赚几年', hint:'+💰 +🧠', fn: g => { g.flags.countyHousing=true; return{money:500,intel:3}; }},
+        { label:'觉得哪里买房都不容易', hint:'+🧠', fn: g => { g.flags.countyHousing=true; return{intel:5}; }},
+      ]},
+
+    { id:'classmate_reunion_v33_1', icon:'🍻', title:'同学聚会', category:'county',
+      body:'过年回家，高中班长组织了一次同学聚会。\n\n来了十几个人。有在县城当老师的、有开店的、有在工厂上班的、有考上了公务员的。还有你——在大城市「漂」着的那个。\n\n大家喝着酒，聊着天。有人说：「你们在大城市一个月赚多少？」你说了一个数。他惊呼：「这么多？」\n\n但你没说的是：你的房租、交通、吃饭加起来，剩下的还没在县城当老师的同学多。\n\n有人问你：「大城市好玩吗？」你说：「好玩，但很累。」\n\n有人问你：「什么时候回来？」你说：「再说吧。」\n\n你发现，你们虽然坐在同一张桌子上，但已经是两个世界的人了。',
+      cond: g => g.age >= 25 && !g.flags.hasHukou,
+      choices:[
+        { label:'跟大家聊了很多，感慨万千', hint:'+👥 +🧠', fn: g => { g.flags.classmateReunion=true; return{social:5,intel:5}; }},
+        { label:'觉得有些尴尬，早早就走了', hint:'-😊', fn: g => { g.flags.classmateReunion=true; return{mood:-3}; }},
+        { label:'跟最好的几个朋友单独又聚了一次', hint:'+👥 +😊', fn: g => { g.flags.classmateReunion=true; g.flags.closeReunion=true; return{social:8,mood:8}; }},
+      ]},
+
+    { id:'county_business_v33_1', icon:'🏪', title:'县城创业', category:'county',
+      body:'你朋友在县城开了一家奶茶店，月入一万五。\n\n他给你看了账本：房租两千、原料成本四千、人工三千、水电五百。剩下的都是利润。\n\n他说：「县城消费虽然低，但成本也低。而且竞争没大城市那么激烈。」\n\n你有点心动了。你在大城市打工，月薪一万二，但到手只剩三千。\n\n你认真考虑了一下：在县城开一家什么样的店？投入多少？多久能回本？\n\n你算了一晚上，发现如果顺利的话，县城创业的收入可能比大城市打工高。\n\n但你也知道——创业有风险，而且县城的市场容量有限，做的人多了就不赚钱了。',
+      cond: g => g.age >= 25 && g.money > 20000 && !g.flags.hasHukou,
+      choices:[
+        { label:'开始认真做创业计划', hint:'+🧠 +💰', fn: g => { g.flags.countyBusiness=true; g.flags.madePlan=true; return{intel:8}; }},
+        { label:'觉得风险太大还是算了', hint:'+🧠', fn: g => { g.flags.countyBusiness=true; return{intel:3}; }},
+        { label:'决定先在大城市多攒点钱', hint:'+💰 +🧠', fn: g => { g.flags.countyBusiness=true; return{money:500,intel:3}; }},
+      ]},
+
+    { id:'parents_want_back_v33_1', icon:'📞', title:'父母催你回家', category:'county',
+      body:'妈妈又来电话了。\n\n「你王阿姨的儿子回来了，在县政府上班，多好啊。你要不也回来考个公务员？」\n\n你已经听了无数遍了。每次打电话，最后都会绕到「回家」这个话题。\n\n「你在大城市那么辛苦，回来多好。离家近，房价低，找个对象也容易。」\n\n你不知道怎么解释。你想说：大城市有更好的机会、更多的可能性、更丰富的人生。\n\n但你也知道，在父母眼里，「离家近」就是最大的优势。\n\n你挂了电话，看着窗外的城市夜景。你想，他们不是不理解你，只是他们理解的幸福跟你不一样。',
+      cond: g => g.age >= 23 && !g.flags.hasHukou,
+      choices:[
+        { label:'耐心地跟妈妈解释了自己的想法', hint:'+👥 +🧠', fn: g => { g.flags.parentsWantBack=true; return{social:5,intel:3}; }},
+        { label:'敷衍了几句就挂了', hint:'-😊', fn: g => { g.flags.parentsWantBack=true; return{mood:-3}; }},
+        { label:'认真地考虑了一下回家的可能性', hint:'+🧠', fn: g => { g.flags.parentsWantBack=true; g.flags.considerReturn=true; return{intel:5}; }},
+      ]},
+
+    { id:'county_leisure_v33_1', icon:'🌅', title:'县城的悠闲', category:'county',
+      body:'你回老家待了几天，感受到了县城的节奏。\n\n早上八点起床，九点上班（反正也没人查考勤），中午十二点下班回家吃饭睡午觉，下午三点再去上班，五点就下班了。\n\n下班后去打篮球、钓鱼、逛街、打牌。晚上十一点就睡觉了。\n\n你在这里过了三天，发现你的焦虑好了很多。没有加班、没有KPI、没有通勤地狱。\n\n但你也有点不适应：县城的商场七点就关门了，外卖选择很少，快递要三天才到。\n\n你想：如果一辈子这样过，是幸福还是无聊？\n\n也许，这就是县城和大城市的区别——一个给你时间，一个给你机会。',
+      cond: g => g.age >= 20 && !g.flags.hasHukou,
+      choices:[
+        { label:'享受了几天的慢生活', hint:'+😊 +💪', fn: g => { g.flags.countyLeisure=true; return{mood:8,health:5}; }},
+        { label:'第三天就开始无聊了', hint:'-😊', fn: g => { g.flags.countyLeisure=true; return{mood:-3}; }},
+        { label:'觉得两种方式都有道理', hint:'+🧠', fn: g => { g.flags.countyLeisure=true; return{intel:5}; }},
+      ]},
+
+    { id:'small_city_medical_v33_1', icon:'🏥', title:'小城市的医疗', category:'county',
+      body:'你在老家的时候身体不舒服，去了县医院。\n\n挂号不用排队，看病不用等。但医生看了两分钟就说：「去市里的大医院看看吧，我们这边设备不行。」\n\n你去了市医院，排队两个小时，看病五分钟。医生说：「要确诊的话，建议去省城的大医院。」\n\n你想起了在大城市看病的体验：挂号要抢，排队要等，但至少设备齐全、专家多。\n\n你突然理解了为什么那么多人愿意留在大城市——不只是因为机会多，还因为生病的时候能得到更好的治疗。\n\n你给爸妈买了一份商业医疗保险。你觉得这是你能给他们最好的保障。',
+      cond: g => g.age >= 22 && !g.flags.hasHukou && g.money > 3000,
+      choices:[
+        { label:'给爸妈买了商业医疗保险', hint:'-💰 +👥 +😊', fn: g => { g.flags.smallCityMedical=true; g.money-=2000; return{social:5,mood:5}; }},
+        { label:'帮爸妈预约了省城医院做体检', hint:'-💰 +👥', fn: g => { g.flags.smallCityMedical=true; g.money-=1500; return{social:5}; }},
+        { label:'更加坚定了留在大城市的理由', hint:'+🧠 +💪', fn: g => { g.flags.smallCityMedical=true; return{intel:5,health:2}; }},
+      ]},
+
+    { id:'county_blinddate_v33_1', icon:'💑', title:'县城里的相亲', category:'county',
+      body:'你回老家过年，亲戚给你介绍了一个对象。\n\n对方在县城当小学老师，长得还不错，性格也温和。亲戚说：「条件多好啊，在县城有房有车。」\n\n你们见了一面，聊了聊。她/他说：「我不太想去大城市，离家太远不放心。」\n\n你觉得她/他挺好的，但你们的生活规划完全不一样。你想在大城市闯一闯，她/他想在县城安稳地过。\n\n回家后亲戚问：「怎么样？」你说：「人挺好的，但不太合适。」\n\n亲戚叹了口气：「你们这些去大城市的，眼光都高了。」\n\n你苦笑了一下。不是眼光高了，是走的路不一样了。',
+      cond: g => g.age >= 25 && !g.flags.hasHukou && !g.flags.married,
+      choices:[
+        { label:'礼貌地拒绝了', hint:'+🧠 +👥', fn: g => { g.flags.countyBlinddate=true; return{intel:3,social:3}; }},
+        { label:'试着交往了一段时间', hint:'+👥 +😊', fn: g => { g.flags.countyBlinddate=true; return{social:5,mood:3}; }},
+        { label:'觉得她说得有道理，考虑了一下', hint:'+🧠', fn: g => { g.flags.countyBlinddate=true; g.flags.considerSettle=true; return{intel:5}; }},
+      ]},
+
+    { id:'cant_go_back_v33_1', icon:'🚂', title:'回不去的故乡', category:'county',
+      body:'你在老家待了一周后，坐上了回大城市的火车。\n\n火车开动的时候，你透过窗户看着站台上的父母。妈妈在擦眼泪，爸爸在挥手。\n\n你靠在座位上，看着窗外的田野慢慢变成了高楼。\n\n你突然明白了一件事：你不是不想回去，而是回不去了。\n\n你的工作、你的朋友、你的生活方式，都已经跟大城市绑定了。县城已经没有你的位置了——不是说县城不好，而是你已经变成了另一个人。\n\n你在备忘录里写了一句话：「故乡是一个你只能离开才能成长的地方。」\n\n你看着窗外的城市越来越近，眼眶湿了。但你没有后悔。',
+      cond: g => g.age >= 25 && g.months >= 24 && !g.flags.hasHukou,
+      choices:[
+        { label:'在火车上写了一篇长文', hint:'+✨ +🧠', fn: g => { g.flags.cantGoBack=true; g.flags.wroteEssay=true; return{charm:8,intel:5}; }},
+        { label:'给爸妈发了条消息说爱他们', hint:'+👥 +😊', fn: g => { g.flags.cantGoBack=true; return{social:5,mood:5}; }},
+        { label:'擦干眼泪，准备迎接新的生活', hint:'+💪 +😊', fn: g => { g.flags.cantGoBack=true; return{health:3,mood:5}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -20190,6 +20281,18 @@ const ACHIEVEMENTS = [
     { id:'dialect_ach', icon:'🗣️', name:'方言入门', desc:'学会了当地的方言', check: g => g.flags.learnDialect },
     { id:'alone_newyear_ach', icon:'🧧', name:'独自过年', desc:'第一次一个人在异乡过了年', check: g => g.flags.aloneNewyear },
     { id:'decide_stay_ach', icon:'🏙️', name:'选择留下', desc:'决定留在这座城市继续奋斗', check: g => g.flags.decideStay },
+
+    // --- v33.1 县城青年成就 ---
+    { id:'county_classmate_ach', icon:'📱', name:'不同的路', desc:'看到了留在县城的同学的生活', check: g => g.flags.countyClassmate },
+    { id:'hometown_change_ach', icon:'🏘️', name:'老家变了', desc:'回老家看到了县城的变化', check: g => g.flags.hometownChange },
+    { id:'county_housing_ach', icon:'🏠', name:'县城房价', desc:'认真比较了大城市和县城的房价', check: g => g.flags.countyHousing },
+    { id:'classmate_reunion_ach', icon:'🍻', name:'同学聚会', desc:'参加了高中同学聚会', check: g => g.flags.classmateReunion },
+    { id:'county_business_ach', icon:'🏪', name:'县城创业梦', desc:'认真考虑了在县城创业', check: g => g.flags.countyBusiness },
+    { id:'parents_back_ach', icon:'📞', name:'父母的期盼', desc:'面对了父母希望你回家的请求', check: g => g.flags.parentsWantBack },
+    { id:'county_leisure_ach', icon:'🌅', name:'慢生活', desc:'体验了县城的悠闲节奏', check: g => g.flags.countyLeisure },
+    { id:'small_medical_ach', icon:'🏥', name:'小城医疗', desc:'感受了小城市医疗的不便', check: g => g.flags.smallCityMedical },
+    { id:'county_date_ach', icon:'💑', name:'县城相亲', desc:'在老家经历了一次相亲', check: g => g.flags.countyBlinddate },
+    { id:'cant_go_back_ach', icon:'🚂', name:'回不去的故乡', desc:'明白了故乡是一个只能离开的地方', check: g => g.flags.cantGoBack },
 ];
 
 // === ENDINGS === (order matters: first match wins)
