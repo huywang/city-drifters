@@ -1656,6 +1656,9 @@ function applyActivity() {
     const effects = ACTIVITY_EFFECTS[selectedActivity];
     if (!effects) return null;
 
+    // v2.17: 记录最后活动（用于每日挑战）
+    G._lastActivity = selectedActivity;
+
     G.money += effects.money;
     G.health = clamp(G.health + effects.health, 0, 100);
     G.mood = clamp(G.mood + effects.mood, 0, 100);
@@ -1685,6 +1688,9 @@ function applyActivity() {
 // === GAME FLOW ===
 function advanceMonth() {
     if (G.isEnded) return;
+    // v2.17: 记录月初金钱（用于每日挑战）
+    G._monthStartMoney = G.money;
+
     G.months++; G.month++;
     if (G.month > 12) { G.month = 1; G.age++; G.year++; G.flags.springFestivalThisYear = false; }
 
@@ -1755,6 +1761,9 @@ function advanceMonth() {
 
     const event = pickEvent();
     if (event) { showEvent(event); } else { showMonthlySummary(); }
+
+    // v2.17: 检查每日挑战
+    checkDailyChallenge();
 
     if (G.months % 12 === 0) G.eventLog.push({ age: G.age, text: `在大城市又活过了一年` });
 }
@@ -1991,6 +2000,9 @@ function triggerEnding() {
         localStorage.setItem('cityDrifters_endings', JSON.stringify(endingsUnlocked));
     }
 
+    // v2.17: Update cross-playthrough statistics
+    updatePlaythroughStats(ending.id);
+
     // Calculate ending rarity
     const rarity = getEndingRarity(ending.id);
     const rarityLabel = { common: '普通', uncommon: '罕见', rare: '稀有', legendary: '传说' }[rarity];
@@ -2112,7 +2124,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.16' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.17' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
@@ -2546,6 +2558,129 @@ function loadSettings() {
 
     if (highContrast) document.body.classList.add('high-contrast');
     if (reduceMotion) document.body.classList.add('reduce-motion');
+}
+
+// === v2.17 DAILY CHALLENGES SYSTEM ===
+const DAILY_CHALLENGES = [
+    { id:'earn_5k', icon:'💰', title:'小富翁', desc:'本月赚取5000元以上', check: g => g.jobSalary>=5000 || g.money > (g._monthStartMoney||0) + 5000, reward: {mood:10,money:1000} },
+    { id:'health_80', icon:'❤️', title:'健康达人', desc:'保持健康在80以上', check: g => g.health>=80, reward: {health:5,mood:5} },
+    { id:'social_call', icon:'📞', title:'社交达人', desc:'选择社交活动', check: g => g._lastActivity==='socialize', reward: {social:8,mood:5} },
+    { id:'study_hard', icon:'📚', title:'学无止境', desc:'选择学习活动', check: g => g._lastActivity==='study', reward: {intel:8,mood:3} },
+    { id:'exercise', icon:'🏃', title:'运动健将', desc:'选择锻炼活动', check: g => g._lastActivity==='exercise', reward: {health:8,charm:3} },
+    { id:'save_money', icon:'🐷', title:'省钱高手', desc:'本月存款增加', check: g => g.money > (g._monthStartMoney||0), reward: {mood:8} },
+    { id:'rest_well', icon:'😴', title:'养生达人', desc:'选择休息活动', check: g => g._lastActivity==='rest', reward: {health:5,mood:8} },
+    { id:'work_hard', icon:'💼', title:'拼命三郎', desc:'选择工作活动', check: g => g._lastActivity==='work', reward: {money:2000,health:-3} },
+];
+
+function getDailyChallenge() {
+    // 根据日期生成确定性挑战（每天不同）
+    const today = new Date();
+    const dayOfYear = Math.floor((today - new Date(today.getFullYear(),0,0)) / 86400000);
+    return DAILY_CHALLENGES[dayOfYear % DAILY_CHALLENGES.length];
+}
+
+function checkDailyChallenge() {
+    const challenge = getDailyChallenge();
+    if (challenge.check(G)) {
+        const reward = challenge.reward;
+        if (reward.money) G.money += reward.money;
+        if (reward.health) G.health = clamp(G.health + reward.health, 0, 100);
+        if (reward.mood) G.mood = clamp(G.mood + reward.mood, 0, 100);
+        if (reward.intel) G.intel = clamp(G.intel + reward.intel, 0, 100);
+        if (reward.social) G.social = clamp(G.social + reward.social, 0, 100);
+        if (reward.charm) G.charm = clamp(G.charm + reward.charm, 0, 100);
+
+        // 记录完成
+        const completed = JSON.parse(localStorage.getItem('cityDrifters_challenges') || '[]');
+        const today = new Date().toDateString();
+        if (!completed.includes(today)) {
+            completed.push(today);
+            localStorage.setItem('cityDrifters_challenges', JSON.stringify(completed));
+        }
+
+        notify(`🎯 每日挑战完成：${challenge.title}！`);
+        playSound('success');
+        updateHUD();
+    }
+}
+
+// === v2.17 CROSS-PLAYTHROUGH STATISTICS ===
+function updatePlaythroughStats(ending) {
+    const stats = JSON.parse(localStorage.getItem('cityDrifters_stats') || '{}');
+    stats.totalPlaythroughs = (stats.totalPlaythroughs || 0) + 1;
+    stats.totalMonths = (stats.totalMonths || 0) + G.months;
+    stats.totalChoices = (stats.totalChoices || 0) + G.choices;
+    stats.totalEvents = (stats.totalEvents || 0) + G.eventsSeen;
+
+    // 记录结局
+    if (!stats.endings) stats.endings = {};
+    stats.endings[ending] = (stats.endings[ending] || 0) + 1;
+
+    // 记录最高金钱
+    if (!stats.maxMoney || G.money > stats.maxMoney) stats.maxMoney = G.money;
+    // 记录最长存活
+    if (!stats.maxAge || G.age > stats.maxAge) stats.maxAge = G.age;
+    // 记录最常选城市
+    if (!stats.cities) stats.cities = {};
+    stats.cities[G.city] = (stats.cities[G.city] || 0) + 1;
+    // 记录最常选背景
+    if (!stats.backgrounds) stats.backgrounds = {};
+    stats.backgrounds[G.background] = (stats.backgrounds[G.background] || 0) + 1;
+
+    localStorage.setItem('cityDrifters_stats', JSON.stringify(stats));
+}
+
+function showPlaythroughStats() {
+    const stats = JSON.parse(localStorage.getItem('cityDrifters_stats') || '{}');
+    const modal = document.getElementById('modal-stats') || createStatsModal();
+
+    const content = modal.querySelector('.stats-content');
+    if (!content) return;
+
+    const totalPlaythroughs = stats.totalPlaythroughs || 0;
+    const avgMonths = totalPlaythroughs > 0 ? Math.round((stats.totalMonths || 0) / totalPlaythroughs) : 0;
+
+    content.innerHTML = `
+        <div class="stats-grid">
+            <div class="stats-card">
+                <div class="stats-number">${totalPlaythroughs}</div>
+                <div class="stats-label">总游玩次数</div>
+            </div>
+            <div class="stats-card">
+                <div class="stats-number">${avgMonths}</div>
+                <div class="stats-label">平均存活月数</div>
+            </div>
+            <div class="stats-card">
+                <div class="stats-number">${stats.maxAge || 0}岁</div>
+                <div class="stats-label">最长存活</div>
+            </div>
+            <div class="stats-card">
+                <div class="stats-number">${fmtMoney(stats.maxMoney || 0)}</div>
+                <div class="stats-label">最高资产</div>
+            </div>
+        </div>
+        <p style="text-align:center;margin-top:16px;color:var(--text-secondary);font-size:0.9rem;">
+            累计做出 ${stats.totalChoices || 0} 个选择，经历 ${stats.totalEvents || 0} 个事件
+        </p>
+    `;
+
+    modal.classList.add('show');
+}
+
+function createStatsModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.id = 'modal-stats';
+    modal.innerHTML = `
+        <div class="modal-overlay" onclick="closeModal('modal-stats')"></div>
+        <div class="modal-content">
+            <h2>📊 游戏统计</h2>
+            <div class="stats-content"></div>
+            <button class="btn btn-secondary" onclick="closeModal('modal-stats')">关闭</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    return modal;
 }
 
 // === INIT ===

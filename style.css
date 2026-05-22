@@ -854,3 +854,33 @@ html[style*="font-size: 18px"] .modal-content {
         grid-template-columns: 1fr;
     }
 }
+
+/* === v2.17 Playthrough Stats === */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin: 16px 0;
+}
+.stats-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    text-align: center;
+}
+.stats-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-primary);
+    margin-bottom: 4px;
+}
+.stats-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+/* Daily Challenge notification style */
+.challenge-complete {
+    background: linear-gradient(135deg, var(--accent-emerald), var(--accent-cyan)) !important;
+}
