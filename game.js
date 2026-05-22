@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v17.0
+// 都市浮生记 - Game Engine v17.1
 // ============================================
 
 // === GAME STATE ===
@@ -8405,6 +8405,103 @@ const EVENTS = [
         { label:'赚钱比学历重要', hint:'+💰 +😊', fn: g => { g.flags.educationReturn=true; return{money:10000,mood:10}; }},
         { label:'平衡发展，两手都要抓', hint:'+🧠 +💰', fn: g => { g.flags.educationReturn=true; return{intel:8,money:5000,mood:5}; }},
       ]},
+    // === v17.1 新增事件（节日文化 + 传统节日 + 假期生活） ===
+    { id:'national_day_travel', icon:'🏖️', title:'国庆黄金周', category:'festival',
+      body:'国庆7天长假到了。你的朋友圈变成了旅游摄影展：\n\n- 同事A在三亚晒太阳\n- 同事B在日本买买买\n- 同事C在大理发呆\n- 你在高速公路上堵了6个小时\n\n到了景区你发现：人比风景多。你拍了100张照片，99张都是别人的后脑勺。\n\n你在酒店躺了3天，吃外卖看剧。第4天你发了一条朋友圈："岁月静好。"\n\n"国庆旅游：不是在旅行——是在参加全国人民的大型集体活动。"',
+      cond: g => !g.flags.nationalDayTravel,
+      choices:[
+        { label:'去热门景区人挤人', hint:'-💰 +😊 -💪', fn: g => { g.flags.nationalDayTravel=true; return{money:-8000,mood:10,health:-5}; }},
+        { label:'宅家躺平7天', hint:'+😊 +💪 +💰', fn: g => { g.flags.nationalDayTravel=true; g.flags.holidaySlacker=true; return{mood:15,health:8,money:-2000}; }},
+        { label:'错峰出行（请年假）', hint:'-💰 +😊 +✨', fn: g => { g.flags.nationalDayTravel=true; g.flags.offPeakTravel=true; return{money:-10000,mood:20,charm:5}; }},
+      ]},
+    { id:'diao_xiu', icon:'😤', title:'调休吐槽', category:'festival',
+      body:'你看了看日历：这个月的周末被调休了。\n\n这意味着：\n- 这周连上6天班\n- 下周连上7天班\n- 下下周终于正常了——但下个假期又要调\n\n你在工位上发出了一声叹息。你的同事也叹了口气。整个办公室都在叹气。\n\n微博热搜第1名：#调休#\n评论区："调休不如不调""放假是假的，加班是真的""我宁愿不放假也不愿意连上7天"\n\n"调休：中国特色的放假方式——放了个假，又没完全放。"',
+      cond: g => !g.flags.diaoXiu,
+      choices:[
+        { label:'默默忍受，继续上班', hint:'+💰 -😊 -💪', fn: g => { g.flags.diaoXiu=true; return{money:3000,mood:-10,health:-5}; }},
+        { label:'请假一天凑个长假', hint:'-💰 +😊', fn: g => { g.flags.diaoXiu=true; return{money:-2000,mood:15}; }},
+        { label:'发微博吐槽', hint:'+👥 +😊', fn: g => { g.flags.diaoXiu=true; g.flags.diaoXiuRanter=true; return{social:8,mood:5}; }},
+      ]},
+    { id:'qixi_valentine', icon:'💝', title:'七夕情人节', category:'festival',
+      body:'七夕到了。朋友圈变成了撒狗粮大赛：\n\n- 有人收到了999朵玫瑰\n- 有人在高级餐厅吃烛光晚餐\n- 有人收到了13140元的转账\n- 你在加班\n\n你打开外卖软件，给自己点了一份双人套餐。外卖小哥说："祝您七夕快乐。"\n\n你笑了笑："谢谢，你也是。"\n\n"七夕不是关于爱情——是关于提醒你：你还没有爱情。"',
+      cond: g => !g.flags.qixiValentine && g.age >= 18,
+      choices:[
+        { label:'给自己买个礼物', hint:'-💰 +😊 +✨', fn: g => { g.flags.qixiValentine=true; g.flags.selfLove=true; return{money:-2000,mood:15,charm:5}; }},
+        { label:'约朋友一起过', hint:'+👥 +😊', fn: g => { g.flags.qixiValentine=true; return{social:10,mood:10}; }},
+        { label:'假装今天不存在', hint:'+💰 +🧠', fn: g => { g.flags.qixiValentine=true; return{money:3000,intel:5}; }},
+      ]},
+    { id:'qingming_tomb', icon:'🕯️', title:'清明扫墓', category:'festival',
+      body:'清明节，你回老家给爷爷扫墓。\n\n你站在墓前，看着墓碑上的名字。你想起了小时候爷爷带你去河边钓鱼、给你买糖葫芦、偷偷塞给你零花钱。\n\n你妈说："给你爷爷烧点纸钱。"\n\n你点了三根香，鞠了三个躬。你小声说："爷爷，我很好。就是有点想你。"\n\n风吹过，树叶沙沙作响。你觉得爷爷听到了。\n\n"清明不是悲伤的节日——是提醒我们：珍惜眼前人。"',
+      cond: g => !g.flags.qingmingTomb && g.age >= 18,
+      choices:[
+        { label:'认真扫墓，陪伴家人', hint:'+👥 +😊', fn: g => { g.flags.qingmingTomb=true; return{social:10,mood:10,health:3}; }},
+        { label:'顺便踏青赏花', hint:'+😊 +💪 +✨', fn: g => { g.flags.qingmingTomb=true; g.flags.springOuting=true; return{mood:15,health:8,charm:5}; }},
+        { label:'太远了，网上祭奠', hint:'+😊 +🧠', fn: g => { g.flags.qingmingTomb=true; return{mood:5,intel:3}; }},
+      ]},
+    { id:'new_year_eve', icon:'🎆', title:'元旦跨年', category:'festival',
+      body:'12月31日晚上11点59分。\n\n你和朋友站在广场上，跟着倒计时：10、9、8……\n\n烟花绽放的那一刻，你发了条朋友圈："新年快乐！希望新的一年一切顺利！"\n\n你的新年愿望：\n- 涨薪30%\n- 减肥10斤\n- 读完20本书\n- 找到一个爱你的人\n\n（去年你的愿望也差不多。但你不在乎。年年许同样的愿望，说明你年年有期待。）\n\n"跨年不是在庆祝新年——是在告别旧年的自己。"',
+      cond: g => !g.flags.newYearEve,
+      choices:[
+        { label:'和朋友一起倒数', hint:'+👥 +😊 +✨', fn: g => { g.flags.newYearEve=true; return{social:12,mood:15,charm:5}; }},
+        { label:'一个人安静跨年', hint:'+🧠 +😊', fn: g => { g.flags.newYearEve=true; g.flags.quietNewYear=true; return{intel:8,mood:10}; }},
+        { label:'加班跨年（三倍工资）', hint:'+💰 -😊', fn: g => { g.flags.newYearEve=true; g.flags.overtimeNewYear=true; return{money:5000,mood:-10}; }},
+      ]},
+    { id:'double_eleven_shopping', icon:'🛒', title:'双十一剁手', category:'festival',
+      body:'双十一零点，你的手已经准备好了。\n\n你的购物车里有37件商品，总价比平时便宜了2000块。你觉得自己赚到了。\n\n你在0点01分下了单。0点02分，你收到了快递短信——"您的包裹正在路上"。\n\n第二天你算了算：花了8000块，其中5000块是你不需要的东西。\n\n你看了看银行卡余额，决定——明年一定不买。\n\n（每年你都这么说。）\n\n"双十一：不是你占了商家的便宜——是商家占了你的便宜。"',
+      cond: g => !g.flags.doubleElevenShopping,
+      choices:[
+        { label:'清空购物车！', hint:'-💰💰 +😊 +✨', fn: g => { g.flags.doubleElevenShopping=true; g.flags.bigSpender=true; return{money:-15000,mood:20,charm:5}; }},
+        { label:'只买真正需要的', hint:'-💰 +🧠 +😊', fn: g => { g.flags.doubleElevenShopping=true; g.flags.smartShopper=true; return{money:-3000,intel:5,mood:8}; }},
+        { label:'理性消费，什么都不买', hint:'+💰 +🧠', fn: g => { g.flags.doubleElevenShopping=true; g.flags.antiConsumer=true; return{money:2000,intel:8,mood:5}; }},
+      ]},
+    { id:'holiday_work', icon:'💼', title:'假期加班', category:'festival',
+      body:'放假了。但你在加班。\n\n你的同事都出去旅游了，朋友圈全是风景照。你一个人坐在空荡荡的办公室里，键盘声在寂静中格外清晰。\n\n领导说："辛苦了，节后给你调休。"\n\n你知道：调休永远不会兑现。\n\n但你的银行卡余额告诉你：三倍工资真的很香。\n\n"假期加班：不是在加班——是在用别人的快乐换自己的工资。"',
+      cond: g => !g.flags.holidayWork && g.job !== '待业中',
+      choices:[
+        { label:'主动加班（三倍工资）', hint:'+💰 -😊 -💪', fn: g => { g.flags.holidayWork=true; return{money:8000,mood:-10,health:-5}; }},
+        { label:'被动加班（领导安排的）', hint:'+💰 -😊 -👥', fn: g => { g.flags.holidayWork=true; return{money:5000,mood:-15,social:-5}; }},
+        { label:'拒绝加班，享受假期', hint:'+😊 +💪 -💰', fn: g => { g.flags.holidayWork=true; return{mood:20,health:8,money:-1000}; }},
+      ]},
+    { id:'holiday_syndrome', icon:'😴', title:'假期综合症', category:'festival',
+      body:'假期结束了。\n\n你的状态：\n- 早上闹钟响了5遍才起床\n- 坐在工位上发呆\n- 打开电脑忘了密码\n- 午饭不知道吃什么\n- 一直看手机等下班\n\n你的同事也是同样的状态。整个办公室弥漫着一种"我不想上班"的气氛。\n\n你在工位上偷偷搜："假期综合症怎么办"\n\n"假期综合症：不是你的身体在休息——是你的灵魂还在度假。"',
+      cond: g => !g.flags.holidaySyndrome,
+      choices:[
+        { label:'硬撑着熬过第一周', hint:'+💰 -😊 -💪', fn: g => { g.flags.holidaySyndrome=true; return{money:3000,mood:-8,health:-3}; }},
+        { label:'请一天假缓冲', hint:'-💰 +😊 +💪', fn: g => { g.flags.holidaySyndrome=true; return{money:-1000,mood:10,health:5}; }},
+        { label:'用运动唤醒身体', hint:'+💪 +😊 +🧠', fn: g => { g.flags.holidaySyndrome=true; g.flags.exerciseRoutine=true; return{health:10,mood:8,intel:3}; }},
+      ]},
+    { id:'annual_leave_trip', icon:'✈️', title:'年假旅行', category:'festival',
+      body:'你终于请了年假。5天年假 + 2天周末 = 7天旅行。\n\n你的目的地：云南/西藏/新疆/东南亚/日本。\n\n你做了详细的攻略：每天的行程精确到小时，餐厅、景点、酒店都预订好了。\n\n但到了之后你发现：\n- 网红餐厅要排队2小时\n- 网红打卡点全是人\n- 你的预算超了50%\n- 你的朋友圈获赞数创了新高\n\n"年假旅行的真谛：不是去了多远的地方——是终于从工作中逃了出来。"',
+      cond: g => !g.flags.annualLeaveTrip && g.age >= 22 && g.money > 10000 && g.job !== '待业中',
+      choices:[
+        { label:'去远方（西藏/新疆/东南亚）', hint:'-💰💰 +😊 +✨ +💪', fn: g => { g.flags.annualLeaveTrip=true; g.flags.longTrip=true; return{money:-15000,mood:25,charm:10,health:5}; }},
+        { label:'周边游（高铁3小时内）', hint:'-💰 +😊 +💪', fn: g => { g.flags.annualLeaveTrip=true; return{money:-5000,mood:18,health:5}; }},
+        { label:'存着年假以后用', hint:'+💰 +🧠', fn: g => { g.flags.annualLeaveTrip=true; return{money:3000,intel:3}; }},
+      ]},
+    { id:'duanwu_zongzi', icon:'🎋', title:'端午节', category:'festival',
+      body:'端午节到了。\n\n你妈从老家寄了一箱粽子：肉粽、蛋黄粽、豆沙粽。你分给了同事几个，大家都说你妈包的粽子好吃。\n\n你打开外卖软件，发现"粽子"的搜索量涨了300%。商家推出了各种奇葩粽子：螺蛳粉粽、火锅粽、巧克力粽。\n\n你吃了两个你妈包的肉粽，觉得还是传统的最好吃。\n\n"粽子的味道：不在于馅料——在于谁包的。"',
+      cond: g => !g.flags.duanwuZongzi,
+      choices:[
+        { label:'学着自己包粽子', hint:'+🧠 +😊 +👥', fn: g => { g.flags.duanwuZongzi=true; g.flags.learnedZongzi=true; return{intel:5,mood:12,social:5}; }},
+        { label:'吃妈妈寄的粽子', hint:'+😊 +👥', fn: g => { g.flags.duanwuZongzi=true; return{mood:15,social:5}; }},
+        { label:'尝尝奇葩粽子', hint:'+😊 +✨', fn: g => { g.flags.duanwuZongzi=true; return{mood:8,charm:3,money:-100}; }},
+      ]},
+    { id:'five_twenty', icon:'💕', title:'520表白日', category:'festival',
+      body:'5月20日。朋友圈又开始撒狗粮了。\n\n你的同事收到了男朋友送的花和包。你的闺蜜收到了老公转的52013.14元。\n\n你在5:20的时候发了一条朋友圈："520快乐。"配图是一杯奶茶。\n\n评论区：\n- 你妈："有对象了吗？"\n- 你同事："哈哈哈哈单身狗"\n- 你朋友："一起过光棍节"\n\n"520：不是爱情的节日——是单身的照妖镜。"',
+      cond: g => !g.flags.fiveTwenty && g.age >= 18 && g.age <= 35,
+      choices:[
+        { label:'给喜欢的人表白', hint:'🎲 +😊 +✨', fn: g => { g.flags.fiveTwenty=true; if(!g.flags.hasPartner&&Math.random()>0.6){g.flags.hasPartner=true;return{mood:25,charm:10}}else{return{mood:-10,charm:5}} }},
+        { label:'给自己买束花', hint:'-💰 +😊 +✨', fn: g => { g.flags.fiveTwenty=true; g.flags.selfLove=true; return{money:-200,mood:12,charm:5}; }},
+        { label:'无视这个节日', hint:'+🧠 +💰', fn: g => { g.flags.fiveTwenty=true; return{intel:5,mood:3}; }},
+      ]},
+    { id:'festival_alone', icon:'🌙', title:'一个人的节日', category:'festival',
+      body:'又是一个节日。春节/中秋/圣诞/元旦。\n\n你一个人在出租屋里。窗外是烟花和欢笑声，屋里是外卖和电视声。\n\n你打开了视频通话，看到了爸妈在老家吃年夜饭/月饼。你笑着说："我挺好的。"\n\n挂了电话，你的笑容消失了。你吃了一口外卖，觉得有点咸。\n\n"在大城市，节日是放大孤独的日子。但也是提醒自己：我还在努力活着。"',
+      cond: g => !g.flags.festivalAlone && g.age >= 22 && !g.flags.married,
+      choices:[
+        { label:'给自己做一顿大餐', hint:'+😊 +💪 +✨', fn: g => { g.flags.festivalAlone=true; g.flags.cookingHoliday=true; return{mood:12,health:5,charm:5}; }},
+        { label:'给朋友打电话聊天', hint:'+👥 +😊', fn: g => { g.flags.festivalAlone=true; return{social:12,mood:10}; }},
+        { label:'早点睡，明天还要上班', hint:'+💪 +💰 -😊', fn: g => { g.flags.festivalAlone=true; return{health:5,money:1000,mood:-8}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -9204,6 +9301,17 @@ const ACHIEVEMENTS = [
     { id:'self_taught_ach', icon:'💻', name:'自学成才', desc:'通过B站自学编程', check: g => g.flags.selfTaughtCoder },
     { id:'lifelong_learner_ach', icon:'🌱', name:'终身学习者', desc:'40岁仍在学习新技能', check: g => g.flags.lifelongLearning },
     { id:'phd_survivor_ach', icon:'🔬', name:'博士幸存者', desc:'熬过了博士心理健康危机', check: g => g.flags.phdMentalHealth },
+    // === v17.1 新增成就（节日文化） ===
+    { id:'travel_enthusiast_ach', icon:'🏖️', name:'旅行达人', desc:'享受了国庆假期', check: g => g.flags.nationalDayTravel },
+    { id:'diao_xiu_survivor_ach', icon:'😤', name:'调休幸存者', desc:'熬过了调休连班', check: g => g.flags.diaoXiu },
+    { id:'self_love_ach', icon:'💝', name:'爱自己', desc:'在节日给自己买了礼物', check: g => g.flags.selfLove },
+    { id:'spring_outing_ach', icon:'🌸', name:'踏青赏花', desc:'清明时节去踏青', check: g => g.flags.springOuting },
+    { id:'new_year_wish_ach', icon:'🎆', name:'新年许愿', desc:'参加了跨年倒数', check: g => g.flags.newYearEve },
+    { id:'smart_shopper_ach', icon:'🛒', name:'理性消费者', desc:'双十一理性购物', check: g => g.flags.smartShopper },
+    { id:'holiday_slacker_ach', icon:'😴', name:'假期宅家王', desc:'假期宅家躺平', check: g => g.flags.holidaySlacker },
+    { id:'off_peak_traveler_ach', icon:'✈️', name:'错峰旅行家', desc:'学会了错峰出行', check: g => g.flags.offPeakTravel },
+    { id:'zongzi_maker_ach', icon:'🎋', name:'粽子师傅', desc:'学会了自己包粽子', check: g => g.flags.learnedZongzi },
+    { id:'holiday_cook_ach', icon:'🌙', name:'节日大厨', desc:'一个人过节也做了一顿大餐', check: g => g.flags.cookingHoliday },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -9471,6 +9579,9 @@ const ENDINGS = [
     { id:'vocational_master_end', badge:'🔧', title:'大国工匠', desc:'你没有走学历路线，而是选择了手艺。\n\n你从学徒做到了师傅，从师傅做到了行业标杆。你的技术在这个城市无人能敌。别人搞不定的问题，你一看就知道毛病在哪。\n\n你的月薪从3000涨到了3万。那些当年嘲笑你"不读书"的同学，现在来找你修车/修水管/装修房子。\n\n你说："读书是一种出路，手艺也是一种出路。路不同，但都能到达终点。"\n\n"手艺人：用双手创造生活，用技术赢得尊重。"', cond: g => g.flags.vocationalEdu && g.flags.craftSkill && g.money >= 100000 && g.age >= 30 },
     { id:'study_returnee_end', badge:'✈️', title:'海归精英', desc:'你出国留学后回国了。\n\n你进了一家外企/大厂，年薪50万。你的英语流利、视野开阔、做事方式和国际接轨。\n\n但你也发现：国内的工作节奏和国外完全不同。你的同事觉得你"太洋气"，你的老板觉得你"不够接地气"。\n\n你在两种文化之间找到了平衡点。你用国际化的方式解决了本地化的问题。\n\n"海归：不是回来镀金——是回来做事。"', cond: g => g.flags.studyAbroad && g.money >= 200000 && g.intel >= 80 && g.age >= 28 },
     { id:'education_reformer_end', badge:'📚', title:'教育革新者', desc:'你经历了教育的内卷，也见证了教育的困境。\n\n你决定做一些改变：你办了一所创新学校/做了一个教育公众号/写了一本教育畅销书。你的理念是"让教育回归本质——培养人，而不是筛选人"。\n\n你的学生/读者/粉丝说："是你改变了我对教育的看法。"\n\n你没有改变整个体制，但你改变了一些人的命运。\n\n"教育改革：不是推翻一切——是在废墟上种花。"', cond: g => g.flags.involutionEdu && g.flags.antiInvolution && g.intel >= 75 && g.social >= 60 && g.age >= 32 },
+    // --- v17.1 节日结局 ---
+    { id:'travel_master_end', badge:'🌍', title:'旅行达人', desc:'你成了一个旅行达人。\n\n你去过30个国家、50个城市。你的护照上有20多个签证，你的冰箱贴摆满了一面墙。\n\n你的朋友圈不是旅行照就是在机场的自拍。有人说你"不务正业"，有人说你"活得精彩"。\n\n你说："旅行的意义不在于去了哪里——在于看到了不同的活法。"\n\n你把每一次旅行都当成一次人生的拓展。你的世界观比大多数人宽广，因为你亲眼看过那么多的不同。\n\n"世界那么大，我想去看看——而你，真的去看了。"', cond: g => g.flags.annualLeaveTrip && g.flags.offPeakTravel && g.money >= 100000 && g.mood >= 65 && g.age >= 30 },
+    { id:'festival_life_end', badge:'🎊', title:'生活仪式感', desc:'你把每一个节日都过得有滋有味。\n\n春节你包饺子、端午你包粽子、中秋你赏月、七夕你给自己买花、元旦你倒数跨年。\n\n你的朋友们说："跟你一起过节总是特别有意思。"\n\n你不是在过节日——你是在用仪式感对抗日常的平淡。每一个节日都是一颗糖，甜在平凡的日子里。\n\n"仪式感：不是矫情——是提醒自己，生活值得被认真对待。"', cond: g => g.flags.newYearEve && g.flags.duanwuZongzi && g.flags.qixiValentine && g.mood >= 70 && g.age >= 25 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
