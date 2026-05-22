@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v13.2
+// 都市浮生记 - Game Engine v13.3
 // ============================================
 
 // === GAME STATE ===
@@ -6988,6 +6988,87 @@ const EVENTS = [
         { label:'卸载小红书', hint:'+😊', fn: g => { g.flags.parentingAnxiety=true; g.flags.digitalDetox=true; return{mood:8}; }},
         { label:'跟其他家长聊聊', hint:'+👥 +🧠', fn: g => { g.flags.parentingAnxiety=true; return{social:8,intel:5,mood:3}; }},
       ]},
+    // === v13.3 中年危机 + 二次创业 + 人生下半场 ===
+    { id:'midlife_crisis_35', icon:'😰', title:'35岁危机',
+      body:'你35岁了。\n\n朋友圈里，有人已经财务自由，有人当了高管，有人创业成功。而你，还在为房贷发愁，还在加班到深夜，还在被领导骂。\n\n你看着镜子里的自己：发际线后移了，肚子起来了，眼神疲惫了。\n\n你问自己：「这就是我的人生吗？」\n\n你老婆/老公说：「你已经很好了。」\n你说：「可是我还想要更多。」\n\n"35岁危机不是年龄的问题——是期望与现实差距的问题。"',
+      cond: g => g.age >= 35 && g.age <= 40 && !g.flags.midlifeCrisis35,
+      choices:[
+        { label:'接受现实', hint:'+😊 +🧠', fn: g => { g.flags.midlifeCrisis35=true; g.flags.lifePhilosophy=true; return{mood:8,intel:10}; }},
+        { label:'辞职创业', hint:'-💰 +✨', fn: g => { g.flags.midlifeCrisis35=true; g.flags.secondStartup=true; return{money:-20000,mood:5,charm:5}; }},
+        { label:'学新技能', hint:'+🧠 -⏰', fn: g => { g.flags.midlifeCrisis35=true; g.flags.midlifeLearning=true; return{intel:15,mood:-3}; }},
+      ]},
+    { id:'second_startup', icon:'🚀', title:'二次创业',
+      body:'你辞职了，开始了第二次创业。\n\n这次你选择了自己真正想做的事：开一家咖啡馆/做自媒体/开网店/做咨询。\n\n你的启动资金是你所有的存款：15万。你老婆/老公说：「我支持你。」\n\n第一个月：收入0。\n第二个月：收入500。\n第三个月：收入2000。\n\n你开始怀疑自己。但你的孩子说：「爸爸/妈妈加油！」\n\n你说：「好。」\n\n"二次创业：不是因为你不怕失败——是因为你更怕后悔。"',
+      cond: g => g.flags.secondStartup && g.age >= 36 && !g.flags.secondStartupDone,
+      choices:[
+        { label:'坚持！', hint:'+✨ -😊', fn: g => { g.flags.secondStartupDone=true; g.flags.entrepreneur=true; return{charm:10,mood:-8,money:-5000}; }},
+        { label:'及时止损', hint:'+💰 -✨', fn: g => { g.flags.secondStartupDone=true; return{money:5000,mood:-10}; }},
+        { label:'找人合伙', hint:'+👥', fn: g => { g.flags.secondStartupDone=true; g.flags.entrepreneur=true; return{social:10,mood:3}; }},
+      ]},
+    { id:'health_crisis_40', icon:'🏥', title:'40岁体检',
+      body:'你40岁了，去做了一次全面体检。\n\n报告出来了：\n- 血压偏高\n- 血脂偏高\n- 肝功能异常\n- 颈椎C5-C6突出\n- 轻度脂肪肝\n- 视力下降\n\n医生看着你说：「你这个年纪，这些指标...要注意了。」\n\n你问：「我还能活多久？」\n医生：「看你怎么活。」\n\n你看着体检报告，突然意识到：你用了20年拿命换钱，现在要用钱换命了。\n\n"40岁是人生的分水岭：之前是拼搏，之后是保养。"',
+      cond: g => g.age >= 40 && !g.flags.healthCrisis40,
+      choices:[
+        { label:'开始养生', hint:'+💪 +😊', fn: g => { g.flags.healthCrisis40=true; g.flags.wellnessMode=true; return{health:15,mood:10,money:-3000}; }},
+        { label:'继续拼命', hint:'-💪 +💰', fn: g => { g.flags.healthCrisis40=true; return{health:-10,money:5000,mood:-8}; }},
+        { label:'买保险', hint:'-💰 +🧠', fn: g => { g.flags.healthCrisis40=true; g.flags.hasInsurance=true; return{money:-8000,intel:5}; }},
+      ]},
+    { id:'empty_nest_syndrome', icon:'🪺', title:'空巢',
+      body:'你的孩子上大学了，离开了家。\n\n你站在孩子的房间里，看着空荡荡的床、墙上贴满的海报、书架上摆满的课本。\n\n你突然觉得心里空了一块。\n\n你老婆/老公说：「孩子长大了，该飞了。」\n你说：「可是我还不想放手。」\n\n你给孩子发微信：「在学校还好吗？」\n孩子回：「挺好的，别担心。」（附带一张和朋友聚餐的照片）\n\n你看着照片，笑了，也哭了。\n\n"空巢不是失去——是放手。放手让孩子飞，也让自己重新活一次。"',
+      cond: g => g.flags.hasChild && g.age >= 45 && !g.flags.emptyNest,
+      choices:[
+        { label:'重新找回自己', hint:'+😊 +✨', fn: g => { g.flags.emptyNest=true; g.flags.secondYouth=true; return{mood:12,charm:8}; }},
+        { label:'每天给孩子打电话', hint:'-😊 -👨‍👩‍👧', fn: g => { g.flags.emptyNest=true; return{mood:-10,social:-5}; }},
+        { label:'养只宠物', hint:'+😊 +💪', fn: g => { g.flags.emptyNest=true; g.flags.hasPet=true; return{mood:10,health:5}; }},
+      ]},
+    { id:'career_pivot_40', icon:'🔄', title:'40岁转行',
+      body:'你40岁了，决定转行。\n\n你的同事说：「你疯了吗？这个年纪还转行？」\n你的领导说：「你在这里干了10年，说走就走？」\n你的父母说：「稳定点不好吗？」\n\n但你知道：你不想在50岁的时候还在做一份不喜欢的工作。\n\n你辞了职，去学了烘焙/编程/设计/心理咨询。\n\n你的新同事比你小15岁。你成了班里年纪最大的学生。\n\n你说：「学习不分年龄。」\n\n"40岁转行：不是因为你不行——是因为你终于敢了。"',
+      cond: g => g.age >= 40 && g.jobSalary >= 15000 && !g.flags.careerPivot40,
+      choices:[
+        { label:'勇敢转行', hint:'+✨ -💰', fn: g => { g.flags.careerPivot40=true; g.flags.careerChange=true; return{charm:10,money:-10000,mood:5}; }},
+        { label:'先兼职试试', hint:'+🧠 +💰', fn: g => { g.flags.careerPivot40=true; g.flags.sideHustle=true; return{intel:8,money:3000}; }},
+        { label:'算了不折腾了', hint:'+😊', fn: g => { g.flags.careerPivot40=true; return{mood:3}; }},
+      ]},
+    { id:'retirement_countdown_real', icon:'🧓', title:'退休倒计时',
+      body:'你算了一下：距离退休还有15年。\n\n你的存款：20万。\n你的养老金：每月3000。\n你的房贷：还有10年。\n\n你打开计算器：如果要维持现在的生活水平，你需要300万退休金。\n\n你看着存款，叹了口气。\n\n你老婆/老公说：「我们可以降低生活标准。」\n你说：「可是我不想降低。」\n\n你开始研究：基金定投、养老保险、以房养老、延迟退休。\n\n"退休规划：不是老了才想——是现在就要开始。"',
+      cond: g => g.age >= 45 && !g.flags.retirementCountdownReal,
+      choices:[
+        { label:'开始存钱', hint:'+💰 -😊', fn: g => { g.flags.retirementCountdownReal=true; return{money:10000,mood:-5,intel:5}; }},
+        { label:'投资理财', hint:'+🧠 +💰', fn: g => { g.flags.retirementCountdownReal=true; g.flags.hasInvestment=true; return{intel:10,money:5000}; }},
+        { label:'活在当下', hint:'+😊 -💰', fn: g => { g.flags.retirementCountdownReal=true; return{mood:10,money:-5000}; }},
+      ]},
+    { id:'parent_aging_care', icon:'👴', title:'父母养老',
+      body:'你爸/妈打电话来：「最近身体不太好...」\n\n你问：「怎么了？」\n对方说：「没事，就是老了。」\n\n你回家看他们。你发现：他们的头发全白了，背驼了，走路慢了。\n\n你妈说：「你忙你的，不用管我们。」\n你爸说：「我们还能照顾自己。」\n\n但你知道：他们需要你。就像你小时候需要他们一样。\n\n你说：「我带你们去体检。」\n\n"父母养老：你长大了，他们老了。这是生命的轮回，也是爱的传承。"',
+      cond: g => g.age >= 40 && !g.flags.parentAgingCare,
+      choices:[
+        { label:'接父母来城里', hint:'-💰 +👨‍👩‍👧', fn: g => { g.flags.parentAgingCare=true; return{money:-10000,mood:8,social:5}; }},
+        { label:'每月寄钱回去', hint:'-💰 +😊', fn: g => { g.flags.parentAgingCare=true; return{money:-3000,mood:5}; }},
+        { label:'每周视频电话', hint:'+👨‍👩‍👧 +😊', fn: g => { g.flags.parentAgingCare=true; return{mood:8,social:3}; }},
+      ]},
+    { id:'midlife_marriage_crisis', icon:'💔', title:'中年婚姻危机',
+      body:'你和老婆/老公结婚15年了。\n\n你们不再吵架了——因为没什么好吵的了。你们也不再说话了——因为没什么好说的了。\n\n你们像两个室友：各忙各的，各睡各的，各吃各的。\n\n你问自己：「这就是婚姻吗？」\n\n你的同事离婚了，说：「解脱了。」\n你的朋友也离婚了，说：「后悔了。」\n\n你不知道该怎么办。但你知道：你们需要谈谈了。\n\n"中年婚姻危机：不是不爱了——是忘了怎么爱。"',
+      cond: g => g.flags.married && g.age >= 40 && !g.flags.midlifeMarriageCrisis,
+      choices:[
+        { label:'找婚姻咨询师', hint:'-💰 +👥', fn: g => { g.flags.midlifeMarriageCrisis=true; return{money:-3000,social:8,mood:5}; }},
+        { label:'重新约会', hint:'+😊 +✨', fn: g => { g.flags.midlifeMarriageCrisis=true; return{mood:10,charm:5}; }},
+        { label:'考虑离婚', hint:'-👥 +😊', fn: g => { g.flags.midlifeMarriageCrisis=true; g.flags.divorced=true; return{mood:5,social:-10,money:-20000}; }},
+      ]},
+    { id:'legacy_thinking', icon:'🌟', title:'人生遗产',
+      body:'你45岁了，开始思考：「我这一生，留下了什么？」\n\n你看着自己的孩子：ta长大了，有了自己的想法和生活。\n你看着自己的工作：做了10年，好像也没什么特别的成就。\n你看着自己的存款：不多不少，刚好够活着。\n\n你问自己：「如果我现在死了，有人会记得我吗？」\n\n你的朋友说：「你会被记得，因为你是一个好人。」\n你说：「好人不应该只是好人——应该做点什么。」\n\n"人生遗产：不是你拥有多少——是你给予多少。"',
+      cond: g => g.age >= 45 && !g.flags.legacyThinking,
+      choices:[
+        { label:'开始做志愿者', hint:'+👥 +😊', fn: g => { g.flags.legacyThinking=true; g.flags.regularVolunteer=true; return{social:15,mood:12}; }},
+        { label:'写回忆录', hint:'+🧠 +✨', fn: g => { g.flags.legacyThinking=true; return{intel:10,charm:8,mood:5}; }},
+        { label:'继续现在的生活', hint:'+😊', fn: g => { g.flags.legacyThinking=true; return{mood:3}; }},
+      ]},
+    { id:'second_youth', icon:'🌸', title:'第二春',
+      body:'你45岁了，突然觉得自己又年轻了。\n\n孩子上大学了，房贷快还完了，工作稳定了。你终于有了时间和自由。\n\n你开始做以前没时间做的事：学画画、学吉他、去旅行、去跑步。\n\n你跑了第一个半程马拉松。你画了第一幅油画。你去了第一个一直想去的地方。\n\n你老婆/老公说：「你变了。」\n你说：「我没变——我只是找回了自己。」\n\n"第二春：不是老了——是终于有时间活给自己了。"',
+      cond: g => g.age >= 45 && g.flags.emptyNest && !g.flags.secondYouthDone,
+      choices:[
+        { label:'活出精彩！', hint:'+😊 +✨ +💪', fn: g => { g.flags.secondYouthDone=true; return{mood:15,charm:10,health:10}; }},
+        { label:'帮助年轻人', hint:'+👥 +🧠', fn: g => { g.flags.secondYouthDone=true; g.flags.mentor=true; return{social:12,intel:8,mood:8}; }},
+        { label:'享受生活', hint:'+😊', fn: g => { g.flags.secondYouthDone=true; return{mood:12}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -7624,6 +7705,17 @@ const ACHIEVEMENTS = [
     { id:'ai_educator', icon:'🤖', name:'AI教育先锋', desc:'教孩子正确使用AI', check: g => g.flags.aiEducation },
     { id:'teen_supporter', icon:'💚', name:'青少年守护者', desc:'关注了孩子心理健康', check: g => g.flags.teenDepression },
     { id:'relaxed_parent', icon:'🌿', name:'佛系家长', desc:'选择了松弛感育儿', check: g => g.flags.relaxedParenting },
+    // === v13.3 新增成就 ===
+    { id:'midlife_crisis_survivor', icon:'😰', name:'35岁危机幸存者', desc:'度过了35岁危机', check: g => g.flags.midlifeCrisis35 },
+    { id:'second_startup_founder', icon:'🚀', name:'二次创业者', desc:'开始了第二次创业', check: g => g.flags.secondStartupDone },
+    { id:'health_awakened_40', icon:'🏥', name:'40岁健康觉醒', desc:'40岁开始关注健康', check: g => g.flags.healthCrisis40 },
+    { id:'empty_nester_real', icon:'🪺', name:'空巢家长', desc:'孩子离家上大学了', check: g => g.flags.emptyNest },
+    { id:'career_pivot_40_ach', icon:'🔄', name:'40岁转行者', desc:'40岁勇敢转行', check: g => g.flags.careerPivot40 },
+    { id:'retirement_planner_real', icon:'🧓', name:'退休规划师v2', desc:'开始认真规划退休', check: g => g.flags.retirementCountdownReal },
+    { id:'parent_caregiver', icon:'👴', name:'父母照护者', desc:'开始照顾年迈父母', check: g => g.flags.parentAgingCare },
+    { id:'marriage_renewer', icon:'💑', name:'婚姻重塑者', desc:'面对了中年婚姻危机', check: g => g.flags.midlifeMarriageCrisis },
+    { id:'legacy_builder', icon:'🌟', name:'遗产建造者', desc:'思考了人生遗产', check: g => g.flags.legacyThinking },
+    { id:'second_youth_liver', icon:'🌸', name:'第二春', desc:'迎来了人生第二春', check: g => g.flags.secondYouthDone },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -7830,6 +7922,10 @@ const ENDINGS = [
     { id:'tiger_parent_end', badge:'🐔', title:'虎妈虎爸', desc:'你成了一个鸡娃家长。\n\n你给孩子报了钢琴、奥数、英语、编程、跆拳道。孩子的周末比工作日还忙。你花了30万在孩子教育上。\n\n你的孩子考上了重点中学。你在家长群里发了条：「感谢各位老师和家长的帮助！」收获了50个赞。\n\n你的孩子说：「爸爸/妈妈，我好累。」你说：「现在累，以后就轻松了。」\n\n"鸡娃的代价：用父母的钱包和孩子的童年，换一个不确定的未来。"', cond: g => g.flags.chickenBaby && g.flags.extracurricularWar && g.money <= 50000 && g.age >= 40 },
     { id:'relaxed_parent_end', badge:'🌱', title:'松弛感家长', desc:'你选择了佛系育儿。\n\n你没有给孩子报那么多班。你的孩子周末可以玩泥巴、看蚂蚁搬家、在公园里疯跑。\n\n你的孩子在家长群里不是最优秀的，但ta是最快乐的。ta喜欢画画，虽然画得不太好，但ta画的时候眼睛里有光。\n\n你的孩子说：「爸爸/妈妈，我长大了想当画家。」你说：「好。」\n\n"松弛感育儿的真相：不是不关心——是相信孩子有自己的节奏。"', cond: g => g.flags.relaxedParenting && g.flags.hasChild && g.mood >= 70 && g.age >= 38 },
     { id:'education_investor_end', badge:'🎓', title:'教育投资人', desc:'你在孩子教育上投入了一切。\n\n学区房、国际学校、留学。你花了200万。你的孩子从海外名校毕业了。\n\n孩子回国后找到了一份月薪2万的工作。你算了一笔账：要8年才能回本。\n\n你说：「教育不是投资——是爱。」（虽然你心里还是在算账）\n\n"教育的价值不在于回报率——在于你给了孩子选择的权利。"', cond: g => g.flags.schoolDistrictHouse && g.flags.studyAbroad && g.age >= 45 && g.money >= -50000 },
+    // --- v13.3 NEW ENDINGS ---
+    { id:'second_startup_success_end', badge:'🚀', title:'二次创业成功', desc:'你的第二次创业成功了。\n\n这一次，你不是为了赚钱，而是为了做自己喜欢的事。你开了咖啡馆/做了自媒体/开了网店。\n\n虽然收入不如以前打工，但你每天都很开心。你的孩子说：「爸爸/妈妈，你现在笑得好多了。」\n\n你说：「因为我终于在做自己想做的事了。」\n\n"二次创业：不是为了成功——是为了不后悔。"', cond: g => g.flags.secondStartupDone && g.flags.entrepreneur && g.mood >= 65 && g.age >= 40 },
+    { id:'midlife_wisdom_end_v2', badge:'🌟', title:'中年智者', desc:'你45岁了，终于活明白了。\n\n你不再追求升职加薪，不再跟同学比房子车子，不再为孩子的成绩焦虑。\n\n你开始享受生活的每一个瞬间：早上的咖啡、傍晚的散步、周末的画画。\n\n你的朋友说：「你变了，变得松弛了。」\n你说：「不是我变了——是我终于学会了放下。」\n\n"中年智慧：不是拥有更多——是需要的更少。"', cond: g => g.flags.midlifeCrisis35 && g.flags.legacyThinking && g.mood >= 70 && g.age >= 45 },
+    { id:'second_youth_end', badge:'🌸', title:'第二春', desc:'你迎来了人生的第二春。\n\n孩子上大学了，房贷还完了，工作稳定了。你终于有了时间和自由。\n\n你学了画画、跑了马拉松、去了西藏。你活得比20岁还精彩。\n\n你的孩子说：「爸/妈，你比我还会玩。」\n你说：「因为我现在才真正活给自己。」\n\n"第二春不是老了——是终于有时间活给自己了。"', cond: g => g.flags.secondYouthDone && g.flags.emptyNest && g.mood >= 70 && g.age >= 45 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
