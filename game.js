@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v13.1
+// 都市浮生记 - Game Engine v13.2
 // ============================================
 
 // === GAME STATE ===
@@ -6907,6 +6907,87 @@ const EVENTS = [
         { label:'吵了一架但和好了', hint:'+🧠 +👥', fn: g => { g.flags.coupleTravel=true; if(g.relationships) g.relationships.partner=Math.min(100,g.relationships.partner+5); return{intel:5,social:3,mood:5,money:-3000}; }},
         { label:'决定以后各玩各的', hint:'-👥', fn: g => { g.flags.coupleTravel=true; if(g.relationships) g.relationships.partner=Math.max(0,g.relationships.partner-5); return{mood:-8,money:-3000}; }},
       ]},
+    // === v13.2 育儿故事 + 教育焦虑 + 鸡娃文化 ===
+    { id:'chicken_baby_start', icon:'🐔', title:'鸡娃大战',
+      body:'你有了孩子，然后你加入了家长群。\n\n群里消息99+：\n「我家小宝3岁已经会背唐诗300首」\n「我女儿5岁开始学编程」\n「我儿子6岁拿到了少儿英语比赛冠军」\n\n你看着正在吃手的自家娃，陷入了沉思。\n\n你老婆/老公说：「我们不能让孩子输在起跑线上。」\n你说：「起跑线在哪？」\n对方说：「在娘胎里。」\n\n"鸡娃的本质：用父母的焦虑，填满孩子的童年。"',
+      cond: g => g.flags.hasChild && g.age >= 28 && !g.flags.chickenBaby,
+      choices:[
+        { label:'加入鸡娃大军', hint:'-💰 -😊', fn: g => { g.flags.chickenBaby=true; g.flags.tigerParent=true; return{mood:-10,money:-5000,intel:3}; }},
+        { label:'佛系育儿', hint:'+😊 -🧠', fn: g => { g.flags.relaxedParenting=true; return{mood:8,intel:-2}; }},
+        { label:'先观察一下', hint:'+🧠', fn: g => { return{intel:5,mood:-3}; }},
+      ]},
+    { id:'school_district_house_v2', icon:'🏫', title:'学区房',
+      body:'孩子要上学了。你开始研究学区房。\n\n中介带你看了三套房：\n1. 老破小，60平，对口重点小学，价格800万\n2. 远大新，120平，对口普通小学，价格400万\n3. 租房，月租8000，可以上私立学校\n\n你算了一笔账：买学区房=20年房贷+生活质量断崖式下降。但如果不买，孩子就要"输在起跑线"。\n\n你老婆/老公说：「为了孩子，值得。」\n你爸说：「当年我们也没买学区房，你不也考上大学了？」\n\n"学区房：中国家长为爱买单的最昂贵证据。"',
+      cond: g => g.flags.hasChild && g.age >= 30 && !g.flags.schoolDistrictHouse && g.money >= 50000,
+      choices:[
+        { label:'咬牙买学区房', hint:'-💰💰💰 +🧠', fn: g => { g.flags.schoolDistrictHouse=true; g.flags.mortgage=true; return{money:-200000,intel:5,mood:-10}; }},
+        { label:'租房上私立', hint:'-💰 -🧠', fn: g => { g.flags.privateSchool=true; return{money:-30000,mood:-5}; }},
+        { label:'就近入学算了', hint:'+😊', fn: g => { return{mood:5}; }},
+      ]},
+    { id:'extracurricular_war', icon:'🎨', title:'兴趣班大战',
+      body:'周末，你的行程表：\n\n8:00-10:00 钢琴课\n10:30-12:00 奥数班\n14:00-16:00 英语外教\n16:30-18:00 跆拳道\n19:00-21:00 编程课\n\n你的孩子在车上睡着了。你看着ta疲惫的小脸，突然有点心疼。\n\n孩子醒来问：「爸爸/妈妈，我什么时候可以玩？」\n你说：「学完这些就可以玩了。」\n孩子说：「那我要学到几岁？」\n\n你沉默了。\n\n"兴趣班的真相：不是培养孩子的兴趣——是缓解家长的焦虑。"',
+      cond: g => g.flags.hasChild && g.flags.chickenBaby && !g.flags.extracurricularWar,
+      choices:[
+        { label:'继续报班', hint:'-💰 -😊', fn: g => { g.flags.extracurricularWar=true; return{money:-8000,mood:-8}; }},
+        { label:'减掉几个班', hint:'+😊 +👨‍👩‍👧', fn: g => { g.flags.extracurricularWar=true; g.flags.relaxedParenting=true; return{mood:10,social:5}; }},
+        { label:'问问孩子想学什么', hint:'+🧠 +👨‍👩‍👧', fn: g => { g.flags.extracurricularWar=true; return{intel:5,social:3,mood:5}; }},
+      ]},
+    { id:'kindergarten_interview', icon:'🎒', title:'幼小衔接',
+      body:'孩子要上小学了。你听说现在"幼小衔接"很重要，于是给孩子报了学前班。\n\n面试那天，老师问孩子：\n「1+1等于几？」\n孩子说：「2。」\n老师：「用英语怎么说？」\n孩子：「Two。」\n老师：「那1+2呢？」\n孩子哭了。\n\n你站在门外，突然意识到：这哪是面试孩子——这是在面试家长的钱包和焦虑程度。\n\n"幼小衔接：让孩子在6岁时就体验人生的第一次内卷。"',
+      cond: g => g.flags.hasChild && g.age >= 32 && !g.flags.kindergartenInterview,
+      choices:[
+        { label:'报幼小衔接班', hint:'-💰', fn: g => { g.flags.kindergartenInterview=true; return{money:-5000,mood:-5}; }},
+        { label:'让孩子快乐玩一年', hint:'+😊', fn: g => { g.flags.kindergartenInterview=true; g.flags.relaxedParenting=true; return{mood:8}; }},
+        { label:'自己在家教', hint:'+🧠 -⏰', fn: g => { g.flags.kindergartenInterview=true; return{intel:5,mood:-3}; }},
+      ]},
+    { id:'parent_teacher_group', icon:'📱', title:'家长群风云',
+      body:'你被拉进了班级家长群。\n\n第一天：\n老师：「请家长们配合完成作业打卡。」\n家长A：「收到！已完成！」\n家长B：「收到！已完成+额外练习！」\n家长C：「收到！已完成+额外练习+阅读打卡+运动打卡！」\n\n你看了看还没开始写作业的自家娃，默默发了条：「收到。」\n\n第三天：\n老师：「本周流动红旗获得者：xxx同学（家长C的孩子）」\n家长C发了个红包：「谢谢大家支持！」\n\n你退出了群聊（然后又默默加了回来）。\n\n"家长群：当代中国家长的精神内耗发源地。"',
+      cond: g => g.flags.hasChild && g.age >= 33 && !g.flags.parentTeacherGroup,
+      choices:[
+        { label:'卷起来！', hint:'-😊 -⏰', fn: g => { g.flags.parentTeacherGroup=true; return{mood:-8,intel:3}; }},
+        { label:'佛系应对', hint:'+😊', fn: g => { g.flags.parentTeacherGroup=true; g.flags.relaxedParenting=true; return{mood:5}; }},
+        { label:'跟老师私下沟通', hint:'+👥', fn: g => { g.flags.parentTeacherGroup=true; return{social:5,intel:3}; }},
+      ]},
+    { id:'middle_school_exam', icon:'📝', title:'中考分流',
+      body:'孩子初三了。班主任找你谈话：\n\n「您孩子成绩中等，考上普高的概率50%。如果考不上，就只能去职高了。」\n\n你问：「职高不好吗？」\n老师：「职高升学率低，就业选择少...」\n\n你回家看着孩子。ta正在画画，画得很好。但你知道：画画不能当饭吃（至少在中国）。\n\n你说：「最后一年，拼一把吧。」\n孩子说：「如果我考不上呢？」\n你说：「那就...再说吧。」\n\n"中考分流：15岁就决定人生方向——这合理吗？"',
+      cond: g => g.flags.hasChild && g.age >= 38 && !g.flags.middleSchoolExam,
+      choices:[
+        { label:'请家教冲刺', hint:'-💰💰', fn: g => { g.flags.middleSchoolExam=true; g.flags.tigerParent=true; return{money:-15000,mood:-10,intel:3}; }},
+        { label:'尊重孩子选择', hint:'+😊 +👨‍👩‍👧', fn: g => { g.flags.middleSchoolExam=true; g.flags.relaxedParenting=true; return{mood:8,social:5}; }},
+        { label:'研究职业教育', hint:'+🧠', fn: g => { g.flags.middleSchoolExam=true; return{intel:8,mood:-3}; }},
+      ]},
+    { id:'study_abroad_dream', icon:'✈️', title:'留学梦',
+      body:'你的孩子成绩不错。有人说：「考虑送孩子出国吗？」\n\n你算了一笔账：\n- 美国本科4年：200万\n- 英国本科3年：150万\n- 澳洲本科3年：120万\n- 国内985大学4年：20万\n\n你问孩子：「想出国吗？」\n孩子说：「想！我想去看看外面的世界。」\n\n你看了看存款，又看了看孩子期待的眼神。\n\n你说：「爸爸/妈妈支持你。」（内心：我的退休金没了）\n\n"留学：用父母的积蓄，换孩子的视野——值不值得，20年后才知道。"',
+      cond: g => g.flags.hasChild && g.age >= 40 && g.money >= 100000 && !g.flags.studyAbroad,
+      choices:[
+        { label:'送孩子出国', hint:'-💰💰💰 +👨‍👩‍👧', fn: g => { g.flags.studyAbroad=true; return{money:-150000,mood:5,social:5}; }},
+        { label:'国内读研也行', hint:'+💰', fn: g => { g.flags.domesticGrad=true; return{money:10000,mood:-3}; }},
+        { label:'让孩子自己决定', hint:'+🧠', fn: g => { g.flags.childIndependence=true; return{intel:5,mood:3}; }},
+      ]},
+    { id:'ai_homework', icon:'🤖', title:'AI写作业',
+      body:'你发现孩子的作文写得特别好。仔细一看——是AI写的。\n\n你问孩子：「这是你写的吗？」\n孩子：「我用ChatGPT帮忙润色了一下...」\n你：「润色？这整篇都是AI写的吧？」\n孩子：「可是老师说要用科技工具辅助学习啊...」\n\n你突然意识到：你花了几十万让孩子学奥数、学英语、学编程——结果AI把这些都学会了。\n\n你的孩子最需要学的，可能是：如何跟AI共存。\n\n"AI时代的教育：不是教孩子比AI强——是教孩子用AI。"',
+      cond: g => g.flags.hasChild && g.age >= 35 && !g.flags.aiHomework,
+      choices:[
+        { label:'禁止使用AI', hint:'-🧠', fn: g => { g.flags.aiHomework=true; return{intel:-3,mood:-5}; }},
+        { label:'教孩子正确使用AI', hint:'+🧠 +😊', fn: g => { g.flags.aiHomework=true; g.flags.aiEducation=true; return{intel:10,mood:5}; }},
+        { label:'跟老师反映', hint:'+👥', fn: g => { g.flags.aiHomework=true; return{social:5}; }},
+      ]},
+    { id:'teen_depression', icon:'😔', title:'青少年心理健康',
+      body:'孩子的班主任打电话来：\n\n「您孩子最近上课总是走神，作业也不交了。我们怀疑可能有心理问题...」\n\n你跟孩子谈话。孩子说：「我觉得活着没意思。每天都在学习、考试、排名...我像个机器。」\n\n你突然意识到：你给孩子报了那么多班，却从来没问过ta开不开心。\n\n你说：「对不起。」\n孩子哭了：「爸爸/妈妈，我好累。」\n\n"青少年抑郁：不是孩子太脆弱——是我们给的压力太大。"',
+      cond: g => g.flags.hasChild && g.flags.chickenBaby && g.age >= 36 && !g.flags.teenDepression,
+      choices:[
+        { label:'带孩子看心理医生', hint:'-💰 +😊', fn: g => { g.flags.teenDepression=true; g.flags.relaxedParenting=true; return{money:-3000,mood:10,social:5}; }},
+        { label:'减少课外班', hint:'+😊 +👨‍👩‍👧', fn: g => { g.flags.teenDepression=true; g.flags.relaxedParenting=true; return{mood:12,social:8}; }},
+        { label:'觉得孩子矫情', hint:'-👨‍👩‍👧', fn: g => { g.flags.teenDepression=true; return{mood:-15,social:-10}; }},
+      ]},
+    { id:'parenting_anxiety', icon:'😰', title:'育儿焦虑',
+      body:'你在小红书上刷到了这些帖子：\n\n「3岁背唐诗300首，5岁编程，7岁拿奖...」\n「我是如何把孩子培养成天才的」\n「不鸡娃的家长，后来都后悔了」\n\n你看了看正在玩泥巴的自家娃，突然焦虑了。\n\n你老婆/老公说：「别看了，每个孩子都不一样。」\n你说：「可是万一我们耽误了孩子呢？」\n对方说：「我们最大的耽误，就是让孩子活在我们的焦虑里。」\n\n"育儿焦虑的根源：不是孩子不够好——是家长不够自信。"',
+      cond: g => g.flags.hasChild && g.age >= 30 && !g.flags.parentingAnxiety,
+      choices:[
+        { label:'继续刷小红书', hint:'-😊', fn: g => { g.flags.parentingAnxiety=true; return{mood:-10}; }},
+        { label:'卸载小红书', hint:'+😊', fn: g => { g.flags.parentingAnxiety=true; g.flags.digitalDetox=true; return{mood:8}; }},
+        { label:'跟其他家长聊聊', hint:'+👥 +🧠', fn: g => { g.flags.parentingAnxiety=true; return{social:8,intel:5,mood:3}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -7532,6 +7613,17 @@ const ACHIEVEMENTS = [
     { id:'divorce_thinker', icon:'💔', name:'围城思考者', desc:'想过离婚', check: g => g.flags.divorceThought },
     { id:'child_decider', icon:'👶', name:'生育抉择者', desc:'面对了生育选择', check: g => g.flags.childDecision },
     { id:'couple_traveler', icon:'✈️', name:'情侣旅行家', desc:'和对象一起旅行', check: g => g.flags.coupleTravel },
+    // === v13.2 新增成就 ===
+    { id:'chicken_parent', icon:'🐔', name:'鸡娃家长', desc:'加入了鸡娃大军', check: g => g.flags.chickenBaby },
+    { id:'school_district_buyer', icon:'🏫', name:'学区房业主', desc:'买了学区房', check: g => g.flags.schoolDistrictHouse },
+    { id:'extracurricular_master', icon:'🎨', name:'兴趣班达人', desc:'给孩子报了各种兴趣班', check: g => g.flags.extracurricularWar },
+    { id:'kindergarten_veteran', icon:'🎒', name:'幼小衔接老手', desc:'经历了幼小衔接', check: g => g.flags.kindergartenInterview },
+    { id:'parent_group_survivor', icon:'📱', name:'家长群幸存者', desc:'在家长群活下来了', check: g => g.flags.parentTeacherGroup },
+    { id:'middle_school_warrior', icon:'📝', name:'中考战士', desc:'经历了中考分流', check: g => g.flags.middleSchoolExam },
+    { id:'study_abroad_parent', icon:'✈️', name:'留学家长', desc:'送孩子出国留学', check: g => g.flags.studyAbroad },
+    { id:'ai_educator', icon:'🤖', name:'AI教育先锋', desc:'教孩子正确使用AI', check: g => g.flags.aiEducation },
+    { id:'teen_supporter', icon:'💚', name:'青少年守护者', desc:'关注了孩子心理健康', check: g => g.flags.teenDepression },
+    { id:'relaxed_parent', icon:'🌿', name:'佛系家长', desc:'选择了松弛感育儿', check: g => g.flags.relaxedParenting },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -7734,6 +7826,10 @@ const ENDINGS = [
     { id:'single_champion_end', badge:'🎊', title:'单身冠军', desc:'你选择了单身，而且活得很精彩。\n\n你没有对象，但你有自由。你可以随时加班、随时旅行、随时吃火锅、随时看午夜场电影。\n\n你妈依然每周催婚，但你学会了微笑以对。你的朋友圈签名是：「一个人，也要活得热气腾腾。」\n\n"单身不是没人要——是我还没遇到让我愿意放弃自由的人。"', cond: g => g.flags.singleLife && !g.flags.married && g.mood >= 70 && g.age >= 32 },
     { id:'relationship_survivor_end', badge:'💪', title:'爱情幸存者', desc:'你经历了爱情的考验，但你们挺过来了。\n\n你们吵过架、冷战过、差点分手过。但每次你们都选择了和解，选择了继续。\n\n你的朋友说：「你们是怎么做到的？」\n你笑着说：「因为我们都知道，放弃比坚持更容易——但我们选择了更难的那条路。」\n\n"爱情不是找到完美的人——是学会和不完美的人，一起成长。"', cond: g => g.flags.relationshipFight && g.flags.coupleTravel && g.mood >= 65 && g.age >= 28 },
     { id:'childfree_end', badge:'🌿', title:'丁克家族', desc:'你和对象决定不要孩子。\n\n你们把省下来的钱用来旅行、学习、享受生活。周末睡到自然醒，假期想去哪就去哪。\n\n有人说你们自私，有人说你们潇洒。但你知道，这只是你们的选择——一个不需要向任何人解释的选择。\n\n"不是所有人都需要成为父母，有些人选择成为自己。"', cond: g => g.flags.childDecision && g.flags.cohabitation && g.age >= 35 && g.mood >= 65 },
+    // --- v13.2 NEW ENDINGS ---
+    { id:'tiger_parent_end', badge:'🐔', title:'虎妈虎爸', desc:'你成了一个鸡娃家长。\n\n你给孩子报了钢琴、奥数、英语、编程、跆拳道。孩子的周末比工作日还忙。你花了30万在孩子教育上。\n\n你的孩子考上了重点中学。你在家长群里发了条：「感谢各位老师和家长的帮助！」收获了50个赞。\n\n你的孩子说：「爸爸/妈妈，我好累。」你说：「现在累，以后就轻松了。」\n\n"鸡娃的代价：用父母的钱包和孩子的童年，换一个不确定的未来。"', cond: g => g.flags.chickenBaby && g.flags.extracurricularWar && g.money <= 50000 && g.age >= 40 },
+    { id:'relaxed_parent_end', badge:'🌱', title:'松弛感家长', desc:'你选择了佛系育儿。\n\n你没有给孩子报那么多班。你的孩子周末可以玩泥巴、看蚂蚁搬家、在公园里疯跑。\n\n你的孩子在家长群里不是最优秀的，但ta是最快乐的。ta喜欢画画，虽然画得不太好，但ta画的时候眼睛里有光。\n\n你的孩子说：「爸爸/妈妈，我长大了想当画家。」你说：「好。」\n\n"松弛感育儿的真相：不是不关心——是相信孩子有自己的节奏。"', cond: g => g.flags.relaxedParenting && g.flags.hasChild && g.mood >= 70 && g.age >= 38 },
+    { id:'education_investor_end', badge:'🎓', title:'教育投资人', desc:'你在孩子教育上投入了一切。\n\n学区房、国际学校、留学。你花了200万。你的孩子从海外名校毕业了。\n\n孩子回国后找到了一份月薪2万的工作。你算了一笔账：要8年才能回本。\n\n你说：「教育不是投资——是爱。」（虽然你心里还是在算账）\n\n"教育的价值不在于回报率——在于你给了孩子选择的权利。"', cond: g => g.flags.schoolDistrictHouse && g.flags.studyAbroad && g.age >= 45 && g.money >= -50000 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
