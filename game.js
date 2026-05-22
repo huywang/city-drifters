@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v9.5
+// 都市浮生记 - Game Engine v10.0
 // ============================================
 
 // === GAME STATE ===
@@ -4647,7 +4647,50 @@ const EVENTS = [
         { label:'回老家发展', hint:'🎲', fn: g => { if(g.money>50000){return{mood:15,social:-15,money:10000}}else{return{mood:-10,social:-10}} }},
         { label:'做出大改变', hint:'🎲', fn: g => { g.flags.midlifeChange=true; return{mood:5,intel:5,charm:5}; }},
       ]},
+    // === v10.0 新增事件 ===
+    { id:'ai_writing', icon:'🤖', title:'AI写作助手',
+      body:'你发现了一个AI写作工具，它能帮你写邮件、写报告、甚至写情书。\n\n你用它写了一篇工作总结，领导夸你"文笔进步了"。\n\n你心想：如果AI能替你工作，那你的工作还有什么意义？',
+      cond: g => g.intel > 50 && g.job !== '待业中' && g.months > 6,
+      choices:[
+        { label:'深度使用AI', hint:'+🧠 +✨', fn: g => { return{intel:8,charm:3,mood:3}; }},
+        { label:'适度使用', hint:'+🧠', fn: g => { return{intel:5,mood:2}; }},
+        { label:'拒绝AI，靠自己', hint:'+😊', fn: g => { return{mood:5,intel:2}; }},
+      ]},
+    { id:'digital_nomad', icon:'🌍', title:'数字游民',
+      body:'你认识了一个数字游民：在巴厘岛远程工作，月薪3万，生活成本不到1万。\n\n他给你看了他的生活照：椰林、沙滩、笔记本电脑。\n\n你看了看你的出租屋和电脑屏幕，沉默了。',
+      cond: g => g.intel > 60 && g.job !== '待业中' && g.age >= 25 && g.age <= 35 && !g.flags.remoteWorker,
+      choices:[
+        { label:'申请远程+搬家', hint:'🎲', fn: g => { if(Math.random()>0.4){g.flags.remoteWorker=true;g.flags.digitalNomad=true;return{mood:20,health:5,money:-3000}}else{return{mood:-10}} }},
+        { label:'先攒钱再说', hint:'+💰', fn: g => { return{money:3000,mood:5}; }},
+        { label:'不现实', hint:'+😊', fn: g => { return{mood:3}; }},
+      ]},
+    { id:'generational_gap', icon:'👴', title:'代沟',
+      body:'你跟你爸视频通话，他说："你们这代人太脆弱了，我们那时候……"\n\n你没反驳，只是默默关掉了摄像头。\n\n你爸不知道的是：你刚被裁了，房租涨了，对象也分手了。\n\n"每一代人都有自己的苦，但上一代人永远觉得下一代人不够苦。"',
+      cond: g => g.age >= 25 && g.age <= 35 && g.mood < 50 && g.relationships,
+      choices:[
+        { label:'跟爸妈倾诉', hint:'+👥', fn: g => { if(g.relationships) g.relationships.family=clamp((g.relationships.family||60)+10,0,100); return{mood:10,social:5}; }},
+        { label:'报喜不报忧', hint:'+😊', fn: g => { return{mood:-5,charm:2}; }},
+        { label:'减少通话频率', hint:'-👥', fn: g => { if(g.relationships) g.relationships.family=clamp((g.relationships.family||60)-5,0,100); return{mood:3}; }},
+      ]},
+    { id:'minimalism', icon:'🧹', title:'断舍离',
+      body:'你整理了一下出租屋，发现你有一堆从来没穿过的衣服、没拆封的快递、过期半年的食品。\n\n你扔了三大袋东西，突然觉得：东西少了，心也轻了。\n\n"断舍离不是扔东西，是扔掉不需要的执念。"',
+      cond: g => g.money > 10000 && g.months > 12,
+      choices:[
+        { label:'深度断舍离', hint:'+😊 +✨', fn: g => { return{mood:15,charm:5,health:3,money:-1000}; }},
+        { label:'只扔垃圾', hint:'+😊', fn: g => { return{mood:8,health:2}; }},
+        { label:'挂闲鱼卖了', hint:'+💰', fn: g => { return{money:2000,mood:5}; }},
+      ]},
+    { id:'city_burnout', icon:'😮‍💨', title:'城市倦怠',
+      body:'你已经在这座城市待了够久了。\n\n地铁的味道、写字楼的空调、外卖的味道——一切都那么熟悉，又那么令人厌倦。\n\n你打开地图，看着其他城市的名字，心想：要不要换一个地方重新开始？',
+      cond: g => g.months > 36 && g.mood < 55,
+      choices:[
+        { label:'换个城市', hint:'🗺️', fn: g => { return{mood:5}; }}, // 会触发城市切换提示
+        { label:'找到新的乐趣', hint:'+😊', fn: g => { return{mood:8,intel:3}; }},
+        { label:'接受这种倦怠', hint:'+🧠', fn: g => { return{intel:5,mood:3}; }},
+      ]},
 ];
+
+// === ACHIEVEMENTS ===
 const ACHIEVEMENTS = [
     { id:'first_job', icon:'💼', name:'职场新人', desc:'找到第一份工作', check: g => g.flags.gotFirstJob },
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -5046,6 +5089,9 @@ const ACHIEVEMENTS = [
     { id:'cook_master', icon:'👨‍🍳', name:'厨房新手', desc:'学会了做饭', check: g => g.flags.cookingSkill },
     { id:'volunteer_ach', icon:'❤️', name:'志愿者', desc:'参加过公益活动', check: g => g.social > 50 && g.months > 24 },
     { id:'midlife_change', icon:'🪞', name:'中年觉醒', desc:'在中年做出了重大改变', check: g => g.flags.midlifeChange },
+    // === v10.0 新增成就 ===
+    { id:'digital_nomad_ach', icon:'🌍', name:'数字游民', desc:'成为数字游民', check: g => g.flags.digitalNomad },
+    { id:'minimalist', icon:'🧹', name:'断舍离', desc:'完成一次断舍离', check: g => g.money > 5000 && g.mood > 70 && g.months > 24 },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -5364,6 +5410,9 @@ function advanceMonth() {
 
     // v9.2: 投资理财月度结算
     updateInvestments();
+
+    // v10.0: 每日运势修正
+    applyDailyModifier();
 
     // v8.2: 连续活动惩罚/奖励 - 连续选同一活动会有额外后果
     processConsecutiveActivity();
@@ -5827,6 +5876,46 @@ function triggerQuarterlyEvent() {
             body: milestone.body + `\n\n<div class="meme-quote" style="color:var(--accent)">— 时光荏苒 —</div>`,
             type: 'neutral'
         }, true);
+    }
+}
+
+// === v10.0 每日运势/修正系统 ===
+const DAILY_MODIFIERS = [
+    { id:'lucky_day', icon:'🍀', name:'幸运日', desc:'今天运气不错', effect: {mood:5,money:100} },
+    { id:'mercury_retrograde', icon:'🔮', name:'水逆', desc:'今天诸事不顺', effect: {mood:-3,health:-1} },
+    { id:'full_moon', icon:'🌕', name:'满月', desc:'月圆之夜，情绪波动', effect: {mood:3,intel:2} },
+    { id:'payday_mood', icon:'💸', name:'月底焦虑', desc:'又快月底了', effect: {mood:-5} },
+    { id:'good_sleep', icon:'😴', name:'睡了好觉', desc:'昨晚睡得特别好', effect: {health:3,mood:3} },
+    { id:'bad_sleep', icon:'😵', name:'失眠之夜', desc:'昨晚几乎没睡', effect: {health:-3,mood:-3,intel:-1} },
+    { id:'inspiration', icon:'💡', name:'灵感闪现', desc:'突然有了好主意', effect: {intel:5,charm:2} },
+    { id:'social_energy', icon:'🦋', name:'社交能量', desc:'今天特别想见人', effect: {social:5,mood:3} },
+    { id:'lazy_day', icon:'🛋️', name:'懒癌发作', desc:'什么都不想干', effect: {mood:3,health:2,intel:-1} },
+    { id:'productive', icon:'⚡', name:'效率爆棚', desc:'今天效率特别高', effect: {intel:3,money:200,mood:3} },
+];
+
+function getDailyModifier() {
+    // 基于日期生成固定的每日修正（同一天总是同样的修正）
+    const daySeed = G.months * 31 + G.month;
+    const index = daySeed % DAILY_MODIFIERS.length;
+    return DAILY_MODIFIERS[index];
+}
+
+function applyDailyModifier() {
+    const mod = getDailyModifier();
+    if (!mod) return;
+
+    // 应用效果
+    for (const [key, value] of Object.entries(mod.effect)) {
+        if (key === 'money') {
+            G.money += value;
+        } else if (G[key] !== undefined) {
+            G[key] = clamp(G[key] + value, 0, 100);
+        }
+    }
+
+    // 偶尔显示提示（30%概率）
+    if (Math.random() > 0.7) {
+        notify(`${mod.icon} ${mod.name}：${mod.desc}`);
     }
 }
 
@@ -6838,7 +6927,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '9.5' };
+    const saveData = { ...G, savedAt: Date.now(), version: '10.0' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
