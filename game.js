@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v5.8
+// 都市浮生记 - Game Engine v5.9
 // ============================================
 
 // === GAME STATE ===
@@ -3152,6 +3152,16 @@ const EVENTS = [
         { label:'发小红书分享', hint:'+✨ +👥 +😊', fn: g => { g.flags.balconyGarden=true; g.flags.gardenBlogger=true; return{charm:12,social:15,mood:18}; }},
         { label:'算了，没时间打理', hint:'+😊', fn: g => { g.flags.balconyGarden=true; return{mood:3}; }},
       ]},
+    // === v5.9 EVENTS - 汉服与国潮文化 ===
+    { id:'hanfu_culture', icon:'👘', title:'汉服体验',
+      body:'你在三坊七巷的国潮旅拍店，换上了汉服：\n\n- 宋制珍珠三白造型\n- 小唐风\n- 战国袍\n- 三条簪\n\n化妆师的巧手下，你显露出跨越时空的东方韵味。\n\n2025年，中国汉服市场规模有望达191.1亿元。\n\n"国潮文化——Z世代的文化自信，传统文化符号融入日常。"\n\n"穿上汉服，不是cosplay，是文化认同。"',
+      cond: g => !g.flags.hanfuCulture && g.age>=18 && g.age<=35,
+      choices:[
+        { label:'买一套汉服', hint:'-💰 +✨ +😊', fn: g => { g.flags.hanfuCulture=true; g.flags.hanfuCollector=true; return{money:-3000,charm:18,mood:20}; }},
+        { label:'参加汉服活动', hint:'+👥 +✨ +😊', fn: g => { g.flags.hanfuCulture=true; g.flags.hanfuCommunity=true; return{social:15,charm:12,mood:15}; }},
+        { label:'拍汉服写真', hint:'-💰 +✨ +😊', fn: g => { g.flags.hanfuCulture=true; return{money:-2000,charm:15,mood:18}; }},
+        { label:'了解一下就好', hint:'+🧠 +😊', fn: g => { g.flags.hanfuCulture=true; return{intel:8,mood:8}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3398,6 +3408,8 @@ const ACHIEVEMENTS = [
     { id:'savings_master', icon:'💰', name:'存钱达人', desc:'完成存钱挑战', check: g => g.flags.savingsChallenge },
     // v5.8 achievements
     { id:'urban_farmer', icon:'🌱', name:'都市农夫', desc:'阳台种菜成功', check: g => g.flags.balconyGarden },
+    // v5.9 achievements
+    { id:'hanfu_enthusiast', icon:'👘', name:'汉服爱好者', desc:'体验汉服文化', check: g => g.flags.hanfuCulture },
 ];
 
 // === ENDINGS === (order matters: first match wins)
