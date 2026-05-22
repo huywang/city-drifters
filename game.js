@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v18.2
+// 都市浮生记 - Game Engine v18.3
 // ============================================
 
 // === GAME STATE ===
@@ -8943,6 +8943,87 @@ const EVENTS = [
         { label:'低调等风头过去', hint:'+🧠 -😊', fn: g => { g.flags.publicShaming=true; g.flags.layLow=true; return{intel:3,mood:-15,social:-5}; }},
         { label:'投诉平台要求删除', hint:'+🧠 🎲', fn: g => { g.flags.publicShaming=true; g.flags.legalAction=true; if(Math.random()>0.5){return{mood:10,intel:5};}else{return{mood:-10,money:-2000};} }},
       ]},
+    // === v18.3 新增事件（消费文化 + 理财观念 + 经济生活） ===
+    { id:'credit_card_spiral', icon:'💳', title:'信用卡漩涡', category:'finance',
+      body:'你的第一张信用卡是大学时办的。那时候额度只有5000，你觉得够用了。\n\n工作后，银行主动给你提额：1万、3万、5万、10万。\n\n你开始用信用卡分期买手机、买包、买球鞋。月息0.6%，听起来不高。\n\n但你算了一笔账：10万分期24个月，总利息14400块。年化利率约13%。\n\n你的还款日越来越多：15号还招行、20号还花呗、25号还白条、月底还微粒贷。\n\n你开始"以卡养卡"——用A卡的钱还B卡，B卡的钱还C卡。你的债务像滚雪球一样越来越大。\n\n"信用卡不是让你花更多的钱——是让你以为自己有更多的钱。"',
+      cond: g => !g.flags.creditCardSpiral && g.age >= 22 && g.age <= 35 && g.money < 50000,
+      choices:[
+        { label:'制定还款计划，咬牙还清', hint:'-💰 +🧠 +😊', fn: g => { g.flags.creditCardSpiral=true; g.flags.debtFree=true; return{money:-20000,intel:8,mood:5}; }},
+        { label:'跟银行协商最低还款', hint:'-💰 -😊', fn: g => { g.flags.creditCardSpiral=true; g.flags.minPayment=true; return{money:-8000,mood:-10}; }},
+        { label:'借钱周转，拆东墙补西墙', hint:'-💰💰 🎲', fn: g => { g.flags.creditCardSpiral=true; g.flags.debtShuffle=true; if(Math.random()>0.5){return{money:-5000};}else{return{money:-30000,mood:-20};} }},
+      ]},
+    { id:'social_media_shopping', icon:'🛒', title:'种草经济', category:'finance',
+      body:'你的小红书/抖音/淘宝推荐页全是"好物推荐"：\n\n"这个面霜真的绝了！""这个包太绝绝子了！""不买后悔一辈子！"\n\n你的购物车里已经积了37件商品，总价8900块。你的理智告诉你"不需要"，但你的手指已经点了"立即购买"。\n\n快递到了。你拆开一看——这个面霜跟超市里99块的没什么区别。这个包的质量也就那样。\n\n但拆快递的那一刻，你的多巴胺确实飙升了。\n\n"种草经济：你以为你在购物——其实你在购买「购物时的快乐」。快乐拆完快递就消失了。"',
+      cond: g => !g.flags.socialShopping && g.age >= 18 && g.age <= 40 && g.money > 10000,
+      choices:[
+        { label:'全部退了，冷静一个月', hint:'+💰 +🧠', fn: g => { g.flags.socialShopping=true; g.flags.shoppingDetox=true; return{money:5000,intel:8,mood:-3}; }},
+        { label:'算了，千金难买我开心', hint:'-💰 +😊', fn: g => { g.flags.socialShopping=true; g.flags.retailTherapy=true; return{money:-8900,mood:10}; }},
+        { label:'取关所有种草博主', hint:'+🧠 +💰 +😊', fn: g => { g.flags.socialShopping=true; g.flags.unfollowed=true; return{intel:5,mood:5,money:2000}; }},
+      ]},
+    { id:'subscription_fatigue_v3', icon:'🔄', title:'订阅疲劳', category:'finance',
+      body:'你整理了一下你的月费账单：\n\n- 爱奇艺会员：25元/月\n- 优酷会员：25元/月\n- B站大会员：25元/月\n- 网易云黑胶VIP：15元/月\n- QQ音乐绿钻：12元/月\n- WPS会员：15元/月\n- 百度网盘超级会员：25元/月\n- 淘宝88VIP：续费了\n- 京东Plus：续费了\n- 山姆会员：260元/年\n- ChatGPT Plus：$20/月（约145元）\n\n总计：每月约400元，每年近5000元。\n\n你发现很多会员你已经半年没用了。但你不敢取消——万一哪天要用呢？\n\n"订阅经济：每月扣你一点钱，让你忘了你有多少钱在流走。就像水费——你看不见水流，直到账单来了。"',
+      cond: g => !g.flags.subscriptionFatigue && g.age >= 20 && g.money > 5000,
+      choices:[
+        { label:'大刀砍掉所有不常用的', hint:'+💰 +🧠', fn: g => { g.flags.subscriptionFatigue=true; g.flags.subCut=true; return{money:4000,intel:5,mood:3}; }},
+        { label:'留着吧，都是生活必需', hint:'-💰', fn: g => { g.flags.subscriptionFatigue=true; g.flags.subKeep=true; return{money:-5000}; }},
+        { label:'跟朋友共享账号', hint:'+💰 +👥', fn: g => { g.flags.subscriptionFatigue=true; g.flags.subShare=true; return{money:3000,social:5}; }},
+      ]},
+    { id:'saving_challenge', icon:'🏦', title:'攒钱挑战', category:'finance',
+      body:'你在网上看到一个"52周攒钱挑战"：\n\n第1周存10元，第2周存20元，第3周存30元……第52周存520元。\n\n一年后总计：13780元。\n\n你觉得简单，开始了。前10周很顺利，你甚至多存了一些。但到了第20周（200元/周），你的工资已经不够用了。\n\n到了第35周（350元/周），你开始动摇：这钱存着干嘛？不如拿去吃顿好的。\n\n你看了看账户余额：已经存了6000多块了。你突然有一种成就感——你从来没存过这么多钱。\n\n"攒钱的意义不在于数字——在于证明你可以控制自己的欲望。"',
+      cond: g => !g.flags.savingChallenge && g.age >= 20 && g.money < 80000,
+      choices:[
+        { label:'坚持到底，完成52周', hint:'+💰💰 +🧠 +😊', fn: g => { g.flags.savingChallenge=true; g.flags.completed52Week=true; return{money:13780,intel:5,mood:15}; }},
+        { label:'中途放弃，把钱花了', hint:'+😊 -💰', fn: g => { g.flags.savingChallenge=true; g.flags.failedChallenge=true; return{mood:5,money:-3000}; }},
+        { label:'改成"记账挑战"', hint:'+🧠 +💰', fn: g => { g.flags.savingChallenge=true; g.flags.budgeting=true; return{intel:8,money:5000,mood:5}; }},
+      ]},
+    { id:'fund_investor', icon:'📊', title:'基金韭菜日记', category:'finance',
+      body:'你开始了基金投资之旅：\n\n第1个月：涨了2%，赚了200块。你觉得自己是巴菲特。\n第3个月：跌了5%，亏了500块。你安慰自己"长期持有"。\n第6个月：跌了15%，亏了1500块。你开始怀疑人生。\n第12个月：涨了8%，终于回本了。你激动得差点卖掉。\n第18个月：又跌了10%。你开始骂基金经理。\n\n你在基金评论区看到了自己的心路历程：\n"买！抄底！" → "稳住，别慌" → "完了完了" → "垃圾基金" → "再也不买了" → "又涨了？买！"\n\n"基金投资最大的敌人不是市场——是你自己的情绪。"',
+      cond: g => !g.flags.fundInvestor && g.age >= 22 && g.money > 30000 && g.intel >= 30,
+      choices:[
+        { label:'坚持定投，不看短期', hint:'+🧠 🎲', fn: g => { g.flags.fundInvestor=true; g.flags.longTermHold=true; if(Math.random()>0.4){return{money:15000,intel:10};}else{return{money:-8000,intel:10};} }},
+        { label:'见好就收，及时止损', hint:'+💰 -🧠', fn: g => { g.flags.fundInvestor=true; g.flags.timidInvestor=true; return{money:2000,intel:3}; }},
+        { label:'追涨杀跌，频繁操作', hint:'🎲 -💰', fn: g => { g.flags.fundInvestor=true; g.flags.frequentTrader=true; if(Math.random()>0.7){return{money:8000};}else{return{money:-12000,mood:-10};} }},
+      ]},
+    { id:'minimalist_life_v2', icon:'🧹', title:'断舍离', category:'finance',
+      body:'你看了近藤麻理惠的节目，决定来一次大扫除。\n\n你翻出了：\n- 3年没穿的衣服：47件\n- 没拆封的快递：12个\n- 过期的化妆品/药品：一堆\n- 前任的礼物：一箱\n- 大学课本：20本（卖废品2块钱/斤）\n\n你扔了3大袋垃圾，捐了2箱衣服，卖了1箱书。\n\n你的房间突然宽敞了。你的心也轻了。\n\n你发现：你拥有的东西比你需要的多得多。而真正让你快乐的，不是"拥有"——是"不需要"。\n\n"断舍离：不是扔东西——是扔掉对物质的执念。你扔掉的越多，留下的空间越大。"',
+      cond: g => !g.flags.minimalistLife && g.age >= 22,
+      choices:[
+        { label:'彻底极简，扔掉80%的东西', hint:'+😊 +🧠 +❤️', fn: g => { g.flags.minimalistLife=true; g.flags.extremeMinimalist=true; return{mood:20,intel:5,health:5}; }},
+        { label:'适度整理，保留有意义的', hint:'+😊 +❤️', fn: g => { g.flags.minimalistLife=true; g.flags.moderateMinimalist=true; return{mood:12,social:3}; }},
+        { label:'理了两天又买回来了', hint:'-💰 +😊', fn: g => { g.flags.minimalistLife=true; g.flags.failedMinimalist=true; return{money:-5000,mood:5}; }},
+      ]},
+    { id:'compare_salary', icon:'🤫', title:'薪资比较', category:'finance',
+      body:'你在脉脉/小红书上看到一个帖子："晒晒你的工资单"。\n\n同岗位、同城市、同经验的人晒出来的工资：\n- 阿里P7：月入3.5万+股票\n- 腾讯T9：月入4万+年终奖10个月\n- 字节2-2：月入3.8万+期权\n- 你的公司：月入1.2万+年终奖1个月\n\n你的心情从好奇变成了焦虑，从焦虑变成了愤怒，从愤怒变成了无力。\n\n你想跳槽。但你的简历投出去50份，只收到3个面试。你发现：高薪不是靠努力——是靠赛道、靠时机、靠选择。\n\n"薪资比较是打工人最大的精神内耗——你越比越焦虑，越焦虑越想跳，越跳越迷茫。"',
+      cond: g => !g.flags.compareSalary && g.age >= 23 && g.age <= 40 && g.job !== '待业中' && g.money < 200000,
+      choices:[
+        { label:'开始准备跳槽', hint:'+🧠 -😊', fn: g => { g.flags.compareSalary=true; g.flags.jobHunt=true; return{intel:8,mood:-10}; }},
+        { label:'删掉脉脉，眼不见心不烦', hint:'+😊 +🧠', fn: g => { g.flags.compareSalary=true; g.flags.ignoreComparison=true; return{mood:10,intel:5}; }},
+        { label:'跟老板谈加薪', hint:'🎲 +✨', fn: g => { g.flags.compareSalary=true; g.flags.askedRaise=true; if(Math.random()>0.5){return{money:3000,mood:15,charm:5};}else{return{mood:-15,social:-5};} }},
+      ]},
+    { id:'second_hand_economy', icon:'♻️', title:'二手经济', category:'finance',
+      body:'你在闲鱼上发现了一个新世界：\n\n你卖掉了：\n- 去年买的手柄（原价400，卖了150）\n- 前年买的kindle（原价900，卖了200）\n- 冲动买的跑步机（原价2000，卖了300——买家自己搬走的）\n- 3件没穿过的衣服（原价总计3000，卖了400）\n\n你赚了1050块。但你也算了笔账：这些东西你花了6300块买的，收回了不到1/6。\n\n同时，你也在闲鱼上买到了好东西：\n- 一台二手iPad：原价3000，你800块买的\n- 一个二手书柜：原价1500，你200块买的\n\n"二手经济：别人的冲动消费，变成了你的精明消费。这个世界的浪费，只是放错了地方。"',
+      cond: g => !g.flags.secondHandEconomy && g.age >= 20 && g.money < 100000,
+      choices:[
+        { label:'成为闲鱼达人，卖旧买新', hint:'+💰 +🧠 +✨', fn: g => { g.flags.secondHandEconomy=true; g.flags.xianyuMaster=true; return{money:5000,intel:5,charm:3}; }},
+        { label:'只卖不买，清理生活', hint:'+💰 +😊', fn: g => { g.flags.secondHandEconomy=true; g.flags.sellOnly=true; return{money:3000,mood:8}; }},
+        { label:'只买不卖，薅二手羊毛', hint:'+💰 -💰', fn: g => { g.flags.secondHandEconomy=true; g.flags.buyOnly=true; return{money:-2000,mood:10,intel:3}; }},
+      ]},
+    { id:'peer_pressure_money', icon:'💸', title:'随份子', category:'finance',
+      body:'十月，你收到了6张请柬：\n\n- 大学同学结婚：600\n- 同事结婚：500\n- 高中同学二胎：500\n- 表弟满月酒：1000\n- 邻居乔迁：300\n- 前同事升迁宴：400\n\n总计：3300块。你的月工资是……\n\n更惨的是，你还没结婚/还没买房/还没生娃——意味着你只有出的份，没有进的份。\n\n你开始计算"人情投资回报率"：如果你一辈子不结婚不办酒，你要"亏"多少份子钱？\n\n"随份子：中国人最古老的社交货币。你随的不是钱——是面子和关系。而这两样东西，越来越贵了。"',
+      cond: g => !g.flags.peerPressureMoney && g.age >= 22 && g.age <= 40 && g.money > 5000 && !g.flags.married,
+      choices:[
+        { label:'大方随礼，维护关系', hint:'-💰 +👥 +✨', fn: g => { g.flags.peerPressureMoney=true; g.flags.generousGifter=true; return{money:-3300,social:12,charm:5}; }},
+        { label:'能不去就不去，省钱', hint:'+💰 -👥', fn: g => { g.flags.peerPressureMoney=true; g.flags.frugalSocial=true; return{money:-800,social:-8,mood:3}; }},
+        { label:'只给真正亲近的人随礼', hint:'+💰 +🧠', fn: g => { g.flags.peerPressureMoney=true; g.flags.selectiveGifting=true; return{money:-1500,intel:5,social:3}; }},
+      ]},
+    { id:'financial_anxiety_v2', icon:'😰', title:'财务焦虑', category:'finance',
+      body:'凌晨2点，你睡不着了。你打开手机银行，看了看余额。\n\n你开始做数学题：\n- 如果失业，你的存款能活几个月？答案是：4个月。\n- 如果生大病，你的医保能报多少？答案是：不够。\n- 如果父母生病，你能出多少？答案是：不确定。\n- 如果房价跌了30%，你的房贷还剩多少？答案是：比房子值钱。\n\n每一个问题都让你更焦虑。你知道焦虑没用——但你停不下来。\n\n你看了一个帖子："中国年轻人的财务焦虑：不是没钱，是觉得永远不够。"\n\n你关掉了手机。但你的大脑没有关机。\n\n"财务焦虑：不是你有问题——是这个时代让每个人都觉得自己不够安全。"',
+      cond: g => !g.flags.financialAnxiety && g.age >= 25 && g.money < 200000,
+      choices:[
+        { label:'制定财务规划，建立安全感', hint:'+🧠 +😊 -💰', fn: g => { g.flags.financialAnxiety=true; g.flags.financialPlan=true; return{intel:10,mood:8,money:-5000}; }},
+        { label:'购买保险，对冲风险', hint:'+🧠 -💰', fn: g => { g.flags.financialAnxiety=true; g.flags.insuranceBuyer=true; return{intel:5,money:-8000,mood:5}; }},
+        { label:'焦虑也没用，过好当下', hint:'+😊 +❤️', fn: g => { g.flags.financialAnxiety=true; g.flags.presentFocused=true; return{mood:12,health:5}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -9796,6 +9877,13 @@ const ACHIEVEMENTS = [
     { id:'consumer_hero_ach', icon:'✊', name:'维权先锋', desc:'通过网络维权成功', check: g => g.flags.consumerAdvocate },
     { id:'garden_hero_ach', icon:'🌱', name:'社区花园达人', desc:'在社区花园种出了丰收', check: g => g.flags.gardenExpert },
     { id:'bridge_builder_ach', icon:'🌉', name:'数字桥梁', desc:'帮助父母跨越数字鸿沟', check: g => g.flags.taughtParents },
+    // === v18.3 新增成就（消费文化 + 理财） ===
+    { id:'debt_free_ach', icon:'💳', name:'财务自由第一步', desc:'还清了信用卡债务', check: g => g.flags.debtFree },
+    { id:'shopping_detox_ach', icon:'🚫', name:'购物冷静期', desc:'成功控制冲动消费', check: g => g.flags.shoppingDetox },
+    { id:'saver_ach', icon:'🏦', name:'攒钱达人', desc:'完成52周攒钱挑战', check: g => g.flags.completed52Week },
+    { id:'minimalist_ach_v2', icon:'🧹', name:'极简主义者', desc:'成功践行断舍离', check: g => g.flags.extremeMinimalist },
+    { id:'xianyu_master_ach', icon:'♻️', name:'闲鱼达人', desc:'在二手经济中游刃有余', check: g => g.flags.xianyuMaster },
+    { id:'financial_planner_ach', icon:'📋', name:'理财规划师', desc:'建立了完善的财务规划', check: g => g.flags.financialPlan },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -10081,6 +10169,9 @@ const ENDINGS = [
     // --- v18.2 社会观察结局 ---
     { id:'community_leader_end', badge:'🏘️', title:'社区领袖', desc:'你成了你所在小区的灵魂人物。\n\n你组织了社区花园、业主互助群、邻里聚餐。你认识小区里80%的住户，大家有事都找你。\n\n你的邻居们说："自从你来了，咱们小区变得不一样了。"\n\n物业请你当业主代表，居委会请你当顾问。你发现：你在大城市找到了一个小社区里的归属感。\n\n"社区领袖：不是当了多大的官——是让多少人觉得，这里像家。"', cond: g => g.flags.communityGarden && g.flags.gardenOrganizer && g.social >= 65 && g.age >= 30 },
     { id:'social_conscious_end', badge:'🌍', title:'社会良心', desc:'你成了一个有社会责任感的公民。\n\n你帮助过被骗的老人维权，你曝光过不良商家，你参加过消费者保护活动，你写文章呼吁关注数字鸿沟。\n\n你不是大V，不是网红——你只是一个不愿沉默的普通人。\n\n有人说你"多管闲事"。你说："如果每个人都沉默，这个世界只会更糟。"\n\n你的一个朋友说："你是我认识的人里最有正义感的。"\n\n你说："不是我有正义感——是我看到了不公平，然后选择不闭眼。"\n\n"社会良心：不是每个人都必须做英雄——但每个人都应该做一个不沉默的人。"', cond: g => g.flags.consumerAdvocate && (g.flags.scamWarner || g.flags.advocacyWriter) && g.social >= 50 && g.charm >= 50 && g.age >= 28 },
+    // --- v18.3 消费文化结局 ---
+    { id:'financial_wise_end', badge:'💰', title:'财务智者', desc:'你从一个月光族变成了一个懂理财的人。\n\n你还清了信用卡债务，完成了52周攒钱挑战，建立了应急基金，买了合适的保险。你的投资组合虽然不大，但稳健增长。\n\n你的同事说："你怎么不焦虑了？以前你天天说没钱。"\n\n你说："不是我有钱了——是我不再被钱控制了。"\n\n你的存款不算多，但够你活12个月。你终于有了"说不"的底气。\n\n"财务自由不是有花不完的钱——是拥有「不做什么」的自由。"', cond: g => g.flags.debtFree && g.flags.completed52Week && g.flags.financialPlan && g.money >= 100000 && g.age >= 28 },
+    { id:'conscious_consumer_end_v2', badge:'🌿', title:'清醒消费者', desc:'你从一个冲动购物者变成了一个清醒的消费者。\n\n你取关了所有种草博主，精简了订阅服务，学会了断舍离。你的家里只有你真正需要的东西，你的购物车永远不超过5件。\n\n你的朋友们说："你怎么什么都不买了？"\n\n你说："不是不买——是只买值得买的。"\n\n你发现：消费降级后，你的生活质量反而提高了。因为你终于分清了"需要"和"想要"。\n\n"清醒消费：不是省钱——是不再为不需要的东西买单。"', cond: g => g.flags.shoppingDetox && g.flags.extremeMinimalist && g.flags.subCut && g.money >= 50000 && g.mood >= 65 && g.age >= 28 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
