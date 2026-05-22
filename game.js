@@ -38,6 +38,18 @@ const CITIES = {
             { label:'考公务员拿户口', hint:'🎲', fn: g => { if(g.intel>75&&Math.random()>0.6){g.flags.hasHukou=true;setJob(g,'公务员',12000);return{mood:20,money:-5000}}else{return{mood:-15,money:-5000}} }},
             { label:'算了，户口不重要', hint:'+😊', fn: g => ({mood:10}) },
           ]},
+        { id:'beijing_subway', icon:'🚇', title:'北京地铁', body:'早高峰，你在北京地铁里被挤成了照片。你的脚已经离地了，但你还能呼吸——这已经是奇迹。\n\n你看了看周围的人：有人在吃煎饼，有人在刷短视频，有人在闭眼养神。\n\n"北京地铁是北京人的修行：挤进去是技术，挤出来是艺术。"', cond: g => g.city==='beijing' && g.job!=='待业中',
+          choices:[
+            { label:'买辆电动车', hint:'-💰 +❤️', fn: g => ({money:-3000,health:5,mood:8}) },
+            { label:'继续挤地铁', hint:'+❤️', fn: g => ({health:-3,mood:-5}) },
+            { label:'搬到公司附近', hint:'-💰 +😊', fn: g => ({money:-2000,mood:10}) },
+          ]},
+        { id:'beijing_smog', icon:'😷', title:'雾霾来袭', body:'北京又雾霾了。PM2.5爆表，你连对面的楼都看不见。\n\n你戴上口罩，打开空气净化器，看着窗外灰蒙蒙的天空。\n\n"北京的雾霾让人学会了：呼吸也是一种奢侈。"', cond: g => g.city==='beijing' && g.month>=11 && g.month<=2,
+          choices:[
+            { label:'买高级空气净化器', hint:'-💰 +❤️', fn: g => ({money:-3000,health:8,mood:5}) },
+            { label:'戴口罩硬扛', hint:'-❤️', fn: g => ({health:-5,mood:-3}) },
+            { label:'去三亚躲几天', hint:'-💰 +😊', fn: g => ({money:-5000,mood:20,health:5}) },
+          ]},
       ]},
     shanghai: { name: '上海', rent: 4000, cost: 1.3, house: 75000, trait: '魔都', meme: '"上海不相信眼泪，只相信咖啡和PPT。"',
       events: [
@@ -46,6 +58,18 @@ const CITIES = {
             { label:'买咖啡机自己做', hint:'-💰 +🧠', fn: g => ({money:-3000,intel:3,mood:5}) },
             { label:'继续买精品咖啡', hint:'-💰 +😊', fn: g => ({money:-500,mood:8,charm:3}) },
             { label:'戒咖啡喝茶', hint:'+💰 +❤️', fn: g => ({money:200,health:3,mood:-3}) },
+          ]},
+        { id:'shanghai_bund', icon:'🌃', title:'外滩夜景', body:'你第一次去外滩，看着对岸的陆家嘴夜景：东方明珠、金茂大厦、上海中心……\n\n你心想：这些楼里有多少人跟你一样，在加班？\n\n你发了条朋友圈："魔都的夜，美得不真实。"\n\n"上海的美，是用加班换来的。"', cond: g => g.city==='shanghai' && g.age<=28,
+          choices:[
+            { label:'拍照发朋友圈', hint:'+✨ +👥', fn: g => ({charm:8,social:5,mood:10}) },
+            { label:'找个酒吧喝一杯', hint:'-💰 +😊', fn: g => ({money:-500,mood:15,charm:3}) },
+            { label:'回公司继续加班', hint:'+💰 -❤️', fn: g => ({money:1000,health:-5,mood:-5}) },
+          ]},
+        { id:'shanghai_fashion', icon:'👗', title:'上海时尚', body:'你在上海街头走了一圈，发现每个人都穿得很时尚。你看了看自己的优衣库——突然觉得有点土。\n\n同事说："在上海，穿搭就是名片。"\n\n"上海人的精致，是从头到脚的。"', cond: g => g.city==='shanghai' && g.charm<60,
+          choices:[
+            { label:'买几件好看的衣服', hint:'-💰 +✨', fn: g => ({money:-3000,charm:12,mood:8}) },
+            { label:'学穿搭', hint:'+✨ +🧠', fn: g => ({charm:8,intel:3,mood:5}) },
+            { label:'算了，舒服最重要', hint:'+😊', fn: g => ({mood:5}) },
           ]},
       ]},
     shenzhen: { name: '深圳', rent: 3000, cost: 1.1, house: 60000, trait: '鹏城', meme: '"来了就是深圳人——来了就开始加班。"',
@@ -56,6 +80,18 @@ const CITIES = {
             { label:'先在大厂积累经验', hint:'+🧠 +💰', fn: g => ({intel:8,money:5000,mood:5}) },
             { label:'算了，打工也挺好', hint:'+😊', fn: g => ({mood:8}) },
           ]},
+        { id:'shenzhen_tech_expo', icon:'💻', title:'高交会', body:'深圳高交会开幕了，你请假去逛了一圈。\n\nAI、机器人、5G、新能源……你看到了未来的样子。\n\n你也看到了：未来的工作，可能不需要人类。\n\n"深圳的高交会，让你看到了未来——也看到了自己的保质期。"', cond: g => g.city==='shenzhen' && g.intel>50 && g.month>=10 && g.month<=11,
+          choices:[
+            { label:'学习新技术', hint:'+🧠', fn: g => ({intel:12,mood:8}) },
+            { label:'找创业机会', hint:'🎲 +💰', fn: g => { if(Math.random()>0.5){return{money:10000,intel:8,social:8}}else{return{money:-5000,mood:-10}} }},
+            { label:'算了，看看就好', hint:'+😊', fn: g => ({mood:5}) },
+          ]},
+        { id:'shenzhen_huaqiangbei', icon:'🔌', title:'华强北淘货', body:'你去华强北逛了一圈，发现这里的电子产品比淘宝便宜一半。\n\n你心动了：要不要淘点东西，然后挂到闲鱼上卖？\n\n"华强北是中国硅谷的缩影：有梦想，也有山寨。"', cond: g => g.city==='shenzhen' && g.money<30000,
+          choices:[
+            { label:'淘货卖闲鱼', hint:'🎲 +💰', fn: g => { if(Math.random()>0.4){return{money:5000,intel:5}}else{return{money:-2000,mood:-5}} }},
+            { label:'买个便宜手机', hint:'-💰', fn: g => ({money:-800,mood:5}) },
+            { label:'算了，不折腾', hint:'+😊', fn: g => ({mood:3}) },
+          ]},
       ]},
     hangzhou: { name: '杭州', rent: 2800, cost: 1.1, house: 45000, trait: '电商之城', meme: '"杭州的空气里都是创业的味道，和直播的噪音。"',
       events: [
@@ -64,6 +100,18 @@ const CITIES = {
             { label:'做兼职主播', hint:'+💰 +✨', fn: g => { g.flags.influencer=true; return{money:5000,charm:10,mood:8,health:-3}; }},
             { label:'全职做主播', hint:'🎲', fn: g => { g.flags.influencer=true;setJob(g,'自媒体博主',0); if(Math.random()>0.5){return{money:10000,charm:15,mood:15}}else{return{money:-5000,mood:-10}} }},
             { label:'算了，不凑热闹', hint:'+🧠', fn: g => ({intel:3,mood:5}) },
+          ]},
+        { id:'hangzhou_westlake', icon:'🏞️', title:'西湖漫步', body:'周末你去西湖散步，看到了断桥残雪、雷峰夕照。\n\n你突然觉得：杭州这座城市，真的有诗意。\n\n"杭州的美，在于工作之余，还有西湖和诗。"', cond: g => g.city==='hangzhou' && g.mood<60,
+          choices:[
+            { label:'拍照发朋友圈', hint:'+✨ +😊', fn: g => ({charm:5,mood:15}) },
+            { label:'找个茶馆喝茶', hint:'+😊 +🧠', fn: g => ({mood:12,intel:5,money:-100}) },
+            { label:'跑步锻炼', hint:'+❤️ +😊', fn: g => ({health:8,mood:10}) },
+          ]},
+        { id:'hangzhou_ecommerce', icon:'🛒', title:'电商创业', body:'你在杭州，周围全是做电商的。朋友说："要不你开个淘宝店？"\n\n你算了算：进货、拍照、修图、客服、发货……一个人能干十个人的活。\n\n"杭州的电商创业，比直播还卷。"', cond: g => g.city==='hangzhou' && g.intel>50 && !g.flags.ecommerce,
+          choices:[
+            { label:'开淘宝店', hint:'🎲 -💰', fn: g => { g.flags.ecommerce=true; if(Math.random()>0.5){return{money:15000,intel:8,mood:10}}else{return{money:-8000,mood:-15}} }},
+            { label:'做跨境电商', hint:'🎲 -💰💰', fn: g => { g.flags.ecommerce=true; if(Math.random()>0.6){return{money:30000,intel:12,charm:5}}else{return{money:-15000,mood:-20}} }},
+            { label:'算了，打工挺好', hint:'+😊', fn: g => ({mood:5}) },
           ]},
       ]},
     guangzhou: { name: '广州', rent: 2500, cost: 1.0, house: 40000, trait: '羊城', meme: '"在广州，没有什么是一顿早茶解决不了的。"',
@@ -74,6 +122,18 @@ const CITIES = {
             { label:'偶尔去一次', hint:'+👥', fn: g => ({social:5,mood:5}) },
             { label:'我不喜欢早茶', hint:'-👥', fn: g => ({social:-5,mood:-3}) },
           ]},
+        { id:'guangzhou_food', icon:'🍜', title:'广州美食', body:'你在广州吃了一圈：肠粉、云吞面、煲仔饭、牛杂、双皮奶……\n\n你胖了10斤，但你觉得值。\n\n"广州人的人生哲学：吃好喝好，没烦恼。"', cond: g => g.city==='guangzhou' && g.health<70,
+          choices:[
+            { label:'继续吃！', hint:'+😊 +❤️ -💰', fn: g => ({mood:15,health:5,money:-500}) },
+            { label:'学做粤菜', hint:'+🧠 +😊', fn: g => { g.flags.cookingSkill=true; return{intel:8,mood:10}; }},
+            { label:'开始减肥', hint:'+❤️ -😊', fn: g => ({health:10,mood:-5}) },
+          ]},
+        { id:'guangzhou_canton_fair', icon:'🎪', title:'广交会', body:'广交会开幕了，你朋友拉你去当翻译/兼职。\n\n你发现：这里全是老外，全是生意。\n\n"广交会是广州的名片：世界工厂，就在这里。"', cond: g => g.city==='guangzhou' && g.month===4 || g.month===10,
+          choices:[
+            { label:'去做兼职', hint:'+💰 +👥 +✨', fn: g => ({money:5000,social:10,charm:8,intel:5}) },
+            { label:'去看看热闹', hint:'+🧠 +👥', fn: g => ({intel:5,social:5,mood:5}) },
+            { label:'算了，不凑热闹', hint:'+😊', fn: g => ({mood:3}) },
+          ]},
       ]},
     chengdu: { name: '成都', rent: 2200, cost: 0.9, house: 25000, trait: '蓉城', meme: '"成都——一座来了就不想走的城市。前提是你能忍受内卷。"',
       events: [
@@ -82,6 +142,18 @@ const CITIES = {
             { label:'融入成都生活', hint:'+😊 +❤️', fn: g => ({mood:15,health:8,social:5,charm:3}) },
             { label:'保持节奏不变', hint:'+🧠', fn: g => ({intel:3,mood:5}) },
             { label:'太慢了，我要回北上广', hint:'+💰 -😊', fn: g => ({money:3000,mood:-10}) },
+          ]},
+        { id:'chengdu_hotpot', icon:'🌶️', title:'成都火锅', body:'你在成都吃火锅，发现这里的人真的能吃辣。\n\n你点了个微辣，结果被辣到怀疑人生。旁边的成都人说："这还不辣？"\n\n"成都的火锅，辣的是味蕾，暖的是人心。"', cond: g => g.city==='chengdu' && g.social<40,
+          choices:[
+            { label:'挑战特辣', hint:'+❤️ +😊', fn: g => ({health:-3,mood:15,social:8}) },
+            { label:'点鸳鸯锅', hint:'+😊', fn: g => ({mood:8,social:3}) },
+            { label:'我不吃辣', hint:'-👥', fn: g => ({social:-5,mood:-3}) },
+          ]},
+        { id:'chengdu_panda', icon:'🐼', title:'成都大熊猫', body:'你去成都大熊猫基地看滚滚了。\n\n你看着大熊猫吃竹子、打滚、睡觉，突然觉得：这才是生活。\n\n"成都的大熊猫，比你活得还滋润。"', cond: g => g.city==='chengdu' && g.mood<50,
+          choices:[
+            { label:'拍照发朋友圈', hint:'+✨ +😊', fn: g => ({charm:5,mood:15}) },
+            { label:'当志愿者', hint:'+😊 +👥 +❤️', fn: g => { g.flags.volunteer=true; return{mood:20,social:10,health:5}; }},
+            { label:'买个熊猫公仔', hint:'-💰 +😊', fn: g => ({money:-200,mood:8}) },
           ]},
       ]},
 };
@@ -1693,7 +1765,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.12' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.13' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
