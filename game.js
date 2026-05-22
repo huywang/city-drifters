@@ -2462,6 +2462,48 @@ const EVENTS = [
         { label:'约朋友一起去', hint:'-💰 +👥 +😊', fn: g => { g.flags.weekendTrip=true; return{money:-800,social:10,mood:15}; }},
         { label:'下次再说', hint:'-😊', fn: g => { g.flags.weekendTrip=true; return{mood:-5}; }},
       ]},
+    // === v2.40 EVENTS ===
+    { id:'lottery_ticket', icon:'🎫', title:'彩票梦',
+      body:'路过彩票站，你花了10块钱买了一张。\n\n"万一中了呢？"\n\n你知道概率是千万分之一，但你还是想试试。\n\n"彩票是穷人交的税——但你今天想逃一次税。"',
+      cond: g => !g.flags.lotteryTicket && g.money>100 && Math.random()>0.6,
+      choices:[
+        { label:'买10张试试手气', hint:'-💰 🎲', fn: g => { g.flags.lotteryTicket=true; if(Math.random()>0.95){g.flags.lotteryWin=true;return{money:-100,money:50000,mood:30}}else{return{money:-100,mood:-3}} }},
+        { label:'就买1张', hint:'-💰', fn: g => { g.flags.lotteryTicket=true; if(Math.random()>0.99){g.flags.lotteryWin=true;return{money:-10,money:10000,mood:20}}else{return{money:-10,mood:-2}} }},
+        { label:'算了，概率太低', hint:'+🧠', fn: g => { g.flags.lotteryTicket=true; return{intel:2}; }},
+      ]},
+    { id:'social_media_fame', icon:'📸', title:'意外走红',
+      body:'你随手发的一条朋友圈/微博突然火了！\n\n点赞999+，评论500+，还有人私信找你合作。\n\n你体验到了"15分钟的名气"。\n\n"走红是偶然，不红是常态——享受那一刻就好。"',
+      cond: g => !g.flags.socialMediaFame && g.charm>=60 && Math.random()>0.7,
+      choices:[
+        { label:'趁热打铁，继续发', hint:'+✨ +👥', fn: g => { g.flags.socialMediaFame=true; g.flags.influencer=true; return{charm:10,social:15,mood:10}; }},
+        { label:'低调处理', hint:'+🧠', fn: g => { g.flags.socialMediaFame=true; return{intel:5,mood:5}; }},
+        { label:'接广告赚钱', hint:'+💰 +✨', fn: g => { g.flags.socialMediaFame=true; return{money:5000,charm:5,mood:8}; }},
+      ]},
+    { id:'career_crossroads', icon:'🔀', title:'职业十字路口',
+      body:'你在现在的岗位已经3年了。\n\n你开始思考：\n- 继续做下去，5年后会怎样？\n- 转行，来得及吗？\n- 创业，敢吗？\n\n"职业选择不是选工作，是选生活方式。"',
+      cond: g => !g.flags.careerCrossroads && g.months>=36 && g.age>=28 && g.job!=='待业中' && Math.random()>0.5,
+      choices:[
+        { label:'转行到新领域', hint:'+🧠 -💰', fn: g => { g.flags.careerCrossroads=true; g.flags.careerChange=true; g.jobSalary=Math.floor(g.jobSalary*0.8); return{intel:10,mood:5,money:-5000}; }},
+        { label:'升职加薪', hint:'+💰 +🧠', fn: g => { g.flags.careerCrossroads=true; if(g.intel>=70&&g.social>=50){g.jobSalary=Math.floor(g.jobSalary*1.3);return{money:10000,mood:15,intel:5}}else{return{mood:-10}} }},
+        { label:'创业试试', hint:'🎲 高风险', fn: g => { g.flags.careerCrossroads=true; g.flags.entrepreneur=true; if(g.intel>=75&&g.social>=60&&Math.random()>0.4){return{money:-20000,mood:20,intel:15}}else{return{money:-30000,mood:-15}} }},
+        { label:'保持现状', hint:'+😊', fn: g => { g.flags.careerCrossroads=true; return{mood:5}; }},
+      ]},
+    { id:'health_checkup', icon:'🏥', title:'年度体检',
+      body:'公司组织了年度体检。你拿到了报告：\n\n- BMI：偏高 ⚠️\n- 血压：正常 ✅\n- 血糖：正常 ✅\n- 肝功能：正常 ✅\n\n"体检报告是成年人的成绩单——但这次，你及格了。"',
+      cond: g => !g.flags.annualCheckup && g.age>=26 && g.months>=12 && Math.random()>0.5,
+      choices:[
+        { label:'开始健身计划', hint:'+❤️ -💰', fn: g => { g.flags.annualCheckup=true; g.flags.fitnessPlan=true; return{health:10,mood:5,money:-2000}; }},
+        { label:'改善饮食习惯', hint:'+❤️ +😊', fn: g => { g.flags.annualCheckup=true; return{health:8,mood:5}; }},
+        { label:'算了，明年再说', hint:'-❤️', fn: g => { g.flags.annualCheckup=true; return{health:-3,mood:-5}; }},
+      ]},
+    { id:'book_club', icon:'📚', title:'读书会',
+      body:'朋友邀请你参加一个读书会。\n\n每月读一本书，分享读后感。\n\n你已经很久没有认真读书了。\n\n"读书不是为了知道答案，是为了保持思考的能力。"',
+      cond: g => !g.flags.bookClub && g.intel>=50 && g.age>=25 && Math.random()>0.5,
+      choices:[
+        { label:'加入，认真读', hint:'+🧠 +👥', fn: g => { g.flags.bookClub=true; return{intel:10,social:8,mood:5}; }},
+        { label:'偶尔参加', hint:'+🧠', fn: g => { g.flags.bookClub=true; return{intel:5,social:3}; }},
+        { label:'自己读就好', hint:'+🧠', fn: g => { g.flags.bookClub=true; return{intel:8,mood:3}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -2609,6 +2651,12 @@ const ACHIEVEMENTS = [
     { id:'skill_learner', icon:'📚', name:'终身学习', desc:'学习了新技能', check: g => g.flags.learnNewSkill },
     { id:'good_child', icon:'👨‍👩‍👦', name:'孝顺子女', desc:'照顾好了父母的健康', check: g => (g.flags.parentHealthIssue || g.flags.hometownVisit) && g.relationships && g.relationships.family>=70 },
     { id:'traveler', icon:'🏖️', name:'周末旅行家', desc:'来了一次说走就走的旅行', check: g => g.flags.weekendTrip },
+    // v2.40 achievements
+    { id:'lottery_player', icon:'🎫', name:'彩票玩家', desc:'买了彩票试试手气', check: g => g.flags.lotteryTicket },
+    { id:'viral_moment', icon:'📸', name:'意外走红', desc:'体验了一把网红感觉', check: g => g.flags.socialMediaFame },
+    { id:'career_changer', icon:'🔀', name:'职业转型', desc:'勇敢走出了职业舒适区', check: g => g.flags.careerCrossroads },
+    { id:'health_conscious', icon:'🏥', name:'健康意识', desc:'认真对待了年度体检', check: g => g.flags.annualCheckup },
+    { id:'bookworm', icon:'📚', name:'读书会成员', desc:'加入了读书会', check: g => g.flags.bookClub },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -2697,6 +2745,10 @@ const ENDINGS = [
     { id:'city_hopper', badge:'🗺️', title:'城市探索者', desc:'你在多个大城市生活过，体验了不同的城市文化。\n\n你发现：没有完美的城市，只有适合你的城市。\n\n"旅行的意义不是去更多地方，是在每个地方都认真生活。"', cond: g => g.flags.citySwitch && g.months>=60 && g.charm>=65 && g.social>=55 && g.age>=30 },
     { id:'lifelong_learner', badge:'📖', title:'终身学习者', desc:'你从未停止学习。\n\n你学了新技能、读了很多书、保持了思考的习惯。\n\n你没有成为专家，但你成为了一个有深度的人。\n\n"学习不是为了知道答案，是为了提出更好的问题。"', cond: g => g.flags.learnNewSkill && g.intel>=85 && g.mood>=65 && g.age>=35 },
     { id:'filial_child', badge:'👨‍👩‍👦', title:'孝顺子女', desc:'你在打拼事业的同时，也照顾好了父母。\n\n你经常回家看他们，给他们买保险，带他们体检。\n\n"孝顺不是给多少钱，是让父母知道你心里有他们。"', cond: g => (g.flags.parentHealthIssue || g.flags.hometownVisit) && (g.relationships && g.relationships.family>=80) && g.mood>=70 && g.age>=35 },
+    // --- v2.40 ENDINGS ---
+    { id:'lottery_winner_end', badge:'🎰', title:'彩票幸运儿', desc:'你真的中了彩票！\n\n虽然不是头奖，但也够你潇洒一阵子了。\n\n你没有辞职，没有炫富，只是默默地把钱存了起来。\n\n"运气是实力的一部分——但你这次，纯粹是运气。"', cond: g => g.flags.lotteryWin && g.money>=50000 && g.age>=28 },
+    { id:'accidental_influencer', badge:'⭐', title:'意外网红', desc:'你的一条动态火了，你成了"15分钟名人"。\n\n你没有成为大V，但你体验了被关注的感觉。\n\n你明白了一个道理：名气是暂时的，真实的生活才是永恒的。\n\n"走红不是目的，是副产品。"', cond: g => g.flags.socialMediaFame && g.charm>=70 && g.social>=65 && g.age>=28 },
+    { id:'career_transformer', badge:'🔄', title:'职业转型者', desc:'你勇敢地走出了舒适区，完成了职业转型。\n\n新的领域让你重新找回了激情。\n\n"转行不是失败，是重新开始。"', cond: g => g.flags.careerChange && g.jobSalary>=15000 && g.intel>=75 && g.mood>=65 && g.age>=32 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
@@ -3329,9 +3381,10 @@ function getEndingRarity(endingId) {
     // Legendary (rare endings that require specific conditions)
     const legendary = ['fire', 'immigration', 'executive', 'retire_abroad', 'wealthy', 'family_first', 'burnout_recovery', 'digital_nomad_senior', 'social_influencer_end', 'phoenix_rising', 'workplace_legend', 'ai_pioneer'];
     // Rare (hard to achieve)
-    const rare = ['settled', 'startup_end', 'influencer_end', 'digital_nomad', 'karoshi', 'jail', 'social_butterfly_end', 'health_guru', 'side_hustle_king', 'kaogong_success', 'mentor_end', 'community_builder', 'career_pivot', 'anti_fraud_hero', 'relationship_guru', 'comeback_kid', 'health_warrior', 'freelance_master', 'labor_hero'];
+    const rare = ['settled', 'startup_end', 'influencer_end', 'digital_nomad', 'karoshi', 'jail', 'social_butterfly_end', 'health_guru', 'side_hustle_king', 'kaogong_success', 'mentor_end', 'community_builder', 'career_pivot', 'anti_fraud_hero', 'relationship_guru', 'comeback_kid', 'health_warrior', 'freelance_master', 'labor_hero', 'lottery_winner_end'];
     // Uncommon (moderately difficult)
-    const uncommon = ['hometown_hero', 'go_home', 'civil_end', 'ordinary', 'single', 'investment_guru', 'lying_flat_end', 'lonely_death', 'estranged', 'pet_parent', 'mortgage_default_end', 'kong_yiji_end', 'full_time_child_end', 'minimalist_life', 'slow_life', 'scam_victim', 'sandwich_generation', 'lonely_achiever', 'wanderer', 'slow_life_master', 'weather_survivor', 'content_king', 'balanced_life', 'side_hustle_success', 'wise_investor', 'mentored_success', 'happy_single', 'city_hopper', 'lifelong_learner', 'filial_child'];
+    const uncommon = ['hometown_hero', 'go_home', 'civil_end', 'ordinary', 'single', 'investment_guru', 'lying_flat_end', 'lonely_death', 'estranged', 'pet_parent', 'mortgage_default_end', 'kong_yiji_end', 'full_time_child_end', 'minimalist_life', 'slow_life', 'scam_victim', 'sandwich_generation', 'lonely_achiever', 'wanderer', 'slow_life_master', 'weather_survivor', 'content_king', 'balanced_life', 'side_hustle_success', 'wise_investor', 'mentored_success', 'happy_single', 'city_hopper', 'lifelong_learner', 'filial_child', 'accidental_influencer', 'career_transformer'];
+    // Rare (hard to achieve)
 
     if (legendary.includes(endingId)) return 'legendary';
     if (rare.includes(endingId)) return 'rare';
@@ -3515,7 +3568,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.39' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.40' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
