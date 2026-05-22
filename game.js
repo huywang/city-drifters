@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v29.8
+// 都市浮生记 - Game Engine v29.9
 // ============================================
 
 // === GAME STATE ===
@@ -15794,6 +15794,87 @@ const EVENTS = [
         { label:'选择国际学校走素质路线', hint:'+😊 -💰', fn: g => { g.flags.qualityVsExam=true; g.flags.internationalSchool=true; return{mood:5,money:-30000}; }},
         { label:'全力拼分数这是唯一出路', hint:'-😊 +🧠', fn: g => { g.flags.qualityVsExam=true; g.flags.fullExamMode=true; return{mood:-3,intel:3}; }},
       ]},
+    // === v29.9 原生家庭与亲子关系 ===
+    { id:'family_origin_trauma', icon:'💔', title:'原生家庭的伤', category:'family',
+      body:'你在心理咨询时说了一句话：「我恨我的父母。」\n\n然后你哭了。\n\n不是因为你不爱他们——是因为他们「伤」了你：\n- 小时候的打骂：「打你是为你好」\n- 从不说爱你：「中国人不说这些」\n- 永远和别人比：「你看看人家小明」\n- 否定你的感受：「你有什么好哭的」\n- 控制你的选择：「我们吃的盐比你走的路多」\n\n你长大了——但你身上有他们的「影子」：\n- 你不会表达爱\n- 你害怕亲密关系\n- 你总是在讨好别人\n- 你不相信有人会真的爱你\n\n「原生家庭的伤：不是你不够好——是你从小被告知「不够好」。」',
+      cond: g => g.age >= 25 && g.mood < 60 && !g.flags.familyOriginTrauma,
+      choices:[
+        { label:'开始通过心理咨询疗愈', hint:'+🧠 +😊', fn: g => { g.flags.familyOriginTrauma=true; g.flags.healingJourney=true; return{intel:5,mood:8}; }},
+        { label:'读心理学书籍自我疗愈', hint:'+🧠 +💪', fn: g => { g.flags.familyOriginTrauma=true; g.flags.selfHealing=true; return{intel:8,mood:3}; }},
+        { label:'选择原谅但不忘记', hint:'+😊 +🧠', fn: g => { g.flags.familyOriginTrauma=true; g.flags.forgiveNotForget=true; return{mood:5,charm:3}; }},
+      ]},
+    { id:'spring_festival_pressure', icon:'🧧', title:'回家过年', category:'family',
+      body:'春节回家——你做好了心理准备。\n\n亲戚们的灵魂拷问：\n- 七大姑：「有对象了吗？」\n- 八大姨：「一个月挣多少？」\n- 大舅：「买房了吗？」\n- 二叔：「什么时候要孩子？」\n- 你妈：「你看看你表姐……」\n\n你的内心：\n- 想摔筷子走人\n- 想告诉他们「别管了」\n- 想哭\n\n但你知道——他们不是恶意——他们只是「不会表达关心」。\n在他们的世界里——问这些就是「在乎你」。\n\n你深吸一口气——笑了笑——说：「还行吧，在努力。」\n\n「回家过年：一年中最短的路——是最长的「心理考验」。」',
+      cond: g => g.age >= 22 && g.months >= 12 && !g.flags.springFestivalPressure,
+      choices:[
+        { label:'学会应对亲戚的灵魂拷问', hint:'+🧠 +😊', fn: g => { g.flags.springFestivalPressure=true; g.flags.relativesSkill=true; return{intel:3,mood:3}; }},
+        { label:'选择旅行过年不回家', hint:'+😊 -👥', fn: g => { g.flags.springFestivalPressure=true; g.flags.travelNewYear=true; return{mood:8,social:-5}; }},
+        { label:'坦诚说出自己的真实想法', hint:'+💪 +😊', fn: g => { g.flags.springFestivalPressure=true; g.flags.honestWithFamily=true; return{mood:5,charm:5}; }},
+      ]},
+    { id:'generation_gap_talk', icon:'🗣️', title:'代际沟通障碍', category:'family',
+      body:'你试图和你爸聊一次「认真的」。\n\n你说：「爸，我工作压力很大，有点焦虑。」\n你爸说：「你们年轻人就是抗压能力差，我们那时候……」\n\n你说：「我想换个工作。」\n你爸说：「好好的工作不干，瞎折腾什么？」\n\n你说：「我不想结婚。」\n你爸说：「不结婚老了谁管你？」\n\n你放弃了。\n\n不是他不想理解你——是他的「操作系统」理解不了你的「版本」。\n- 他活在「生存模式」——你活在「意义模式」\n- 他觉得「活着就好」——你想要「活得好」\n- 他不是不爱你——是他不知道怎么爱你\n\n「代际沟通：你们说的是同一种语言——但不是同一个「世界」。」',
+      cond: g => g.age >= 22 && !g.flags.generationGapTalk,
+      choices:[
+        { label:'接受代际差异不再强求理解', hint:'+🧠 +😊', fn: g => { g.flags.generationGapTalk=true; g.flags.acceptGap=true; return{intel:5,mood:5}; }},
+        { label:'用他们能理解的方式表达', hint:'+👥 +🧠', fn: g => { g.flags.generationGapTalk=true; g.flags.adaptedCommunication=true; return{social:5,charm:3}; }},
+        { label:'算了不说了说了也不懂', hint:'-😊 -👥', fn: g => { g.flags.generationGapTalk=true; g.flags.gaveUpTalking=true; return{mood:-5,social:-3}; }},
+      ]},
+    { id:'parents_expectations', icon:'🎯', title:'父母的期望', category:'family',
+      body:'你从小就知道——你承载着父母的「期望」。\n\n他们的期望清单：\n- 考上好大学（你考上了）\n- 找份好工作（你找到了）\n- 买房买车（还在努力）\n- 结婚生子（你不想）\n- 光宗耀祖（你没做到）\n\n你做了他们想要的一切——但你不快乐。\n\n你问自己：「我的人生——是我的——还是他们的？」\n\n你开始理解：\n- 他们的期望——是他们「未完成的人生」\n- 他们把自己的遗憾——变成了你的「KPI」\n- 你不是他们的「第二次机会」——你是你自己\n\n「父母的期望：你不是来完成他们的梦的——你是来活自己的。」',
+      cond: g => g.age >= 25 && !g.flags.parentsExpectations,
+      choices:[
+        { label:'和父母坦诚谈谈自己的真实想法', hint:'+💪 +😊', fn: g => { g.flags.parentsExpectations=true; g.flags.honestExpectations=true; return{mood:8,charm:3}; }},
+        { label:'表面顺从内心做自己', hint:'+🧠 -😊', fn: g => { g.flags.parentsExpectations=true; g.flags.surfaceObey=true; return{intel:3,mood:-3}; }},
+        { label:'彻底按自己的方式活', hint:'+💪 +😊', fn: g => { g.flags.parentsExpectations=true; g.flags.liveOwnLife=true; return{mood:10,charm:5}; }},
+      ]},
+    { id:'gender_bias_memory', icon:'⚖️', title:'重男轻女的记忆', category:'family',
+      body:'你想起了一些小时候的事。\n\n如果你是女孩：\n- 「女孩子不用读那么多书」\n- 弟弟有新衣服你没有\n- 家里最好的房间给了弟弟\n- 「你以后是别人家的人」\n\n如果你是男孩：\n- 「你是家里的顶梁柱」\n- 你不能哭不能软弱\n- 你的姐姐/妹妹为你「让路」\n- 「你要照顾全家」\n\n无论男女——你都是「性别偏见」的受害者。\n\n你开始理解：\n- 你的父母——也是他们父母的受害者\n- 这不是谁的错——是「时代」的错\n- 但你可以选择——不让这个循环继续\n\n「重男轻女：不是你的错——也不是你父母的错——是「旧观念」的错。」',
+      cond: g => g.age >= 22 && g.intel >= 25 && !g.flags.genderBiasMemory,
+      choices:[
+        { label:'打破循环给下一代平等的爱', hint:'+💪 +😊', fn: g => { g.flags.genderBiasMemory=true; g.flags.breakCycle=true; return{mood:8,charm:5}; }},
+        { label:'理解父母那个时代的局限', hint:'+🧠 +😊', fn: g => { g.flags.genderBiasMemory=true; g.flags.understandEra=true; return{intel:5,mood:5}; }},
+        { label:'还是觉得不公平很愤怒', hint:'+💪 -😊', fn: g => { g.flags.genderBiasMemory=true; g.flags.stillAngry=true; return{mood:-5,charm:3}; }},
+      ]},
+    { id:'left_behind_child_v29_9', icon:'👦', title:'留守儿童的回忆', category:'family',
+      body:'你小时候是「留守儿童」。\n\n你的童年：\n- 爸妈在外打工\n- 你跟着爷爷奶奶长大\n- 每年只有过年能见爸妈\n- 电话里只能说「我很好」\n\n你那时候最害怕的事：\n- 不是考试——是「爸妈不要我了」\n- 不是挨饿——是「没人管我」\n- 不是被欺负——是「没人保护我」\n\n长大后你发现：\n- 你特别害怕被抛弃\n- 你不太会依赖别人\n- 你总觉得要「靠自己」\n- 你对亲密关系既渴望又恐惧\n\n你不是「独立」——你是「被迫独立」。\n\n「留守儿童：你不是不需要爱——你是从小就学会了「不要期待爱」。」',
+      cond: g => g.age >= 22 && g.social < 50 && !g.flags.leftBehindChild,
+      choices:[
+        { label:'正视童年创伤开始疗愈', hint:'+🧠 +😊', fn: g => { g.flags.leftBehindChild=true; g.flags.healingChildhood=true; return{intel:5,mood:8}; }},
+        { label:'感恩爷爷奶奶的养育', hint:'+😊 +❤️', fn: g => { g.flags.leftBehindChild=true; g.flags.gratefulGrandparents=true; return{mood:5,social:5}; }},
+        { label:'理解父母当年的无奈', hint:'+🧠 +😊', fn: g => { g.flags.leftBehindChild=true; g.flags.understandParents=true; return{intel:5,mood:5}; }},
+      ]},
+    { id:'aging_parent_care_v29_9', icon:'👴', title:'父母老了', category:'family',
+      body:'你接到了妈妈的电话：「你爸住院了。」\n\n你赶到医院——看到病床上的爸爸：\n- 头发白了\n- 背驼了\n- 手上全是针眼\n\n你突然意识到：他们老了。\n\n你的焦虑：\n- 工作不能请太多假\n- 医疗费很贵\n- 谁来照顾他们？\n- 你在外地——他们在家\n\n你站在病床前——爸爸对你说：\n「不用管我，你忙你的。」\n\n你忍住了眼泪——走出病房——蹲在走廊里哭了。\n\n你想起了一句话：「子欲养而亲不待」——你害怕来不及。\n\n「父母老了：你长大的速度——永远赶不上他们变老的速度。」',
+      cond: g => g.age >= 28 && g.months >= 24 && !g.flags.agingParentCare_v29_9,
+      choices:[
+        { label:'请假回家好好陪父母', hint:'+😊 -💰', fn: g => { g.flags.agingParentCare_v29_9=true; g.flags.accompanyParents=true; return{mood:8,money:-3000}; }},
+        { label:'开始规划父母的养老方案', hint:'+🧠 +💰', fn: g => { g.flags.agingParentCare_v29_9=true; g.flags.parentCarePlan=true; return{intel:5,mood:3}; }},
+        { label:'打电话关心但无法在身边', hint:'-😊 +👥', fn: g => { g.flags.agingParentCare_v29_9=true; g.flags.remoteCare=true; return{mood:-3,social:2}; }},
+      ]},
+    { id:'parent_child_reconciliation', icon:'🤝', title:'亲子和解', category:'family',
+      body:'你和你的父亲（或母亲）——终于有了一次真正的对话。\n\n起因：你回家帮忙收拾老房子——翻到了你小时候的照片。\n\n你爸说：「你小时候——我天天加班——没怎么陪你。」\n你说：「嗯。」\n你爸说：「那时候——我不知道怎么当爸爸。」\n你沉默了。\n你爸说：「对不起。」\n\n你哭了。\n\n这是你30年来——第一次听到他说「对不起」。\n\n你终于理解了：\n- 他不是不爱你——是他「不会」爱你\n- 他不是不在乎——是他「不知道怎么」在乎\n- 他不是一个完美的父亲——但他「尽力了」\n\n「亲子和解：不是你原谅了他——是你终于理解了「他也是第一次当爸爸」。」',
+      cond: g => g.age >= 28 && g.intel >= 30 && !g.flags.parentReconciliation,
+      choices:[
+        { label:'接受道歉开始新的亲子关系', hint:'+😊 +❤️', fn: g => { g.flags.parentReconciliation=true; g.flags.newRelationship=true; return{mood:15,social:5}; }},
+        { label:'虽然感动但还是有些怨', hint:'+🧠 -😊', fn: g => { g.flags.parentReconciliation=true; g.flags.partialForgive=true; return{intel:3,mood:3}; }},
+        { label:'主动说「我也爱你爸」', hint:'+😊 +💪', fn: g => { g.flags.parentReconciliation=true; g.flags.expressedLove=true; return{mood:10,charm:5}; }},
+      ]},
+    { id:'family_expectation_burden', icon:'🏋️', title:'家族期望的重担', category:'family',
+      body:'你是家族里唯一考上大学的人。\n\n你的「家族使命」：\n- 你是全村的「希望」\n- 你是家族的「骄傲」\n- 你是表弟表妹的「榜样」\n- 你是父母在亲戚面前的「面子」\n\n你的压力：\n- 你不能「失败」——因为你是「榜样」\n- 你不能「普通」——因为你是「骄傲」\n- 你不能「放弃」——因为你是「希望」\n\n你累了。\n\n你只是一个普通人——但你背负着「整个家族的期望」。\n\n你开始问自己：「我有权做一个「普通人」吗？」\n\n答案是：有。你一直都是。\n\n「家族期望：你不是家族的「工具」——你是一个「人」。」',
+      cond: g => g.age >= 22 && g.intel >= 40 && !g.flags.familyExpectationBurden,
+      choices:[
+        { label:'接受自己只是普通人', hint:'+😊 +💪', fn: g => { g.flags.familyExpectationBurden=true; g.flags.acceptOrdinary=true; return{mood:10,charm:3}; }},
+        { label:'继续背负但设好边界', hint:'+🧠 +💪', fn: g => { g.flags.familyExpectationBurden=true; g.flags.setBoundaries=true; return{intel:5,mood:3}; }},
+        { label:'和家族坦诚说自己的压力', hint:'+💪 +😊', fn: g => { g.flags.familyExpectationBurden=true; g.flags.spokeUp=true; return{mood:5,social:5}; }},
+      ]},
+    { id:'parent_as_friend', icon:'☕', title:'和父母做朋友', category:'family',
+      body:'你发现了一个秘密：当你的父母「不再是父母」的时候——他们其实是很有趣的人。\n\n你和妈妈的下午茶：\n- 她讲了她年轻时的恋爱故事（比你的精彩）\n- 她说她也曾想当画家（但她爸不允许）\n- 她说她也曾在深夜哭过\n- 她说她最大的遗憾是「没好好看看这个世界」\n\n你突然意识到：\n- 她不只是「你妈妈」——她是一个「人」\n- 她有自己的梦想、遗憾、青春\n- 她为了你——放下了很多「她自己的人生」\n\n你和妈妈聊了3小时——像两个朋友一样。\n\n这是你第一次——不只是用「孩子」的身份看她。\n\n「和父母做朋友：当你把他们当「人」看——你才真正理解了「爱」。」',
+      cond: g => g.age >= 25 && !g.flags.parentAsFriend,
+      choices:[
+        { label:'开始把父母当朋友相处', hint:'+😊 +❤️', fn: g => { g.flags.parentAsFriend=true; g.flags.friendshipParents=true; return{mood:10,social:5}; }},
+        { label:'带父母一起去旅行', hint:'+😊 -💰', fn: g => { g.flags.parentAsFriend=true; g.flags.familyTrip=true; return{mood:8,money:-5000}; }},
+        { label:'记录父母的人生故事', hint:'+🧠 +😊', fn: g => { g.flags.parentAsFriend=true; g.flags.recordStories=true; return{intel:5,mood:8}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -17226,6 +17307,15 @@ const ACHIEVEMENTS = [
     { id:'child_pace_ach', icon:'🏁', name:'尊重节奏', desc:'让孩子按自己的节奏成长', check: g => g.flags.childPace },
     { id:'edu_volunteer_ach', icon:'⚖️', name:'教育公平践行者', desc:'参加教育公益帮助资源少的孩子', check: g => g.flags.eduVolunteer },
     { id:'balanced_edu_ach', icon:'🤔', name:'教育平衡术', desc:'在应试框架内尽量保护孩子兴趣', check: g => g.flags.balancedEducation },
+    // v29.9 achievements - 原生家庭与亲子关系
+    { id:'healing_journey_ach_v29_9', icon:'💚', name:'疗愈之旅', desc:'开始通过心理咨询疗愈原生家庭创伤', check: g => g.flags.healingJourney },
+    { id:'relatives_skill_ach', icon:'🧧', name:'亲戚应对大师', desc:'学会了应对春节亲戚的灵魂拷问', check: g => g.flags.relativesSkill },
+    { id:'accept_gap_ach', icon:'🗣️', name:'代际和解', desc:'接受了代际差异不再强求父母理解', check: g => g.flags.acceptGap },
+    { id:'live_own_life_ach', icon:'🎯', name:'为自己而活', desc:'彻底按自己的方式生活而非满足父母期望', check: g => g.flags.liveOwnLife },
+    { id:'break_cycle_ach', icon:'⚖️', name:'打破循环', desc:'打破重男轻女的循环给下一代平等的爱', check: g => g.flags.breakCycle },
+    { id:'parent_reconcile_ach', icon:'🤝', name:'亲子和解', desc:'和父母达成了一次真正的理解和和解', check: g => g.flags.newRelationship },
+    { id:'accept_ordinary_ach', icon:'🏋️', name:'普通人宣言', desc:'接受了自己只是普通人放下了家族期望', check: g => g.flags.acceptOrdinary },
+    { id:'parent_friend_ach', icon:'☕', name:'父母的朋友', desc:'开始把父母当朋友一样相处', check: g => g.flags.friendshipParents },
 ];
 
 // === ENDINGS === (order matters: first match wins)
