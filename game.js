@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v3.7
+// 都市浮生记 - Game Engine v3.8
 // ============================================
 
 // === GAME STATE ===
@@ -767,14 +767,6 @@ const EVENTS = [
         { label:'限制使用时间', hint:'+🧠', fn: g => ({intel:5,mood:5,health:3}) },
         { label:'听播客代替', hint:'+🧠 +😊', fn: g => ({intel:8,mood:5}) },
         { label:'继续刷', hint:'-❤️', fn: g => ({mood:3,health:-5,intel:-3}) },
-      ]},
-    { id:'delayed_retirement', icon:'👴', title:'延迟退休',
-      body:'新闻说延迟退休要来了。男性65岁，女性60岁。\n\n你算了算：你要工作到65岁。你已经上了4年班。还剩39年。\n\n你看了看你的颈椎、腰椎、膝盖和发际线：它们不确定能撑到那时候。\n\n"35岁嫌你老，65岁才让你退休。中间30年你干嘛？——送外卖。"\n\n你在微博上发了个"微笑"表情。',
-      cond: g => g.age>=28 && g.age<=45 && !g.flags.delayedRetirement,
-      choices:[
-        { label:'接受现实，养生续命', hint:'+❤️ +🧠', fn: g => { g.flags.delayedRetirement=true; return{health:5,intel:5,mood:-5}; }},
-        { label:'提前FIRE！', hint:'-💰 +😊', fn: g => { g.flags.delayedRetirement=true; return{money:-10000,mood:15,charm:5}; }},
-        { label:'发个帖子吐槽', hint:'+✨', fn: g => { g.flags.delayedRetirement=true; return{charm:5,mood:5,social:5}; }},
       ]},
     { id:'flexible_work', icon:'🛒', title:'灵活就业',
       body:'你下载了灵活就业平台。选项有：外卖骑手、代驾、家政保洁、快递分拣、直播间场控。\n\n"灵活就业"——多么优雅的词汇，把"没有正式工作"说得如此体面。\n\n但你发现，灵活是真的灵活：想干就干，不想干……也得干，因为要交房租。\n\n"灵活就业的自由，是不得不自由的自由。"',
@@ -2834,6 +2826,24 @@ const EVENTS = [
         { label:'买宠物保险', hint:'-💰 +🧠', fn: g => { g.flags.petMedical=true; g.flags.petInsurance=true; return{money:-1000,intel:5}; }},
         { label:'自己查资料治疗', hint:'+🧠 🎲', fn: g => { g.flags.petMedical=true; if(Math.random()>0.5){return{intel:8,mood:10}}else{return{mood:-15}} }},
       ]},
+    // === v3.8 EVENTS - 相亲角与延迟退休 ===
+    { id:'matchmaking_corner', icon:'💑', title:'相亲角',
+      body:'你妈去公园相亲角了，把你的简历挂在那里。\n\n简历上写着：\n- 年龄：28岁\n- 学历：本科\n- 工作：互联网\n- 年薪：20万\n- 有房有车\n\n你妈说："今天有3个阿姨来问了。"\n你说："她们问的是我，还是我的条件？"\n\n"相亲角是父母的战场——但主角从来都不在场。"',
+      cond: g => !g.flags.matchmakingCorner && !g.flags.married && g.age>=26 && g.age<=35,
+      choices:[
+        { label:'配合父母', hint:'+👥 -😊', fn: g => { g.flags.matchmakingCorner=true; return{social:10,mood:-10}; }},
+        { label:'拒绝相亲', hint:'+😊 -👥', fn: g => { g.flags.matchmakingCorner=true; return{mood:15,social:-10}; }},
+        { label:'自己去相亲角看看', hint:'+👥 +✨', fn: g => { g.flags.matchmakingCorner=true; return{social:8,charm:5}; }},
+      ]},
+    { id:'delayed_retirement', icon:'👴', title:'延迟退休',
+      body:'新闻说：从2025年起，延迟退休正式实施。\n\n- 男性：从60岁延迟到63岁\n- 女性：从50/55岁延迟到55/58岁\n- 养老金最低缴费年限：从15年提高到20年\n\n你算了算：你现在25岁，要工作到63岁才能退休。\n\n还有38年。\n\n"延迟退休让年轻人意识到：这辈子，工作的时间比想象中更长。"',
+      cond: g => !g.flags.delayedRetirement && g.age>=22 && g.age<=40,
+      choices:[
+        { label:'开始规划养老', hint:'+💰 +🧠', fn: g => { g.flags.delayedRetirement=true; return{money:3000,intel:10}; }},
+        { label:'焦虑，但接受现实', hint:'+😊 -🧠', fn: g => { g.flags.delayedRetirement=true; return{mood:5,intel:-3}; }},
+        { label:'考虑FIRE提前退休', hint:'+💰 +😊', fn: g => { g.flags.delayedRetirement=true; g.flags.fireMovement=true; return{money:5000,mood:8}; }},
+        { label:'不管了，活在当下', hint:'+😊 -💰', fn: g => { g.flags.delayedRetirement=true; return{mood:10,money:-2000}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3025,6 +3035,9 @@ const ACHIEVEMENTS = [
     { id:'career_changer', icon:'🔀', name:'职业转型', desc:'勇敢走出了职业舒适区', check: g => g.flags.careerCrossroads },
     { id:'health_conscious', icon:'🏥', name:'健康意识', desc:'认真对待了年度体检', check: g => g.flags.annualCheckup },
     { id:'bookworm', icon:'📚', name:'读书会成员', desc:'加入了读书会', check: g => g.flags.bookClub },
+    // v3.8 achievements
+    { id:'matchmaking_corner_visitor', icon:'💑', name:'相亲角体验者', desc:'经历公园相亲', check: g => g.flags.matchmakingCorner },
+    { id:'retirement_planner', icon:'👴', name:'延迟退休规划者', desc:'面对延迟退休', check: g => g.flags.delayedRetirement },
 ];
 
 // === ENDINGS === (order matters: first match wins)
