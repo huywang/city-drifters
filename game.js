@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v12.7
+// 都市浮生记 - Game Engine v12.8
 // ============================================
 
 // === GAME STATE ===
@@ -6497,6 +6497,87 @@ const EVENTS = [
         { label:'继续补充', hint:'+🧠', fn: g => { g.flags.urbanSurvival=true; return{intel:8,mood:3}; }},
         { label:'算了太丧了', hint:'', fn: g => { return{mood:-3}; }},
       ]},
+    // === v12.8 终身学习 + 职业进阶 + 考证考公 ===
+    { id:'kaogong_war', icon:'⚔️', title:'考公大战',
+      body:'你决定考公务员。\n\n你花了3000块报了个培训班。每天下班后学3小时。周末全天刷题。\n\n你的朋友圈：「行测」「申论」「时政热点」。你的娱乐：没了。\n\n考试那天，你走进考场——发现竞争对手比你多10倍。\n\n一个岗位，2000人报名，只招1个。概率0.05%。\n\n"考公是当代年轻人的新科举——千军万马过独木桥，考上的叫上岸，没考上的叫继续漂泊。"',
+      cond: g => g.age >= 22 && g.age <= 35 && g.intel >= 50 && !g.flags.kaogongWar,
+      choices:[
+        { label:'全力备考', hint:'+🧠 -❤️ -💰', fn: g => { g.flags.kaogongWar=true; if(Math.random()>0.8){g.flags.civilServant=true;setJob(g,'公务员',6500);return{intel:15,health:-5,mood:20,money:-3000};} return{intel:10,health:-5,mood:-10,money:-3000}; }},
+        { label:'边工作边备考', hint:'+🧠 -❤️', fn: g => { g.flags.kaogongWar=true; if(Math.random()>0.9){g.flags.civilServant=true;setJob(g,'公务员',6500);return{intel:12,health:-3,mood:15,money:-3000};} return{intel:8,health:-3,mood:-5,money:-3000}; }},
+        { label:'算了我考不上', hint:'', fn: g => { return{mood:-5}; }},
+      ]},
+    { id:'mba_dream_v2', icon:'🎓', title:'读MBA',
+      body:'你考虑读MBA。\n\n学费：30万。时间：2年（周末上课）。回报：不确定。\n\n你问了一个读了MBA的朋友。他说：「最大的收获是人脉。」\n你又问了一个没读MBA的朋友。他说：「30万存银行利息都比涨薪多。」\n\n你的老板说：「读完MBA回来，我给你涨500。」\n你算了算：30万 ÷ 500/月 = 50年回本。\n\n"读MBA是投资还是消费？取决于你读的是名校还是野鸡大学——以及你爸是不是董事。"',
+      cond: g => g.age >= 26 && g.age <= 38 && g.money >= 50000 && !g.flags.mbaDream,
+      choices:[
+        { label:'读了！投资自己', hint:'+🧠 +👥 -💰💰', fn: g => { g.flags.mbaDream=true; return{intel:15,social:15,mood:10,money:-30000}; }},
+        { label:'算了性价比太低', hint:'', fn: g => { return{mood:-3}; }},
+        { label:'读个便宜的', hint:'+🧠 -💰', fn: g => { g.flags.mbaDream=true; return{intel:8,money:-10000}; }},
+      ]},
+    { id:'cert_collection', icon:'📜', title:'考证狂人',
+      body:'你开始疯狂考证：CPA、CFA、PMP、软考、教师资格证……\n\n你的书架上摆满了各种教材。你的笔记本写了12本。你的黑眼圈深得像挖了地道。\n\n你妈说：「你考了这么多证，能当饭吃吗？」\n你说：「不能——但能让我吃饭的时候更有底气。」\n\n你的简历从1页变成了3页。你的自信从0变成了——还是0。因为你发现：证再多，也治不了你的焦虑。\n\n"考证是当代年轻人的精神鸦片——你以为在提升自己，其实在逃避选择。"',
+      cond: g => g.age >= 22 && g.age <= 35 && g.intel >= 55 && !g.flags.certCollection,
+      choices:[
+        { label:'继续考', hint:'+🧠 -❤️ -💰', fn: g => { g.flags.certCollection=true; return{intel:15,health:-5,mood:-3,money:-5000}; }},
+        { label:'够了该实践了', hint:'+💰 +🧠', fn: g => { g.flags.certCollection=true; return{intel:5,money:2000,mood:5}; }},
+        { label:'只考最有用的', hint:'+🧠', fn: g => { g.flags.certCollection=true; return{intel:10,mood:3}; }},
+      ]},
+    { id:'career_switch', icon:'🔄', title:'转行',
+      body:'你决定转行了。\n\n你在这个行业干了5年，突然觉得：这不是我想要的生活。\n\n你投了一堆简历。面试官问你：「为什么转行？」你说：「想挑战自己。」其实你是因为：上一个领导太恶心了。\n\n新工作第一天，你什么都不会。你感觉自己又回到了刚毕业的时候。\n\n但你不怕。因为你终于在做自己想做的事了。\n\n"转行是最勇敢的决定——你放弃了5年的积累，只为不再浪费下一个5年。"',
+      cond: g => g.age >= 25 && g.age <= 38 && g.months >= 24 && g.job !== '待业中' && !g.flags.careerSwitch,
+      choices:[
+        { label:'转互联网', hint:'+💰 +🧠', fn: g => { g.flags.careerSwitch=true; setJob(g,'产品经理',12000); return{intel:8,mood:10}; }},
+        { label:'转金融', hint:'+💰 -❤️', fn: g => { g.flags.careerSwitch=true; setJob(g,'金融分析师',15000); return{money:5000,health:-3}; }},
+        { label:'转教育', hint:'+😊 +👥', fn: g => { g.flags.careerSwitch=true; g.flags.teacher=true; setJob(g,'培训师',8000); return{mood:12,social:5}; }},
+      ]},
+    { id:'online_course', icon:'💻', title:'网课成瘾',
+      body:'你迷上了网课。\n\n编程、设计、心理学、哲学、理财……你买了48门课。看完了——3门。\n\n你的购物车里还有52门课在等你「有空再看」。\n\n你的学习时间分布：20%上课，80%选下一门课。\n\n你终于理解了一个道理：买课不等于学了，就像买书不等于读了。\n\n"网课焦虑的本质：你以为花钱买了知识——其实你只是买了焦虑的安慰剂。"',
+      cond: g => g.age >= 22 && g.age <= 35 && !g.flags.onlineCourse,
+      choices:[
+        { label:'认真学完一门', hint:'+🧠 +😊', fn: g => { g.flags.onlineCourse=true; return{intel:12,mood:8,money:-500}; }},
+        { label:'继续买课', hint:'-💰', fn: g => { g.flags.onlineCourse=true; return{intel:3,money:-2000,mood:-3}; }},
+        { label:'退掉没看的', hint:'+💰 +🧠', fn: g => { g.flags.onlineCourse=true; return{money:1000,intel:5}; }},
+      ]},
+    { id:'mentor_found_v3', icon:'👨‍🏫', title:'遇到贵人',
+      body:'你在一次行业沙龙上遇到了一个人。\n\n他不是大老板，也不是行业大佬——他只是一个比你早走了5年路的前辈。\n\n他跟你说了三句话改变了你：\n1.「不要做所有人都能做的事。」\n2.「人脉不是你认识谁——是谁认识你。」\n3.「年轻人最大的资本不是时间——是试错的机会。」\n\n你们加了微信。从此以后，你每次迷茫的时候都会找他聊聊。\n\n"人生路上，遇到一个好导师，比遇到十个好机会更重要。"',
+      cond: g => g.age >= 24 && g.age <= 35 && g.social >= 30 && !g.flags.mentorFound,
+      choices:[
+        { label:'拜师学艺', hint:'+🧠 +👥', fn: g => { g.flags.mentorFound=true; return{intel:10,social:8,mood:10}; }},
+        { label:'加了微信但没联系', hint:'', fn: g => { g.flags.mentorFound=true; return{social:3}; }},
+        { label:'自己也能行', hint:'+🧠', fn: g => { return{intel:3,mood:-3}; }},
+      ]},
+    { id:'public_speech', icon:'🎤', title:'第一次公开演讲',
+      body:'公司让你做一次内部分享。\n\n你准备了两周。PPT改了8遍。你对着镜子练了20次。\n\n演讲那天，你站在台上——腿在抖。你的声音开始发抖。\n\n然后你看到了台下有人在玩手机。你突然放松了：反正也没人认真听。\n\n你讲完了。掌声不大。但你的领导说：「不错，下次公司年会你也来讲。」\n\n"公开演讲是人类最大的恐惧之一——甚至超过死亡。所以站在台上就已经是胜利了。"',
+      cond: g => g.age >= 23 && g.job !== '待业中' && !g.flags.publicSpeech,
+      choices:[
+        { label:'以后多练习', hint:'+✨ +🧠', fn: g => { g.flags.publicSpeech=true; return{charm:10,intel:5,mood:8}; }},
+        { label:'再也不来了', hint:'-✨', fn: g => { g.flags.publicSpeech=true; return{mood:-5,charm:-3}; }},
+        { label:'报了演讲课', hint:'+✨ -💰', fn: g => { g.flags.publicSpeech=true; return{charm:12,mood:5,money:-3000}; }},
+      ]},
+    { id:'night_school', icon:'🌙', title:'夜校充电',
+      body:'你报了社区的夜校。\n\n每周二、四晚上7点到9点。学费一学期200块。课程：Excel高级应用。\n\n你的同学有：外卖小哥、全职妈妈、退休大爷、刚毕业的大学生。\n\n你发现：这些「失败者」比大厂的精英们更认真。因为他们是真心想学——不是为了KPI。\n\n学期结束的时候，你拿到了结业证书。虽然这张证书可能一文不值——但你学到的东西不会。\n\n"夜校是大城市最被低估的宝藏——便宜、实用、还有一群和你一样想改变命运的人。"',
+      cond: g => g.age >= 22 && g.age <= 40 && !g.flags.nightSchool,
+      choices:[
+        { label:'继续报下一期', hint:'+🧠 +👥', fn: g => { g.flags.nightSchool=true; return{intel:10,social:8,mood:5,money:-200}; }},
+        { label:'自学也行', hint:'+🧠', fn: g => { g.flags.nightSchool=true; return{intel:8,mood:3}; }},
+        { label:'坚持不下来', hint:'', fn: g => { return{mood:-3}; }},
+      ]},
+    { id:'startup_invite', icon:'🚀', title:'创业公司挖你',
+      body:'一家创业公司的创始人找到你：「来我们这里吧！期权、弹性工作、扁平管理！」\n\n你看了看他的BP（商业计划书）：预计明年上市。你看了看他的办公室：共享工位。\n\n你的纠结：\n留在大公司：稳定、有保障、但像个螺丝钉。\n去创业公司：可能暴富、可能倒闭、但至少刺激。\n\n"创业公司给你的不是工作——是一张彩票。你可能中大奖，也可能血本无归。但至少你买了。"',
+      cond: g => g.age >= 24 && g.age <= 35 && g.job !== '待业中' && !g.flags.startupInvite,
+      choices:[
+        { label:'加入创业公司', hint:'+💰 +🧠 -❤️', fn: g => { g.flags.startupInvite=true; if(Math.random()>0.6){g.flags.entrepreneur=true;setJob(g,'联合创始人',10000);return{intel:10,mood:15,health:-5};} setJob(g,'创业公司员工',8000); return{intel:8,mood:5,health:-5}; }},
+        { label:'还是留在大公司', hint:'', fn: g => { return{mood:-3}; }},
+        { label:'兼职顾问', hint:'+💰 +🧠', fn: g => { g.flags.startupInvite=true; return{money:3000,intel:5,social:5}; }},
+      ]},
+    { id:'imposter_syndrome_v2', icon:'🎭', title:'冒充者综合征',
+      body:'你升职了。但你一点也不开心。\n\n你总觉得：我不配。我只是一个运气好的人。迟早有一天他们会发现我其实什么都不行。\n\n你查了查——这叫「冒充者综合征」。70%的成功者都有过这种感觉。\n\n你的领导说：「你是凭实力上来的。」\n你的内心说：「是吗？那你为什么开会的时候不敢发言？」\n\n"冒充者综合征不是病——是你太在意自己做得够不够好。这本身就是一种实力。"',
+      cond: g => g.age >= 25 && g.job !== '待业中' && g.intel >= 60 && !g.flags.imposterSyndrome,
+      choices:[
+        { label:'接受不完美的自己', hint:'+😊 +🧠', fn: g => { g.flags.imposterSyndrome=true; return{mood:12,intel:5}; }},
+        { label:'用行动证明自己', hint:'+💰 -❤️', fn: g => { g.flags.imposterSyndrome=true; return{money:2000,health:-3,mood:3}; }},
+        { label:'去看心理咨询师', hint:'+😊 -💰', fn: g => { g.flags.imposterSyndrome=true; g.flags.therapyVisit=true; return{mood:10,money:-500}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -7074,6 +7155,17 @@ const ACHIEVEMENTS = [
     { id:'night_rider_v2', icon:'🚕', name:'夜归人', desc:'深夜打车回家', check: g => g.flags.lateNightTaxi },
     { id:'weekend_alone', icon:'☕', name:'周末独行侠', desc:'学会了一个人过周末', check: g => g.flags.weekendSolo },
     { id:'urban_guide', icon:'🎯', name:'都市生存专家', desc:'总结了生存指南', check: g => g.flags.urbanSurvival },
+    // === v12.8 新增成就 ===
+    { id:'kaogong_warrior_v2', icon:'⚔️', name:'考公战士', desc:'参加了公务员考试', check: g => g.flags.kaogongWar },
+    { id:'mba_graduate_v2', icon:'🎓', name:'MBA学员', desc:'决定读MBA', check: g => g.flags.mbaDream },
+    { id:'cert_collector', icon:'📜', name:'考证达人', desc:'疯狂考取各种证书', check: g => g.flags.certCollection },
+    { id:'career_changer_v3', icon:'🔄', name:'转行勇士', desc:'勇敢换了行业', check: g => g.flags.careerSwitch },
+    { id:'course_addict', icon:'💻', name:'网课达人', desc:'沉迷在线学习', check: g => g.flags.onlineCourse },
+    { id:'mentee_v2', icon:'👨‍🏫', name:'拜师学艺', desc:'找到了人生导师', check: g => g.flags.mentorFound },
+    { id:'public_speaker', icon:'🎤', name:'演讲者', desc:'完成了公开演讲', check: g => g.flags.publicSpeech },
+    { id:'night_student', icon:'🌙', name:'夜校学员', desc:'在社区夜校充电', check: g => g.flags.nightSchool },
+    { id:'startup_joiner', icon:'🚀', name:'创业参与者', desc:'加入了创业公司', check: g => g.flags.startupInvite },
+    { id:'imposter_healer', icon:'🎭', name:'自我和解', desc:'面对了冒充者综合征', check: g => g.flags.imposterSyndrome },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -7261,6 +7353,9 @@ const ENDINGS = [
     // --- v12.7 NEW ENDINGS ---
     { id:'urban_settler_end', badge:'🏠', title:'城市扎根者', desc:'你终于在大城市扎下了根。\n\n从合租到独居，从隔断间到两室一厅。你搬了7次家，换了3份工作，熬过了无数个加班的深夜。\n\n你的冰箱里终于不只有老干妈了——你自己做的红烧肉，味道快赶上你妈了。\n\n你的邻居不再吵闹了——因为你买了一套房。\n\n你站在新家的阳台上看着夜景。那些灯火里，终于有一盏是你的了。\n\n"大城市不相信眼泪——但大城市尊重坚持。"', cond: g => g.flags.soloLiving && g.flags.apartmentHunting && g.flags.urbanSurvival && g.money >= 50000 && g.age >= 30 },
     { id:'night_city_end', badge:'🌃', title:'深夜城市人', desc:'你爱上了大城市的深夜。\n\n凌晨的兰州拉面、深夜的出租车、24小时便利店、加班后空旷的写字楼。\n\n你认识了这个城市最真实的一面——不是白天光鲜亮丽的CBD，而是深夜疲惫但温暖的街角。\n\n你成了一个「夜猫子」——不是因为不困，是因为深夜的你最像你自己。\n\n"大城市的深夜属于两种人：失眠的人和真实的人。"', cond: g => g.flags.midnightSnack && g.flags.lateNightTaxi && g.age >= 26 },
+    // --- v12.8 NEW ENDINGS ---
+    { id:'lifelong_learner_end', badge:'📚', title:'终身学习者', desc:'你成了一个「学习怪人」。\n\n你考过公、读过MBA、上过夜校、刷过网课。你的证书摆满了书架。你的笔记本写了一摞又一摞。\n\n你最终没有成为任何一个领域的专家——但你成了所有领域都懂一点的「通才」。\n\n你的同事遇到任何问题都会来找你：「你好像什么都懂一点？」\n你笑着说：「我只是比你们多花了一点点时间在学习。」\n\n"学习的意义不在于成为专家——在于永远保持对世界的好奇。"', cond: g => g.flags.onlineCourse && g.flags.nightSchool && g.intel >= 80 && g.age >= 30 },
+    { id:'brave_changer_end', badge:'🔄', title:'勇敢转身的人', desc:'你在大城市换了三次行业。\n\n从工程师到产品经理到培训师。每一次转行，都有人说你疯了。\n\n但你终于找到了自己热爱的事——不是因为它是最好的，而是因为你做的时候最开心。\n\n你爸说：「你这辈子能不能稳定一点？」\n你说：「爸，不稳定才是我的稳定。」\n\n"人生最大的风险不是选错路——是不敢走路。"', cond: g => g.flags.careerSwitch && g.flags.startupInvite && g.mood >= 60 && g.age >= 30 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
