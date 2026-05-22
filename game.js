@@ -1541,6 +1541,107 @@ const EVENTS = [
         { label:'买更多健康设备', hint:'-💰 +❤️', fn: g => ({money:-2000,health:5,mood:3}) },
         { label:'算了，眼不见心不烦', hint:'-❤️', fn: g => ({health:-5,mood:-3}) },
       ]},
+    // ===== v2.21: SOCIAL NEWS EXPANSION =====
+    { id:'mortgage_default', icon:'🏚️', title:'断供危机',
+      body:'你买的房子跌价了。当初300万买的，现在只值200万。\n\n更糟的是：你失业了，房贷每月15000，已经三个月没交。\n\n银行打来电话："再不还款，我们就拍卖房子。"\n\n你算了一下：卖掉房子还要倒贴银行50万。\n\n"房子是资产？不，房子是负债——而且是你最大的负债。"',
+      cond: g => g.flags.hasHouse && g.money<-20000 && !g.flags.mortgageDefault,
+      choices:[
+        { label:'跟银行协商延期', hint:'🎲 +🧠', fn: g => { g.flags.mortgageDefault=true; if(Math.random()>0.5){return{mood:10,intel:5}}else{return{mood:-20,money:-10000}} }},
+        { label:'卖掉房子止损', hint:'-💰💰 +😊', fn: g => { g.flags.mortgageDefault=true; g.flags.hasHouse=false; return{money:-80000,mood:15,health:-10}; }},
+        { label:'断供，让银行收走', hint:'-💰 -😊', fn: g => { g.flags.mortgageDefault=true; g.flags.hasHouse=false; return{money:-50000,mood:-30,social:-10,health:-15}; }},
+        { label:'借钱硬撑', hint:'-💰 -❤️', fn: g => { g.flags.mortgageDefault=true; return{money:-30000,health:-10,mood:-15}; }},
+      ]},
+    { id:'unfinished_building', icon:'🏗️', title:'烂尾楼维权',
+      body:'你买的期房烂尾了。开发商跑路，工地停工，你的100万首付打了水漂。\n\n你加入维权群，发现里面有300多人，有人已经等了3年。\n\n你们去售楼处拉横幅，被保安赶了出来。你们去政府上访，被"维稳"了。\n\n"你买的不是房子，是薛定谔的房子——在交房之前，它既存在又不存在。"',
+      cond: g => g.flags.hasHouse && !g.flags.unfinishedBuilding && g.age>=28 && Math.random()>0.6,
+      choices:[
+        { label:'坚持维权', hint:'+👥 -😊 -❤️', fn: g => { g.flags.unfinishedBuilding=true; g.relationships.friends = clamp((g.relationships.friends||40)+10, 0, 100); return{social:10,mood:-25,health:-10,money:-50000}; }},
+        { label:'认栽，重新攒钱', hint:'+🧠 -💰', fn: g => { g.flags.unfinishedBuilding=true; g.flags.hasHouse=false; return{intel:10,mood:-20,money:-100000}; }},
+        { label:'找律师打官司', hint:'-💰 🎲', fn: g => { g.flags.unfinishedBuilding=true; g.flags.hasHouse=false; if(Math.random()>0.7){return{money:-20000,mood:10,intel:8}}else{return{money:-150000,mood:-30}} }},
+      ]},
+    { id:'youth_unemployment', icon:'📊', title:'青年失业率',
+      body:'新闻说：青年失业率已经超过20%。也就是说，每5个年轻人里就有1个找不到工作。\n\n你看了看自己的简历：985本科、3年工作经验、掌握5种技能。\n\n你投了100份简历，收到3个面试，0个offer。\n\nHR说："你很优秀，但我们想要更年轻的——更便宜的。"\n\n"你不是找不到工作，是找不到配得上你的工作。"',
+      cond: g => g.job==='待业中' && g.age>=22 && g.age<=30 && g.intel>60,
+      choices:[
+        { label:'降低预期，先干着', hint:'+💰 -😊', fn: g => { g.flags.tookOffGown=true; setJob(g,'外卖骑手',6000); return{mood:-10,health:5}; }},
+        { label:'继续找，不将就', hint:'+😊 -💰', fn: g => ({mood:5,money:-5000}) },
+        { label:'考公务员', hint:'+🧠 -💰', fn: g => { g.flags.kaogongPrep=true; return{intel:10,mood:-5,money:-3000}; }},
+        { label:'回家啃老', hint:'+😊 -✨', fn: g => { g.flags.fullTimeChild=true; return{mood:10,charm:-10,social:-5}; }},
+      ]},
+    { id:'kong_yiji', icon:'👔', title:'孔乙己的长衫',
+      body:'你在网上看到一篇文章："孔乙己的长衫，是当代年轻人的枷锁。"\n\n你读了985，学了金融，但你找不到对口的工作。你不愿意做"低端"工作，但"高端"工作不要你。\n\n你妈说："读了那么多书，连个工作都找不到？"\n\n你想说：不是找不到，是不想将就。\n\n"学历是孔乙己的长衫，脱不下是面子，脱下了是生活。"',
+      cond: g => g.background==='cs' || g.background==='liberal' || g.background==='returnee' && g.job==='待业中' && g.age>=24 && !g.flags.tookOffGown,
+      choices:[
+        { label:'脱下长衫，脚踏实地', hint:'+💰 +🧠 -✨', fn: g => { g.flags.tookOffGown=true; setJob(g,'社区运营',7000); return{intel:5,mood:10,charm:-5}; }},
+        { label:'继续穿长衫，等机会', hint:'+😊 -💰', fn: g => ({mood:5,money:-8000}) },
+        { label:'考研/留学镀金', hint:'-💰 +🧠', fn: g => ({money:-50000,intel:15,mood:-10}) },
+        { label:'做自媒体，知识变现', hint:'🎲 +✨', fn: g => { if(Math.random()>0.6){g.flags.influencer=true;return{money:10000,charm:15,mood:15}}else{return{money:-5000,mood:-10}} }},
+      ]},
+    { id:'full_time_child', icon:'🏠', title:'全职儿女',
+      body:'你辞职了，回了老家。你妈给你做饭，你爸给你零花钱。\n\n你每天的生活：睡到自然醒，刷手机，看剧，偶尔帮爸妈做家务。\n\n邻居问："你孩子在哪里工作？"\n你妈说："在家休息呢。"\n\n你听到了，心里一酸。\n\n"全职儿女不是啃老，是gap year——无限期的gap year。"',
+      cond: g => g.flags.fullTimeChild && !g.flags.fullTimeChildHandled && g.age>=24 && g.age<=32,
+      choices:[
+        { label:'开始学技能，准备复出', hint:'+🧠 +😊', fn: g => { g.flags.fullTimeChildHandled=true; return{intel:12,mood:10,health:5}; }},
+        { label:'帮爸妈开店，积累经验', hint:'+💰 +👥', fn: g => { g.flags.fullTimeChildHandled=true; g.flags.entrepreneur=true; return{money:8000,social:10,mood:8}; }},
+        { label:'继续躺平', hint:'+😊 -💰', fn: g => { g.flags.fullTimeChildHandled=true; g.flags.lyingFlat=true; return{mood:15,money:-5000,social:-10}; }},
+        { label:'考公务员', hint:'+🧠 -💰', fn: g => { g.flags.fullTimeChildHandled=true; g.flags.kaogongPrep=true; return{intel:10,mood:-5,money:-3000}; }},
+      ]},
+    { id:'kaogong_fever', icon:'📚', title:'考公上岸',
+      body:'你准备了1年，终于考上了公务员。\n\n当你在公示名单上看到自己的名字时，你哭了。\n\n你妈在电话里说："终于稳定了，妈放心了。"\n\n你的同学说："恭喜你，铁饭碗。"\n\n你想说：这不是铁饭碗，是金饭碗——在这个不确定的时代。\n\n"宇宙的尽头是编制——但编制不是宇宙的终点。"',
+      cond: g => g.flags.kaogongPrep && !g.flags.civilServant && g.age>=24 && g.intel>65 && Math.random()>0.4,
+      choices:[
+        { label:'接受，开始体制内生活', hint:'+💰 +😊 +🧠', fn: g => { g.flags.civilServant=true; setJob(g,'公务员',9000); g.relationships.family = clamp((g.relationships.family||60)+15, 0, 100); return{mood:25,money:5000,intel:5,social:10}; }},
+        { label:'放弃，还是想去大厂', hint:'+💰 -😊', fn: g => { return{money:3000,mood:-10}; }},
+      ]},
+    { id:'workplace_pua', icon:'😤', title:'职场PUA',
+      body:'你的领导又开始了："你这个年纪，不努力就废了。""别人都能加班，为什么你不行？""公司给你机会，你要感恩。"\n\n你开始怀疑：是不是我真的不行？是不是我太矫情了？\n\n你查了一下"职场PUA"的定义：通过贬低、否定、打压来控制员工。\n\n"PUA不只是在恋爱里，职场里更常见——而且你还不能分手。"',
+      cond: g => g.job!=='待业中' && g.mood<50 && g.age>=23 && g.age<=35 && !g.flags.workplacePUA,
+      choices:[
+        { label:'收集证据，准备仲裁', hint:'+🧠 +👥', fn: g => { g.flags.workplacePUA=true; return{intel:10,social:5,mood:5}; }},
+        { label:'骑驴找马，准备跳槽', hint:'+💰 +😊', fn: g => { g.flags.workplacePUA=true; return{money:5000,mood:10,intel:5}; }},
+        { label:'硬刚，当场怼回去', hint:'+😊 -👥', fn: g => { g.flags.workplacePUA=true; return{mood:20,social:-15,charm:5}; }},
+        { label:'忍着，为了房贷', hint:'-😊 -❤️', fn: g => { g.flags.workplacePUA=true; return{mood:-20,health:-10}; }},
+      ]},
+    { id:'marriage_corner', icon:'💑', title:'相亲角',
+      body:'你妈带你去了人民公园相亲角。这里像菜市场，但卖的是人。\n\n每个人的"产品说明书"：年龄、身高、学历、房产、收入。\n\n一个大妈看了你的资料："985？有房吗？有车吗？年薪多少？"\n\n你说："我有梦想。"\n\n大妈笑了："梦想不能当彩礼。"\n\n"相亲角把爱情变成了交易——但交易至少明码标价。"',
+      cond: g => g.age>=28 && g.age<=38 && !g.flags.married && g.social>30 && !g.flags.marriageCorner,
+      choices:[
+        { label:'认真对待，扩大社交圈', hint:'🎲 +👥', fn: g => { g.flags.marriageCorner=true; if(Math.random()>0.5){g.flags.inRelationship=true;return{mood:15,social:12,charm:5}}else{return{social:8,mood:-5}} }},
+        { label:'应付一下，让妈开心', hint:'+😊 -👥', fn: g => { g.flags.marriageCorner=true; g.relationships.family = clamp((g.relationships.family||60)+10, 0, 100); return{mood:-5,social:-3}; }},
+        { label:'拒绝，我的人生我做主', hint:'+😊 +✨ -👥', fn: g => { g.flags.marriageCorner=true; return{mood:10,charm:8,social:-10}; }},
+      ]},
+    { id:'school_district_house', icon:'🏫', title:'学区房',
+      body:'你的孩子要上小学了。好的学校要学区房，学区房要800万。\n\n你算了算：卖掉现在的房子，加上所有存款，还差200万。\n\n你老婆说："为了孩子，值。"\n\n你爸说："我们那会儿哪有学区房？不也长大了？"\n\n"学区房是中国家长的军备竞赛——没有最卷，只有更卷。"',
+      cond: g => g.flags.hasChild && g.flags.hasHouse && g.age>=32 && !g.flags.schoolDistrictHouse,
+      choices:[
+        { label:'买！为了孩子', hint:'-💰💰💰 +😊', fn: g => { g.flags.schoolDistrictHouse=true; return{money:-200000,mood:20,social:5}; }},
+        { label:'上普通学校，省钱', hint:'+💰 +🧠 -😊', fn: g => { g.flags.schoolDistrictHouse=true; return{money:30000,intel:5,mood:-15}; }},
+        { label:'送孩子上私立', hint:'-💰💰 +✨', fn: g => { g.flags.schoolDistrictHouse=true; return{money:-150000,charm:10,mood:10}; }},
+      ]},
+    { id:'tiger_parenting', icon:'📖', title:'鸡娃',
+      body:'你的孩子3岁了。你的朋友们已经开始"鸡娃"了：\n\n- 英语启蒙：2万/年\n- 钢琴课：3万/年\n- 马术课：5万/年\n- 编程课：1万/年\n- 游学：10万/年\n\n总计：21万/年。你的年收入是……\n\n"鸡娃是家长的焦虑，孩子的童年——都在内卷中消失了。"',
+      cond: g => g.flags.hasChild && g.age>=30 && !g.flags.tigerParenting,
+      choices:[
+        { label:'鸡！不能输在起跑线', hint:'-💰💰 +🧠 -😊', fn: g => { g.flags.tigerParenting=true; return{money:-100000,mood:-10,health:-5}; }},
+        { label:'佛系养娃，快乐就好', hint:'+😊 +❤️', fn: g => { g.flags.tigerParenting=true; return{mood:15,health:5,social:5}; }},
+        { label:'自己教，省钱又亲子', hint:'+🧠 +👥', fn: g => { g.flags.tigerParenting=true; g.relationships.family = clamp((g.relationships.family||60)+10, 0, 100); return{intel:8,social:8,mood:10}; }},
+      ]},
+    { id:'consumption_downgrade', icon:'📉', title:'消费降级',
+      body:'你开始消费降级了：\n\n- 咖啡：从星巴克→瑞幸→速溶→白开水\n- 外卖：从海底捞→麦当劳→沙县→自己做饭\n- 衣服：从Zara→优衣库→拼多多→旧衣服\n- 娱乐：从旅游→电影→刷短视频→睡觉\n\n你发现：省下来的钱，够你多活3个月。\n\n"消费降级不是穷，是觉醒——你终于分清了需要和想要。"',
+      cond: g => g.money<30000 && !g.flags.minimalist && g.age>=25,
+      choices:[
+        { label:'彻底极简主义', hint:'+💰 +🧠 +😊', fn: g => { g.flags.minimalist=true; return{money:8000,intel:8,mood:10}; }},
+        { label:'只降不必要的', hint:'+💰 +😊', fn: g => { g.flags.minimalist=true; return{money:5000,mood:8}; }},
+        { label:'偶尔奖励自己', hint:'+😊 -💰', fn: g => ({mood:10,money:-2000}) },
+      ]},
+    { id:'digital_refugee', icon:'📱', title:'数字鸿沟',
+      body:'你爸打电话来："那个健康码怎么弄？""怎么网上挂号？""怎么用手机支付？"\n\n你教了他5遍，他还是不会。\n\n你说："爸，你学学吧，现在不用手机啥也干不了。"\n\n他说："我老了，学不会了。"\n\n你突然意识到：数字化时代，老年人成了"数字难民"。\n\n"科技进步了，但有些人被留在了昨天。"',
+      cond: g => g.age>=28 && g.intel>50 && !g.flags.digitalRefugee,
+      choices:[
+        { label:'耐心教，写操作手册', hint:'+👥 +🧠 +😊', fn: g => { g.flags.digitalRefugee=true; g.relationships.family = clamp((g.relationships.family||60)+15, 0, 100); return{social:10,intel:5,mood:15}; }},
+        { label:'帮他们装好所有App', hint:'+👥 +😊', fn: g => { g.flags.digitalRefugee=true; g.relationships.family = clamp((g.relationships.family||60)+10, 0, 100); return{social:8,mood:10}; }},
+        { label:'算了，他们需要的时候找你', hint:'+😊', fn: g => { g.flags.digitalRefugee=true; return{mood:5}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -1595,6 +1696,15 @@ const ACHIEVEMENTS = [
     { id:'side_hustle', icon:'💡', name:'斜杠青年', desc:'开始做副业', check: g => g.flags.sideHustle },
     { id:'long_timer', icon:'📅', name:'老员工', desc:'在同一家公司工作超过3年', check: g => g.job!=='待业中' && g.months>36 },
     { id:'challenge_master', icon:'🎯', name:'挑战达人', desc:'完成10个每日挑战', check: g => { const c = JSON.parse(localStorage.getItem('cityDrifters_challenges')||'[]'); return c.length>=10; }},
+    // v2.21 achievements
+    { id:'mortgage_survivor', icon:'🏚️', name:'房贷幸存者', desc:'经历过断供危机', check: g => g.flags.mortgageDefault },
+    { id:'unfinished_building_fighter', icon:'🏗️', name:'维权斗士', desc:'参与过烂尾楼维权', check: g => g.flags.unfinishedBuilding },
+    { id:'full_time_child', icon:'🏠', name:'全职儿女', desc:'回家做全职儿女', check: g => g.flags.fullTimeChild },
+    { id:'kaogong_warrior', icon:'📚', name:'考公战士', desc:'备考公务员', check: g => g.flags.kaogongPrep },
+    { id:'workplace_pua_survivor', icon:'😤', name:'职场PUA幸存者', desc:'经历过职场PUA', check: g => g.flags.workplacePUA },
+    { id:'tiger_parent', icon:'📖', name:'鸡娃家长', desc:'开始鸡娃', check: g => g.flags.tigerParenting },
+    { id:'digital_helper', icon:'📱', name:'数字桥梁', desc:'帮助家人跨越数字鸿沟', check: g => g.flags.digitalRefugee },
+    { id:'school_district_hero', icon:'🏫', name:'学区房勇士', desc:'买了学区房', check: g => g.flags.schoolDistrictHouse },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -1639,6 +1749,12 @@ const ENDINGS = [
     { id:'side_hustle_king', badge:'💡', title:'副业达人', desc:'你的副业收入超过了主业。从独立开发到内容创作，你成了真正的"斜杠青年"。\n\n白天上班摸鱼，晚上副业赚钱。你找到了属于自己的节奏。\n\n有人说你不务正业，但你知道：多条路，多个选择。\n\n"主业是生存，副业是生活。你两者都兼顾了。"', cond: g => g.flags.sideHustle && g.money>=150000 && g.intel>=70 && g.age>=30 },
     { id:'burnout_recovery', badge:'🌱', title:'浴火重生', desc:'你曾经差点过劳死，但你选择了改变。\n\n你辞掉了高薪但高压的工作，找了一份能平衡生活的工作。\n\n现在的你：准点下班，周末爬山，晚上陪家人。\n\n"人生不是百米冲刺，是马拉松。你学会了配速。"', cond: g => g.health>=70 && g.mood>=70 && g.flags.healthyLifestyle && g.age>=40 && g.consecutiveOvertime===0 },
     { id:'pet_parent', badge:'🐾', title:'铲屎官人生', desc:'你和你的宠物成了最好的朋友。\n\n每天下班回家，它都在门口等你。周末你们一起窝在沙发上，你看剧，它睡觉。\n\n有人说："养宠物不如养孩子。"但你知道：它不会叛逆，不会催婚，不会借钱。\n\n"有猫/狗的人生，是最好的人生。"', cond: g => g.flags.hasPet && g.mood>=65 && g.relationships.partner<50 && g.age>=30 },
+    // --- v2.21 NEW ENDINGS ---
+    { id:'mortgage_default_end', badge:'🏚️', title:'断供人生', desc:'你的房子被银行收走了。你从有房一族变回了租客。\n\n你搬出小区的那天，回头看了一眼：那个你曾经以为属于你，但永远不属于你的家。\n\n"房子是租的，但生活不是——虽然有时候生活也是租的。"\n\n你重新开始攒钱，重新开始生活。至少，你不用再还房贷了。', cond: g => g.flags.mortgageDefault && g.flags.hasHouse===false && g.money<-50000 && g.age>=30 },
+    { id:'full_time_child_end', badge:'🏠', title:'全职儿女', desc:'你选择了回家，做爸妈的"全职儿女"。\n\n你帮他们做饭、打扫、陪他们聊天。你妈说："你回来就好，妈养你。"\n\n有人说你是啃老，有人说你是gap。你不在乎。\n\n"不是每个人都要在大城市拼命。回家，也是一种选择。"\n\n你找到了属于自己的节奏：慢一点，暖一点。', cond: g => g.flags.fullTimeChild && g.flags.lyingFlat && g.relationships.family>=75 && g.mood>=60 && g.age>=28 },
+    { id:'kaogong_success', badge:'🎉', title:'考公上岸', desc:'你考上了公务员，成了"体制内"的人。\n\n你妈逢人就夸："我孩子在政府上班！"你爸在酒桌上第一次主动敬了你一杯。\n\n你的朋友圈从加班照变成了食堂照，从咖啡变成了茶。\n\n"宇宙的尽头是编制——你终于找到了你的宇宙。"\n\n虽然工资不高，但稳定，在这个不确定的时代，稳定本身就是一种奢侈。', cond: g => g.flags.civilServant && g.mood>=65 && g.money>=30000 && g.age>=26 },
+    { id:'kong_yiji_end', badge:'📚', title:'孔乙己', desc:'你读了很多书，但你找不到"配得上"你的工作。\n\n你不愿意做"低端"工作，但"高端"工作不要你。你成了当代孔乙己：站着喝酒而穿长衫的唯一的人。\n\n"学历是孔乙己的长衫，脱不下是面子，脱下了是生活。"\n\n你还在等，等一个配得上你学历的机会。也许它会来，也许不会。', cond: g => !g.flags.tookOffGown && g.job==='待业中' && g.intel>=75 && g.age>=28 && g.mood<45 },
+    { id:'digital_nomad_senior', badge:'🌏', title:'数字游民（资深）', desc:'你成了资深数字游民。你的办公室是全世界：清迈、巴厘岛、里斯本、墨西哥城。\n\n你的收入是美元，你的生活成本是泰铢，你的朋友圈是全球。\n\n"不是逃离，是选择另一种活法——一种不被国界限制的活法。"\n\n你在Instagram上发了张海边的照片，配文："Office for today."\n\n虽然你偶尔也会想念家乡的火锅和父母的唠叨。', cond: g => g.flags.lyingFlat && g.flags.freelancer && g.money>=120000 && g.intel>=70 && g.charm>=60 && g.age>=30 && g.age<=42 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
@@ -2152,11 +2268,11 @@ function triggerEnding() {
 
 function getEndingRarity(endingId) {
     // Legendary (rare endings that require specific conditions)
-    const legendary = ['fire', 'immigration', 'executive', 'retire_abroad', 'wealthy', 'family_first', 'burnout_recovery'];
+    const legendary = ['fire', 'immigration', 'executive', 'retire_abroad', 'wealthy', 'family_first', 'burnout_recovery', 'digital_nomad_senior'];
     // Rare (hard to achieve)
-    const rare = ['settled', 'startup_end', 'influencer_end', 'digital_nomad', 'karoshi', 'jail', 'social_butterfly_end', 'health_guru', 'side_hustle_king'];
+    const rare = ['settled', 'startup_end', 'influencer_end', 'digital_nomad', 'karoshi', 'jail', 'social_butterfly_end', 'health_guru', 'side_hustle_king', 'kaogong_success'];
     // Uncommon (moderately difficult)
-    const uncommon = ['hometown_hero', 'go_home', 'civil_end', 'ordinary', 'single', 'investment_guru', 'lying_flat_end', 'lonely_death', 'estranged', 'pet_parent'];
+    const uncommon = ['hometown_hero', 'go_home', 'civil_end', 'ordinary', 'single', 'investment_guru', 'lying_flat_end', 'lonely_death', 'estranged', 'pet_parent', 'mortgage_default_end', 'kong_yiji_end', 'full_time_child_end'];
 
     if (legendary.includes(endingId)) return 'legendary';
     if (rare.includes(endingId)) return 'rare';
@@ -2233,7 +2349,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.20' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.21' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
