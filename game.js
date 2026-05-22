@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v5.2
+// 都市浮生记 - Game Engine v5.3
 // ============================================
 
 // === GAME STATE ===
@@ -3092,6 +3092,16 @@ const EVENTS = [
         { label:'学习他们的方式', hint:'+🧠 +✨ +👥', fn: g => { g.flags.digitalParents=true; g.flags.parentingLearner=true; return{intel:10,charm:8,social:10}; }},
         { label:'觉得太假了', hint:'+🧠', fn: g => { g.flags.digitalParents=true; return{intel:5,mood:-3}; }},
       ]},
+    // === v5.3 EVENTS - Gap Year间隔年 ===
+    { id:'gap_year', icon:'🌍', title:'Gap Year',
+      body:'你决定Gap一年：\n\n辞职，旅行，放空，重新思考人生。\n\n但在中国，Gap Year不是"间隔年"，而是"空窗期"。\n\n面试官问："你这半年干嘛去了？"\n你说："调整状态。"\nHR心里想："能力不行被裁了吧。"\n\n"Gap一年比gay一年还严重——中国职场，不欢迎gap过的年轻人。"\n\n但你还是去了。因为你不想30岁时还在问自己："我这辈子到底想要什么？"',
+      cond: g => !g.flags.gapYear && g.age>=23 && g.age<=32 && g.money>30000 && g.job!=='待业中',
+      choices:[
+        { label:'裸辞Gap一年', hint:'+😊 +🧠 +✨ -💰', fn: g => { g.flags.gapYear=true; g.flags.fullGapYear=true; setJob(g,'待业中',0); return{mood:30,intel:15,charm:12,money:-50000}; }},
+        { label:'Gap半年', hint:'+😊 +🧠 -💰', fn: g => { g.flags.gapYear=true; g.flags.halfGapYear=true; setJob(g,'待业中',0); return{mood:20,intel:10,charm:8,money:-30000}; }},
+        { label:'Gap Day（每周休息一天）', hint:'+😊 +❤️', fn: g => { g.flags.gapYear=true; g.flags.gapDay=true; return{mood:12,health:8}; }},
+        { label:'算了，不敢Gap', hint:'+💰 -😊', fn: g => { g.flags.gapYear=true; return{money:2000,mood:-10}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3326,6 +3336,8 @@ const ACHIEVEMENTS = [
     { id:'side_hustle_survivor', icon:'💔', name:'副业幸存者', desc:'经历副业翻车', check: g => g.flags.sideHustleFail },
     // v5.2 achievements
     { id:'digital_child', icon:'👨‍👩‍👧', name:'电子孩子', desc:'关注电子爸妈', check: g => g.flags.digitalParents },
+    // v5.3 achievements
+    { id:'gap_explorer', icon:'🌍', name:'间隔年探索者', desc:'体验Gap Year', check: g => g.flags.gapYear },
 ];
 
 // === ENDINGS === (order matters: first match wins)
