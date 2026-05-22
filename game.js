@@ -1324,6 +1324,87 @@ const EVENTS = [
         { label:'接受现实', hint:'-👥 +😊', fn: g => { g.relationships.friends = clamp((g.relationships.friends||40)-5, 0, 100); return{mood:5}; }},
         { label:'交新朋友', hint:'+👥', fn: g => { g.relationships.friends = clamp((g.relationships.friends||40)+8, 0, 100); return{social:8,mood:5,money:-300}; }},
       ]},
+    // === v2.15 MORE RANDOM EVENTS ===
+    { id:'roommate_drama', icon:'🏠', title:'室友矛盾',
+      body:'你的室友又搞事情了：凌晨3点打游戏开语音、带对象回来过夜不提前说、用了你的锅还不洗。\n\n你想搬走，但押金还没到期。你想忍忍，但忍字头上一把刀。\n\n"合租就像婚姻：需要磨合，也需要底线。"',
+      cond: g => !g.flags.hasHouse && g.age<35 && Math.random()>0.5,
+      choices:[
+        { label:'开诚布公谈一谈', hint:'🎲 +👥', fn: g => { if(Math.random()>0.4){return{mood:15,social:5}}else{return{mood:-10,social:-5}} }},
+        { label:'忍到租期结束', hint:'-😊', fn: g => ({mood:-10,health:-3}) },
+        { label:'直接搬走', hint:'-💰 +😊', fn: g => ({money:-5000,mood:15,health:5}) },
+      ]},
+    { id:'impulse_buy', icon:'🛍️', title:'冲动消费',
+      body:'双十一/618来了，你的购物车已经塞满了"可能有用"的东西。\n\n空气炸锅、筋膜枪、投影仪、Switch、Kindle……\n\n你知道这些东西大概率会吃灰，但折扣实在太诱人了。\n\n"你以为你在省钱，其实你在花钱。"',
+      cond: g => (g.month===6 || g.month===11) && g.money>5000,
+      choices:[
+        { label:'清空购物车！', hint:'-💰 +😊', fn: g => ({money:-8000,mood:20,charm:5}) },
+        { label:'只买最需要的', hint:'-💰 +🧠', fn: g => ({money:-2000,mood:8,intel:3}) },
+        { label:'什么都不买', hint:'+💰 +🧠', fn: g => ({money:500,intel:5,mood:-5}) },
+      ]},
+    { id:'health_check', icon:'🏥', title:'年度体检',
+      body:'公司组织年度体检。你拿到报告，发现好几项指标都亮了黄灯：血脂偏高、尿酸偏高、颈椎曲度变直。\n\n医生说："年轻人，要注意饮食和作息了。"\n\n你点点头，然后中午又点了一份黄焖鸡米饭。\n\n"体检报告是成年人的成绩单——大部分人都不及格。"',
+      cond: g => g.job!=='待业中' && g.months>6 && g.month===3,
+      choices:[
+        { label:'开始健康生活', hint:'+❤️ +😊', fn: g => { g.flags.healthyLifestyle=true; return{health:15,mood:10,money:-2000}; }},
+        { label:'买保健品', hint:'-💰 +❤️', fn: g => ({money:-3000,health:5,mood:-3}) },
+        { label:'假装没看到', hint:'-❤️', fn: g => ({health:-10,mood:-5}) },
+      ]},
+    { id:'nostalgia', icon:'📷', title:'怀旧时刻',
+      body:'你翻到了一张老照片：大学毕业时的合影。大家都笑得很灿烂，眼里都是对未来的期待。\n\n你打开同学群，发现大家已经各奔东西：有人在大厂996，有人在老家考公，有人已经结婚生子。\n\n"青春是一本太仓促的书，我们含着泪一读再读。"',
+      cond: g => g.age>=25 && g.age<=35,
+      choices:[
+        { label:'组织同学聚会', hint:'-💰 +👥', fn: g => { g.relationships.friends = clamp((g.relationships.friends||40)+10, 0, 100); return{social:10,mood:15,money:-1000}; }},
+        { label:'给老朋友打个电话', hint:'+😊', fn: g => { g.relationships.friends = clamp((g.relationships.friends||40)+5, 0, 100); return{mood:10}; }},
+        { label:'收起照片继续生活', hint:'+🧠', fn: g => ({intel:3,mood:5}) },
+      ]},
+    { id:'weekend_dilemma', icon:'🎯', title:'周末怎么过',
+      body:'又是一个周末。你躺在床上刷手机，发现朋友圈里：\n- 同事A在爬山\n- 朋友B在咖啡厅看书\n- 同学C在学烘焙\n- 你：躺着刷他们的朋友圈\n\n"周末是大城市人的奢侈品——但很多人不知道怎么花。"',
+      cond: g => g.job!=='待业中' && g.mood<60,
+      choices:[
+        { label:'出去走走', hint:'+❤️ +😊', fn: g => ({health:8,mood:12,money:-200}) },
+        { label:'学个新技能', hint:'+🧠', fn: g => ({intel:8,mood:5,money:-500}) },
+        { label:'继续躺着', hint:'+❤️ -😊', fn: g => ({health:5,mood:-3}) },
+      ]},
+    { id:'online_argument', icon:'💬', title:'网络对线',
+      body:'你在微博/知乎上和网友吵起来了。话题是关于"年轻人该不该买房"。\n\n你打了500字的回复，又删了，又写了800字，又删了。最后发了句："你是对的。"\n\n"网上吵架，赢了也是输。"',
+      cond: g => g.intel>40 && Math.random()>0.5,
+      choices:[
+        { label:'据理力争', hint:'-😊 -🧠', fn: g => ({mood:-10,intel:-3,health:-2}) },
+        { label:'一笑而过', hint:'+🧠 +😊', fn: g => ({intel:3,mood:5}) },
+        { label:'卸载App', hint:'+🧠 +❤️', fn: g => ({intel:5,health:3,mood:8}) },
+      ]},
+    { id:'found_money', icon:'💵', title:'意外之财',
+      body:'你在路上捡到了一个信封，里面有2000块钱和一张名片。\n\n你站在原地犹豫了5分钟：是交给警察，还是……\n\n"道德和贫穷之间，有时候只隔着一个信封的距离。"',
+      cond: g => Math.random()>0.7 && g.money<30000,
+      choices:[
+        { label:'交给警察', hint:'+😊 +✨', fn: g => ({mood:15,charm:10,social:3}) },
+        { label:'联系失主归还', hint:'+😊 +👥', fn: g => { g.relationships.friends = clamp((g.relationships.friends||40)+5, 0, 100); return{mood:20,social:8,charm:5}; }},
+        { label:'……', hint:'+💰 -😊', fn: g => ({money:2000,mood:-15,charm:-5}) },
+      ]},
+    { id:'mentor_encounter', icon:'🧓', title:'遇见前辈',
+      body:'你在咖啡厅遇到了一位行业前辈。你们聊了起来，他分享了很多经验。\n\n"年轻人，我当年也跟你一样迷茫。后来我发现：迷茫不可怕，不行动才可怕。"\n\n你加了前辈的微信，他说有事可以随时联系。\n\n"有些话，年轻人听不进去——直到自己也变成了前辈。"',
+      cond: g => g.age>=25 && g.age<=35 && g.intel>50,
+      choices:[
+        { label:'定期请教学习', hint:'+🧠 +👥', fn: g => ({intel:12,social:8,mood:10}) },
+        { label:'请前辈吃饭', hint:'-💰 +👥', fn: g => { g.relationships.colleagues = clamp((g.relationships.colleagues||30)+10, 0, 100); return{social:10,mood:8,money:-500}; }},
+        { label:'只是客套一下', hint:'', fn: g => ({mood:3}) },
+      ]},
+    { id:'rent_increase', icon:'📈', title:'房租涨了',
+      body:'房东发来消息："下个月开始房租涨500。"\n\n你问为什么，他说："市场价就是这样。"\n\n你看了看周边的房价，他说的是实话——但你的工资没涨。\n\n"房租是大城市最大的税——而且你还没法抵税。"',
+      cond: g => !g.flags.hasHouse && g.months>12 && Math.random()>0.5,
+      choices:[
+        { label:'接受涨价', hint:'-💰', fn: g => ({mood:-10}) },
+        { label:'换个便宜的房子', hint:'-💰 +😊', fn: g => ({money:-3000,mood:5,health:-3}) },
+        { label:'找室友分摊', hint:'+👥 -😊', fn: g => ({social:5,mood:-5}) },
+      ]},
+    { id:'skill_certification', icon:'📜', title:'考证热',
+      body:'同事们都开始考证了：PMP、AWS认证、CFA、CPA……\n\n你也心动了：多个证，多条路？还是说这只是另一种形式的内卷？\n\n"证多不压身——但考证压钱包和头发。"',
+      cond: g => g.age>=24 && g.age<=40 && g.intel>50 && g.job!=='待业中',
+      choices:[
+        { label:'报班考证', hint:'-💰 +🧠', fn: g => ({money:-10000,intel:15,mood:-5,health:-5}) },
+        { label:'自学试试', hint:'+🧠', fn: g => ({intel:8,mood:3}) },
+        { label:'算了，没时间', hint:'', fn: g => ({mood:-3}) },
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -1755,9 +1836,49 @@ function updateHUD() {
     updBar('bar-social','val-social', G.social, G.social);
     updBar('bar-charm','val-charm', G.charm, G.charm);
 
+    // v2.15: 更新人际关系面板
+    updateRelationshipHUD();
+
     document.getElementById('play-months').textContent = G.months;
     document.getElementById('total-choices').textContent = G.choices;
     document.getElementById('total-events').textContent = G.eventsSeen;
+}
+
+// v2.15: 人际关系HUD更新
+function updateRelationshipHUD() {
+    if (!G.relationships) return;
+    const relBar = (id, val) => {
+        const bar = document.getElementById(`bar-${id}`);
+        const valEl = document.getElementById(`val-${id}`);
+        if (bar) bar.querySelector('.rel-fill').style.width = `${clamp(val,0,100)}%`;
+        if (valEl) valEl.textContent = Math.round(val);
+    };
+    relBar('family', G.relationships.family || 0);
+    relBar('friends', G.relationships.friends || 0);
+    relBar('colleagues', G.relationships.colleagues || 0);
+    // 恋人特殊处理
+    const partnerVal = document.getElementById('val-partner');
+    const partnerBar = document.getElementById('bar-partner');
+    if (G.flags.hasPartner) {
+        if (partnerBar) partnerBar.querySelector('.rel-fill').style.width = `${clamp(G.relationships.partner||0,0,100)}%`;
+        if (partnerVal) partnerVal.textContent = Math.round(G.relationships.partner || 0);
+    } else {
+        if (partnerBar) partnerBar.querySelector('.rel-fill').style.width = '0%';
+        if (partnerVal) partnerVal.textContent = '—';
+    }
+}
+
+// v2.15: 切换人际关系面板显示
+function toggleRelationships() {
+    const content = document.getElementById('relationships-content');
+    const icon = document.getElementById('rel-toggle');
+    if (content.style.display === 'none') {
+        content.style.display = 'grid';
+        icon.classList.add('open');
+    } else {
+        content.style.display = 'none';
+        icon.classList.remove('open');
+    }
 }
 
 function updBar(barId, valId, pct, display) {
@@ -1928,7 +2049,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.14' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.15' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();

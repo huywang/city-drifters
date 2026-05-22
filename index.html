@@ -38,7 +38,7 @@
                 </button>
             </div>
             <div class="title-footer">
-                <span>v2.14</span> · <span>献给每一个在大城市奋斗的你</span>
+                <span>v2.15</span> · <span>献给每一个在大城市奋斗的你</span>
             </div>
         </div>
     </div>
@@ -268,6 +268,48 @@
                 <div class="stat-bar-wrap">
                     <div class="stat-bar" id="bar-charm"><div class="stat-fill fill-charm"></div></div>
                     <span class="stat-val" id="val-charm">50</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- v2.15 人际关系面板 -->
+        <div class="relationships-panel" id="relationships-panel">
+            <div class="relationships-header" onclick="toggleRelationships()">
+                <span>👨‍👩‍👧 人际关系</span>
+                <span class="toggle-icon" id="rel-toggle">▼</span>
+            </div>
+            <div class="relationships-content" id="relationships-content" style="display:none;">
+                <div class="rel-item">
+                    <span class="rel-icon">👨‍👩‍👧</span>
+                    <span class="rel-label">家人</span>
+                    <div class="rel-bar-wrap">
+                        <div class="rel-bar" id="bar-family"><div class="rel-fill fill-family"></div></div>
+                        <span class="rel-val" id="val-family">60</span>
+                    </div>
+                </div>
+                <div class="rel-item">
+                    <span class="rel-icon">🤝</span>
+                    <span class="rel-label">朋友</span>
+                    <div class="rel-bar-wrap">
+                        <div class="rel-bar" id="bar-friends"><div class="rel-fill fill-friends"></div></div>
+                        <span class="rel-val" id="val-friends">40</span>
+                    </div>
+                </div>
+                <div class="rel-item">
+                    <span class="rel-icon">💕</span>
+                    <span class="rel-label">恋人</span>
+                    <div class="rel-bar-wrap">
+                        <div class="rel-bar" id="bar-partner"><div class="rel-fill fill-partner"></div></div>
+                        <span class="rel-val" id="val-partner">—</span>
+                    </div>
+                </div>
+                <div class="rel-item">
+                    <span class="rel-icon">👥</span>
+                    <span class="rel-label">同事</span>
+                    <div class="rel-bar-wrap">
+                        <div class="rel-bar" id="bar-colleagues"><div class="rel-fill fill-colleagues"></div></div>
+                        <span class="rel-val" id="val-colleagues">30</span>
+                    </div>
                 </div>
             </div>
         </div>
