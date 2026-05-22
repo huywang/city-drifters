@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v21.0
+// 都市浮生记 - Game Engine v21.1
 // ============================================
 
 // === GAME STATE ===
@@ -9849,6 +9849,87 @@ const EVENTS = [
         { label:'还在思考中，但有了初步方向', hint:'+🧠 +😊', fn: g => { g.flags.lifePhilosophy=true; return{intel:8,mood:5}; }},
         { label:'想太多不如做太多', hint:'', fn: g => { g.flags.lifePhilosophy=true; return{intel:3}; }},
       ]},
+    // === v21.1 新增事件（城市更新 + 空间记忆 + 城市变迁） ===
+    { id:'old_shop_closing', icon:'🏪', title:'老店关门了', category:'city',
+      body:'你常去的那家面馆关门了。\n\n老板在这条街开了20年。你刚来这个城市的时候，一碗面8块钱。现在涨到18块了——但还是这条街最便宜的。\n\n门上贴着一张手写告示：「房租涨了3倍，实在撑不住了。感谢20年来每一位顾客。」\n\n你站在门口，想起无数个加班后的深夜、发薪日的庆祝、失恋后的独酌——都是在这家面馆度过的。\n\n你的邻居说：「这条街上的老店一家接一家地关了。取而代之的是连锁咖啡店、网红餐厅、无人便利店。」\n\n你发现：城市更新的速度，比你记忆形成的速度还快。也许有一天，你走过这条街，什么都不认识了。\n\n「老店关门：消失的不只是一家店——是你在城市里的一个记忆坐标。」',
+      cond: g => !g.flags.oldShopClosing && g.age >= 22 && g.months >= 24,
+      choices:[
+        { label:'去最后一趟，跟老板好好告别', hint:'+❤️ +😊', fn: g => { g.flags.oldShopClosing=true; g.flags.memoryKeeper=true; return{mood:5,social:3}; }},
+        { label:'拍了照片留作纪念', hint:'+😊', fn: g => { g.flags.oldShopClosing=true; return{mood:3}; }},
+        { label:'有点可惜，但也正常', hint:'', fn: g => { g.flags.oldShopClosing=true; return{mood:2}; }},
+      ]},
+    { id:'greenway_running', icon:'🏃', title:'城市绿道', category:'city',
+      body:'你发现你家附近新建了一条城市绿道——从公园延伸到河边，全长5公里。\n\n你第一次去跑了一圈：两边是树、脚下是塑胶跑道、耳边是鸟叫。你忘记了你在一个有2000万人口的大城市里。\n\n你的同事说：「以前这条河边全是垃圾和违章建筑。政府花了2亿改造，现在成了市民最喜欢的地方。」\n\n你开始在绿道上跑步：早上6点，有老人打太极；晚上8点，有年轻人夜跑；周末，有家庭带着孩子骑行。\n\n你发现：城市不只有钢筋水泥——它也可以有绿色、有温度、有呼吸的空间。\n\n你在绿道上遇到了一个同样跑步的女生。你们开始一起跑。有时候你跑得快，有时候她跑得快。但你们总是会在终点等对方。\n\n「城市绿道：不是修了一条路——是给城市留了一口气。」',
+      cond: g => !g.flags.greenwayRunning && g.age >= 20,
+      choices:[
+        { label:'成了绿道常客，坚持跑步', hint:'+❤️ +😊 +🧠', fn: g => { g.flags.greenwayRunning=true; g.flags.greenwayRunner=true; return{health:10,mood:8,social:5}; }},
+        { label:'偶尔去散步，享受绿色', hint:'+😊 +❤️', fn: g => { g.flags.greenwayRunning=true; return{health:5,mood:8}; }},
+        { label:'去了几次就不去了', hint:'', fn: g => { g.flags.greenwayRunning=true; return{mood:3}; }},
+      ]},
+    { id:'fifteen_min_city', icon:'🏘️', title:'15分钟生活圈', category:'city',
+      body:'你的小区被评为「15分钟生活圈示范点」。\n\n你算了算：从家出发15分钟内——有超市、菜市场、社区医院、幼儿园、公园、图书馆、健身房、社区食堂。\n\n你的一个朋友住在郊区：「你们太幸福了。我买菜要开车20分钟，看病要开车30分钟。」\n\n你开始觉得：城市生活质量不在于城市有多大——而在于你周围15分钟有什么。\n\n城市规划师说：「15分钟生活圈是未来城市的方向——让人们不用跑太远，就能满足日常需求。」\n\n你发现：好的城市规划，不是在造大楼——是在造生活。当你的日常需求都能在步行范围内满足，你就不再是城市的奴隶——而是城市的主人。\n\n「15分钟生活圈：不是缩小城市——是让城市更人性化。」',
+      cond: g => !g.flags.fifteenMinCity && g.age >= 22,
+      choices:[
+        { label:'充分利用15分钟生活圈', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.fifteenMinCity=true; g.flags.localLiving=true; return{mood:8,health:5,intel:3}; }},
+        { label:'确实方便了不少', hint:'+😊', fn: g => { g.flags.fifteenMinCity=true; return{mood:5}; }},
+        { label:'跟我之前差不多', hint:'', fn: g => { g.flags.fifteenMinCity=true; return{mood:2}; }},
+      ]},
+    { id:'pocket_park', icon:'🌳', title:'口袋公园', category:'city',
+      body:'你发现小区拐角处多了一个「口袋公园」——大概只有100平方米，但有长椅、有花、有一棵大树。\n\n以前这里是一个废弃的自行车棚。社区花了10万块改造，现在成了居民最爱的休息地。\n\n你每天下班路过都会坐一会儿。看着大树发呆、听着鸟叫放空。你的同事问你：「你怎么不直接回家？」\n\n你说：「因为这里有树。」\n\n你的一个邻居阿姨说：「以前我们只能在楼道里聊天，现在有了这个地方，大家都愿意出来坐坐。」\n\n你发现：城市不需要很大的公园——有时候100平方米的绿色就够了。一个口袋公园，改变的不是一块地——而是周围人的生活。\n\n「口袋公园：城市最小的善意——是给忙碌的你一个喘气的地方。」',
+      cond: g => !g.flags.pocketPark && g.age >= 20,
+      choices:[
+        { label:'成了口袋公园的常客', hint:'+😊 +❤️', fn: g => { g.flags.pocketPark=true; g.flags.parkRegular=true; return{mood:10,health:3,social:5}; }},
+        { label:'偶尔去坐坐，感觉不错', hint:'+😊', fn: g => { g.flags.pocketPark=true; return{mood:5}; }},
+        { label:'没太大感觉', hint:'', fn: g => { g.flags.pocketPark=true; return{mood:2}; }},
+      ]},
+    { id:'ghost_city', icon:'🏙️', title:'新城与空城', category:'city',
+      body:'你的公司搬到了一个新开发区——号称「未来城市中心」。\n\n你到了才发现：周围全是新建的写字楼和住宅，但人很少。白天像写字楼，晚上像鬼城。\n\n你的同事说：「这里租金便宜，但吃饭要开车10分钟。晚上加班完走在路上，一个人都没有，有点瘆人。」\n\n你查了数据：这个新区规划容纳50万人，目前入住率只有15%。很多楼盘卖出去了，但没有人住——都是投资客买的。\n\n你的一个朋友在这个新区买了房：「我买的时候2万一平，现在1.5万都没人要。说是未来会涨，但我看不到未来。」\n\n你发现：城市不是盖楼——是聚人。没有人气的城市，只是一堆钢筋水泥。\n\n「新城与空城：是城市化的代价——我们建了太多的房子，却忘了建太多的生活。」',
+      cond: g => !g.flags.ghostCity && g.age >= 22 && g.job !== '待业中',
+      choices:[
+        { label:'开始关注城市规划，参与社区建设', hint:'+🧠 +👥', fn: g => { g.flags.ghostCity=true; g.flags.urbanAware=true; return{intel:8,social:5}; }},
+        { label:'有点焦虑，考虑换地方', hint:'-😊', fn: g => { g.flags.ghostCity=true; return{mood:-3,intel:3}; }},
+        { label:'只要工资照发就行', hint:'', fn: g => { g.flags.ghostCity=true; return{}; }},
+      ]},
+    { id:'night_market_v2', icon:'🌃', title:'夜市经济', category:'city',
+      body:'你家附近开了一条夜市街。\n\n各种小吃摊、烧烤架、啤酒桶、叫卖声——烟火气十足。你走了一圈，花了50块吃了一肚子。\n\n你的室友说：「以前这里什么都没有，现在政府搞了夜市经济，晚上热闹多了。」\n\n你发现：夜市的魅力不在于食物多好吃——而在于那种「人间烟火」的感觉。在格子间里待了一天的你，需要一个有温度的地方放松一下。\n\n但你的另一个邻居投诉了：「太吵了、油烟太重了、垃圾太多了。」\n\n你开始理解：城市管理的难度在于——每个人想要的都不一样。有人要烟火气，有人要安静。好的城市，是让每个人都能找到自己想要的。\n\n「夜市经济：是城市最真实的表情——有烟火、有噪音、有人情味。」',
+      cond: g => !g.flags.nightMarket && g.age >= 20,
+      choices:[
+        { label:'成了夜市常客，爱上了烟火气', hint:'+😊 +❤️ -💰', fn: g => { g.flags.nightMarket=true; g.flags.nightMarketFan=true; return{mood:10,social:5,money:-1000}; }},
+        { label:'偶尔去逛逛，挺有意思', hint:'+😊', fn: g => { g.flags.nightMarket=true; return{mood:5}; }},
+        { label:'太吵了，不太喜欢', hint:'', fn: g => { g.flags.nightMarket=true; return{mood:-2}; }},
+      ]},
+    { id:'city_sound_memory', icon:'🔊', title:'城市声音', category:'city',
+      body:'你录了一段声音——你家楼下早上的声音。\n\n卖煎饼的阿姨喊：「煎饼果子，加蛋加肠！」\n送快递的小哥喊：「快递到了！」\n学校广播在放：「同学们，上课时间到了。」\n远处有地铁经过的隆隆声。\n\n你把录音存到了手机里。你不知道为什么要录——但你觉得：如果有一天你离开了这个城市，你会想念这些声音。\n\n你的一个朋友去了国外生活。他说：「我最想念的不是中国菜——是中国的声音。早上楼下叫卖的声音、地铁报站的声音、菜市场的声音。那些声音让我觉得我活着。」\n\n你发现：城市不只是看得见的建筑——还有听得见的声音、闻得到的气味、摸得到的温度。这些才是城市的灵魂。\n\n「城市声音：是你离开后最先想念的东西——也是你回来后最先认出的东西。」',
+      cond: g => !g.flags.citySoundMemory && g.age >= 22 && g.months >= 24,
+      choices:[
+        { label:'开始记录城市的声音和记忆', hint:'+🧠 +❤️ +😊', fn: g => { g.flags.citySoundMemory=true; g.flags.soundCollector=true; return{intel:5,mood:8,social:3}; }},
+        { label:'录了几段，保存起来', hint:'+😊 +❤️', fn: g => { g.flags.citySoundMemory=true; return{mood:5,social:2}; }},
+        { label:'有点感触但没做什么', hint:'', fn: g => { g.flags.citySoundMemory=true; return{mood:3}; }},
+      ]},
+    { id:'urban_renewal_resist', icon:'🏗️', title:'拆迁与留守', category:'city',
+      body:'你的一个朋友住在老城区——那里的房子要被拆了，建商业综合体。\n\n补偿方案是：每平米赔1.2万，或者置换到郊区的新房。\n\n你的朋友说：「我在这条街住了30年。我的孩子在这里出生、我的父母在这里过世。你让我搬到郊区？那里连个说话的人都没有。」\n\n但另一个邻居说：「赶紧签了吧！1.2万一平，我这套60平的老房子能拿到72万。够我在郊区买两套了。」\n\n你看着这条老街：斑驳的墙壁、生锈的晾衣架、歪斜的电线杆。它很旧、很破、很不「现代」——但它是有温度的。\n\n你开始理解：城市更新最大的矛盾不是钱——是记忆。对有些人来说，一个老地方比一套新房子值钱得多。\n\n「拆迁与留守：不是旧与新的对抗——是记忆与利益的博弈。」',
+      cond: g => !g.flags.urbanRenewalResist && g.age >= 25,
+      choices:[
+        { label:'帮朋友记录老街的故事和记忆', hint:'+❤️ +🧠 +👥', fn: g => { g.flags.urbanRenewalResist=true; g.flags.memoryDocumenter=true; return{intel:5,mood:5,social:8}; }},
+        { label:'劝朋友理性看待，接受现实', hint:'+🧠', fn: g => { g.flags.urbanRenewalResist=true; return{intel:3,mood:2}; }},
+        { label:'这是别人的事，跟我没关系', hint:'', fn: g => { g.flags.urbanRenewalResist=true; return{}; }},
+      ]},
+    { id:'city_reading_space', icon:'📚', title:'城市书房', category:'city',
+      body:'你发现小区旁边开了一家「城市书房」——24小时开放、免费、有空调、有WiFi。\n\n你走进去：木质书架、暖色灯光、舒适的沙发。有学生在这里写作业、有白领在这里看书、有老人在这里翻报纸。\n\n管理员说：「这是政府的文化工程。我们不卖书——我们只提供空间。每个人都可以来这里读书、自习、发呆。」\n\n你在这里度过了一个周末的下午。你读了一本一直想读但没时间读的书。你发现：在城市里找到一个安静的、免费的、有温度的空间——是一种奢侈。\n\n你在留言本上写了一句话：「谢谢你，城市书房。你让我在忙碌的城市里找到了一个可以呼吸的地方。」\n\n「城市书房：不是让你多读书——是让你知道，这座城市愿意为安静留一个位置。」',
+      cond: g => !g.flags.cityReadingSpace && g.age >= 20,
+      choices:[
+        { label:'成了城市书房的常客', hint:'+🧠 +😊 +❤️', fn: g => { g.flags.cityReadingSpace=true; g.flags.readingRegular=true; return{intel:10,mood:8}; }},
+        { label:'偶尔去坐坐，看看书', hint:'+🧠 +😊', fn: g => { g.flags.cityReadingSpace=true; return{intel:5,mood:5}; }},
+        { label:'去了一次就不去了', hint:'', fn: g => { g.flags.cityReadingSpace=true; return{intel:2}; }},
+      ]},
+    { id:'city_farewell', icon:'🚂', title:'告别一座城市', category:'city',
+      body:'你决定离开这个城市了。\n\n你已经在这里住了X年。你知道哪条路最堵、哪家面馆最好吃、哪个公园最适合发呆。你在这里笑过、哭过、爱过、失去过。\n\n你最后一次走了一遍你最喜欢的路线：从出租屋出发、经过面馆、穿过公园、走到河边。你把每一个画面都记在了心里。\n\n你的同事说：「你真的要走吗？」\n\n你说：「是啊。但我会回来的——至少回来吃碗面。」\n\n你在火车上看着窗外渐渐远去的城市天际线。你发了最后一条朋友圈：「再见，XX。谢谢你收留了我这么多年。」\n\n你发现：离开一座城市比离开一个人还难——因为城市不会挽留你，但它会用记忆缠住你。\n\n「告别一座城市：不是你离开了它——是它的一部分永远留在了你身上。」',
+      cond: g => !g.flags.cityFarewell && g.age >= 24 && g.months >= 36,
+      choices:[
+        { label:'带着满满的回忆离开了', hint:'+❤️ +😊 -😊', fn: g => { g.flags.cityFarewell=true; g.flags.cityMemory=true; return{mood:5,social:-5}; }},
+        { label:'决定再坚持一下，不走了', hint:'+😊 +❤️', fn: g => { g.flags.cityFarewell=true; g.flags.stayDecision=true; return{mood:8,social:5}; }},
+        { label:'说走就走，不回头', hint:'+🧠', fn: g => { g.flags.cityFarewell=true; return{intel:3}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -10772,6 +10853,12 @@ const ACHIEVEMENTS = [
     { id:'ikigai_ach', icon:'🎯', name:'Ikigai发现者', desc:'找到了活着的理由和方向', check: g => g.flags.foundIkigai },
     { id:'gratitude_ach', icon:'📔', name:'感恩践行者', desc:'通过感恩日记找到了幸福', check: g => g.flags.gratitude },
     { id:'philosopher_ach_v2', icon:'🌟', name:'人生哲学家', desc:'形成了自己的人生哲学', check: g => g.flags.lifePhilosophy && g.flags.personalGrowth },
+    // === v21.1 新增成就（城市更新） ===
+    { id:'greenway_runner_ach', icon:'🏃', name:'绿道跑者', desc:'在城市绿道上坚持跑步', check: g => g.flags.greenwayRunner },
+    { id:'memory_keeper_ach', icon:'🏪', name:'记忆守护者', desc:'用照片和行动守护城市的记忆', check: g => g.flags.memoryKeeper || g.flags.memoryDocumenter },
+    { id:'sound_collector_ach', icon:'🔊', name:'城市声音收藏家', desc:'开始记录城市的声音', check: g => g.flags.soundCollector },
+    { id:'reading_regular_ach', icon:'📚', name:'城市书房常客', desc:'在城市书房找到了阅读的乐趣', check: g => g.flags.readingRegular },
+    { id:'night_market_fan_ach', icon:'🌃', name:'夜市达人', desc:'爱上了城市的烟火气', check: g => g.flags.nightMarketFan },
 ];
 
 // === ENDINGS === (order matters: first match wins)
