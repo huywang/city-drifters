@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v24.3
+// 都市浮生记 - Game Engine v24.4
 // ============================================
 
 // === GAME STATE ===
@@ -11995,6 +11995,87 @@ const EVENTS = [
         { label:'改变了一些习惯，但没完全戒掉', hint:'+❤️', fn: g => { g.flags.healthAnxiety=true; return{health:8,mood:3}; }},
         { label:'焦虑了两周就忘了，该怎样还怎样', hint:'+😊 -❤️', fn: g => { g.flags.healthAnxiety=true; return{mood:5,health:-3}; }},
       ]},
+    // === v24.4: 家庭关系 + 代际冲突 ===
+    { id:'tiger_parenting_v24_4', icon:'🐯', title:'鸡娃教育', category:'social',
+      body:'你的表姐开始「鸡娃」了。\n\n她儿子才5岁，日程表已经排满：\n- 周一：钢琴课\n- 周二：英语外教\n- 周三：编程启蒙\n- 周四：国际象棋\n- 周五：美术\n- 周六：马术\n- 周日：唯一的「休息日」——做奥数题\n\n一年花费：15万。\n\n你问表姐：「他才5岁，不能让他玩吗？」\n\n表姐说：「你知道现在幼升小面试有多卷吗？别人家的孩子都会背100首唐诗了！」\n\n你看着那个5岁的孩子，他的眼神——像极了加班到深夜的你。\n\n你突然意识到：内卷——从5岁就开始了。\n\n「鸡娃：起跑线越来越前——但终点在哪？没人知道。」',
+      cond: g => g.age >= 25 && !g.flags.tigerParenting,
+      choices:[
+        { label:'被影响了，开始规划未来的教育投入', hint:'-💰 +🧠', fn: g => { g.flags.tigerParenting=true; g.flags.educationPlanner=true; g.money -= 5000; return{intel:5,mood:-5}; }},
+        { label:'坚决反对鸡娃，决定给孩子自由', hint:'+😊 +🤝', fn: g => { g.flags.tigerParenting=true; g.flags.freeParenting=true; return{mood:8,social:5}; }},
+        { label:'觉得跟自己没关系，不想这些', hint:'+😊', fn: g => { g.flags.tigerParenting=true; return{mood:3}; }},
+      ]},
+    { id:'family_trauma', icon:'💔', title:'原生家庭', category:'psychology',
+      body:'你在整理东西时翻到了一本童年日记。\n\n里面写着：\n- 「今天考试考了95分，爸爸说不够好」\n- 「妈妈又吵架了，说是因为我」\n- 「我想离家出走」\n- 「为什么别人家的爸妈那么好」\n\n你已经30岁了——但看到这些字，眼泪还是掉了下来。\n\n你开始理解：你现在很多的行为模式——都来自童年。\n\n- 你害怕犯错——因为小时候犯错会被打\n- 你不敢拒绝别人——因为小时候说「不」会被骂\n- 你总在讨好别人——因为小时候只有乖才被爱\n\n你在想：原生家庭的伤——要不要原谅？\n\n「原生家庭：你不是你的错——但你是你的解药。」',
+      cond: g => g.age >= 25 && !g.flags.familyTrauma && g.mood <= 55,
+      choices:[
+        { label:'开始做心理咨询，直面童年创伤', hint:'-💰 +😊 +❤️', fn: g => { g.flags.familyTrauma=true; g.flags.healingJourney=true; g.money -= 5000; return{mood:10,health:5,intel:5}; }},
+        { label:'读了很多心理学的书，自我疗愈', hint:'+🧠 +😊', fn: g => { g.flags.familyTrauma=true; g.flags.selfHealing=true; return{intel:10,mood:5}; }},
+        { label:'把日记扔了，不想再想这些', hint:'-😊', fn: g => { g.flags.familyTrauma=true; return{mood:-5}; }},
+      ]},
+    { id:'marriage_pressure_v24_4', icon:'💍', title:'催婚大战', category:'social',
+      body:'过年回家，又被催婚了。\n\n你妈：「你看你表弟都二胎了，你连对象都没有。」\n你爸：「我们老了，就想看到你成家。」\n你姑：「要不要给你介绍一个？」\n你舅：「再不找就来不及了。」\n\n你感觉自己不是一个「人」——而是一个「未婚问题」。\n\n你试着解释：\n- 「我还没遇到合适的人」→「你太挑了」\n- 「我现在不想结婚」→「你不懂事」\n- 「一个人也挺好的」→「你老了谁管你」\n\n你放弃了。你开始理解：在父母的世界里——不结婚不是一种「病」。\n\n而你——是那个让他们丢脸的「病人」。\n\n「催婚：不是关心——是控制。不是爱——是焦虑。」',
+      cond: g => g.age >= 26 && g.age <= 40 && !g.flags.marriagePressure && !g.flags.married,
+      choices:[
+        { label:'妥协了，开始相亲', hint:'+🤝 -😊', fn: g => { g.flags.marriagePressure=true; g.flags.datingPressure=true; return{social:5,mood:-8}; }},
+        { label:'跟父母大吵一架，表明立场', hint:'-🤝 +😊 +✨', fn: g => { g.flags.marriagePressure=true; g.flags.independenceDeclaration=true; return{social:-5,mood:5,charm:5}; }},
+        { label:'假装在找了，实际上按自己的节奏来', hint:'+😊', fn: g => { g.flags.marriagePressure=true; g.flags.coolHandling=true; return{mood:3,intel:3}; }},
+      ]},
+    { id:'dink_choice', icon:'🚫', title:'丁克人生', category:'psychology',
+      body:'你和另一半认真讨论了一个问题：要不要孩子？\n\n不要孩子的理由：\n- 经济压力大（养一个孩子到大学毕业至少100万）\n- 时间自由（想旅行就旅行）\n- 职业发展不受限\n- 环境焦虑（这个世界的未来……）\n- 看了太多「鸡娃」家庭的焦虑\n\n要孩子的理由：\n- 父母的期望\n- 老了有人照顾\n- 人生的「完整性」\n- 想看看自己养大的孩子是什么样\n\n你们讨论了一整晚。\n\n最后你们做了一个决定——不管别人怎么说，这是你们自己的人生。\n\n「丁克：不是不爱孩子——是更爱自由。或者——更怕责任。」',
+      cond: g => g.age >= 28 && g.age <= 40 && !g.flags.dinkChoice && g.flags.married && !g.flags.hasChild,
+      choices:[
+        { label:'决定丁克，享受二人世界', hint:'+💰 +😊 -🤝', fn: g => { g.flags.dinkChoice=true; g.flags.dinkCouple=true; return{money:5000,mood:10,social:-3}; }},
+        { label:'再想想，暂时不要但不排除以后', hint:'+🧠', fn: g => { g.flags.dinkChoice=true; g.flags.childDelay=true; return{intel:5,mood:3}; }},
+        { label:'还是要吧，不想让父母失望', hint:'+🤝 -💰 -😊', fn: g => { g.flags.dinkChoice=true; g.flags.parentPressure=true; return{social:5,money:-5000,mood:-5}; }},
+      ]},
+    { id:'mother_daughter_war', icon:'👩‍👧', title:'婆媳大战', category:'social',
+      body:'你妈和你老婆/老公——又吵起来了。\n\n起因很小：孩子吃饭该不该追着喂。\n\n但很快就升级了：\n- 「你们这代人什么都不懂」\n- 「你们那套早就过时了」\n- 「你到底站谁那边？」\n\n你夹在中间，左右为难。\n\n帮老婆——你妈说你「有了媳妇忘了娘」。\n帮妈——老婆说你「妈宝」。\n\n你突然理解了：婆媳矛盾——不是两个女人的战争，是一个男人的无能。\n\n或者更准确地说：是两种爱的冲突——一种不肯放手，一种不想被管。\n\n「婆媳关系：世界上最难的工作——是同时当儿子和丈夫。」',
+      cond: g => g.age >= 25 && !g.flags.motherDaughterWar && g.flags.married,
+      choices:[
+        { label:'学会了两边安抚，成了调解高手', hint:'+🤝 +🧠 +😊', fn: g => { g.flags.motherDaughterWar=true; g.flags.familyMediator=true; return{social:10,intel:8,mood:3}; }},
+        { label:'选择站在老婆这边，跟妈保持距离', hint:'+🤝 -🤝', fn: g => { g.flags.motherDaughterWar=true; g.flags.partnerFirst=true; return{social:-3,mood:5}; }},
+        { label:'逃避了，假装什么都没发生', hint:'-😊', fn: g => { g.flags.motherDaughterWar=true; return{mood:-8}; }},
+      ]},
+    { id:'aging_parents_v24_4', icon:'👴', title:'父母老了', category:'psychology',
+      body:'今天视频通话时，你发现你爸的白头发又多了。\n\n你妈说：「你爸上个月摔了一跤，没告诉你。」\n\n你问为什么不告诉你。\n\n你爸说：「你在外面打拼，不想让你担心。」\n\n你挂了电话后，一个人哭了好久。\n\n你开始算：\n- 你一年回家2次，每次5天\n- 你爸妈今年65岁\n- 假设他们活到85岁\n- 你还能见他们——40次\n\n40次。\n\n你跟他们在一起的时间——可能还不如你跟同事在一起的时间多。\n\n你突然觉得——在大城市赚再多钱，也换不回陪父母的时间。\n\n「父母老了：你长大的速度——永远赶不上他们变老的速度。」',
+      cond: g => g.age >= 28 && !g.flags.agingParents,
+      choices:[
+        { label:'增加回家频率，每周视频通话', hint:'+🤝 +😊 -💰', fn: g => { g.flags.agingParents=true; g.flags.familyPriority=true; g.money -= 3000; return{social:10,mood:12}; }},
+        { label:'开始研究父母的养老方案', hint:'+🧠 +🤝', fn: g => { g.flags.agingParents=true; g.flags.elderPlanning=true; return{intel:8,social:5,mood:5}; }},
+        { label:'心里难过但觉得没办法，生活就是这样', hint:'-😊', fn: g => { g.flags.agingParents=true; return{mood:-8}; }},
+      ]},
+    { id:'three_child_policy', icon:'👶', title:'三胎压力', category:'society',
+      body:'国家放开了三胎政策。\n\n你爸妈立刻打来电话：「再生一个吧，三个孩子热闹。」\n\n你看了看自己的：\n- 房贷：每月8000\n- 大宝学费：每月5000\n- 二宝奶粉+尿布：每月3000\n- 生活费：每月5000\n- 你的工资：……\n\n你算了一笔账：生三胎——\n- 孕期+生产：3-5万\n- 月嫂：2万\n- 奶粉+尿布+衣服：每月3000\n- 幼儿园：每月5000\n- 到大学毕业：至少80万\n\n你沉默了。\n\n你爸说：「我们那会儿养5个孩子也没这么费劲。」\n\n你说：「你们那会儿——不用买房、不用补习、不用学区房。」\n\n「三胎：政策放开了——但钱包没放开。」',
+      cond: g => g.age >= 28 && g.age <= 42 && !g.flags.threeChildPolicy && g.flags.hasChild,
+      choices:[
+        { label:'生了！家里热闹一点也好', hint:'+🤝 -💰 -😊', fn: g => { g.flags.threeChildPolicy=true; g.flags.threeChildFamily=true; g.money -= 30000; return{social:8,mood:-5}; }},
+        { label:'坚决不生，两个够了', hint:'+😊 +💰', fn: g => { g.flags.threeChildPolicy=true; g.flags.twoChildEnough=true; return{mood:5,money:2000}; }},
+        { label:'跟父母解释了经济压力，争取理解', hint:'+🤝 +🧠', fn: g => { g.flags.threeChildPolicy=true; g.flags.honestTalk=true; return{social:5,intel:3}; }},
+      ]},
+    { id:'left_behind_child', icon:'🏚️', title:'留守回忆', category:'psychology',
+      body:'你的发小小张来看你了。\n\n你们从小一起长大——都是留守儿童。\n\n爸妈去城里打工，你们跟着爷爷奶奶长大。\n\n你们聊起了小时候：\n- 每年只有过年能见到爸妈\n- 电话里妈妈总是哭\n- 你偷偷在被窝里也哭\n- 你想爸妈——但不敢说\n\n小张说：「我到现在——都不会跟人亲近。因为我从小就没学会。」\n\n你沉默了。因为你也是。\n\n你们在大城市拼命工作——也许不是为了赚钱，是为了证明：被遗弃的孩子，也能活下去。\n\n「留守儿童：你长大了——但那个等你爸妈回家的小孩，还在心里。」',
+      cond: g => g.age >= 25 && !g.flags.leftBehindChild && g.background === 'rural',
+      choices:[
+        { label:'开始面对这段经历，寻求心理帮助', hint:'-💰 +😊 +❤️', fn: g => { g.flags.leftBehindChild=true; g.flags.childhoodHealing=true; g.money -= 3000; return{mood:10,health:5}; }},
+        { label:'跟发小约定以后多联系，互相支持', hint:'+🤝 +😊', fn: g => { g.flags.leftBehindChild=true; g.flags.friendshipBond=true; return{social:12,mood:8}; }},
+        { label:'不想提了，过去就过去了', hint:'-😊', fn: g => { g.flags.leftBehindChild=true; return{mood:-5}; }},
+      ]},
+    { id:'boomerang_kid', icon:'🏠', title:'新型啃老', category:'society',
+      body:'你的大学同学小周辞职了。\n\n他搬回了老家，跟爸妈住在一起。\n\n他说：「我太累了，想休息一段时间。」\n\n这一休息——就是一年。\n\n他每天的日程：\n- 睡到中午\n- 打游戏\n- 看剧\n- 吃爸妈做的饭\n- 偶尔投几份简历（但其实没想上班）\n\n他爸妈不敢说什么——怕他「压力太大做出傻事」。\n\n你问小周：「你打算怎么办？」\n\n他说：「我也不知道。我就是不想上班了。」\n\n你在想：他是真的累了——还是在逃避？\n\n也许——两者都有。\n\n「新型啃老：不是不努力——是努力了也没用。至少他是这么觉得的。」',
+      cond: g => g.age >= 22 && g.age <= 35 && !g.flags.boomerangKid,
+      choices:[
+        { label:'劝小周振作，帮他找工作', hint:'+🤝 +😊', fn: g => { g.flags.boomerangKid=true; g.flags.careerHelper=true; return{social:8,mood:5,charm:5}; }},
+        { label:'理解他的选择，每个人有自己的节奏', hint:'+😊 +🧠', fn: g => { g.flags.boomerangKid=true; return{mood:3,intel:3}; }},
+        { label:'觉得他就是在逃避，有些看不起', hint:'-🤝', fn: g => { g.flags.boomerangKid=true; return{social:-3,mood:-2}; }},
+      ]},
+    { id:'family_meeting', icon:'🗣️', title:'家庭会议', category:'social',
+      body:'你做了一件从未做过的事：召开了一次「家庭会议」。\n\n你把爸妈、另一半都叫到一起，说：「我们好好聊聊。」\n\n你们聊了：\n- 对未来的规划和期望\n- 彼此的感受和需求\n- 哪些事情让对方不舒服了\n- 哪些话一直想说但没说出口\n\n这是你第一次——不是以「儿子/女儿」或「丈夫/妻子」的角色——而是以「一个人」的身份，跟家人平等对话。\n\n你妈哭了。她说：「你长大了。我终于可以不用事事操心了。」\n\n你爸没说话——但他握了握你的手。\n\n「家庭会议：最难的不是跟陌生人沟通——是跟最亲的人说真话。」',
+      cond: g => g.age >= 25 && !g.flags.familyMeeting,
+      choices:[
+        { label:'定期开家庭会议，建立沟通机制', hint:'+🤝 +😊 +🧠', fn: g => { g.flags.familyMeeting=true; g.flags.familyCommunicator=true; return{social:12,mood:12,intel:5}; }},
+        { label:'这次聊开了，以后看情况', hint:'+🤝 +😊', fn: g => { g.flags.familyMeeting=true; return{social:8,mood:8}; }},
+        { label:'觉得太formal了，不太适合中国人', hint:'', fn: g => { g.flags.familyMeeting=true; return{social:3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -13080,6 +13161,12 @@ const ACHIEVEMENTS = [
     { id:'body_positive_ach_v24_3', icon:'💪', name:'身体自爱', desc:'拒绝容貌焦虑，接受自己的身体', check: g => g.flags.bodyPositive },
     { id:'digital_sunset_ach', icon:'🌙', name:'数字日落', desc:'发现放下手机就是最好的养生', check: g => g.flags.digitalSunset },
     { id:'mental_health_advocate_ach', icon:'🧠', name:'心理健康倡导者', desc:'勇敢使用心理假并鼓励他人', check: g => g.flags.mentalHealthAdvocate },
+    // v24.4: 家庭关系成就
+    { id:'healing_journey_ach', icon:'💔', name:'疗愈之旅', desc:'勇敢面对原生家庭创伤', check: g => g.flags.healingJourney },
+    { id:'independence_decl_ach', icon:'💍', name:'独立宣言', desc:'勇敢表明不婚立场', check: g => g.flags.independenceDeclaration },
+    { id:'family_priority_ach', icon:'👴', name:'陪伴为先', desc:'增加回家频率优先陪伴父母', check: g => g.flags.familyPriority },
+    { id:'family_communicator_ach', icon:'🗣️', name:'家庭沟通师', desc:'定期召开家庭会议建立沟通', check: g => g.flags.familyCommunicator },
+    { id:'free_parenting_ach', icon:'🐯', name:'自由教育', desc:'拒绝鸡娃给孩子自由成长空间', check: g => g.flags.freeParenting },
 ];
 
 // === ENDINGS === (order matters: first match wins)
