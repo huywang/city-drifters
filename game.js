@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v29.4
+// 都市浮生记 - Game Engine v29.5
 // ============================================
 
 // === GAME STATE ===
@@ -15470,6 +15470,87 @@ const EVENTS = [
         { label:'觉醒后开始做副业Plan B', hint:'+🧠 +💰', fn: g => { g.flags.workerAwakening=true; g.flags.planBSideHustle=true; return{intel:5,mood:5}; }},
         { label:'觉醒后发现无力改变', hint:'-😊 +🧠', fn: g => { g.flags.workerAwakening=true; g.flags.helplessAwakening=true; return{mood:-5,intel:5}; }},
       ]},
+    // === v29.5 社交媒体与信息茧房 ===
+    { id:'wechat_persona', icon:'📱', title:'朋友圈人设', category:'social_media',
+      body:'你花了2小时编辑一条朋友圈。\n\n修图30分钟，文案改了5遍，滤镜换了3个。\n\n你的朋友圈：\n- 精修的旅行照（其实是公司团建）\n- 网红餐厅打卡（其实是AA制）\n- 健身自拍（其实只去了10分钟）\n- 读书笔记（其实只拍了封面）\n\n你发出去后——5分钟看一次有没有人点赞。\n\n30个赞：你觉得自己很受欢迎。\n10个赞：你开始怀疑自己是不是不够好。\n0个赞：你删掉了这条朋友圈。\n\n你的真实生活——和朋友圈里的你——差了至少3个滤镜。\n\n「朋友圈人设：你不是在生活——你是在「表演」生活。」',
+      cond: g => g.age >= 18 && !g.flags.wechatPersona,
+      choices:[
+        { label:'继续经营精致人设', hint:'+😊 -🧠', fn: g => { g.flags.wechatPersona=true; g.flags.fakePersona=true; return{mood:3,charm:2}; }},
+        { label:'发一条真实的动态', hint:'+💪 +😊', fn: g => { g.flags.wechatPersona=true; g.flags.authenticPost=true; return{mood:8,charm:3}; }},
+        { label:'关闭朋友圈', hint:'+🧠 -👥', fn: g => { g.flags.wechatPersona=true; g.flags.closedMoments=true; return{intel:5,social:-5}; }},
+      ]},
+    { id:'xiaohongshu_trap', icon:'📕', title:'小红书种草陷阱', category:'social_media',
+      body:'你打开了小红书——「就看5分钟」。\n\n2小时后：\n- 你收藏了30个「必买清单」\n- 你加购了5件「平价好物」\n- 你下单了2件「博主同款」\n- 你关注了10个「生活方式博主」\n\n你不知道的是：\n- 那些「真实测评」——是广告\n- 那些「素颜出镜」——化了妆\n- 那些「平价好物」——有佣金\n- 那些「生活方式」——是团队策划\n\n你不是在购物——你是在「被购物」。\n你的欲望——不是你的——是算法「植入」给你的。\n\n「小红书种草：你以为你在选择，其实你被选择了。」',
+      cond: g => g.money >= 3000 && !g.flags.xiaohongshuTrap,
+      choices:[
+        { label:'继续买买买', hint:'-💰 +😊', fn: g => { g.flags.xiaohongshuTrap=true; g.flags.impulseBuyer=true; return{money:-2000,mood:3}; }},
+        { label:'学会识别软文和广告', hint:'+🧠 +💰', fn: g => { g.flags.xiaohongshuTrap=true; g.flags.adAwareness=true; return{intel:5,mood:2}; }},
+        { label:'卸载小红书', hint:'+🧠 +💪', fn: g => { g.flags.xiaohongshuTrap=true; g.flags.deletedXHS=true; return{intel:3,mood:5}; }},
+      ]},
+    { id:'short_video_addiction_v29_5', icon:'🎬', title:'短视频成瘾', category:'social_media',
+      body:'你说「就看10分钟」——然后看了3小时。\n\n你的抖音/快手使用记录：\n- 晚上11点：「再看最后一个」\n- 凌晨12点：「这个好好笑再看一个」\n- 凌晨1点：「都这个点了再看几个」\n- 凌晨2点：「完了明天又要迟到了」\n\n你的大脑已经被「训练」了：\n- 15秒：注意力上限\n- 3秒：决定要不要划走\n- 0秒：自动播放下一个\n\n你不是在看视频——你是被算法「喂」视频。\n你的时间——不是被浪费了——是被「收割」了。\n\n「短视频成瘾：你以为你在消磨时间，其实时间在消磨你。」',
+      cond: g => g.age >= 16 && !g.flags.shortVideoAddiction,
+      choices:[
+        { label:'设置每天30分钟使用时间限制', hint:'+🧠 +💪', fn: g => { g.flags.shortVideoAddiction=true; g.flags.screenTimeLimit=true; return{intel:3,mood:3}; }},
+        { label:'干脆把短视频APP删了', hint:'+💪 +🧠', fn: g => { g.flags.shortVideoAddiction=true; g.flags.deletedShortVideo=true; return{intel:5,health:3}; }},
+        { label:'算了吧反正也改不了', hint:'-😊 -💪', fn: g => { g.flags.shortVideoAddiction=true; g.flags.addictedAcceptance=true; return{mood:-3,health:-2}; }},
+      ]},
+    { id:'algorithm_cocoon', icon:'🕸️', title:'信息茧房', category:'social_media',
+      body:'你发现了一件可怕的事：你看到的世界——和别人看到的不一样。\n\n你的信息茧房：\n- 你看到的新闻——是算法筛选过的\n- 你看到的观点——是和你一样的\n- 你看到的产品——是根据你的消费能力推荐的\n- 你看到的生活——是你「想看」的\n\n你不知道茧房外面的世界是什么样的。\n你也不需要知道——算法让你很舒服。\n\n直到你和朋友聊天——你们发现：\n- 你们看到的「热点」完全不同\n- 你们的「常识」互相矛盾\n- 你们的「事实」不一样\n\n你们活在同一个世界——但在不同的「茧房」里。\n\n「信息茧房：你以为你看到了全部，其实你只看到了算法想让你看到的。」',
+      cond: g => g.intel >= 30 && !g.flags.algorithmCocoon,
+      choices:[
+        { label:'主动接触不同观点', hint:'+🧠 +💪', fn: g => { g.flags.algorithmCocoon=true; g.flags.diverseInfo=true; return{intel:8,mood:3}; }},
+        { label:'减少算法推荐手动搜索', hint:'+🧠 +💪', fn: g => { g.flags.algorithmCocoon=true; g.flags.manualSearch=true; return{intel:5,charm:2}; }},
+        { label:'算了茧房里挺舒服的', hint:'-🧠 +😊', fn: g => { g.flags.algorithmCocoon=true; g.flags.comfortableCocoon=true; return{intel:-3,mood:2}; }},
+      ]},
+    { id:'keyboard_warrior_v29_5', icon:'⌨️', title:'键盘侠时刻', category:'social_media',
+      body:'你在网上和一个陌生人吵起来了。\n\n起因：他发了一条你不赞同的观点。\n\n你的反应：\n- 第1条回复：理性反驳\n- 第2条回复：开始阴阳怪气\n- 第3条回复：人身攻击\n- 第4条回复：翻对方历史找黑料\n- 第5条回复：「你就是个XX」\n\n吵了2小时——你赢了？输了？平局？\n\n你不知道。你只知道：\n- 你浪费了2小时\n- 你的血压升高了\n- 你什么都没改变\n- 对方也什么都没改变\n\n你关掉手机——发现刚才那2小时——你可以看一本书、跑一个步、和朋友聊个天。\n\n「键盘侠：你赢了争论——输了时间。」',
+      cond: g => g.age >= 16 && !g.flags.keyboardWarrior,
+      choices:[
+        { label:'学会不在网上争论', hint:'+🧠 +😊', fn: g => { g.flags.keyboardWarrior=true; g.flags.noOnlineArgue=true; return{intel:5,mood:5}; }},
+        { label:'继续当键盘侠但只怼不公', hint:'+💪 +👥', fn: g => { g.flags.keyboardWarrior=true; g.flags.justiceWarrior=true; return{charm:3,social:2}; }},
+        { label:'被对方说得更生气了', hint:'-😊 -💪', fn: g => { g.flags.keyboardWarrior=true; g.flags.angerOnline=true; return{mood:-5,health:-2}; }},
+      ]},
+    { id:'social_anxiety_digital', icon:'😰', title:'社交恐惧症', category:'social_media',
+      body:'你发现自己有了一种奇怪的「病」：\n\n- 发微信要反复编辑10分钟\n- 收到语音消息不敢听\n- 电话响了假装没看到\n- 聚会前焦虑到想取消\n- 朋友圈发完5分钟就删\n- 被人@会心跳加速\n\n你不是不想社交——你是害怕社交。\n\n你害怕的不是人——是「被评价」。\n你害怕的不是说话——是「说错话」。\n你害怕的不是社交——是「不够好」的自己被别人看到。\n\n社交恐惧不是病——是这个时代给每个人的「礼物」。\n\n「社交恐惧：不是你不够好——是你对自己要求太高了。」',
+      cond: g => g.social < 50 && g.age >= 18 && !g.flags.socialAnxietyDigital,
+      choices:[
+        { label:'尝试每天主动联系一个朋友', hint:'+👥 +💪', fn: g => { g.flags.socialAnxietyDigital=true; g.flags.overcomingAnxiety=true; return{social:5,mood:5}; }},
+        { label:'接受自己不社交也没关系', hint:'+😊 +🧠', fn: g => { g.flags.socialAnxietyDigital=true; g.flags.acceptIntrovert=true; return{mood:8,intel:2}; }},
+        { label:'开始寻求心理咨询帮助', hint:'+🧠 +💪', fn: g => { g.flags.socialAnxietyDigital=true; g.flags.seekingTherapy=true; return{intel:3,mood:3}; }},
+      ]},
+    { id:'cyberbullying_witness', icon:'💔', title:'网络暴力现场', category:'social_media',
+      body:'你看到了一个帖子——一个人在被全网攻击。\n\n原因：他说了一句不太恰当的话。\n\n评论区：\n- 「这种人就应该社死」\n- 「全家都该被骂」\n- 「人肉他让他知道代价」\n- 「建议自杀」\n\n你看到了那个人的回应：「我只是说了一句话……请你们不要骂我的家人……」\n\n你的手悬在键盘上——\n- 你想帮他说话——但怕被一起骂\n- 你想沉默——但良心过不去\n- 你想举报那些恶评——但觉得没用\n\n你突然意识到：网络暴力——不是别人的事——是每个人的事。\n\n「网络暴力：一个人的错——不应该由一群人的恶意来审判。」',
+      cond: g => g.intel >= 20 && !g.flags.cyberbullyingWitness,
+      choices:[
+        { label:'站出来帮他说话', hint:'+💪 +👥', fn: g => { g.flags.cyberbullyingWitness=true; g.flags.stoodUpOnline=true; return{mood:5,charm:5}; }},
+        { label:'默默举报恶评', hint:'+🧠 +💪', fn: g => { g.flags.cyberbullyingWitness=true; g.flags.reportedBullying=true; return{intel:3,mood:3}; }},
+        { label:'沉默但开始反思', hint:'+🧠 -😊', fn: g => { g.flags.cyberbullyingWitness=true; g.flags.silentReflection=true; return{intel:5,mood:-3}; }},
+      ]},
+    { id:'digital_detox_v29_5', icon:'🌿', title:'数字断联挑战', category:'social_media',
+      body:'你决定做一个实验：断网24小时。\n\n第1小时：手不知道往哪放\n第3小时：不自觉地摸口袋\n第6小时：开始焦虑错过什么\n第12小时：突然安静到不适应\n第18小时：开始看到周围的世界\n第24小时：你发现了——\n\n- 原来天这么蓝\n- 原来楼下的花开了\n- 原来你的邻居是个有趣的人\n- 原来安静——是一种「奢侈」\n\n你回来了。但你的认知变了：\n- 你不是「需要」手机——你是「依赖」手机\n- 你不是「害怕错过」——你是「害怕独处」\n- 你不是「很忙」——你是「不敢停下来」\n\n「数字断联：关掉屏幕——打开生活。」',
+      cond: g => g.age >= 18 && !g.flags.digitalDetox,
+      choices:[
+        { label:'养成每天断网1小时的习惯', hint:'+😊 +💪', fn: g => { g.flags.digitalDetox=true; g.flags.dailyDisconnect=true; return{mood:8,health:5}; }},
+        { label:'周末固定为无手机日', hint:'+😊 +👥', fn: g => { g.flags.digitalDetox=true; g.flags.weekendOffline=true; return{mood:5,social:5}; }},
+        { label:'太难受了还是算了吧', hint:'-😊 -💪', fn: g => { g.flags.digitalDetox=true; g.flags.failedDetox=true; return{mood:-3}; }},
+      ]},
+    { id:'fomo_anxiety', icon:'😵', title:'错失恐惧症', category:'social_media',
+      body:'你有了一种病——FOMO（Fear of Missing Out）。\n\n你的症状：\n- 看到别人的旅行照：「我也应该去」\n- 看到别人的升职：「我也应该升」\n- 看到别人的美食：「我也应该吃」\n- 看到别人的恋爱：「我也应该谈」\n- 看到别人的存款：「我也应该赚」\n\n你永远觉得自己在「错过」什么。\n但真相是：你什么都没错过——你只是在看别人的「高光时刻」。\n\n没人发：加班到凌晨、还信用卡、和父母吵架、一个人吃外卖。\n\n你看到的——是每个人「最好的5%」——然后拿来和自己的「全部100%」比较。\n\n「FOMO：你不是过得不好——你只是一直在和别人比。」',
+      cond: g => g.mood < 60 && !g.flags.fomoAnxiety,
+      choices:[
+        { label:'学会只和昨天的自己比', hint:'+😊 +🧠', fn: g => { g.flags.fomoAnxiety=true; g.flags.selfComparison=true; return{mood:8,intel:3}; }},
+        { label:'取关那些让你焦虑的人', hint:'+💪 +😊', fn: g => { g.flags.fomoAnxiety=true; g.flags.unfollowedToxic=true; return{mood:5,charm:2}; }},
+        { label:'继续焦虑但知道原因', hint:'+🧠 -😊', fn: g => { g.flags.fomoAnxiety=true; g.flags.awareFOMO=true; return{intel:5,mood:-3}; }},
+      ]},
+    { id:'real_vs_online', icon:'🎭', title:'线上巨人线下社恐', category:'social_media',
+      body:'你在网上：\n- 段子手——评论总是最好笑的\n- 意见领袖——观点犀利一针见血\n- 社交达人——好友列表1000+\n- 知心大哥/大姐——总能安慰别人\n\n你在现实：\n- 开会不敢发言\n- 聚会躲在角落\n- 打招呼都紧张\n- 打电话要做心理建设\n\n你是「线上巨人，线下社恐」。\n\n不是你有两个「人格」——是屏幕给了你「安全感」。\n你可以编辑、删除、撤回——但现实中——说出去的话就是泼出去的水。\n\n你不是不会社交——你是害怕「不可撤回」的真实。\n\n「线上巨人线下社恐：屏幕不是你的盔甲——是你的牢笼。」',
+      cond: g => g.social < 40 && g.charm >= 30 && !g.flags.realVsOnline,
+      choices:[
+        { label:'每周至少一次线下社交练习', hint:'+👥 +💪', fn: g => { g.flags.realVsOnline=true; g.flags.offlinePractice=true; return{social:8,mood:5}; }},
+        { label:'接受线上线下都是真实的自己', hint:'+😊 +🧠', fn: g => { g.flags.realVsOnline=true; g.flags.acceptBothSelves=true; return{mood:8,intel:3}; }},
+        { label:'继续躲在线上世界里', hint:'-💪 +😊', fn: g => { g.flags.realVsOnline=true; return{mood:2,social:-3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -16866,6 +16947,15 @@ const ACHIEVEMENTS = [
     { id:'meeting_reformer_ach', icon:'🗣️', name:'会议改革者', desc:'提议减少无效会议', check: g => g.flags.meetingReformer },
     { id:'life_outside_work_ach', icon:'🌅', name:'工作之外', desc:'在狗屁工作之外找到了人生价值', check: g => g.flags.lifeOutsideWork },
     { id:'worker_awakened_ach', icon:'✊', name:'打工人觉醒', desc:'不再为别人的梦想而努力', check: g => g.flags.liveForSelf },
+    // v29.5 achievements - 社交媒体与信息茧房
+    { id:'authentic_post_ach', icon:'📱', name:'真实发声', desc:'发了一条不修图不滤镜的真实动态', check: g => g.flags.authenticPost },
+    { id:'ad_aware_ach', icon:'🛡️', name:'软文猎人', desc:'学会了识别小红书上的广告和软文', check: g => g.flags.adAwareness },
+    { id:'screen_limit_ach', icon:'⏰', name:'屏幕自律', desc:'设置了每天30分钟的短视频使用限制', check: g => g.flags.screenTimeLimit },
+    { id:'diverse_info_ach', icon:'🌐', name:'破茧者', desc:'主动接触不同观点打破信息茧房', check: g => g.flags.diverseInfo },
+    { id:'no_argue_ach', icon:'🧘', name:'网络和平者', desc:'学会了不在网上争论', check: g => g.flags.noOnlineArgue },
+    { id:'offline_warrior_ach', icon:'🤝', name:'线下社交达人', desc:'克服社恐每周至少一次线下社交', check: g => g.flags.offlinePractice },
+    { id:'digital_detox_ach_v29_5', icon:'🌿', name:'数字断联者', desc:'成功完成24小时断网挑战', check: g => g.flags.dailyDisconnect },
+    { id:'self_compare_ach', icon:'🪞', name:'只和自己比', desc:'学会了不和朋友圈里的人比较', check: g => g.flags.selfComparison },
 ];
 
 // === ENDINGS === (order matters: first match wins)
