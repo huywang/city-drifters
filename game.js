@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v11.9
+// 都市浮生记 - Game Engine v12.0
 // ============================================
 
 // === GAME STATE ===
@@ -449,6 +449,37 @@ const SURPRISE_EVENTS = [
     { id:'surprise_found_cat', icon:'🐱', title:'猫咪碰瓷', weight:2,
       body:'你蹲在路边等外卖，一只猫走过来，直接躺在你脚边翻肚皮。\n\n你摸了它10分钟，外卖到了，但它不让你走。\n\n最终你花了20分钟才脱身。\n\n"猫咪碰瓷是世界上最可爱的犯罪。"',
       fn: g => ({mood: 10, charm: 3}) },
+    // === v12.0 新增惊喜事件 ===
+    { id:'surprise_pay_raise', icon:'🎉', title:'意外加薪', weight:1,
+      body:'今天发工资，你发现多了2000块。问了才知道：上个月你帮别的部门救了一个项目，对方领导给你申请了额外奖金。\n\n你的同事酸了：「怎么不是我？」\n\n"有时候，多管闲事是有回报的。"',
+      fn: g => ({money: 2000, mood: 15, social: 5}) },
+    { id:'surprise_lost_wallet', icon:'👛', title:'钱包丢了', weight:2,
+      body:'你的钱包丢了。里面有身份证、银行卡、500块现金。\n\n你花了一整天补办证件。排队3小时，办事10分钟。\n\n"大城市教会你的第二课：手机比钱包重要——因为手机丢了更惨。"',
+      fn: g => ({money: -800, mood: -15}) },
+    { id:'surprise_viral_post', icon:'📱', title:'随手发帖火了', weight:1,
+      body:'你在小红书上随手发了一条吐槽帖，没想到一觉醒来10万赞。\n\n评论区炸了：「说出了我的心声！」「太真实了！」\n\n你涨了3000粉丝。虽然三天后就没人记得你了。\n\n"互联网的记忆只有72小时——但那72小时，你是主角。"',
+      fn: g => ({charm: 8, mood: 12, social: 5}) },
+    { id:'surprise_food_poisoning', icon:'🤢', title:'外卖中毒', weight:2,
+      body:'你点了一份25块的外卖，吃完两小时后开始上吐下泻。\n\n你打了12315投诉，商家说：「我们已经关门了。」\n\n你在医院挂了一天盐水，花了600块。\n\n"便宜外卖的风险：你可能省了10块饭钱，但花了600块医药费。"',
+      fn: g => ({health: -10, money: -600, mood: -8}) },
+    { id:'surprise_old_friend', icon:'📞', title:'老友来电', weight:2,
+      body:'你接到了一个很久没联系的朋友的电话。\n\n「嘿，最近怎么样？有空出来吃个饭吗？」\n\n你们聊了两个小时，从工作聊到感情，从过去聊到未来。挂电话的时候，你觉得：\n\n这个城市没那么冷了。\n\n"老朋友是最好的药——不花钱，但治百病。"',
+      fn: g => ({mood: 12, social: 8}) },
+    { id:'surprise_rent_increase', icon:'📈', title:'房东涨租', weight:3,
+      body:'你收到房东的微信：「下个月开始房租涨500。」\n\n没有理由，没有商量，甚至没有表情包。\n\n你搜了一圈附近的房子，发现：要么更贵，要么更远，要么更破。\n\n你默默转了新的房租。\n\n"租房的真相：你不是在租房子——你是在给房东还房贷。"',
+      fn: g => ({money: -3000, mood: -10}) },
+    { id:'surprise_kindness', icon:'💝', title:'陌生人的善意', weight:2,
+      body:'你今天心情很差。在便利店买咖啡的时候，你发现自己忘了带手机。\n\n排在你后面的陌生人说：「我帮你付吧。」\n\n你说：「不用不用。」\n\n她说：「没事，我也有过这样的时候。」然后她帮你付了28块，走了。\n\n你站在那儿，鼻子一酸。\n\n"有时候，陌生人的28块钱，比朋友的一万句「加油」更有力量。"',
+      fn: g => ({mood: 15, social: 3}) },
+    { id:'surprise_power_outage', icon:'🕯️', title:'突然停电', weight:2,
+      body:'晚上8点，你正在赶一个明天要交的PPT。突然——停电了。\n\n你的笔记本还有15%的电。你的手机还有23%。你打开手电筒，发现自己不知道蜡烛放在哪。\n\n你坐在黑暗中，第一次听到了：楼上在吵架，隔壁在打游戏，楼下有人在弹吉他。\n\n原来这座城市，比你以为的更热闹。\n\n"停电是城市给你的礼物：一段被迫的安静。"',
+      fn: g => ({mood: -5, intel: 3}) },
+    { id:'surprise_found_money', icon:'💵', title:'捡到钱了', weight:1,
+      body:'你在路边捡到了200块钱。你左看右看，没有摄像头，没有失主。\n\n你的内心经历了三个阶段：\n\n1. 交给警察（道德高地）\n2. 放自己口袋（经济理性）\n3. 买了一顿好的（实用主义）\n\n你选了第三个。\n\n"捡钱的道德困境：你做了正确的事——如果你不捡，下一个人也会捡。"',
+      fn: g => ({money: 200, mood: 8}) },
+    { id:'surprise_celebrity_encounter', icon:'⭐', title:'偶遇名人', weight:1,
+      body:'你在咖啡馆排队，发现前面那个人……好像是个网红？\n\n你犹豫了三秒要不要搭话。最终你鼓起勇气：「你是xxx吗？」\n\n对方笑着说：「是呀，你好。」然后你们合了张影。\n\n你发了朋友圈，收获了200个赞——比你过去一年发的所有朋友圈加起来都多。\n\n"偶遇名人的价值：不在于见到谁——在于朋友圈能发什么。"',
+      fn: g => ({charm: 5, mood: 10, social: 3}) },
 ];
 
 // === EVENTS (100+) ===
@@ -5818,6 +5849,87 @@ const EVENTS = [
         { label:'珍惜当下', hint:'+❤️ +😊', fn: g => { g.flags.emptyNestPrep=true; return{mood:10,social:5}; }},
         { label:'提前规划养老', hint:'+🧠', fn: g => { g.flags.emptyNestPrep=true; g.flags.pensionPlan=true; return{intel:5,mood:-3}; }},
       ]},
+    // === v12.0 生活场景补全 ===
+    { id:'gym_resolution', icon:'💪', title:'新年健身flag',
+      body:'新年第一天，你办了张健身卡。3980元/年，你咬牙付了。\n\n一月：去了15次。二月：去了5次。三月：去了1次。四月到十二月：0次。\n\n年底健身房的公众号推送了一条消息：「恭喜您！今年您消耗了238大卡。」\n\n你算了算：每次去平均消耗238/16≈15大卡。也就是：你每次去健身房，还不如走路回家消耗得多。\n\n"健身卡的本质：你买的不是锻炼——是「我可能会锻炼」的安心感。"',
+      cond: g => g.money > 4000 && g.health < 75 && g.months % 12 === 0,
+      choices:[
+        { label:'认真练', hint:'+❤️❤️ +💰', fn: g => { g.flags.gymMember=true; return{health:10,mood:5,money:-3980}; }},
+        { label:'三天打鱼', hint:'+😊', fn: g => { g.flags.gymMember=true; return{health:3,mood:5,money:-3980}; }},
+        { label:'不去也行', hint:'+💰', fn: g => { return{mood:-3}; }},
+      ]},
+    { id:'roommate_drama_v2', icon:'🏠', title:'室友风云',
+      body:'你和室友的战争终于爆发了。\n\n导火索是：他/她第三次用了你的洗发水没告诉你。但真正的原因是：空调温度、洗碗频率、深夜打电话的音量——积累了半年的鸡毛蒜皮。\n\n你们吵了两个小时。最后达成共识：写了一份「室友公约」。\n\n一周后，公约被贴在了冰箱上——然后被外卖菜单盖住了。\n\n"合租的真相：不是找室友——是找一个你能忍受的陌生人。"',
+      cond: g => !g.flags.hasHouse && g.months > 3 && g.age < 35,
+      choices:[
+        { label:'据理力争', hint:'+🧠 +👥', fn: g => { g.flags.roommateConflict=true; return{intel:3,social:-5,mood:-5}; }},
+        { label:'忍了', hint:'-😊', fn: g => { return{mood:-8}; }},
+        { label:'搬家', hint:'-💰 +😊', fn: g => { g.flags.roommateConflict=true; return{money:-5000,mood:10}; }},
+      ]},
+    { id:'office_politics_v2', icon:'🏢', title:'站队时刻',
+      body:'公司的两个VP在争夺同一个位置。你的直属领导站了A队，你的mentor站了B队。\n\nA队领导找你谈话：「小张，你觉得A总怎么样？」\n\nB队mentor发消息：「最近有空聊聊吗？」\n\n你知道：在这种时候，不站队就是站了两边的队。\n\n你选择了沉默。但沉默本身也是一种态度。\n\n"办公室政治的生存法则：你以为自己在旁观，其实你早就被归了类。"',
+      cond: g => g.job !== '待业中' && g.age >= 25 && g.months > 12 && g.social >= 40,
+      choices:[
+        { label:'站领导', hint:'+💰 +👥', fn: g => { g.flags.officePolitics=true; return{money:3000,social:-5,mood:-5}; }},
+        { label:'站mentor', hint:'+🧠 +✨', fn: g => { g.flags.officePolitics=true; return{intel:5,charm:3,mood:-3}; }},
+        { label:'两不相帮', hint:'+🧠', fn: g => { g.flags.officePolitics=true; return{intel:5,mood:-8}; }},
+      ]},
+    { id:'phone_addiction', icon:'📱', title:'屏幕使用时间',
+      body:'你打开手机设置，看了一眼「屏幕使用时间」。\n\n今日平均：8小时47分钟\n社交媒体：4小时12分钟\n短视频：2小时38分钟\n工作邮件：23分钟\n\n你每天醒着的时间大概16小时。也就是说，你一半的人生都在看手机。\n\n你算了一下：如果你活到80岁，你将有40年花在这块6.1英寸的屏幕上。\n\n你默默关掉了这个页面，打开了抖音。\n\n"屏幕使用时间是一个你不敢看的数字——因为看了你也不会改。"',
+      cond: g => g.age >= 22 && g.age <= 40 && g.months > 3,
+      choices:[
+        { label:'设置限时', hint:'+🧠 +❤️', fn: g => { g.flags.screenTimeLimit=true; return{intel:5,health:3,mood:-3}; }},
+        { label:'继续刷', hint:'+😊 -❤️', fn: g => { return{mood:5,health:-3}; }},
+        { label:'换成功能机', hint:'+🧠 +😊', fn: g => { g.flags.digitalDetox=true; return{intel:8,mood:8,social:-5}; }},
+      ]},
+    { id:'weekend_trip_v2', icon:'🏖️', title:'说走就走的周末',
+      body:'周五晚上你刷到一个视频：一个人在大理的洱海边看日落。\n\n你打开12306，发现周六早上的票还有。你犹豫了三秒，点了「购买」。\n\n48小时后，你站在洱海边，看着同样的日落。你拍了一张照片，配文：「人生苦短，及时行乐。」\n\n周一你回到工位，发现：你不在的两天，什么事都没发生。原来你没你想的那么重要。\n\n"旅行的意义不在于去哪里——在于你终于决定出发了。"',
+      cond: g => g.money > 3000 && g.mood < 60 && g.age >= 22 && g.age <= 38,
+      choices:[
+        { label:'说走就走', hint:'-💰 +😊😊', fn: g => { g.flags.weekendTrip=true; return{money:-2500,mood:20,health:5}; }},
+        { label:'下次再说', hint:'', fn: g => { return{mood:-5}; }},
+        { label:'周边游也行', hint:'-💰 +😊', fn: g => { g.flags.weekendTrip=true; return{money:-500,mood:10,health:3}; }},
+      ]},
+    { id:'salary_comparison_v2', icon:'💰', title:'薪资大比拼',
+      body:'你在脉脉上刷到一条匿名帖子：「坐标北京，工作3年，年薪45万。」\n\n你看了看自己的工资条：工作3年，年薪18万。\n\n你开始怀疑人生。然后你看到评论区：「我也3年，年薪12万，是不是该转行了？」\n\n你突然觉得自己还行。\n\n然后你又刷到一条：「应届，大厂sp，年薪60万。」\n\n你又觉得自己不行了。\n\n"薪资比较是成年人的精神自残——但你总是忍不住要看。"',
+      cond: g => g.job !== '待业中' && g.age >= 23 && g.age <= 35,
+      choices:[
+        { label:'努力提升自己', hint:'+🧠', fn: g => { return{intel:5,mood:-5}; }},
+        { label:'准备跳槽', hint:'+💰？', fn: g => { g.flags.salaryCompare=true; return{mood:-3,intel:3}; }},
+        { label:'不看了', hint:'+😊', fn: g => { return{mood:5}; }},
+      ]},
+    { id:'online_shopping_spree', icon:'🛍️', title:'深夜购物冲动',
+      body:'凌晨1点，你躺在床上刷淘宝。\n\n你看中了一件羽绒服（1299元）、一双运动鞋（899元）、一个空气炸锅（399元）。\n\n你的大脑在说：「不需要。」你的手指在说：「下单下单下单。」\n\n你用了30秒完成了支付。然后你看了看银行卡余额，后悔了。\n\n但第二天快递到了的时候，你拆箱的快感，瞬间治愈了昨晚的后悔。\n\n"深夜购物的本质：用明天的后悔，买今天的多巴胺。"',
+      cond: g => g.money > 2000 && g.mood < 60,
+      choices:[
+        { label:'买买买', hint:'-💰💰 +😊', fn: g => { return{money:-2600,mood:12}; }},
+        { label:'加购物车', hint:'+🧠', fn: g => { return{intel:3,mood:-3}; }},
+        { label:'全部退款', hint:'+💰 +🧠', fn: g => { return{intel:5,mood:-5}; }},
+      ]},
+    { id:'parent_health_crisis', icon:'🏥', title:'父母生病',
+      body:'你妈打电话来，声音不太对：「你爸住院了。没什么大事，就是血压高。」\n\n你问：「真的没事？」\n\n她说：「真的。」\n\n你后来从你表姐那里知道：你爸是脑梗，幸好发现得早，没有大碍。你妈不想让你担心，也不舍得让你请假回来。\n\n你买了最近的车票回去。在火车上你一直在想：你多久没回家了？\n\n三个月？半年？你记不清了。\n\n"父母生病是成年人的分水岭：从这一刻起，你不再是那个被保护的孩子了。"',
+      cond: g => g.age >= 28 && !g.flags.parentHealthIssue,
+      choices:[
+        { label:'马上回去', hint:'-💰 +👥❤️', fn: g => { g.flags.parentHealthIssue=true; g.flags.parentHealthDone=true; return{money:-3000,social:10,mood:-5}; }},
+        { label:'转钱表心意', hint:'-💰 +👥', fn: g => { g.flags.parentHealthIssue=true; return{money:-5000,social:5,mood:-8}; }},
+        { label:'视频安慰', hint:'+👥', fn: g => { g.flags.parentHealthIssue=true; return{social:3,mood:-10}; }},
+      ]},
+    { id:'midnight_philosophy_v2', icon:'🌙', title:'深夜emo',
+      body:'凌晨3点，你还没有睡着。\n\n你在想：我为什么在这里？我在做什么？我以后怎么办？\n\n你打开了备忘录，写了一些「深刻」的句子。第二天醒来一看：全是废话。\n\n凌晨3点的你觉得自己是哲学家。中午12点的你觉得自己是个傻子。\n\n"深夜emo的真相：不是你想太多——是你太闲了。忙起来就好了。"',
+      cond: g => g.mood < 55 && g.age >= 22 && g.age <= 35,
+      choices:[
+        { label:'写日记', hint:'+🧠 +😊', fn: g => { return{intel:5,mood:5}; }},
+        { label:'吃宵夜', hint:'+😊 +❤️', fn: g => { return{mood:8,health:-3,money:-50}; }},
+        { label:'刷手机到天亮', hint:'+😊 -❤️', fn: g => { return{mood:3,health:-8}; }},
+      ]},
+    { id:'career_crossroads_v2', icon:'🔀', title:'职业十字路口',
+      body:'你的mentor离职了。走之前他请你吃了顿饭，说了一句让你一夜没睡的话：\n\n「你在这里还能学到东西吗？如果不能，就该走了。」\n\n你想了想：你已经半年没有学到新东西了。你的工作内容越来越重复，你的技能越来越专业化——但也越来越窄。\n\n你开始投简历。面试了三家公司，发现外面的世界也没有你想的那么好。\n\n但至少有变化。而变化，有时候就是好的。\n\n"职业发展的真相：不是你在选工作——是工作在选你。"',
+      cond: g => g.job !== '待业中' && g.age >= 26 && g.age <= 38 && g.months > 24,
+      choices:[
+        { label:'跳槽', hint:'+💰 +🧠', fn: g => { g.flags.careerChange=true; setJob(g, g.job, Math.floor(g.jobSalary*1.2)); return{mood:5,intel:5,social:-5}; }},
+        { label:'留下来深耕', hint:'+🧠 +👥', fn: g => { return{intel:8,social:5}; }},
+        { label:'转行试试', hint:'🎲', fn: g => { g.flags.careerChange=true; setJob(g,'新行业新人',Math.floor(g.jobSalary*0.7)); return{intel:10,mood:3,money:-5000}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -6319,6 +6431,14 @@ const ACHIEVEMENTS = [
     { id:'tiger_parent_ach', icon:'📚', name:'虎妈虎爸v2', desc:'为孩子教育大力投入', check: g => g.flags.tigerParent },
     { id:'hometown_return', icon:'🏠', name:'思乡之情', desc:'面对回乡还是留下的抉择', check: g => g.flags.hometownPull },
     { id:'life_reviewer', icon:'🪞', name:'人生复盘者', desc:'在40岁反思了自己的人生', check: g => g.flags.lifeReview40 },
+    // === v12.0 新增成就 ===
+    { id:'gym_card_ach', icon:'💪', name:'健身卡持有者', desc:'办了健身卡', check: g => g.flags.gymMember },
+    { id:'roommate_survivor_v2', icon:'🏠', name:'合租幸存者', desc:'经历了室友矛盾', check: g => g.flags.roommateConflict },
+    { id:'office_politician', icon:'🏢', name:'办公室生存术', desc:'经历了办公室政治', check: g => g.flags.officePolitics },
+    { id:'screen_conscious', icon:'📱', name:'屏幕觉醒者', desc:'开始控制屏幕时间', check: g => g.flags.screenTimeLimit },
+    { id:'traveler_ach', icon:'🏖️', name:'周末旅行家', desc:'来了一次说走就走的旅行', check: g => g.flags.weekendTrip },
+    { id:'career_changer_v2', icon:'🔀', name:'职业转型者', desc:'做出了职业改变', check: g => g.flags.careerChange },
+    { id:'kindness_receiver', icon:'💝', name:'被温柔以待', desc:'感受过陌生人的善意', check: g => g.social > 60 && g.mood > 50 },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -6479,6 +6599,9 @@ const ENDINGS = [
     // --- v11.9 NEW ENDINGS ---
     { id:'hometown_return_end', badge:'🏠', title:'归乡', desc:'你回了老家。\n\n你在小城开了一家店，过上了朝九晚五的生活。没有996，没有通勤两小时，没有房租压力。\n\n你的收入少了一半，但你的笑容多了一倍。你可以每天回家吃饭，可以周末陪父母钓鱼，可以看着孩子在院子里疯跑。\n\n你的大城市朋友发微信：「你后悔了吗？」\n\n你回复：「不后悔回来。只后悔没早点回来。」\n\n"回家的路很长——但每一步都离幸福更近。"', cond: g => g.flags.hometownPull && g.flags.hometownEntrepreneur && g.mood >= 60 && g.age >= 33 },
     { id:'midlife_wisdom_end', badge:'🪞', title:'四十知天命', desc:'你40岁了，终于想明白了一些事。\n\n你不再跟同事比工资，不再跟同学比房子，不再跟朋友圈里的「成功人士」比人生。\n\n你开始接受：自己就是一个普通人。普通的收入、普通的工作、普通的生活。但普通的你，养大了孩子、照顾了父母、没有放弃自己。\n\n你发了一条朋友圈：「40岁，学会了跟自己和解。」\n\n"人生最大的成就不是成为谁——是接受自己是谁。"', cond: g => g.flags.lifeReview40 && g.mood >= 55 && g.age >= 40 },
+    // --- v12.0 NEW ENDINGS ---
+    { id:'balanced_life_end', badge:'⚖️', title:'平衡人生', desc:'你找到了一种平衡：不躺平也不内卷，不焦虑也不麻木。\n\n你有一份不算完美但还行的工作，有几个真心朋友，有一个健康的身体，有一颗还在思考的脑袋。\n\n你的领导说你应该更「有野心」。你笑着说：「我的野心是——过好自己的每一天。」\n\n"人生的终极答案不是成功——是平衡。"', cond: g => g.mood >= 65 && g.health >= 60 && g.social >= 45 && g.money >= 20000 && g.age >= 30 && g.intel >= 55 },
+    { id:'wanderer_end', badge:'🌍', title:'永远在路上', desc:'你成了一个「城市漫游者」。\n\n你在五个城市生活过，换过七份工作，搬过十二次家。你的行李箱里装着你所有的家当。\n\n有人说你「不稳定」。你说你只是还没找到让你停下来的理由。\n\n也许明天你就找到了。也许永远不会。但路上的风景，也挺好的。\n\n"不是所有流浪的人都迷了路——有些人只是在寻找。"', cond: g => g.flags.citySwitch && g.flags.weekendTrip && g.charm >= 50 && g.age >= 28 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
