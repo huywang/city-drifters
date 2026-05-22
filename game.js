@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v26.2
+// 都市浮生记 - Game Engine v26.3
 // ============================================
 
 // === GAME STATE ===
@@ -12925,6 +12925,87 @@ const EVENTS = [
         { label:'觉得风险太大，放弃了', hint:'+🧠 +💰', fn: g => { g.flags.homesteadDream=true; return{intel:3}; }},
         { label:'跟父母商量，准备以后回老家发展', hint:'+🤝 +😊 +💰', fn: g => { g.flags.homesteadDream=true; g.flags.hometownPlan=true; return{social:5,mood:5,money:2000}; }},
       ]},
+    // v26.3: 医疗生态 + 健康危机
+    { id:'hospital_registration', icon:'🏥', title:'挂号难', category:'health',
+      body:'你身体不舒服，想去三甲医院看病。\n\n你打开挂号App——\n- 今天的号：没了\n- 明天的号：没了\n- 后天的号：没了\n- 一周后的号：有，但只有下午4点的\n\n你挂了「一周后」的号。\n\n一周后你去了医院：\n- 排队2小时\n- 候诊1小时\n- 看病5分钟\n- 开了一堆检查\n\n检查又要预约——又要等。\n\n你算了一下：看一次病=请假1天+排队3小时+花500元+等一周。\n\n你问自己：如果是急病呢？\n\n「挂号难：不是生病难——是看病难。」',
+      cond: g => g.age >= 18 && !g.flags.hospitalRegistration,
+      choices:[
+        { label:'坚持排队看完，了解整个流程', hint:'+🧠 -💰 -😊', fn: g => { g.flags.hospitalRegistration=true; g.flags.patientVeteran=true; g.money -= 500; return{intel:5,mood:-5}; }},
+        { label:'找了黄牛，花300元买了个号', hint:'-💰 +😊', fn: g => { g.flags.hospitalRegistration=true; g.flags.scalperUser=true; g.money -= 300; return{mood:3}; }},
+        { label:'转去社区医院，虽然小病还行大病不行', hint:'+💰 +🧠 -❤️', fn: g => { g.flags.hospitalRegistration=true; g.flags.communityClinic=true; g.money -= 100; return{intel:3,health:-2}; }},
+      ]},
+    { id:'emergency_room', icon:'🚑', title:'急诊经历', category:'health',
+      body:'你半夜突发剧烈腹痛——你打了120。\n\n救护车10分钟到了。你被送到最近的三甲医院急诊。\n\n急诊室里：\n- 人满为患\n- 有人在哭，有人在喊\n- 医生护士跑前跑后\n- 你等了一个小时才被叫到\n\n医生给你做了检查：\n- 血常规\n- B超\n- CT\n\n结果出来：「急性阑尾炎」。\n\n医生说：「要手术，现在做还是明天做？」\n\n你：「现在。」\n\n手术很顺利。你在医院躺了3天。\n\n你第一次认真想：如果我没医保——这3万块怎么办？\n\n「急诊经历：当你躺在急诊床上的那一刻——才知道「健康」两个字的重量。」',
+      cond: g => g.age >= 18 && !g.flags.emergencyRoom && g.health >= 30,
+      choices:[
+        { label:'开始重视健康，开始规律作息', hint:'+❤️ +🧠 +😊', fn: g => { g.flags.emergencyRoom=true; g.flags.healthAwakener=true; g.health -= 10; return{health:10,intel:5,mood:3}; }},
+        { label:'买了商业医疗保险，以防万一', hint:'-💰 +🧠', fn: g => { g.flags.emergencyRoom=true; g.flags.medicalInsuranceBuyer=true; g.money -= 5000; return{intel:5}; }},
+        { label:'病好了就忘了，继续原来的生活', hint:'-❤️ +😊', fn: g => { g.flags.emergencyRoom=true; g.health -= 10; return{mood:3}; }},
+      ]},
+    { id:'chronic_disease', icon:'💊', title:'慢性病诊断', category:'health',
+      body:'你最近总是口渴、频繁上厕所。\n\n去医院检查——结果出来了：\n\n「2型糖尿病」。\n\n医生说：\n- 这是慢性病，要终身服药\n- 要控制饮食\n- 要规律运动\n- 要定期复查\n- 如果控制不好——会引发并发症\n\n你震惊了：你才30多岁——就得了老年病？\n\n你查了一下：\n- 中国有1.4亿糖尿病患者\n- 发病年龄越来越年轻\n- 跟饮食、熬夜、压力、缺乏运动都有关\n\n你开始反思：你这几年的生活方式——熬夜、外卖、不运动、压力大——身体早就在发出警告了。\n\n「慢性病诊断：不是身体突然垮了——是你早就在透支它。」',
+      cond: g => g.age >= 28 && !g.flags.chronicDisease && g.health <= 60,
+      choices:[
+        { label:'彻底改变生活方式：饮食+运动+作息', hint:'+❤️ +🧠 -😊 -💰', fn: g => { g.flags.chronicDisease=true; g.flags.lifestyleReformer=true; g.money -= 3000; return{health:10,intel:5,mood:-5}; }},
+        { label:'按时吃药，但其他习惯没怎么改', hint:'+❤️ -💰', fn: g => { g.flags.chronicDisease=true; g.money -= 1000; return{health:3}; }},
+        { label:'觉得还年轻，不重视', hint:'-❤️ -🧠', fn: g => { g.flags.chronicDisease=true; g.flags.diseaseDenier=true; return{health:-10,intel:-3}; }},
+      ]},
+    { id:'health_checkup_v26_3', icon:'🔬', title:'体检', category:'health',
+      body:'公司安排了一年一度的体检。\n\n你拿到报告：\n- 体重：超标\n- 血脂：偏高\n- 尿酸：临界\n- 脂肪肝：轻度\n- 颈椎：问题\n- 睡眠：不佳\n- 肺结节：3mm（要复查）\n\n你看到「肺结节」三个字——心里一紧。\n\n医生说：「90%的肺结节都是良性的，但需要定期复查。」\n\n你开始理解：体检——不是「确认自己健康」，而是「提前发现不健康」。\n\n你也发现：\n- 同龄人的体检报告——几乎都有问题\n- 亚健康——已经成了常态\n- 「健康」——已经成了一种奢侈品\n\n「体检：你不是在检查身体——是在看「透支」的账单。」',
+      cond: g => g.age >= 25 && !g.flags.healthCheckup,
+      choices:[
+        { label:'根据体检报告开始调整生活方式', hint:'+❤️ +🧠 +😊', fn: g => { g.flags.healthCheckup=true; g.flags.checkupFollower=true; return{health:5,intel:3,mood:3}; }},
+        { label:'买了体检加项，每年自费深度检查', hint:'-💰 +❤️ +🧠', fn: g => { g.flags.healthCheckup=true; g.flags.deepChecker=true; g.money -= 3000; return{health:5,intel:5}; }},
+        { label:'看了一眼就扔了，不敢面对', hint:'-❤️ -🧠 +😊', fn: g => { g.flags.healthCheckup=true; return{health:-3,intel:-2,mood:3}; }},
+      ]},
+    { id:'medical_insurance_v26_3', icon:'🛡️', title:'医保', category:'health',
+      body:'你生病住院了。出院时，你拿到了账单：\n\n总费用：8万\n- 医保报销：5万\n- 自费：3万\n\n你看着那3万自费——心里五味杂陈。\n\n你了解到：\n- 医保覆盖基本医疗——但进口药、高端检查不报\n- 医保有起付线和封顶线\n- 医保目录外的药——100%自费\n- 跨省就医——报销比例更低\n\n你算了一下：如果得了癌症——自费部分可能要30-50万。\n\n你开始思考：要不要买商业医疗险？\n- 百万医疗险：每年几百元，可报销上百万\n- 重疾险：每年几千元，确诊即赔\n- 高端医疗险：每年几万元，全球可用\n\n「医保：不是保障——是「底线」。能不能活得好——还要看你的「上限」。」',
+      cond: g => g.age >= 20 && !g.flags.medicalInsurance && g.money >= 5000,
+      choices:[
+        { label:'买了百万医疗+重疾险，全面保障', hint:'-💰 +🧠 +❤️', fn: g => { g.flags.medicalInsurance=true; g.flags.fullyInsured=true; g.money -= 8000; return{intel:5,health:3}; }},
+        { label:'只买了百万医疗，基础保障', hint:'-💰 +🧠', fn: g => { g.flags.medicalInsurance=true; g.money -= 1000; return{intel:3}; }},
+        { label:'觉得有医保就够了，不买商业险', hint:'+💰 -🧠', fn: g => { g.flags.medicalInsurance=true; return{intel:-3}; }},
+      ]},
+    { id:'doctor_patient', icon:'👨‍⚕️', title:'医患关系', category:'health',
+      body:'你去看病。\n\n医生看了你5分钟，说：「没什么大事，多休息，多喝水。」\n\n你心里不满：\n- 我等了一上午\n- 你就看了5分钟\n- 你连我症状都没听完\n\n你想投诉。\n\n但你也看到了：\n- 医生一上午看了50个病人\n- 每个病人平均5分钟\n- 医生的午饭——是冷掉的盒饭\n- 医生的眼圈——是黑的\n\n你突然理解了：医生——也是受害者。\n\n在一个「看病难、看病贵」的系统里——医生和患者——都是被碾压的个体。\n\n你问：错的到底是谁？\n\n「医患关系：不是医生和患者的矛盾——是系统的矛盾。」',
+      cond: g => g.age >= 18 && !g.flags.doctorPatient,
+      choices:[
+        { label:'成了患者权益倡导者，开始发声', hint:'+✨ +🧠 +🤝', fn: g => { g.flags.doctorPatient=true; g.flags.patientAdvocate=true; return{charm:5,intel:5,social:3}; }},
+        { label:'理解了医生的难处，态度变好了', hint:'+😊 +🧠 +🤝', fn: g => { g.flags.doctorPatient=true; return{mood:3,intel:3,social:3}; }},
+        { label:'还是不满意，投诉了', hint:'-😊 -🤝', fn: g => { g.flags.doctorPatient=true; return{mood:-3,social:-3}; }},
+      ]},
+    { id:'medical_tourism', icon:'✈️', title:'跨境医疗', category:'health',
+      body:'一个朋友去了日本做体检。\n\n她说：\n- 服务一流（全程有人陪）\n- 设备先进（早期癌症检出率高）\n- 医生认真（看了30分钟）\n- 价格：3万人民币（包括机票酒店）\n\n你问她：「值得吗？」\n\n她说：「我在国内体检——只查出脂肪肝。在日本——查出了早期甲状腺结节。早发现——就是救命。」\n\n你开始了解跨境医疗：\n- 日本：精密体检、癌症早筛\n- 美国：顶级治疗（但贵到离谱）\n- 韩国：整形+医美\n- 泰国：性价比医疗\n\n你也知道：能去跨境医疗的——都是有钱人。\n\n「跨境医疗：健康——也成了可以「买」的商品。」',
+      cond: g => g.age >= 30 && !g.flags.medicalTourism && g.money >= 50000,
+      choices:[
+        { label:'也去了日本做精密体检', hint:'-💰 +❤️ +🧠', fn: g => { g.flags.medicalTourism=true; g.flags.medicalTourist=true; g.money -= 30000; return{health:5,intel:5}; }},
+        { label:'了解了，但觉得没必要', hint:'+🧠', fn: g => { g.flags.medicalTourism=true; return{intel:3}; }},
+        { label:'被震撼了，开始认真存「健康基金」', hint:'+💰 +❤️ +🧠', fn: g => { g.flags.medicalTourism=true; g.flags.healthFundSaver=true; return{intel:5,health:3,money:5000}; }},
+      ]},
+    { id:'psychotherapy', icon:'🧘', title:'心理咨询', category:'health',
+      body:'你最近总是失眠、焦虑、情绪低落。\n\n朋友建议你：「去做心理咨询吧。」\n\n你犹豫了：\n- 「我又不是精神病」\n- 「咨询那么贵，有用吗？」\n- 「别人怎么看我？」\n\n但你还是去了。\n\n第一次咨询：\n- 50分钟\n- 800元\n- 咨询师一直在听\n- 你说了很多从没说过的话\n\n咨询结束后——你哭了。\n\n你发现：有些情绪——你压了很多年，却从来没被看见过。\n\n你开始明白：心理健康——跟身体健康一样重要。\n\n你也知道：在中国——看心理咨询的人还不到1%。大多数人——选择「自己扛」。\n\n「心理咨询：不是你「有病」——是你终于愿意面对自己。」',
+      cond: g => g.age >= 20 && !g.flags.psychotherapy && g.mood <= 50 && g.money >= 2000,
+      choices:[
+        { label:'开始长期心理咨询，每周一次', hint:'-💰 +😊 +🧠 +❤️', fn: g => { g.flags.psychotherapy=true; g.flags.therapyRegular=true; g.money -= 5000; return{mood:10,intel:5,health:3}; }},
+        { label:'做了几次，感觉有帮助', hint:'-💰 +😊 +🧠', fn: g => { g.flags.psychotherapy=true; g.money -= 2000; return{mood:5,intel:3}; }},
+        { label:'觉得没用，不去了', hint:'+💰 -😊', fn: g => { g.flags.psychotherapy=true; return{mood:-3}; }},
+      ]},
+    { id:'rehabilitation', icon:'🏃', title:'康复治疗', category:'health',
+      body:'你运动时受了伤——膝盖半月板撕裂。\n\n手术很成功。但医生说：「接下来要做康复治疗。」\n\n康复训练：\n- 每周3次\n- 每次1小时\n- 持续3-6个月\n- 费用：每次300元\n\n你开始康复训练：\n- 第一次：疼得走不动\n- 第二次：有点进步\n- 第三次：可以慢慢弯曲了\n- 第N次：你终于能正常走路了\n\n你发现：康复——是一个「重建」的过程。\n\n不只是重建膝盖——也是重建你对身体的信任。\n\n你也学到了：\n- 康复比手术更重要\n- 急不得\n- 每一次小进步——都值得庆祝\n\n「康复治疗：不是回到过去——是重新出发。」',
+      cond: g => g.age >= 20 && !g.flags.rehabilitation && g.health >= 20,
+      choices:[
+        { label:'严格按照康复计划执行，完全恢复', hint:'-💰 +❤️ +🧠 +😊', fn: g => { g.flags.rehabilitation=true; g.flags.disciplinedRecover=true; g.money -= 10000; return{health:10,intel:5,mood:5}; }},
+        { label:'做了一段时间就偷懒了，恢复一般', hint:'-💰 +❤️', fn: g => { g.flags.rehabilitation=true; g.money -= 5000; return{health:3}; }},
+        { label:'嫌太贵太麻烦，自己在家练', hint:'+💰 -❤️ +🧠', fn: g => { g.flags.rehabilitation=true; g.flags.selfRehab=true; return{intel:3,health:-3}; }},
+      ]},
+    { id:'long_term_care', icon:'👴', title:'长护险', category:'health',
+      body:'你爷爷中风了——生活不能自理。\n\n你爸妈每天：\n- 轮流照顾\n- 请假陪诊\n- 请护工（每月6000元）\n- 心理和身体都快撑不住了\n\n你了解到了「长期护理保险」（长护险）：\n- 为失能老人提供照护\n- 由政府和个人共同承担\n- 在部分城市试点\n- 每月可获得2000-5000元护理补贴\n\n你也了解到：\n- 中国有4000万失能老人\n- 大多数家庭——没有准备\n- 「一人失能，全家失衡」\n- 长护险——被称为「第六险」\n\n你开始思考：当你老了——谁来照顾你？\n\n「长护险：不是给老人的保险——是给子女和未来的自己的保险。」',
+      cond: g => g.age >= 35 && !g.flags.longTermCare && g.money >= 10000,
+      choices:[
+        { label:'给父母买了长护险，也给自己买了一份', hint:'-💰 +🧠 +❤️', fn: g => { g.flags.longTermCare=true; g.flags.longTermCareBuyer=true; g.money -= 6000; return{intel:5,health:3}; }},
+        { label:'只给父母买了，自己还年轻再说', hint:'-💰 +🧠 +🤝', fn: g => { g.flags.longTermCare=true; g.money -= 3000; return{intel:3,social:3}; }},
+        { label:'觉得还早，以后再说', hint:'+💰 -🧠', fn: g => { g.flags.longTermCare=true; return{intel:-2}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -14076,6 +14157,12 @@ const ACHIEVEMENTS = [
     { id:'diy_expert_ach', icon:'🔨', name:'装修专家', desc:'亲自盯装修成了半个专家', check: g => g.flags.diyExpert },
     { id:'neighbor_organizer_ach', icon:'🤝', name:'邻里组织者', desc:'联合邻居一起跟物业谈判', check: g => g.flags.neighborOrganizer },
     { id:'homestead_builder_ach', icon:'🏡', name:'宅基地梦想家', desc:'租了宅基地开始建民宿', check: g => g.flags.homesteadBuilder },
+    // v26.3: 医疗生态成就
+    { id:'health_awakener_ach', icon:'💚', name:'健康觉醒者', desc:'经历急诊后开始重视健康', check: g => g.flags.healthAwakener },
+    { id:'deep_checker_ach', icon:'🔬', name:'深度体检派', desc:'每年自费做深度体检', check: g => g.flags.deepChecker },
+    { id:'fully_insured_v26_3_ach', icon:'🛡️', name:'全面医保派', desc:'配齐了百万医疗和重疾险', check: g => g.flags.fullyInsured },
+    { id:'patient_advocate_ach', icon:'📣', name:'患者权益倡导者', desc:'开始为患者权益发声', check: g => g.flags.patientAdvocate },
+    { id:'therapy_regular_ach_v26_3b', icon:'🧘', name:'心理咨询常客', desc:'开始长期规律的心理咨询', check: g => g.flags.therapyRegular },
 ];
 
 // === ENDINGS === (order matters: first match wins)
