@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v15.1
+// 都市浮生记 - Game Engine v15.2
 // ============================================
 
 // === GAME STATE ===
@@ -7773,6 +7773,87 @@ const EVENTS = [
         { label:'减少个人信息暴露', hint:'+🧠 +😊', fn: g => { g.flags.privacyConcern=true; g.flags.minimalData=true; return{intel:8,mood:5}; }},
         { label:'算了，反正也没什么好泄露的', hint:'+😊 -🧠', fn: g => { g.flags.privacyConcern=true; return{mood:3,intel:-3}; }},
       ]},
+    // === v15.2 社交文化 + 人情世故 + 网络生态 ===
+    { id:'dinner_party_culture', icon:'🍻', title:'饭局文化',
+      body:'你的领导叫你去参加一个饭局。\n\n桌上有8个人：你的领导、领导的领导、领导的领导的客户、以及你——一个负责倒酒的小角色。\n\n你学到了饭局礼仪：敬酒要低于对方的杯子、等领导先动筷子、别在饭桌上谈正事——正事都是饭后单独说的。\n\n你喝了半斤白酒，胃翻了一晚上。第二天你问同事：「昨天饭局谈成了吗？」同事说：「成不成不重要——重要的是让领导开心了。」\n\n"饭局文化：不是在吃饭——是在吃人情世故。"',
+      cond: g => g.age >= 22 && g.job !== '待业中' && !g.flags.dinnerParty,
+      choices:[
+        { label:'学会饭局技巧', hint:'+👥 +✨ +🧠', fn: g => { g.flags.dinnerParty=true; g.flags.socialSavvy=true; return{social:10,charm:8,intel:5}; }},
+        { label:'拒绝无意义的饭局', hint:'+🧠 +😊 -👥', fn: g => { g.flags.dinnerParty=true; g.flags.boundarySetter=true; return{intel:8,mood:5,social:-5}; }},
+        { label:'硬着头皮参加', hint:'+👥 -💪', fn: g => { g.flags.dinnerParty=true; return{social:5,health:-5}; }},
+      ]},
+    { id:'gift_giving_anxiety', icon:'🎁', title:'送礼焦虑',
+      body:'中秋节到了，你开始焦虑送什么礼物。\n\n给父母送什么？给丈母娘/公婆送什么？给领导送什么？给客户送什么？给帮过忙的同事送什么？\n\n你列了一张清单：8个人，预算5000。你纠结了3天：月饼太普通、茶叶太贵、保健品太假、红包太直接。\n\n最后你花了4800块，送了一圈。你觉得每个人都不太满意——但你已经尽力了。\n\n你的一个朋友说：「我今年谁都没送。」你震惊地看着他：「你不怕得罪人？」他说：「真正的关系不需要月饼来维持。」\n\n"送礼焦虑：不是不知道送什么——是害怕送错了影响关系。"',
+      cond: g => g.age >= 22 && !g.flags.giftGivingAnxiety,
+      choices:[
+        { label:'精心挑选每份礼物', hint:'-💰 +👥 +✨', fn: g => { g.flags.giftGivingAnxiety=true; g.flags.giftMaster=true; return{money:-3000,social:10,charm:5}; }},
+        { label:'只送重要的人', hint:'-💰 +🧠', fn: g => { g.flags.giftGivingAnxiety=true; return{money:-1000,intel:5}; }},
+        { label:'今年不送了', hint:'+💰 -👥', fn: g => { g.flags.giftGivingAnxiety=true; g.flags.noGift=true; return{money:500,social:-5}; }},
+      ]},
+    { id:'cyberbullying_victim', icon:'💻', title:'网络暴力',
+      body:'你在网上发表了一个观点，然后被网暴了。\n\n你的微博评论里全是骂你的：「你是不是傻」「这智商也好意思发言」「人肉他」。你删了那条微博，但已经有人截图了。\n\n你一整天都在看那些评论，每看一条就难过一次。你的手指不受控制地继续看——像是在自虐。\n\n你的一个朋友说：「别看了，那些人都是键盘侠。」但你知道——每一条恶评都是一个真实的人打的。\n\n你关掉了评论通知。但那些话，已经在你的脑子里了。\n\n"网络暴力：屏幕那边的人忘了你是人——而你也快忘了他们是人。"',
+      cond: g => g.age >= 18 && !g.flags.cyberbullyingVictim,
+      choices:[
+        { label:'学会不在意', hint:'+🧠 +💪', fn: g => { g.flags.cyberbullyingVictim=true; g.flags.thickSkin=true; return{intel:8,health:3}; }},
+        { label:'减少社交媒体使用', hint:'+💪 +😊 +🧠', fn: g => { g.flags.cyberbullyingVictim=true; g.flags.socialMediaBreak=true; return{health:8,mood:10,intel:5}; }},
+        { label:'反击回去', hint:'+✨ -😊', fn: g => { g.flags.cyberbullyingVictim=true; g.flags.fighter=true; return{charm:5,mood:-8}; }},
+      ]},
+    { id:'information_bubble', icon:'🫧', title:'信息茧房',
+      body:'你发现——你和你的朋友看到的新闻完全不一样。\n\n你看到的都是「经济向好」「科技突破」「国货崛起」。他看到的都是「裁员潮」「房价下跌」「消费降级」。\n\n你们在同一个城市、同一年龄段、做着类似的工作——但你们活在两个完全不同的信息世界里。\n\n你试着看了他的推荐流——觉得全是负能量。他试着看了你的——觉得全是正能量。\n\n你们吵了一架。最后达成共识：也许真相在两者之间。\n\n"信息茧房：不是你选择了信息——是算法选择了你该看到什么。"',
+      cond: g => g.age >= 20 && !g.flags.informationBubble,
+      choices:[
+        { label:'主动看不同观点', hint:'+🧠 +💪', fn: g => { g.flags.informationBubble=true; g.flags.criticalThinker=true; return{intel:15,health:3}; }},
+        { label:'减少算法推荐', hint:'+🧠 +😊', fn: g => { g.flags.informationBubble=true; g.flags.algorithmResistant=true; return{intel:10,mood:5}; }},
+        { label:'只看让自己舒服的', hint:'+😊 -🧠', fn: g => { g.flags.informationBubble=true; return{mood:5,intel:-5}; }},
+      ]},
+    { id:'colleague_competition', icon:'🏢', title:'同事内卷',
+      body:'你的同事今天又加班到11点了。\n\n你本来打算6点下班，但看到他还亮着灯——你又坐了下来。你们组有5个人，每个人都在比谁走得晚。\n\n你的领导说：「你们不用比加班。」但他的绩效考核里，「工作态度」占了30%。\n\n你算了一下：你每天多待3小时，一个月多待66小时，一年多待800小时。换来的是什么？是一个「态度好」的评价和黑眼圈。\n\n你终于理解了什么叫「内卷」：不是你不努力——是你不敢不努力。\n\n"同事内卷：不是在竞争业绩——是在竞争谁更能忍。"',
+      cond: g => g.age >= 22 && g.job !== '待业中' && !g.flags.colleagueCompetition,
+      choices:[
+        { label:'提高效率，准点下班', hint:'+🧠 +💪 +😊', fn: g => { g.flags.colleagueCompetition=true; g.flags.efficiencyKing=true; return{intel:10,health:5,mood:8}; }},
+        { label:'跟着卷', hint:'+💰 -💪 -😊', fn: g => { g.flags.colleagueCompetition=true; g.flags.overtimeWorker=true; return{money:2000,health:-10,mood:-8}; }},
+        { label:'和领导谈谈', hint:'+👥 +🧠', fn: g => { g.flags.colleagueCompetition=true; g.flags.upwardCommunication=true; return{social:8,intel:5}; }},
+      ]},
+    { id:'keyboard_warrior', icon:'⌨️', title:'键盘侠时刻',
+      body:'你在网上看到一条不公正的新闻，忍不住写了一篇长评。\n\n你写了500字，逻辑清晰、论据充分。你以为自己是在「理性讨论」。\n\n然后你发现——评论区里的人比你更愤怒。他们把你的评论转发到了各个群里，有人赞同你，也有人骂你。\n\n你的评论被顶上了热评第一。你收获了500个赞和200条骂你的回复。\n\n你突然意识到：你以为你在伸张正义，但在这个流量至上的时代，你的愤怒也变成了别人的娱乐。\n\n"键盘侠：不是每个在网上说话的人都是正义的——也不是每个正义的人都应该在网上说话。"',
+      cond: g => g.age >= 18 && !g.flags.keyboardWarrior,
+      choices:[
+        { label:'继续理性发声', hint:'+✨ +🧠 +👥', fn: g => { g.flags.keyboardWarrior=true; g.flags.rationalVoice=true; return{charm:8,intel:8,social:5}; }},
+        { label:'沉默是金', hint:'+🧠 +😊', fn: g => { g.flags.keyboardWarrior=true; g.flags.silentObserver=true; return{intel:10,mood:5}; }},
+        { label:'删评道歉', hint:'-✨ +😊', fn: g => { g.flags.keyboardWarrior=true; return{charm:-3,mood:3}; }},
+      ]},
+    { id:'neighbor_dispute', icon:'🏘️', title:'邻里纠纷',
+      body:'你楼上的邻居每晚11点开始拖家具。\n\n你上楼敲门，一个穿着睡衣的大叔开了门。你说：「能不能轻一点？」他说：「我孩子刚学会走路。」\n\n你说：「我理解，但我明天要上班。」他说：「我理解，但孩子不会理解。」\n\n你们互相理解了10分钟，什么都没解决。\n\n你后来买了耳塞。他在地板上铺了地毯。你们的关系从「敌对」变成了「互相忍让」。\n\n你在电梯里遇到他，他笑了笑。你也笑了笑。你们什么都没说——但都知道对方尽力了。\n\n"邻里关系：不是要成为朋友——是要学会互相容忍。"',
+      cond: g => g.age >= 22 && !g.flags.neighborDispute,
+      choices:[
+        { label:'主动沟通解决', hint:'+👥 +🧠', fn: g => { g.flags.neighborDispute=true; g.flags.conflictResolver=true; return{social:8,intel:5}; }},
+        { label:'找物业投诉', hint:'+🧠 -👥', fn: g => { g.flags.neighborDispute=true; return{intel:5,social:-3}; }},
+        { label:'忍忍就过去了', hint:'+💪 -😊', fn: g => { g.flags.neighborDispute=true; return{health:3,mood:-5}; }},
+      ]},
+    { id:'favor_exchange', icon:'🤝', title:'人情债',
+      body:'一个不太熟的朋友找你帮忙：「能不能帮我内推一下？」\n\n你帮他内推了。他没进。但你欠了你朋友一个人情。\n\n三个月后他又找你：「能不能帮我写个推荐信？」你写了。他用了，但没告诉你结果。\n\n六个月后他又找你：「能不能借我5000块？」你犹豫了。\n\n你开始理解什么叫「人情债」：不是欠了就要还——是还了还要欠。你帮了他三次，他不觉得欠你什么。但如果你拒绝第四次——他觉得你不仗义。\n\n"人情债：最难还的债不是钱——是那些你以为免费的好意。"',
+      cond: g => g.age >= 22 && !g.flags.favorExchange,
+      choices:[
+        { label:'学会婉拒', hint:'+🧠 +😊', fn: g => { g.flags.favorExchange=true; g.flags.learnedToRefuse=true; return{intel:10,mood:5}; }},
+        { label:'继续帮忙', hint:'+👥 -💰 +😊', fn: g => { g.flags.favorExchange=true; return{social:8,money:-5000,mood:3}; }},
+        { label:'划清界限', hint:'+🧠 -👥', fn: g => { g.flags.favorExchange=true; g.flags.boundaryClear=true; return{intel:8,social:-5}; }},
+      ]},
+    { id:'wechat_group_fatigue', icon:'📱', title:'微信群疲劳',
+      body:'你有47个微信群。\n\n工作群3个、家庭群2个、朋友群5个、业主群1个、拼团群3个、快递群2个、以及各种你已经忘了为什么加的群。\n\n每天你的手机震300次以上。大多数消息和你无关，但你不敢退出——因为万一有你相关的呢？\n\n你的一个前同事退出了所有非工作群。他说：「我终于安静了。」你羡慕地看着他——然后继续看群消息。\n\n"微信群：不是在社交——是在被社交绑架。但你不敢退出——因为你怕被遗忘。"',
+      cond: g => g.age >= 20 && !g.flags.wechatGroupFatigue,
+      choices:[
+        { label:'退出无用群', hint:'+😊 +🧠 +💪', fn: g => { g.flags.wechatGroupFatigue=true; g.flags.groupCleaner=true; return{mood:10,intel:8,health:5}; }},
+        { label:'全部静音', hint:'+😊 +🧠', fn: g => { g.flags.wechatGroupFatigue=true; g.flags.muteAll=true; return{mood:8,intel:5}; }},
+        { label:'继续潜水', hint:'+🧠', fn: g => { g.flags.wechatGroupFatigue=true; return{intel:3}; }},
+      ]},
+    { id:'face_culture', icon:'🎭', title:'面子问题',
+      body:'你的同学聚会，大家都在比。\n\n老张开的是奔驰、老李住的是别墅、老王的孩子考上了清华。你开的是电动车、住的是出租屋、你的孩子还在上幼儿园。\n\n你微笑着听他们聊天，心里五味杂陈。有人问你：「你现在做什么？」你说了一个普通的公司名字。他「哦」了一声就转了话题。\n\n回家的路上，你想：面子是什么？是别人看你的方式？还是你看自己的方式？\n\n你突然觉得：也许真正的体面不是开好车、住大房子——是对自己的选择感到坦然。\n\n"面子文化：不是你有面子——是面子有你。"',
+      cond: g => g.age >= 25 && !g.flags.faceCulture,
+      choices:[
+        { label:'不在乎面子', hint:'+😊 +🧠 +💪', fn: g => { g.flags.faceCulture=true; g.flags.innerConfidence=true; return{mood:12,intel:10,health:3}; }},
+        { label:'努力提升自己', hint:'+🧠 +💪 -💰', fn: g => { g.flags.faceCulture=true; g.flags.selfImprovement=true; return{intel:10,health:3,money:-2000}; }},
+        { label:'减少这类聚会', hint:'+😊 +🧠', fn: g => { g.flags.faceCulture=true; g.flags.selectiveSocializing=true; return{mood:8,intel:5}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -8503,6 +8584,15 @@ const ACHIEVEMENTS = [
     { id:'ride_hailer_ach', icon:'🚗', name:'网约车司机', desc:'跑了网约车', check: g => g.flags.rideHailingDriver },
     { id:'privacy_guard_ach', icon:'🔒', name:'隐私卫士', desc:'关注了个人隐私', check: g => g.flags.privacyConcern },
     { id:'gig_worker_ach', icon:'💼', name:'零工达人', desc:'体验了零工经济', check: g => g.flags.gigEconomy },
+    // === v15.2 新增成就（社交文化） ===
+    { id:'dinner_party_ach', icon:'🍻', name:'饭局老手', desc:'参加了职场饭局', check: g => g.flags.dinnerParty },
+    { id:'gift_giver_ach', icon:'🎁', name:'送礼达人', desc:'经历了送礼焦虑', check: g => g.flags.giftGivingAnxiety },
+    { id:'cyber_survivor_ach', icon:'💻', name:'网暴幸存者', desc:'经历了网络暴力', check: g => g.flags.cyberbullyingVictim },
+    { id:'critical_thinker_ach', icon:'🫧', name:'独立思考者', desc:'意识到了信息茧房', check: g => g.flags.informationBubble },
+    { id:'anti_involution_ach', icon:'🏢', name:'反卷先锋', desc:'面对了同事内卷', check: g => g.flags.colleagueCompetition },
+    { id:'neighbor_peace_ach', icon:'🏘️', name:'邻里和平使者', desc:'处理了邻里纠纷', check: g => g.flags.neighborDispute },
+    { id:'favor_master_ach', icon:'🤝', name:'人情练达', desc:'面对了人情债', check: g => g.flags.favorExchange },
+    { id:'face_free_ach', icon:'🎭', name:'面子自由', desc:'不再被面子绑架', check: g => g.flags.faceCulture },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -8743,6 +8833,10 @@ const ENDINGS = [
     { id:'digital_pioneer_end', badge:'🤖', title:'数字先锋', desc:'你成了AI时代的弄潮儿。\n\n你深度掌握了各种AI工具，你的工作效率是同事的3倍。你开了一个AI教程频道，粉丝10万+。你被邀请去做演讲，主题是「如何与AI共舞」。\n\n你的领导说：「你是我们公司的AI大使。」你说：「我只是比别人早了一步。」\n\n你知道：在技术变革的浪潮中，先行者未必赢——但不学习的人一定会输。\n\n"数字先锋：不是技术改变了你——是你利用技术改变了自己。"', cond: g => g.flags.aiExpert && g.flags.selfMediaCreator && g.intel >= 75 && g.age >= 25 },
     { id:'nomad_life_end', badge:'🌍', title:'自由灵魂', desc:'你成了一个真正的数字游民。\n\n你在大理、丽江、清迈、巴厘岛都工作过。你的办公室是咖啡馆、联合办公空间、甚至是海边的吊床。\n\n你的收入不高，但你的生活成本很低。你有时间看日落、有时间交朋友、有时间做自己。\n\n你的父母终于理解了：「你开心就好。」你的朋友圈里，全是来自世界各地的照片。\n\n"数字游民：不是逃避——是选择了自己想要的生活节奏。"', cond: g => g.flags.nomadLifestyle && g.flags.remoteNetwork && g.mood >= 70 && g.age >= 28 },
     { id:'platform_survivor_end', badge:'🛵', title:'平台幸存者', desc:'你在平台经济中找到了自己的位置。\n\n你做过外卖骑手、跑过网约车、接过各种零工。你比任何人都了解底层劳动者的辛苦。\n\n你后来成了一个劳动权益博主，为平台工人发声。你的文章被很多媒体报道引用。\n\n你说：「每一个在风雨中奔跑的骑手，都值得被尊重。」\n\n"平台幸存者：不是逃离了平台——是让平台看见了人的价值。"', cond: g => g.flags.deliveryRider && g.flags.gigEconomy && g.flags.algorithmAware && g.social >= 60 && g.age >= 28 },
+    // --- v15.2 NEW ENDINGS (社交文化) ---
+    { id:'social_master_end', badge:'🎭', title:'社交大师', desc:'你成了一个真正懂社交的人。\n\n你学会了饭局礼仪、送礼技巧、邻里相处、人情往来。你在公司里人缘极好，在小区里人人夸赞。\n\n但最让你骄傲的不是这些——是你学会了什么时候该社交、什么时候该独处。你不再为了合群而合群，不再为了面子而勉强自己。\n\n你的朋友说：「和你相处特别舒服。」你说：「因为我终于不装了。」\n\n"社交大师：不是认识多少人——是让认识的人都觉得值得。"', cond: g => g.flags.socialSavvy && g.flags.giftMaster && g.flags.conflictResolver && g.social >= 75 && g.age >= 30 },
+    { id:'free_thinker_end', badge:'🧠', title:'独立思考者', desc:'你在信息洪流中保持了清醒。\n\n你不再被算法推荐左右、不再被网络舆论裹挟、不再为了面子而活。你学会了看多方信息、学会了质疑、学会了沉默。\n\n你的同事说：「你怎么什么都不表态？」你说：「不是不表态——是在表态之前先想想。」\n\n你订阅了5个不同立场的媒体。你的朋友圈里不转任何未经核实的消息。你成了朋友眼中的「靠谱信息源」。\n\n"独立思考：不是反对一切——是在相信之前，先问为什么。"', cond: g => g.flags.criticalThinker && g.flags.informationBubble && g.flags.innerConfidence && g.intel >= 75 && g.age >= 28 },
+    { id:'anti_involution_champion_end', badge:'⚡', title:'反卷之王', desc:'你在内卷的洪流中找到了自己的节奏。\n\n你不再和同事比加班、不再和朋友圈比收入、不再和社会比标准。你用自己的方式工作、用自己的方式休息、用自己的方式活着。\n\n你的领导说：「你很特别。」你说：「我只是不想活成别人的模板。」\n\n你准点下班、周末不加班、年假全部休完。你的绩效不是最好的——但你的生活是你想要的。\n\n"反卷：不是不努力——是不用别人的尺子量自己的人生。"', cond: g => g.flags.efficiencyKing && g.flags.faceCulture && g.flags.innerConfidence && g.mood >= 65 && g.age >= 28 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
