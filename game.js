@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v4.6
+// 都市浮生记 - Game Engine v4.7
 // ============================================
 
 // === GAME STATE ===
@@ -2996,6 +2996,25 @@ const EVENTS = [
         { label:'试了一天，失败了', hint:'+😊 -🧠', fn: g => { g.flags.dopamineFasting=true; return{mood:3,intel:-3}; }},
         { label:'不需要，我很有自制力', hint:'+✨', fn: g => { g.flags.dopamineFasting=true; return{charm:5,mood:5}; }},
       ]},
+    // === v4.7 EVENTS - 抽象文化与网络梗 ===
+    { id:'abstract_culture', icon:'🎭', title:'抽象文化',
+      body:'你刷短视频，看到了：\n\n- 《哈基米之歌》：AI无限二创，歌词毫无逻辑，但你就是想笑\n- 《技能五子棋》：AI谱曲，完全抽象，但莫名上头\n- "丝瓜汤"：AI换脸演家庭剧，一个人演全家\n\n你不懂，但你笑了。\n\n"抽象文化——不是讽刺，而是展示一种全新的、偏离日常逻辑的可能性。"\n\n"看不懂？那就对了。看不懂带来了新鲜感和解放感。"',
+      cond: g => !g.flags.abstractCulture && g.age>=18 && g.age<=32,
+      choices:[
+        { label:'二创一个视频', hint:'+✨ +😊 +🧠', fn: g => { g.flags.abstractCulture=true; g.flags.contentCreator=true; return{charm:15,mood:12,intel:8}; }},
+        { label:'发抽象表情包', hint:'+👥 +✨', fn: g => { g.flags.abstractCulture=true; return{social:12,charm:8,mood:8}; }},
+        { label:'用AI创作', hint:'+🧠 +✨', fn: g => { g.flags.abstractCulture=true; g.flags.aiCreator=true; return{intel:12,charm:10,mood:10}; }},
+        { label:'看不懂，也不想看', hint:'+🧠', fn: g => { g.flags.abstractCulture=true; return{intel:3,mood:-3}; }},
+      ]},
+    { id:'internet_meme', icon:'😂', title:'网络热梗',
+      body:'你发现今年的网络热梗：\n\n- "班味儿"：上班后的疲惫感\n- "脆皮打工人"：一碰就坏的年轻人\n- "电子榨菜"：吃饭时看的视频\n- "搭子"：精准陪伴的社交关系\n\n你开始用这些词发朋友圈。\n\n朋友评论："你已经被互联网腌入味了。"\n\n"网络热梗——是一代人的集体记忆，也是时代情绪的浓缩。"',
+      cond: g => !g.flags.internetMeme && g.age>=18 && g.age<=35,
+      choices:[
+        { label:'写段子投稿', hint:'+✨ +💰', fn: g => { g.flags.internetMeme=true; g.flags.jokeWriter=true; if(Math.random()>0.5){return{charm:15,mood:15,money:2000}}else{return{charm:5,mood:-5}} }},
+        { label:'做梗图', hint:'+✨ +😊', fn: g => { g.flags.internetMeme=true; g.flags.memeCreator=true; return{charm:12,mood:10}; }},
+        { label:'只是默默使用', hint:'+👥 +😊', fn: g => { g.flags.internetMeme=true; return{social:8,mood:8}; }},
+        { label:'不玩梗，太累了', hint:'+🧠 +😊', fn: g => { g.flags.internetMeme=true; return{intel:5,mood:3}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3214,6 +3233,9 @@ const ACHIEVEMENTS = [
     // v4.6 achievements
     { id:'slow_living_pioneer', icon:'🌿', name:'慢生活先锋', desc:'实践慢生活', check: g => g.flags.mindfulLiving || g.flags.dailyReader },
     { id:'dopamine_detoxer', icon:'🧘', name:'多巴胺断舍离', desc:'完成多巴胺断舍离', check: g => g.flags.dopamineFasting && g.flags.digitalDetox },
+    // v4.7 achievements
+    { id:'abstract_artist', icon:'🎭', name:'抽象艺术家', desc:'体验抽象文化', check: g => g.flags.abstractCulture },
+    { id:'meme_lord', icon:'😂', name:'梗王', desc:'成为网络热梗玩家', check: g => g.flags.internetMeme },
 ];
 
 // === ENDINGS === (order matters: first match wins)
