@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v4.0
+// 都市浮生记 - Game Engine v4.1
 // ============================================
 
 // === GAME STATE ===
@@ -2891,6 +2891,25 @@ const EVENTS = [
         { label:'研究薅羊毛攻略', hint:'+💰 +✨', fn: g => { g.flags.reverseConsumption=true; return{money:5000,intel:5}; }},
         { label:'该买还是买', hint:'-💰 +😊', fn: g => { g.flags.reverseConsumption=true; return{money:-3000,mood:5}; }},
       ]},
+    // === v4.1 EVENTS - 谷子经济与MBTI ===
+    { id:'goods_economy', icon:'🎭', title:'吃谷',
+      body:'你路过谷子店，看到一排排"吧唧"（徽章）：\n- 《咒术回战》五条悟：限量款\n- 《原神》钟离：绝版\n- 《名侦探柯南》灰原哀：全球限量100个\n\n你花了800块买了3个吧唧。朋友说你疯了。\n\n你说："这不是铁皮，这是情绪价值。"\n\n2024年，中国谷子经济市场规模达1689亿元，增长40%。\n\n"炒股不如炒谷——但谷价比股票还刺激：今天2700，明天可能变27。"',
+      cond: g => !g.flags.goodsEconomy && g.age>=18 && g.age<=30 && g.money>3000,
+      choices:[
+        { label:'入坑吃谷', hint:'-💰 +😊 +✨', fn: g => { g.flags.goodsEconomy=true; g.flags.guziCollector=true; return{money:-5000,mood:20,charm:5}; }},
+        { label:'只买普谷', hint:'-💰 +😊', fn: g => { g.flags.goodsEconomy=true; return{money:-1000,mood:12}; }},
+        { label:'囤货等升值', hint:'-💰 🎲', fn: g => { g.flags.goodsEconomy=true; if(Math.random()>0.5){return{money:10000,mood:20}}else{return{money:-8000,mood:-15}} }},
+        { label:'不理解', hint:'+🧠', fn: g => { g.flags.goodsEconomy=true; return{intel:3}; }},
+      ]},
+    { id:'mbti_test', icon:'🧩', title:'MBTI测试',
+      body:'同事问你："你是I人还是E人？"\n\n你做了MBTI测试，结果是INFJ（提倡者）。\n\n你的微信签名改成了"INFJ · 1%"（全球最稀有的人格类型）。\n\n"MBTI是当代年轻人的社交货币——比星座科学，比八字靠谱，比户口本详细。"\n\n相亲时第一句话："你MBTI是什么？"面试时HR问："你们团队都是什么MBTI？"',
+      cond: g => !g.flags.mbtiTest && g.age>=18 && g.age<=35,
+      choices:[
+        { label:'认真做测试', hint:'+🧠 +✨', fn: g => { g.flags.mbtiTest=true; g.flags.mbtiINFJ=Math.random()>0.85; return{intel:8,charm:3}; }},
+        { label:'随便选', hint:'+😊', fn: g => { g.flags.mbtiTest=true; return{mood:5}; }},
+        { label:'写进简历', hint:'+✨ +💰', fn: g => { g.flags.mbtiTest=true; return{charm:5,money:2000}; }},
+        { label:'不信这个', hint:'+🧠', fn: g => { g.flags.mbtiTest=true; return{intel:5,mood:-3}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3092,6 +3111,9 @@ const ACHIEVEMENTS = [
     // v4.0 achievements
     { id:'pickle_master', icon:'📱', name:'电子榨菜品鉴师', desc:'享受电子榨菜下饭', check: g => g.flags.electronicPickle },
     { id:'smart_shopper', icon:'💸', name:'反向消费达人', desc:'成为平替专家', check: g => g.flags.reverseConsumption },
+    // v4.1 achievements
+    { id:'guzi_collector', icon:'🎭', name:'吃谷人', desc:'开始收集谷子', check: g => g.flags.guziCollector },
+    { id:'mbti_master', icon:'🧩', name:'MBTI专家', desc:'做了MBTI测试', check: g => g.flags.mbtiTest },
 ];
 
 // === ENDINGS === (order matters: first match wins)
