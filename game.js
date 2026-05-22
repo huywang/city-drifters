@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v31.0
+// 都市浮生记 - Game Engine v31.1
 // ============================================
 
 // === GAME STATE ===
@@ -16709,8 +16709,90 @@ const EVENTS = [
         { label:'计划回国弥补遗憾', hint:'+👥 +😊', fn: g => { g.flags.immigrationRegret=true; g.flags.planReturn=true; return{social:5,mood:3}; }},
         { label:'后悔太深无法释怀', hint:'-😊', fn: g => { g.flags.immigrationRegret=true; g.flags.deepRegret=true; return{mood:-8}; }},
       ]},
+    // --- v31.1 年轻人亚文化与网络现象 ---
+    { id:'crazy_literature_v31_1', icon:'🤪', title:'发疯文学', category:'youth_culture',
+      body:'你加班到凌晨3点，老板还在群里发消息：「大家辛苦了，明天继续。」\n\n你突然想发一段话——不是正常的回复，是一段发疯文学：\n\n「我不辛苦！我很痛苦！我的人生不应该在这里！我要去大理开咖啡馆！我要去西藏洗涤灵魂！我要——」\n\n你打了200字，然后删掉了。\n\n你回复：「收到，明天见。」',
+      cond: g => g.job && g.job!=='待业中' && g.mood < 50 && g.age <= 35,
+      choices:[
+        { label:'真的发出去', hint:'+😊 -💼', fn: g => { g.flags.crazyLiterature=true; g.flags.workplaceRebellion=true; return{mood:10,charm:-3}; }},
+        { label:'发到朋友圈（屏蔽同事）', hint:'+😊 +👥', fn: g => { g.flags.crazyLiterature=true; g.flags.ventingOnline=true; return{mood:8,social:3}; }},
+        { label:'删掉回复收到', hint:'+🧠', fn: g => { g.flags.suppressEmotion=true; return{intel:3,mood:-3}; }},
+      ]},
+    { id:'digital_side_dish', icon:'📱', title:'电子榨菜', category:'youth_culture',
+      body:'你点了一份30块的外卖，但你不急着吃。\n\n你在找一个「电子榨菜」——一个下饭视频。不能太长，不能太烧脑，要刚好配一碗米饭。\n\n你翻了10分钟B站、刷了5分钟抖音、看了3个小红书推荐，终于找到了一个「完美」的视频。\n\n你的饭已经凉了。但你不在乎——电子榨菜才是正餐。',
+      cond: g => g.age <= 35 && g.mood < 60,
+      choices:[
+        { label:'享受电子榨菜配饭', hint:'+😊 -🧠', fn: g => { g.flags.digitalPickle=true; return{mood:5,intel:-2}; }},
+        { label:'关掉手机认真吃饭', hint:'+💪 +🧠', fn: g => { g.flags.digitalDetox=true; return{health:3,intel:3}; }},
+        { label:'自己也做一个电子榨菜', hint:'+💰 +✨', fn: g => { g.flags.digitalPickle=true; g.flags.contentCreator=true; return{charm:3,money:100}; }},
+      ]},
+    { id:'fragile_college_student', icon:'🤒', title:'脆皮大学生', category:'youth_culture',
+      body:'你是一个大学生。你觉得自己很年轻，但你的身体不同意。\n\n熬夜写论文到3点——第二天头痛欲裂。打了一晚上游戏——颈椎僵硬得转不动。吃了一周外卖——胃痛到去医院。\n\n你的体检报告上写着：脂肪肝、近视600度、颈椎曲度变直、维生素D缺乏。\n\n你才21岁。你觉得自己像个60岁的老人。',
+      cond: g => g.age >= 18 && g.age <= 25 && g.health < 60,
+      choices:[
+        { label:'开始养生（枸杞泡脚早睡）', hint:'+💪', fn: g => { g.flags.fragileStudent=true; g.flags.earlyWellness=true; return{health:8,mood:3}; }},
+        { label:'继续摆烂（年轻就是资本）', hint:'+😊 -💪', fn: g => { g.flags.fragileStudent=true; g.flags.ignoreHealth=true; return{mood:3,health:-8}; }},
+        { label:'发一条脆皮大学生vlog', hint:'+✨ +👥', fn: g => { g.flags.fragileStudent=true; g.flags.healthContentCreator=true; return{charm:5,social:3}; }},
+      ]},
+    { id:'small_town_scholar_v31_1', icon:'📖', title:'小镇做题家', category:'youth_culture',
+      body:'你来自一个小镇。你从小就知道：读书是唯一的出路。\n\n你做到了。你考上了985大学，你的父母在亲戚面前抬起了头。\n\n但到了大学，你发现——有些同学从小学编程、初中出国游学、高中参加模联。而你只会做题。\n\n你的英语带着浓重的口音，你没听说过雅思托福，你的社交圈只有高中同学。\n\n你开始怀疑：考上大学，就够了吗？',
+      cond: g => g.intel >= 70 && g.charm < 40 && g.age >= 18 && g.age <= 28,
+      choices:[
+        { label:'拼命补课缩小差距', hint:'+🧠 -💪', fn: g => { g.flags.smallTownScholar=true; g.flags.catchUp=true; return{intel:8,health:-3,mood:-2}; }},
+        { label:'接受自己的起点', hint:'+😊 +🧠', fn: g => { g.flags.smallTownScholar=true; g.flags.acceptOrigin=true; return{mood:5,intel:3}; }},
+        { label:'利用做题优势考研', hint:'+🧠 +💰', fn: g => { g.flags.smallTownScholar=true; g.flags.examAdvantage=true; return{intel:5,money:200}; }},
+      ]},
+    { id:'workplace_jargon_v31_1', icon:'💬', title:'职场黑话', category:'youth_culture',
+      body:'你的领导开会时说了一段话：\n\n「我们要打通底层逻辑，形成闭环，赋能业务，拉齐认知，找到抓手，实现颗粒度对齐，在垂直领域深耕，打造差异化竞争力。」\n\n你一个字都没听懂。但你点头了。\n\n你的同事小声说：「翻译成人话就是——加班。」',
+      cond: g => g.job && g.job!=='待业中' && g.age >= 22 && g.age <= 40,
+      choices:[
+        { label:'学会用黑话包装自己', hint:'+✨ +💰', fn: g => { g.flags.workplaceJargon=true; g.flags.corporateSpeak=true; return{charm:5,money:500}; }},
+        { label:'拒绝黑话说人话', hint:'+😊 +👥', fn: g => { g.flags.workplaceJargon=true; g.flags.plainSpeaker=true; return{mood:5,social:3}; }},
+        { label:'偷偷学黑话但内心翻白眼', hint:'+🧠', fn: g => { g.flags.workplaceJargon=true; g.flags.silentRebel=true; return{intel:3,charm:2}; }},
+      ]},
+    { id:'social_anxiety_event_v31_1', icon:'😰', title:'社恐vs社牛', category:'youth_culture',
+      body:'公司团建。你站在KTV包间门口，里面传来同事的歌声和笑声。\n\n你的内心在打架：\n\n社恐的一面说：「进去好尴尬，不知道说什么，不如回家。」\n社牛的一面说：「去啊！唱歌！喝酒！认识新朋友！」\n\n你在门口站了5分钟。有人路过说：「你不进去吗？」\n\n你说：「我……我去买点东西。」然后你在便利店坐了1小时。',
+      cond: g => g.job && g.job!=='待业中' && g.age >= 20 && g.age <= 35,
+      choices:[
+        { label:'鼓起勇气进去', hint:'+👥 -😊', fn: g => { g.flags.socialAnxietyBattle=true; g.flags.braveSocial=true; return{social:8,mood:-2}; }},
+        { label:'在便利店待到结束', hint:'+😊 -👥', fn: g => { g.flags.socialAnxietyBattle=true; g.flags.avoidSocial=true; return{mood:3,social:-5}; }},
+        { label:'只进去唱一首歌就撤', hint:'+👥 +😊', fn: g => { g.flags.socialAnxietyBattle=true; g.flags.compromisedSocial=true; return{social:3,mood:3}; }},
+      ]},
+    { id:'reverse_consumption_v31_1', icon:'🏷️', title:'反向消费', category:'youth_culture',
+      body:'你在商场看到一件衣服，标价899元。你试了一下，很好看。\n\n以前你会直接买。但现在你打开了1688，找到了同款，89元。\n\n你又打开了拼多多，找到了「平替」，39元。\n\n你最后花了39元买了一件「看起来差不多」的衣服。你觉得自己很聪明。\n\n但你收到货后发现——质量差了很多。你穿了一次就起球了。\n\n你开始想：「反向消费到底是聪明还是愚蠢？」',
+      cond: g => g.age >= 20 && g.age <= 40 && g.money < 100000,
+      choices:[
+        { label:'坚持反向消费省钱第一', hint:'+💰 -✨', fn: g => { g.flags.reverseConsumption=true; g.flags.budgetFirst=true; return{money:500,charm:-2}; }},
+        { label:'学会分辨值得花的钱', hint:'+🧠 +💰', fn: g => { g.flags.reverseConsumption=true; g.flags.smartSpending=true; return{intel:5,money:200}; }},
+        { label:'偶尔犒劳自己买正品', hint:'+😊 +💰', fn: g => { g.flags.reverseConsumption=true; g.flags.treatYourself=true; return{mood:8,money:-500}; }},
+      ]},
+    { id:'internet_spokesperson', icon:'🗣️', title:'网络嘴替', category:'youth_culture',
+      body:'你在微博上看到一条热搜：一个明星说了你觉得很对但不敢说的话。\n\n评论区一片叫好。你疯狂点赞，转发并写上「嘴替！」\n\n你发现——你已经不敢自己说话了。你害怕被骂、被举报、被人肉。\n\n你只能通过别人的嘴，表达自己的想法。\n\n你的朋友说：「你什么时候变成了需要嘴替的人？」\n\n你想了想，觉得她说得对。',
+      cond: g => g.age >= 18 && g.age <= 40 && g.social < 60,
+      choices:[
+        { label:'开始练习自己表达', hint:'+👥 +✨', fn: g => { g.flags.internetSpokesperson=true; g.flags.practiceExpression=true; return{social:5,charm:3}; }},
+        { label:'继续当嘴替搬运工', hint:'+😊', fn: g => { g.flags.internetSpokesperson=true; g.flags.staySilent=true; return{mood:3}; }},
+        { label:'写匿名博客表达真实想法', hint:'+🧠 +😊', fn: g => { g.flags.internetSpokesperson=true; g.flags.anonymousWriter=true; return{intel:5,mood:5}; }},
+      ]},
+    { id:'cyberpunk_wellness_v31_1', icon:'🧘', title:'赛博养生', category:'youth_culture',
+      body:'你开始了赛博养生。\n\n你买了智能手环监测睡眠，下载了冥想APP，订阅了健康知识公众号。\n\n你一边熬夜一边吃护肝片，一边久坐一边用筋膜枪，一边焦虑一边听白噪音。\n\n你的智能手环提醒你：「今天步数不足，请起来走走。」\n\n你看了看手环，继续躺着。\n\n你的养生，是一种很新的养生。',
+      cond: g => g.age >= 20 && g.age <= 35 && g.health < 70,
+      choices:[
+        { label:'从赛博养生变成真养生', hint:'+💪 +🧠', fn: g => { g.flags.cyberpunkWellness=true; g.flags.realWellness=true; return{health:8,intel:3}; }},
+        { label:'享受赛博养生的安慰剂效应', hint:'+😊', fn: g => { g.flags.cyberpunkWellness=true; g.flags.placeboWellness=true; return{mood:5}; }},
+        { label:'把赛博养生做成内容', hint:'+💰 +✨', fn: g => { g.flags.cyberpunkWellness=true; g.flags.wellnessContent=true; return{money:300,charm:3}; }},
+      ]},
+    { id:'budget_backpacking_v31_1', icon:'🎒', title:'穷游背包客', category:'youth_culture',
+      body:'你请了年假，决定穷游。\n\n你住50块一晚的青旅，吃路边摊，坐绿皮火车。你背着60升的登山包，走了3个城市。\n\n你在青旅遇到了一个德国背包客，他说：「你们中国人旅游太赶了。」\n\n你说：「我们假期太少了。」\n\n你发了一条朋友圈：「世界那么大，我想去看看。」\n\n你的领导点了个赞。你不确定这是支持还是警告。',
+      cond: g => g.job && g.job!=='待业中' && g.age >= 20 && g.age <= 35 && g.mood < 60,
+      choices:[
+        { label:'延长旅行不想回去上班', hint:'+😊 -💰', fn: g => { g.flags.budgetBackpacking=true; g.flags.travelEscape=true; return{mood:10,money:-2000}; }},
+        { label:'旅行后满血复活回去上班', hint:'+💪 +💼', fn: g => { g.flags.budgetBackpacking=true; g.flags.travelRecharge=true; return{health:5,mood:5}; }},
+        { label:'考虑转行做旅游博主', hint:'+✨ -💰', fn: g => { g.flags.budgetBackpacking=true; g.flags.travelBlogger=true; return{charm:5,money:-1000}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
+
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
     { id:'homeowner', icon:'🏡', name:'有房一族', desc:'在大城市买房', check: g => g.flags.hasHouse },
     { id:'married', icon:'💒', name:'人生赢家？', desc:'结婚', check: g => g.flags.married },
@@ -18240,6 +18322,17 @@ const ACHIEVEMENTS = [
     { id:'balanced_culture_ach', icon:'🌐', name:'文化平衡', desc:'为孩子找到了中西文化的平衡', check: g => g.flags.balancedCulture },
     { id:'active_readapt_ach', icon:'🔄', name:'重新融入', desc:'回国后积极适应重新融入国内生活', check: g => g.flags.activeReadapt },
     { id:'embrace_global_ach', icon:'🌏', name:'世界公民', desc:'拥抱了世界公民身份', check: g => g.flags.embraceGlobal },
+    // --- v31.1 年轻人亚文化成就 ---
+    { id:'crazy_literature_ach', icon:'🤪', name:'发疯文学大师', desc:'勇敢地发出了自己的声音', check: g => g.flags.crazyLiterature },
+    { id:'digital_pickle_ach', icon:'📱', name:'电子榨菜品鉴师', desc:'享受了电子榨菜配饭', check: g => g.flags.digitalPickle },
+    { id:'fragile_student_ach', icon:'🤒', name:'脆皮觉醒', desc:'意识到身体健康问题', check: g => g.flags.fragileStudent },
+    { id:'small_town_ach', icon:'📖', name:'小镇之光', desc:'从小镇走出来并接纳自己', check: g => g.flags.smallTownScholar },
+    { id:'plain_speaker_ach', icon:'💬', name:'职场清流', desc:'拒绝黑话坚持说人话', check: g => g.flags.plainSpeaker },
+    { id:'brave_social_ach', icon:'😰', name:'社恐勇士', desc:'克服社恐走进人群', check: g => g.flags.braveSocial },
+    { id:'smart_spender_ach_v31_1', icon:'🏷️', name:'聪明消费者', desc:'学会分辨值得花的钱', check: g => g.flags.smartSpending },
+    { id:'self_expression_ach', icon:'🗣️', name:'真实表达', desc:'开始练习自己表达想法', check: g => g.flags.practiceExpression },
+    { id:'real_wellness_ach', icon:'🧘', name:'真养生达人', desc:'从赛博养生变成真养生', check: g => g.flags.realWellness },
+    { id:'travel_recharge_ach', icon:'🎒', name:'穷游充电', desc:'通过穷游满血复活', check: g => g.flags.travelRecharge },
 ];
 
 // === ENDINGS === (order matters: first match wins)
