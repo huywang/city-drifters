@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v26.6
+// 都市浮生记 - Game Engine v26.7
 // ============================================
 
 // === GAME STATE ===
@@ -13249,6 +13249,87 @@ const EVENTS = [
         { label:'以后选上门喂养，不让它离开家', hint:'-💰 +❤️', fn: g => { g.flags.petBoarding=true; g.money -= 350; return{mood:2}; }},
         { label:'觉得亏欠了它，买了很多零食补偿', hint:'-💰 +❤️ +😊', fn: g => { g.flags.petBoarding=true; g.money -= 500; return{mood:3}; }},
       ]},
+    // v26.7: 婚恋文化 + 相亲市场
+    { id:'blind_date_v26_7', icon:'💑', title:'相亲', category:'social',
+      body:'你妈给你介绍了个对象。\n\n对方条件：\n- 年龄：28\n- 职业：银行职员\n- 月薪：1万\n- 有房（父母名下）\n- 无车\n\n你们在星巴克见面了。\n\n聊了：\n- 工作（「稳定」）\n- 家庭（「独生子」）\n- 爱好（「看剧」）\n- 未来（「想安定下来」）\n\n你觉得：\n- 不讨厌\n- 没什么火花\n- 像在面试\n\n回去后你妈问：「怎么样？」\n\n你说：「还行。」\n\n你妈说：「那就继续呗，别挑了。」\n\n你开始思考：相亲——是在找「爱情」还是在找「条件合适的人」？\n\n「相亲：不是在找对象——是在用KPI的方式找「合伙人」。」',
+      cond: g => g.age >= 25 && !g.flags.blindDate && !g.flags.married,
+      choices:[
+        { label:'继续接触，觉得条件合适', hint:'+🤝 +😊', fn: g => { g.flags.blindDate=true; g.flags.blindDateContinue=true; return{social:3,mood:2}; }},
+        { label:'见了一次面，没有然后了', hint:'-😊', fn: g => { g.flags.blindDate=true; return{mood:-2}; }},
+        { label:'拒绝了你妈，说不想相亲', hint:'+😊 -🤝', fn: g => { g.flags.blindDate=true; g.flags.rejectMatchmaking=true; return{mood:3,social:-2}; }},
+      ]},
+    { id:'bride_price_v26_7', icon:'💍', title:'彩礼', category:'society',
+      body:'你要结婚了。\n\n但你遇到了一个问题：彩礼。\n\n对方父母要求：\n- 彩礼：28.8万\n- 三金：5万\n- 改口费：1万\n- 婚房装修：20万\n- 婚宴：10万\n\n总计：64.8万。\n\n你的存款：15万。\n\n你跟你爸妈说了。\n\n你爸说：「我去借钱。」\n\n你妈说：「要不……你们再商量商量？」\n\n你对象说：「这是我爸妈的意思，我也没办法。」\n\n你开始思考：\n- 这到底是「结婚」还是「交易」？\n- 爱情值多少钱？\n- 你的未来——值多少钱？\n\n你开始理解：彩礼——不是「给新娘的钱」——是「两个家庭的博弈」。\n\n「彩礼：不是结婚的费用——是两个家庭在「谈判」谁更爱谁多一点。」',
+      cond: g => g.age >= 25 && g.age <= 40 && !g.flags.bridePrice && g.flags.married === false && g.money >= 50000,
+      choices:[
+        { label:'借了钱凑够了彩礼，结了婚', hint:'-💰 +🤝 -😊', fn: g => { g.flags.bridePrice=true; g.flags.paidBridePrice=true; g.money -= 300000; return{social:3,mood:-5}; }},
+        { label:'跟对方谈了谈，降到了10万', hint:'-💰 +🧠 +🤝', fn: g => { g.flags.bridePrice=true; g.flags.negotiatedPrice=true; g.money -= 100000; return{intel:3,social:3}; }},
+        { label:'觉得不合理，取消了婚礼', hint:'+💰 -🤝 -😊', fn: g => { g.flags.bridePrice=true; g.flags.cancelledWedding=true; return{mood:-10,social:-5}; }},
+      ]},
+    { id:'dating_app_v26_7', icon:'📱', title:'交友软件', category:'social',
+      body:'你下载了一个交友软件。\n\n你的资料：\n- 头像：P过的自拍\n- 身高：加了3厘米\n- 收入：写了一个区间（「10-20万」）\n- 兴趣：「旅行、美食、看书」（每个人都这么写）\n\n你开始「右滑」。\n\n你发现：\n- 90%的人——你右滑了——她们左滑了你\n- 匹配了——不知道说什么\n- 聊了三天——就不聊了\n- 见了面——跟照片不一样\n\n你也发现：\n- 你的「价值」——被算法量化了\n- 你的「吸引力」——被一张照片决定了\n- 你的「缘分」——被一个APP控制了\n\n你删了APP。\n\n你突然明白：在交友软件上找爱情——就像在淘宝上找朋友。\n\n「交友软件：不是在找对象——是在刷「人类的商品目录」。」',
+      cond: g => g.age >= 20 && g.age <= 45 && !g.flags.datingApp && !g.flags.married,
+      choices:[
+        { label:'在软件上认识了有趣的人', hint:'-💰 +🤝 +😊', fn: g => { g.flags.datingApp=true; g.flags.appDate=true; g.money -= 500; return{social:5,mood:3}; }},
+        { label:'用了几个月，没找到合适的', hint:'-😊 +🧠', fn: g => { g.flags.datingApp=true; return{mood:-3,intel:2}; }},
+        { label:'觉得太虚假了，删了', hint:'+😊 +🧠', fn: g => { g.flags.datingApp=true; g.flags.deletedApp=true; return{mood:2,intel:3}; }},
+      ]},
+    { id:'single_life_v26_7', icon:'🙋', title:'单身宣言', category:'psychology',
+      body:'过年了。你回家了。\n\n亲戚问：「有对象了吗？」\n\n你说：「没有。」\n\n亲戚说：「你都XX岁了，再不找就晚了。」\n\n你妈说：「你看看隔壁小王，孩子都两岁了。」\n\n你爸不说话——但你知道他在想什么。\n\n你回到房间——\n\n你开始想：\n- 我真的需要「对象」吗？\n- 一个人不好吗？\n- 为什么「单身」是一种「需要被解决的问题」？\n\n你发现：\n- 你有工作\n- 你有朋友\n- 你有爱好\n- 你有猫/狗\n\n你不缺什么——除了「别人觉得你应该有的」。\n\n你在朋友圈发了一条：「单身很好，谢谢关心。」\n\n收获了50个赞和3个私信：「加油，别放弃。」\n\n「单身宣言：不是「找不到」——是「不想将就」。」',
+      cond: g => g.age >= 28 && !g.flags.married && !g.flags.singleLife,
+      choices:[
+        { label:'坚定了单身立场，活得更自在', hint:'+😊 +✨ +🧠', fn: g => { g.flags.singleLife=true; g.flags.singleByChoice=true; return{mood:8,charm:5,intel:3}; }},
+        { label:'嘴上说单身，心里还是想找', hint:'+😊 -😊', fn: g => { g.flags.singleLife=true; return{mood:2}; }},
+        { label:'被催婚催烦了，开始相亲', hint:'-😊 +🤝', fn: g => { g.flags.singleLife=true; g.flags.forcedToDate=true; return{mood:-5,social:3}; }},
+      ]},
+    { id:'wedding_cost_v26_7', icon:'🎊', title:'婚礼费用', category:'finance',
+      body:'你要办婚礼了。\n\n你开始做预算——\n\n最低配置：\n- 酒店：3万\n- 婚庆：2万\n- 婚纱：5000\n- 摄影：5000\n- 化妆：3000\n- 车队：5000\n- 喜糖+红包：5000\n\n总计：7.3万。\n\n你对象说：「我想要一场梦幻婚礼。」\n\n升级版：\n- 五星酒店：8万\n- 定制婚庆：5万\n- 品牌婚纱：2万\n- 跟拍团队：1.5万\n- 海外蜜月：3万\n\n总计：20万+。\n\n你看了看你的银行卡。\n\n你开始理解：婚礼——不是给新人办的——是给「面子」办的。\n\n你开始想：如果把这些钱省下来——\n- 够首付了\n- 够环游世界了\n- 够创业了\n\n但你妈说：「一辈子就一次。」\n\n「婚礼费用：不是庆祝结婚——是庆祝「终于能收回之前随出去的份子钱了」。」',
+      cond: g => g.flags.married && !g.flags.weddingCost && g.money >= 30000,
+      choices:[
+        { label:'办了梦幻婚礼，花光积蓄', hint:'-💰 +😊 +✨', fn: g => { g.flags.weddingCost=true; g.flags.dreamWedding=true; g.money -= 200000; return{mood:10,charm:5}; }},
+        { label:'办了简约婚礼，省了钱', hint:'-💰 +😊 +🧠', fn: g => { g.flags.weddingCost=true; g.flags.simpleWedding=true; g.money -= 70000; return{mood:5,intel:3}; }},
+        { label:'旅行结婚，不办酒席', hint:'-💰 +😊 +✨ +🧠', fn: g => { g.flags.weddingCost=true; g.flags.travelWedding=true; g.money -= 30000; return{mood:8,charm:5,intel:3}; }},
+      ]},
+    { id:'prenup', icon:'📋', title:'婚前协议', category:'finance',
+      body:'你们准备结婚了。\n\n你提出了「婚前协议」。\n\n你对象：「你不信任我？」\n\n你对象的妈妈：「还没结婚就想着离婚？」\n\n你妈：「这样不好吧，人家会怎么想？」\n\n但你看了太多新闻：\n- 婚后对方欠了200万赌债\n- 离婚时财产分割不公\n- 婚前买房婚后加名的纠纷\n\n你觉得：婚前协议——不是「不信任」——是「保护」。\n\n保护你——也保护对方。\n\n你们坐下来——认真谈了：\n- 婚前财产\n- 婚后财产\n- 如果离婚怎么分\n\n谈完之后——你们反而更坦诚了。\n\n你开始理解：婚前协议——不是「爱情的敌人」——是「理性的朋友」。\n\n「婚前协议：不是因为不爱——是因为太爱了，不想让「钱」毁了「爱」。」',
+      cond: g => g.flags.married && !g.flags.prenup && g.age >= 25 && g.money >= 50000,
+      choices:[
+        { label:'签了婚前协议，双方都安心', hint:'+🧠 +😊', fn: g => { g.flags.prenup=true; g.flags.signedPrenup=true; return{intel:5,mood:3}; }},
+        { label:'提了但没签成，对方不同意', hint:'-🤝 -😊', fn: g => { g.flags.prenup=true; return{social:-3,mood:-3}; }},
+        { label:'觉得伤感情，没提了', hint:'+🤝 -🧠', fn: g => { g.flags.prenup=true; return{social:2,intel:-2}; }},
+      ]},
+    { id:'marriage_market', icon:'📊', title:'相亲角', category:'society',
+      body:'你妈带你去了公园相亲角。\n\n这里：\n- 大爷大妈举着牌子\n- 牌子上写着子女的「条件」\n- 像在卖菜\n\n你看到了一些牌子：\n- 「男，30岁，硕士，年薪50万，北京有房」\n- 「女，27岁，本科，公务员，身高165」\n- 「男，35岁，创业，有车有房，离异无孩」\n\n你发现：\n- 每个人都被「量化」了\n- 年龄、身高、学历、收入——就是你的「价格」\n- 爱情在这里——不存在\n\n一个大妈看了你的条件——\n\n「月薪多少？」\n「有房吗？」\n「多大了？」\n\n你觉得自己像一件被估价的商品。\n\n你开始理解：相亲角——不是「找对象」——是「父母在用他们的标准替你选人生」。\n\n「相亲角：不是在找爱情——是在做「人才市场」的交易。」',
+      cond: g => g.age >= 26 && !g.flags.marriageMarket && !g.flags.married,
+      choices:[
+        { label:'理解了父母的焦虑，认真开始相亲', hint:'+🤝 -😊', fn: g => { g.flags.marriageMarket=true; g.flags.seriousDating=true; return{social:3,mood:-2}; }},
+        { label:'跟父母谈了谈，表示不着急', hint:'+😊 +🧠', fn: g => { g.flags.marriageMarket=true; g.flags.talkedToParents=true; return{mood:3,intel:2}; }},
+        { label:'当场发飙，说不要再管我了', hint:'+😊 -🤝', fn: g => { g.flags.marriageMarket=true; g.flags.rebelledMarriage=true; return{mood:5,social:-5}; }},
+      ]},
+    { id:'love_expense', icon:'💕', title:'恋爱消费', category:'finance',
+      body:'你恋爱了。\n\n你发现：恋爱——真的很贵。\n\n每月固定支出：\n- 约会吃饭：2000元\n- 电影/KTV：500元\n- 打车（送她回家）：300元\n- 礼物（节日/纪念日/生日）：1000元\n\n总计：每月3800元。\n\n你的月薪：8000元。\n\n你开始「省」：\n- 少叫外卖，自己做饭\n- 不买新衣服\n- 取消健身房会员\n\n但情人节——\n- 她想要一束花（200元）\n- 她想要一个包（2000元）\n- 她想要一顿大餐（800元）\n\n你看了看银行卡。\n\n你开始理解：恋爱——是一种「甜蜜的负担」。\n\n但你不敢说——因为你怕她说「你不够爱她」。\n\n你开始思考：爱情和钱——到底是什么关系？\n\n「恋爱消费：不是花在恋爱上——是花在「证明你爱她」上。」',
+      cond: g => g.age >= 20 && g.age <= 40 && !g.flags.loveExpense && !g.flags.married && g.money >= 1000,
+      choices:[
+        { label:'努力赚钱，给她更好的生活', hint:'-💰 +😊 +✨', fn: g => { g.flags.loveExpense=true; g.flags.generousLover=true; g.money -= 5000; return{mood:5,charm:3}; }},
+        { label:'跟她谈了谈，开始AA制', hint:'+🧠 +💰 -😊', fn: g => { g.flags.loveExpense=true; g.flags.aaRelationship=true; return{intel:3,mood:-2}; }},
+        { label:'觉得太贵了，分了手', hint:'+💰 -😊 -❤️', fn: g => { g.flags.loveExpense=true; g.flags.brokeUpMoney=true; return{mood:-8,money:2000}; }},
+      ]},
+    { id:'cohabitation_v26_7', icon:'🏠', title:'同居', category:'social',
+      body:'你们同居了。\n\n你发现了：\n- 她/他早上要占卫生间30分钟\n- 她/他的袜子乱扔\n- 她/他打呼噜\n- 她/他做饭很难吃\n\n但你也发现了：\n- 有人等你回家——很温暖\n- 一起做饭——很有趣\n- 一起看剧——很幸福\n- 半夜醒来——有人在你身边——很安心\n\n你们开始「磨合」：\n- 谁做饭谁洗碗\n- 谁打扫谁倒垃圾\n- 牙膏从中间挤还是从底部挤\n- 马桶盖到底要不要放下来\n\n你开始理解：同居——不是「提前体验婚姻」——是「提前学习包容」。\n\n你发现：爱一个人——不只是爱她的优点——也爱她的袜子。\n\n「同居：不是在「试婚」——是在学「如何跟一个不完美的人一起生活」。」',
+      cond: g => g.age >= 23 && !g.flags.cohabitation && !g.flags.married && g.money >= 2000,
+      choices:[
+        { label:'同居后发现更爱了，准备结婚', hint:'-💰 +😊 +🤝', fn: g => { g.flags.cohabitation=true; g.flags.happyCohabit=true; g.money -= 2000; return{mood:8,social:3}; }},
+        { label:'同居后发现了问题，开始磨合', hint:'+🧠 +🤝', fn: g => { g.flags.cohabitation=true; return{intel:3,social:2}; }},
+        { label:'同居后发现不合适，搬出去了', hint:'-😊 -🤝 +🧠', fn: g => { g.flags.cohabitation=true; g.flags.movedOut=true; return{mood:-5,intel:3}; }},
+      ]},
+    { id:'divorce_culture', icon:'💔', title:'离婚冷静期', category:'society',
+      body:'你想离婚了。\n\n你去了民政局。\n\n工作人员说：「现在有30天冷静期。你们回去再想想。」\n\n你回去了。\n\n你开始想：\n- 为什么要离婚？\n- 是因为不爱了吗？\n- 还是因为太累了？\n- 还是因为有了别人？\n\n30天后——\n\n你去了。\n\n你发现：\n- 需要两个人都到场\n- 需要结婚证\n- 需要身份证\n- 需要户口本\n- 如果对方不来——视为「撤回」\n\n你开始理解：离婚——不是「结束」——是另一场「战争」的开始。\n\n你也开始想：\n- 冷静期——是在保护婚姻——还是在阻止自由？\n- 如果一段婚姻需要「冷静期」才能结束——它真的需要「冷静期」才能开始吗？\n\n「离婚冷静期：不是让你冷静——是让你知道「结婚容易离婚难」。」',
+      cond: g => g.flags.married && g.age >= 28 && !g.flags.divorceCulture && g.mood <= 40,
+      choices:[
+        { label:'坚持离婚，走完了所有程序', hint:'-🤝 -💰 +🧠', fn: g => { g.flags.divorceCulture=true; g.flags.divorced=true; g.married=false; g.money -= 50000; return{intel:5,mood:-10}; }},
+        { label:'冷静了30天，决定再试试', hint:'+🤝 +😊', fn: g => { g.flags.divorceCulture=true; g.flags.gaveAnotherChance=true; return{mood:3,social:3}; }},
+        { label:'放弃了离婚，因为太麻烦了', hint:'-😊 +🧠', fn: g => { g.flags.divorceCulture=true; g.flags.tooHardToDivorce=true; return{mood:-5,intel:2}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -14424,6 +14505,12 @@ const ACHIEVEMENTS = [
     { id:'pet_surgery_ach', icon:'🏥', name:'宠物守护者', desc:'花一个月工资给宠物做了手术', check: g => g.flags.petSurgery },
     { id:'animal_volunteer_ach', icon:'🏠', name:'流浪动物志愿者', desc:'每月去救助站做志愿服务', check: g => g.flags.animalVolunteer },
     { id:'pet_farewell_ach', icon:'🕊️', name:'最后的告别', desc:'为陪伴多年的宠物办了告别仪式', check: g => g.flags.petFarewell },
+    // v26.7: 婚恋文化成就
+    { id:'single_by_choice_ach', icon:'🙋', name:'单身贵族', desc:'主动选择单身，活出自我', check: g => g.flags.singleByChoice },
+    { id:'prenup_signer_ach', icon:'📋', name:'理性婚姻', desc:'签了婚前协议保护双方', check: g => g.flags.signedPrenup },
+    { id:'travel_wedding_ach', icon:'✈️', name:'旅行结婚', desc:'不办酒席选择旅行结婚', check: g => g.flags.travelWedding },
+    { id:'aa_relationship_ach', icon:'💰', name:'AA恋爱', desc:'跟伴侣实行了AA制消费', check: g => g.flags.aaRelationship },
+    { id:'another_chance_ach', icon:'💕', name:'再给一次机会', desc:'冷静期后决定继续婚姻', check: g => g.flags.gaveAnotherChance },
 ];
 
 // === ENDINGS === (order matters: first match wins)
