@@ -2031,6 +2031,51 @@ const EVENTS = [
         { label:'转钱回去，人不到', hint:'-💰 +👨‍👩‍👧', fn: g => { g.flags.parentIllness=true; g.relationships.family=clamp((g.relationships.family||60)+10,0,100); return{money:-100000,mood:-5}; }},
         { label:'请假一周回去照顾', hint:'-💰 -💼 +👨‍👩‍👧', fn: g => { g.flags.parentIllness=true; g.relationships.family=clamp((g.relationships.family||60)+20,0,100); if(g.jobSalary>15000&&Math.random()>0.6){return{money:-90000,mood:5,jobSalary:-3000}}else{return{money:-90000,mood:10}} }},
       ]},
+    // === v2.31 INTERACTIVE EVENTS ===
+    { id:'salary_negotiation', icon:'💼', title:'薪资谈判',
+      body:'年度绩效考核结束了。你的绩效是A，但涨薪幅度只有5%。\n\n同事悄悄告诉你：隔壁组同样绩效的人涨了15%。\n\nHR说："公司有公司的考虑。"你的leader说："我已经帮你争取了。"\n\n你知道：不争取，就没有。\n\n"薪资谈判是一场博弈——你的底牌是你的能力，你的筹码是你的勇气。"',
+      cond: g => g.job!=='待业中' && g.jobSalary>=10000 && g.age>=25 && !g.flags.salaryNegotiation && Math.random()>0.6,
+      choices:[
+        { label:'要求涨到15%', hint:'🎲 +💰', fn: g => { g.flags.salaryNegotiation=true; const skill=g.intel+g.charm; if(skill>130&&Math.random()>0.4){const raise=Math.floor(g.jobSalary*0.15);g.jobSalary+=raise;return{money:raise*6,mood:20,intel:3}}else if(Math.random()>0.5){const raise=Math.floor(g.jobSalary*0.08);g.jobSalary+=raise;return{money:raise*6,mood:5}}else{return{mood:-15,charm:-3}} }},
+        { label:'拿offer去谈判', hint:'🎲🎲 +💰💰', fn: g => { g.flags.salaryNegotiation=true; if(g.intel>70&&Math.random()>0.5){const raise=Math.floor(g.jobSalary*0.25);g.jobSalary+=raise;return{money:raise*6,mood:25,intel:5,social:-5}}else{return{mood:-20,social:-10}} }},
+        { label:'接受现状', hint:'+😊', fn: g => { g.flags.salaryNegotiation=true; return{mood:-5}; }},
+        { label:'直接跳槽', hint:'🎲 +💰 -👥', fn: g => { g.flags.salaryNegotiation=true; if(Math.random()>0.4){const newSalary=Math.floor(g.jobSalary*1.3);setJob(g,getTitle(g,'senior'),newSalary);return{money:5000,mood:15,social:-5}}else{return{mood:-10,social:-5}} }},
+      ]},
+    { id:'apartment_hunt', icon:'🏠', title:'租房大作战',
+      body:'你的租约到期了，房东要涨租20%。\n\n你打开租房App，发现：\n- 同地段的房子都涨了\n- 远一点的地方便宜但通勤2小时\n- 合租能省钱但没隐私\n- 有个"长租公寓"打折但口碑堪忧\n\n"在大城市，租房比找工作还难。"',
+      cond: g => g.months>=6 && !g.flags.hasHouse && !g.flags.apartmentHunt && g.job!=='待业中',
+      choices:[
+        { label:'搬到远一点但便宜', hint:'+💰 -😊 -❤️', fn: g => { g.flags.apartmentHunt=true; return{money:5000,mood:-10,health:-5}; }},
+        { label:'找人合租', hint:'+💰 +👥', fn: g => { g.flags.apartmentHunt=true; if(Math.random()>0.5){g.relationships.friends=clamp((g.relationships.friends||40)+10,0,100);return{money:3000,social:10,mood:5}}else{return{money:3000,mood:-10,social:-5}} }},
+        { label:'咬牙续租', hint:'-💰 +😊', fn: g => { g.flags.apartmentHunt=true; return{money:-3000,mood:5}; }},
+        { label:'试试长租公寓', hint:'🎲 -💰?', fn: g => { g.flags.apartmentHunt=true; if(Math.random()>0.6){return{money:2000,mood:8,charm:3}}else{return{money:-20000,mood:-25}} }},
+      ]},
+    { id:'involution_choice', icon:'🔄', title:'内卷还是躺平',
+      body:'你的公司开始了新一轮的"绩效考核优化"——说白了就是末位淘汰。\n\n你的同事开始疯狂加班：有人凌晨2点还在发邮件，有人周末主动来公司，有人把年假全退了。\n\n你的leader说："这个季度，大家都要冲一冲。"\n\n你看着同事们卷生卷死，心里有个声音在问：值得吗？\n\n"内卷是一场没有终点的赛跑——你以为你在追别人，其实别人也在追你。"',
+      cond: g => g.job!=='待业中' && g.jobSalary>8000 && !g.flags.involutionChoice && g.age>=24 && g.age<=40,
+      choices:[
+        { label:'跟着卷！', hint:'-❤️ +💰 +🧠', fn: g => { g.flags.involutionChoice=true; g.consecutiveOvertime=(g.consecutiveOvertime||0)+6; return{health:-15,money:15000,intel:5,mood:-10}; }},
+        { label:'做最低限度的工作', hint:'+❤️ +😊', fn: g => { g.flags.involutionChoice=true; g.flags.quietQuitting=true; return{health:5,mood:10,money:-2000}; }},
+        { label:'开始准备跳槽', hint:'+🧠 -💰', fn: g => { g.flags.involutionChoice=true; return{intel:10,mood:5,money:-1000}; }},
+        { label:'跟leader谈条件', hint:'🎲 +💰 +👥', fn: g => { g.flags.involutionChoice=true; if(g.charm>60&&Math.random()>0.5){return{money:8000,social:8,mood:10}}else{return{mood:-8,social:-3}} }},
+      ]},
+    { id:'social_credit_event', icon:'📊', title:'征信危机',
+      body:'你查了一下自己的征信报告，发现：\n\n- 你之前忘了还一笔小额网贷\n- 信用卡有一次逾期记录\n- 你的信用评分下降了\n\n这意味着：以后买房贷款、租车、甚至找工作都可能受影响。\n\n"征信是你在金融世界的身份证——一旦花了，洗白很难。"',
+      cond: g => g.money<0 && !g.flags.creditCrisis && g.age>=25,
+      choices:[
+        { label:'立刻还清所有欠款', hint:'-💰 +🧠', fn: g => { g.flags.creditCrisis=true; g.flags.creditRepaired=true; return{money:-15000,intel:5,mood:10}; }},
+        { label:'跟银行协商分期', hint:'+🧠 +😊', fn: g => { g.flags.creditCrisis=true; return{money:-5000,intel:8,mood:5}; }},
+        { label:'先不管了', hint:'-😊', fn: g => { g.flags.creditCrisis=true; g.flags.badCredit=true; return{mood:-10}; }},
+      ]},
+    { id:'generational_clash', icon:'💥', title:'代际冲突',
+      body:'春节回家，你和你爸/你妈大吵了一架。\n\n导火索可能是：\n- "什么时候结婚？"\n- "为什么不要孩子？"\n- "你那个工作到底能赚多少？"\n- "隔壁老王的孩子都生二胎了"\n\n你说了不该说的话。你妈哭了。你爸摔了杯子。\n\n你摔门而出，在小区楼下抽了根烟。\n\n"代际冲突不是谁对谁错，是两个时代的碰撞。"',
+      cond: g => g.age>=26 && g.age<=38 && g.relationships && g.relationships.family>30 && !g.flags.generationalClash && Math.random()>0.7,
+      choices:[
+        { label:'道歉，但不改变立场', hint:'+👨‍👩‍👧 +😊', fn: g => { g.flags.generationalClash=true; g.relationships.family=clamp((g.relationships.family||60)+10,0,100); return{mood:5,social:3}; }},
+        { label:'坚持己见', hint:'-👨‍👩‍👧 +✨', fn: g => { g.flags.generationalClash=true; g.relationships.family=clamp((g.relationships.family||60)-15,0,100); return{mood:-5,charm:5}; }},
+        { label:'试着理解他们', hint:'+👨‍👩‍👧 +🧠', fn: g => { g.flags.generationalClash=true; g.flags.generationalGap=true; g.relationships.family=clamp((g.relationships.family||60)+20,0,100); return{intel:8,mood:10}; }},
+        { label:'冷战，假装没发生', hint:'-👨‍👩‍👧 -😊', fn: g => { g.flags.generationalClash=true; g.relationships.family=clamp((g.relationships.family||60)-10,0,100); return{mood:-8}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -2124,6 +2169,12 @@ const ACHIEVEMENTS = [
     { id:'digital_planner', icon:'💾', name:'数字遗嘱人', desc:'规划了数字遗产', check: g => g.flags.digitalLegacy },
     { id:'filial_crisis', icon:'🏥', name:'亲情守护者', desc:'照顾过生病的父母', check: g => g.flags.parentIllness },
     { id:'midlife_rebel', icon:'🌅', name:'中年叛逆者', desc:'40岁重新出发', check: g => g.flags.midlifeAwakening && g.mood>=60 },
+    // v2.31 achievements
+    { id:'negotiator', icon:'💼', name:'谈判高手', desc:'成功谈了薪资', check: g => g.flags.salaryNegotiation && g.jobSalary>=15000 },
+    { id:'quiet_quitter', icon:'🤫', name:'安静辞职者', desc:'选择quiet quitting', check: g => g.flags.quietQuitting },
+    { id:'credit_fixer', icon:'📊', name:'信用修复师', desc:'修复了征信', check: g => g.flags.creditRepaired },
+    { id:'bridge_builder', icon:'🌉', name:'代沟桥梁师', desc:'理解了父母那一代', check: g => g.flags.generationalClash && g.relationships && g.relationships.family>=70 },
+    { id:'phoenix', icon:'🔥', name:'浴火凤凰', desc:'从人生低谷重新崛起', check: g => (g.flags.romanceScam||g.flags.mortgageDefault||g.flags.parentIllness) && g.money>=50000 && g.mood>=60 },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -2180,6 +2231,12 @@ const ENDINGS = [
     { id:'mentor_end', badge:'🎓', title:'人生导师', desc:'你成了很多年轻人的导师。你在知乎写回答，在B站做视频，在播客分享经验。\n\n你的口头禅是："我走过的弯路，你不必再走。"\n\n有人给你留言："谢谢你，让我少走了3年弯路。"\n\n你笑了：其实你走过的弯路，比任何人都多。\n\n"教育的本质是一棵树摇动另一棵树——你摇动了很多树。"', cond: g => g.intel>=80 && g.social>=65 && g.flags.teacher && g.age>=35 && g.months>=60 },
     { id:'community_builder', badge:'🏘️', title:'社区营造者', desc:'你在大城市建了一个"小社区"。你组织了读书会、跑步团、志愿者团队。\n\n你的微信群有500人，每个人都认识你，你也认识每个人。\n\n有人说："你让这座城市有了温度。"\n\n你笑了：其实你只是不想一个人孤独。\n\n"社区不是地理概念，是人与人的连接。"', cond: g => g.social>=80 && g.relationships.friends>=75 && g.flags.volunteer && g.mood>=65 && g.age>=32 },
     { id:'slow_life', badge:'🐌', title:'慢生活家', desc:'你选择了慢生活。你不加班、不社交、不内卷。\n\n你每天的生活：\n- 7点起床，做早餐\n- 8点上班，准点下班\n- 6点做饭，散步\n- 10点睡觉\n\n有人说你"没有上进心"，你说："我只是选择了不同的节奏。"\n\n"慢生活不是懒惰，是清醒。"', cond: g => g.flags.lyingFlat && g.flags.healthyLifestyle && g.health>=75 && g.mood>=70 && g.age>=33 },
+    // --- v2.31 NEW ENDINGS ---
+    { id:'scam_victim', badge:'🎭', title:'杀猪盘受害者', desc:'你被杀猪盘骗了。不只是钱，还有感情。\n\n你把积蓄都投了进去，对方消失后你才发现：那些甜言蜜语，都是话术。\n\n你报了警，但钱追不回来了。你删掉了交友App，删掉了聊天记录，但删不掉那段记忆。\n\n"你以为遇到了真爱，其实遇到了KPI。"\n\n你开始告诉每一个朋友：天上不会掉馅饼，更不会掉真爱。\n\n（如果你或身边的人遭遇诈骗，请拨打反诈热线：96110）', cond: g => g.flags.romanceScam && g.money<-30000 },
+    { id:'anti_fraud_hero', badge:'🛡️', title:'反诈达人', desc:'你不仅识破了杀猪盘，还成了反诈志愿者。\n\n你在社区做反诈宣传，帮老年人识别电信诈骗，在朋友圈科普各种骗局。\n\n有人说你"管太多"，但你知道：每多一个人识破骗局，就少一个受害者。\n\n"防人之心不可无——在这个时代，防人之心要升级。"', cond: g => g.flags.antiFraud && g.social>=60 && g.age>=30 },
+    { id:'career_pivot', badge:'🔄', title:'华丽转身', desc:'35岁那年，你成功转型了。\n\n你没有被年龄焦虑打败，而是找到了新的赛道。也许是管理岗，也许是技术专家，也许是完全不同的领域。\n\n你的经验成了优势，而不是包袱。\n\n"35岁不是终点，是另一个起点——前提是你准备好了。"', cond: g => g.flags.age35Crisis && g.flags.careerTransition && g.jobSalary>=20000 && g.age>=38 },
+    { id:'sandwich_generation', badge:'🥪', title:'三明治一代', desc:'你上有老、下有小，你是全家的顶梁柱。\n\n父母的医药费、孩子的学费、房贷车贷——每一笔都压在你肩上。\n\n你不敢生病，不敢辞职，不敢休息。\n\n但你看着孩子的笑脸、父母的健康，你觉得一切都值了。\n\n"三明治虽然被夹在中间，但它是最有料的那一个。"', cond: g => g.flags.parentIllness && g.flags.hasChild && g.flags.married && g.age>=38 && g.mood>=50 },
+    { id:'phoenix_rising', badge:'🔥', title:'浴火凤凰', desc:'你经历了人生最黑暗的时刻——也许是破产，也许是失业，也许是失去亲人。\n\n但你没有倒下。你一步一步地爬了起来，重新开始。\n\n现在的你：更坚强、更清醒、更珍惜当下。\n\n"人不是被打败的。一个人可以被毁灭，但不能被打败。"\n\n你成了别人眼中的"传奇"——不是因为成功，而是因为不放弃。', cond: g => (g.flags.romanceScam || g.flags.mortgageDefault || g.flags.parentIllness) && g.money>=50000 && g.mood>=65 && g.health>=60 && g.age>=40 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
@@ -2738,11 +2795,11 @@ function triggerEnding() {
 
 function getEndingRarity(endingId) {
     // Legendary (rare endings that require specific conditions)
-    const legendary = ['fire', 'immigration', 'executive', 'retire_abroad', 'wealthy', 'family_first', 'burnout_recovery', 'digital_nomad_senior', 'social_influencer_end'];
+    const legendary = ['fire', 'immigration', 'executive', 'retire_abroad', 'wealthy', 'family_first', 'burnout_recovery', 'digital_nomad_senior', 'social_influencer_end', 'phoenix_rising'];
     // Rare (hard to achieve)
-    const rare = ['settled', 'startup_end', 'influencer_end', 'digital_nomad', 'karoshi', 'jail', 'social_butterfly_end', 'health_guru', 'side_hustle_king', 'kaogong_success', 'mentor_end', 'community_builder'];
+    const rare = ['settled', 'startup_end', 'influencer_end', 'digital_nomad', 'karoshi', 'jail', 'social_butterfly_end', 'health_guru', 'side_hustle_king', 'kaogong_success', 'mentor_end', 'community_builder', 'career_pivot', 'anti_fraud_hero'];
     // Uncommon (moderately difficult)
-    const uncommon = ['hometown_hero', 'go_home', 'civil_end', 'ordinary', 'single', 'investment_guru', 'lying_flat_end', 'lonely_death', 'estranged', 'pet_parent', 'mortgage_default_end', 'kong_yiji_end', 'full_time_child_end', 'minimalist_life', 'slow_life'];
+    const uncommon = ['hometown_hero', 'go_home', 'civil_end', 'ordinary', 'single', 'investment_guru', 'lying_flat_end', 'lonely_death', 'estranged', 'pet_parent', 'mortgage_default_end', 'kong_yiji_end', 'full_time_child_end', 'minimalist_life', 'slow_life', 'scam_victim', 'sandwich_generation'];
 
     if (legendary.includes(endingId)) return 'legendary';
     if (rare.includes(endingId)) return 'rare';
@@ -2926,7 +2983,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.30' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.31' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
