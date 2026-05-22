@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v5.4
+// 都市浮生记 - Game Engine v5.5
 // ============================================
 
 // === GAME STATE ===
@@ -3112,6 +3112,16 @@ const EVENTS = [
         { label:'学一门手艺', hint:'+🧠 +✨ +💰', fn: g => { g.flags.postgradCooling=true; g.flags.skillLearner=true; return{intel:15,charm:10,money:-5000}; }},
         { label:'还是考研吧', hint:'+🧠 -😊 -💰', fn: g => { g.flags.postgradCooling=true; g.flags.persistPostgrad=true; return{intel:10,mood:-8,money:-8000}; }},
       ]},
+    // === v5.5 EVENTS - 年轻人创业与咖啡店 ===
+    { id:'young_entrepreneur', icon:'☕', title:'开咖啡店',
+      body:'你看到了一个故事：\n\n90后女生辞职，把牛棚改成咖啡店，投入不到10万，年营收140万。\n\n你心动了。\n\n"投入5000元月入过万"——低成本咖啡馆创业成了年轻人的新梦想。\n\n但你又看到：很多咖啡馆刚开业就倒闭，博主卖课比卖咖啡多。\n\n"创业不是浪漫，是九死一生。"\n\n"成功的村咖背后，是99%失败的村咖。"',
+      cond: g => !g.flags.youngEntrepreneur && g.age>=23 && g.age<=35 && g.money>20000,
+      choices:[
+        { label:'开一家咖啡店', hint:'-💰 +✨ +😊 🎲', fn: g => { g.flags.youngEntrepreneur=true; g.flags.coffeeShopOwner=true; if(Math.random()>0.4){return{money:-80000,charm:20,mood:25,social:15}}else{return{money:-100000,mood:-20,charm:-5}} }},
+        { label:'做自媒体创业', hint:'-💰 +✨ +😊', fn: g => { g.flags.youngEntrepreneur=true; g.flags.mediaEntrepreneur=true; return{money:-10000,charm:15,mood:18,intel:10}; }},
+        { label:'加盟奶茶店', hint:'-💰 +💰 🎲', fn: g => { g.flags.youngEntrepreneur=true; if(Math.random()>0.5){return{money:50000,mood:20}}else{return{money:-60000,mood:-15}} }},
+        { label:'算了，风险太大', hint:'+💰 +🧠', fn: g => { g.flags.youngEntrepreneur=true; return{money:5000,intel:5,mood:-3}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3350,6 +3360,8 @@ const ACHIEVEMENTS = [
     { id:'gap_explorer', icon:'🌍', name:'间隔年探索者', desc:'体验Gap Year', check: g => g.flags.gapYear },
     // v5.4 achievements
     { id:'rational_learner', icon:'📚', name:'理性学习者', desc:'理性看待考研', check: g => g.flags.postgradCooling },
+    // v5.5 achievements
+    { id:'coffee_dreamer', icon:'☕', name:'咖啡店老板', desc:'开了咖啡店', check: g => g.flags.coffeeShopOwner || g.flags.mediaEntrepreneur },
 ];
 
 // === ENDINGS === (order matters: first match wins)
