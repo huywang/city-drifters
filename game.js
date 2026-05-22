@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v22.5
+// 都市浮生记 - Game Engine v22.6
 // ============================================
 
 // === GAME STATE ===
@@ -10861,9 +10861,88 @@ const EVENTS = [
         { label:'觉得有道理但没太深想', hint:'+🧠', fn: g => { g.flags.animeInspiration=true; return{intel:5,mood:5}; }},
         { label:'觉得动漫就是娱乐，不必太认真', hint:'', fn: g => { g.flags.animeInspiration=true; return{mood:3}; }},
       ]},
+    // === v22.6 新增事件（短视频/直播） ===
+    { id:'short_video_addict', icon:'📱', title:'短视频上瘾', category:'tech',
+      body:'你下载了抖音。\n\n「就看5分钟，」你对自己说。\n\n两个小时后——你还在刷。\n\n你开始每天花3小时以上刷短视频。你的屏幕使用时间报告让你心碎：日均5小时。\n\n你发现自己变了：\n- 注意力变差了——看书超过10分钟就走神\n- 对长视频没耐心了——2小时的电影看不下去\n- 开始模仿网上的说话方式\n\n你的同事说：「你最近说话怎么跟抖音一样？」\n\n你试了好几次卸载——每次都重新下载了。\n\n你开始理解一个词：「信息茧房」。算法给你推的都是你喜欢看的——你看到的世界越来越窄。\n\n「短视频的恐怖不在于浪费时间——在于它正在重塑你的大脑。你以为你在看视频——其实是视频在看你。」',
+      cond: g => !g.flags.shortVideoAddict && g.age >= 20 && g.age <= 45,
+      choices:[
+        { label:'意识到了问题，开始限制使用时间', hint:'+🧠 +😊', fn: g => { g.flags.shortVideoAddict=true; g.flags.personalGrowth=true; return{intel:8,mood:5}; }},
+        { label:'试着控制但失败了，算法太强了', hint:'', fn: g => { g.flags.shortVideoAddict=true; return{mood:-5}; }},
+        { label:'觉得挺好玩的，不觉得有什么问题', hint:'+😊', fn: g => { g.flags.shortVideoAddict=true; return{mood:3}; }},
+      ]},
+    { id:'create_short_video', icon:'🎬', title:'拍短视频', category:'career',
+      body:'你不只是看短视频了——你开始拍了。\n\n你拍了一条关于「打工人的日常」的短视频。用手机拍，简单剪辑，发到了抖音。\n\n第一天的播放量：200。\n\n第二天：500。\n\n第三天——10万。\n\n你火了。\n\n评论区：「太真实了！」「这就是我！」「笑着笑着就哭了。」\n\n你开始认真做短视频。你研究了算法、封面、标题、发布时间。\n\n你发现：短视频创作是一门技术活。不是拍得好就行——是要「懂平台」。\n\n一个月后，你的粉丝到了1万。有人找你接广告：一条视频500元。\n\n你发了条动态：「从观众到创作者——原来拍短视频比刷短视频有意思多了。」\n\n「短视频时代：每个人都是导演，也是演员。你的手机就是摄影机——你的生活就是剧本。」',
+      cond: g => g.flags.shortVideoAddict && !g.flags.createShortVideo && g.charm >= 30,
+      choices:[
+        { label:'认真做短视频，粉丝快速增长', hint:'+💰 +✨ +😊', fn: g => { g.flags.createShortVideo=true; g.flags.influencer=true; return{money:3000,charm:8,mood:10}; }},
+        { label:'偶尔发发，当个爱好', hint:'+✨ +😊', fn: g => { g.flags.createShortVideo=true; return{charm:5,mood:8}; }},
+        { label:'拍了几条没人看，放弃了', hint:'', fn: g => { g.flags.createShortVideo=true; return{mood:-3}; }},
+      ]},
+    { id:'live_streaming_v22_6', icon:'📺', title:'开始直播', category:'career',
+      body:'你的短视频做得不错——有人建议你试试直播。\n\n你开了第一场直播。观众：3个人（包括你的两个朋友）。\n\n你紧张得不知道说什么。你的一个朋友在弹幕里说：「别紧张，就当我们不在。」\n\n你聊了两个小时。聊你的工作、你的生活、你的困惑。\n\n第二场直播：观众10人。第三场：50人。一个月后：稳定在200人。\n\n有人给你刷了礼物——100块。你激动得差点哭了。\n\n你发现：直播的魅力在于「实时互动」。观众问你问题，你马上回答。你们之间没有「剪辑」——只有真实。\n\n你妈看了你的直播说：「你在网上聊天还能赚钱？」\n\n「直播经济的本质：你卖的不是内容——是陪伴。在一个孤独的时代，有人愿意为你的陪伴付费。」',
+      cond: g => g.flags.createShortVideo && !g.flags.liveStreaming && g.social >= 30,
+      choices:[
+        { label:'坚持直播，成了小有名气的主播', hint:'+💰 +👥 +😊', fn: g => { g.flags.liveStreaming=true; return{money:5000,social:10,mood:10}; }},
+        { label:'偶尔直播，粉丝增长缓慢', hint:'+👥 +😊', fn: g => { g.flags.liveStreaming=true; return{social:5,mood:5}; }},
+        { label:'直播太累了，还是做短视频舒服', hint:'+😊', fn: g => { g.flags.liveStreaming=true; return{mood:3}; }},
+      ]},
+    { id:'viral_content', icon:'🔥', title:'爆款内容', category:'career',
+      body:'你拍的一条视频突然爆了——播放量1000万。\n\n你不敢相信。你反复刷新数据：100万、500万、1000万……\n\n你的粉丝一夜之间从5000涨到了5万。\n\n你开始收到各种私信：\n- MCN公司想签你\n- 品牌想合作\n- 有人要买你的课程\n- 有人说你抄袭\n\n你懵了。你发现：一条爆款视频能改变很多——但也带来很多麻烦。\n\n你的一个做自媒体的朋友说：「爆款是运气——但持续出爆款才是能力。」\n\n你开始研究：为什么这条视频会爆？是因为选题？还是因为发布时间？还是纯粹运气？\n\n「爆款视频就像中彩票：每个人都想要——但没人知道什么时候会来。重要的是：来了之后你接不接得住。」',
+      cond: g => g.flags.createShortVideo && !g.flags.viralContent && g.charm >= 40,
+      choices:[
+        { label:'抓住了机会，成功转型为全职创作者', hint:'+💰 +✨ +😊', fn: g => { g.flags.viralContent=true; g.flags.fullTimeCreator=true; setJob(g,'自媒体创作者',8000); return{money:10000,charm:10,mood:12}; }},
+        { label:'火了一阵又回归平淡', hint:'+✨ +😊', fn: g => { g.flags.viralContent=true; return{charm:8,mood:8,money:3000}; }},
+        { label:'被网络暴力吓到了', hint:'-😊', fn: g => { g.flags.viralContent=true; return{mood:-10,charm:5}; }},
+      ]},
+    { id:'content_burnout', icon:'😩', title:'创作倦怠', category:'psychology',
+      body:'你做了半年的短视频/直播。你开始觉得累了。\n\n不是身体的累——是精神的累。\n\n你每天都要想：今天拍什么？什么选题能火？什么时间发最好？\n\n你的数据开始下滑。播放量从10万变成了1万，再变成3000。\n\n你开始焦虑：「是不是我不够好？是不是要被淘汰了？」\n\n你看了一个心理学家的视频：「创作倦怠的根源：你把自我价值绑定在了数据上。」\n\n你开始调整：\n- 不再每天追数据\n- 回归做内容的初心：做自己想做的，不是算法想让你做的\n- 给自己放了一周的假\n\n「创作者最大的敌人不是竞争——是倦怠。当创作变成了工作——你需要找回它最初让你快乐的原因。」',
+      cond: g => g.flags.createShortVideo && !g.flags.contentBurnout,
+      choices:[
+        { label:'调整后重新出发，心态更健康了', hint:'+😊 +🧠', fn: g => { g.flags.contentBurnout=true; g.flags.personalGrowth=true; return{mood:10,intel:5}; }},
+        { label:'坚持了一段时间但还是放弃了', hint:'+😊', fn: g => { g.flags.contentBurnout=true; return{mood:3}; }},
+        { label:'越焦虑越做不好，陷入了恶性循环', hint:'-😊', fn: g => { g.flags.contentBurnout=true; return{mood:-10}; }},
+      ]},
+    { id:'ecommerce_live', icon:'🛒', title:'直播带货', category:'finance',
+      body:'有品牌找你做直播带货。佣金20%。\n\n你犹豫了：你不想变成「卖货的」。但佣金真的很诱人。\n\n你试了一场。你推荐了一个你自己在用的产品。\n\n「家人们，这个真的好用！我自己买了三个！」\n\n你发现你很有天赋。一场直播卖了5万元——你的佣金1万元。\n\n但你也发现：直播带货很累。你需要提前准备话术、了解产品、应对各种弹幕。\n\n你开始理解：为什么那些大主播能赚那么多钱——因为这是体力+脑力+情绪的全方位消耗。\n\n你的一个粉丝说：「你推荐的东西我买了，确实好用。」\n\n你觉得：这也许就是价值——帮别人找到好东西。\n\n「直播带货的本质：信任变现。粉丝买的不是产品——是对你品味的信任。」',
+      cond: g => g.flags.liveStreaming && !g.flags.ecommerceLive && g.social >= 40,
+      choices:[
+        { label:'开始做直播带货，收入大增', hint:'+💰 +😊', fn: g => { g.flags.ecommerceLive=true; return{money:15000,mood:8}; }},
+        { label:'做了几场觉得太累了', hint:'+💰 +😊', fn: g => { g.flags.ecommerceLive=true; return{money:5000,mood:3}; }},
+        { label:'觉得不适合自己，继续做内容', hint:'+😊', fn: g => { g.flags.ecommerceLive=true; return{mood:5}; }},
+      ]},
+    { id:'digital_detox_v3_v22_6', icon:'📵', title:'数字排毒', category:'health',
+      body:'你做了一个决定：7天不用手机（除了工作）。\n\n第一天：你的手不知道放哪。你下意识地掏手机——然后想起你不能用。\n\n第二天：你开始注意到以前忽略的东西。路边的花、天上的云、邻居的微笑。\n\n第三天：你开始读书了。你翻出了一本买了两年没看的书。\n\n第四天：你和朋友面对面聊了两个小时。没有手机，没有干扰。\n\n第七天：你重新打开手机。你发现：900条未读消息中——真正重要的不超过10条。\n\n你在日记里写：「7天不用手机——我找回了3样东西：注意力、耐心、和对真实世界的感知。」\n\n「数字排毒不是戒手机——是提醒自己：你才是手机的主人——不是它的奴隶。」',
+      cond: g => g.flags.shortVideoAddict && !g.flags.digitalDetoxV3,
+      choices:[
+        { label:'完成了7天排毒，生活方式改变了', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.digitalDetoxV3=true; g.flags.personalGrowth=true; return{mood:15,health:8,intel:8}; }},
+        { label:'坚持了3天就破功了', hint:'+😊', fn: g => { g.flags.digitalDetoxV3=true; return{mood:5}; }},
+        { label:'觉得太难了，一天都没坚持住', hint:'', fn: g => { g.flags.digitalDetoxV3=true; return{mood:-3}; }},
+      ]},
+    { id:'mcn_offer', icon:'🏢', title:'MCN签约', category:'career',
+      body:'一家MCN公司联系了你。\n\n他们的条件：\n- 签约费：10万\n- 每月保底收入：1万\n- 公司帮你运营账号、接广告\n- 但：账号归公司所有，分成50/50\n\n你的一个做自媒体的朋友说：「MCN签约是把双刃剑。好处是有资源，坏处是失去自由。」\n\n你研究了其他签约创作者的经历：\n- 有人通过MCN起飞了\n- 有人被公司雪藏了\n- 有人想解约但赔了违约金\n\n你面临选择：是签约走捷径——还是自己慢慢做？\n\n你的一个律师朋友看了合同后说：「条款对你不太有利。账号归公司——这意味着你离开后什么都带不走。」\n\n「MCN签约就像结婚：签约容易解约难。关键是：你准备好了吗？」',
+      cond: g => g.flags.createShortVideo && !g.flags.mcnOffer && g.charm >= 45,
+      choices:[
+        { label:'签了约，获得了专业资源支持', hint:'+💰 +✨', fn: g => { g.flags.mcnOffer=true; g.flags.mcnSigned=true; return{money:50000,charm:8,mood:5}; }},
+        { label:'谈了更好的条件后签约', hint:'+💰 +🧠 +✨', fn: g => { g.flags.mcnOffer=true; g.flags.mcnSigned=true; return{money:30000,intel:5,charm:5}; }},
+        { label:'拒绝了，坚持独立创作', hint:'+🧠 +😊', fn: g => { g.flags.mcnOffer=true; return{intel:5,mood:8}; }},
+      ]},
+    { id:'algorithm_prison', icon:'🔐', title:'算法囚徒', category:'tech',
+      body:'你在思考一个问题：你以为你在用平台——还是平台在用你？\n\n你做了一个实验：你在抖音上搜索了一次「编程教程」。从此你的推荐全是编程内容。\n\n你搜索了一次「旅游」。从此你的推荐全是旅游视频。\n\n你意识到：算法正在给你构建一个「信息茧房」。\n\n你开始刻意搜索不同的内容来打破茧房：政治、经济、艺术、哲学……\n\n你发现：当你看到不同观点时——你的第一反应是「不同意」。因为你已经习惯了同质化信息。\n\n你开始理解：算法不只影响你看什么——它影响你怎么想。\n\n你在微博上写了一段话：「我们是第一批被算法喂养长大的人。我们正在经历一场前所未有的思想实验——而我们大多数人甚至不知道自己在实验中。」\n\n「算法时代的最大挑战：不是AI太聪明——是人类太容易被预测。」',
+      cond: g => g.flags.shortVideoAddict && !g.flags.algorithmPrison && g.intel >= 45,
+      choices:[
+        { label:'开始有意识地对抗算法，拓宽了视野', hint:'+🧠 +😊', fn: g => { g.flags.algorithmPrison=true; g.flags.personalGrowth=true; return{intel:12,mood:8}; }},
+        { label:'意识到了问题但不知道怎么办', hint:'+🧠', fn: g => { g.flags.algorithmPrison=true; return{intel:8}; }},
+        { label:'觉得无所谓，反正看得开心', hint:'+😊', fn: g => { g.flags.algorithmPrison=true; return{mood:3}; }},
+      ]},
+    { id:'creator_economy', icon:'💰', title:'创作者经济', category:'finance',
+      body:'你开始研究「创作者经济」——这是一个正在爆发的市场。\n\n数据：\n- 中国有超过2亿内容创作者\n- 短视频/直播平台市场规模超过5000亿\n- 头部创作者年收入过亿\n- 但95%的创作者月收入不超过5000\n\n你开始思考：如何在这个市场中找到自己的位置？\n\n你研究了几种变现方式：\n1. 广告合作\n2. 直播带货\n3. 知识付费\n4. 粉丝打赏\n5. IP授权\n\n你发现：内容创作不是一个人能做的——你需要团队。\n\n你的一个在MCN工作的朋友说：「创作者经济的真相：20%的人赚了80%的钱。但进入的门槛很低——所以每个人都觉得自己能成。」\n\n「创作者经济是这个时代最大的机会——也是最大的幻觉。因为门槛低不等于容易成功。」',
+      cond: g => g.flags.createShortVideo && !g.flags.creatorEconomy && g.intel >= 40,
+      choices:[
+        { label:'认真研究了商业模式，制定了计划', hint:'+🧠 +💰', fn: g => { g.flags.creatorEconomy=true; return{intel:10,money:5000}; }},
+        { label:'了解了行业现状，更理性了', hint:'+🧠 +😊', fn: g => { g.flags.creatorEconomy=true; return{intel:8,mood:5}; }},
+        { label:'觉得太卷了，不适合自己', hint:'', fn: g => { g.flags.creatorEconomy=true; return{mood:3}; }},
+      ]},
 ];
-
-// === ACHIEVEMENTS ===
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
     { id:'homeowner', icon:'🏡', name:'有房一族', desc:'在大城市买房', check: g => g.flags.hasHouse },
@@ -11864,6 +11943,12 @@ const ACHIEVEMENTS = [
     { id:'figure_collector_ach', icon:'🗿', name:'手办收藏家', desc:'开始收集动漫手办', check: g => g.flags.figureCollection },
     { id:'pilgrim_ach', icon:'⛩️', name:'圣地巡礼者', desc:'去了动漫取景地朝圣', check: g => g.flags.animePilgrimage },
     { id:'doujin_creator_ach', icon:'✏️', name:'同人创作者', desc:'开始了自己的同人创作', check: g => g.flags.doujinCreate },
+    // === v22.6 新增成就（短视频与直播经济） ===
+    { id:'short_video_survivor_ach', icon:'📱', name:'短视频重度用户', desc:'每天刷短视频超过3小时', check: g => g.flags.shortVideoAddict },
+    { id:'video_creator_ach', icon:'🎬', name:'短视频创作者', desc:'发布了自己的第一条短视频', check: g => g.flags.createdShortVideo },
+    { id:'live_streamer_ach', icon:'🎙️', name:'主播之路', desc:'尝试了直播', check: g => g.flags.liveStreamed },
+    { id:'viral_ach', icon:'🔥', name:'爆款制造机', desc:'内容上了热门', check: g => g.flags.viralContent },
+    { id:'digital_detoxer_ach', icon:'🧘', name:'数字排毒师', desc:'成功戒断了手机依赖', check: g => g.flags.digitalDetoxV3 },
 ];
 
 // === ENDINGS === (order matters: first match wins)
