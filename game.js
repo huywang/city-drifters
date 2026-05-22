@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v23.1
+// 都市浮生记 - Game Engine v23.2
 // ============================================
 
 // === GAME STATE ===
@@ -11347,6 +11347,87 @@ const EVENTS = [
         { label:'开始做中西文化交流的工作', hint:'+💰 +🤝', fn: g => { g.flags.eastWestFusion=true; g.flags.culturalBridge=true; return{money:5000,social:12,intel:10}; }},
         { label:'觉得这个问题太深了，想不清楚', hint:'+🧠', fn: g => { g.flags.eastWestFusion=true; return{intel:8,mood:3}; }},
       ]},
+    // === v23.2 新增事件（中年创业 + 下岗危机 + 职场转型） ===
+    { id:'layoff_warning', icon:'⚠️', title:'裁员风暴', category:'career',
+      body:'你的公司开始裁员了。\n\n消息是从HR的同事那里传出来的：「公司要优化20%的人员。」\n\n你不在第一批名单上——但你知道，第二批可能就有你。\n\n你开始焦虑：\n- 你已经35+了\n- 你的薪资在公司属于中高水平\n- 你的岗位不是核心业务\n- 你的上司对你越来越冷淡\n\n你的同事老李，40岁，上周被裁了。他拿到了N+1的赔偿，但他说：「赔偿金够活半年。半年后呢？」\n\n你开始更新简历。你发现：\n- 你的技能已经过时了\n- 你的行业在萎缩\n- 你的年龄是个劣势\n\n但你也发现：\n- 你有丰富的行业经验\n- 你有成熟的人脉网络\n- 你知道怎么解决复杂问题\n\n「裁员不是你的错——但你必须为自己的未来负责。」',
+      cond: g => g.age >= 33 && g.age <= 50 && !g.flags.layoffWarning && g.job !== '待业中',
+      choices:[
+        { label:'提前准备，开始找下家和副业', hint:'+🧠 +💪', fn: g => { g.flags.layoffWarning=true; g.flags.prepareLayoff=true; return{intel:10,mood:-5,charm:3}; }},
+        { label:'焦虑了一段时间，但没采取行动', hint:'-😊', fn: g => { g.flags.layoffWarning=true; return{mood:-10,health:-5}; }},
+        { label:'主动找领导谈了自己的发展规划', hint:'+🤝 +🧠', fn: g => { g.flags.layoffWarning=true; g.flags.proactiveTalk=true; return{social:5,intel:5,mood:-3}; }},
+      ]},
+    { id:'age_discrimination', icon:'🚫', title:'年龄歧视', category:'career',
+      body:'你投了30份简历，只收到了2个面试邀请。\n\n面试的时候，你明显感觉到面试官的犹豫：\n- 「您的经验很丰富，但我们团队平均年龄25岁」\n- 「您期望的薪资有点超出我们的预算」\n- 「这个岗位需要经常加班，您能接受吗？」\n\n你知道这些都是在绕弯子。真正的潜台词是：你太老了。\n\n你在招聘网站上看到：80%的岗位要求「35岁以下」。\n\n你愤怒了。但愤怒过后，你开始冷静分析：\n- 不是你不优秀——是市场在用年龄筛选人\n- 年龄歧视是结构性的——不是个人能改变的\n- 你能做的是：让自己的价值超越年龄的标签\n\n你开始思考：什么样的工作不看你多少岁，而看你能做什么？\n\n「年龄歧视的本质：用一个人的出生年份来否定他的全部价值——这是最廉价的筛选方式。」',
+      cond: g => g.flags.layoffWarning && !g.flags.ageDiscrimination,
+      choices:[
+        { label:'开始转向不看年龄的赛道', hint:'+🧠 +💪', fn: g => { g.flags.ageDiscrimination=true; g.flags.ageProofCareer=true; return{intel:10,mood:5}; }},
+        { label:'降低薪资预期，先找到工作再说', hint:'+💰 -😊', fn: g => { g.flags.ageDiscrimination=true; return{money:3000,mood:-8}; }},
+        { label:'决定自己干——不再受制于人', hint:'+💪 -💰', fn: g => { g.flags.ageDiscrimination=true; g.flags.selfEmployed=true; return{mood:5,money:-10000,charm:5}; }},
+      ]},
+    { id:'midlife_startup', icon:'🚀', title:'中年创业', category:'career',
+      body:'你决定创业了。\n\n不是年轻时的冲动——是经过深思熟虑的决定。\n\n你的优势：\n- 20年的行业经验\n- 丰富的人脉资源\n- 对行业的深度理解\n- 成熟的心智和抗压能力\n\n你的劣势：\n- 家庭负担（房贷、子女教育）\n- 体力不如年轻人\n- 试错成本更高\n\n你的创业项目：为中小企业提供行业咨询。\n\n你拿出了30万积蓄作为启动资金。你的伴侣很担心：「如果亏了呢？」\n\n你说：「如果我不试，我会后悔一辈子。」\n\n前三个月：0收入。你每天只睡5个小时。\n第四个月：第一个客户来了。\n第六个月：开始有稳定的现金流。\n\n一年后，你的月收入超过了之前的工资。\n\n「中年创业不是赌博——是把20年的积累变现。」',
+      cond: g => g.age >= 35 && g.age <= 50 && !g.flags.midlifeStartup && (g.flags.layoffWarning || g.flags.selfEmployed) && g.money >= 30000,
+      choices:[
+        { label:'全力以赴，一年后实现了盈利', hint:'+💰💰 +😊', fn: g => { g.flags.midlifeStartup=true; g.flags.startupProfit=true; setJob(g,'创业者',25000); return{money:10000,mood:15,intel:10,charm:8}; }},
+        { label:'稳扎稳打，两年后才开始盈利', hint:'+💰 +🧠', fn: g => { g.flags.midlifeStartup=true; return{money:-15000,intel:15,mood:5}; }},
+        { label:'创业失败了，但学到了很多', hint:'-💰 +🧠', fn: g => { g.flags.midlifeStartup=true; g.flags.startupFailed=true; return{money:-30000,intel:15,mood:-10}; }},
+      ]},
+    { id:'career_pivot', icon:'🔄', title:'职业大转型', category:'career',
+      body:'你做了一件让所有人惊讶的事：彻底换了行业。\n\n从金融跳到教育。从互联网跳到医疗。从工程师变成心理咨询师。\n\n你的朋友说：「你疯了吗？你在原来的行业干了十几年！」\n\n你说：「正因为干了十几年，我才知道这不是我想要的。」\n\n你的转型策略：\n1. 先学习新行业的知识（6个月）\n2. 找到行业内的mentor（3个月）\n3. 从小公司开始（降低预期）\n4. 用旧行业的技能创造差异化\n\n你发现：你以前的经验并没有浪费——它们成了你的独特优势。\n\n一个从教育转互联网的同事对你说：「你教我做课程设计，我教你用数据分析。我们互相学习。」\n\n一年后，你在新行业站稳了脚跟。虽然薪资暂时降低了，但你觉得——终于在做有意义的事。\n\n「转型不是从头开始——是带着过去的智慧走向新的方向。」',
+      cond: g => g.age >= 30 && g.age <= 45 && !g.flags.careerPivot && g.intel >= 35,
+      choices:[
+        { label:'成功转型，在新行业找到了热情', hint:'+😊 +🧠', fn: g => { g.flags.careerPivot=true; g.flags.newPassion=true; return{mood:15,intel:12,charm:5,money:-5000}; }},
+        { label:'转型艰难，还在适应中', hint:'+🧠 -😊', fn: g => { g.flags.careerPivot=true; return{intel:10,mood:-8,money:-3000}; }},
+        { label:'发现新行业也不适合自己', hint:'+🧠', fn: g => { g.flags.careerPivot=true; return{intel:8,mood:-5}; }},
+      ]},
+    { id:'second_career_v23_2', icon:'🌱', title:'第二职业', category:'career',
+      body:'你开始了一份「第二职业」——不影响本职工作的兼职/副业。\n\n你的选择：\n- 周末做行业咨询（时薪500元）\n- 晚上做线上课程（被动收入）\n- 写付费专栏（月入3000-8000元）\n- 做企业培训（日薪3000元）\n\n第一个月，你的副业收入：2000元。\n第三个月：5000元。\n第六个月：8000元。\n\n你发现了一个真相：你的经验和知识是可以变现的。很多人愿意为你的专业意见付费。\n\n但你也付出了代价：\n- 几乎没有休息时间\n- 和家人在一起的时间少了\n- 身体开始疲惫\n\n你的伴侣说：「你赚钱多了，但你人不在家。」\n\n你开始思考：第二职业的目的到底是什么？是赚更多的钱——还是做更有意义的事？\n\n「第二职业不是加班——是用你的独特价值创造第二个人生。」',
+      cond: g => g.age >= 30 && g.age <= 50 && !g.flags.secondCareer && g.intel >= 30,
+      choices:[
+        { label:'副业收入逐渐超过主业', hint:'+💰💰 +🧠', fn: g => { g.flags.secondCareer=true; g.flags.sideHustleBig=true; return{money:8000,intel:8,mood:5,health:-5}; }},
+        { label:'平衡了副业和生活，找到了节奏', hint:'+💰 +😊', fn: g => { g.flags.secondCareer=true; g.flags.balancedSide=true; return{money:4000,mood:8,intel:5}; }},
+        { label:'太累了，暂停了副业', hint:'+💪 +😊', fn: g => { g.flags.secondCareer=true; return{health:5,mood:5}; }},
+      ]},
+    { id:'upskilling_midlife', icon:'📚', title:'中年充电', category:'education',
+      body:'你决定回到课堂。\n\n不是为了学历——是为了不被淘汰。\n\n你报名了：\n- 在线MBA课程（学费8万）\n- AI应用培训（学费2万）\n- 心理咨询师认证（学费3万）\n- 数据分析训练营（学费1.5万）\n\n你的同学都是25-30岁的年轻人。你是班里年龄最大的。\n\n但你发现：年龄大不是劣势——你有实践经验，年轻人有理论知识。你们互相学习。\n\n一个年轻同学说：「大哥，你讲的那些案例比老师讲的还有意思。」\n\n你的教授说：「学习永远不嫌晚。最遗憾的是那些觉得已经太晚的人。」\n\n六个月后，你拿到了证书。你的简历上多了一行——但更重要的是，你的脑子里多了很多新的想法。\n\n「中年充电不是为了追赶年轻人——是为了让自己的人生多一种可能。」',
+      cond: g => g.age >= 32 && g.age <= 50 && !g.flags.upskillingMidlife && g.money >= 15000,
+      choices:[
+        { label:'学了新技能，成功转型', hint:'+🧠🧠 +💰', fn: g => { g.flags.upskillingMidlife=true; g.flags.skillTransform=true; return{intel:18,mood:10,money:-15000}; }},
+        { label:'学了很多，但还没找到应用场景', hint:'+🧠', fn: g => { g.flags.upskillingMidlife=true; return{intel:12,mood:3,money:-15000}; }},
+        { label:'学习过程中认识了重要的人脉', hint:'+🤝 +🧠', fn: g => { g.flags.upskillingMidlife=true; g.flags.studyNetwork=true; return{intel:10,social:10,money:-15000}; }},
+      ]},
+    { id:'mentor_youngsters', icon:'👨‍🏫', title:'带年轻人', category:'social',
+      body:'你的公司让你带一个实习生。\n\n实习生叫小周，23岁，名牌大学毕业，但什么都不懂。\n\n你教他：\n- 怎么写一份好的方案\n- 怎么和客户沟通\n- 怎么处理职场中的复杂关系\n- 怎么在犯错中学习\n\n三个月后，小周从一个什么都不懂的新人变成了一个能独当一面的员工。\n\n他对你说：「哥，你是我遇到过最好的mentor。学校没教我的东西，你都教了。」\n\n你突然意识到：你最大的价值不是你自己能做什么——是你能帮助别人做什么。\n\n你开始在公司做内部分享会。你的PPT标题是：《我在大城市踩过的100个坑》。\n\n来听的人比你预期的多三倍。\n\n「导师的价值：不是你爬了多高——是你能帮多少人爬上去。」',
+      cond: g => g.age >= 32 && !g.flags.mentorYoungsters && g.intel >= 30,
+      choices:[
+        { label:'成了公司里的「导师」，带了很多新人', hint:'+🤝 +😊', fn: g => { g.flags.mentorYoungsters=true; g.flags.companyMentor=true; return{social:12,mood:12,charm:8}; }},
+        { label:'开始做线上职业指导', hint:'+💰 +🤝', fn: g => { g.flags.mentorYoungsters=true; g.flags.onlineMentor=true; return{money:3000,social:8,mood:8}; }},
+        { label:'带了一个实习生，但没有持续', hint:'+🧠', fn: g => { g.flags.mentorYoungsters=true; return{intel:5,social:3}; }},
+      ]},
+    { id:'midlife_burnout', icon:'🔥', title:'中年倦怠', category:'psychology',
+      body:'你倦怠了。\n\n不是身体的疲惫——是心灵的疲惫。\n\n你每天早上醒来，想到的第一件事是：「又要去上班了。」\n\n你对工作失去了热情。你对生活失去了兴趣。你对未来失去了期待。\n\n你开始理解「中年危机」不是矫情——是一种真实的存在：\n- 你做了20年同样的事\n- 你看到了职业的天花板\n- 你觉得时间过得越来越快\n- 你开始问自己：「这就是人生吗？」\n\n你的一个朋友——心理咨询师——对你说：\n「中年倦怠不是你的问题——是你的人生在要求你改变。痛苦是信号，说明有什么东西需要调整。」\n\n你开始审视自己的生活：\n- 工作还有意义吗？\n- 关系还滋养你吗？\n- 身体还好吗？\n- 有没有什么是你一直想做但没做的？\n\n「中年倦怠不是终点——是一个邀请：邀请你重新设计自己的人生。」',
+      cond: g => g.age >= 35 && g.age <= 50 && !g.flags.midlifeBurnout && g.mood < 40,
+      choices:[
+        { label:'寻求了心理咨询，开始重新审视人生', hint:'+🧠 +😊', fn: g => { g.flags.midlifeBurnout=true; g.flags.therapyHelp=true; return{intel:10,mood:10,money:-3000}; }},
+        { label:'休了一个长假，去了一个完全陌生的地方', hint:'+😊 +💪', fn: g => { g.flags.midlifeBurnout=true; g.flags.longVacation=true; return{mood:15,health:10,money:-5000}; }},
+        { label:'硬撑过去了，但内心知道迟早要面对', hint:'-💪', fn: g => { g.flags.midlifeBurnout=true; return{health:-8,mood:-5,intel:5}; }},
+      ]},
+    { id:'reinvention_story', icon:'🦋', title:'涅槃重生', category:'psychology',
+      body:'你经历了人生最黑暗的一段时期——然后你重生了。\n\n回头看，你走过的路：\n- 被裁员/面临裁员危机\n- 经历了年龄歧视\n- 体验了中年倦怠\n- 怀疑了自己的价值\n\n但你没有被击垮。你：\n- 学了新的技能\n- 尝试了新的事物\n- 找到了新的方向\n- 成为了一个更强大的人\n\n你站在镜子前，看着自己。你不再年轻——但你更有深度了。\n\n你的一个老朋友说：「你变了。你以前很焦虑，现在很从容。」\n\n你说：「不是从容——是经历了够多的事之后，你终于知道什么重要、什么不重要了。」\n\n你开始给和你一样经历中年危机的人分享经验。\n\n你说：「中年不是危机——是蜕变。蝴蝶在变成蝴蝶之前，也要经历一段丑陋的毛毛虫时期。」\n\n「涅槃重生：不是回到过去——是从灰烬中站起来，成为一个全新的自己。」',
+      cond: g => (g.flags.midlifeStartup || g.flags.careerPivot || g.flags.therapyHelp) && g.flags.midlifeBurnout && !g.flags.reinventionStory,
+      choices:[
+        { label:'写了《我的中年蜕变》系列文章', hint:'+😊 +🤝', fn: g => { g.flags.reinventionStory=true; return{mood:20,social:10,charm:10,intel:5}; }},
+        { label:'成了中年转型的职业顾问', hint:'+💰 +🤝', fn: g => { g.flags.reinventionStory=true; g.flags.midlifeCoach=true; setJob(g,'职业顾问',20000); return{money:5000,social:12,mood:15}; }},
+        { label:'默默消化了这段经历，继续前行', hint:'+🧠 +😊', fn: g => { g.flags.reinventionStory=true; return{intel:12,mood:10,health:5}; }},
+      ]},
+    { id:'age_is_just_number', icon:'🎂', title:'年龄只是数字', category:'psychology',
+      body:'你参加了一个马拉松。\n\n你48岁，是参赛者中年龄较大的之一。但你跑完了全程。\n\n终点线前，一个20岁的小伙子对你说：「大叔，你太厉害了！」\n\n你笑了笑。你想起了5年前的自己——那个觉得「我老了」的自己。\n\n现在的你：\n- 每周跑步3次\n- 在读研究生课程\n- 学了一门新语言\n- 刚完成了一次创业\n\n你终于理解了一句话：「年龄只是数字。」\n\n不是因为你不服老——是因为你学会了在每个年龄段都活出最好的自己。\n\n20岁有20岁的激情，30岁有30岁的拼劲，40岁有40岁的智慧，50岁有50岁的从容。\n\n每个年龄都有它的美好——前提是你不害怕变老。\n\n你的一个朋友问你：「你觉得自己几岁？」\n\n你说：「我永远觉得自己25岁——只是多了20多年的经验。」\n\n「年龄只是数字——但心态决定你活了多少岁。」',
+      cond: g => g.age >= 40 && !g.flags.ageJustNumber && g.health >= 50 && (g.flags.reinventionStory || g.flags.midlifeStartup),
+      choices:[
+        { label:'活出了最好的中年状态', hint:'+😊 +💪', fn: g => { g.flags.ageJustNumber=true; return{mood:20,health:10,charm:10,intel:5}; }},
+        { label:'开始激励身边人：什么时候开始都不晚', hint:'+🤝 +😊', fn: g => { g.flags.ageJustNumber=true; g.flags.ageInspire=true; return{social:12,mood:15}; }},
+        { label:'接受了变老，但拒绝变弱', hint:'+💪 +🧠', fn: g => { g.flags.ageJustNumber=true; return{health:8,intel:8,mood:10}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -12384,6 +12465,12 @@ const ACHIEVEMENTS = [
     { id:'tea_master_ach', icon:'🍵', name:'茶艺师', desc:'考了茶艺师证', check: g => g.flags.teaCertified },
     { id:'calligrapher_ach', icon:'✒️', name:'书法家', desc:'坚持练了一年书法', check: g => g.flags.calligraphyMaster },
     { id:'culture_confident_ach', icon:'🇨🇳', name:'文化自信', desc:'形成了真正的文化自觉和自信', check: g => g.flags.culturalConfidence },
+    // === v23.2 新增成就（中年创业与职场转型） ===
+    { id:'midlife_entrepreneur_ach', icon:'🚀', name:'中年创业者', desc:'在中年勇敢地开始了创业', check: g => g.flags.midlifeStartup },
+    { id:'career_transformer_ach', icon:'🔄', name:'职业转型家', desc:'成功地完成了职业大转型', check: g => g.flags.newPassion },
+    { id:'reinvented_ach', icon:'🦋', name:'涅槃重生', desc:'经历了中年危机后蜕变成全新的自己', check: g => g.flags.reinventionStory },
+    { id:'mentor_ach', icon:'👨‍🏫', name:'人生导师', desc:'成为了年轻人的导师', check: g => g.flags.companyMentor },
+    { id:'age_just_number_ach', icon:'🎂', name:'年龄只是数字', desc:'活出了最好的中年状态', check: g => g.flags.ageJustNumber },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -12443,7 +12530,7 @@ const ENDINGS = [
     // --- v2.31 NEW ENDINGS ---
     { id:'scam_victim', badge:'🎭', title:'杀猪盘受害者', desc:'你被杀猪盘骗了。不只是钱，还有感情。\n\n你把积蓄都投了进去，对方消失后你才发现：那些甜言蜜语，都是话术。\n\n你报了警，但钱追不回来了。你删掉了交友App，删掉了聊天记录，但删不掉那段记忆。\n\n"你以为遇到了真爱，其实遇到了KPI。"\n\n你开始告诉每一个朋友：天上不会掉馅饼，更不会掉真爱。\n\n（如果你或身边的人遭遇诈骗，请拨打反诈热线：96110）', cond: g => g.flags.romanceScam && g.money<-30000 },
     { id:'anti_fraud_hero', badge:'🛡️', title:'反诈达人', desc:'你不仅识破了杀猪盘，还成了反诈志愿者。\n\n你在社区做反诈宣传，帮老年人识别电信诈骗，在朋友圈科普各种骗局。\n\n有人说你"管太多"，但你知道：每多一个人识破骗局，就少一个受害者。\n\n"防人之心不可无——在这个时代，防人之心要升级。"', cond: g => g.flags.antiFraud && g.social>=60 && g.age>=30 },
-    { id:'career_pivot', badge:'🔄', title:'华丽转身', desc:'35岁那年，你成功转型了。\n\n你没有被年龄焦虑打败，而是找到了新的赛道。也许是管理岗，也许是技术专家，也许是完全不同的领域。\n\n你的经验成了优势，而不是包袱。\n\n"35岁不是终点，是另一个起点——前提是你准备好了。"', cond: g => g.flags.age35Crisis && g.flags.careerTransition && g.jobSalary>=20000 && g.age>=38 },
+    { id:'career_pivot_v23_2', badge:'🔄', title:'华丽转身', desc:'35岁那年，你成功转型了。\n\n你没有被年龄焦虑打败，而是找到了新的赛道。也许是管理岗，也许是技术专家，也许是完全不同的领域。\n\n你的经验成了优势，而不是包袱。\n\n"35岁不是终点，是另一个起点——前提是你准备好了。"', cond: g => g.flags.age35Crisis && g.flags.careerTransition && g.jobSalary>=20000 && g.age>=38 },
     { id:'sandwich_generation_v2', badge:'🥪', title:'三明治一代', desc:'你上有老、下有小，你是全家的顶梁柱。\n\n父母的医药费、孩子的学费、房贷车贷——每一笔都压在你肩上。\n\n你不敢生病，不敢辞职，不敢休息。\n\n但你看着孩子的笑脸、父母的健康，你觉得一切都值了。\n\n"三明治虽然被夹在中间，但它是最有料的那一个。"', cond: g => g.flags.parentIllness && g.flags.hasChild && g.flags.married && g.age>=38 && g.mood>=50 },
     { id:'phoenix_rising', badge:'🔥', title:'浴火凤凰', desc:'你经历了人生最黑暗的时刻——也许是破产，也许是失业，也许是失去亲人。\n\n但你没有倒下。你一步一步地爬了起来，重新开始。\n\n现在的你：更坚强、更清醒、更珍惜当下。\n\n"人不是被打败的。一个人可以被毁灭，但不能被打败。"\n\n你成了别人眼中的"传奇"——不是因为成功，而是因为不放弃。', cond: g => (g.flags.romanceScam || g.flags.mortgageDefault || g.flags.parentIllness) && g.money>=50000 && g.mood>=65 && g.health>=60 && g.age>=40 },
     // --- v2.34 NEW ENDINGS ---
