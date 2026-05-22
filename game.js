@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v6.3
+// 都市浮生记 - Game Engine v6.4
 // ============================================
 
 // === GAME STATE ===
@@ -3238,6 +3238,34 @@ const EVENTS = [
         { label:'研究技术原理', hint:'+🧠 +✨', fn: g => { g.flags.smartDriving=true; g.flags.aiResearcher=true; return{intel:15,charm:8}; }},
         { label:'不敢用', hint:'+🧠', fn: g => { g.flags.smartDriving=true; return{intel:3,mood:-5}; }},
       ]},
+    // === v6.4 EVENTS - 房地产与人口危机 ===
+    { id:'housing_dilemma', icon:'🏠', title:'买房还是租房',
+      body:'你在考虑买房。看了下房价：一线城市均价6万/㎡，二线城市3万/㎡。\n\n然后你看了下自己的存款：8万。\n\n同事说："现在谁还买房？房价还在跌呢！"\n\n数据：2025年30个重点城市二手房成交面积创5年新高，但新房交易在下降。三线城市房价环比下降0.4%。\n\n"房价还没跌到位，租金太低、房价太贵，继续买不划算，不如先租。"\n\n你算了笔账：同样地段的房子，月租4000，月供12000。租房30年的钱，够买半套房。\n\n但房东随时可能赶你走，你的东西永远在箱子里。\n\n"买房是'长期投资'，租房是'短期自由'——你选哪个？"',
+      cond: g => !g.flags.housingDilemma && g.age>=25 && g.age<=40 && !g.flags.hasHouse,
+      choices:[
+        { label:'咬牙买房', hint:'-💰💰💰💰 +🏠', fn: g => { g.flags.housingDilemma=true; g.flags.hasHouse=true; if(Math.random()>0.6){return{money:-500000,mood:15,charm:10}}else{return{money:-500000,mood:-10}} }},
+        { label:'继续租房', hint:'+💰 +😊', fn: g => { g.flags.housingDilemma=true; g.flags.renter=true; return{money:-2000,mood:8,intel:3}; }},
+        { label:'回老家买', hint:'-💰💰 +🏠 +😊', fn: g => { g.flags.housingDilemma=true; g.flags.hasHouse=true; g.flags.returnedHometown=true; return{money:-150000,mood:12,social:8}; }},
+        { label:'躺平，不考虑', hint:'+😊', fn: g => { g.flags.housingDilemma=true; return{mood:5}; }},
+      ]},
+    { id:'population_crisis', icon:'👶', title:'不婚不育保平安',
+      body:'春节回家，亲戚问："什么时候结婚？什么时候生孩子？"\n\n你看了看数据：2025年中国出生人口792万，连续3年负增长。结婚登记676万对，较2013年历史高点下降50%。\n\n"不婚不育保平安，单身保长寿。"\n\n你的理由：\n- 房价太高，养不起\n- 996太累，没时间\n- 教育内卷，卷不起\n- 自己还是个孩子，怎么养孩子\n\n"60年代是传统的一代，70、80年代是转型的一代，90、00后不向往结婚生育，向往独立、自由、享受。"\n\n但你也看到了问题：2025年60岁以上人口占比23%，老龄化加速。未来谁来养老？谁来工作？',
+      cond: g => !g.flags.populationCrisis && g.age>=25 && g.age<=35 && !g.flags.married,
+      choices:[
+        { label:'坚持不婚', hint:'+💰 +😊', fn: g => { g.flags.populationCrisis=true; g.flags.singleForever=true; return{money:5000,mood:10,intel:5}; }},
+        { label:'考虑结婚', hint:'-💰 +👥 +😊', fn: g => { g.flags.populationCrisis=true; return{money:-3000,social:12,mood:8}; }},
+        { label:'养宠物代替', hint:'-💰 +😊 +❤️', fn: g => { g.flags.populationCrisis=true; g.flags.hasPet=true; return{money:-2000,mood:15,health:5}; }},
+        { label:'顺其自然', hint:'+😊', fn: g => { g.flags.populationCrisis=true; return{mood:3}; }},
+      ]},
+    { id:'silver_economy', icon:'👴', title:'银发经济',
+      body:'你发现了一个商机：中国60岁以上人口已达3.2亿，占比23%。\n\n预计到2050年，老年人口消费将占GDP的21%。\n\n"银发经济——从保健品到养老服务，从广场舞到老年大学，这是一个万亿级市场。"\n\n你看到了各种机会：\n- 智能养老设备（健康监测、紧急呼叫）\n- 老年旅游（夕阳红旅行团）\n- 老年教育（书法、绘画、摄影）\n- 养老服务（居家护理、社区养老）\n\n"我们前面享受了多大的人口红利，后面就要背负多大的老龄化负担。"\n\n但你也看到了风险：老年人消费谨慎、市场监管严格、回报周期长。',
+      cond: g => !g.flags.silverEconomy && g.age>=25 && g.age<=45 && g.intel>=60,
+      choices:[
+        { label:'创业做养老服务', hint:'-💰💰 +💰 +✨', fn: g => { g.flags.silverEconomy=true; g.flags.elderCareEntrepreneur=true; if(Math.random()>0.5){return{money:80000,charm:15,social:10}}else{return{money:-30000,mood:-10}} }},
+        { label:'开发老年App', hint:'-💰 +🧠 +✨', fn: g => { g.flags.silverEconomy=true; g.flags.techEntrepreneur=true; return{money:-5000,intel:12,charm:8}; }},
+        { label:'投资养老产业', hint:'-💰💰 💰', fn: g => { g.flags.silverEconomy=true; if(Math.random()>0.5){return{money:50000}}else{return{money:-20000}} }},
+        { label:'太复杂，不碰', hint:'+🧠', fn: g => { g.flags.silverEconomy=true; return{intel:3}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3501,6 +3529,11 @@ const ACHIEVEMENTS = [
     { id:'smart_consumer', icon:'🧠', name:'理性消费者', desc:'做功课再下单', check: g => g.flags.smartConsumer },
     { id:'ev_owner', icon:'🚗', name:'新能源车主', desc:'购买新能源汽车', check: g => g.flags.newEnergyCar },
     { id:'tech_enthusiast', icon:'🤖', name:'科技发烧友', desc:'体验智能驾驶', check: g => g.flags.techEnthusiast },
+    // v6.4 achievements
+    { id:'homeowner_struggle', icon:'🏠', name:'房奴', desc:'在高房价下买房', check: g => g.flags.housingDilemma && g.flags.hasHouse },
+    { id:'renter_life', icon:'📦', name:'租房一族', desc:'选择租房生活', check: g => g.flags.renter },
+    { id:'single_forever', icon:'💍', name:'不婚主义', desc:'坚持不婚不育', check: g => g.flags.singleForever },
+    { id:'silver_entrepreneur', icon:'👴', name:'银发经济创业者', desc:'投身养老产业', check: g => g.flags.silverEconomy },
 ];
 
 // === ENDINGS === (order matters: first match wins)
