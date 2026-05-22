@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v31.8
+// 都市浮生记 - Game Engine v31.9
 // ============================================
 
 // === GAME STATE ===
@@ -17357,6 +17357,87 @@ const EVENTS = [
         { label:'制定一个5年改变计划', hint:'+🧠 +💰', fn: g => { g.flags.lifeRedefine=true; g.flags.fiveYearPlan=true; return{intel:8,money:500}; }},
         { label:'先和重要的人分享你的想法', hint:'+👥 +😊', fn: g => { g.flags.lifeRedefine=true; g.flags.shareVision=true; return{social:8,mood:5}; }},
       ]},
+    // --- v31.9 数字时代与网络生活 ---
+    { id:'social_media_detox_v31_9', icon:'📵', title:'社交媒体断联', category:'digital',
+      body:'你删掉了微信、微博、小红书、抖音——所有的社交媒体。\n\n第一天，你每5分钟看一次手机，手指条件反射地划向那些已经不存在的App图标。\n\n第三天，你觉得世界安静了，但你也觉得——世界好像把你忘了。\n\n第七天，你发现：你错过了3个朋友的生日、2个同事的婚礼、1个亲戚的葬礼通知。\n\n你重新下载了微信。但你决定——以后每天只刷30分钟。',
+      cond: g => g.age >= 18 && g.age <= 40 && g.mood < 55,
+      choices:[
+        { label:'坚持断联一个月', hint:'+🧠 +😊', fn: g => { g.flags.socialMediaDetoxV31=true; g.flags.fullDetox=true; return{intel:8,mood:5}; }},
+        { label:'只保留微信其他全删', hint:'+👥 +🧠', fn: g => { g.flags.socialMediaDetoxV31=true; g.flags.keepWechat=true; return{social:3,intel:5}; }},
+        { label:'设了每天30分钟使用时间', hint:'+🧠 +😊', fn: g => { g.flags.socialMediaDetoxV31=true; g.flags.timeLimit=true; return{intel:3,mood:5}; }},
+      ]},
+    { id:'cyberbully_victim_v31_9', icon:'😢', title:'网络暴力', category:'digital',
+      body:'你在网上发了一条观点，然后——你被网暴了。\n\n有人骂你「脑残」，有人扒你的个人信息，有人P你的照片发到群里。你的手机响了200条通知。\n\n你关了评论、设了隐私、拉黑了100个人。但你知道——有些人换个号还会来。\n\n你第一次理解了「网暴受害者」的感受。那不是愤怒——是恐惧。是一种「全世界都在看你」的恐惧。\n\n你一周没敢发任何动态。你觉得——互联网是有记忆的，但它没有同情心。',
+      cond: g => g.age >= 18 && g.age <= 40 && g.charm >= 30,
+      choices:[
+        { label:'删掉争议内容低调处理', hint:'+🧠 -😊', fn: g => { g.flags.cyberbullyVictim=true; g.flags.lowProfile=true; return{intel:3,mood:-5}; }},
+        { label:'正面回应坚持立场', hint:'+✨ +😊', fn: g => { g.flags.cyberbullyVictim=true; g.flags.standGround=true; return{charm:5,mood:3}; }},
+        { label:'截图取证考虑报警', hint:'+🧠 +💰', fn: g => { g.flags.cyberbullyVictim=true; g.flags.legalAction=true; return{intel:5,money:-200}; }},
+      ]},
+    { id:'viral_spread_v31_9', icon:'🔥', title:'一夜爆红', category:'digital',
+      body:'你随手拍的一段视频，突然火了。\n\n10万播放、100万播放、1000万播放。你的粉丝从500涨到了5万。评论区999+，私信999+。\n\n你兴奋了一整晚。你觉得自己找到了「流量密码」。\n\n但第二天，你发现——有人开始扒你的过去、有人质疑你造假、有人说你「恰烂饭」。\n\n你开始理解「红」的代价：你得到了关注，也失去了隐私。',
+      cond: g => g.age >= 18 && g.age <= 35 && g.charm >= 40,
+      choices:[
+        { label:'趁热度多更内容变现', hint:'+💰 +✨', fn: g => { g.flags.viralSpread=true; g.flags.monetizeViral=true; return{money:2000,charm:5}; }},
+        { label:'保持平常心继续日常', hint:'+🧠 +😊', fn: g => { g.flags.viralSpread=true; g.flags.stayNormal=true; return{intel:5,mood:5}; }},
+        { label:'删掉视频回归低调', hint:'+😊 -✨', fn: g => { g.flags.viralSpread=true; g.flags.deleteViral=true; return{mood:3,charm:-3}; }},
+      ]},
+    { id:'ai_writing_tool_v31_9', icon:'🤖', title:'AI代写', category:'digital',
+      body:'你发现了一个AI写作工具——你只需要输入几个关键词，它就能帮你写一篇文章。\n\n你用AI写了周报、写了方案、写了邮件。你的领导说：「你最近写得不错。」\n\n但你心里有点虚——这些真的是你写的吗？\n\n你的同事问你：「你那个方案的思路是什么？」你愣住了——因为你也不太记得AI是怎么想的。\n\n你开始想：如果AI能替你做所有的工作，那你的价值是什么？',
+      cond: g => g.job && g.job!=='待业中' && g.age >= 22 && g.age <= 45 && g.intel >= 40,
+      choices:[
+        { label:'用AI辅助但自己审核把关', hint:'+🧠 +💰', fn: g => { g.flags.aiWritingV31=true; g.flags.aiAssisted=true; return{intel:5,money:500}; }},
+        { label:'完全依赖AI省时间', hint:'+💰 -🧠', fn: g => { g.flags.aiWritingV31=true; g.flags.aiDependent=true; return{money:300,intel:-3}; }},
+        { label:'反思后决定提升自己', hint:'+🧠 +💪', fn: g => { g.flags.aiWritingV31=true; g.flags.selfImprovement=true; return{intel:8,health:3}; }},
+      ]},
+    { id:'data_privacy_leak_v31_9', icon:'🔓', title:'数据泄露', category:'digital',
+      body:'你收到了一封邮件：「您的个人信息已在某次数据泄露中被暴露。请立即修改密码。」\n\n你吓出了一身冷汗。你检查了——你的手机号、邮箱、甚至身份证号，都在一个暗网数据库里。\n\n你开始回忆：你在多少个网站注册过？你用同一个密码登录过多少个平台？\n\n你花了3个小时改了所有密码，开了二次验证。但你知道——你的数据已经不在你的控制范围了。\n\n你觉得在互联网时代，隐私是一种幻觉。',
+      cond: g => g.age >= 18 && g.age <= 50,
+      choices:[
+        { label:'全面升级密码安全', hint:'+🧠 +💪', fn: g => { g.flags.dataPrivacyLeak=true; g.flags.securityUpgrade=true; return{intel:5,health:2}; }},
+        { label:'减少在线注册和服务', hint:'+🧠 -👥', fn: g => { g.flags.dataPrivacyLeak=true; g.flags.minimizeOnline=true; return{intel:3,social:-3}; }},
+        { label:'算了反正也防不住', hint:'+😊 -🧠', fn: g => { g.flags.dataPrivacyLeak=true; g.flags.giveUpPrivacy=true; return{mood:3,intel:-2}; }},
+      ]},
+    { id:'internet_addiction_rehab_v31_9', icon:'📱', title:'手机成瘾', category:'digital',
+      body:'你打开手机的屏幕使用时间报告：每天平均8小时。\n\n你震惊了。8小时——相当于你醒着的一半时间都在看手机。\n\n你决定戒手机。你把手机锁进了抽屉里。\n\n第一个小时，你焦虑得不行。第二个小时，你坐立不安。第三个小时——你开始发呆。\n\n你发现：没有手机的时间过得很慢很慢。慢到你能听到窗外的鸟叫、能看清墙上的裂缝、能想起很多被手机屏蔽的记忆。\n\n第四个小时，你打开了抽屉。你承认：你离不开它。但你想——至少可以少看一点。',
+      cond: g => g.age >= 16 && g.age <= 45 && g.mood < 60,
+      choices:[
+        { label:'设置每天2小时上限', hint:'+🧠 +😊', fn: g => { g.flags.internetAddictionRehab=true; g.flags.screenTimeLimit=true; return{intel:5,mood:5}; }},
+        { label:'用非手机活动替代刷屏', hint:'+💪 +😊', fn: g => { g.flags.internetAddictionRehab=true; g.flags.offlineActivities=true; return{health:5,mood:5}; }},
+        { label:'算了这是现代人的宿命', hint:'+😊 -🧠', fn: g => { g.flags.internetAddictionRehab=true; g.flags.acceptAddiction=true; return{mood:3,intel:-2}; }},
+      ]},
+    { id:'virtual_persona_v31_9', icon:'🎭', title:'虚拟人设', category:'digital',
+      body:'你在网上有一个完全不同的身份。\n\n你的名字是假的，你的照片是AI生成的，你的故事是编的。在这个虚拟世界里，你是一个幽默、成功、有魅力的人。\n\n你有1000个网友，他们觉得他们了解你。但他们了解的——只是你创造的角色。\n\n有一天，一个网友说：「你是我最好的朋友。」\n\n你看着这句话，觉得愧疚。因为你们从来没有见过面，而你——甚至不是一个真实的人。',
+      cond: g => g.age >= 18 && g.age <= 35 && g.social < 40,
+      choices:[
+        { label:'逐步展现真实的自己', hint:'+😊 +👥', fn: g => { g.flags.virtualPersona=true; g.flags.revealReal=true; return{mood:8,social:5}; }},
+        { label:'关闭虚拟身份重新开始', hint:'+🧠 +😊', fn: g => { g.flags.virtualPersona=true; g.flags.freshStart=true; return{intel:5,mood:3}; }},
+        { label:'继续维持但内心挣扎', hint:'+✨ -😊', fn: g => { g.flags.virtualPersona=true; g.flags.keepActing=true; return{charm:3,mood:-5}; }},
+      ]},
+    { id:'secondhand_economy_v31_9', icon:'♻️', title:'闲鱼人生', category:'digital',
+      body:'你打开了闲鱼，准备卖掉你不需要的东西。\n\n你翻出了：穿了一次的衣服、看了两页的书、用了三次的健身器材、积灰的Switch。\n\n你拍了照片，写了描述，标了价格。你发现——每一件闲置物品都代表一个「过去的你」。\n\n有人来买你的Switch，他说：「我刚失业，想买个便宜的游戏机解解闷。」\n\n你减了50块卖给了他。你觉得——二手交易不只是买卖，是一种物品和故事的传递。',
+      cond: g => g.age >= 20 && g.age <= 45,
+      choices:[
+        { label:'定期清理卖闲置', hint:'+💰 +😊', fn: g => { g.flags.secondhandEconomyV31=true; g.flags.regularDeclutter=true; return{money:500,mood:5}; }},
+        { label:'开始买二手替代新品', hint:'+💰 +🧠', fn: g => { g.flags.secondhandEconomyV31=true; g.flags.buySecondhand=true; return{money:300,intel:3}; }},
+        { label:'做闲鱼副业倒卖赚差价', hint:'+💰 -🧠', fn: g => { g.flags.secondhandEconomyV31=true; g.flags.resellBusiness=true; return{money:800,intel:-2}; }},
+      ]},
+    { id:'livestream_temptation_v31_9', icon:'📺', title:'直播间剁手', category:'digital',
+      body:'你在直播间看了一晚上。\n\n主播说：「家人们！这个价格只有今天！3、2、1上链接！」\n\n你的手比你的脑子快——你抢了3单。你花了800块买了一些「限时特价」的东西。\n\n第二天你冷静下来：你不需要那个空气炸锅、你不需要那套护肤品、你不需要那箱零食。\n\n你退了2单，留了1单。你觉得自己像被催眠了一样——直播间有一种让人失去理性的魔力。',
+      cond: g => g.age >= 20 && g.age <= 45 && g.mood < 60,
+      choices:[
+        { label:'取消关注所有直播间', hint:'+💰 +🧠', fn: g => { g.flags.livestreamTemptation=true; g.flags.unfollowStreams=true; return{money:300,intel:3}; }},
+        { label:'设一个月度网购上限', hint:'+💰 +😊', fn: g => { g.flags.livestreamTemptation=true; g.flags.onlineShoppingLimit=true; return{money:500,mood:3}; }},
+        { label:'反正退了就行', hint:'+😊 -💰', fn: g => { g.flags.livestreamTemptation=true; g.flags.impulseBuy=true; return{mood:3,money:-500}; }},
+      ]},
+    { id:'online_date_irl_v31_9', icon:'💕', title:'网友奔现', category:'digital',
+      body:'你在社交App上认识了一个人。你们聊了3个月，每天至少2小时。\n\n你们决定见面——「奔现」。\n\n你穿了最好看的衣服，提前15分钟到了约定的咖啡馆。你的心跳得很快——比面试还紧张。\n\n他/她来了。和照片有点不一样——但你觉得更好看。\n\n你们聊了4小时。你说：「你跟网上一样有趣。」他/她说：「你也是。」\n\n你们告别的时候，你问：「下次什么时候见？」他/她说：「周末？」你笑了。',
+      cond: g => g.age >= 20 && g.age <= 38 && !g.flags.married && g.social >= 30,
+      choices:[
+        { label:'开始认真交往', hint:'+👥 +😊', fn: g => { g.flags.onlineDateIRL=true; g.flags.seriousDating=true; return{social:8,mood:8}; }},
+        { label:'做朋友也很好', hint:'+👥 +🧠', fn: g => { g.flags.onlineDateIRL=true; g.flags.stayFriends=true; return{social:5,intel:3}; }},
+        { label:'觉得还是线上更好', hint:'+😊 -👥', fn: g => { g.flags.onlineDateIRL=true; g.flags.preferOnline=true; return{mood:3,social:-2}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
 
@@ -18974,6 +19055,17 @@ const ACHIEVEMENTS = [
     { id:'stay_china_ach', icon:'✈️', name:'选择留下', desc:'放弃海外offer选择留下', check: g => g.flags.stayChina },
     { id:'lifestyle_change_ach_v31_8', icon:'🏥', name:'重获新生', desc:'大病后彻底改变生活方式', check: g => g.flags.lifestyleChange },
     { id:'start_dream_ach', icon:'🌟', name:'追梦人', desc:'开始做一直想做的事', check: g => g.flags.startDream },
+    // --- v31.9 数字时代成就 ---
+    { id:'full_detox_ach', icon:'📵', name:'数字断联者', desc:'坚持社交媒体断联一个月', check: g => g.flags.fullDetox },
+    { id:'legal_action_ach', icon:'😢', name:'网络维权', desc:'网暴后截图取证考虑报警', check: g => g.flags.legalAction },
+    { id:'stay_normal_ach', icon:'🔥', name:'平常心', desc:'一夜爆红后保持平常心', check: g => g.flags.stayNormal },
+    { id:'self_improve_ach', icon:'🤖', name:'拒绝AI依赖', desc:'决定提升自己而非依赖AI', check: g => g.flags.selfImprovement },
+    { id:'security_upgrade_ach', icon:'🔓', name:'安全升级', desc:'全面升级了密码安全', check: g => g.flags.securityUpgrade },
+    { id:'offline_activities_ach', icon:'📱', name:'线下生活', desc:'用非手机活动替代刷屏', check: g => g.flags.offlineActivities },
+    { id:'reveal_real_ach', icon:'🎭', name:'真实的我', desc:'在网上展现真实的自己', check: g => g.flags.revealReal },
+    { id:'buy_secondhand_ach', icon:'♻️', name:'二手生活家', desc:'开始买二手替代新品', check: g => g.flags.buySecondhand },
+    { id:'unfollow_streams_ach', icon:'📺', name:'直播断舍离', desc:'取消关注了所有直播间', check: g => g.flags.unfollowStreams },
+    { id:'serious_dating_ach', icon:'💕', name:'奔现成功', desc:'网友见面后开始认真交往', check: g => g.flags.seriousDating },
 ];
 
 // === ENDINGS === (order matters: first match wins)
