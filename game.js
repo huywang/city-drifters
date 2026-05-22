@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v19.3
+// 都市浮生记 - Game Engine v20.0
 // ============================================
 
 // === GAME STATE ===
@@ -9388,6 +9388,127 @@ const EVENTS = [
         { label:'买了几个桌游回家跟朋友玩', hint:'+👥 +😊 -💰', fn: g => { g.flags.boardGameCafe=true; g.flags.homeGamer=true; return{social:8,mood:8,money:-500}; }},
         { label:'太烧脑了，不适合我', hint:'', fn: g => { g.flags.boardGameCafe=true; return{mood:3}; }},
       ]},
+    // === v20.0 新增事件（时代脉搏 + 社会热点） ===
+    { id:'double_reduction', icon:'📚', title:'教育双减', category:'era',
+      body:'你听说「双减」政策落地了——校外培训机构几乎全部关停。\n\n你身边有孩子的朋友松了一口气：「终于不用卷补习班了。」但另一个朋友说：「不卷补习班，卷家长了——你得自己教。」\n\n你想了想：教育的本质到底是什么？是把孩子送进最好的学校，还是教会他们如何学习？\n\n你看着朋友圈里那些晒孩子成绩单的家长，觉得这个问题没有标准答案。\n\n「双减：减掉的是培训班，减不掉的是焦虑。」',
+      cond: g => !g.flags.doubleReduction && g.age >= 22 && g.age <= 50,
+      choices:[
+        { label:'支持，孩子应该有童年', hint:'+😊', fn: g => { g.flags.doubleReduction=true; g.flags.supportDoubleReduction=true; return{mood:5}; }},
+        { label:'焦虑转移到了家长身上', hint:'+🧠 -😊', fn: g => { g.flags.doubleReduction=true; g.flags.eduAnxietyParent=true; return{intel:3,mood:-3}; }},
+        { label:'跟我没关系', hint:'', fn: g => { g.flags.doubleReduction=true; return{}; }},
+      ]},
+    { id:'kindergarten_closing', icon:'🏫', title:'幼儿园关停潮', category:'era',
+      body:'你路过小区门口的那家幼儿园，发现它关门了。\n\n门口贴着通知：「因生源不足，本园将于本学期结束后停止办园。」\n\n你查了一下数据：2023年全国出生人口只有902万，比2016年几乎腰斩。幼儿园关停、小学合并、教师转岗——少子化的影响正在显现。\n\n你的一个幼师朋友说：「我教了10年幼儿园，现在班上一半的孩子都不来了。」\n\n「当一个社会的幼儿园开始关门，说明这个社会正在变老。」',
+      cond: g => !g.flags.kindergartenClosing && g.age >= 20,
+      choices:[
+        { label:'时代变了，要适应', hint:'+🧠', fn: g => { g.flags.kindergartenClosing=true; return{intel:3}; }},
+        { label:'有点感慨，想起自己的幼儿园', hint:'+😊 -😊', fn: g => { g.flags.kindergartenClosing=true; return{mood:2}; }},
+        { label:'跟我无关', hint:'', fn: g => { g.flags.kindergartenClosing=true; return{}; }},
+      ]},
+    { id:'community_canteen', icon:'🍽️', title:'社区食堂', category:'era',
+      body:'你发现小区里开了一家「社区食堂」——两荤一素12块，三荤一素15块。\n\n你走进去一看：里面坐满了人——有老人、有带孩子的妈妈、有外卖小哥、还有你这样的年轻人。\n\n厨师说：「我们不是饭店，是民生工程。政府补贴一部分，我们赚个辛苦钱。」\n\n你点了一份红烧肉套餐。味道不算惊艳，但很家常。你想起了小时候奶奶做的菜。\n\n你拍了张照片发朋友圈：「社区食堂：打工人的第二厨房。」\n\n「在大城市最幸福的事，就是有人帮你做好了饭，还不用你洗碗。」',
+      cond: g => !g.flags.communityCanteen && g.age >= 18,
+      choices:[
+        { label:'成了社区食堂常客', hint:'+😊 +❤️ -💰省', fn: g => { g.flags.communityCanteen=true; g.flags.canteenRegular=true; return{mood:8,health:5,money:200}; }},
+        { label:'偶尔去吃，还不错', hint:'+😊', fn: g => { g.flags.communityCanteen=true; return{mood:5,health:3}; }},
+        { label:'不太合我口味', hint:'', fn: g => { g.flags.communityCanteen=true; return{mood:2}; }},
+      ]},
+    { id:'deepseek_boom', icon:'🤖', title:'DeepSeek热潮', category:'era',
+      body:'你的朋友圈被DeepSeek刷屏了。\n\n同事说：「这个国产大模型比ChatGPT还好用！」你试了一下——它帮你写了一份周报，质量竟然比你写的好。\n\n你的程序员朋友说：「DeepSeek开源了，我们公司准备用它做产品。」\n\n你的老板说：「以后每个员工都要会用AI。」\n\n你看着DeepSeek的回答，突然有一种复杂的感觉：AI不再只是科幻电影里的东西——它就在你的手机里，随时可以对话。\n\n你的同事调侃：「以前担心AI抢饭碗，现在发现——会用AI的人抢了不会用的人的饭碗。」\n\n「AI不会取代你——但会用AI的人会。」',
+      cond: g => !g.flags.deepseekBoom && g.age >= 18 && g.intel >= 30,
+      choices:[
+        { label:'深入学习AI，成为AI达人', hint:'+🧠 +💰', fn: g => { g.flags.deepseekBoom=true; g.flags.aiPowerUser=true; return{intel:10,mood:5}; }},
+        { label:'用AI提升工作效率', hint:'+🧠 +😊', fn: g => { g.flags.deepseekBoom=true; g.flags.aiWorkHelper=true; return{intel:5,mood:3}; }},
+        { label:'有点焦虑，AI发展太快了', hint:'-😊', fn: g => { g.flags.deepseekBoom=true; g.flags.aiAnxietyDeep=true; return{mood:-5}; }},
+      ]},
+    { id:'prompt_engineer', icon:'💻', title:'新职业：AI提示词工程师', category:'era',
+      body:'你在招聘网站上看到一个奇怪的岗位：「AI提示词工程师，月薪3-8万」。\n\n你的第一反应是：「这也算工作？」\n\n但仔细看JD：需要理解大模型原理、会写高质量prompt、能做RAG和Fine-tuning、有跨部门沟通能力。\n\n你的朋友说：「这就是新时代的翻译官——不是翻译语言，是翻译人类意图给AI听。」\n\n你想：几年前，谁能想到「跟AI说话」也能成为一种职业？\n\n「当你的工作是教AI做事——你是在驾驭工具，还是被工具驾驭？」',
+      cond: g => !g.flags.promptEngineer && g.age >= 22 && g.age <= 40 && g.intel >= 50,
+      choices:[
+        { label:'转行做提示词工程师', hint:'+💰 +🧠', fn: g => { g.flags.promptEngineer=true; if(g.job!=='待业中') setJob(g,'AI提示词工程师',25000); return{intel:10,mood:5}; }},
+        { label:'学了点提示词技巧，用在现有工作中', hint:'+🧠', fn: g => { g.flags.promptEngineer=true; g.flags.promptSkills=true; return{intel:8}; }},
+        { label:'观望一下，不确定这行能走多远', hint:'', fn: g => { g.flags.promptEngineer=true; return{intel:2}; }},
+      ]},
+    { id:'ev_price_war', icon:'🚗', title:'新能源车价格战', category:'era',
+      body:'你打开手机新闻，满屏都是「价格战」：\n\n比亚迪：「秦PLUS 7.98万起」\n特斯拉：「Model 3再降2万」\n小米：「SU7交个朋友价」\n\n你的同事刚买了一辆比亚迪海豹，比半年前便宜了3万。他说：「早买早享受，晚买享折扣——但早买的想哭。」\n\n你算了算：一辆15万的新能源车，油费省了、购置税免了、保养费低了。但你又想：再等等会不会更便宜？\n\n你发现：价格战最大的赢家不是消费者——是那些等不及的人。\n\n「价格战的尽头不是最低价——是所有人都觉得「够了」的那一天。」',
+      cond: g => !g.flags.evPriceWar && g.age >= 22 && g.money >= 50000,
+      choices:[
+        { label:'趁便宜入手一辆', hint:'+😊 -💰💰', fn: g => { g.flags.evPriceWar=true; g.flags.evOwner=true; g.flags.hasCar=true; return{mood:10,money:-150000}; }},
+        { label:'再等等，还会降', hint:'', fn: g => { g.flags.evPriceWar=true; g.flags.evWatcher=true; return{mood:2}; }},
+        { label:'不需要车', hint:'', fn: g => { g.flags.evPriceWar=true; return{}; }},
+      ]},
+    { id:'going_global_trend', icon:'🌍', title:'企业出海潮', category:'era',
+      body:'你的公司开了一个全员大会：「我们要出海！」\n\nCEO说：「国内太卷了，我们要把产品卖到东南亚、中东、拉美去。」\n\n你的同事被派去了越南，每天发朋友圈：越南的咖啡3块钱一杯，街头的摩托车比汽车多，但经济增长率7%。\n\n另一个同事去了沙特：「这里的人很有钱，但什么都不懂——正好需要我们。」\n\n你看着世界地图，突然觉得：「中国制造」不再只是便宜货的代名词——它正在变成一种能力。\n\n「当中国企业开始出海，中国人也开始走向世界。」',
+      cond: g => !g.flags.goingGlobalTrend && g.age >= 22 && g.age <= 45 && g.job !== '待业中',
+      choices:[
+        { label:'申请海外派驻', hint:'+🧠 +💰 +😊', fn: g => { g.flags.goingGlobalTrend=true; g.flags.overseasExp=true; return{intel:10,money:5000,mood:5}; }},
+        { label:'学点英语/小语种，为出海做准备', hint:'+🧠', fn: g => { g.flags.goingGlobalTrend=true; g.flags.languageSkill=true; return{intel:8}; }},
+        { label:'出海跟我没关系', hint:'', fn: g => { g.flags.goingGlobalTrend=true; return{}; }},
+      ]},
+    { id:'elderly_digital', icon:'👴', title:'银发族触网', category:'era',
+      body:'你回家看爸妈，发现你妈在刷短视频。\n\n她的收藏夹里全是：「60岁学跳舞」「老年人养生」「广场舞教学」「退休金计算方法」。\n\n她说：「你看这个阿姨，70岁了还在学钢琴。我也想去学。」\n\n你帮她注册了老年大学的网课，还教她用智能手机挂号、买菜、打车。\n\n你爸说：「以前觉得手机是年轻人的东西，现在发现——不会用手机，连医院都去不了。」\n\n你突然意识到：数字化不是一代人的事——它是所有人的事。\n\n「当银发族开始触网，数字鸿沟不再是年龄的问题——是学习意愿的问题。」',
+      cond: g => !g.flags.elderlyDigital && g.age >= 25,
+      choices:[
+        { label:'耐心教父母用手机', hint:'+❤️ +😊', fn: g => { g.flags.elderlyDigital=true; g.flags.digitalBridge=true; return{social:5,mood:8}; }},
+        { label:'给他们买了个老年手机', hint:'+❤️ -💰', fn: g => { g.flags.elderlyDigital=true; return{social:3,mood:3,money:-500}; }},
+        { label:'他们自己会学的', hint:'', fn: g => { g.flags.elderlyDigital=true; return{mood:2}; }},
+      ]},
+    { id:'reverse_tourism', icon:'🏔️', title:'反向旅游', category:'era',
+      body:'五一假期，你做了一个反常的决定：不去热门景点。\n\n你去了一个十八线小县城——没有网红打卡点，没有人山人海，只有一条老街、一座古桥、和一家开了30年的米粉店。\n\n你坐在米粉店里，老板问你：「你们大城市的人怎么跑到我们这里来了？」\n\n你说：「因为大城市的人太多了。」\n\n你发了一条朋友圈：「反向旅游：不去网红景点，只去没人的地方。」\n\n评论里全是：「这是哪里？求定位！」「我也想去！」「这才是真正的旅行！」\n\n你发现：旅行的意义不在于打卡——在于让自己安静下来。\n\n「当所有人都在挤热门景点的时候，聪明人已经在找冷门秘境了。」',
+      cond: g => !g.flags.reverseTourism && g.age >= 20 && g.age <= 45,
+      choices:[
+        { label:'爱上了反向旅游，开始探索小众目的地', hint:'+😊 +🧠 -💰', fn: g => { g.flags.reverseTourism=true; g.flags.reverseTourist=true; return{mood:12,intel:5,money:-3000}; }},
+        { label:'体验不错，但还是喜欢热闹', hint:'+😊', fn: g => { g.flags.reverseTourism=true; return{mood:8}; }},
+        { label:'太冷清了，不习惯', hint:'', fn: g => { g.flags.reverseTourism=true; return{mood:2}; }},
+      ]},
+    { id:'flex_work_era', icon:'💼', title:'灵活就业新时代', category:'era',
+      body:'你看到一个数据：中国灵活就业人员已经超过2亿。\n\n外卖骑手、网约车司机、自媒体博主、直播主播、自由设计师、远程程序员……「灵活就业」不再是「找不到工作」的代名词——它正在成为一种选择。\n\n你的一个朋友辞职做了自由插画师：「收入不稳定，但时间自由。我可以接送孩子、可以旅行、可以睡到自然醒。」\n\n另一个朋友在做知识付费：「我把工作经验做成课程，一个月赚的比上班还多。」\n\n你开始想：工作的本质是什么？是出卖时间换工资，还是用能力换自由？\n\n「灵活就业：不是没有工作——是不想被一份工作定义。」',
+      cond: g => !g.flags.flexWorkEra && g.age >= 22 && g.age <= 40,
+      choices:[
+        { label:'尝试灵活就业', hint:'+😊 +🧠 -💰', fn: g => { g.flags.flexWorkEra=true; g.flags.flexWorker=true; setJob(g,'灵活就业者',8000+Math.floor(Math.random()*8000)); return{mood:8,intel:5}; }},
+        { label:'发展一个副业作为备选', hint:'+🧠 +💰', fn: g => { g.flags.flexWorkEra=true; g.flags.sideHustlePlan=true; g.flags.sideHustle=true; return{intel:5,mood:3}; }},
+        { label:'还是稳定工作比较安心', hint:'', fn: g => { g.flags.flexWorkEra=true; return{mood:2}; }},
+      ]},
+    { id:'housing_crash_continued', icon:'📉', title:'房价持续下跌', category:'era',
+      body:'你打开手机看了看二手房价格：又跌了。\n\n你的小区去年挂牌价600万的房子，现在450万还没人买。中介说：「现在是买方市场，卖家只能降价再降价。」\n\n你有个朋友2020年高位买房，现在房子价值比贷款还低：「我每个月还贷1万2，但房子只值380万了。卖掉还要倒贴银行钱。」\n\n你看着这些数据，心情复杂：对没买房的人来说，这是好消息；对已经买房的人来说，这是噩梦。\n\n「房价下跌：有人庆幸，有人心碎。但所有人都在想同一个问题——到底什么才是「家」？」',
+      cond: g => !g.flags.housingCrashContinued && g.age >= 22,
+      choices:[
+        { label:'趁机低价入手', hint:'-💰💰💰 +😊', fn: g => { g.flags.housingCrashContinued=true; if(!g.flags.hasHouse){g.flags.hasHouse=true; g.flags.boughtLow=true;} return{mood:10,money:-200000}; }},
+        { label:'继续观望，可能还会跌', hint:'', fn: g => { g.flags.housingCrashContinued=true; g.flags.houseWatcher=true; return{mood:3}; }},
+        { label:'租房挺好，不折腾', hint:'+😊', fn: g => { g.flags.housingCrashContinued=true; return{mood:5}; }},
+      ]},
+    { id:'birth_rate_decline', icon:'👶', title:'催生与不生', category:'era',
+      body:'过年回家，亲戚又开始了：「什么时候要孩子？」\n\n你看了看数据：2024年出生人口继续下降，很多地方出台了生育补贴——生二胎奖5000，生三胎奖10000。\n\n你的同事说：「5000块？连月子中心的零头都不够。」\n\n你的一个朋友选择了丁克：「不是不喜欢孩子，是觉得自己还没准备好对另一个人的人生负责。」\n\n另一个朋友生了三胎：「虽然很累，但看到他们在一起笑的时候，觉得值了。」\n\n你发现：生不生孩子没有标准答案——只有适不适合自己。\n\n「催生是上一代的爱，不生是这一代的自由。但自由从来不是轻松的。」',
+      cond: g => !g.flags.birthRateDecline && g.age >= 24 && g.age <= 40,
+      choices:[
+        { label:'生孩子确实是深思熟虑的决定', hint:'+🧠', fn: g => { g.flags.birthRateDecline=true; g.flags.thoughtfulParenthood=true; return{intel:5,mood:3}; }},
+        { label:'现在不是时候，以后再说', hint:'', fn: g => { g.flags.birthRateDecline=true; return{mood:2}; }},
+        { label:'丁克也挺好', hint:'+😊', fn: g => { g.flags.birthRateDecline=true; g.flags.dinkChoice=true; return{mood:5}; }},
+      ]},
+    { id:'carbon_neutral_life', icon:'🌱', title:'碳中和生活', category:'era',
+      body:'你的公司开始推行「碳中和办公」——无纸化、节能灯、远程办公减少通勤。\n\nHR说：「我们不只是在做环保，也是在做品牌——碳中和是未来的大趋势。」\n\n你开始注意自己的碳足迹：少开车多骑车、自带杯子、减少外卖包装、二手物品循环利用。\n\n你的一个朋友在做碳交易：「碳排放权以后比黄金还值钱。」\n\n另一个朋友在做新能源投资：「光伏、风电、储能——这三个行业未来十年都是黄金赛道。」\n\n你发现：环保不只是道德问题——它是经济问题、是未来问题。\n\n「碳中和：不是拯救地球——是拯救我们自己。」',
+      cond: g => !g.flags.carbonNeutralLife && g.age >= 20 && g.intel >= 40,
+      choices:[
+        { label:'践行低碳生活，还投资了新能源', hint:'+🧠 +😊 -💰', fn: g => { g.flags.carbonNeutralLife=true; g.flags.lowCarbon=true; g.flags.greenInvestment=true; return{intel:5,mood:8,money:-5000}; }},
+        { label:'开始关注环保，从小事做起', hint:'+😊', fn: g => { g.flags.carbonNeutralLife=true; g.flags.lowCarbon=true; return{mood:5}; }},
+        { label:'跟我关系不大', hint:'', fn: g => { g.flags.carbonNeutralLife=true; return{}; }},
+      ]},
+    { id:'silver_industry', icon:'🏥', title:'银发产业崛起', category:'era',
+      body:'你在新闻里看到：中国60岁以上人口已经超过3亿——银发经济正在爆发。\n\n养老院、老年旅游、适老化改造、健康管理、老年教育……围绕老年人的产业链正在快速形成。\n\n你的朋友开了一家养老院：「入住率100%，排队排到了明年。」\n\n另一个朋友在做适老化App：「老年人也需要社交、娱乐、学习——只是没有人给他们做产品。」\n\n你突然意识到：当整个社会都在变老，「变老」本身也变成了一门生意。\n\n你的一个做投资的朋友说：「未来10年，银发产业会诞生至少10家上市公司。」\n\n「当社会变老，聪明人不是在害怕——而是在找机会。」',
+      cond: g => !g.flags.silverIndustry && g.age >= 25 && (g.intel >= 45 || g.flags.entrepreneur),
+      choices:[
+        { label:'进入银发产业创业', hint:'+💰 +🧠 +😊', fn: g => { g.flags.silverIndustry=true; g.flags.silverEntrepreneur=true; g.flags.entrepreneur=true; return{intel:8,mood:5,money:10000}; }},
+        { label:'投资银发相关股票', hint:'+🧠 -💰', fn: g => { g.flags.silverIndustry=true; g.flags.silverInvestor=true; return{intel:5,money:-10000}; }},
+        { label:'了解一下就好', hint:'+🧠', fn: g => { g.flags.silverIndustry=true; return{intel:3}; }},
+      ]},
+    { id:'tech_self_reliance', icon:'🔬', title:'科技自主之路', category:'era',
+      body:'华为发布了新款芯片——完全自主研发。\n\n你的朋友圈炸了：「终于不用被人卡脖子了！」「中国芯，中国心！」\n\n你在科技公司的朋友说：「以前我们的芯片90%靠进口，现在自主率已经到了30%。还有很长的路要走——但方向是对的。」\n\n另一个在半导体行业的朋友说：「做芯片太难了，投入大、周期长、回报慢。但不做就永远被人卡脖子。」\n\n你看着新闻里那些在实验室里日夜攻关的科研人员，觉得：有些路，注定要自己走。\n\n「科技自主：不是闭门造车——是在全球化的浪潮中，保持自己的底牌。」',
+      cond: g => !g.flags.techSelfReliance && g.age >= 20 && g.intel >= 40,
+      choices:[
+        { label:'转行进入半导体/芯片行业', hint:'+🧠 +💰', fn: g => { g.flags.techSelfReliance=true; if(g.intel>=60 && g.age<=35) setJob(g,'芯片工程师',20000+Math.floor(Math.random()*15000)); return{intel:10,mood:5}; }},
+        { label:'关注国产科技发展，学习相关技能', hint:'+🧠', fn: g => { g.flags.techSelfReliance=true; return{intel:8}; }},
+        { label:'跟我行业关系不大', hint:'', fn: g => { g.flags.techSelfReliance=true; return{intel:2}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -10275,6 +10396,15 @@ const ACHIEVEMENTS = [
     { id:'coffee_master_ach', icon:'☕', name:'咖啡大师', desc:'在手冲咖啡中找到了平静', check: g => g.flags.pourOverCoffee && g.flags.dailyRitual },
     { id:'zen_fisher_ach', icon:'🎣', name:'禅意钓者', desc:'在钓鱼中学会了安静', check: g => g.flags.fishingEnthusiast },
     { id:'artist_soul_ach', icon:'🏺', name:'匠心独运', desc:'通过手工艺术找到了表达', check: g => g.flags.potteryArtist || g.flags.certifiedBaker || g.flags.calligraphy },
+    // === v20.0 新增成就（时代脉搏） ===
+    { id:'ai_power_user_ach_v3', icon:'🤖', name:'AI达人', desc:'成为AI工具的熟练使用者', check: g => g.flags.aiPowerUser || g.flags.promptSkills },
+    { id:'prompt_eng_ach', icon:'💻', name:'提示词大师', desc:'转型成为AI提示词工程师', check: g => g.flags.promptEngineer && g.job==='AI提示词工程师' },
+    { id:'canteen_regular_ach', icon:'🍽️', name:'社区食堂常客', desc:'在社区食堂找到了家的味道', check: g => g.flags.canteenRegular },
+    { id:'ev_owner_ach', icon:'🚗', name:'新能源车主', desc:'入手了一辆新能源车', check: g => g.flags.evOwner },
+    { id:'reverse_tourist_ach', icon:'🏔️', name:'反向旅行者', desc:'在冷门目的地找到了旅行的真谛', check: g => g.flags.reverseTourist },
+    { id:'flex_worker_ach', icon:'💼', name:'灵活就业者', desc:'拥抱了灵活就业的新生活方式', check: g => g.flags.flexWorker },
+    { id:'green_pioneer_ach', icon:'🌱', name:'绿色先锋', desc:'践行低碳生活并投资了新能源', check: g => g.flags.lowCarbon && g.flags.greenInvestment },
+    { id:'silver_entrepreneur_ach', icon:'🏥', name:'银发产业家', desc:'在银发经济中找到了创业机会', check: g => g.flags.silverEntrepreneur },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -10573,6 +10703,10 @@ const ENDINGS = [
     { id:'graceful_aging_end', badge:'🌿', title:'优雅老去', desc:'你学会了优雅地老去。\n\n你没有对抗衰老——你拥抱了它。你45岁开始学吉他，48岁写了第一篇文章，50岁开始画画。\n\n你的体检报告从一片红变成了基本正常。你的孩子长大了，成了你的朋友。你的伴侣跟你重新约了会。\n\n你的一个年轻同事说："你怎么看起来比30岁的人还年轻？"\n\n你说："因为我不再害怕变老了。"\n\n"优雅老去：不是不变老——是在变老的过程中，依然保持对生活的热爱。"', cond: g => g.flags.secondSpring && g.flags.healthScareMidlife && g.flags.lifestyleOverhaul && g.mood >= 65 && g.health >= 60 && g.age >= 45 },
     // --- v19.3 兴趣爱好结局 ---
     { id:'rich_hobby_end', badge:'🎨', title:'生活家', desc:'你成了一个真正的"生活家"。\n\n你学会了手冲咖啡、烘焙面包、陶艺拉坯、书法写字、瑜伽冥想。你的周末不是在家做手工，就是去户外露营、钓鱼、CityWalk。\n\n你的朋友圈不是晒美食、就是晒风景、不是晒作品、就是晒生活。\n\n有人问你："你怎么这么多才多艺？"\n\n你说："我不是多才多艺——我只是学会了把时间花在让自己开心的事情上。"\n\n"生活家：不是什么都做——是知道什么值得做。当你的爱好比你的烦恼多的时候，你就赢了。"', cond: g => (g.flags.campingExpert || g.flags.fishingEnthusiast) && (g.flags.pourOverCoffee || g.flags.certifiedBaker) && (g.flags.potteryArtist || g.flags.calligraphy || g.flags.regularYogi) && g.mood >= 70 && g.age >= 28 },
+    // --- v20.0 时代脉搏结局 ---
+    { id:'ai_master_end', badge:'🤖', title:'AI弄潮儿', desc:'你成了AI时代的弄潮儿。\n\n从DeepSeek到提示词工程，从AI创作到AI创业——你抓住了每一波AI浪潮。你的公司用AI改造了业务流程，你的团队每个人都成了AI高手。\n\n投资人说：「你们是AI原生公司。」\n\n你说：「不是AI原生——是学会跟AI一起工作。」\n\n你的一个同事说：「你当年学AI的时候，我们都在笑你。现在你笑得最好。」\n\n「AI时代最大的风险不是AI太强——而是你站在原地不动。」', cond: g => g.flags.aiPowerUser && (g.flags.promptEngineer || g.flags.aiWorkHelper) && g.intel >= 70 && g.money >= 100000 && g.age >= 28 },
+    { id:'global_pioneer_end', badge:'🌍', title:'出海先锋', desc:'你成了中国企业出海的先锋。\n\n你从一个小员工成长为海外业务负责人。你走过越南、沙特、巴西、尼日利亚——你把中国的产品和模式带到了全世界。\n\n你的同事说：「你一年飞了20个国家。」\n\n你说：「不是我爱飞——是世界太大了，不去看看永远不知道自己有多渺小。」\n\n你的老板说：「下一个十年，属于出海的人。」\n\n「出海：不是逃离中国——是把中国的能力变成世界的能力。」', cond: g => g.flags.goingGlobalTrend && g.flags.overseasExp && g.money >= 200000 && g.social >= 60 && g.age >= 30 },
+    { id:'green_pioneer_end', badge:'🌱', title:'绿色先锋', desc:'你成了绿色生活的践行者和推动者。\n\n你从自己做起：低碳出行、减少浪费、二手循环。你还投资了新能源产业，参与了碳中和项目。\n\n你的朋友圈不是种树就是捡垃圾，你的邻居都叫你「环保达人」。\n\n你的孩子问你：「为什么要保护环境？」\n\n你说：「因为这个地球不是我留给你的遗产——是我从你那里借来的。」\n\n「绿色生活：不是苦行僧——是用更聪明的方式，让自己和地球都活得更好。」', cond: g => g.flags.lowCarbon && g.flags.greenInvestment && g.flags.carbonNeutralLife && g.mood >= 65 && g.age >= 28 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
@@ -10788,6 +10922,52 @@ function advanceMonth() {
             : '你回顾了过去的人生，似乎没有做出什么特别的选择。但你还在路上。';
         G.eventLog.push({ age: G.age, text: `${G.age}岁生日：${summary}` });
         G.mood = clamp(G.mood + (milestones.length >= 3 ? 10 : 5), 0, 100);
+    }
+
+    // v20.0: 时代浪潮系统 - 根据年龄/年份激活时代背景效果
+    if (!G.flags._eraSystemInit) {
+        G.flags._eraSystemInit = true;
+        G.eraWaves = [];
+    }
+    // 每个时代浪潮有：id, label, cond(激活条件), effect(月度效果), eventChance(触发专属事件概率)
+    const ERA_WAVES = [
+        { id:'ai_era', label:'AI浪潮', cond: g => g.age >= 18 && !g.flags['era_ai_era'],
+          onActivate: g => { g.flags['era_ai_era']=true; g.eventLog.push({age:g.age, text:'【时代浪潮】AI浪潮席卷而来——ChatGPT、DeepSeek、大模型……每个人都在谈论AI。'}); },
+          monthlyEffect: g => { if(g.job==='待业中' && Math.random()<0.03) g.flags.aiJobOpportunity=true; } },
+        { id:'economic_slowdown', label:'经济寒冬', cond: g => g.age >= 20 && g.months >= 24 && !g.flags['era_economic_slowdown'],
+          onActivate: g => { g.flags['era_economic_slowdown']=true; g.eventLog.push({age:g.age, text:'【时代浪潮】经济寒冬——裁员、降薪、倒闭……你感受到了大环境的寒意。'}); },
+          monthlyEffect: g => { if(Math.random()<0.02 && g.job!=='待业中') { g.mood = clamp(g.mood-2,0,100); } } },
+        { id:'silver_tsunami', label:'银发浪潮', cond: g => g.age >= 40 && !g.flags['era_silver_tsunami'],
+          onActivate: g => { g.flags['era_silver_tsunami']=true; g.eventLog.push({age:g.age, text:'【时代浪潮】银发浪潮——中国进入深度老龄化，养老、医疗、延迟退休成为社会焦点。'}); },
+          monthlyEffect: g => { if(g.age>=50) g.health = clamp(g.health+0.5,0,100); } },
+        { id:'birth_decline', label:'少子化时代', cond: g => g.age >= 22 && g.age <= 45 && !g.flags['era_birth_decline'],
+          onActivate: g => { g.flags['era_birth_decline']=true; g.eventLog.push({age:g.age, text:'【时代浪潮】少子化时代——幼儿园关停、学区房降温、「生不起养不起」成为年轻人的共识。'}); },
+          monthlyEffect: g => { if(g.flags.hasChild && Math.random()<0.02) g.mood = clamp(g.mood+2,0,100); } },
+        { id:'digital_rmb_era', label:'数字人民币', cond: g => g.age >= 18 && g.months >= 36 && !g.flags['era_digital_rmb'],
+          onActivate: g => { g.flags['era_digital_rmb']=true; g.eventLog.push({age:g.age, text:'【时代浪潮】数字人民币时代——现金越来越少见，连路边摊都用数字人民币。'}); },
+          monthlyEffect: g => { } },
+        { id:'going_global', label:'出海热潮', cond: g => g.age >= 22 && g.intel >= 50 && !g.flags['era_going_global'],
+          onActivate: g => { g.flags['era_going_global']=true; g.eventLog.push({age:g.age, text:'【时代浪潮】出海热潮——TikTok、SHEIN、Temu……中国企业正在征服世界。身边越来越多人在讨论「出海」。'}); },
+          monthlyEffect: g => { if(g.flags.entrepreneur && Math.random()<0.03) g.money += 3000; } },
+        { id:'domestic_tech', label:'国产替代', cond: g => g.age >= 20 && !g.flags['era_domestic_tech'],
+          onActivate: g => { g.flags['era_domestic_tech']=true; g.eventLog.push({age:g.age, text:'【时代浪潮】国产替代——华为、鸿蒙、国产芯片……「自主可控」成了科技圈的关键词。'}); },
+          monthlyEffect: g => { } },
+        { id:'micro_drama_boom', label:'微短剧爆发', cond: g => g.age >= 18 && g.age <= 50 && !g.flags['era_micro_drama'],
+          onActivate: g => { g.flags['era_micro_drama']=true; g.eventLog.push({age:g.age, text:'【时代浪潮】微短剧爆发——3分钟一集、爽点密集、充值上头。你发现身边所有人都在刷短剧。'}); },
+          monthlyEffect: g => { if(Math.random()<0.02) g.mood = clamp(g.mood-1,0,100); } },
+    ];
+    // 检查并激活时代浪潮
+    for (const wave of ERA_WAVES) {
+        if (wave.cond(G)) {
+            wave.onActivate(G);
+            G.eraWaves.push(wave.id);
+        }
+    }
+    // 应用已激活浪潮的月度效果
+    for (const wave of ERA_WAVES) {
+        if (G.eraWaves && G.eraWaves.includes(wave.id)) {
+            wave.monthlyEffect(G);
+        }
     }
 
     // v8.0: 每月更新倒卖交易价格
