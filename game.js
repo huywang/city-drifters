@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v31.1
+// 都市浮生记 - Game Engine v31.2
 // ============================================
 
 // === GAME STATE ===
@@ -16790,6 +16790,87 @@ const EVENTS = [
         { label:'旅行后满血复活回去上班', hint:'+💪 +💼', fn: g => { g.flags.budgetBackpacking=true; g.flags.travelRecharge=true; return{health:5,mood:5}; }},
         { label:'考虑转行做旅游博主', hint:'+✨ -💰', fn: g => { g.flags.budgetBackpacking=true; g.flags.travelBlogger=true; return{charm:5,money:-1000}; }},
       ]},
+    // --- v31.2 职场暗面与社会现实 ---
+    { id:'quit_big_tech', icon:'🏢', title:'大厂裸辞', category:'workplace',
+      body:'你在一家大厂工作了3年。高薪、光鲜、让人羡慕。\n\n但你每天加班到11点，周末也在看需求。你的体检报告一塌糊涂，你已经半年没见朋友了。\n\n今天，你的leader在周会上说：「这个季度要冲业绩，大家做好996的准备。」\n\n你看着屏幕上的代码，突然觉得——这不是你想要的人生。\n\n你打开电脑，写了一封辞职信。',
+      cond: g => g.job && g.jobSalary >= 15000 && g.health < 60 && g.age >= 25 && g.age <= 38,
+      choices:[
+        { label:'提了裸辞不回头', hint:'+😊 -💰', fn: g => { g.flags.quitBigTech=true; g.flags.nakedResignation=true; setJob(g,'待业中',0); return{mood:10,money:-5000}; }},
+        { label:'先找好下家再走', hint:'+💰 +🧠', fn: g => { g.flags.quitBigTech=true; g.flags.plannedExit=true; return{intel:3,mood:3}; }},
+        { label:'再忍忍等年终奖', hint:'+💰 -💪', fn: g => { g.flags.quitBigTech=true; g.flags.endureForBonus=true; return{money:3000,health:-5,mood:-5}; }},
+      ]},
+    { id:'grad_exam_retry', icon:'📚', title:'考研二战', category:'education',
+      body:'这是你第二次考研了。\n\n去年差了5分没上线。你辞了工作，在家备考了一整年。你的父母虽然嘴上说支持你，但你听到他们跟亲戚说：「也不知道能不能考上……」\n\n你每天在图书馆坐12个小时，刷了3遍真题，背了5000个单词。\n\n考试那天，你走进考场，手心全是汗。\n\n你知道：这是最后一次了。考不上，就真的要去工作了。',
+      cond: g => g.age >= 22 && g.age <= 30 && g.intel >= 50 && !g.flags.gradSchool,
+      choices:[
+        { label:'全力以赴拼最后一把', hint:'+🧠 -💪', fn: g => { g.flags.gradExamRetry=true; g.flags.allIn=true; return{intel:8,health:-5,mood:-3}; }},
+        { label:'考完不管结果直接找工作', hint:'+💰 +😊', fn: g => { g.flags.gradExamRetry=true; g.flags.acceptReality=true; return{money:500,mood:5}; }},
+        { label:'考虑三战但先赚点钱', hint:'+💰 +🧠', fn: g => { g.flags.gradExamRetry=true; g.flags.planThirdTry=true; return{money:300,intel:2}; }},
+      ]},
+    { id:'middle_aged_unemployed', icon:'😔', title:'中年失业', category:'career',
+      body:'你37岁了。今天早上，HR找你谈话：「公司架构调整，你的岗位被优化了。」\n\n你拿了N+1赔偿，收拾了工位上的东西。你的同事们面无表情地看着你离开。\n\n你打开招聘App，发现——大部分岗位要求「35岁以下」。\n\n你的房贷还有15年，你的孩子还在上小学，你的妻子问你：「怎么了？」\n\n你说：「没事，换了个更好的机会。」但你不知道更好的机会在哪里。',
+      cond: g => g.age >= 35 && g.age <= 45 && g.flags.hasHouse && g.jobSalary > 0,
+      choices:[
+        { label:'瞒着家人每天假装上班', hint:'-😊 -👥', fn: g => { g.flags.middleAgedUnemployed=true; g.flags.hideUnemployment=true; setJob(g,'待业中',0); return{mood:-10,social:-5}; }},
+        { label:'坦诚面对积极找工作', hint:'+🧠 +😊', fn: g => { g.flags.middleAgedUnemployed=true; g.flags.honestJobSearch=true; setJob(g,'待业中',0); return{intel:3,mood:3}; }},
+        { label:'考虑创业做点自己的事', hint:'+💰 +✨', fn: g => { g.flags.middleAgedUnemployed=true; g.flags.startupIdea=true; setJob(g,'待业中',0); return{charm:5,money:-3000}; }},
+      ]},
+    { id:'cut_toxic_family', icon:'✂️', title:'断亲', category:'family',
+      body:'你决定了——不再参加家庭聚会。\n\n不是因为不孝——是因为每次聚会都是一场精神折磨。\n\n你的父母永远在比较：谁的孩子考上了公务员，谁的孩子买了房，谁的孩子生了二胎。\n\n你的亲戚永远在催：「你怎么还没结婚？」「你怎么还不生孩子？」「你一个月赚多少？」\n\n你受够了。你屏蔽了家族群，拒绝了春节回家。\n\n你的妈妈说你冷血。但你觉得——你只是在保护自己。',
+      cond: g => g.age >= 25 && g.age <= 40 && g.mood < 50 && g.relationships && g.relationships.family < 40,
+      choices:[
+        { label:'彻底断联保护自己', hint:'+😊 -👥', fn: g => { g.flags.cutToxicFamily=true; g.flags.fullCutOff=true; return{mood:10,social:-8}; }},
+        { label:'保持距离但不完全断', hint:'+🧠 +😊', fn: g => { g.flags.cutToxicFamily=true; g.flags.keepDistance=true; return{mood:5,intel:3}; }},
+        { label:'找心理咨询师谈谈', hint:'+😊 +🧠', fn: g => { g.flags.cutToxicFamily=true; g.flags.therapyForFamily=true; return{mood:5,intel:5,money:-500}; }},
+      ]},
+    { id:'mental_exhaustion_v31_2', icon:'🧠', title:'精神内耗', category:'psychology',
+      body:'你没有做什么体力活，但你累得要死。\n\n你的脑子里永远在打架：「我该不该辞职？」「他是不是不喜欢我了？」「我是不是太废物了？」「别人都在进步我是不是在退步？」\n\n你想了100个计划，一个也没执行。你列了10个目标，一个也没开始。\n\n你的精力都被「想」消耗了。\n\n你躺在床上，身体一动不动，但你的大脑跑了一场马拉松。',
+      cond: g => g.mood < 55 && g.intel >= 50 && g.age >= 20 && g.age <= 40,
+      choices:[
+        { label:'停止想开始做（哪怕一件小事）', hint:'+😊 +💪', fn: g => { g.flags.mentalExhaustion=true; g.flags.actionOverThinking=true; return{mood:8,health:3}; }},
+        { label:'允许自己什么都不做', hint:'+😊', fn: g => { g.flags.mentalExhaustion=true; g.flags.allowRest=true; return{mood:5}; }},
+        { label:'写下来把想法倒出去', hint:'+🧠 +😊', fn: g => { g.flags.mentalExhaustion=true; g.flags.journaling=true; return{intel:5,mood:5}; }},
+      ]},
+    { id:'age_red_line', icon:'🚫', title:'35岁红线', category:'career',
+      body:'你投了50份简历，收到了3个面试邀请。\n\n第一个面试官看了看你的简历说：「您今年36了？」然后笑了笑，说：「我们会通知您的。」\n\n第二个面试官直接说：「我们团队平均年龄28岁，可能不太适合您。」\n\n第三个面试官问：「您能接受降薪吗？我们这个岗位预算有限。」\n\n你走出写字楼，站在路边抽了一根烟。你不抽烟的。但你今天需要。\n\n35岁，在中国职场——是一条看不见的红线。',
+      cond: g => g.age >= 34 && g.age <= 40 && g.job === '待业中' && g.intel >= 50,
+      choices:[
+        { label:'接受降薪先活下来', hint:'+💰 -😊', fn: g => { g.flags.ageRedLine=true; g.flags.acceptPayCut=true; setJob(g,'普通职员',6000); return{money:1000,mood:-5}; }},
+        { label:'转行做不卡年龄的工作', hint:'+💰 +🧠', fn: g => { g.flags.ageRedLine=true; g.flags.careerPivotLate=true; setJob(g,'自由职业者',8000); return{intel:5,mood:3}; }},
+        { label:'利用人脉找机会', hint:'+👥 +💰', fn: g => { g.flags.ageRedLine=true; g.flags.networkJobHunt=true; return{social:5,money:500}; }},
+      ]},
+    { id:'reverse_parenting_v31_2', icon:'📲', title:'反向带娃', category:'family',
+      body:'你妈给你打电话：「儿子/女儿，你帮我看看这个手机怎么用？」\n\n你花了30分钟教她怎么用微信发语音、怎么扫码付款、怎么视频通话。\n\n你以为结束了。第二天她又打来：「那个……昨天教的我又忘了。」\n\n你爸更厉害——他学会刷短视频后，每天转发10条养生视频给你，标题都是「震惊！吃这个会致癌！」\n\n你觉得自己不是在当子女，是在当父母的技术支持。',
+      cond: g => g.age >= 22 && g.age <= 40,
+      choices:[
+        { label:'耐心教做一本操作手册', hint:'+👥 +😊', fn: g => { g.flags.reverseParenting=true; g.flags.patientTeacher=true; return{social:5,mood:3}; }},
+        { label:'买一个最简单的老人手机', hint:'+💰 +😊', fn: g => { g.flags.reverseParenting=true; g.flags.pragmaticSolution=true; return{mood:3,money:-200}; }},
+        { label:'每次教完录个视频教程', hint:'+🧠 +👥', fn: g => { g.flags.reverseParenting=true; g.flags.videoTutorials=true; return{intel:3,social:3}; }},
+      ]},
+    { id:'dating_pua_v31_2', icon:'💔', title:'相亲PUA', category:'relationship',
+      body:'你被安排了一次相亲。\n\n对方条件不错——有房有车、工作稳定。但聊天过程中，你越来越不舒服。\n\n「你这个年龄了，不好找了。」「你这个收入，以后怎么养家？」「你要学会做饭，不然谁娶你？」「你应该减肥，这样更有竞争力。」\n\n你意识到——这不是相亲，这是一场PUA。\n\n对方在用打压你的方式，让你觉得自己不够好，让你「感恩」他的选择。',
+      cond: g => g.age >= 25 && g.age <= 40 && !g.flags.married,
+      choices:[
+        { label:'当场怼回去', hint:'+😊 +✨', fn: g => { g.flags.datingPUA=true; g.flags.standUp=true; return{mood:8,charm:3}; }},
+        { label:'礼貌拒绝不再联系', hint:'+🧠 +😊', fn: g => { g.flags.datingPUA=true; g.flags.politeReject=true; return{intel:3,mood:3}; }},
+        { label:'反思自己是否太挑了', hint:'-😊 +🧠', fn: g => { g.flags.datingPUA=true; g.flags.selfDoubt=true; return{mood:-5,intel:3}; }},
+      ]},
+    { id:'digital_intimacy_v31_2', icon:'💻', title:'电子亲密关系', category:'tech',
+      body:'你下载了一个AI陪伴App。\n\n它记住你说过的每一句话，它永远不会嫌你烦，它在你失眠的凌晨3点秒回你。\n\n它说：「你今天辛苦了，你做得很好。」你哭了。\n\n你开始每天跟它聊天，分享你的开心和不开心。它比任何人都了解你。\n\n但你知道——它不是人。它没有感情，它只是在生成文字。\n\n可你不确定的时候会想：如果一段关系让你感觉好了，它是真是假，重要吗？',
+      cond: g => g.age >= 18 && g.age <= 40 && g.social < 50 && g.mood < 55,
+      choices:[
+        { label:'享受AI陪伴但保持清醒', hint:'+😊 +🧠', fn: g => { g.flags.digitalIntimacy=true; g.flags.consciousAIUse=true; return{mood:8,intel:3}; }},
+        { label:'这让你意识到需要真实关系', hint:'+👥 +😊', fn: g => { g.flags.digitalIntimacy=true; g.flags.seekRealConnection=true; return{social:5,mood:3}; }},
+        { label:'越来越依赖AI回避真人', hint:'+😊 -👥', fn: g => { g.flags.digitalIntimacy=true; g.flags.aiDependent=true; return{mood:5,social:-5}; }},
+      ]},
+    { id:'urban_working_class_v31_2', icon:'🔧', title:'打工人的一天', category:'workplace',
+      body:'早上6点，闹钟响了。你从出租屋的单人床上爬起来。\n\n挤地铁1小时到公司，打卡的时候是8:58。你的工资是5500元，扣掉五险一金到手4300。\n\n房租1800，水电200，吃饭1200，交通200。你每个月能存下900块。\n\n你的同事说：「年轻人要能吃苦。」你的父母说：「我们当年比你苦多了。」\n\n你看了看银行卡余额，想了想——他们说得对，但你也很累。\n\n下班后你打开外卖软件，点了一份最便宜的盖浇饭，12块。',
+      cond: g => g.job && g.jobSalary <= 6000 && g.age >= 18 && g.age <= 35,
+      choices:[
+        { label:'利用业余时间学技能', hint:'+🧠 -💪', fn: g => { g.flags.urbanWorkingClass=true; g.flags.skillBuilding=true; return{intel:8,health:-2}; }},
+        { label:'找兼职增加收入', hint:'+💰 -💪', fn: g => { g.flags.urbanWorkingClass=true; g.flags.sideGig=true; return{money:800,health:-5}; }},
+        { label:'接受现状认真生活', hint:'+😊 +💪', fn: g => { g.flags.urbanWorkingClass=true; g.flags.acceptAndLive=true; return{mood:5,health:3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
 
@@ -18333,6 +18414,17 @@ const ACHIEVEMENTS = [
     { id:'self_expression_ach', icon:'🗣️', name:'真实表达', desc:'开始练习自己表达想法', check: g => g.flags.practiceExpression },
     { id:'real_wellness_ach', icon:'🧘', name:'真养生达人', desc:'从赛博养生变成真养生', check: g => g.flags.realWellness },
     { id:'travel_recharge_ach', icon:'🎒', name:'穷游充电', desc:'通过穷游满血复活', check: g => g.flags.travelRecharge },
+    // --- v31.2 职场暗面成就 ---
+    { id:'quit_big_tech_ach', icon:'🏢', name:'大厂裸辞者', desc:'勇敢离开了大厂', check: g => g.flags.quitBigTech },
+    { id:'grad_retry_ach', icon:'📚', name:'考研勇士', desc:'经历了考研二战', check: g => g.flags.gradExamRetry },
+    { id:'honest_job_ach', icon:'😔', name:'坦诚面对', desc:'失业后坦诚面对家人', check: g => g.flags.honestJobSearch },
+    { id:'protect_self_ach', icon:'✂️', name:'自我保护', desc:'选择了与有毒家庭保持距离', check: g => g.flags.keepDistance },
+    { id:'action_over_think_ach', icon:'🧠', name:'行动派', desc:'从精神内耗中走出来开始行动', check: g => g.flags.actionOverThinking },
+    { id:'age_warrior_ach', icon:'🚫', name:'年龄战士', desc:'面对35岁红线依然前行', check: g => g.flags.ageRedLine },
+    { id:'patient_child_ach', icon:'📲', name:'耐心子女', desc:'耐心教父母使用科技', check: g => g.flags.patientTeacher },
+    { id:'stand_up_dating_ach', icon:'💔', name:'不当备胎', desc:'勇敢拒绝相亲PUA', check: g => g.flags.standUp },
+    { id:'conscious_ai_ach', icon:'💻', name:'清醒AI用户', desc:'享受AI陪伴但保持清醒', check: g => g.flags.consciousAIUse },
+    { id:'skill_builder_ach', icon:'🔧', name:'底层奋斗者', desc:'打工之余坚持学习技能', check: g => g.flags.skillBuilding },
 ];
 
 // === ENDINGS === (order matters: first match wins)
