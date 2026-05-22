@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v25.4
+// 都市浮生记 - Game Engine v25.6
 // ============================================
 
 // === GAME STATE ===
@@ -12643,6 +12643,87 @@ const EVENTS = [
         { label:'选了性价比高的新加坡', hint:'-💰 +🧠', fn: g => { g.flags.studyAbroad=true; g.flags.sgParent=true; g.money -= 200000; return{intel:5}; }},
         { label:'决定在国内读，省下的钱做教育基金', hint:'+💰 +🧠 +😊', fn: g => { g.flags.studyAbroad=true; g.flags.domesticParent=true; return{intel:3,mood:3}; }},
       ]},
+    // v25.6: 美食文化 + 饮食生态
+    { id:'late_night_snack', icon:'🍢', title:'夜宵文化', category:'food',
+      body:'晚上11点，朋友发来消息：「出来撸串？」\n\n你犹豫了三秒——然后穿鞋出门。\n\n夜市灯火通明：\n- 烧烤架上滋滋作响的羊肉串\n- 小龙虾红彤彤堆成山\n- 炒粉的锅气直冲云霄\n- 啤酒泡沫溢出杯沿\n\n你们坐在那里，从天黑吃到天亮。\n\n聊的都是些不重要的事——但每一句都很真。\n\n你回家的时候，肚子撑得走不动。但你心里很满足。\n\n你知道：夜宵——在中国不只是吃饭。是一种社交，是一种慰藉，是对白天辛苦的犒赏。\n\n当然——你的胃和体重不同意。\n\n「夜宵：城市夜归人的深夜食堂——热量超标，但灵魂得到慰藉。」',
+      cond: g => g.age >= 18 && !g.flags.lateNightSnack,
+      choices:[
+        { label:'成了夜宵常客，每周出去吃三次', hint:'+😊 +🤝 -❤️ -💰', fn: g => { g.flags.lateNightSnack=true; g.flags.nightOwlEater=true; g.money -= 3000; return{mood:8,social:5,health:-5}; }},
+        { label:'偶尔出去，但控制频率', hint:'+😊 +🤝 +🧠', fn: g => { g.flags.lateNightSnack=true; return{mood:5,social:3}; }},
+        { label:'太晚吃对身体不好，拒绝了', hint:'+❤️ -🤝', fn: g => { g.flags.lateNightSnack=true; return{health:3,social:-2}; }},
+      ]},
+    { id:'delivery_dependency', icon:'🛵', title:'外卖依赖', category:'food',
+      body:'你算了算：这个月你点了38次外卖。\n\n你的外卖记录：\n- 早餐：豆浆油条（10元）\n- 午餐：黄焖鸡米饭（22元）\n- 下午茶：奶茶（18元）\n- 晚餐：麻辣烫（28元）\n- 夜宵：烧烤（50元）\n\n你的厨房：一年没开火。锅已经生锈了。\n\n你算了一下账：外卖一个月花了3500元。如果自己做饭——可能只要1500。\n\n但你也算了一下时间：做饭+洗碗=1小时。点外卖=5分钟。\n\n你说服自己：「我的时间比外卖贵。」\n\n但你也知道：你只是——懒得动。\n\n「外卖依赖：省下了时间——却失去了烟火气。」',
+      cond: g => g.age >= 18 && g.age <= 50 && !g.flags.deliveryDependency && g.money >= 2000,
+      choices:[
+        { label:'继续依赖外卖，省时间干别的事', hint:'-💰 -❤️ +🧠', fn: g => { g.flags.deliveryDependency=true; g.money -= 3500; return{health:-3,intel:3}; }},
+        { label:'开始学做饭，每周自己做3天', hint:'+❤️ +🧠 -💰', fn: g => { g.flags.deliveryDependency=true; g.flags.homeCook=true; return{health:5,intel:3}; }},
+        { label:'彻底戒掉外卖，天天自己做', hint:'+❤️ +💰 -🧠', fn: g => { g.flags.deliveryDependency=true; g.flags.antiDelivery=true; return{health:8,money:1500}; }},
+      ]},
+    { id:'mukbang_culture', icon:'📺', title:'吃播文化', category:'food',
+      body:'你刷到了一个吃播博主。\n\n她一顿饭能吃：\n- 5斤小龙虾\n- 3碗米饭\n- 2斤牛肉\n- 1个西瓜\n- 外加各种零食\n\n你在屏幕前看得目瞪口呆——但也停不下来。\n\n你发现：看别人吃饭——居然能让你「感觉自己也吃了」。\n\n后来你了解到：\n- 很多大胃王其实是催吐\n- 有些是假吃（镜头外吐掉）\n- 还有用剪辑作假的\n\n更讽刺的是：你在看别人吃饭的时候——你自己正在吃泡面。\n\n你突然问自己：我为什么喜欢看别人吃饭？是馋？是寂寞？还是对丰盛的向往？\n\n「吃播文化：你吃的不是饭——是别人替你「吃好」的幻觉。」',
+      cond: g => g.age >= 16 && !g.flags.mukbangCulture,
+      choices:[
+        { label:'也去做了吃播，靠流量赚了钱', hint:'+💰 +✨ -❤️', fn: g => { g.flags.mukbangCulture=true; g.flags.mukbanger=true; return{money:5000,charm:8,health:-5}; }},
+        { label:'成了吃播的铁粉，每天看', hint:'+😊 -🧠', fn: g => { g.flags.mukbangCulture=true; return{mood:3,intel:-2}; }},
+        { label:'看了几条就取关了，觉得没意思', hint:'+🧠', fn: g => { g.flags.mukbangCulture=true; return{intel:3}; }},
+      ]},
+    { id:'home_cooking', icon:'🍳', title:'自己做饭', category:'food',
+      body:'你今天第一次认真做了一顿饭。\n\n你跟着短视频学了「红烧肉」：\n- 五花肉切块\n- 焯水去腥\n- 炒糖色\n- 加调料炖一小时\n\n你站在厨房里——闻着肉香——一种久违的满足感涌上来。\n\n你发现：做饭——是一种「慢下来」的能力。\n\n在这个什么都能买到的时代——自己动手做一顿饭——是一种奢侈。\n\n不是因为省钱。是因为——你把自己的时间、注意力、心意——都放进了这一锅菜里。\n\n你把菜端上桌，拍了张照——没有加滤镜，但它看起来比任何网红餐厅都好吃。\n\n「自己做饭：不是在做菜——是在「做」生活。」',
+      cond: g => g.age >= 18 && !g.flags.homeCooking,
+      choices:[
+        { label:'开始每天做饭，成了朋友圈的「厨神」', hint:'+❤️ +🧠 +✨ -💰', fn: g => { g.flags.homeCooking=true; g.flags.homeChef=true; return{health:8,intel:5,charm:5}; }},
+        { label:'周末做一顿，平时还是外卖', hint:'+❤️ +😊', fn: g => { g.flags.homeCooking=true; g.flags.weekendChef=true; return{health:3,mood:3}; }},
+        { label:'做一次就放弃了，太麻烦', hint:'-🧠', fn: g => { g.flags.homeCooking=true; return{intel:-2}; }},
+      ]},
+    { id:'influencer_restaurant', icon:'🍽️', title:'网红餐厅', category:'food',
+      body:'一家新的网红餐厅在你家附近开业了。\n\n它在网上的评价：\n- 「环境绝美」\n- 「拍照超出片」\n- 「服务超好」\n- 「性价比一般」\n- 「味道……就那样」\n\n你去了。\n\n- 等了2小时\n- 人均280元\n- 菜品摆盘确实漂亮\n- 但味道真的——很普通\n\n你拍了几十张照片，发了朋友圈——收到了100个赞。\n\n但你心里在想：这280元——如果我去家楼下的小馆子——能吃10顿。\n\n你也意识到：网红餐厅——卖的不是食物，是「氛围」。\n\n你为「氛围」付了溢价——但你的胃只想要一顿踏实的好饭。\n\n「网红餐厅：你以为在吃味道——其实在吃滤镜。」',
+      cond: g => g.age >= 18 && g.age <= 45 && !g.flags.influencerRestaurant && g.money >= 500,
+      choices:[
+        { label:'成了网红餐厅收集者，每月打卡一家', hint:'-💰 +✨ -❤️', fn: g => { g.flags.influencerRestaurant=true; g.flags.restaurantCollector=true; g.money -= 3000; return{charm:5,health:-3}; }},
+        { label:'拍完照就走了，以后不来了', hint:'-💰 +🧠', fn: g => { g.flags.influencerRestaurant=true; g.money -= 280; return{intel:3}; }},
+        { label:'转而去支持楼下的小馆子', hint:'+❤️ +💰 +🧠', fn: g => { g.flags.influencerRestaurant=true; g.flags.localFoodie=true; return{health:3,money:100,intel:3}; }},
+      ]},
+    { id:'coffee_addiction_v25_6', icon:'☕', title:'咖啡续命', category:'food',
+      body:'早上9点，你到了公司。第一件事——不是打开电脑，是打开咖啡App。\n\n你今天喝的是：\n- 早上：美式（提神）\n- 下午：拿铁（续命）\n- 晚上：冷萃（加班）\n\n你算了一下：一天三杯咖啡，每天60元，一个月1800元，一年2万。\n\n你可以买一辆二手车了。\n\n但你也说服自己：「咖啡是我的生产力工具。」\n\n你开始反思：\n- 是真的需要咖啡——还是习惯了「手里拿杯东西」？\n- 是真的困——还是因为昨晚又熬夜了？\n- 如果戒掉咖啡——你还能正常上班吗？\n\n「咖啡续命：你以为在喝咖啡——其实是咖啡在喝你的钱包和睡眠。」',
+      cond: g => g.age >= 20 && g.age <= 50 && !g.flags.coffeeAddiction && g.job !== '待业中' && g.money >= 1000,
+      choices:[
+        { label:'继续每天3杯，「咖啡是我的血」', hint:'-💰 -❤️ +🧠', fn: g => { g.flags.coffeeAddiction=true; g.flags.coffeeAddict=true; g.money -= 1800; return{health:-3,intel:3}; }},
+        { label:'控制在每天一杯，偶尔戒几天', hint:'+❤️ +🧠', fn: g => { g.flags.coffeeAddiction=true; g.flags.moderateCoffee=true; return{health:3,intel:3}; }},
+        { label:'彻底戒掉，改喝茶和白开水', hint:'+❤️ +💰', fn: g => { g.flags.coffeeAddiction=true; g.flags.coffeeQuitter=true; return{health:5,money:500}; }},
+      ]},
+    { id:'milk_tea_craze', icon:'🧋', title:'奶茶成瘾', category:'food',
+      body:'你路过一家新开的奶茶店。\n\n排队的人——排到了街角。\n\n你问自己：一杯奶茶——值得排2小时吗？\n\n你排了。\n\n你点的是：「黑糖珍珠厚乳茶，三分糖，去冰，加芋圆」。\n\n你喝了一口——确实是好喝的。但你心里也知道：这就是糖水+奶+珍珠。\n\n你查了一下：一杯奶茶=10勺糖=500卡路里=跑步1小时。\n\n你也发现：你上个月在奶茶上花了1200元。\n\n你问自己：我是真的爱喝奶茶——还是只是喜欢「点奶茶」这个动作？\n\n「奶茶成瘾：你以为在喝饮料——其实在喝多巴胺。」',
+      cond: g => g.age >= 16 && g.age <= 35 && !g.flags.milkTeaCraze && g.money >= 500,
+      choices:[
+        { label:'成了奶茶重度爱好者，每周5杯', hint:'-💰 -❤️ +😊', fn: g => { g.flags.milkTeaCraze=true; g.flags.milkTeaAddict=true; g.money -= 1200; return{health:-5,mood:5}; }},
+        { label:'控制在一周一杯，奖励自己', hint:'+😊 +🧠', fn: g => { g.flags.milkTeaCraze=true; g.flags.moderateTea=true; return{mood:3,intel:2}; }},
+        { label:'戒了，改喝自己泡的茶', hint:'+❤️ +💰', fn: g => { g.flags.milkTeaCraze=true; g.flags.teaQuitter=true; return{health:5,money:300}; }},
+      ]},
+    { id:'light_meal', icon:'🥗', title:'轻食主义', category:'food',
+      body:'你的一个朋友开始吃「轻食」了。\n\n她每天吃的是：\n- 藜麦沙拉\n- 牛油果吐司\n- 鸡胸肉配西兰花\n- 酸奶配坚果\n- 黑咖啡（不加糖）\n\n她说：「这是健康饮食。」\n\n你看了看价目表：一份轻食沙拉——68元。\n\n你看了看份量：比你的拳头大不了多少。\n\n你也发现：\n- 轻食确实健康——但你吃不饱\n- 很多轻食的酱汁——热量比正餐还高\n- 轻食店的顾客——90%是年轻女性\n\n你开始想：「轻食」——是为了健康，还是一种身份标签？\n\n它告诉你：「我是一个注重身材、有消费能力、追求品质生活的人。」\n\n「轻食主义：吃的不是食物——是一种生活方式的表演。」',
+      cond: g => g.age >= 18 && g.age <= 40 && !g.flags.lightMeal && g.money >= 1000,
+      choices:[
+        { label:'开始每天吃轻食，严格控制热量', hint:'-💰 +❤️ +✨ -😊', fn: g => { g.flags.lightMeal=true; g.flags.lightMealFollower=true; g.money -= 2000; return{health:5,charm:5,mood:-3}; }},
+        { label:'偶尔吃，主要靠自己均衡饮食', hint:'+❤️ +🧠', fn: g => { g.flags.lightMeal=true; return{health:3,intel:3}; }},
+        { label:'觉得是智商税，还是吃饭堂炒菜香', hint:'+😊 +💰', fn: g => { g.flags.lightMeal=true; g.flags.antiLightMeal=true; return{mood:5,money:200}; }},
+      ]},
+    { id:'wild_vegetable', icon:'🌱', title:'挖野菜', category:'food',
+      body:'春天到了。你的一个同事邀请你：「去挖野菜吗？」\n\n你：「挖野菜？那不是农村才干的事吗？」\n\n同事：「现在城里人也流行这个。荠菜、蒲公英、香椿——都是宝。」\n\n你们去了城郊的一个公园。\n\n你挖了：\n- 荠菜（包饺子超香）\n- 蒲公英（可以泡茶）\n- 马兰头（凉拌好吃）\n\n你发现：\n- 野菜不要钱\n- 挖的过程很解压\n- 挖回来的菜——比超市的香\n\n你也学到：很多你小时候在乡下吃的「杂草」——其实是珍贵的食材。\n\n你突然想家了。\n\n「挖野菜：城市人返璞归真的一种方式——也是乡愁的另一种表达。」',
+      cond: g => g.age >= 20 && !g.flags.wildVegetable,
+      choices:[
+        { label:'爱上了挖野菜，每个周末都去', hint:'+❤️ +😊 +🧠 -💰', fn: g => { g.flags.wildVegetable=true; g.flags.veggieHunter=true; return{health:5,mood:8,intel:3}; }},
+        { label:'体验了一次，觉得挺有趣', hint:'+😊 +🧠', fn: g => { g.flags.wildVegetable=true; return{mood:3,intel:3}; }},
+        { label:'太脏太累，以后不去了', hint:'-❤️', fn: g => { g.flags.wildVegetable=true; return{health:-2}; }},
+      ]},
+    { id:'food_nostalgia', icon:'🍜', title:'美食乡愁', category:'food',
+      body:'你在一家大城市的餐厅吃到了「家乡菜」。\n\n但味道——不对。\n\n面条太软了，汤不够鲜，辣椒也不够辣。\n\n你跟老板说：「这不正宗。」\n\n老板说：「在这边太正宗——客人吃不惯。」\n\n你突然想家了。想家楼下那家开了20年的小面馆。想妈妈做的红烧排骨。想小时候街角的豆浆油条。\n\n你发现：\n- 在大城市——你能吃到全世界的食物\n- 但吃不到——真正的「家乡味」\n\n因为家乡的味道——不只是食材和调料。还有：\n- 做的人\n- 吃的环境\n- 那个时候的你\n\n这些东西——一旦离开了，就再也回不来了。\n\n「美食乡愁：你想念的不是食物——是那个吃食物的自己。」',
+      cond: g => g.age >= 20 && !g.flags.foodNostalgia,
+      choices:[
+        { label:'开始研究家乡菜谱，自己做家乡味', hint:'+❤️ +🧠 +😊', fn: g => { g.flags.foodNostalgia=true; g.flags.recipeResearcher=true; return{health:3,intel:5,mood:5}; }},
+        { label:'给妈妈打了电话，约了过年回家', hint:'+😊 +🤝', fn: g => { g.flags.foodNostalgia=true; g.flags.homesickCall=true; return{mood:8,social:3}; }},
+        { label:'接受了「大城市吃不到正宗家乡味」的现实', hint:'+🧠 -😊', fn: g => { g.flags.foodNostalgia=true; return{intel:3,mood:-3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -13776,6 +13857,12 @@ const ACHIEVEMENTS = [
     { id:'supportive_parent_ach', icon:'💪', name:'支持型家长', desc:'支持孩子选择自己喜欢的专业', check: g => g.flags.supportiveParent },
     { id:'interest_first_ach', icon:'❤️', name:'兴趣优先', desc:'保护孩子对学科的兴趣而不是追求竞赛', check: g => g.flags.interestFirst },
     { id:'domestic_parent_ach', icon:'🇨🇳', name:'本土派家长', desc:'选择让孩子在国内读大学', check: g => g.flags.domesticParent },
+    // v25.6: 美食文化成就
+    { id:'home_chef_ach', icon:'🍳', name:'家庭厨神', desc:'每天自己做饭成了朋友圈的厨神', check: g => g.flags.homeChef },
+    { id:'night_owl_eater_ach', icon:'🌙', name:'夜宵常客', desc:'成了夜宵摊的常客', check: g => g.flags.nightOwlEater },
+    { id:'veggie_hunter_ach', icon:'🌱', name:'野菜猎人', desc:'爱上了挖野菜每个周末都去', check: g => g.flags.veggieHunter },
+    { id:'recipe_researcher_ach', icon:'📖', name:'菜谱研究者', desc:'开始研究并复刻家乡菜', check: g => g.flags.recipeResearcher },
+    { id:'local_foodie_ach', icon:'🥘', name:'本地美食家', desc:'转而去支持楼下的小馆子', check: g => g.flags.localFoodie },
 ];
 
 // === ENDINGS === (order matters: first match wins)
