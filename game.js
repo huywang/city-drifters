@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v24.5
+// 都市浮生记 - Game Engine v25.0
 // ============================================
 
 // === GAME STATE ===
@@ -12157,6 +12157,87 @@ const EVENTS = [
         { label:'选了几个精品播客，通勤时听', hint:'+🧠', fn: g => { g.flags.podcastListener=true; return{intel:8}; }},
         { label:'更喜欢看书，播客太慢了', hint:'+🧠', fn: g => { g.flags.podcastListener=true; return{intel:5}; }},
       ]},
+    // === v25.0: 人生智慧 + 时代观察 ===
+    { id:'life_philosophy_v25', icon:'📖', title:'人生哲学', category:'psychology',
+      body:'你在网上看到一句话，愣住了：\n\n「你不是在活着——你是在忙着活着。」\n\n你开始反思自己的生活：\n- 每天忙着上班、加班、通勤\n- 忙着社交、维护关系\n- 忙着消费、赚钱、还贷\n- 忙着焦虑未来、后悔过去\n\n但你有多久没有——什么都不做，只是「活着」了？\n\n你决定给自己一个下午——不看手机、不工作、不社交。\n\n你坐在窗前，看着外面的世界。\n\n你发现：原来「什么都不做」——才是最难的事。\n\n「人生哲学：活着的意义——也许就是活着本身。」',
+      cond: g => g.age >= 25 && !g.flags.lifePhilosophy && g.intel >= 25,
+      choices:[
+        { label:'开始定期给自己「什么都不做」的时间', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.lifePhilosophy=true; g.flags.mindfulLiving=true; return{mood:15,health:5,intel:5}; }},
+        { label:'被触动了，但很快又回到忙碌中', hint:'+🧠', fn: g => { g.flags.lifePhilosophy=true; return{intel:5,mood:3}; }},
+        { label:'觉得这就是鸡汤，没当回事', hint:'', fn: g => { g.flags.lifePhilosophy=true; return{intel:2}; }},
+      ]},
+    { id:'digital_funeral_v25', icon:'📱', title:'数字葬礼', category:'society',
+      body:'你看到一条新闻：一个人去世后，他的社交账号被自动标记为「纪念账户」。\n\n他的朋友圈永远停在了那天：「明天出差，好累。」\n\n评论区里，亲人们在留言：\n- 「想你」\n- 「今天是你走后的第100天」\n- 「我还在等你的回复」\n\n你看着这些留言，突然意识到：\n\n你的数字身份——可能比你活得更久。\n\n你发了10年的朋友圈、微博、抖音——它们会存在多少年？\n\n你开始想：如果有一天你不在了——你希望别人看到怎样的你？\n\n「数字葬礼：你的最后一个朋友圈——会写什么？」',
+      cond: g => g.age >= 25 && !g.flags.digitalFuneral,
+      choices:[
+        { label:'开始整理自己的社交媒体，留下有价值的', hint:'+🧠 +😊', fn: g => { g.flags.digitalFuneral=true; g.flags.digitalLegacy=true; return{intel:8,mood:5,charm:3}; }},
+        { label:'决定活好当下，不想那么多', hint:'+😊', fn: g => { g.flags.digitalFuneral=true; return{mood:8}; }},
+        { label:'觉得太沉重了，不想了', hint:'-😊', fn: g => { g.flags.digitalFuneral=true; return{mood:-3}; }},
+      ]},
+    { id:'urban_renewal', icon:'🏗️', title:'城市更新', category:'city',
+      body:'你住了5年的老街——要拆了。\n\n政府说要搞「城市更新」，把老旧街区变成商业综合体。\n\n你最后一次走过那条街：\n- 楼下卖煎饼的老王要搬了\n- 街角的修鞋匠说「修了一辈子鞋，没想到被拆了」\n- 那家开了20年的馄饨店——要关门了\n- 你第一次来这座城市时吃的第一碗面——就是在这里\n\n你拍了很多照片。\n\n你知道：城市在进步。但你也知道：有些东西——拆了就没了。\n\n一座城市的灵魂——不在高楼大厦里，在这些小巷子里。\n\n「城市更新：拆掉的是旧房子——拆不掉的是旧记忆。」',
+      cond: g => g.age >= 20 && !g.flags.urbanRenewal && g.months >= 24,
+      choices:[
+        { label:'写了一篇长文记录这条街的故事', hint:'+😊 +🧠 +✨', fn: g => { g.flags.urbanRenewal=true; g.flags.cityStoryteller=true; return{mood:8,intel:8,charm:5}; }},
+        { label:'搬到了新地方，开始新的生活', hint:'+😊 -🤝', fn: g => { g.flags.urbanRenewal=true; return{mood:5,social:-3}; }},
+        { label:'很伤感，但觉得这是必然的', hint:'-😊', fn: g => { g.flags.urbanRenewal=true; return{mood:-5,intel:3}; }},
+      ]},
+    { id:'climate_anxiety', icon:'🌡️', title:'气候焦虑', category:'society',
+      body:'今年夏天，你经历了有史以来最热的一年。\n\n- 连续10天40度以上\n- 多地暴雨引发洪水\n- 山火烧了整整一周\n- 北极冰川又创新低\n\n你看着新闻，心里越来越焦虑：\n- 地球是不是真的要完？\n- 我们的下一代还能正常生活吗？\n- 个人的努力——在气候灾难面前有意义吗？\n\n一个朋友说：「我选择不生孩子——因为我不想让孩子活在一个正在毁灭的世界里。」\n\n另一个朋友说：「正因为世界在变——才更要好好活。」\n\n你不知道谁是对的。\n\n「气候焦虑：你改变不了地球——但你可以改变面对它的态度。」',
+      cond: g => g.age >= 18 && !g.flags.climateAnxiety,
+      choices:[
+        { label:'开始践行低碳生活，做力所能及的事', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.climateAnxiety=true; g.flags.lowCarbon=true; return{mood:8,health:3,intel:5}; }},
+        { label:'焦虑了一阵，然后该怎样还怎样', hint:'-😊', fn: g => { g.flags.climateAnxiety=true; return{mood:-5}; }},
+        { label:'决定不为不可控的事情焦虑', hint:'+😊 +🧠', fn: g => { g.flags.climateAnxiety=true; g.flags.stoicAcceptance=true; return{mood:8,intel:5}; }},
+      ]},
+    { id:'intergenerational_friend', icon:'👴', title:'忘年交', category:'social',
+      body:'你在社区活动中心认识了一个70岁的老人——老周。\n\n老周退休前是大学教授，退休后每天来活动中心下棋。\n\n你们成了忘年交：\n- 他给你讲他年轻时下乡的经历\n- 你教他用智能手机\n- 他分享人生智慧：「年轻时觉得天大的事，老了发现都是小事」\n- 你分享年轻人的烦恼：「加班、买房、催婚」\n\n他说了一句让你印象深刻的话：\n\n「你们这代人比我们累。我们那时候虽然穷，但不焦虑。因为大家都一样。你们现在——每个人都在跟所有人比较。」\n\n你突然觉得——他说得太对了。\n\n「忘年交：年轻人的问题——老年人早就经历过了。」',
+      cond: g => g.age >= 22 && !g.flags.intergenerationalFriend,
+      choices:[
+        { label:'跟老周成了固定棋友，经常请教人生问题', hint:'+😊 +🧠 +🤝', fn: g => { g.flags.intergenerationalFriend=true; g.flags.elderWisdom=true; return{mood:10,intel:8,social:5}; }},
+        { label:'觉得很有收获，偶尔去找他聊天', hint:'+😊 +🧠', fn: g => { g.flags.intergenerationalFriend=true; return{mood:5,intel:5}; }},
+        { label:'觉得代沟太大，聊不到一起', hint:'', fn: g => { g.flags.intergenerationalFriend=true; return{intel:2}; }},
+      ]},
+    { id:'solo_travel_v25', icon:'🧳', title:'一个人的旅行', category:'hobby',
+      body:'你做了一个决定：一个人去旅行。\n\n不是逃避——是想跟自己独处。\n\n你去了一个从没去过的城市：\n- 没有行程规划\n- 没有同伴需要迁就\n- 想走就走，想停就停\n\n你一个人：\n- 在陌生的街道迷路\n- 在路边的小店吃了一碗好吃到流泪的面\n- 在海边坐了一整个下午\n- 在旅馆里跟一个陌生人聊了一晚上\n\n你发现：一个人的时候——你反而更容易听到自己内心的声音。\n\n那个声音说：「你比你自己以为的——更勇敢。」\n\n「独自旅行：一个人不是孤独——是自由。」',
+      cond: g => g.age >= 20 && !g.flags.soloTravel && g.money >= 3000,
+      choices:[
+        { label:'爱上了独自旅行，每年去一个地方', hint:'-💰 +😊 +✨ +🧠', fn: g => { g.flags.soloTravel=true; g.flags.soloTraveler=true; g.money -= 5000; return{mood:15,charm:8,intel:5}; }},
+        { label:'这次体验很好，但不会经常一个人去', hint:'-💰 +😊', fn: g => { g.flags.soloTravel=true; g.money -= 3000; return{mood:10}; }},
+        { label:'觉得太孤独了，下次还是跟朋友一起', hint:'+🤝', fn: g => { g.flags.soloTravel=true; g.money -= 3000; return{social:5,mood:-2}; }},
+      ]},
+    { id:'minimalism_2', icon:'🗑️', title:'极简主义', category:'psychology',
+      body:'你在整理房间时，发现了一个惊人的事实：\n\n你拥有的东西——比你以为的多10倍。\n\n- 50件衣服，常穿的只有5件\n- 20双鞋，常穿的只有3双\n- 书架上100本书，30本没拆封\n- 厨房里的器具——可以开一个餐厅\n\n你开始实践「极简主义」：\n- 一个月没用的东西——捐掉\n- 一年没穿的衣服——扔掉\n- 不再买「可能有用」的东西\n\n三个月后：你的房间空了一半。但你觉得——生活满了一半。\n\n你终于理解了那句话：「拥有得越少——自由得越多。」\n\n「极简主义：扔掉的不是东西——是负担。」',
+      cond: g => g.age >= 22 && !g.flags.minimalism2,
+      choices:[
+        { label:'彻底实践极简主义，大幅减少物品', hint:'+😊 +💰 +🧠', fn: g => { g.flags.minimalism2=true; g.flags.minimalistLife=true; g.money += 3000; return{mood:12,intel:5}; }},
+        { label:'适度断舍离，保留有感情的东西', hint:'+😊 +💰', fn: g => { g.flags.minimalism2=true; g.money += 1000; return{mood:8}; }},
+        { label:'整理了一下就好，扔东西太心疼了', hint:'+😊', fn: g => { g.flags.minimalism2=true; return{mood:3}; }},
+      ]},
+    { id:'legacy_letter', icon:'✉️', title:'写给未来的信', category:'psychology',
+      body:'你参加了一个活动：「写给10年后自己的信」。\n\n你坐在那里，想了很久。\n\n10年后的你——会在哪里？在做什么？跟谁在一起？\n\n你写道：\n\n「亲爱的未来的我：\n\n如果你读到这封信，说明你又活了10年。谢谢你没有放弃。\n\n我不知道你现在过得好不好。但我希望：\n- 你已经不再为别人的评价失眠了\n- 你已经找到了自己真正想做的事\n- 你还跟爸妈保持着联系\n- 你偶尔还是会笑\n\n不管你现在怎样——请记住：10年前的你，一直在努力。」\n\n你写完后，把它封好了。你不知道10年后的自己会不会觉得幼稚。\n\n但你知道：这封信——是你给自己最好的礼物。\n\n「写给未来：你现在做的每一个选择——都在写这封信。」',
+      cond: g => g.age >= 20 && !g.flags.legacyLetter,
+      choices:[
+        { label:'认真地写了一封长信，封存好', hint:'+😊 +🧠', fn: g => { g.flags.legacyLetter=true; g.flags.futureSelf=true; return{mood:12,intel:5,charm:3}; }},
+        { label:'简单写了几句，觉得挺好的', hint:'+😊', fn: g => { g.flags.legacyLetter=true; return{mood:5}; }},
+        { label:'觉得太矫情了，没写', hint:'', fn: g => { g.flags.legacyLetter=true; return{mood:-2}; }},
+      ]},
+    { id:'volunteer_work_v25', icon:'🤝', title:'志愿者', category:'social',
+      body:'你报名做了社区志愿者。\n\n每个周末花4小时帮助需要的人：\n- 给独居老人送饭\n- 帮残障人士买菜\n- 陪留守儿童做作业\n- 教老年人用智能手机\n\n你原本以为：你在帮助别人。\n\n但你发现：他们在帮助你。\n\n一个80岁的老奶奶拉着你的手说：「孩子，谢谢你。我已经一个月没跟人说话了。」\n\n你哭了。\n\n你突然理解了：帮助他人——不是施舍，是连接。你给出去的爱——会以另一种方式回到你身上。\n\n「志愿者：你以为你在改变世界——其实是世界在改变你。」',
+      cond: g => g.age >= 20 && !g.flags.volunteerWork,
+      choices:[
+        { label:'成了长期志愿者，每周坚持', hint:'+🤝 +😊 +✨', fn: g => { g.flags.volunteerWork=true; g.flags.longTermVolunteer=true; return{social:15,mood:15,charm:8}; }},
+        { label:'做了几次觉得很有意义', hint:'+🤝 +😊', fn: g => { g.flags.volunteerWork=true; return{social:8,mood:8}; }},
+        { label:'觉得太累了，还是顾好自己吧', hint:'', fn: g => { g.flags.volunteerWork=true; return{mood:-2}; }},
+      ]},
+    { id:'acceptance', icon:'🌈', title:'学会接受', category:'psychology',
+      body:'你经历了很多事情之后，开始理解一个道理：\n\n人生——不是关于「得到什么」，而是关于「接受什么」。\n\n你学会了接受：\n- 接受自己不是最优秀的\n- 接受父母不会改变\n- 接受有些朋友会走散\n- 接受努力不一定有回报\n- 接受遗憾是人生的一部分\n- 接受「足够好」比「完美」更重要\n\n你发现：接受——不是认输，是一种更高级的勇敢。\n\n因为接受意味着：你不再跟现实较劲——而是开始跟现实合作。\n\n你深呼吸了一下。你觉得——肩上的担子，轻了一些。\n\n「接受：不是放弃——是放过自己。」',
+      cond: g => g.age >= 30 && !g.flags.acceptance && g.intel >= 30 && g.mood <= 60,
+      choices:[
+        { label:'开始练习「接受」，写感恩日记', hint:'+😊 +🧠 +❤️', fn: g => { g.flags.acceptance=true; g.flags.gracefulAcceptance=true; return{mood:18,intel:8,health:5}; }},
+        { label:'理解了但还没完全做到，慢慢来', hint:'+😊 +🧠', fn: g => { g.flags.acceptance=true; return{mood:8,intel:5}; }},
+        { label:'觉得「接受」就是「认命」，不甘心', hint:'-😊', fn: g => { g.flags.acceptance=true; return{mood:-5}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -13254,6 +13335,12 @@ const ACHIEVEMENTS = [
     { id:'camping_pro_ach', icon:'⛺', name:'露营达人', desc:'入坑精致露营生活', check: g => g.flags.campingPro },
     { id:'bookstore_regular_ach', icon:'📚', name:'书店常客', desc:'成了独立书店的常客和志愿者', check: g => g.flags.bookstoreRegular },
     { id:'podcast_addict_ach', icon:'🎧', name:'播客重度用户', desc:'每天听播客开阔思维', check: g => g.flags.podcastAddict },
+    // v25.0: 人生智慧成就
+    { id:'mindful_living_ach', icon:'📖', name:'活在当下', desc:'定期给自己什么都不做的时间', check: g => g.flags.mindfulLiving },
+    { id:'solo_traveler_ach', icon:'🧳', name:'独行旅者', desc:'爱上一个人的旅行', check: g => g.flags.soloTraveler },
+    { id:'long_term_volunteer_ach', icon:'🤝', name:'长期志愿者', desc:'每周坚持社区志愿服务', check: g => g.flags.longTermVolunteer },
+    { id:'graceful_acceptance_ach', icon:'🌈', name:'学会接受', desc:'不再跟现实较劲，练习感恩', check: g => g.flags.gracefulAcceptance },
+    { id:'city_storyteller_ach', icon:'🏗️', name:'城市记录者', desc:'用文字记录城市的故事', check: g => g.flags.cityStoryteller },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -13565,6 +13652,10 @@ const ENDINGS = [
     { id:'inner_peace_end_v23', badge:'🕊️', title:'内心安宁', desc:'你找到了内心安宁。\n\n你经历了大城市的喧嚣、职场的勾心斗角、人际关系的纷扰——但最终，你找到了属于自己的平静。\n\n你不再为别人的评价失眠，不再为得不到的东西焦虑，不再为过去的事后悔。你学会了接纳——接纳自己、接纳生活、接纳不完美。\n\n你的日记本上写着一句话：「我不需要更多的东西。我需要更少的欲望。」\n\n你的一个焦虑的朋友问你：「你怎么这么平静？」\n\n你说：「因为我终于明白了——控制能控制的，接受不能控制的。」\n\n「内心安宁：不是世界变安静了——是你不再被噪音干扰了。」', cond: g => g.flags.innerPeace && g.mood >= 65 && g.intel >= 50 && g.age >= 35 },
     { id:'community_leader_end_v23', badge:'🌐', title:'社群领袖', desc:'你成了一个社群领袖。\n\n从饭搭子到组局达人，从共享办公到社交活动创业——你把连接人变成了你的使命。\n\n你的社群有5000+成员。每周有3场活动。有人通过你的社群找到了工作、找到了对象、找到了人生方向。\n\n一个成员给你发了一条消息：「谢谢你。如果不是你的社群，我可能早就离开这个城市了。」\n\n你哭了。你没想到，你做的这些事，对别人来说这么重要。\n\n「社群的力量：一个人走得快，一群人走得远。但需要有人把这群人聚在一起。」', cond: g => g.traits && g.traits.socialite && (g.flags.masterGathering || g.flags.socialBiz) && g.social >= 70 && g.age >= 30 },
     { id:'wisdom_elder_end_v23', badge:'📚', title:'智慧长者', desc:'你成了一个智慧的长者。\n\n你把你的经验写成了文章、做了分享、带了一些年轻人。你的人生不是一场独角戏——是一堂传承课。\n\n你的一个学生后来成了行业大佬。他回来看你，说：「当年你跟我说的那句话，改变了我的命运。」\n\n你想了想，你甚至不记得是哪句话了。\n\n但你知道：种子撒出去了，总有一些会发芽。\n\n你的书架上有一本自己写的书。封面上写着：「给后来者的100条建议——一个普通人的不普通经验。」\n\n「传承：不是你要留下什么——是你帮别人找到他们自己的路。」', cond: g => g.flags.wisdomSharing && g.flags.personalBrand && g.intel >= 60 && g.age >= 40 && g.achievements.length >= 20 },
+    // --- v25.0 ENDINGS ---
+    { id:'enlightened_end', badge:'🌈', title:'通透人生', desc:'你成了一个通透的人。\n\n你学会了接受、学会了放下、学会了活在当下。你不再跟现实较劲，不再为别人的标准活着。\n\n你的房间很简朴，但每一件东西都有故事。你的朋友不多，但每一个都是经过时间考验的。你的钱不算多，但你不再焦虑。\n\n有人问你：「你怎么活得这么通透？」\n\n你笑了笑说：「没什么秘诀。只是终于想明白了一件事——人生不是比赛。」\n\n你的书架上有一封信——10年前写给自己的。你打开看了看，觉得那个年轻的自己，真的很可爱。\n\n「通透：不是看破红尘——是看破自己。」', cond: g => g.flags.gracefulAcceptance && g.flags.mindfulLiving && g.flags.legacyLetter && g.mood >= 60 && g.intel >= 50 },
+    { id:'giver_end', badge:'💝', title:'给予者', desc:'你把人生献给了他人。\n\n从社区志愿者到帮助陌生人，从倾听朋友到陪伴老人——你的存在，让很多人的世界温暖了一点。\n\n你没有赚很多钱，没有很高的社会地位。但你走在街上，总有人跟你打招呼。\n\n一个曾经受你帮助的人，后来也成了一个志愿者。他给你发了一条消息：「因为你，我开始帮助别人。现在我已经帮助了100个人。」\n\n你看着这条消息，觉得——这是你这辈子收到过的最好的回报。\n\n「给予：你给出去的爱——永远会以另一种方式存在。」', cond: g => g.flags.longTermVolunteer && g.social >= 60 && g.flags.familyPriority && g.achievements.length >= 15 },
+    { id:'explorer_end', badge:'🌍', title:'人生探索者', desc:'你成了一个永不停歇的探索者。\n\n从独自旅行到体验不同文化，从尝试新事物到挑战舒适区——你的人生不是一条直线，是一张地图。\n\n你去过很多地方，见过很多人，听过很多故事。你的朋友圈就是一本「人间观察日记」。\n\n有人问你：「你探索了这么多，找到了什么？」\n\n你说：「找到了一个事实——没有终点。探索本身就是意义。」\n\n你的墙上挂着一张世界地图，上面标满了你去过的地方和你想去的地方。想去的地方——永远比去过的多。\n\n「探索：世界那么大——一辈子都不够。」', cond: g => g.flags.soloTraveler && (g.flags.cityExplorer || g.flags.nomadLife) && g.charm >= 40 && g.intel >= 40 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
@@ -13882,6 +13973,11 @@ function advanceMonth() {
         }
     }
 
+    // v25.0: 人生阶段系统 - 根据年龄阶段应用属性修正
+    if (G.month === 1) {
+        applyLifeStageModifiers();
+    }
+
     // v20.0: 时代浪潮系统 - 根据年龄/年份激活时代背景效果
     if (!G.flags._eraSystemInit) {
         G.flags._eraSystemInit = true;
@@ -14105,6 +14201,10 @@ function applySeasonEffects(season) {
 }
 
 function pickEvent() {
+    // v25.0: 季节事件系统 - 有概率触发季节专属事件
+    const seasonEvent = getSeasonEvent();
+    if (seasonEvent) return seasonEvent;
+
     // v8.0: 事件冷却去重 - 最近15个事件不会重复出现
     // v17.0: 事件类别多样性 - 优先选择最近较少触发的类别
     const cityEvents = CITIES[G.city]?.events || [];
@@ -15264,6 +15364,87 @@ function getLifeTimeline() {
     // 按年龄排序
     timeline.sort((a, b) => a.age - b.age);
     return timeline.slice(0, 15); // 最多显示15个关键事件
+}
+
+// v25.0: 人生阶段系统 - 根据年龄定义不同人生阶段
+const LIFE_STAGES = [
+    { id:'youth', name:'青年期', ageMin:18, ageMax:24, desc:'探索与迷茫', modifiers:{mood:-2,social:3,charm:2}, color:'#4ade80' },
+    { id:'early_career', name:'立业期', ageMin:25, ageMax:30, desc:'拼搏与选择', modifiers:{intel:2,money_bonus:0.05}, color:'#60a5fa' },
+    { id:'mid_career', name:'发展期', ageMin:31, ageMax:40, desc:'稳定与焦虑', modifiers:{intel:1,mood:-1,social:1}, color:'#f59e0b' },
+    { id:'midlife', name:'中年期', ageMin:41, ageMax:50, desc:'反思与转型', modifiers:{intel:2,mood:-2,charm:-1}, color:'#f97316' },
+    { id:'late_career', name:'成熟期', ageMin:51, ageMax:60, desc:'沉淀与传承', modifiers:{intel:3,social:2,mood:1}, color:'#a78bfa' },
+    { id:'retirement', name:'退休期', ageMin:61, ageMax:100, desc:'自由与回忆', modifiers:{mood:2,health:-1,social:-1}, color:'#f472b6' },
+];
+
+function getCurrentLifeStage() {
+    if (!G.age) return LIFE_STAGES[0];
+    return LIFE_STAGES.find(s => G.age >= s.ageMin && G.age <= s.ageMax) || LIFE_STAGES[LIFE_STAGES.length-1];
+}
+
+function applyLifeStageModifiers() {
+    const stage = getCurrentLifeStage();
+    const prevStage = G.flags._lastLifeStage;
+    // 进入新阶段时通知玩家
+    if (prevStage !== stage.id) {
+        if (prevStage) {
+            G.eventLog.push({ age: G.age, text: `【人生阶段】进入${stage.name}：${stage.desc}` });
+        }
+        G.flags._lastLifeStage = stage.id;
+    }
+    // 应用阶段修正值
+    if (stage.modifiers.mood) G.mood = clamp(G.mood + stage.modifiers.mood, 0, 100);
+    if (stage.modifiers.social) G.social = clamp(G.social + stage.modifiers.social, 0, 100);
+    if (stage.modifiers.charm) G.charm = clamp(G.charm + stage.modifiers.charm, 0, 100);
+    if (stage.modifiers.intel) G.intel = clamp(G.intel + stage.modifiers.intel, 0, 100);
+    if (stage.modifiers.health) G.health = clamp(G.health + stage.modifiers.health, 0, 100);
+    if (stage.modifiers.money_bonus && G.salary) G.money += Math.floor(G.salary * stage.modifiers.money_bonus);
+}
+
+// v25.0: 季节事件系统 - 不同季节触发特定事件
+const SEASON_EVENTS = {
+    spring: [
+        { id:'spring_bloom', icon:'🌸', title:'春暖花开', body:'春天来了，城市里的樱花开了。\n\n你在上班路上停下脚步，拍了一张照片。\n\n突然觉得：活着——真好。', choices:[
+            { label:'发了条朋友圈：春天真好', hint:'+😊', fn: g => ({mood:5,social:2}) },
+            { label:'决定周末去郊外踏青', hint:'+😊 +❤️', fn: g => ({mood:8,health:3}) },
+        ]},
+    ],
+    summer: [
+        { id:'summer_heat_v25', icon:'🔥', title:'酷暑难耐', body:'40度高温，整个城市像个大蒸笼。\n\n空调外机在滴水，路上的柏油在融化。\n\n你挤在地铁里，闻着各种味道混合在一起的「人间烟火」。\n\n你想：在这种天气上班的人——都是英雄。', choices:[
+            { label:'买了一堆冷饮犒劳自己', hint:'-💰 +😊', fn: g => { g.money -= 200; return{mood:5}; }},
+            { label:'默默忍受，打工人的命', hint:'-😊', fn: g => ({mood:-3}) },
+        ]},
+    ],
+    autumn: [
+        { id:'autumn_melancholy_v25', icon:'🍂', title:'秋天感伤', body:'秋风起了，落叶铺满了人行道。\n\n你走在下班的路上，突然有些感伤。\n\n又一年过去了——你做了什么？你得到了什么？你失去了什么？\n\n你想：也许人生就是——在每个秋天，问自己同样的问题。', choices:[
+            { label:'给自己买了一杯热奶茶，温暖一下', hint:'-💰 +😊', fn: g => { g.money -= 30; return{mood:5}; }},
+            { label:'写了一篇年度反思日记', hint:'+🧠 +😊', fn: g => ({intel:5,mood:3}) },
+        ]},
+    ],
+    winter: [
+        { id:'winter_warmth', icon:'❄️', title:'冬日温暖', body:'下班的路上，飘起了小雪。\n\n你缩着脖子走在冷风中，手机响了。\n\n是妈妈发来的消息：「冷了吧？多穿点。想吃什么，妈给你寄。」\n\n你回了一个「好」字，眼眶突然红了。\n\n在这个冰冷的城市里——总有人在远方温暖地惦记着你。', choices:[
+            { label:'给妈妈回了一条长消息', hint:'+🤝 +😊', fn: g => ({social:5,mood:8}) },
+            { label:'打了电话回家，聊了半小时', hint:'+🤝 +😊', fn: g => ({social:8,mood:10}) },
+        ]},
+    ],
+};
+
+function getSeasonEvent() {
+    // 根据当前月份确定季节
+    const month = G.month || 1;
+    let season;
+    if (month >= 3 && month <= 5) season = 'spring';
+    else if (month >= 6 && month <= 8) season = 'summer';
+    else if (month >= 9 && month <= 11) season = 'autumn';
+    else season = 'winter';
+
+    const events = SEASON_EVENTS[season];
+    if (!events || events.length === 0) return null;
+    // 每个季节事件有30%概率触发，且每年只触发一次
+    const yearKey = `season_${G.age}_${season}`;
+    if (G.flags[yearKey]) return null;
+    if (Math.random() > 0.3) return null;
+    G.flags[yearKey] = true;
+    return events[Math.floor(Math.random() * events.length)];
 }
 
 function triggerEnding() {
