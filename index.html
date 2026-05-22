@@ -30,12 +30,15 @@
                 <button class="btn btn-ghost" onclick="showScreen('screen-about')">
                     <span class="btn-icon">📖</span> 关于游戏
                 </button>
+                <button class="btn btn-ghost" onclick="showEndingGallery()">
+                    <span class="btn-icon">🏆</span> 结局图鉴
+                </button>
                 <button class="btn btn-ghost" onclick="openSettings()">
                     <span class="btn-icon">⚙️</span> 设置
                 </button>
             </div>
             <div class="title-footer">
-                <span>v2.11</span> · <span>献给每一个在大城市奋斗的你</span>
+                <span>v2.12</span> · <span>献给每一个在大城市奋斗的你</span>
             </div>
         </div>
     </div>
@@ -363,6 +366,17 @@
             <h2>🏆 成就列表</h2>
             <div class="achievement-grid" id="achievement-grid"></div>
             <button class="btn btn-secondary" onclick="closeModal('modal-achievements')">关闭</button>
+        </div>
+    </div>
+
+    <!-- ===== 结局图鉴弹窗 ===== -->
+    <div class="modal" id="modal-gallery">
+        <div class="modal-overlay" onclick="closeModal('modal-gallery')"></div>
+        <div class="modal-content">
+            <h2>🏆 结局图鉴</h2>
+            <p class="gallery-progress" id="gallery-progress"></p>
+            <div class="gallery-grid" id="gallery-grid"></div>
+            <button class="btn btn-secondary" onclick="closeModal('modal-gallery')">关闭</button>
         </div>
     </div>
 

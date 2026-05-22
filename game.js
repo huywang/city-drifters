@@ -1284,6 +1284,9 @@ function startGame() {
     document.getElementById('current-event').innerHTML = '';
     document.getElementById('btn-advance').disabled = false;
     G.eventLog.push({ age: G.age, text: `来到${city.name}，开始漂泊生活` });
+
+    // Show tutorial for first-time players
+    showTutorial();
 }
 
 // === MONTHLY ACTIVITY SYSTEM ===
@@ -1621,6 +1624,52 @@ function getEndingRarity(endingId) {
     return 'common';
 }
 
+// === ENDING GALLERY ===
+function showEndingGallery() {
+    const unlocked = JSON.parse(localStorage.getItem('cityDrifters_endings') || '[]');
+    const grid = document.getElementById('gallery-grid');
+    const progress = document.getElementById('gallery-progress');
+
+    progress.textContent = `已解锁 ${unlocked.length} / ${ENDINGS.length} 种结局`;
+
+    grid.innerHTML = ENDINGS.map(e => {
+        const isUnlocked = unlocked.includes(e.id);
+        const rarity = getEndingRarity(e.id);
+        const rarityLabel = { common: '普通', uncommon: '罕见', rare: '稀有', legendary: '传说' }[rarity];
+        const rarityColor = { common: '#888', uncommon: '#4ade80', rare: '#60a5fa', legendary: '#f59e0b' }[rarity];
+
+        if (isUnlocked) {
+            return `<div class="gallery-item unlocked" title="${e.title}">
+                <div class="gallery-badge">${e.badge}</div>
+                <div class="gallery-title">${e.title}</div>
+                <div class="gallery-rarity" style="color:${rarityColor}">${rarityLabel}</div>
+            </div>`;
+        } else {
+            return `<div class="gallery-item locked" title="???">
+                <div class="gallery-badge">❓</div>
+                <div class="gallery-title">???</div>
+                <div class="gallery-rarity" style="color:${rarityColor}">${rarityLabel}</div>
+            </div>`;
+        }
+    }).join('');
+
+    document.getElementById('modal-gallery').classList.add('open');
+}
+
+// === TUTORIAL ===
+function showTutorial() {
+    const tutorialShown = localStorage.getItem('cityDrifters_tutorial');
+    if (tutorialShown) return;
+
+    setTimeout(() => {
+        notify('💡 提示：选择月度活动来影响你的人生！按 1-5 快速选择');
+        setTimeout(() => {
+            notify('💡 提示：按空格键前进到下个月');
+        }, 4000);
+        localStorage.setItem('cityDrifters_tutorial', 'true');
+    }, 2000);
+}
+
 // === ACHIEVEMENTS ===
 function checkAchievements() { ACHIEVEMENTS.forEach(a => { if(!G.achievements.includes(a.id)&&a.check(G)) unlockAchievement(a.id); }); }
 
@@ -1644,7 +1693,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.11' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.12' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
