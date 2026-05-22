@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v6.0
+// 都市浮生记 - Game Engine v6.1
 // ============================================
 
 // === GAME STATE ===
@@ -3172,6 +3172,16 @@ const EVENTS = [
         { label:'当义工', hint:'+😊 +🧠 +👥', fn: g => { g.flags.templeVisit=true; g.flags.templeVolunteer=true; return{mood:25,intel:12,social:10}; }},
         { label:'只是看看', hint:'+🧠 +😊', fn: g => { g.flags.templeVisit=true; return{intel:8,mood:8}; }},
       ]},
+    // === v6.1 EVENTS - Citywalk城市漫步 ===
+    { id:'citywalk', icon:'🚶', title:'Citywalk',
+      body:'你加入了Citywalk小组：\n\n主题：美食、建筑、历史\n\n路线：荣巷老街 → 梁溪河十里画廊 → 华晶新村\n\n"Citywalk——不是走过路过，而是深入观察。"\n\n"在数字化生存的时代，年轻人反而更渴望与城市建立真实的连接。"\n\n你发现了一家隐藏的老店，老板的故事让你感动。\n\n"城市漫步，是对抗城市同质化的独特体验。"',
+      cond: g => !g.flags.citywalk && g.age>=20 && g.age<=35,
+      choices:[
+        { label:'参加主题Citywalk', hint:'+😊 +👥 +✨', fn: g => { g.flags.citywalk=true; g.flags.citywalkGroup=true; return{mood:18,social:15,charm:8}; }},
+        { label:'自己规划路线', hint:'+🧠 +😊 +✨', fn: g => { g.flags.citywalk=true; g.flags.citywalkPlanner=true; return{intel:12,mood:15,charm:10}; }},
+        { label:'写漫游指南', hint:'+✨ +🧠 +😊', fn: g => { g.flags.citywalk=true; g.flags.citywalkWriter=true; return{charm:15,intel:12,mood:18}; }},
+        { label:'拍照发小红书', hint:'+✨ +👥 +😊', fn: g => { g.flags.citywalk=true; g.flags.citywalkPhotographer=true; return{charm:12,social:12,mood:15}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3422,6 +3432,8 @@ const ACHIEVEMENTS = [
     { id:'hanfu_enthusiast', icon:'👘', name:'汉服爱好者', desc:'体验汉服文化', check: g => g.flags.hanfuCulture },
     // v6.0 achievements
     { id:'zen_seeker', icon:'🏯', name:'佛系青年', desc:'去寺庙寻求心灵慰藉', check: g => g.flags.templeVisit },
+    // v6.1 achievements
+    { id:'city_explorer_pro', icon:'🚶', name:'城市漫步者', desc:'体验Citywalk', check: g => g.flags.citywalk },
 ];
 
 // === ENDINGS === (order matters: first match wins)
