@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v6.6
+// 都市浮生记 - Game Engine v6.7
 // ============================================
 
 // === GAME STATE ===
@@ -3322,6 +3322,34 @@ const EVENTS = [
         { label:'二手奢侈品', hint:'+✨ +😊', fn: g => { g.flags.pingtiCulture=true; g.flags.secondHand=true; return{money:-3000,charm:12,mood:8}; }},
         { label:'还是买大牌', hint:'-💰 +✨', fn: g => { g.flags.pingtiCulture=true; return{money:-8000,charm:8,mood:5}; }},
       ]},
+    // === v6.7 EVENTS - AI创作与一人公司 ===
+    { id:'ai_creation', icon:'🤖', title:'AI创作',
+      body:'你发现了一个副业机会：用AI绘画做治愈系插画。\n\n案例：某职场人用豆包AI做插画，副业收入超20万，全网涨粉13万。\n\n"AI创作——让普通人也能成为艺术家，让副业变现变得更容易。"\n\n你试了试：\n- AI绘画：Midjourney、Stable Diffusion、豆包\n- AI写作：ChatGPT、文心一言、通义千问\n- AI视频：Runway、Pika、Sora\n- AI音乐：Suno、Udio\n\n"AI降低了创作门槛，使新手能通过流程学习快速入门。"\n\n但你也看到了问题：版权争议、AI生成内容的同质化、"AI味"太重、客户对AI作品的偏见。\n\n"AI是工具，不是艺术家——真正的创造力，仍然来自人类。"',
+      cond: g => !g.flags.aiCreation && g.age>=20 && g.age<=35 && g.intel>=50,
+      choices:[
+        { label:'学AI绘画', hint:'+🧠 +💰', fn: g => { g.flags.aiCreation=true; g.flags.aiArtist=true; return{intel:12,money:3000,charm:5}; }},
+        { label:'做AI写作', hint:'+🧠 +💰', fn: g => { g.flags.aiCreation=true; g.flags.aiWriter=true; return{intel:15,money:2500}; }},
+        { label:'AI视频创作', hint:'+🧠 +✨', fn: g => { g.flags.aiCreation=true; g.flags.aiVideoMaker=true; return{intel:10,charm:10,mood:8}; }},
+        { label:'不学，太卷了', hint:'+😊', fn: g => { g.flags.aiCreation=true; return{mood:5}; }},
+      ]},
+    { id:'one_person_company', icon:'🏢', title:'一人公司',
+      body:'你决定不再打工，用AI做"一人公司"（OPC）。\n\n"在35岁职场焦虑和AI浪潮的夹击下，越来越多中国年轻人选择不再等待就业机会，而是借助人工智能独自创业。"\n\n你的一人公司：\n- 你做决策，AI做执行\n- 你做创意，AI做内容\n- 你做客户，AI做客服\n- 你做战略，AI做数据\n\n"一人公司不是单打独斗，而是一个人与一支AI团队并肩作战。"\n\n你的收入：月入2-5万，但不稳定，没有五险一金，没有带薪休假。\n\n"自由是代价，也是收获——你既是老板，也是员工；既是决策者，也是执行者。"',
+      cond: g => !g.flags.onePersonCompany && g.age>=25 && g.age<=35 && g.intel>=60 && g.flags.aiCreation,
+      choices:[
+        { label:'全职做一人公司', hint:'-💰 +💰 +✨', fn: g => { g.flags.onePersonCompany=true; g.flags.opcFounder=true; if(Math.random()>0.5){return{money:30000,charm:15,intel:10,mood:20}}else{return{money:-10000,mood:-10}} }},
+        { label:'兼职做一人公司', hint:'+💰 +🧠', fn: g => { g.flags.onePersonCompany=true; g.flags.opcSideHustle=true; return{money:8000,intel:8,mood:10}; }},
+        { label:'做AI SaaS产品', hint:'-💰 +💰 +🧠', fn: g => { g.flags.onePersonCompany=true; g.flags.saasFounder=true; if(Math.random()>0.6){return{money:50000,intel:15,charm:10}}else{return{money:-15000,intel:10,mood:-15}} }},
+        { label:'太冒险，继续打工', hint:'+💰', fn: g => { g.flags.onePersonCompany=true; return{money:3000,mood:-5}; }},
+      ]},
+    { id:'ai_anxiety_work', icon:'😰', title:'AI焦虑',
+      body:'公司开会：我们要引入AI了，会用AI的人留下。\n\n你看了看你的岗位：文案策划、数据分析、客服、设计、编程——AI都能做。\n\n"AI不淘汰你，但会用AI的人淘汰你。"\n\n你看了看你的工资：8000元/月。AI的价格：99元/月。\n\n你开始焦虑：如果AI能做我的工作，我还有什么价值？\n\n但你也在思考：AI能做执行，但做不了决策；AI能做内容，但做不了创意；AI能做分析，但做不了共情。\n\n"未来属于'人+AI'的组合，而不是'人vs AI'的对抗。"\n\n你决定：与其被AI替代，不如学会驾驭AI。',
+      cond: g => !g.flags.aiAnxietyWork && g.age>=22 && g.age<=40 && g.job!=='待业中' && !g.flags.aiCreation,
+      choices:[
+        { label:'学习AI工具', hint:'+🧠 +✨', fn: g => { g.flags.aiAnxietyWork=true; g.flags.aiToolUser=true; return{intel:15,charm:8,money:-1000}; }},
+        { label:'发展AI无法替代的技能', hint:'+🧠 +✨', fn: g => { g.flags.aiAnxietyWork=true; g.flags.humanSkills=true; return{intel:12,charm:10,mood:8}; }},
+        { label:'转行做AI相关工作', hint:'+🧠 +💰', fn: g => { g.flags.aiAnxietyWork=true; g.flags.aiCareer=true; return{intel:10,money:5000}; }},
+        { label:'焦虑但不行动', hint:'-😊', fn: g => { g.flags.aiAnxietyWork=true; return{mood:-10,health:-5}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3601,6 +3629,11 @@ const ACHIEVEMENTS = [
     { id:'frugal_master', icon:'📉', name:'消费降级大师', desc:'实践消费降级', check: g => g.flags.consumptionDowngrade },
     { id:'minimalist', icon:'🎯', name:'极简主义者', desc:'选择极简生活', check: g => g.flags.minimalist },
     { id:'pingti_expert', icon:'🔄', name:'平替专家', desc:'拥抱平替文化', check: g => g.flags.pingtiCulture },
+    // v6.7 achievements
+    { id:'ai_creator', icon:'🤖', name:'AI创作者', desc:'学习AI创作', check: g => g.flags.aiCreation },
+    { id:'ai_artist', icon:'🎨', name:'AI艺术家', desc:'用AI做绘画创作', check: g => g.flags.aiArtist },
+    { id:'opc_founder', icon:'🏢', name:'一人公司创始人', desc:'创办一人公司', check: g => g.flags.onePersonCompany },
+    { id:'ai_tool_master', icon:'🛠️', name:'AI工具达人', desc:'掌握AI工具', check: g => g.flags.aiToolUser },
 ];
 
 // === ENDINGS === (order matters: first match wins)
