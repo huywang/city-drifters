@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v9.4
+// 都市浮生记 - Game Engine v9.5
 // ============================================
 
 // === GAME STATE ===
@@ -4578,9 +4578,76 @@ const EVENTS = [
         { label:'卖掉房子', hint:'🎲', fn: g => { if(Math.random()>0.4){g.flags.hasHouse=false;g.flags.hasMortgage=false;return{money:250000,mood:10}}else{return{mood:-20,money:50000}} }},
         { label:'硬扛', hint:'-😊 -❤️', fn: g => { return{mood:-15,health:-5}; }},
       ]},
+    // === v9.5 职场深度事件 ===
+    { id:'side_project', icon:'🔧', title:'副业项目',
+      body:'你接到一个朋友的私活：做个小程序，报酬8000块。\n\n你算了算：周末加班两周就能搞定。但你已经连续加了三个星期的班了。\n\n"副业是大城市打工人的第二份工作——没有五险一金，但有钱拿。"',
+      cond: g => g.intel > 55 && g.job !== '待业中' && g.months > 6,
+      choices:[
+        { label:'接！多赚点', hint:'+💰 -❤️', fn: g => { return{money:8000,health:-8,mood:-3,intel:5}; }},
+        { label:'太累了，不接', hint:'+❤️ +😊', fn: g => { return{health:5,mood:5}; }},
+        { label:'介绍给别人', hint:'+👥', fn: g => { return{social:8,mood:3}; }},
+      ]},
+    { id:'office_politics', icon:'🎭', title:'站队',
+      body:'公司两个领导在争权，你的直属领导和隔壁部门领导不对付。\n\n你的直属领导暗示你："关键时刻要站在对的人身边。"\n\n你心想：我只想好好写代码/做业务，不想卷进政治。',
+      cond: g => g.job !== '待业中' && g.jobSalary > 8000 && g.months > 12,
+      choices:[
+        { label:'站直属领导', hint:'🎲', fn: g => { if(Math.random()>0.4){return{mood:5,social:5,money:3000}}else{setJob(g,'待业中',0);return{mood:-20,money:-5000}} }},
+        { label:'两边不得罪', hint:'+🧠', fn: g => { return{intel:3,mood:-5}; }},
+        { label:'趁乱跳槽', hint:'🎲', fn: g => { if(Math.random()>0.5){setJob(g,'高级'+g.job.replace('初级','').replace('高级',''),Math.floor(g.jobSalary*1.2));return{mood:10,money:5000}}else{return{mood:-10}} }},
+      ]},
+    { id:'remote_work', icon:'💻', title:'远程办公',
+      body:'公司宣布可以远程办公了！你激动得差点跳起来。\n\n第一周：效率翻倍，心情大好。\n第二周：分不清上班和下班。\n第三周：你已经三天没换过衣服了。\n\n"远程办公是自由，也是另一种形式的牢笼。"',
+      cond: g => g.job !== '待业中' && g.intel > 50 && g.months > 6 && !g.flags.remoteWorker,
+      choices:[
+        { label:'申请全远程', hint:'+😊 -👥', fn: g => { g.flags.remoteWorker=true; return{mood:15,social:-8,health:5}; }},
+        { label:'混合办公', hint:'+😊', fn: g => { return{mood:10,health:3,social:3}; }},
+        { label:'还是去公司吧', hint:'+👥', fn: g => { return{social:5,mood:-3}; }},
+      ]},
+    // === v9.5 生活变体事件 ===
+    { id:'hobby_photography', icon:'📸', title:'入坑摄影',
+      body:'你被朋友拉进了摄影坑。一台相机加镜头，花了两万块。\n\n你开始每个周末出去拍照：扫街、人像、风光……\n\n你的朋友圈变得好看了，你的钱包变薄了。',
+      cond: g => g.charm > 40 && g.money > 10000 && !g.flags.hobbyPhotography,
+      choices:[
+        { label:'入坑！', hint:'-💰 +✨', fn: g => { g.flags.hobbyPhotography=true; return{money:-20000,charm:12,mood:15,health:3}; }},
+        { label:'用手机拍就行', hint:'+😊', fn: g => { return{charm:3,mood:5}; }},
+      ]},
+    { id:'travel_solo', icon:'✈️', title:'独自旅行',
+      body:'你请了年假，一个人去了大理。\n\n在洱海边发呆了一下午，你突然想明白了一件事：你不需要向任何人证明什么。\n\n你发了条朋友圈：「生活不止眼前的苟且。」然后关掉了工作群通知。',
+      cond: g => g.mood < 50 && g.money > 5000 && g.months > 12,
+      choices:[
+        { label:'多玩几天', hint:'-💰 +😊 +❤️', fn: g => { return{money:-5000,mood:25,health:10,charm:5}; }},
+        { label:'三天就回来', hint:'-💰 +😊', fn: g => { return{money:-2000,mood:15,health:5}; }},
+      ]},
+    { id:'cooking_class', icon:'👨‍🍳', title:'学做饭',
+      body:'你在B站上看了100个做菜视频，终于决定自己动手了。\n\n第一道菜：西红柿炒蛋。蛋糊了，西红柿还是生的。\n\n你吃了两口，觉得比外卖好吃——大概是因为自己做的。\n\n"做饭是大城市最后的仪式感。"',
+      cond: g => g.health < 60 && g.months > 6 && !g.flags.cookingSkill,
+      choices:[
+        { label:'坚持学', hint:'+❤️ +🧠', fn: g => { g.flags.cookingSkill=true; return{health:10,intel:5,mood:8,money:-500}; }},
+        { label:'还是点外卖', hint:'+😊', fn: g => { return{mood:3}; }},
+      ]},
+    { id:'gym_challenge', icon:'🏋️', title:'健身挑战',
+      body:'你参加了健身房的"百日挑战"：100天每天锻炼，打卡成功退全款。\n\n第30天你觉得浑身酸痛。第60天你想放弃。第90天你已经上瘾了。\n\n"健身最难的不是举铁，是坚持。"',
+      cond: g => g.flags.hasGymCard && g.health < 70,
+      choices:[
+        { label:'坚持100天', hint:'+❤️ +✨', fn: g => { addDelayedEffect(4, function(g2){ g2.health=clamp(g2.health+15,0,100);g2.charm=clamp(g2.charm+8,0,100);g2.mood=clamp(g2.mood+10,0,100); return{money:1199}; }, '百日挑战成功！你拿到了退款，更重要的是——你变了。'); return{health:-5,mood:-3}; }},
+        { label:'第31天放弃', hint:'+😊', fn: g => { return{mood:5,health:3}; }},
+      ]},
+    { id:'charity_event', icon:'❤️', title:'公益活动',
+      body:'你参加了一次志愿者活动——去养老院陪老人聊天。\n\n一个80岁的奶奶拉着你的手说："年轻人，别着急，慢慢来。"\n\n你不知道她在安慰你还是在说人生道理。但你听完之后，心里平静了很多。',
+      cond: g => g.social > 30 && g.months > 6,
+      choices:[
+        { label:'定期做志愿者', hint:'+👥 +😊', fn: g => { return{social:10,mood:15,charm:8,health:3}; }},
+        { label:'偶尔参加', hint:'+😊', fn: g => { return{mood:8,social:5}; }},
+      ]},
+    { id:'midlife_reflection', icon:'🪞', title:'中年反思',
+      body:'你坐在公司天台上看落日，突然意识到：你已经在这座城市待了十年了。\n\n十年来你换了三份工作、搬了五次家、认识了一百个人、忘记了一百零一个。\n\n你问自己：这就是你想要的生活吗？',
+      cond: g => g.age >= 32 && g.months > 60,
+      choices:[
+        { label:'接受现实，继续前行', hint:'+😊 +🧠', fn: g => { return{mood:10,intel:8}; }},
+        { label:'回老家发展', hint:'🎲', fn: g => { if(g.money>50000){return{mood:15,social:-15,money:10000}}else{return{mood:-10,social:-10}} }},
+        { label:'做出大改变', hint:'🎲', fn: g => { g.flags.midlifeChange=true; return{mood:5,intel:5,charm:5}; }},
+      ]},
 ];
-
-// === ACHIEVEMENTS ===
 const ACHIEVEMENTS = [
     { id:'first_job', icon:'💼', name:'职场新人', desc:'找到第一份工作', check: g => g.flags.gotFirstJob },
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -4973,6 +5040,12 @@ const ACHIEVEMENTS = [
     { id:'car_owner', icon:'🚗', name:'有车一族', desc:'买了车', check: g => g.flags.hasCar },
     { id:'homeowner_ach', icon:'🏠', name:'有房一族', desc:'在大城市买了房', check: g => g.flags.hasHouse },
     { id:'tiktok_creator', icon:'🎬', name:'短视频创作者', desc:'开始做短视频', check: g => g.flags.tiktokCreator },
+    // === v9.5 新增成就 ===
+    { id:'hobby_photo', icon:'📸', name:'摄影爱好者', desc:'入坑摄影', check: g => g.flags.hobbyPhotography },
+    { id:'remote_worker_ach', icon:'💻', name:'远程工作者', desc:'实现远程办公', check: g => g.flags.remoteWorker },
+    { id:'cook_master', icon:'👨‍🍳', name:'厨房新手', desc:'学会了做饭', check: g => g.flags.cookingSkill },
+    { id:'volunteer_ach', icon:'❤️', name:'志愿者', desc:'参加过公益活动', check: g => g.social > 50 && g.months > 24 },
+    { id:'midlife_change', icon:'🪞', name:'中年觉醒', desc:'在中年做出了重大改变', check: g => g.flags.midlifeChange },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -6765,7 +6838,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '9.4' };
+    const saveData = { ...G, savedAt: Date.now(), version: '9.5' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
