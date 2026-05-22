@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v27.0
+// 都市浮生记 - Game Engine v27.1
 // ============================================
 
 // === GAME STATE ===
@@ -13575,6 +13575,87 @@ const EVENTS = [
         { label:'聊了一次，给了他一些建议', hint:'+🤝 +🧠', fn: g => { g.flags.reputationMentor=true; g.money -= 50; g.reputation.career += 3; return{intel:3,social:2}; }},
         { label:'觉得自己还不够格，婉拒了', hint:'+🧠 -🤝', fn: g => { g.flags.reputationMentor=true; return{intel:2,social:-2}; }},
       ]},
+    // v27.1: 养老焦虑 + 退休规划
+    { id:'pension_anxiety_v27_1', icon:'📊', title:'养老金焦虑', category:'finance',
+      body:'你开始担心养老了。\n\n你查了养老金计算器——\n\n假设你60岁退休：\n- 每月养老金：3500元\n- 预期寿命：80岁\n- 退休20年需要：84万\n\n你的存款：15万。\n\n你的缺口：69万。\n\n你开始焦虑了。\n\n你搜了「如何准备养老金」——\n- 商业养老保险：每年交2万，60岁后每月领3000\n- 基金定投：每月投3000，年化8%，30年后约300万\n- 以房养老：把房子抵押给银行换养老金\n\n你算了算——\n\n如果现在开始准备——还来得及。\n但如果你再等5年——就晚了。\n\n你开始理解：养老——不是「老了再想」的事——是「现在就要想」的事。\n\n「养老金焦虑：不是在担心「老了怎么办」——是在担心「来不来得及」。」',
+      cond: g => g.age >= 30 && !g.flags.pensionAnxiety && g.money >= 5000,
+      choices:[
+        { label:'开始每月定投3000准备养老', hint:'-💰 +🧠 +😊', fn: g => { g.flags.pensionAnxiety=true; g.flags.pensionInvestor=true; g.money -= 3000; g.reputation.economy += 5; return{intel:5,mood:3}; }},
+        { label:'买了商业养老保险', hint:'-💰 +🧠 +❤️', fn: g => { g.flags.pensionAnxiety=true; g.flags.pensionInsurance=true; g.money -= 20000; return{intel:3,mood:2}; }},
+        { label:'焦虑了一阵但没行动', hint:'-😊 -🧠', fn: g => { g.flags.pensionAnxiety=true; return{mood:-5,intel:-2}; }},
+      ]},
+    { id:'retirement_community', icon:'🏘️', title:'养老社区考察', category:'society',
+      body:'你去考察了一家高端养老社区。\n\n这里：\n- 独立公寓\n- 24小时护理\n- 健身房、游泳池\n- 图书馆、棋牌室\n- 每周有医生巡诊\n- 每天有营养配餐\n\n价格：\n- 押金：100万（不退）\n- 月费：8000元\n\n你看到了住在这里的老人：\n- 有在打太极的\n- 有在下棋的\n- 有在聊天的\n- 有在发呆的\n\n你问了一位老人：「这里好吗？」\n\n他说：「好是好——就是——没有年轻人。」\n\n你开始理解：养老社区——不是「养老」——是「把老人放在一起」。\n\n但老人需要的——不只是「照顾」——还有「活力」。\n\n「养老社区：不是在选「住哪里」——是在选「老了以后跟谁在一起」。」',
+      cond: g => g.age >= 40 && !g.flags.retirementCommunity && g.money >= 50000,
+      choices:[
+        { label:'预定了名额，为父母或自己', hint:'-💰 +❤️ +🧠', fn: g => { g.flags.retirementCommunity=true; g.flags.bookedRetirement=true; g.money -= 100000; g.reputation.social += 5; return{mood:3,intel:3}; }},
+        { label:'考察了但觉得太贵了', hint:'+🧠 -😊', fn: g => { g.flags.retirementCommunity=true; return{intel:3,mood:-3}; }},
+        { label:'觉得还是在家养老好', hint:'+😊 +🧠', fn: g => { g.flags.retirementCommunity=true; g.flags.homeRetirement=true; return{mood:5,intel:2}; }},
+      ]},
+    { id:'silver_entrepreneur', icon:'👴', title:'银发创业', category:'career',
+      body:'你55岁了。快退休了。\n\n但你不想「退休」。\n\n你想做点什么——不是为了钱——是为了「不闲着」。\n\n你开始想：\n- 开一家小面馆？\n- 做自媒体分享人生经验？\n- 当社区志愿者？\n- 开一家书店？\n\n你选择了开一家小面馆。\n\n投资：15万。\n\n开业那天——\n\n你的老同事、老朋友都来了。\n\n你的面馆叫：「不老面馆」。\n\n你的招牌上写着：「55岁，人生才刚开始。」\n\n你发现：创业——不需要「年轻」——需要「不甘心」。\n\n你不甘心——退休后就「消失」。\n\n你开始理解：退休不是「结束」——是「换一种方式活着」。\n\n「银发创业：不是在赚钱——是在证明「老了也有价值」。」',
+      cond: g => g.age >= 50 && !g.flags.silverEntrepreneur && g.money >= 100000,
+      choices:[
+        { label:'开了面馆，生意还不错', hint:'-💰 +😊 +✨ +🤝', fn: g => { g.flags.silverEntrepreneur=true; g.flags.noodleShop=true; g.money -= 150000; g.reputation.career += 10; return{mood:10,charm:5,social:5}; }},
+        { label:'做了自媒体，分享人生经验', hint:'-💰 +😊 +🧠 +✨', fn: g => { g.flags.silverEntrepreneur=true; g.flags.silverBlogger=true; g.money -= 5000; g.reputation.culture += 8; return{mood:8,intel:5,charm:5}; }},
+        { label:'想了想还是算了，安心退休', hint:'+😊 -✨', fn: g => { g.flags.silverEntrepreneur=true; g.flags.peacefulRetire=true; return{mood:3}; }},
+      ]},
+    { id:'caring_elderly', icon:'🏥', title:'照顾父母', category:'social',
+      body:'你爸摔了一跤。\n\n髋骨骨折。\n\n需要做手术。手术费：8万。\n\n你赶回了家。\n\n你发现：\n- 你爸妈的家——很旧了\n- 冰箱里有过期的食物\n- 药柜里有很多药\n- 卫生间没有扶手\n\n你开始做：\n- 请了护工（每月5000元）\n- 装了卫生间扶手（2000元）\n- 买了防滑垫（500元）\n- 装了监控（1000元）\n\n你发现：照顾老人——比照顾孩子——更难。\n\n孩子会「长大」。\n老人只会「变老」。\n\n你开始理解：你正在经历「上有老下有小」的中年危机。\n\n但你也开始理解：照顾父母——是你能给他们的「最后一份爱」。\n\n「照顾父母：不是在「尽孝」——是在学「如何面对离别」。」',
+      cond: g => g.age >= 35 && !g.flags.caringElderly && g.money >= 10000,
+      choices:[
+        { label:'请了护工并经常回去看望', hint:'-💰 +❤️ +🤝', fn: g => { g.flags.caringElderly=true; g.flags.regularVisit=true; g.money -= 60000; g.reputation.social += 8; return{mood:3,social:5}; }},
+        { label:'接父母到大城市住', hint:'-💰 +❤️ -😊', fn: g => { g.flags.caringElderly=true; g.flags.parentsMovedIn=true; g.money -= 30000; return{mood:-3,social:3}; }},
+        { label:'转了钱但没时间回去', hint:'-💰 -❤️ -🤝', fn: g => { g.flags.caringElderly=true; g.money -= 80000; return{mood:-5,social:-3}; }},
+      ]},
+    { id:'retirement_countdown_v27_1', icon:'⏰', title:'退休倒计时', category:'career',
+      body:'距离退休还有5年。\n\n你开始倒计时了。\n\n你在想：退休后我要做什么？\n\n你的计划：\n- 环游世界\n- 学一门乐器\n- 写一本书\n- 每天睡到自然醒\n\n但你的现实：\n- 存款不够环游世界\n- 手指不够灵活学乐器\n- 文采不够写书\n- 生物钟不允许睡到自然醒\n\n你开始思考：退休——是「自由」还是「空虚」？\n\n你问了一个已经退休的前同事：「退休生活怎么样？」\n\n他说：「前3个月——太爽了。3个月后——太无聊了。」\n\n你开始理解：退休不是「终点」——是需要「新目标」的起点。\n\n「退休倒计时：不是在等退休——是在想「退休后我还能成为谁」。」',
+      cond: g => g.age >= 55 && g.age <= 60 && !g.flags.retirementCountdown && g.job !== '待业中',
+      choices:[
+        { label:'开始规划退休后的精彩生活', hint:'+😊 +🧠 +✨', fn: g => { g.flags.retirementCountdown=true; g.flags.plannedRetirement=true; return{mood:8,intel:5,charm:3}; }},
+        { label:'焦虑了，不知道怎么度过', hint:'-😊 +🧠', fn: g => { g.flags.retirementCountdown=true; return{mood:-5,intel:3}; }},
+        { label:'决定延迟退休，继续工作', hint:'+💰 -😊 +🧠', fn: g => { g.flags.retirementCountdown=true; g.flags.delayedRetirement=true; return{mood:-3,intel:3}; }},
+      ]},
+    { id:'intergenerational_living', icon:'👨‍👩‍👧‍👦', title:'代际共居', category:'social',
+      body:'你开始尝试「代际共居」了。\n\n这是一个新模式：\n- 年轻人租老人的空房间——免房租\n- 条件是：每周陪老人聊天10小时\n- 帮忙做家务、买菜、教用手机\n\n你的室友：78岁的张奶奶。\n\n她：\n- 老伴去世了\n- 孩子在国外\n- 一个人住了5年\n\n你帮她：\n- 教她用微信视频\n- 帮她网购\n- 陪她去公园散步\n- 听她讲过去的故事\n\n她教你：\n- 做红烧肉\n- 织毛衣\n- 下象棋\n- 人生道理\n\n你发现：你们——互相治愈了。\n\n你开始理解：代际共居——不是「慈善」——是「两代人互相取暖」。\n\n「代际共居：不是你陪她——是她让你知道「老了也不孤单」。」',
+      cond: g => g.age >= 20 && g.age <= 35 && !g.flags.intergenerationalLiving && g.money >= 500,
+      choices:[
+        { label:'跟张奶奶成了忘年交', hint:'+🤝 +😊 +❤️ +🧠', fn: g => { g.flags.intergenerationalLiving=true; g.flags.crossGenFriend=true; g.reputation.social += 10; return{social:5,mood:8,intel:5}; }},
+        { label:'住了一段时间，挺有收获', hint:'+🤝 +😊', fn: g => { g.flags.intergenerationalLiving=true; return{social:3,mood:3}; }},
+        { label:'生活习惯差异太大，搬走了', hint:'-🤝 -😊', fn: g => { g.flags.intergenerationalLiving=true; return{social:-2,mood:-3}; }},
+      ]},
+    { id:'will_planning', icon:'📝', title:'立遗嘱', category:'psychology',
+      body:'你开始考虑立遗嘱了。\n\n不是因为你病了——是因为你想「有准备」。\n\n你查了「怎么立遗嘱」——\n\n方式：\n- 公证遗嘱：费用2000-5000元\n- 律师见证：费用3000-8000元\n- 自书遗嘱：免费但可能被质疑\n\n你决定：做公证遗嘱。\n\n你在遗嘱里写了：\n- 房子给谁\n- 存款给谁\n- 保险给谁\n- 如果我有宠物——谁来照顾\n- 我的器官——捐不捐\n\n你发现：立遗嘱——不是「告别」——是「负责」。\n\n对你爱的人负责。\n\n你立完遗嘱后——心情反而更轻松了。\n\n因为你知道：不管发生什么——你已经做了「最好的安排」。\n\n「立遗嘱：不是在准备死亡——是在准备「安心」。」',
+      cond: g => g.age >= 45 && !g.flags.willPlanning && g.money >= 2000,
+      choices:[
+        { label:'做了公证遗嘱，心里踏实了', hint:'-💰 +😊 +🧠 +❤️', fn: g => { g.flags.willPlanning=true; g.flags.notarizedWill=true; g.money -= 3000; g.reputation.social += 3; return{mood:5,intel:5}; }},
+        { label:'写了自书遗嘱，放在保险箱里', hint:'+🧠 +😊', fn: g => { g.flags.willPlanning=true; return{intel:3,mood:3}; }},
+        { label:'觉得太早了，以后再说', hint:'+💰 -🧠', fn: g => { g.flags.willPlanning=true; return{intel:-2}; }},
+      ]},
+    { id:'hobby_retirement', icon:'🎨', title:'退休爱好', category:'hobby',
+      body:'你退休了。\n\n你终于有了「无限的时间」。\n\n但你也发现：时间太多了——反而不知道干什么。\n\n你试了：\n- 跳广场舞——跳了两天就不想去了\n- 打麻将——输了很多钱\n- 钓鱼——晒黑了还没钓到\n- 画画——画得像小学生\n\n直到你发现了：摄影。\n\n你买了一台相机——开始拍公园里的花。\n\n你发现：\n- 早上的花和晚上的花——不一样\n- 春天的花和秋天的花——不一样\n- 同样的花——每天都不一样\n\n你把照片发到网上——有人点赞了。\n\n你开始理解：退休后的爱好——不是「打发时间」——是「重新发现世界」。\n\n「退休爱好：不是找事做——是找「让你觉得活着有意思」的事。」',
+      cond: g => g.age >= 58 && !g.flags.hobbyRetirement && g.job === '退休' || (g.age >= 60 && !g.flags.hobbyRetirement),
+      choices:[
+        { label:'成了摄影爱好者，每天拍花', hint:'-💰 +😊 +✨ +🧠', fn: g => { g.flags.hobbyRetirement=true; g.flags.retirePhotographer=true; g.money -= 5000; g.reputation.culture += 8; return{mood:8,charm:5,intel:3}; }},
+        { label:'试了很多爱好，找到了书法', hint:'-💰 +😊 +🧠', fn: g => { g.flags.hobbyRetirement=true; g.money -= 2000; return{mood:5,intel:3}; }},
+        { label:'找不到爱好，开始觉得无聊', hint:'-😊 -🧠', fn: g => { g.flags.hobbyRetirement=true; return{mood:-5,intel:-2}; }},
+      ]},
+    { id:'aging_gracefully', icon:'🌟', title:'优雅老去', category:'psychology',
+      body:'你照镜子——发现了第一根白发。\n\n你拔掉了它。\n\n一周后——又长了两根。\n\n你开始数：1、2、3、4、5……\n\n你放弃了。\n\n你开始接受：你在变老。\n\n但你也发现了：\n- 你的皱纹——是「笑纹」——因为你笑过很多\n- 你的白发——是「智慧」——因为你经历了很多\n- 你的松弛——是「放松」——因为你不再那么紧绷\n\n你开始穿颜色更鲜艳的衣服。\n你开始学新的东西。\n你开始跟年轻人聊天。\n\n你发现：老去——不是「变丑」——是「变得更有故事」。\n\n你开始理解：优雅老去——不是「抵抗衰老」——是「拥抱变化」。\n\n「优雅老去：不是「不老」——是「老了也很美」。」',
+      cond: g => g.age >= 45 && !g.flags.agingGracefully && g.mood >= 50,
+      choices:[
+        { label:'开始接受衰老，活得更自在了', hint:'+😊 +✨ +🧠 +❤️', fn: g => { g.flags.agingGracefully=true; g.flags.elegantAging=true; g.reputation.culture += 5; return{mood:10,charm:5,intel:5}; }},
+        { label:'开始注重保养，花了钱但心情好了', hint:'-💰 +😊 +✨', fn: g => { g.flags.agingGracefully=true; g.money -= 10000; return{mood:5,charm:5}; }},
+        { label:'还是很在意衰老，染了头发', hint:'-💰 -😊 +✨', fn: g => { g.flags.agingGracefully=true; g.money -= 500; return{mood:-3,charm:3}; }},
+      ]},
+    { id:'legacy_planning', icon:'📖', title:'人生遗产', category:'psychology',
+      body:'你开始想：你的人生——留下了什么？\n\n不是钱——不是房子——是「故事」。\n\n你开始写回忆录。\n\n你写了：\n- 你的童年\n- 你的初恋\n- 你的第一份工作\n- 你在大城市的日子\n- 你的失败和成功\n- 你的遗憾和骄傲\n\n你写了10万字。\n\n你把书打印了10本——分给了你的家人和朋友。\n\n你的孩子说：「爸/妈，我不知道你年轻时有这么多故事。」\n\n你笑了。\n\n你开始理解：人生遗产——不是「留给别人多少钱」——是「让别人知道你活过」。\n\n「人生遗产：不是留给世界的东西——是你「活过」的证明。」',
+      cond: g => g.age >= 55 && !g.flags.legacyPlanning && g.intel >= 30,
+      choices:[
+        { label:'写了回忆录，给了家人和朋友', hint:'+😊 +❤️ +🧠 +✨', fn: g => { g.flags.legacyPlanning=true; g.flags.wroteMemoir=true; g.reputation.culture += 15; return{mood:15,intel:5,charm:5}; }},
+        { label:'录了口述视频，留给了后代', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.legacyPlanning=true; g.flags.videoLegacy=true; g.reputation.culture += 8; return{mood:8,intel:3}; }},
+        { label:'觉得自己的故事不值一提', hint:'-😊 +🧠', fn: g => { g.flags.legacyPlanning=true; return{mood:-3,intel:2}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -13837,7 +13918,7 @@ const ACHIEVEMENTS = [
     { id:'homeowner_struggle', icon:'🏠', name:'房奴', desc:'在高房价下买房', check: g => g.flags.housingDilemma && g.flags.hasHouse },
     { id:'renter_life', icon:'📦', name:'租房一族', desc:'选择租房生活', check: g => g.flags.renter },
     { id:'single_forever', icon:'💍', name:'不婚主义', desc:'坚持不婚不育', check: g => g.flags.singleForever },
-    { id:'silver_entrepreneur', icon:'👴', name:'银发经济创业者', desc:'投身养老产业', check: g => g.flags.silverEconomy },
+    { id:'silver_entrepreneur_v27_1', icon:'👴', name:'银发经济创业者', desc:'投身养老产业', check: g => g.flags.silverEconomy },
     // v6.5 achievements
     { id:'digital_nomad_pro', icon:'💻', name:'数字游民', desc:'成为自由职业者', check: g => g.flags.digitalNomad },
     { id:'freelancer_v2', icon:'🎨', name:'自由职业者', desc:'远程工作或自由接单', check: g => g.flags.freelancer },
@@ -14774,6 +14855,12 @@ const ACHIEVEMENTS = [
     { id:'regular_charity_ach', icon:'💝', name:'慈善家', desc:'开始定期做公益捐款', check: g => g.flags.regularCharity },
     { id:'long_term_mentor_ach', icon:'🎓', name:'人生导师', desc:'成了年轻人的长期导师', check: g => g.flags.longTermMentor },
     { id:'accepted_invisible_ach', icon:'👻', name:'享受隐形', desc:'接受城市隐形人状态并找到自我', check: g => g.flags.acceptedInvisible },
+    // v27.1: 养老焦虑成就
+    { id:'pension_investor_ach', icon:'📊', name:'养老规划师', desc:'开始每月定投准备养老金', check: g => g.flags.pensionInvestor },
+    { id:'cross_gen_friend_ach', icon:'👨‍👩‍👧‍👦', name:'忘年之交', desc:'通过代际共居跟老人成了朋友', check: g => g.flags.crossGenFriend },
+    { id:'elegant_aging_ach', icon:'🌟', name:'优雅老去', desc:'接受衰老并活得更自在', check: g => g.flags.elegantAging },
+    { id:'wrote_memoir_ach', icon:'📖', name:'回忆录作者', desc:'写了人生回忆录留给后代', check: g => g.flags.wroteMemoir },
+    { id:'notarized_will_ach', icon:'📝', name:'提前安排', desc:'做了公证遗嘱心里踏实了', check: g => g.flags.notarizedWill },
 ];
 
 // === ENDINGS === (order matters: first match wins)
