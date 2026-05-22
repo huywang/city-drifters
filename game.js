@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v22.6
+// 都市浮生记 - Game Engine v22.7
 // ============================================
 
 // === GAME STATE ===
@@ -10942,6 +10942,87 @@ const EVENTS = [
         { label:'了解了行业现状，更理性了', hint:'+🧠 +😊', fn: g => { g.flags.creatorEconomy=true; return{intel:8,mood:5}; }},
         { label:'觉得太卷了，不适合自己', hint:'', fn: g => { g.flags.creatorEconomy=true; return{mood:3}; }},
       ]},
+    // === v22.7 新增事件（盲盒经济 + 谷子经济 + 潮玩收藏） ===
+    { id:'blind_box_first', icon:'🎁', title:'第一次买盲盒', category:'hobby',
+      body:'你路过泡泡玛特，被橱窗里的小玩偶吸引了。\n\n「就买一个试试。」\n\n你花69块钱买了一个盲盒。拆开的那一刻——你的心跳加速了。\n\n是一个普通款。但你看着它，觉得还挺可爱的。\n\n店员说：「这一系列有12个普通款和1个隐藏款。隐藏款的概率是1/144。」\n\n你的同事是个盲盒爱好者，她的工位上摆了满满一排。她说：「这不是赌博，这是为快乐付费。」\n\n你的另一个同事说：「69块买一个塑料小人，智商税。」\n\n你看着手里的小玩偶，不确定自己属于哪一类人。\n\n「盲盒的秘密：你买的不是玩偶，是拆开那一瞬间的多巴胺。」',
+      cond: g => g.age >= 18 && g.age <= 35 && !g.flags.blindBoxFirst && g.money >= 69,
+      choices:[
+        { label:'又买了两个，想抽隐藏款', hint:'-💰 +😊', fn: g => { g.flags.blindBoxFirst=true; g.flags.blindBoxCurious=true; return{mood:8,money:-138}; }},
+        { label:'就买了这一个，图个新鲜', hint:'-💰', fn: g => { g.flags.blindBoxFirst=true; return{mood:3,money:-69}; }},
+        { label:'算了，69块够吃三天了', hint:'+🧠', fn: g => { g.flags.blindBoxFirst=true; return{intel:3}; }},
+      ]},
+    { id:'blind_box_addict', icon:'🎰', title:'盲盒上瘾', category:'psychology',
+      body:'你承认了——你对盲盒上瘾了。\n\n每个月工资到账的第一件事：打开泡泡玛特APP，看看有没有新款发售。\n\n你的购物车里永远有「待拆」的盲盒。你的快递柜里永远有没取的快递。\n\n你的消费记录：\n- 上个月：盲盒消费1200元\n- 上上个月：盲盒消费800元\n- 这个月：已经花了1500元\n\n你开始计算概率：1/144的隐藏款，如果买144个，理论上能抽到1个。144×69=9936元。\n\n「但概率不是这么算的。」你学统计的朋友说。\n\n你不听。你又下了一单。\n\n拆开的那一刻——你的心跳加速了。又是一个普通款。\n\n「盲盒经济学：边际成本几乎为零的快乐，加在一起就是昂贵的痛苦。」',
+      cond: g => g.flags.blindBoxCurious && !g.flags.blindBoxAddict && g.money >= 1500,
+      choices:[
+        { label:'又买了一整套，不信抽不到隐藏', hint:'-💰💰 +😊', fn: g => { g.flags.blindBoxAddict=true; g.flags.blindBoxSunk=true; return{mood:10,money:-3000}; }},
+        { label:'开始理性控制消费，每月限额', hint:'+🧠 -😊', fn: g => { g.flags.blindBoxAddict=true; g.flags.blindBoxControl=true; return{intel:8,mood:-5,money:-500}; }},
+        { label:'算了，再买最后一个就戒', hint:'-💰', fn: g => { g.flags.blindBoxAddict=true; return{mood:5,money:-500}; }},
+      ]},
+    { id:'hidden_rare', icon:'✨', title:'抽到隐藏款！', category:'hobby',
+      body:'你的手在发抖。\n\n拆开盲盒的那一刻，你看到了一个从未见过的配色。\n\n「这是……隐藏款？！」\n\n你不敢相信。你拿起手机搜索：这个系列的隐藏款在二手平台上卖多少钱？\n\n答案是：3800元。\n\n你花了69块钱，抽到了一个价值3800元的隐藏款。\n\n你的朋友圈炸了。有人说「欧皇」，有人说「吸欧气」，有人说「卖给我吧」。\n\n你突然理解了盲盒的魔力：不是每个人都能抽到隐藏款——但每个人都觉得自己能。\n\n这就是概率的力量：它让少数人的幸运，变成了多数人的消费。\n\n你的理性告诉你：卖掉。你的感性告诉你：留着，这是命运。\n\n「隐藏款的价值不在于它的价格——在于它让你相信，你是特别的。」',
+      cond: g => g.flags.blindBoxFirst && !g.flags.hiddenRare,
+      choices:[
+        { label:'挂闲鱼卖了，3800到账！', hint:'+💰💰', fn: g => { g.flags.hiddenRare=true; g.flags.hiddenRareSold=true; return{mood:15,money:3800}; }},
+        { label:'留着！这是命运的馈赠', hint:'+😊', fn: g => { g.flags.hiddenRare=true; g.flags.hiddenRareKept=true; return{mood:20}; }},
+        { label:'送给了喜欢这个系列的朋友', hint:'+🤝', fn: g => { g.flags.hiddenRare=true; g.flags.hiddenRareGift=true; return{mood:10,social:10}; }},
+      ]},
+    { id:'secondhand_toy', icon:'📦', title:'二手潮玩市场', category:'finance',
+      body:'你发现了新世界——二手潮玩市场。\n\n在闲鱼上，一些限量版潮玩的价格已经翻了几十倍。你看到一个2019年的限量款，原价599元，现在标价8800元。\n\n你开始研究潮玩投资：\n- 限量版Molly：年均涨幅300%\n- 绝版BE@RBRICK：最高涨幅1000%\n- 某些隐藏款：涨幅超过50倍\n\n「这比基金赚多了！」你兴奋地说。\n\n你的学金融的朋友泼了冷水：「潮玩投资有三个风险：\n1. 流动性极差——卖不出去就是废纸\n2. 品牌方随时可以复刻——供给增加价格暴跌\n3. 审美变迁——今天的热门可能明天就是垃圾」\n\n但你的眼睛已经盯上了一个即将绝版的系列……\n\n「当消费主义披上投资的外衣，赌博就有了道德的许可证。」',
+      cond: g => g.flags.blindBoxFirst && !g.flags.secondhandToy && g.intel >= 25,
+      choices:[
+        { label:'入了限量版，赌它会涨价', hint:'-💰💰 高风险', fn: g => { g.flags.secondhandToy=true; g.flags.toyInvest=true; if(Math.random()<0.4){return{mood:15,money:5000};}else{return{mood:-10,money:-2000};} }},
+        { label:'研究了一下，决定不碰这个市场', hint:'+🧠', fn: g => { g.flags.secondhandToy=true; return{intel:8,mood:3}; }},
+        { label:'买了几个绝版的，边收藏边等升值', hint:'-💰', fn: g => { g.flags.secondhandToy=true; g.flags.toyCollector=true; return{mood:8,money:-1500}; }},
+      ]},
+    { id:'guzi_economy', icon:'🎴', title:'入坑谷子经济', category:'hobby',
+      body:'你的朋友给你看了她的「谷子」——一整个柜子的动漫周边。\n\n「谷子」就是goods的谐音，泛指动漫、游戏、小说的周边商品：\n- 吧唧（徽章）：10-500元不等\n- 立牌：30-200元\n- 色纸（彩色纸板画）：20-100元\n- 手办：200-5000元\n- 痛包（挂满周边的包）：成本可达万元\n\n你的朋友是某个二次元IP的忠实粉丝。她每月花在谷子上的钱：3000元。\n\n「你不理解。」她说，「这不是消费，这是对我推（喜欢的角色）的支持。」\n\n你被她拉去了一个谷子市集。人山人海。你看到：\n- 一个吧唧被炒到2000元\n- 有人在排队抽限量谷子\n- 有人用一整个行李箱装谷子\n\n你开始理解：谷子经济本质上是一种情感消费——你买的不是商品，是归属感。\n\n「当你为虚拟角色花钱时，你在购买的是一种身份认同。」',
+      cond: g => g.age >= 16 && g.age <= 30 && !g.flags.guziEconomy,
+      choices:[
+        { label:'入了坑，开始买自己喜欢的IP周边', hint:'-💰 +😊', fn: g => { g.flags.guziEconomy=true; g.flags.guziFan=true; return{mood:12,money:-800}; }},
+        { label:'只买了一两个尝尝鲜', hint:'-💰', fn: g => { g.flags.guziEconomy=true; return{mood:5,money:-100}; }},
+        { label:'理解了但没消费，感觉不是自己的圈子', hint:'+🧠', fn: g => { g.flags.guziEconomy=true; return{intel:5,social:3}; }},
+      ]},
+    { id:'designer_toy_show', icon:'🎨', title:'潮玩展', category:'social',
+      body:'你去了一个潮玩展。\n\n现场比你想象的壮观：\n- 几十家潮玩品牌\n- 上千款限量/独家产品\n- 排队抽号的人从早上6点就开始了\n- 黄牛在门口高价收购限量款\n\n你看到一个艺术家在现场签售。他的一个作品售价12800元，限量100体。\n\n「这不是玩具。」一个收藏家对你说，「这是当代艺术。你想想，一幅画卖几百万没人觉得奇怪，一个雕塑卖一万为什么就是智商税？」\n\n你觉得他说得有道理。\n\n你也看到了另一面：\n- 有人花了一个月工资买了一体限量款\n- 有人在二手群里疯狂加价转卖\n- 有人为了排队错过了一场面试\n\n回家的路上，你思考一个问题：当爱好变成消费，当消费变成投资，当投资变成执念——边界在哪里？\n\n「潮玩展的本质：一个让消费主义变得理直气壮的仪式。」',
+      cond: g => (g.flags.blindBoxFirst || g.flags.guziFan) && !g.flags.designerToyShow && g.age <= 40,
+      choices:[
+        { label:'买了一体限量款，犒劳自己', hint:'-💰💰 +😊', fn: g => { g.flags.designerToyShow=true; g.flags.limitedToy=true; return{mood:15,money:-3000}; }},
+        { label:'逛了一圈，只拍了照没买东西', hint:'+😊', fn: g => { g.flags.designerToyShow=true; return{mood:8,social:5}; }},
+        { label:'认识了几个同好，加了微信', hint:'+🤝', fn: g => { g.flags.designerToyShow=true; g.flags.toyCommunity=true; return{social:10,mood:5}; }},
+      ]},
+    { id:'collection_display', icon:'🏠', title:'收藏展示柜', category:'hobby',
+      body:'你买了一个亚克力展示柜，放在家里最显眼的位置。\n\n你把所有的盲盒、潮玩、谷子都摆了上去。\n\n你的妈妈视频通话时看到了：「你花多少钱买这些塑料玩具？」\n\n你不敢告诉她真实数字。\n\n你的同事来你家做客：「哇，这一柜子得值不少钱吧？」\n\n你笑了笑，心里默默算了一下：\n- 盲盒：约5000元\n- 潮玩：约8000元\n- 谷子：约3000元\n- 展示柜：800元\n- 总计：约16800元\n\n这个数字比你存款余额还多。\n\n你开始理解一句话：「你不是在收藏玩具，你是在用物质填补精神的空洞。」\n\n但看着满柜子的小人偶，你觉得……也挺好。至少它们不会让你失望。\n\n「收藏的本质：在一个不确定的世界里，创造一小片确定的秩序。」',
+      cond: g => (g.flags.blindBoxAddict || g.flags.guziFan || g.flags.toyCollector) && !g.flags.collectionDisplay,
+      choices:[
+        { label:'开始系统地整理和分类收藏', hint:'+😊 +🧠', fn: g => { g.flags.collectionDisplay=true; return{mood:10,intel:5,money:-800}; }},
+        { label:'拍了一个展示视频发到社交平台', hint:'+😊 +🤝', fn: g => { g.flags.collectionDisplay=true; g.flags.toyInfluencer=true; return{mood:12,social:8,charm:5}; }},
+        { label:'突然觉得有点空虚，反思了消费习惯', hint:'+🧠 -😊', fn: g => { g.flags.collectionDisplay=true; g.flags.consumptionReflect=true; return{intel:10,mood:-5}; }},
+      ]},
+    { id:'blind_box_regret', icon:'💸', title:'盲盒消费反思', category:'psychology',
+      body:'你打开手机银行，查看了过去一年的消费记录。\n\n盲盒/潮玩/谷子相关消费：23800元。\n\n你的月薪是8000元。你花了将近三个月的工资在塑料玩具上。\n\n你开始算账：\n- 如果用这钱学一门技能……\n- 如果用这钱旅行一次……\n- 如果用这钱存起来……\n\n你看着满柜子的盲盒。有些你甚至忘了是什么时候买的。\n\n你不是不喜欢它们——只是那种「拆开」的快感已经消失了。剩下的只是一堆塑料。\n\n你的一个曾经一起买盲盒的朋友已经退坑了。她把一整柜的盲盒挂在闲鱼上，打了三折。\n\n「消费主义的陷阱不在于让你买东西——在于让你觉得，买了就会快乐。而快乐永远在下一个盲盒里。」',
+      cond: g => (g.flags.blindBoxAddict || g.flags.guziFan) && !g.flags.blindBoxRegret && g.money < 5000,
+      choices:[
+        { label:'决定退坑，把一部分挂闲鱼', hint:'+💰 +🧠', fn: g => { g.flags.blindBoxRegret=true; g.flags.toyDetox=true; return{money:3000,intel:8,mood:5}; }},
+        { label:'减少了消费，但没有完全戒', hint:'+🧠', fn: g => { g.flags.blindBoxRegret=true; return{intel:5,mood:3}; }},
+        { label:'知道不理性，但这是你唯一的爱好', hint:'+😊', fn: g => { g.flags.blindBoxRegret=true; return{mood:8}; }},
+      ]},
+    { id:'toy_resell_business', icon:'🏪', title:'潮玩倒卖生意', category:'career',
+      body:'你发现了一个商机：倒卖限量潮玩。\n\n逻辑很简单：\n1. 凌晨排队抢限量款（原价）\n2. 当天在二手平台加价50%-300%出售\n3. 利润到手\n\n你试了一次：排了4小时的队，买到了一体限量款（原价1299元），当天下午以3800元卖出。\n\n净赚2500元。时薪625元。\n\n你开始认真考虑：这是不是一个可以持续做的副业？\n\n你研究了一下：\n- 黄牛圈子有信息差——知道哪些款会涨\n- 需要资金周转——提前囤货有风险\n- 品牌方在打击黄牛——有些限量款开始实名制\n\n你的一个黄牛朋友说：「这行最赚钱的时候已经过了。现在入场的都是接盘侠。」\n\n但你看到了另一个机会：做潮玩鉴定和二手交易中间商。\n\n「当所有人都想当黄牛时，最赚钱的是卖铲子的人。」',
+      cond: g => g.flags.secondhandToy && !g.flags.toyResellBiz && g.intel >= 30,
+      choices:[
+        { label:'开始做潮玩倒卖副业', hint:'+💰 风险', fn: g => { g.flags.toyResellBiz=true; if(Math.random()<0.5){return{money:3000,intel:5};}else{return{money:-1000,mood:-5};} }},
+        { label:'做了中间商，帮人鉴定和交易', hint:'+💰 +🧠', fn: g => { g.flags.toyResellBiz=true; g.flags.toyMiddleman=true; return{money:2000,intel:8,social:5}; }},
+        { label:'觉得风险太大，没入行', hint:'+🧠', fn: g => { g.flags.toyResellBiz=true; return{intel:5}; }},
+      ]},
+    { id:'emotional_consumption', icon:'🧠', title:'情感消费觉醒', category:'psychology',
+      body:'你上了一门网课：《消费心理学》。\n\n你终于理解了自己为什么会买那么多盲盒和潮玩：\n\n1. **多巴胺机制**：不确定的奖励比确定的奖励更能刺激多巴胺分泌——这就是盲盒让人上瘾的原因\n2. **禀赋效应**：一旦拥有了某样东西，你对它的估值会远高于市场价\n3. **损失厌恶**：「绝版」意味着错过就永远没有了——这比获得更让人焦虑\n4. **社群认同**：拥有同款潮玩让你获得群体归属感\n5. **心理账户**：你把「爱好」和「消费」放在了不同的心理账户——但钱是同一笔\n\n你开始用这些知识审视自己的消费行为。\n\n你不是不快乐——你只是用错了获取快乐的方式。\n\n真正的快乐来自：成长、关系、意义——而不是下一个盲盒。\n\n「消费主义最厉害的一招：让你把购物当成自我实现。」',
+      cond: g => g.flags.blindBoxRegret && !g.flags.emotionalConsumption && g.intel >= 35,
+      choices:[
+        { label:'制定了理性消费计划，每月限额', hint:'+🧠 +💰', fn: g => { g.flags.emotionalConsumption=true; return{intel:12,mood:8,money:1000}; }},
+        { label:'把精力转向了自我提升', hint:'+🧠 +😊', fn: g => { g.flags.emotionalConsumption=true; g.flags.selfGrowth=true; return{intel:15,mood:10}; }},
+        { label:'理论都懂了，但下次出新款还是会买', hint:'+😊', fn: g => { g.flags.emotionalConsumption=true; return{mood:5,intel:5}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -11949,6 +12030,12 @@ const ACHIEVEMENTS = [
     { id:'live_streamer_ach', icon:'🎙️', name:'主播之路', desc:'尝试了直播', check: g => g.flags.liveStreamed },
     { id:'viral_ach', icon:'🔥', name:'爆款制造机', desc:'内容上了热门', check: g => g.flags.viralContent },
     { id:'digital_detoxer_ach', icon:'🧘', name:'数字排毒师', desc:'成功戒断了手机依赖', check: g => g.flags.digitalDetoxV3 },
+    // === v22.7 新增成就（盲盒经济与潮玩收藏） ===
+    { id:'blind_box_fan_ach', icon:'🎁', name:'盲盒新手', desc:'买了人生中第一个盲盒', check: g => g.flags.blindBoxFirst },
+    { id:'hidden_lucky_ach', icon:'✨', name:'欧皇附体', desc:'抽到了隐藏款', check: g => g.flags.hiddenRare },
+    { id:'guzi_fan_ach', icon:'🎴', name:'谷圈人', desc:'入了谷子坑', check: g => g.flags.guziFan },
+    { id:'toy_collector_ach', icon:'🏠', name:'收藏家', desc:'建立了自己的展示柜', check: g => g.flags.collectionDisplay },
+    { id:'rational_consumer_ach', icon:'🧠', name:'理性消费者', desc:'看透了消费主义的本质', check: g => g.flags.emotionalConsumption },
 ];
 
 // === ENDINGS === (order matters: first match wins)
