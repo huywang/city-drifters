@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v6.7
+// 都市浮生记 - Game Engine v6.8
 // ============================================
 
 // === GAME STATE ===
@@ -3350,6 +3350,34 @@ const EVENTS = [
         { label:'转行做AI相关工作', hint:'+🧠 +💰', fn: g => { g.flags.aiAnxietyWork=true; g.flags.aiCareer=true; return{intel:10,money:5000}; }},
         { label:'焦虑但不行动', hint:'-😊', fn: g => { g.flags.aiAnxietyWork=true; return{mood:-10,health:-5}; }},
       ]},
+    // === v6.8 EVENTS - 宠物经济与户外运动 ===
+    { id:'pet_economy', icon:'🐾', title:'养宠物',
+      body:'你决定养一只宠物。看了看选项：\n\n- 猫：独立、安静、不用遛，但高冷\n- 狗：忠诚、热情、需要遛，但粘人\n- 异宠：仓鼠、兔子、爬宠、鹦鹉，独特但难养\n\n"宠物经济——年轻人用'毛孩子'治愈孤独，用'它经济'撑起万亿市场。"\n\n2025年，中国宠物行业市场规模突破5800亿元，城镇宠物（犬猫）消费市场规模达3126亿元。\n\n90后宠主占比42.7%，00后占比26.3%——年轻人已成养宠主力军。\n\n"宠物无条件的正反馈可以缓解工作压力、舒缓情绪，带来陪伴感。"\n\n但你也看到了成本：\n- 食品：猫粮/狗粮、营养膏、冻干、罐头\n- 医疗：驱虫、疫苗、看病（初诊500元起）\n- 用品：自动喂食器、智能猫砂盆、宠物保险\n\n"一只猫关联140多个行业，养宠不是养宠物，是养一个'家庭成员'。"',
+      cond: g => !g.flags.petEconomy && g.age>=22 && g.age<=35 && !g.flags.hasPet,
+      choices:[
+        { label:'养猫', hint:'-💰 +😊 +❤️', fn: g => { g.flags.petEconomy=true; g.flags.hasPet=true; g.flags.catOwner=true; return{money:-3000,mood:20,health:5,charm:3}; }},
+        { label:'养狗', hint:'-💰 +😊 +❤️ +🏃', fn: g => { g.flags.petEconomy=true; g.flags.hasPet=true; g.flags.dogOwner=true; return{money:-4000,mood:22,health:8,charm:5}; }},
+        { label:'养异宠', hint:'-💰 +😊 +✨', fn: g => { g.flags.petEconomy=true; g.flags.hasPet=true; g.flags.exoticPet=true; return{money:-2000,mood:15,charm:8}; }},
+        { label:'云养宠', hint:'+😊', fn: g => { g.flags.petEconomy=true; return{mood:10}; }},
+      ]},
+    { id:'outdoor_sports', icon:'⛰️', title:'户外运动',
+      body:'你决定走出格子间，去"没有天花板的地方"。\n\n你看了看选项：\n- 徒步：周末爬山、越野、森林徒步\n- 露营：星空露营、野炊、篝火\n- 骑行：城市骑行、长途骑行、山地车\n- 水上运动：桨板、皮划艇、漂流\n- 冰雪运动：滑雪、滑冰\n\n"户外运动——从'没苦硬吃'的驴友模式，到'躺平式'漂流、星空露营。"\n\n2025年，中国户外运动参与人数突破4亿人，25-34岁群体占比最高。\n\n户外运动相关企业达33.5万家，2025年上半年新增2.4万余家。\n\n"户外装备从'实用优先'转向'时尚与功能兼具'，成为年轻人'山系时尚'的生活方式标签。"\n\n但你也看到了问题：装备贵、时间成本高、安全风险、环境污染。',
+      cond: g => !g.flags.outdoorSports && g.age>=20 && g.age<=40 && g.health>=50,
+      choices:[
+        { label:'开始徒步', hint:'+🏃 +😊 +❤️', fn: g => { g.flags.outdoorSports=true; g.flags.hiker=true; return{health:12,mood:18,health:8}; }},
+        { label:'露营装备党', hint:'-💰 +😊 +✨', fn: g => { g.flags.outdoorSports=true; g.flags.camper=true; return{money:-5000,mood:20,charm:8}; }},
+        { label:'骑行通勤', hint:'+🏃 +💰 +❤️', fn: g => { g.flags.outdoorSports=true; g.flags.cyclist=true; return{health:10,money:2000,health:5}; }},
+        { label:'太累，宅家', hint:'+😊', fn: g => { g.flags.outdoorSports=true; return{mood:5}; }},
+      ]},
+    { id:'outdoor_community', icon:'👥', title:'户外社群',
+      body:'你加入了一个户外社群：每周五晚组织飞盘、周末徒步、露营。\n\n"户外运动自带社交属性——在山野间认识的朋友，比在办公室认识的更纯粹。"\n\n你的社群活动：\n- 飞盘：男女混合，门槛低，强社交\n- 腰旗橄榄球：新兴运动，年轻人喜欢\n- 瑜伽桨板：水上瑜伽，拍照好看\n- 荧光骑行：夜间骑行，城市探索\n\n"零基础人群也能找到适配项目——户外运动正在从'专业'走向'大众'。"\n\n你在社群里认识了各种职业的人：程序员、设计师、老师、自由职业者。\n\n"在户外，没有KPI，没有996，只有风、阳光和笑声。"',
+      cond: g => !g.flags.outdoorCommunity && g.flags.outdoorSports && g.age>=22 && g.age<=35,
+      choices:[
+        { label:'成为社群主理人', hint:'+👥 +✨ +💰', fn: g => { g.flags.outdoorCommunity=true; g.flags.communityLeader=true; return{social:18,charm:12,money:3000}; }},
+        { label:'积极参加活动', hint:'+👥 +😊 +🏃', fn: g => { g.flags.outdoorCommunity=true; g.flags.activeMember=true; return{social:15,mood:15,health:8}; }},
+        { label:'组织主题露营', hint:'+👥 +✨', fn: g => { g.flags.outdoorCommunity=true; g.flags.eventOrganizer=true; return{social:12,charm:10,mood:12}; }},
+        { label:'只参加活动', hint:'+👥 +😊', fn: g => { g.flags.outdoorCommunity=true; return{social:8,mood:10}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3634,6 +3662,13 @@ const ACHIEVEMENTS = [
     { id:'ai_artist', icon:'🎨', name:'AI艺术家', desc:'用AI做绘画创作', check: g => g.flags.aiArtist },
     { id:'opc_founder', icon:'🏢', name:'一人公司创始人', desc:'创办一人公司', check: g => g.flags.onePersonCompany },
     { id:'ai_tool_master', icon:'🛠️', name:'AI工具达人', desc:'掌握AI工具', check: g => g.flags.aiToolUser },
+    // v6.8 achievements
+    { id:'pet_parent', icon:'🐾', name:'宠物家长', desc:'养宠物', check: g => g.flags.petEconomy },
+    { id:'cat_lover', icon:'🐱', name:'猫奴', desc:'养猫', check: g => g.flags.catOwner },
+    { id:'dog_lover', icon:'🐶', name:'铲屎官', desc:'养狗', check: g => g.flags.dogOwner },
+    { id:'outdoor_enthusiast', icon:'⛰️', name:'户外爱好者', desc:'参与户外运动', check: g => g.flags.outdoorSports },
+    { id:'hiker_pro', icon:'🥾', name:'徒步达人', desc:'开始徒步', check: g => g.flags.hiker },
+    { id:'community_leader', icon:'👥', name:'社群领袖', desc:'成为户外社群主理人', check: g => g.flags.communityLeader },
 ];
 
 // === ENDINGS === (order matters: first match wins)
