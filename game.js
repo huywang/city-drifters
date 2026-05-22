@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v18.0
+// 都市浮生记 - Game Engine v18.1
 // ============================================
 
 // === GAME STATE ===
@@ -8773,6 +8773,87 @@ const EVENTS = [
         { label:'发朋友圈提醒大家', hint:'+👥 +✨', fn: g => { g.flags.deepfake=true; g.flags.publicAware=true; return{social:8,charm:8}; }},
         { label:'默默记住，以后小心', hint:'+🧠 +😊', fn: g => { g.flags.deepfake=true; return{intel:8,mood:5}; }},
       ]},
+    // === v18.1 新增事件（社交关系 + 婚恋家庭 + 养老） ===
+    { id:'matchmaking_market', icon:'💕', title:'相亲角', category:'social',
+      body:'你妈把你拉去了人民公园相亲角。\n\n你看到了一排排"简历"：\n- 男，32岁，985硕士，年薪50万，有房有车\n- 女，28岁，海归，外企，年薪30万，独生女\n\n你的简历被你妈写得像高考志愿表：身高、体重、学历、收入、有无房车……\n\n一个大妈看了你的简历："还行吧，有户口吗？"\n\n你说："没有。"\n\n大妈："那下一位。"\n\n"相亲市场：不是在找爱情——是在做资产重组。而你的价值，被明码标价在一张A4纸上。"',
+      cond: g => !g.flags.matchmakingMarket && g.age >= 25 && g.age <= 40 && !g.flags.married,
+      choices:[
+        { label:'认真相亲，找个合适的人', hint:'+👥 +😊 -✨', fn: g => { g.flags.matchmakingMarket=true; if(Math.random()>0.5){g.flags.hasPartner=true;return{social:15,mood:15}}else{return{social:5,mood:-5}} }},
+        { label:'应付你妈，走个过场', hint:'+😊 +👥', fn: g => { g.flags.matchmakingMarket=true; return{mood:5,social:3}; }},
+        { label:'拒绝相亲，相信缘分', hint:'+✨ +😊', fn: g => { g.flags.matchmakingMarket=true; g.flags.antiMatchmaking=true; return{charm:8,mood:10}; }},
+      ]},
+    { id:'marriage_pressure_v3', icon:'😤', title:'催婚压力', category:'social',
+      body:'过年了。你妈又开始了：\n\n"你同学小李都二胎了。"\n"你再不结婚，好男/女人都被抢光了。"\n"我一个人养你这么大，就想看你成家。"\n\n你爸在旁边默默喝茶，偶尔说一句："你妈说得对。"\n\n你看了看朋友圈：有人在秀恩爱，有人在晒娃，有人在旅游。你觉得全世界都在结婚，只有你还在单身。\n\n"催婚：不是关心——是焦虑的传递。你妈焦虑，所以你焦虑。但你的幸福，不该由别人的时间表决定。"',
+      cond: g => !g.flags.marriagePressure && g.age >= 27 && !g.flags.married,
+      choices:[
+        { label:'理解父母，开始认真找对象', hint:'+👥 +😊', fn: g => { g.flags.marriagePressure=true; if(Math.random()>0.6){g.flags.hasPartner=true;return{social:12,mood:10}}else{return{social:5,mood:5}} }},
+        { label:'跟父母谈谈，婚姻不是任务', hint:'+🧠 +👥', fn: g => { g.flags.marriagePressure=true; g.flags.boundarySetting=true; return{intel:8,social:5,mood:8}; }},
+        { label:'单身挺好的，不用解释', hint:'+✨ +😊', fn: g => { g.flags.marriagePressure=true; g.flags.happySingle=true; return{charm:8,mood:12}; }},
+      ]},
+    { id:'newborn_exhaustion', icon:'👶', title:'新生儿疲劳', category:'social',
+      body:'你的孩子出生了。恭喜你！\n\n但现实是：\n- 每2小时喂一次奶\n- 孩子一哭你就醒\n- 你已经3天没睡过一个整觉\n- 你和另一半因为谁换尿布吵了3次\n- 你的妈妈/婆婆来帮忙，但她的育儿方式你不认同\n\n你看着镜子里的自己：黑眼圈比熊猫还重，头发乱得像鸡窝。\n\n"新生儿：是上天赐予的礼物——附赠3年的睡眠剥夺。"',
+      cond: g => g.flags.hasChild && !g.flags.newbornExhaustion && g.age >= 24,
+      choices:[
+        { label:'请月嫂帮忙', hint:'-💰 +💪 +😊', fn: g => { g.flags.newbornExhaustion=true; g.flags.hiredNanny=true; return{money:-15000,health:10,mood:12}; }},
+        { label:'自己扛，省钱', hint:'+💰 -💪 -😊', fn: g => { g.flags.newbornExhaustion=true; return{money:3000,health:-15,mood:-10}; }},
+        { label:'让父母来帮忙', hint:'+👥 +💰 -😊', fn: g => { g.flags.newbornExhaustion=true; g.flags.parentsHelping=true; return{social:8,money:5000,mood:-3}; }},
+      ]},
+    { id:'elderly_care', icon:'👴', title:'父母养老', category:'social',
+      body:'你爸退休了。你妈也退了。\n\n他们现在的生活：\n- 每天早上去公园跳舞/打太极\n- 下午打麻将/看电视剧\n- 晚上给你打电话：今天吃了什么、身体怎么样\n\n你每个月给他们转3000块。他们从来不花，说"给你攒着"。\n\n你打电话说："你们自己花，别省。"\n\n你妈说："我们花不了多少，留着给你以后用。"\n\n你鼻子一酸。\n\n"父母的养老：不是你养他们——是他们一直在养你。从出生到你老去。"',
+      cond: g => !g.flags.elderlyCare && g.age >= 30,
+      choices:[
+        { label:'每月多给钱，让父母过好', hint:'-💰 +👥 +😊', fn: g => { g.flags.elderlyCare=true; g.flags.generousChild=true; return{money:-5000,social:15,mood:15}; }},
+        { label:'经常回家看看', hint:'+👥 +😊 -💪', fn: g => { g.flags.elderlyCare=true; g.flags.frequentVisitor=true; return{social:12,mood:12,health:-3}; }},
+        { label:'给父母买养老保险', hint:'-💰 +🧠 +👥', fn: g => { g.flags.elderlyCare=true; g.flags.parentInsurance=true; return{money:-20000,intel:8,social:10}; }},
+      ]},
+    { id:'nursing_home', icon:'🏥', title:'养老院选择', category:'social',
+      body:'你爸/你妈身体越来越差，生活不能自理了。\n\n你面临一个艰难的选择：\n- 请保姆在家照顾：5000-8000/月\n- 送养老院：3000-15000/月\n- 辞职回家照顾：失去收入\n- 接来同住：你的小家庭能承受吗？\n\n你的另一半说："我们自己都顾不过来……"\n\n你的亲戚说："送养老院不孝顺。"\n\n"养老：不是选择题——是一道没有标准答案的论述题。不管你怎么选，都会有人说你不对。"',
+      cond: g => !g.flags.nursingHome && g.age >= 35 && g.flags.elderlyCare,
+      choices:[
+        { label:'请保姆在家照顾', hint:'-💰 +👥 +😊', fn: g => { g.flags.nursingHome=true; g.flags.hiredCaregiver=true; return{money:-8000,social:10,mood:8}; }},
+        { label:'送好的养老院', hint:'-💰 +🧠', fn: g => { g.flags.nursingHome=true; g.flags.nursingFacility=true; return{money:-10000,intel:5}; }},
+        { label:'接来同住', hint:'+👥 +😊 -💪 -💰', fn: g => { g.flags.nursingHome=true; g.flags.liveTogether=true; return{social:12,mood:10,health:-8,money:-3000}; }},
+      ]},
+    { id:'divorce_consideration', icon:'💔', title:'离婚念头', category:'social',
+      body:'你和另一半大吵了一架。这已经是这个月第5次了。\n\n你开始想：是不是该离婚了？\n\n你看了看离婚冷静期的规定：30天。也就是说，你想离婚也得等一个月。\n\n你的朋友说："没有不吵架的夫妻。"\n你的妈妈说："离婚多丢人。"\n你的同事说："想清楚再做决定。"\n\n但你心里知道：有时候，分开也是一种勇气。\n\n"离婚不是失败——是在错误的人生里，按下了重启键。"',
+      cond: g => g.flags.married && !g.flags.divorceConsideration && g.age >= 28,
+      choices:[
+        { label:'去做婚姻咨询', hint:'-💰 +👥 +🧠', fn: g => { g.flags.divorceConsideration=true; g.flags.marriageCounseling=true; return{money:-5000,social:10,intel:5}; }},
+        { label:'给彼此一些空间', hint:'+😊 +🧠', fn: g => { g.flags.divorceConsideration=true; return{mood:8,intel:5}; }},
+        { label:'决定离婚', hint:'+😊 -👥 -💰', fn: g => { g.flags.divorceConsideration=true; g.flags.divorced=true; g.flags.married=false; return{mood:5,social:-15,money:-50000}; }},
+      ]},
+    { id:'pet_as_family', icon:'🐱', title:'毛孩子就是家人', category:'social',
+      body:'你的宠物生病了。医生说手术费要8000块。\n\n你的同事说："8000块看个猫/狗？太贵了吧。"\n\n你妈说："花那么多钱给一只动物？"\n\n但你知道：它不只是"一只动物"。它是你加班回来时等在门口的那个身影，是你哭的时候蹭你手的那团毛。\n\n你毫不犹豫地付了钱。\n\n"宠物不是宠物——是不会说话的家人。它用一辈子的时间，陪你走过人生的一段路。"',
+      cond: g => g.flags.hasPet && !g.flags.petAsFamily && g.age >= 22,
+      choices:[
+        { label:'花大钱治好它', hint:'-💰 +😊 +👥', fn: g => { g.flags.petAsFamily=true; g.flags.petSurgery=true; return{money:-8000,mood:15,social:5}; }},
+        { label:'选择保守治疗', hint:'-💰 +😊', fn: g => { g.flags.petAsFamily=true; return{money:-2000,mood:5}; }},
+        { label:'换个便宜的医院', hint:'+💰 +😊', fn: g => { g.flags.petAsFamily=true; return{money:-1000,mood:8}; }},
+      ]},
+    { id:'online_friend_v2', icon:'💻', title:'网友变朋友', category:'social',
+      body:'你在网上认识了一个人。你们聊了半年，从游戏到工作、从理想到人生。\n\n你觉得他/她比很多现实中的朋友还懂你。\n\n你决定见面。约在了一个咖啡厅。\n\n见面后你发现：对方比照片好看/丑。但聊天还是很有趣。你们聊了3个小时，觉得时间过得特别快。\n\n"网友：不是虚拟的朋友——是在虚拟世界里找到的真实连接。有时候，距离让人更诚实。"',
+      cond: g => !g.flags.onlineFriend && g.age >= 18 && g.social > 30,
+      choices:[
+        { label:'发展成现实好友', hint:'+👥 +😊 +✨', fn: g => { g.flags.onlineFriend=true; g.flags.realLifeFriend=true; return{social:15,mood:12,charm:5}; }},
+        { label:'继续做网友就好', hint:'+👥 +😊', fn: g => { g.flags.onlineFriend=true; return{social:8,mood:8}; }},
+        { label:'见面后发现不合适', hint:'+🧠', fn: g => { g.flags.onlineFriend=true; return{intel:5}; }},
+      ]},
+    { id:'child_education_cost', icon:'📚', title:'教育军备竞赛', category:'social',
+      body:'你的孩子上学了。你开始了"教育军备竞赛"。\n\n每月支出：\n- 兴趣班（钢琴+英语+编程）：5000\n- 课外辅导（数学+语文）：3000\n- 夏令营/研学：2000（均摊到每月）\n- 各种学习材料：1000\n\n总计：11000/月。一年13万。\n\n你的工资才2万/月。你一半的收入都花在了孩子的教育上。\n\n你的孩子说："妈妈/爸爸，我不想学钢琴了。"\n\n你犹豫了：是逼他继续，还是让他快乐成长？\n\n"教育军备竞赛：不是在培养孩子——是在缓解自己的焦虑。但你不确定，到底是谁在受罪。"',
+      cond: g => g.flags.hasChild && !g.flags.childEducationCost && g.age >= 32 && g.money > 50000,
+      choices:[
+        { label:'全力支持教育投入', hint:'-💰💰 +🧠', fn: g => { g.flags.childEducationCost=true; g.flags.heavyEducation=true; return{money:-80000,intel:8,mood:-5}; }},
+        { label:'尊重孩子，减少不必要的班', hint:'+😊 +👥 +💰', fn: g => { g.flags.childEducationCost=true; g.flags.respectChild=true; return{mood:15,social:8,money:-30000}; }},
+        { label:'平衡投入，理性规划', hint:'+🧠 +😊 +💰', fn: g => { g.flags.childEducationCost=true; g.flags.balancedEdu2=true; return{intel:8,mood:8,money:-50000}; }},
+      ]},
+    { id:'social_isolation', icon:'😶', title:'社交孤立', category:'social',
+      body:'你发现自己很久没跟朋友见面了。\n\n你的微信好友有1000个，但能打电话聊天的不超过5个。\n你的朋友圈有200条未读，但你一条也不想看。\n你的周末都是在家里度过的。\n\n你不是不想社交——你是社交疲劳了。每次社交都让你觉得更累。\n\n你开始理解：为什么越来越多的人选择"社交断联"。\n\n"社交孤立：不是你不需要朋友——是你需要的那种连接，越来越难找到了。"',
+      cond: g => !g.flags.socialIsolation && g.age >= 25 && g.social < 40,
+      choices:[
+        { label:'主动约朋友出来聚', hint:'+👥 +😊 +💰', fn: g => { g.flags.socialIsolation=true; g.flags.reconnectFriends=true; return{social:15,mood:12,money:-1000}; }},
+        { label:'加入一个兴趣社群', hint:'+👥 +🧠 +😊', fn: g => { g.flags.socialIsolation=true; g.flags.communityJoin=true; return{social:12,intel:8,mood:10}; }},
+        { label:'享受独处，不需要别人', hint:'+😊 +🧠 -👥', fn: g => { g.flags.socialIsolation=true; g.flags.soloLife=true; return{mood:8,intel:5,social:-5}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -9611,6 +9692,13 @@ const ACHIEVEMENTS = [
     { id:'security_aware_ach', icon:'🔐', name:'网络安全意识', desc:'识破了AI换脸骗局', check: g => g.flags.securityAware },
     { id:'gene_optimized_ach', icon:'🧬', name:'基因优化者', desc:'根据基因报告调整生活', check: g => g.flags.geneOptimized },
     { id:'tech_optimist_ach', icon:'🤖', name:'科技乐观派', desc:'拥抱科技新生活', check: g => g.flags.techOptimist },
+    // === v18.1 新增成就（社交关系） ===
+    { id:'matchmaking_ach', icon:'💕', name:'相亲达人', desc:'去了相亲角', check: g => g.flags.matchmakingMarket },
+    { id:'happy_single_ach', icon:'🌟', name:'快乐单身族', desc:'享受单身生活', check: g => g.flags.happySingle },
+    { id:'good_child_ach', icon:'👴', name:'孝顺子女', desc:'认真照顾年迈的父母', check: g => g.flags.elderlyCare },
+    { id:'pet_parent_ach', icon:'🐱', name:'毛孩子家长', desc:'把宠物当家人', check: g => g.flags.petAsFamily },
+    { id:'reconnect_ach', icon:'🤝', name:'重拾友情', desc:'主动联系老朋友', check: g => g.flags.reconnectFriends },
+    { id:'boundary_setter_ach', icon:'🛡️', name:'边界感达人', desc:'跟父母建立了健康边界', check: g => g.flags.boundarySetting },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -9890,6 +9978,9 @@ const ENDINGS = [
     // --- v18.0 科技结局 ---
     { id:'tech_pioneer_end', badge:'🚀', title:'科技先锋', desc:'你成了AI时代的弄潮儿。\n\n你是最早拥抱AI的人之一。你用AI辅助工作、用AI创作、用AI投资、用AI管理生活。\n\n你的同事还在担心AI替代他们的时候，你已经成了那个"会用AI的人"。你的收入是同龄人的2倍，你的效率是别人的3倍。\n\n你的一个朋友说："你怎么什么都比别人快一步？"\n\n你说："不是我快——是我比别人更早开始学习。"\n\n"科技先锋：不是追赶未来——是在未来还没来的时候就准备好了。"', cond: g => g.flags.aiPowerUser && g.flags.aiArtist && g.flags.smartHome && g.intel >= 85 && g.money >= 200000 && g.age >= 28 },
     { id:'digital_balanced_end', badge:'⚖️', title:'数字平衡者', desc:'你在数字时代找到了完美的平衡。\n\n你既不是科技恐惧者，也不是科技成瘾者。你用AI提高效率，但你坚持独立思考。你享受智能生活，但你每周给自己一天"断网日"。\n\n你的朋友们都来找你问："你怎么做到既用科技又不被科技控制的？"\n\n你说："科技是工具——工具好不好用，取决于用它的人。"\n\n"数字平衡：不是远离科技——是不让科技定义你是谁。"', cond: g => g.flags.digitalMinimalist && g.flags.balancedAI && g.mood >= 70 && g.health >= 65 && g.intel >= 70 && g.age >= 30 },
+    // --- v18.1 社交结局 ---
+    { id:'family_harmony_end', badge:'🏡', title:'家庭和谐', desc:'你在事业和家庭之间找到了完美的平衡。\n\n你有稳定的收入、健康的孩子、和睦的父母、理解你的伴侣。你的周末是全家一起去公园，你的晚上是一起吃晚饭、一起看电视。\n\n你的同事说："你怎么什么都搞得定？"\n\n你说："我什么都没搞定——我只是把时间花在了最重要的地方。"\n\n你的孩子长大后回忆起童年，会说："我的爸爸/妈妈虽然很忙，但他/她总是在我最需要的时候出现。"\n\n"家庭和谐：不是完美——是在不完美中，找到爱的方式。"', cond: g => g.flags.married && g.flags.hasChild && g.flags.elderlyCare && g.mood >= 65 && g.social >= 50 && g.age >= 35 },
+    { id:'happy_single_end', badge:'🌟', title:'快乐单身', desc:'你选择了单身，而且过得很快乐。\n\n你不需要向任何人解释你的生活。你想旅行就旅行，想加班就加班，想养猫就养猫。\n\n你的妈妈说："你不结婚以后怎么办？"\n\n你说："我现在就很好。以后的事以后再说。"\n\n你有几个交心的朋友、一份还行的工作、一只可爱的猫。你的周末是自己安排的，你的夜晚是属于自己的。\n\n"快乐单身：不是找不到——是终于明白，幸福不一定要两个人才能拥有。"', cond: g => g.flags.happySingle && !g.flags.married && g.mood >= 70 && g.age >= 32 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
