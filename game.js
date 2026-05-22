@@ -1601,7 +1601,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.8' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.9' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
@@ -1724,6 +1724,97 @@ function initMobileSwipe() {
             toggleMenu();
         }
     }
+}
+
+// === KEYBOARD SHORTCUTS ===
+function initKeyboardShortcuts() {
+    document.addEventListener('keydown', (e) => {
+        // Skip if typing in an input field
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        // Skip if a modal is open
+        if (document.querySelector('.modal.open')) return;
+
+        const gameScreen = document.getElementById('screen-game');
+        if (!gameScreen || !gameScreen.classList.contains('active')) return;
+
+        switch (e.key) {
+            case ' ':
+            case 'Enter':
+                e.preventDefault();
+                const btn = document.getElementById('btn-advance');
+                if (btn && !btn.disabled) advanceMonth();
+                break;
+            case 'Escape':
+                e.preventDefault();
+                const menu = document.getElementById('side-menu');
+                if (menu.classList.contains('open')) toggleMenu();
+                break;
+            case 'm':
+            case 'M':
+                e.preventDefault();
+                toggleMenu();
+                break;
+            case '1':
+                e.preventDefault();
+                selectActivity('work');
+                break;
+            case '2':
+                e.preventDefault();
+                selectActivity('rest');
+                break;
+            case '3':
+                e.preventDefault();
+                selectActivity('study');
+                break;
+            case '4':
+                e.preventDefault();
+                selectActivity('socialize');
+                break;
+            case '5':
+                e.preventDefault();
+                selectActivity('exercise');
+                break;
+            case 's':
+            case 'S':
+                e.preventDefault();
+                if (e.ctrlKey) {
+                    e.preventDefault();
+                    showSaveMenu();
+                }
+                break;
+        }
+    });
+}
+
+// === QUICK STATS ===
+function showQuickStats() {
+    const stats = {
+        totalMonths: G.months,
+        totalChoices: G.choices,
+        eventsSeen: G.eventsSeen,
+        currentAge: G.age,
+        cityYears: Math.floor(G.months / 12),
+        flagsCount: Object.keys(G.flags).filter(k => G.flags[k]).length,
+        topStat: getTopStat(),
+        lowestStat: getLowestStat(),
+    };
+    return stats;
+}
+
+function getTopStat() {
+    const stats = { money: Math.max(0, G.money), health: G.health, mood: G.mood, intel: G.intel, social: G.social, charm: G.charm };
+    const entries = Object.entries(stats);
+    entries.sort((a, b) => b[1] - a[1]);
+    const names = { money: '💰金钱', health: '❤️健康', mood: '😊心情', intel: '🧠智力', social: '👥人脉', charm: '✨魅力' };
+    return names[entries[0][0]];
+}
+
+function getLowestStat() {
+    const stats = { money: Math.max(0, G.money), health: G.health, mood: G.mood, intel: G.intel, social: G.social, charm: G.charm };
+    const entries = Object.entries(stats);
+    entries.sort((a, b) => a[1] - b[1]);
+    const names = { money: '💰金钱', health: '❤️健康', mood: '😊心情', intel: '🧠智力', social: '👥人脉', charm: '✨魅力' };
+    return names[entries[0][0]];
 }
 
 // === MENU ===
@@ -1872,6 +1963,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadSettings();
     initParticles();
     initMobileSwipe();
+    initKeyboardShortcuts();
     const hasAnySave = localStorage.getItem(SAVE_PREFIX + '1') || localStorage.getItem(SAVE_PREFIX + '2') || localStorage.getItem(SAVE_PREFIX + '3') || localStorage.getItem('cityDrifters_save');
     if (!hasAnySave) document.getElementById('btn-continue').style.opacity = '0.4';
 });

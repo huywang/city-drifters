@@ -634,3 +634,16 @@ html[style*="font-size: 18px"] .modal-content {
         font-size: 1.2rem;
     }
 }
+
+/* === Keyboard Hint === */
+.action-hint {
+    font-size: 0.65rem;
+    color: var(--text-tertiary, rgba(255,255,255,0.4));
+    margin-top: 2px;
+    display: block;
+}
+@media (max-width: 768px) {
+    .action-hint {
+        display: none;
+    }
+}
