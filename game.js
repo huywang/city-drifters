@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v5.3
+// 都市浮生记 - Game Engine v5.4
 // ============================================
 
 // === GAME STATE ===
@@ -3102,6 +3102,16 @@ const EVENTS = [
         { label:'Gap Day（每周休息一天）', hint:'+😊 +❤️', fn: g => { g.flags.gapYear=true; g.flags.gapDay=true; return{mood:12,health:8}; }},
         { label:'算了，不敢Gap', hint:'+💰 -😊', fn: g => { g.flags.gapYear=true; return{money:2000,mood:-10}; }},
       ]},
+    // === v5.4 EVENTS - 考研降温与学历贬值 ===
+    { id:'postgrad_cooling', icon:'📚', title:'考研降温',
+      body:'你看到了数据：\n\n- 2023年考研报名474万\n- 2024年降至438万\n- 2025年降至388万\n- 两年下降86万\n\n同时，考公人数屡创新高：2025年国考报名325万。\n\n"考研热降温——不是不想读研，是读研的性价比变低了。"\n\n"贬值的是学历，不是学习。真正的铁饭碗，是永不停止的学习力。"\n\n你开始思考：读研是为了什么？为了更好的工作？还是为了逃避就业？',
+      cond: g => !g.flags.postgradCooling && g.age>=21 && g.age<=28,
+      choices:[
+        { label:'放弃考研，直接就业', hint:'+💰 +😊 +🧠', fn: g => { g.flags.postgradCooling=true; g.flags.skipPostgrad=true; return{money:5000,mood:12,intel:8}; }},
+        { label:'转考公务员', hint:'+🧠 +💰', fn: g => { g.flags.postgradCooling=true; g.flags.civilServicePrep=true; return{intel:12,mood:5,money:-3000}; }},
+        { label:'学一门手艺', hint:'+🧠 +✨ +💰', fn: g => { g.flags.postgradCooling=true; g.flags.skillLearner=true; return{intel:15,charm:10,money:-5000}; }},
+        { label:'还是考研吧', hint:'+🧠 -😊 -💰', fn: g => { g.flags.postgradCooling=true; g.flags.persistPostgrad=true; return{intel:10,mood:-8,money:-8000}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3338,6 +3348,8 @@ const ACHIEVEMENTS = [
     { id:'digital_child', icon:'👨‍👩‍👧', name:'电子孩子', desc:'关注电子爸妈', check: g => g.flags.digitalParents },
     // v5.3 achievements
     { id:'gap_explorer', icon:'🌍', name:'间隔年探索者', desc:'体验Gap Year', check: g => g.flags.gapYear },
+    // v5.4 achievements
+    { id:'rational_learner', icon:'📚', name:'理性学习者', desc:'理性看待考研', check: g => g.flags.postgradCooling },
 ];
 
 // === ENDINGS === (order matters: first match wins)
