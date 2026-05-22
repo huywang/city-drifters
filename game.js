@@ -1562,9 +1562,27 @@ function triggerEnding() {
     G.isEnded = true;
     const ending = ENDINGS.find(e => e.cond(G)) || ENDINGS[ENDINGS.length-1];
 
+    // Track ending for statistics
+    const endingsUnlocked = JSON.parse(localStorage.getItem('cityDrifters_endings') || '[]');
+    if (!endingsUnlocked.includes(ending.id)) {
+        endingsUnlocked.push(ending.id);
+        localStorage.setItem('cityDrifters_endings', JSON.stringify(endingsUnlocked));
+    }
+
+    // Calculate ending rarity
+    const rarity = getEndingRarity(ending.id);
+    const rarityLabel = { common: '普通', uncommon: '罕见', rare: '稀有', legendary: '传说' }[rarity];
+    const rarityColor = { common: '#888', uncommon: '#4ade80', rare: '#60a5fa', legendary: '#f59e0b' }[rarity];
+
     document.getElementById('ending-badge').textContent = ending.badge;
-    document.getElementById('ending-title').textContent = ending.title;
+    document.getElementById('ending-title').innerHTML = `${ending.title} <span class="ending-rarity" style="color:${rarityColor}">[${rarityLabel}]</span>`;
     document.getElementById('ending-desc').innerHTML = ending.desc.replace(/\n/g,'<br>');
+
+    // Get achievements summary
+    const achievementSummary = G.achievements.slice(0, 6).map(a => {
+        const ach = ACHIEVEMENTS.find(x => x.id === a);
+        return ach ? `<span class="achievement-badge-small">${ach.icon} ${ach.name}</span>` : '';
+    }).join('');
 
     document.getElementById('summary-grid').innerHTML = `
         <div class="summary-item"><div class="summary-value">${G.age}岁</div><div class="summary-label">最终年龄</div></div>
@@ -1574,8 +1592,33 @@ function triggerEnding() {
         <div class="summary-item"><div class="summary-value">${G.eventsSeen}个</div><div class="summary-label">经历事件</div></div>
         <div class="summary-item"><div class="summary-value">${G.achievements.length}个</div><div class="summary-label">解锁成就</div></div>`;
 
+    // Add achievement showcase
+    const achievementShowcase = document.getElementById('achievement-showcase');
+    if (achievementShowcase) {
+        achievementShowcase.innerHTML = achievementSummary ? `<h3>🏆 获得成就</h3><div class="achievement-showcase">${achievementSummary}</div>` : '';
+    }
+
+    // Update ending progress
+    const progressText = `已解锁 ${endingsUnlocked.length}/${ENDINGS.length} 种结局`;
+    const progressEl = document.getElementById('ending-progress');
+    if (progressEl) progressEl.textContent = progressText;
+
     document.getElementById('timeline-list').innerHTML = G.eventLog.map(e => `<div class="timeline-item"><span class="timeline-year">${e.age}岁</span><span class="timeline-text">${e.text}</span></div>`).join('');
     showScreen('screen-ending');
+}
+
+function getEndingRarity(endingId) {
+    // Legendary (rare endings that require specific conditions)
+    const legendary = ['fire', 'immigration', 'executive', 'retire_abroad', 'wealthy'];
+    // Rare (hard to achieve)
+    const rare = ['settled', 'startup_end', 'influencer_end', 'digital_nomad', 'karoshi', 'jail'];
+    // Uncommon (moderately difficult)
+    const uncommon = ['hometown_hero', 'go_home', 'civil_end', 'ordinary', 'single', 'investment_guru', 'lying_flat_end'];
+
+    if (legendary.includes(endingId)) return 'legendary';
+    if (rare.includes(endingId)) return 'rare';
+    if (uncommon.includes(endingId)) return 'uncommon';
+    return 'common';
 }
 
 // === ACHIEVEMENTS ===
@@ -1601,7 +1644,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.10' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.11' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
@@ -1889,8 +1932,12 @@ function notify(text) {
 
 // === SHARE ===
 function shareEnding() {
-    const t = document.getElementById('ending-title').textContent;
-    const text = `我在「都市浮生记」中获得了【${t}】结局！${G.name}，${G.age}岁，在${G.cityName}漂泊了${Math.floor(G.months/12)}年。`;
+    const t = document.getElementById('ending-title').textContent.replace(/\s*\[.*?\]\s*/g, '');
+    const rarity = getEndingRarity(ENDINGS.find(e => e.title.includes(t))?.id || 'default');
+    const rarityEmoji = { common: '⚪', uncommon: '🟢', rare: '🔵', legendary: '🟡' }[rarity];
+    const topStat = getTopStat();
+    const achievementCount = G.achievements.length;
+    const text = `🏙️ 都市浮生记 · 人生结局\n\n${rarityEmoji} ${t}\n\n👤 ${G.name}，${G.age}岁\n📍 ${G.cityName}\n⏱️ 漂泊了${Math.floor(G.months/12)}年${G.months%12}个月\n💰 最终资产：${fmtMoney(G.money)}\n🎯 做出选择：${G.choices}次\n🏆 解锁成就：${achievementCount}个\n📊 最强属性：${topStat}\n\n#都市浮生记 #人生模拟器`;
     if (navigator.share) { navigator.share({title:'都市浮生记',text}); }
     else { navigator.clipboard.writeText(text).then(() => notify('📤 已复制到剪贴板！')); }
 }
