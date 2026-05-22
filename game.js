@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v33.4
+// 都市浮生记 - Game Engine v33.5
 // ============================================
 
 // === GAME STATE ===
@@ -18794,6 +18794,97 @@ const EVENTS = [
         { label:'发了条深夜动态', hint:'+✨ +👥', fn: g => { g.flags.midnightStore=true; return{charm:5,social:3}; }},
       ]},
 
+    // === v33.5 搭子文化与轻社交 ===
+    { id:'meal_buddy_v33_5', icon:'🍽️', title:'饭搭子', category:'dazi',
+      body:'你在小红书上发了一个帖子：「找个饭搭子，坐标XX，不尬聊不社交，吃完饭各回各家。」\n\n半小时后你收到了二十多条私信。你选了一个住你附近的人，约了明天中午吃那家新开的湘菜馆。\n\n第二天你们见了面。对方是个跟你差不多大的上班族。你们点了四个菜，聊了聊工作和最近的新闻。\n\n吃完饭后你们加了微信，说：「下次再约。」\n\n你觉得这就是饭搭子的精髓——不用维护关系，不用情感投资，想吃的时候就约，不想吃就不约。比朋友轻松，比陌生人温暖。',
+      cond: g => g.age >= 20 && g.social < 60 && g.social > 15,
+      choices:[
+        { label:'找到了一个固定饭搭子', hint:'+👥 +😊', fn: g => { g.flags.mealBuddy=true; g.flags.hasDazi=true; return{social:8,mood:5}; }},
+        { label:'跟不同人吃了很多顿饭', hint:'+👥 +✨', fn: g => { g.flags.mealBuddy=true; return{social:10,charm:3}; }},
+        { label:'觉得还是一个人吃更自在', hint:'+🧠', fn: g => { g.flags.mealBuddy=true; return{intel:5}; }},
+      ]},
+
+    { id:'travel_buddy_v33_5', icon:'✈️', title:'旅游搭子', category:'dazi',
+      body:'你想去云南，但朋友们都没空。你在豆瓣小组发了个帖：「找个旅游搭子，去大理/丽江，7天，AA制。」\n\n你找到了一个女生/男生，你们聊了一周，确认了行程和预算。你们约好：不干涉对方的行程，想一起就一起，想分开就分开。\n\n旅行的第一天你们一起逛了古城，第二天她/他想去一个你没兴趣的景点，你们就分开了。晚上约了吃晚饭，分享各自的照片。\n\n你发现这种关系特别舒服——有陪伴的自由，没有义务的压力。\n\n回来后你们偶尔在微信上聊两句，互相点赞朋友圈。你觉得这就是成年人最好的关系——刚刚好。',
+      cond: g => g.age >= 22 && g.money > 5000 && g.jobSalary > 0,
+      choices:[
+        { label:'度过了完美的旅行', hint:'+😊 +👥', fn: g => { g.flags.travelBuddy=true; return{mood:10,social:8}; }},
+        { label:'旅途中学会了跟人相处', hint:'+🧠 +👥', fn: g => { g.flags.travelBuddy=true; return{intel:5,social:5}; }},
+        { label:'拍了很多照片发朋友圈', hint:'+✨ +😊', fn: g => { g.flags.travelBuddy=true; return{charm:8,mood:5}; }},
+      ]},
+
+    { id:'study_buddy_v33_5', icon:'📖', title:'学习搭子', category:'dazi',
+      body:'你准备考一个证书，但一个人总是拖延。你在B站评论区找到了一个「学习搭子」。\n\n你们约好每天晚上8点到10点开视频自习，互相监督。你们不说话，只是开着摄像头，让对方看到你在学。\n\n第一天你差点刷手机，但看到屏幕对面的搭子在认真看书，你不好意思摸鱼了。\n\n一个月后你的学习效率提高了很多。你们偶尔在休息时聊几句，发现对方也在焦虑工作和生活。\n\n考完试后你们约了一顿饭。你觉得这个「不说话只学习」的搭子，可能比你认识的大多数朋友都靠谱。',
+      cond: g => g.age >= 20 && g.intel > 30,
+      choices:[
+        { label:'坚持了一个月的自习搭子', hint:'+🧠 +💪', fn: g => { g.flags.studyBuddy=true; return{intel:10,health:3}; }},
+        { label:'学习效率大幅提高', hint:'+🧠 +😊', fn: g => { g.flags.studyBuddy=true; return{intel:8,mood:5}; }},
+        { label:'考完试后约了饭', hint:'+👥 +😊', fn: g => { g.flags.studyBuddy=true; return{social:5,mood:5}; }},
+      ]},
+
+    { id:'gym_buddy_v33_5', icon:'🏋️', title:'健身搭子', category:'dazi',
+      body:'你在健身房办卡三个月了，一个人去总是偷懒——做两组就开始刷手机。\n\n你在健身App上找了一个搭子，对方是个比你练得好的上班族。你们约好每周三和周六一起去。\n\n他/她会帮你数组数、纠正动作、在你快放弃的时候喊「再来两个」。你第一次体会到了「被push」的感觉。\n\n两个月后你的体脂率降了3%。你发了一张对比照，收到了很多赞。\n\n你请搭子吃了一顿减脂餐。你们聊了很多——不是关于健身，而是关于生活。你觉得，一个好的健身搭子，半个是教练，半个是朋友。',
+      cond: g => g.age >= 22 && g.health < 70 && g.money > 2000,
+      choices:[
+        { label:'体脂率降了3%', hint:'+💪 +😊', fn: g => { g.flags.gymBuddy=true; return{health:10,mood:5}; }},
+        { label:'养成了规律健身的习惯', hint:'+💪 +🧠', fn: g => { g.flags.gymBuddy=true; g.flags.gymHabit=true; return{health:8,intel:3}; }},
+        { label:'跟搭子成了好朋友', hint:'+👥 +😊', fn: g => { g.flags.gymBuddy=true; return{social:8,mood:5}; }},
+      ]},
+
+    { id:'movie_buddy_v33_5', icon:'🎬', title:'电影搭子', category:'dazi',
+      body:'你看了一部小众文艺片，很想跟人讨论，但朋友圈里没有人看过。\n\n你在豆瓣上找了一个「观影搭子」，约了下周末一起看一部新上映的电影。\n\n看完后你们在咖啡馆聊了两个小时。从导演的手法聊到剧情的隐喻，从角色聊到了自己的人生。\n\n你说：「我很久没跟人聊这么深了。」她/他说：「我也是。跟熟人反而聊不了这些。」\n\n你觉得这就是搭子文化的好处——跟陌生人反而能说真话。因为你们之间没有利益关系，没有面子问题，只有这一刻的真诚。',
+      cond: g => g.age >= 20 && g.intel > 40,
+      choices:[
+        { label:'聊了两个小时的人生', hint:'+🧠 +👥', fn: g => { g.flags.movieBuddy=true; return{intel:8,social:5}; }},
+        { label:'写了一篇影评发豆瓣', hint:'+✨ +🧠', fn: g => { g.flags.movieBuddy=true; return{charm:8,intel:5}; }},
+        { label:'觉得跟陌生人聊天更轻松', hint:'+🧠 +😊', fn: g => { g.flags.movieBuddy=true; return{intel:5,mood:3}; }},
+      ]},
+
+    { id:'dazi_fail_v33_5', icon:'💔', title:'搭子翻车', category:'dazi',
+      body:'你的搭子翻车了。\n\n你在网上找了一个「咖啡搭子」，约在一家网红咖啡馆见面。结果对方迟到了半小时，来了以后一直拍照，拍了四十分钟才开始喝咖啡。\n\n你说：「我们可以聊聊？」她/他说：「等一下，这个角度还没拍好。」\n\n你坐在那里看着她/他摆弄了二十分钟滤镜，终于忍不住了：「你到底来喝咖啡的还是来拍照的？」\n\n对方愣了一下：「发小红书啊，不然呢？」\n\n你付了账，走了。你觉得不是每个搭子都靠谱，但至少你知道了自己想要什么样的搭子——一个能放下手机的人。',
+      cond: g => g.age >= 20 && g.social > 20 && g.flags.hasDazi,
+      choices:[
+        { label:'拉黑了这个搭子', hint:'+🧠', fn: g => { g.flags.daziFail=true; return{intel:5}; }},
+        { label:'觉得这也是人生经验', hint:'+🧠 +😊', fn: g => { g.flags.daziFail=true; return{intel:5,mood:3}; }},
+        { label:'发了条吐槽动态', hint:'+✨ +👥', fn: g => { g.flags.daziFail=true; return{charm:5,social:3}; }},
+      ]},
+
+    { id:'dazi_to_friend_v33_5', icon:'🤝', title:'搭子变朋友', category:'dazi',
+      body:'你和你的饭搭子认识了半年了。\n\n你们从每个月约一次变成了每周约一次。从只聊吃的，变成了聊工作、聊感情、聊家庭。\n\n有一天你加班到很晚，发了条朋友圈说「好累」。她/他私信你：「明天请你吃饭，别太累了。」\n\n你突然意识到：你们已经是朋友了。不是那种需要维护关系的朋友，而是那种自然而然就变成的朋友。\n\n你们约了一顿火锅。你举杯说：「敬搭子文化。」她/他笑着说：「敬意外收获。」',
+      cond: g => g.age >= 22 && g.flags.hasDazi && g.social > 40,
+      choices:[
+        { label:'搭子变成了真正的朋友', hint:'+👥 +😊', fn: g => { g.flags.daziToFriend=true; return{social:10,mood:10}; }},
+        { label:'觉得这是最自然的交友方式', hint:'+🧠 +👥', fn: g => { g.flags.daziToFriend=true; return{intel:5,social:5}; }},
+        { label:'约了更多搭子一起聚', hint:'+👥 +✨', fn: g => { g.flags.daziToFriend=true; return{social:8,charm:5}; }},
+      ]},
+
+    { id:'dazi_economy_v33_5', icon:'💰', title:'搭子经济', category:'dazi',
+      body:'你发现「搭子」已经变成了一门生意。\n\n有个App推出了「付费搭子」服务：花50块可以找一个「逛街搭子」，花80块找一个「拍照搭子」，花200块找一个「陪聊搭子」。\n\n你觉得这个世界变化太快了。以前找人陪伴是自然的社交行为，现在变成了明码标价的服务。\n\n但你也理解：很多人不是不想社交，而是不擅长社交。付费搭子降低了社交的门槛——你不用欠人情，不用担心被拒绝，不满意还可以换人。\n\n你在评论区写道：「如果孤独可以被购买，那真正的陪伴还有意义吗？」\n\n收到了很多赞和反驳。',
+      cond: g => g.age >= 22 && g.intel > 40 && g.money > 3000,
+      choices:[
+        { label:'花钱体验了一次付费搭子', hint:'-💰 +🧠', fn: g => { g.flags.daziEconomy=true; g.money-=200; return{intel:5}; }},
+        { label:'写了一篇关于搭子经济的评论', hint:'+✨ +🧠', fn: g => { g.flags.daziEconomy=true; return{charm:8,intel:5}; }},
+        { label:'觉得免费的搭子更珍贵', hint:'+🧠 +😊', fn: g => { g.flags.daziEconomy=true; return{intel:8,mood:3}; }},
+      ]},
+
+    { id:'lose_dazi_v33_5', icon:'👋', title:'失去搭子', category:'dazi',
+      body:'你的健身搭子突然不来了。\n\n你发了消息：「最近怎么没来？」对方隔了一天回复：「工作太忙了，以后可能不去了。」\n\n你说了声「好的」，但你心里有点失落。你们一起练了四个月了，她/他知道你每组能做多少个，你知道她/他最讨厌练什么。\n\n你一个人去了健身房，做了以前两个人做的训练。你发现少了个人在旁边喊「加油」，最后两个真的做不动了。\n\n你在搭子App上发了一条新帖：「找个新的健身搭子。」\n\n你觉得搭子关系的脆弱性就在于此——它太轻了，轻到随时可以放手。但也许这就是它的本质。',
+      cond: g => g.age >= 22 && g.flags.hasDazi && g.months >= 6,
+      choices:[
+        { label:'找了一个新的搭子', hint:'+👥 +💪', fn: g => { g.flags.loseDazi=true; return{social:5,health:3}; }},
+        { label:'开始一个人训练', hint:'+💪 +🧠', fn: g => { g.flags.loseDazi=true; return{health:5,intel:3}; }},
+        { label:'觉得每段关系都有保质期', hint:'+🧠 +😊', fn: g => { g.flags.loseDazi=true; return{intel:8,mood:3}; }},
+      ]},
+
+    { id:'dazi_philosophy_v33_5', icon:'🤔', title:'搭子哲学', category:'dazi',
+      body:'你跟朋友争论了一个问题：搭子算不算朋友？\n\n朋友说：「搭子就是工具人，用完就扔。」\n\n你不同意：「搭子是一种新型社交关系。它不是友情，不是爱情，也不是同事。它是一种有边界感的陪伴。」\n\n你想了很久，觉得搭子文化的流行反映了这代人的社交困境：我们既渴望陪伴，又害怕亲密。我们既需要连接，又不想承担情感成本。\n\n搭子是一个完美的折中——有温度但没负担，有陪伴但没义务。\n\n你在日记里写：「也许搭子不是最好的关系，但它是最适合这个时代的关系。」',
+      cond: g => g.age >= 22 && g.intel > 50 && g.flags.hasDazi,
+      choices:[
+        { label:'深入思考了当代社交的本质', hint:'+🧠 +😊', fn: g => { g.flags.daziPhilosophy=true; return{intel:10,mood:5}; }},
+        { label:'写了一篇关于搭子文化的文章', hint:'+✨ +🧠', fn: g => { g.flags.daziPhilosophy=true; g.flags.wroteDazi=true; return{charm:10,intel:5}; }},
+        { label:'决定珍惜身边的每一个搭子', hint:'+👥 +😊', fn: g => { g.flags.daziPhilosophy=true; return{social:5,mood:8}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -20603,6 +20694,18 @@ const ACHIEVEMENTS = [
     { id:'solo_travel_ach', icon:'🎒', name:'一个人的旅行', desc:'独自去旅行了一次', check: g => g.flags.soloTravel },
     { id:'birthday_alone_v33_4_ach', icon:'🎂', name:'一个人的生日', desc:'自己给自己过了一个生日', check: g => g.flags.birthdayAlone },
     { id:'midnight_store_ach', icon:'🏪', name:'深夜便利店', desc:'在凌晨的便利店遇到了同类', check: g => g.flags.midnightStore },
+
+    // --- v33.5 搭子文化与轻社交成就 ---
+    { id:'meal_buddy_v33_5_ach', icon:'🍽️', name:'饭搭子', desc:'找到了一个一起吃饭的人', check: g => g.flags.mealBuddy },
+    { id:'travel_buddy_v33_5_ach', icon:'✈️', name:'旅游搭子', desc:'跟搭子一起旅行了一次', check: g => g.flags.travelBuddy },
+    { id:'study_buddy_ach', icon:'📖', name:'学习搭子', desc:'找到了互相监督的学习伙伴', check: g => g.flags.studyBuddy },
+    { id:'gym_buddy_ach', icon:'🏋️', name:'健身搭子', desc:'找到了一个push你的健身伙伴', check: g => g.flags.gymBuddy },
+    { id:'movie_buddy_ach', icon:'🎬', name:'电影搭子', desc:'跟搭子看了一部电影并深入讨论', check: g => g.flags.movieBuddy },
+    { id:'dazi_fail_ach', icon:'💔', name:'搭子翻车', desc:'遇到了一个不靠谱的搭子', check: g => g.flags.daziFail },
+    { id:'dazi_to_friend_ach', icon:'🤝', name:'意外之喜', desc:'搭子变成了真正的朋友', check: g => g.flags.daziToFriend },
+    { id:'dazi_economy_ach', icon:'💰', name:'孤独有价', desc:'见证了搭子经济的兴起', check: g => g.flags.daziEconomy },
+    { id:'lose_dazi_ach', icon:'👋', name:'轻如鸿毛', desc:'失去了一个搭子，理解了这种关系的脆弱', check: g => g.flags.loseDazi },
+    { id:'dazi_philosophy_ach', icon:'🤔', name:'社交哲学家', desc:'思考了搭子文化背后的社交本质', check: g => g.flags.daziPhilosophy },
 ];
 
 // === ENDINGS === (order matters: first match wins)
