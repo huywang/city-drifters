@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v30.7
+// 都市浮生记 - Game Engine v30.8
 // ============================================
 
 // === GAME STATE ===
@@ -16547,6 +16547,87 @@ const EVENTS = [
         { label:'重新定义什么是"足够"', hint:'+🧠', fn: g => { g.flags.enoughIsEnough=true; g.flags.redefineEnough=true; return{intel:8}; }},
         { label:'还不够我还需要更多', hint:'-😊', fn: g => { g.flags.enoughIsEnough=true; g.flags.stillNotEnough=true; return{mood:-3}; }},
       ]},
+    // v30.8 事件 - 代际差异与价值观碰撞
+    { id:'generation_gap_conflict', icon:'🗣️', title:'代沟冲突', category:'generational',
+      body:'你和父母又「吵架」了——因为「价值观」的差异。\n\n你们争论的话题：\n- 「工作」——他们觉得「稳定最重要」，你觉得「要有意义」\n- 「婚姻」——他们觉得「该结婚了」，你觉得「不着急」\n- 「房子」——他们觉得「必须买」，你觉得「租房也行」\n- 「孩子」——他们觉得「一定要有」，你觉得「看情况」\n- 「消费」——他们觉得「你乱花钱」，你觉得「他们太节约」\n\n你们的「代沟」：\n- 他们成长在「物质匮乏」的时代——你成长在「信息爆炸」的时代\n- 他们的「安全感」来自「稳定」——你的「安全感」来自「自由」\n- 他们的「成功」是「有房有车有孩子」——你的「成功」是「做自己喜欢的事」\n\n你的「困境」：\n- 「听父母的」——你觉得「不自由」\n- 「不听父母的」——你觉得「不孝」\n- 「解释」——他们「不理解」\n- 「不解释」——你「很压抑」\n\n「代沟」不是「谁对谁错」——是「不同的时代塑造了不同的人」。',
+      cond: g => g.age >= 22 && g.age <= 40 && !g.flags.generationGapConflict,
+      choices:[
+        { label:'尝试理解父母的出发点', hint:'+🧠 +👥', fn: g => { g.flags.generationGapConflict=true; g.flags.understandParents=true; return{intel:5,social:3}; }},
+        { label:'坚持自己的价值观', hint:'+😊', fn: g => { g.flags.generationGapConflict=true; g.flags.standGround=true; return{mood:3}; }},
+        { label:'暂时回避减少冲突', hint:'-👥', fn: g => { g.flags.generationGapConflict=true; g.flags.avoidConflict=true; return{social:-3}; }},
+      ]},
+    { id:'traditional_vs_modern', icon:'⚖️', title:'传统vs现代', category:'generational',
+      body:'你在「传统」和「现代」之间——感到「撕裂」。\n\n你的「传统」一面：\n- 「孝顺父母」——你不想「让他们失望」\n- 「家庭责任」——你觉得「应该承担」\n- 「社会稳定」——你理解「为什么他们求稳」\n\n你的「现代」一面：\n- 「个人自由」——你想要「自己做主」\n- 「自我实现」——你想要「追求梦想」\n- 「多元选择」——你觉得「人生不止一条路」\n\n你的「撕裂」：\n- 「结婚」——传统说「必须」，现代说「选择」\n- 「生子」——传统说「延续香火」，现代说「个人决定」\n- 「工作」——传统说「稳定第一」，现代说「热爱优先」\n- 「生活」——传统说「随大流」，现代说「做自己」\n\n你的「整合」：\n- 「传统」和「现代」不是「对立」的——是「互补」的\n- 你可以「尊重传统」同时「追求现代」\n- 你可以「爱父母」同时「做自己」\n\n「你不需要「二选一」——你可以「两者兼得」。关键是「找到平衡」。',
+      cond: g => g.age >= 24 && g.intel >= 25 && !g.flags.traditionalVsModern,
+      choices:[
+        { label:'找到传统与现代的平衡', hint:'+🧠 +😊', fn: g => { g.flags.traditionalVsModern=true; g.flags.findBalance=true; return{intel:8,mood:5}; }},
+        { label:'偏向现代价值观', hint:'+😊', fn: g => { g.flags.traditionalVsModern=true; g.flags.preferModern=true; return{mood:3}; }},
+        { label:'回归传统价值观', hint:'+👥', fn: g => { g.flags.traditionalVsModern=true; g.flags.preferTraditional=true; return{social:5}; }},
+      ]},
+    { id:'parent_expectations', icon:'📋', title:'父母的期望', category:'generational',
+      body:'你发现——你一直在「背负」父母的「期望」。\n\n他们的「期望」：\n- 「考上好大学」——你做到了\n- 「找到好工作」——你做到了\n- 「结婚生子」——你还没做\n- 「买房买车」——你还没做\n- 「出人头地」——你不确定什么是「出人头地」\n\n你的「感受」：\n- 「压力」——你觉得「永远不够好」\n- 「内疚」——你觉得「让他们失望了」\n- 「愤怒」——你觉得「他们不应该控制我」\n- 「疲惫」——你觉得「一直在为别人活」\n\n你的「觉醒」：\n- 「父母的期望」是「他们的梦想」——不是「你的义务」\n- 「孝顺」不是「听话」——是「爱」\n- 「做自己」不是「自私」——是「责任」\n\n你的「选择」：\n- 你可以「爱父母」同时「不满足他们的期望」\n- 你可以「尊重他们」同时「走自己的路」\n- 你可以「感恩」同时「做自己」\n\n「你的人生——是你自己的。不是「父母的续集」。',
+      cond: g => g.age >= 22 && !g.flags.parentExpectations,
+      choices:[
+        { label:'和父母坦诚谈你的想法', hint:'+👥 +🧠', fn: g => { g.flags.parentExpectations=true; g.flags.talkParents=true; return{social:5,intel:5}; }},
+        { label:'默默做自己用行动证明', hint:'+😊 +💪', fn: g => { g.flags.parentExpectations=true; g.flags.proveByAction=true; return{mood:5,intel:3}; }},
+        { label:'继续满足他们的期望', hint:'-😊', fn: g => { g.flags.parentExpectations=true; g.flags.continueExpect=true; return{mood:-5}; }},
+      ]},
+    { id:'filial_piety_redefined', icon:'💕', title:'重新定义孝顺', category:'generational',
+      body:'你开始「重新定义」什么是「孝顺」。\n\n传统的「孝顺」：\n- 「听话」——父母说什么就做什么\n- 「陪伴」——留在父母身边\n- 「传宗接代」——结婚生子\n- 「光宗耀祖」——出人头地\n\n你的「孝顺」：\n- 「理解」——理解他们的出发点是「爱」\n- 「沟通」——和他们分享你的生活和想法\n- 「尊重」——尊重他们的选择也让他们尊重你的\n- 「关怀」——在他们需要时给予支持\n\n你的「发现」：\n- 「孝顺」不是「服从」——是「爱」\n- 「孝顺」不是「牺牲自己」——是「共同成长」\n- 「孝顺」不是「完美的孩子」——是「真实的孩子」\n\n你的「实践」：\n- 每周打一次电话——不是「汇报」，是「聊天」\n- 每年带他们旅行——不是「义务」，是「陪伴」\n- 教他们用新科技——不是「嫌弃」，是「帮助」\n\n「孝顺」的本质——不是「你为他们做了什么」，是「你让他们感受到什么」。',
+      cond: g => g.age >= 25 && g.flags.understandParents && !g.flags.filialPietyRedefined,
+      choices:[
+        { label:'用自己的方式孝顺父母', hint:'+😊 +👥', fn: g => { g.flags.filialPietyRedefined=true; g.flags.ownFilial=true; return{mood:5,social:5}; }},
+        { label:'在孝顺和自由间找平衡', hint:'+🧠', fn: g => { g.flags.filialPietyRedefined=true; g.flags.balancedFilial=true; return{intel:5}; }},
+        { label:'孝顺太累了我还是做自己', hint:'-👥', fn: g => { g.flags.filialPietyRedefined=true; g.flags.skipFilial=true; return{social:-3}; }},
+      ]},
+    { id:'family_tradition_evolution', icon:'🏮', title:'家族传统的演变', category:'generational',
+      body:'你发现——「家族传统」在你们这一代「变了」。\n\n你家的「传统」：\n- 「年夜饭」——以前「全家一起做」，现在「去饭店吃」\n- 「拜年」——以前「挨家挨户」，现在「微信群发」\n- 「祭祖」——以前「烧香磕头」，现在「网上祭扫」\n- 「家训」——以前「刻在墙上」，现在「没人记得」\n\n你的「感受」：\n- 「失落」——你觉得「年味淡了」\n- 「理解」——你知道「时代在变」\n- 「思考」——你想知道「什么该保留什么该改变」\n\n你的「探索」：\n- 哪些「传统」是「有意义的」——值得「保留」\n- 哪些「传统」是「形式主义的」——可以「改变」\n- 哪些「新传统」是「值得建立的」——可以「创造」\n\n你的「决定」：\n- 「传统」不是「不变的」——是「演变的」\n- 「传统」不是「束缚」——是「连接」\n- 「传统」不是「过去」——是「传承」\n\n「每一代人——都在「重新定义」传统。',
+      cond: g => g.age >= 25 && !g.flags.familyTraditionEvolution,
+      choices:[
+        { label:'创造属于自己的新家庭传统', hint:'+😊 +🧠', fn: g => { g.flags.familyTraditionEvolution=true; g.flags.createNewTradition=true; return{mood:5,intel:5}; }},
+        { label:'保留有意义的改变形式的', hint:'+🧠', fn: g => { g.flags.familyTraditionEvolution=true; g.flags.selectiveTradition=true; return{intel:5}; }},
+        { label:'传统就让它自然消亡吧', hint:'', fn: g => { g.flags.familyTraditionEvolution=true; g.flags.letGoTradition=true; return{}; }},
+      ]},
+    { id:'marriage_values_clash', icon:'💒', title:'婚姻观念碰撞', category:'generational',
+      body:'你和父母在「婚姻观」上——产生了「巨大分歧」。\n\n父母的「婚姻观」：\n- 「男大当婚女大当嫁」——「到年龄就该结婚」\n- 「门当户对」——「条件要匹配」\n- 「搭伙过日子」——「爱情不是最重要的」\n- 「离婚是失败」——「忍忍就过去了」\n\n你的「婚姻观」：\n- 「婚姻是选择不是必须」——「不结婚也行」\n- 「爱情是基础」——「没有爱不如不结」\n- 「平等伙伴关系」——「不是谁依附谁」\n- 「不合适就分开」——「离婚不是失败」\n\n你们的「冲突」：\n- 他们「催婚」——你「抗拒」\n- 他们「介绍对象」——你「反感」\n- 他们「说你不孝」——你「觉得被控制」\n\n你的「思考」：\n- 「婚姻」是「你的人生」——不是「父母的面子」\n- 「幸福」不是「结婚」——是「找到对的人」\n- 「孝顺」不是「听话」——是「让他们看到你幸福」\n\n「婚姻」不是「任务」——是「选择」。',
+      cond: g => g.age >= 25 && g.age <= 38 && !g.flags.married && !g.flags.marriageValuesClash,
+      choices:[
+        { label:'坚持自己的婚姻观', hint:'+😊', fn: g => { g.flags.marriageValuesClash=true; g.flags.ownMarriageView=true; return{mood:5}; }},
+        { label:'理解父母但坚持自己', hint:'+🧠 +👥', fn: g => { g.flags.marriageValuesClash=true; g.flags.understandButPersist=true; return{intel:5,social:3}; }},
+        { label:'妥协去相亲', hint:'-😊', fn: g => { g.flags.marriageValuesClash=true; g.flags.compromiseDate=true; return{mood:-3}; }},
+      ]},
+    { id:'career_path_generation', icon:'🛤️', title:'职业道路的代际差异', category:'generational',
+      body:'你和父母在「职业选择」上——有「根本分歧」。\n\n父母的「职业观」：\n- 「稳定」——公务员/国企/银行是最好的\n- 「体面」——白领比蓝领好\n- 「铁饭碗」——一辈子一份工作\n- 「听话」——领导说什么就做什么\n\n你的「职业观」：\n- 「热爱」——做自己喜欢的事\n- 「成长」——不断学习和挑战\n- 「自由」——可以换工作/创业/自由职业\n- 「价值」——做有意义的事\n\n你们的「冲突」：\n- 你想「辞职」——他们说「你疯了」\n- 你想「创业」——他们说「太冒险了」\n- 你想「gap year」——他们说「浪费时间」\n- 你想「转行」——他们说「白学了」\n\n你的「理解」：\n- 他们的「求稳」是因为「经历过动荡」\n- 你的「求变」是因为「生活在变化」\n- 没有「谁对谁错」——只有「不同的时代」\n\n「职业」不是「一辈子的牢笼」——是「不断选择的旅程」。',
+      cond: g => g.age >= 22 && g.age <= 35 && g.jobSalary > 0 && !g.flags.careerPathGeneration,
+      choices:[
+        { label:'向父母解释你的职业观', hint:'+👥 +🧠', fn: g => { g.flags.careerPathGeneration=true; g.flags.explainCareer=true; return{social:5,intel:3}; }},
+        { label:'用成绩证明自己的选择', hint:'+💰 +😊', fn: g => { g.flags.careerPathGeneration=true; g.flags.proveCareer=true; return{money:3000,mood:5}; }},
+        { label:'算了不解释了他们不会懂', hint:'-👥', fn: g => { g.flags.careerPathGeneration=true; g.flags.giveUpExplain=true; return{social:-3}; }},
+      ]},
+    { id:'parent_tech_gap', icon:'📱', title:'父母的数字鸿沟', category:'generational',
+      body:'你发现——父母在「数字时代」越来越「吃力」了。\n\n他们的「困难」：\n- 「手机支付」——他们「不会用」\n- 「网上挂号」——他们「搞不懂」\n- 「健康码」——他们「找不到」\n- 「视频通话」——他们「接不到」\n- 「防诈骗」——他们「分不清」\n\n你的「角色」：\n- 你变成了「父母的IT支持」\n- 你「教了一遍又一遍」\n- 你「远程帮他们解决技术问题」\n- 你「担心他们被骗」\n\n你的「感受」：\n- 「耐心」——你知道「他们老了」\n- 「焦虑」——你担心「他们被骗」\n- 「内疚」——你觉得「没教好」\n- 「心疼」——你看到「他们被时代抛弃」\n\n你的「行动」：\n- 给他们「设置好常用APP」\n- 教他们「识别诈骗」\n- 给他们「买简单的设备」\n- 定期「检查他们的手机」\n\n「数字鸿沟」不是「技术问题」——是「代际关怀」。',
+      cond: g => g.age >= 25 && !g.flags.parentTechGap,
+      choices:[
+        { label:'耐心教父母使用科技', hint:'+👥 +😊', fn: g => { g.flags.parentTechGap=true; g.flags.patientTeach=true; return{social:5,mood:3}; }},
+        { label:'帮他们设置好一切', hint:'+👥', fn: g => { g.flags.parentTechGap=true; g.flags.setupEverything=true; return{social:3}; }},
+        { label:'他们学不会就算了', hint:'-👥', fn: g => { g.flags.parentTechGap=true; g.flags.giveUpTeach=true; return{social:-3}; }},
+      ]},
+    { id:'raising_next_generation', icon:'👶', title:'养育下一代', category:'generational',
+      body:'如果你有孩子——你面临一个「重大决定」：「怎么养育下一代？」\n\n你的「纠结」：\n- 「严格教育」还是「宽松教育」？\n- 「鸡娃」还是「佛系」？\n- 「传统价值观」还是「现代价值观」？\n- 「应试教育」还是「素质教育」？\n\n你的「反思」：\n- 你「不想重复」父母的一些做法——因为「伤害了你」\n- 你「想保留」父母的一些做法——因为「对你有帮助」\n- 你「想创造」新的做法——因为「时代不同了」\n\n你的「选择」：\n- 「尊重孩子的个性」——不是「按你的模板塑造」\n- 「给予爱和支持」——不是「控制和期望」\n- 「做榜样」——不是「说教」\n\n你的「理解」：\n- 「养育」不是「复制」——是「创造」\n- 「好孩子」不是「听话的」——是「有独立思考的」\n- 「好父母」不是「完美的」——是「成长的」\n\n「你不是在「养育一个孩子」——你是在「影响一个未来」。',
+      cond: g => g.flags.hasChild && g.age >= 28 && !g.flags.raisingNextGen,
+      choices:[
+        { label:'用新的方式养育下一代', hint:'+😊 +🧠', fn: g => { g.flags.raisingNextGen=true; g.flags.newParenting=true; return{mood:5,intel:5}; }},
+        { label:'在传统和现代间找平衡', hint:'+🧠', fn: g => { g.flags.raisingNextGen=true; g.flags.balancedParenting=true; return{intel:5}; }},
+        { label:'还是按父母的方式来吧', hint:'', fn: g => { g.flags.raisingNextGen=true; g.flags.traditionalParenting=true; return{}; }},
+      ]},
+    { id:'bridging_generations', icon:'🌉', title:'跨越代际的桥梁', category:'generational',
+      body:'你决定——主动「跨越代际的鸿沟」。\n\n你的「行动」：\n- 和父母「分享你的生活」——让他们「了解你的世界」\n- 听父母「讲他们的故事」——让你「理解他们的经历」\n- 一起做「双方都喜欢的事」——找到「共同语言」\n- 尊重「差异」——不强求「一致」\n\n你的「发现」：\n- 父母的「唠叨」——背后是「关心」\n- 父母的「控制」——背后是「恐惧」\n- 父母的「期望」——背后是「爱」\n\n你的「理解」：\n- 「代沟」不是「不可逾越的」——是「可以沟通的」\n- 「差异」不是「对立的」——是「互补的」\n- 「爱」不是「控制」——是「连接」\n\n你的「收获」：\n- 你和父母的关系「更好了」\n- 你「更理解」自己了\n- 你「更成熟」了\n\n「跨越代际」不是「改变对方」——是「理解彼此」。',
+      cond: g => g.flags.generationGapConflict && g.age >= 25 && !g.flags.bridgingGenerations,
+      choices:[
+        { label:'成功建立了更好的代际关系', hint:'+👥 +😊', fn: g => { g.flags.bridgingGenerations=true; g.flags.betterRelation=true; return{social:8,mood:5}; }},
+        { label:'至少尝试了虽然还有距离', hint:'+🧠', fn: g => { g.flags.bridgingGenerations=true; g.flags.triedBridge=true; return{intel:5}; }},
+        { label:'代沟太深了无法跨越', hint:'-👥', fn: g => { g.flags.bridgingGenerations=true; g.flags.giveUpBridge=true; return{social:-3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -18060,6 +18141,15 @@ const ACHIEVEMENTS = [
     { id:'prioritize_experience_ach', icon:'🌍', name:'体验优先', desc:'把钱更多花在体验而不是物品上', check: g => g.flags.prioritizeExperience },
     { id:'persist_minimal_ach', icon:'🏠', name:'极简之家', desc:'坚持极简之家享受留白', check: g => g.flags.persistMinimal },
     { id:'accept_enough_ach', icon:'✋', name:'知足常乐', desc:'接受了"够了就是够了"开始享受生活', check: g => g.flags.acceptEnough },
+    // v30.8 achievements - 代际差异与价值观碰撞
+    { id:'understand_parents_ach', icon:'💕', name:'理解父母', desc:'尝试理解父母的出发点和爱', check: g => g.flags.understandParents },
+    { id:'find_balance_ach', icon:'⚖️', name:'平衡之道', desc:'找到了传统与现代价值观的平衡', check: g => g.flags.findBalance },
+    { id:'talk_parents_ach', icon:'🗣️', name:'坦诚沟通', desc:'和父母坦诚谈了自己的想法和期望', check: g => g.flags.talkParents },
+    { id:'own_filial_ach', icon:'💝', name:'新式孝顺', desc:'用自己的方式重新定义和践行孝顺', check: g => g.flags.ownFilial },
+    { id:'create_new_tradition_ach', icon:'🏮', name:'新传统', desc:'创造了属于自己的新家庭传统', check: g => g.flags.createNewTradition },
+    { id:'own_marriage_view_ach', icon:'💒', name:'婚姻自主', desc:'坚持了自己的婚姻观念', check: g => g.flags.ownMarriageView },
+    { id:'patient_teach_ach', icon:'📱', name:'耐心教导', desc:'耐心教父母使用数字科技跨越数字鸿沟', check: g => g.flags.patientTeach },
+    { id:'better_relation_ach', icon:'🌉', name:'跨越代际', desc:'成功建立了更好的代际关系和沟通', check: g => g.flags.betterRelation },
 ];
 
 // === ENDINGS === (order matters: first match wins)
