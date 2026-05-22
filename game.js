@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v32.6
+// 都市浮生记 - Game Engine v32.7
 // ============================================
 
 // === GAME STATE ===
@@ -18065,6 +18065,97 @@ const EVENTS = [
         { label:'用手机记录了一路上的见闻', hint:'+✨ +🧠', fn: g => { g.flags.midnightWalk=true; g.flags.recorded=true; return{charm:5,intel:3}; }},
         { label:'走了一圈心情好多了', hint:'+😊', fn: g => { g.flags.midnightWalk=true; return{mood:8}; }},
       ]},
+
+    // === v32.7 城市里的声音 ===
+    { id:'square_dance_music_v32_7', icon:'🔊', title:'广场舞的音乐', category:'sound',
+      body:'每天晚上七点，楼下准时响起广场舞的音乐。\n\n《最炫民族风》、《小苹果》、《站在草原望北京》……你都能背下来了。\n\n有时候你在加班，有时候你在看剧，那个音乐就像闹钟一样准时出现。你曾经很烦躁，但今天你站在窗户边往下看——\n\n十几个大妈排成两排，动作整齐划一。领头的那个穿红色运动服，动作最标准。她们的表情很认真，像是完成一件重要的事情。\n\n你突然想：等自己老了，会不会也去跳广场舞？至少她们看起来很快乐。\n\n你关上了窗户，但嘴角微微上扬了。',
+      cond: g => g.age >= 20,
+      choices:[
+        { label:'下楼看了一会儿，还学了两个动作', hint:'+😊 +💪', fn: g => { g.flags.squareDanceMusic=true; return{mood:5,health:2}; }},
+        { label:'买了副好的降噪耳机', hint:'-💰 +💪', fn: g => { g.flags.squareDanceMusic=true; g.money-=500; return{health:2}; }},
+        { label:'录了一段视频发到网上', hint:'+✨', fn: g => { g.flags.squareDanceMusic=true; return{charm:3,mood:3}; }},
+      ]},
+
+    { id:'construction_noise_v32_7', icon:'🔨', title:'工地上的噪音', category:'sound',
+      body:'你家旁边开始建一栋新楼了。\n\n每天早上六点半，打桩机就开始「咚咚咚」。周末也不停。你的窗户关上也能听到那个声音，像是有人在你的太阳穴上敲锤子。\n\n你去投诉了，物业说：「施工许可证是合法的，我们也没办法。」\n\n你上网查了一下，这个工地要建两年。两年。\n\n你开始习惯了每天戴着耳塞睡觉，习惯了在噪音中看书、吃饭、发呆。\n\n你想：这个城市永远在建设中。旧的拆了建新的，新的旧了再拆。而你就在这些噪音里，慢慢变老。',
+      cond: g => g.age >= 18,
+      choices:[
+        { label:'买了工业级耳塞，继续忍', hint:'-💰 +💪', fn: g => { g.flags.constructionNoise=true; g.money-=100; return{health:-2}; }},
+        { label:'跟邻居们一起联名反映', hint:'+👥 +🧠', fn: g => { g.flags.constructionNoise=true; g.flags.jointComplaint=true; return{social:5,intel:3}; }},
+        { label:'把噪音当成了白噪音，居然习惯了', hint:'+🧠', fn: g => { g.flags.constructionNoise=true; g.flags.adapted=true; return{intel:3,mood:-2}; }},
+      ]},
+
+    { id:'subway_announce_v32_7', icon:'🚇', title:'地铁报站声', category:'sound',
+      body:'「下一站，人民广场。」\n\n你每天坐同一条线路的地铁上班，那个报站的声音你已经听了上千遍。普通话、英语、上海话——三种语言，同样的内容。\n\n今天你闭着眼睛听，发现自己居然能跟着那个声音一起念出来。每一个站名、每一次停顿、每一个语调，你都烂熟于心。\n\n你想到，这个声音陪伴了你在这个城市的无数个早晨和傍晚。它见证了你的加班、你的约会、你的面试、你的失落。\n\n你下了地铁，走在熟悉的通道里。你觉得这个声音是你在大城市里最忠实的伙伴——它从来不会迟到，也从来不会缺席。',
+      cond: g => g.months >= 6 && g.jobSalary > 0,
+      choices:[
+        { label:'用手机录了一段报站声做铃声', hint:'+✨ +😊', fn: g => { g.flags.subwayAnnounce=true; return{charm:3,mood:3}; }},
+        { label:'突然想换一个通勤方式', hint:'+🧠', fn: g => { g.flags.subwayAnnounce=true; g.flags.newCommute=true; return{intel:3}; }},
+        { label:'感慨了一下时间的流逝', hint:'+🧠 +😊', fn: g => { g.flags.subwayAnnounce=true; return{intel:5,mood:3}; }},
+      ]},
+
+    { id:'neighbors_fight_v32_7', icon:'💢', title:'楼下吵架', category:'sound',
+      body:'晚上十一点，你被一阵激烈的争吵声吵醒了。\n\n是隔壁的邻居。一男一女，声音很大，隔着墙你都能听清每一个字。\n\n「你天天加班，这个家你还回不回来了？」\n「我不加班谁挣钱？你以为我愿意？」\n\n你躺在床上，不知道该不该管。你听到玻璃碎的声音，然后是一阵沉默。\n\n你犹豫了一下，敲了敲隔壁的门。没人开。你听到里面有人在小声哭。\n\n你回到自己房间，写了一张纸条塞在他们门缝里：「如果需要帮助，可以找我。302。」\n\n你不知道他们后来怎么样了。但这个城市里，每扇门的背后都有你不了解的故事。',
+      cond: g => g.age >= 20,
+      choices:[
+        { label:'留了纸条表达关心', hint:'+👥 +😊', fn: g => { g.flags.neighborsFight=true; g.flags.leftNote2=true; return{social:5,mood:3}; }},
+        { label:'打电话给物业处理', hint:'+🧠', fn: g => { g.flags.neighborsFight=true; return{intel:3}; }},
+        { label:'戴上耳塞假装没听到', hint:'-😊', fn: g => { g.flags.neighborsFight=true; return{mood:-3}; }},
+      ]},
+
+    { id:'street_vendor_v32_7', icon:'📢', title:'叫卖声', category:'sound',
+      body:'「烤红薯嘞——又甜又糯的烤红薯——」\n\n冬天的傍晚，你走在回家的路上，听到远处传来叫卖声。\n\n你循着声音走过去，看到一个老大爷推着三轮车，车上是一个铁皮炉子，冒着白烟和烤红薯的香味。\n\n你买了一个。老大爷挑了一个最大的给你，说：「这个最甜。」\n\n你捧在手里，又暖又香。你咬了一口——真的很甜。\n\n你想起小时候，放学路上也有一个卖烤红薯的老爷爷。那时候五毛钱一个，现在十块钱一个。味道好像没变，但你已经长大了。\n\n老大爷推着车继续往前走，叫卖声渐渐远了。',
+      cond: g => g.age >= 18,
+      choices:[
+        { label:'买了两个，一个给自己一个给路人', hint:'-💰 +👥 +😊', fn: g => { g.flags.streetVendor=true; g.money-=20; return{social:3,mood:8}; }},
+        { label:'跟大爷聊了一会儿，问他冷不冷', hint:'+👥 +😊', fn: g => { g.flags.streetVendor=true; return{social:5,mood:5}; }},
+        { label:'吃完继续走路，想起了小时候', hint:'+🧠 +😊', fn: g => { g.flags.streetVendor=true; return{intel:3,mood:5}; }},
+      ]},
+
+    { id:'rain_sound_v32_7', icon:'🌧️', title:'雨打窗户', category:'sound',
+      body:'下雨了。\n\n你坐在窗前，听着雨滴打在玻璃上的声音。一滴一滴，像有人在轻轻敲门。\n\n雨越下越大，声音从「滴答」变成了「哗啦」。你打开窗户，闻到了泥土和树叶的混合味道。\n\n你泡了一杯茶，什么也不做，就坐在窗前听雨。\n\n你已经很久没有这样安静地坐着了。每天都在赶——赶地铁、赶deadline、赶饭局、赶进度。但此刻，雨让你不得不停下来。\n\n你发现，停下来也没那么可怕。雨声像一双温柔的手，帮你按下了暂停键。',
+      cond: g => g.mood < 60,
+      choices:[
+        { label:'泡了杯茶，听了一下午的雨', hint:'+😊 +💪', fn: g => { g.flags.rainSound=true; return{mood:10,health:3}; }},
+        { label:'打开电脑写了一篇关于雨的文字', hint:'+✨ +🧠', fn: g => { g.flags.rainSound=true; g.flags.wroteRain=true; return{charm:5,intel:3}; }},
+        { label:'拍了雨景视频发到朋友圈', hint:'+✨', fn: g => { g.flags.rainSound=true; return{charm:3}; }},
+      ]},
+
+    { id:'city_whitenoise_v32_7', icon:'🎧', title:'城市的白噪音', category:'sound',
+      body:'你在网上看到一个说法：城市里的声音其实是一种白噪音。\n\n你试了一下——打开窗户，闭上眼睛，不再分辨每一个声音，而是让它们混在一起。\n\n远处的车流声、空调外机的嗡嗡声、偶尔的喇叭声、楼上走路的脚步声……当你不再试图区分它们的时候，它们变成了一种持续的低鸣。\n\n你居然觉得平静了。\n\n你开始每天睡前打开窗户十分钟，听城市的白噪音。你不再觉得这些声音是噪音——它们是这个城市的心跳。\n\n只要心跳还在，城市就还活着。你也还活着。',
+      cond: g => g.age >= 18 && g.intel > 30,
+      choices:[
+        { label:'养成了每天听白噪音的习惯', hint:'+💪 +😊', fn: g => { g.flags.cityWhitenoise=true; return{health:5,mood:5}; }},
+        { label:'录了一段城市白噪音做成助眠音频', hint:'+✨ +🧠', fn: g => { g.flags.cityWhitenoise=true; g.flags.madeAudio=true; return{charm:5,intel:3}; }},
+        { label:'把这个发现分享给了朋友', hint:'+👥', fn: g => { g.flags.cityWhitenoise=true; return{social:5}; }},
+      ]},
+
+    { id:'neighbor_piano_v32_7', icon:'🎹', title:'邻居家的钢琴', category:'sound',
+      body:'你家楼上住着一户人家，他们家有个学钢琴的孩子。\n\n每天下午四点到六点，你都能听到钢琴声。一开始弹得很生涩，磕磕绊绊的。你的第一反应是烦。\n\n但一个月后，你发现那个孩子弹得越来越流畅了。你开始能听出旋律——是《小星星》，然后是《致爱丽丝》，再后来是一首你叫不出名字的曲子。\n\n半年后，那首曲子已经弹得很美了。你下班回来的时候听到，觉得一天的疲惫都被治愈了。\n\n你给楼上送了一盒饼干，附了张纸条：「你弹得很好听，谢谢你。」\n\n第二天你听到那个孩子弹了一首新曲子。你觉得那是他弹给你听的。',
+      cond: g => g.age >= 20,
+      choices:[
+        { label:'送了饼干鼓励那个孩子', hint:'+👥 +😊', fn: g => { g.flags.neighborPiano=true; g.money-=50; return{social:5,mood:8}; }},
+        { label:'开始在钢琴声中看书', hint:'+🧠 +😊', fn: g => { g.flags.neighborPiano=true; return{intel:5,mood:5}; }},
+        { label:'跟邻居打了招呼，认识了一家人', hint:'+👥', fn: g => { g.flags.neighborPiano=true; g.flags.metNeighbors=true; return{social:8}; }},
+      ]},
+
+    { id:'morning_horns_v32_7', icon:'🚗', title:'早高峰的喇叭', category:'sound',
+      body:'早上八点，你在公交车上被堵在了路上。\n\n前面的车一动不动，后面的车开始疯狂按喇叭。「滴滴滴——嘟嘟嘟——」此起彼伏，像一场混乱的交响乐。\n\n你看了看窗外：每个人都一脸焦躁。有人在车里打电话，有人在拼命看时间，有人在骂骂咧咧。\n\n你前面那辆出租车的司机打开了窗户，冲旁边的大妈喊：「别按了！按也没用！」\n\n大妈回了一句：「我不按你就不堵了吗？」\n\n你忍不住笑了。你觉得早高峰的喇叭声是这个城市最真实的声音——每个人都在着急，但每个人都在假装自己不着急。',
+      cond: g => g.jobSalary > 0 && g.age >= 18,
+      choices:[
+        { label:'决定以后早出门半小时', hint:'+💪 +🧠', fn: g => { g.flags.morningHorns=true; g.flags.leaveEarlier=true; return{health:3,intel:3}; }},
+        { label:'在堵车的路上听完了一集播客', hint:'+🧠 +😊', fn: g => { g.flags.morningHorns=true; return{intel:5,mood:3}; }},
+        { label:'开始考虑骑电动车上班', hint:'+🧠 +💪', fn: g => { g.flags.morningHorns=true; g.flags.considerBike=true; return{intel:3,health:3}; }},
+      ]},
+
+    { id:'midnight_cats_v32_7', icon:'🐈', title:'深夜的猫叫', category:'sound',
+      body:'凌晨一点，你被一阵猫叫声吵醒了。\n\n不是家猫那种软绵绵的「喵」，而是流浪猫那种尖锐的、近乎人类婴儿啼哭的叫声。\n\n你知道这是发情期的猫在「叫春」。你翻了个身，用枕头捂住耳朵，但那声音穿透了一切。\n\n你干脆起来了，走到窗前。月光下，你看到三四只猫在围墙上面追逐、对峙、嚎叫。\n\n你想到，在这个城市的每一个角落，都有生命在用力地活着。它们不需要闹钟，不需要计划，不需要为明天的会议焦虑。\n\n它们只是活着，用最大的声音告诉世界：我在这里。\n\n你躺回去，在猫叫声中慢慢睡着了。居然睡得比平时更沉。',
+      cond: g => g.age >= 18,
+      choices:[
+        { label:'第二天在楼下放了一些猫粮', hint:'-💰 +😊', fn: g => { g.flags.midnightCats=true; g.money-=30; return{mood:5}; }},
+        { label:'录了一段猫叫声当素材', hint:'+✨', fn: g => { g.flags.midnightCats=true; return{charm:3}; }},
+        { label:'在猫叫声中睡着了，觉得很治愈', hint:'+😊 +💪', fn: g => { g.flags.midnightCats=true; return{mood:5,health:3}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -19778,6 +19869,18 @@ const ACHIEVEMENTS = [
     { id:'night_run_ach', icon:'🏃', name:'夜跑者', desc:'开始了夜间跑步的习惯', check: g => g.flags.nightRun },
     { id:'allnight_study_ach', icon:'📚', name:'通宵自习室', desc:'在通宵自习室为梦想努力', check: g => g.flags.allnightStudy },
     { id:'midnight_walk_ach', icon:'🚶', name:'午夜漫步', desc:'在午夜的街道上找到了平静', check: g => g.flags.midnightWalk },
+
+    // --- v32.7 城市里的声音成就 ---
+    { id:'square_dance_ach', icon:'🔊', name:'广场舞观察家', desc:'重新认识了楼下广场舞的意义', check: g => g.flags.squareDanceMusic },
+    { id:'construction_noise_ach', icon:'🔨', name:'噪音适应者', desc:'在工地噪音中学会了适应', check: g => g.flags.constructionNoise },
+    { id:'subway_voice_ach', icon:'🚇', name:'地铁常客', desc:'把地铁报站声当成了城市的心跳', check: g => g.flags.subwayAnnounce },
+    { id:'neighbors_fight_ach', icon:'💢', name:'隔壁的故事', desc:'听到了邻居的争吵并表达了关心', check: g => g.flags.neighborsFight },
+    { id:'street_vendor_ach_v32_7', icon:'📢', name:'叫卖记忆', desc:'在叫卖声中找回了童年的味道', check: g => g.flags.streetVendor },
+    { id:'rain_sound_ach', icon:'🌧️', name:'听雨人', desc:'在雨声中找到了平静', check: g => g.flags.rainSound },
+    { id:'whitenoise_ach', icon:'🎧', name:'城市白噪音', desc:'学会了把城市噪音当成白噪音', check: g => g.flags.cityWhitenoise },
+    { id:'piano_neighbor_ach', icon:'🎹', name:'钢琴邻居', desc:'在邻居的钢琴声中找到了美好', check: g => g.flags.neighborPiano },
+    { id:'morning_horns_ach', icon:'🚗', name:'早高峰生存者', desc:'在早高峰的喇叭声中保持了冷静', check: g => g.flags.morningHorns },
+    { id:'midnight_cats_ach', icon:'🐈', name:'深夜猫叫', desc:'在猫叫声中感受到了城市里的生命力', check: g => g.flags.midnightCats },
 ];
 
 // === ENDINGS === (order matters: first match wins)
