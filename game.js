@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v11.5
+// 都市浮生记 - Game Engine v11.6
 // ============================================
 
 // === GAME STATE ===
@@ -5526,6 +5526,63 @@ const EVENTS = [
         { label:'偶尔参加', hint:'+😊 +👥', fn: g => { return{social:5,mood:8}; }},
         { label:'不太适合', hint:'', fn: g => { return{mood:-2}; }},
       ]},
+    // === v11.6 兴趣爱好/宠物/城市文化 ===
+    { id:'photography', icon:'📷', title:'摄影入门',
+      body:'你买了一台二手相机，开始学摄影。\n\n你拍日出、拍街道、拍流浪猫、拍路人。你发现：当你透过镜头看城市时，一切都变得不一样了。\n\n你在小红书上发了一组照片，有人评论说："你拍出了这座城市的灵魂。"\n\n"摄影是用光的艺术——用光你的钱，用光你的时间，用光你的内存。"',
+      cond: g => g.charm >= 30 && g.money > 1000 && g.months > 6,
+      choices:[
+        { label:'认真学习', hint:'-💰 +✨', fn: g => { g.flags.photographer=true; return{money:-2000,charm:8,intel:3,mood:8}; }},
+        { label:'随手拍拍', hint:'+✨', fn: g => { return{charm:5,mood:5}; }},
+        { label:'手机就够了', hint:'+😊', fn: g => { return{mood:3}; }},
+      ]},
+    { id:'running_habit', icon:'🏃', title:'跑步习惯',
+      body:'你决定开始跑步。第一天跑了1公里就喘不上气了。\n\n你坚持了一个月，能跑5公里了。你参加了人生的第一次5公里欢乐跑。\n\n你发了条朋友圈："我不是在跑步，我是在跑掉焦虑。"\n\n"跑步是最便宜的心理治疗——一双鞋，一条路，就够了。"',
+      cond: g => g.age >= 20 && g.age <= 45 && g.health < 75 && g.months > 3,
+      choices:[
+        { label:'每天晨跑', hint:'+💪 +😊', fn: g => { g.flags.runner=true; return{health:10,mood:8}; }},
+        { label:'每周三次', hint:'+💪', fn: g => { g.flags.runner=true; return{health:6,mood:5}; }},
+        { label:'跑了一次就放弃', hint:'+😊', fn: g => { return{mood:-3}; }},
+      ]},
+    { id:'pet_birthday', icon:'🎂', title:'宠物生日',
+      body:'今天是你的毛孩子的生日。你买了一个宠物蛋糕，给它戴上了生日帽。\n\n你给它唱了生日快乐歌——虽然它完全不知道你在干什么。\n\n你拍了100张照片，选了一张最好看的发了朋友圈。\n\n"宠物的生日是给主人的——它不在乎蛋糕，但它在乎你在它身边。"',
+      cond: g => g.flags.hasPet && g.months > 12,
+      choices:[
+        { label:'办派对', hint:'-💰 +😊', fn: g => { return{money:-300,mood:15,charm:3}; }},
+        { label:'买好吃的', hint:'-💰 +😊', fn: g => { return{money:-50,mood:10}; }},
+        { label:'多陪它玩', hint:'+😊', fn: g => { return{mood:8}; }},
+      ]},
+    { id:'pet_lost', icon:'😰', title:'宠物走丢了',
+      body:'你回家发现门没关好，你的猫/狗不见了。\n\n你疯狂地找了三个小时，贴了寻宠启事，发了朋友圈。你的邻居帮你转发，你的同事帮你找。\n\n第四个小时，你在楼下花坛里找到了它——它正在吃一只蝴蝶。\n\n"宠物走丢是主人最恐怖的经历——因为你知道：它不知道自己在外面有多危险。"',
+      cond: g => g.flags.hasPet && g.months > 6,
+      choices:[
+        { label:'买GPS项圈', hint:'-💰', fn: g => { return{money:-200,mood:5}; }},
+        { label:'以后关好门', hint:'+🧠', fn: g => { return{intel:2,mood:3}; }},
+        { label:'吓到了', hint:'+😊', fn: g => { return{mood:-10}; }},
+      ]},
+    { id:'marathon', icon:'🏅', title:'半程马拉松',
+      body:'你报名了人生第一次半程马拉松。\n\n21公里。你跑了15公里的时候想放弃，旁边一个60岁的大爷说："年轻人，我都能跑，你怕什么？"\n\n你咬着牙跑完了。终点线前你差点哭了。\n\n"马拉松不是和别人的比赛，是和自己的和解。"',
+      cond: g => g.flags.runner && g.health >= 65 && g.age >= 20 && g.age <= 45,
+      choices:[
+        { label:'跑完全马', hint:'+💪 +😊', fn: g => { g.flags.marathonFinish=true; return{health:10,mood:20}; }},
+        { label:'半马就够了', hint:'+💪 +😊', fn: g => { return{health:5,mood:12}; }},
+        { label:'下次再说', hint:'+😊', fn: g => { return{mood:5}; }},
+      ]},
+    { id:'art_hobby', icon:'🎨', title:'画画',
+      body:'你买了一套水彩颜料和画本，开始学画画。\n\n你画的第一幅画是你出租屋的窗户——窗外是一堵墙。你发了朋友圈，配文："心中有风景，窗外就有风景。"\n\n收获了80个赞。\n\n"画画不需要天赋——你只需要一支笔和一颗想表达的心。"',
+      cond: g => g.charm >= 25 && g.months > 6 && g.money > 200,
+      choices:[
+        { label:'报班学习', hint:'-💰 +✨', fn: g => { g.flags.artist=true; return{money:-2000,charm:10,intel:3,mood:10}; }},
+        { label:'自学成才', hint:'+✨', fn: g => { g.flags.artist=true; return{charm:5,mood:5}; }},
+        { label:'只是涂鸦', hint:'+😊', fn: g => { return{mood:5}; }},
+      ]},
+    { id:'plant_parent', icon:'🌱', title:'养植物',
+      body:'你买了几盆绿植放在出租屋里。\n\n第一周你每天浇水。第二周你忘了。第三周你发现：有一盆活了下来，另外两盆枯了。\n\n你开始认真研究每种植物的习性。那盆活下来的成了你的"精神支柱"。\n\n"养植物是成年人最低成本的陪伴——它不会离开你，只要你不忘了浇水。"',
+      cond: g => !g.flags.hasHouse && g.months > 3 && g.money > 100,
+      choices:[
+        { label:'扩大种植', hint:'-💰 +😊', fn: g => { g.flags.plantParent=true; return{money:-300,mood:10,health:2}; }},
+        { label:'养好这一盆', hint:'+😊', fn: g => { g.flags.plantParent=true; return{mood:5}; }},
+        { label:'养什么死什么', hint:'', fn: g => { return{mood:-3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'first_job', icon:'💼', name:'职场新人', desc:'找到第一份工作', check: g => g.flags.gotFirstJob },
@@ -5999,6 +6056,12 @@ const ACHIEVEMENTS = [
     { id:'volunteer_regular', icon:'❤️', name:'常驻志愿者', desc:'定期参加志愿活动', check: g => g.flags.regularVolunteer },
     { id:'moved_up', icon:'📦', name:'消费升级', desc:'搬到了更好的房子', check: g => g.flags.movedUp },
     { id:'retirement_planner', icon:'👴', name:'养老规划师', desc:'开始规划退休生活', check: g => g.investments && g.investments.fund >= 10000 },
+    // === v11.6 新增成就 ===
+    { id:'photographer_ach', icon:'📷', name:'光影猎人', desc:'入坑摄影', check: g => g.flags.photographer },
+    { id:'runner_ach', icon:'🏃', name:'跑者', desc:'养成了跑步习惯', check: g => g.flags.runner },
+    { id:'marathon_finisher', icon:'🏅', name:'马拉松完赛', desc:'跑完了全程马拉松', check: g => g.flags.marathonFinish },
+    { id:'artist_ach', icon:'🎨', name:'业余画家', desc:'坚持艺术创作', check: g => g.flags.artist },
+    { id:'plant_parent_ach', icon:'🌿', name:'植物家长', desc:'养活了绿植', check: g => g.flags.plantParent },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -6147,6 +6210,9 @@ const ENDINGS = [
     { id:'influencer_end', badge:'📱', title:'网红人生', desc:'你成了一个小网红。\n\n粉丝不多不少，刚好够养活自己。你接广告、做直播、写测评。你把自己的生活变成了一种"内容"。\n\n有人说你"活得很累"，因为你要时刻维护人设。但你觉得：能把喜欢的事变成工作，已经很幸运了。\n\n"网红的真相：你展示的是精心编排的人生，但观众需要的是真实。"', cond: g => g.flags.contentCreator && g.charm >= 55 && g.money >= 30000 && g.age >= 25 },
     // --- v11.5 NEW ENDINGS ---
     { id:'volunteer_heart_end', badge:'❤️', title:'温暖的人', desc:'你成了社区里最受欢迎的人。\n\n每个周末你都会去养老院、收容所、社区中心做志愿者。你认识了很多朋友——有些比你大50岁，有些比你小20岁。\n\n有人说："你做的事情没有一分钱收入。"\n\n你笑着说："但收获的快乐，千金不换。"\n\n"生命的意义不在于你拥有多少，在于你给予了多少。"', cond: g => g.flags.regularVolunteer && g.social >= 60 && g.mood >= 65 && g.age >= 27 },
+    // --- v11.6 NEW ENDINGS ---
+    { id:'marathon_life_end', badge:'🏅', title:'跑马人生', desc:'你从一个走两步就喘的废柴，变成了一个能跑42公里的狠人。\n\n你参加了北马/上马/广马。冲过终点线的那一刻，你哭了——不是因为累，是因为你证明了自己。\n\n你的朋友圈签名改成了："人生就是一场马拉松，慢慢来，别着急。"\n\n"跑步教会你的不是速度，是坚持。"', cond: g => g.flags.marathonFinish && g.health >= 75 && g.age >= 26 },
+    { id:'artist_life_end', badge:'🎨', title:'业余艺术家', desc:'你没有成为专业画家，但你的画挂满了出租屋的墙壁。\n\n朋友来你家都会说："哇，这都是你画的？"\n\n你在小红书上有了一个小小的粉丝群，他们叫你「城市里的心灵画师」。\n\n"艺术不需要被认可，它只需要被创造。"', cond: g => g.flags.artist && g.mood >= 65 && g.charm >= 50 && g.age >= 27 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
