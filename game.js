@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v28.0
+// 都市浮生记 - Game Engine v28.1
 // ============================================
 
 // === GAME STATE ===
@@ -14304,6 +14304,87 @@ const EVENTS = [
         { label:'跟兄弟姐妹AA了费用', hint:'-💰 +🧠 +🤝', fn: g => { g.flags.parentMedicalFund=true; g.money -= 30000; return{intel:3,social:3}; }},
         { label:'出了自己那份，但感到很焦虑', hint:'-💰 -😊 -🧠', fn: g => { g.flags.parentMedicalFund=true; g.flags.medicalAnxiety=true; g.money -= 30000; return{mood:-8,intel:-3}; }},
       ]},
+    // v28.1: 网络暴力 + 人肉搜索 + 键盘侠
+    { id:'cyberbullying_victim_v28_1', icon:'💻', title:'网络暴力受害者', category:'society',
+      body:'你被网暴了。\n\n起因：你在微博上说了一句「我觉得这个电影不好看」。\n\n然后——\n\n你被「粉丝」围攻了：\n- 「你有什么资格说不好看？」\n- 「你行你上啊！」\n- 「一看就是没文化的」\n- 「你妈没教过你尊重别人吗？」\n\n你的微博被「扒」了：\n- 你的真名\n- 你的工作单位\n- 你的照片\n- 你3年前发的一条「不当言论」\n\n你收到了：\n- 500条辱骂私信\n- 30条死亡威胁\n- 你的公司收到了「举报信」\n\n你开始理解：网络暴力——不是「言论自由」——是「以言论自由之名的暴力」。\n\n他们不是在「表达观点」——他们是在「用人数碾压个人」。\n\n你只是说了一句「不好看」——你被「审判」了。\n\n「网络暴力：你以为你在说话——其实你在给一群陌生人递刀子。」',
+      cond: g => g.age >= 16 && !g.flags.cyberbullyingVictim && g.social >= 10,
+      choices:[
+        { label:'报警并起诉了带头的人', hint:'+🧠 +✨ -💰', fn: g => { g.flags.cyberbullyingVictim=true; g.flags.legalFighter=true; g.money -= 10000; return{intel:8,charm:5,mood:-5}; }},
+        { label:'删了所有社交媒体消失了', hint:'-🤝 -😊 +❤️', fn: g => { g.flags.cyberbullyingVictim=true; g.flags.socialMediaExile=true; return{social:-10,mood:-10,health:5}; }},
+        { label:'硬刚回去，发了一条澄清视频', hint:'+✨ +🧠 -😊', fn: g => { g.flags.cyberbullyingVictim=true; g.flags.foughtBack=true; return{charm:8,intel:5,mood:-8}; }},
+      ]},
+    { id:'keyboard_warrior_v28_1', icon:'⌨️', title:'当了一次键盘侠', category:'psychology',
+      body:'你在网上骂了人。\n\n起因：你看到一条新闻——一个女孩在地铁上吃韭菜饼。\n\n你评论了：「在公共场合吃这种东西，素质真低。」\n\n然后——你发现这条评论火了。\n\n你收到了2000个赞——\n\n你觉得自己「正义」了——\n\n然后有人回复你：「你有什么资格说别人？你在地铁上没吃过东西？」\n\n你开始想：\n- 你为什么要骂她？\n- 你认识她吗？\n- 你知道她为什么在地铁上吃东西吗？\n- 也许她加班到凌晨——来不及吃饭\n\n你开始理解：键盘侠——不是「正义」——是「用别人的错误满足自己的优越感」。\n\n你在网上骂人——因为你在现实中——不敢。\n\n你不是在维护公共道德——你是在发泄自己的不满。\n\n「键盘侠：你不是在伸张正义——你是在用别人的错误刷存在感。」',
+      cond: g => g.age >= 16 && !g.flags.keyboardWarrior,
+      choices:[
+        { label:'反思了，删了评论并道歉', hint:'+🧠 +✨ +😊', fn: g => { g.flags.keyboardWarrior=true; g.flags.reformedTroll=true; return{intel:8,charm:5,mood:3}; }},
+        { label:'意识到了但没道歉', hint:'+🧠', fn: g => { g.flags.keyboardWarrior=true; return{intel:5}; }},
+        { label:'觉得骂得对，继续骂', hint:'-🧠 -✨', fn: g => { g.flags.keyboardWarrior=true; g.flags.persistentTroll=true; return{intel:-5,charm:-5}; }},
+      ]},
+    { id:'doxxing_incident', icon:'🔍', title:'人肉搜索', category:'society',
+      body:'你被人肉了。\n\n起因：你跟邻居吵了一架（因为停车位）。\n\n邻居把你的信息发到了业主群：\n- 你的车牌号\n- 你的房号\n- 你的照片\n\n然后有人「深挖」了：\n- 你的工作单位\n- 你的社交媒体\n- 你10年前的一条微博\n\n你被「挂」了——\n\n你收到了一条私信：「我知道你住哪里，小心点。」\n\n你开始想：\n- 你在互联网上——没有隐私\n- 任何人——都可以——用10分钟——找到你的一切\n- 你的过去——永远在网上——等着被人翻出来\n\n你开始理解：人肉搜索——不是「揭露真相」——是「用信息当武器」。\n\n他们不是在「曝光坏人」——他们是在玩「侦探游戏」。\n\n而你——只是这场游戏里的「猎物」。\n\n「人肉搜索：你在网上的每一个痕迹——都是别人手里的子弹。」',
+      cond: g => g.age >= 18 && !g.flags.doxxingIncident && g.social >= 5,
+      choices:[
+        { label:'开始全面清理网上个人信息', hint:'+🧠 +✨ -😊', fn: g => { g.flags.doxxingIncident=true; g.flags.digitalCleaner=true; return{intel:8,charm:3,mood:-5}; }},
+        { label:'报警了但没什么结果', hint:'+🧠 -😊', fn: g => { g.flags.doxxingIncident=true; return{intel:3,mood:-8}; }},
+        { label:'跟对方和解了', hint:'+🤝 -😊', fn: g => { g.flags.doxxingIncident=true; g.flags.peaceMaker=true; return{social:3,mood:-3}; }},
+      ]},
+    { id:'cancel_culture', icon:'🚫', title:'网络审判', category:'society',
+      body:'你的同事——被「网络审判」了。\n\n起因：他在朋友圈转发了一个「争议性」文章。\n\n然后——\n\n有人截图——发到了微博——@了他的公司——\n\n公司：「已关注到相关舆情，正在调查。」\n\n3天后——他被辞退了。\n\n你问他：「你转发了什么？」\n\n他说：「一篇关于教育的文章，说了几句自己的看法。」\n\n你看了他的朋友圈——\n\n他的观点——确实有争议——但不违法。\n\n你开始想：\n- 他因为一条朋友圈——丢了工作\n- 举报他的人——他不认识\n- 公司辞退他——是因为「舆情」——不是因为他的工作\n\n你开始理解：网络审判——不是「正义」——是「多数人暴政」。\n\n你不需要犯法——你只需要「让人不舒服」。\n\n你不是在被法律审判——你是在被「流量审判」。\n\n「网络审判：你不需要犯罪——你只需要一条让某些人不舒服的发言。」',
+      cond: g => g.age >= 20 && !g.flags.cancelCulture && g.jobSalary > 0,
+      choices:[
+        { label:'开始谨慎管理自己的网络发言', hint:'+🧠 +✨ -😊', fn: g => { g.flags.cancelCulture=true; g.flags.cautiousSpeaker=true; return{intel:8,charm:3,mood:-5}; }},
+        { label:'为同事发声，写了封联名信', hint:'+🤝 +✨ -😊', fn: g => { g.flags.cancelCulture=true; g.flags.defendedColleague=true; g.reputation.social += 5; return{social:5,charm:5,mood:-3}; }},
+        { label:'删了自己所有可能有争议的内容', hint:'-🤝 -✨ +🧠', fn: g => { g.flags.cancelCulture=true; g.flags.selfCensored=true; return{intel:3,charm:-3}; }},
+      ]},
+    { id:'water_army_encounter', icon:'🌊', title:'水军攻击', category:'society',
+      body:'你发了一个产品差评。\n\n你买了一个耳机——300块——音质很差——你在电商平台给了1星差评。\n\n第二天——\n\n你收到了50条回复：\n- 「你是竞争对手请的水军吧？」\n- 「300块的耳机你想要什么音质？」\n- 「不爱用就退，别在这里黑」\n- 「已举报，恶意差评」\n\n你的差评被「折叠」了。\n\n你开始想：\n- 这50条回复——是真的用户——还是「水军」？\n- 你的真实评价——被「水军」淹没了\n- 你看到的「好评」——有多少是真的？\n\n你开始理解：水军——不是「营销手段」——是「信息污染」。\n\n你以为你在看「用户评价」——其实你在看「品牌花钱买的假好评」。\n\n你不是在做消费决策——你是在「被水军引导消费」。\n\n「水军攻击：你在网上看到的「好评」——可能比你看到的「假新闻」还假。」',
+      cond: g => g.age >= 16 && !g.flags.waterArmyEncounter,
+      choices:[
+        { label:'坚持真实评价，追加了更详细的评论', hint:'+🧠 +✨ -😊', fn: g => { g.flags.waterArmyEncounter=true; g.flags.truthReviewer=true; return{intel:8,charm:5,mood:-3}; }},
+        { label:'意识到水军太多，以后不写评价了', hint:'-🧠 +😊', fn: g => { g.flags.waterArmyEncounter=true; return{intel:-3,mood:3}; }},
+        { label:'退了货，不跟他们纠缠了', hint:'+🧠 +💰', fn: g => { g.flags.waterArmyEncounter=true; g.money += 300; return{intel:3}; }},
+      ]},
+    { id:'online_misjudgment', icon:'⚖️', title:'网络误判', category:'psychology',
+      body:'你参与了一次「网络讨伐」。\n\n事件：有人拍到一辆豪车占了两个停车位。\n\n你转发了——配文：「有钱就可以不守规矩？」\n\n然后——真相出来了：\n- 那辆车旁边的车位——是坏的\n- 停车场管理员让他停那里的\n- 车主当时在车上——等人\n\n你转发的「真相」——是假的。\n\n你「讨伐」的那个人——是无辜的。\n\n你的转发——已经伤害了他——\n\n你开始想：\n- 你转发了——因为你「觉得」他不对\n- 你没有查证——因为你「懒得查」\n- 你只是——「随手一转」\n\n你开始理解：网络误判——不是「意外」——是「必然」。\n\n因为——真相——需要时间——而情绪——不需要。\n\n你不是在追求真相——你是在追求「情绪共鸣」。\n\n「网络误判：你转发的每一条「真相」——都可能是你伤害别人的武器。」',
+      cond: g => g.age >= 18 && !g.flags.onlineMisjudgment && g.intel >= 20,
+      choices:[
+        { label:'公开道歉并删了转发', hint:'+✨ +🧠 -😊', fn: g => { g.flags.onlineMisjudgment=true; g.flags.publicApology=true; return{charm:8,intel:5,mood:-5}; }},
+        { label:'默默删了但没道歉', hint:'+🧠 -😊', fn: g => { g.flags.onlineMisjudgment=true; return{intel:5,mood:-3}; }},
+        { label:'觉得就算这次是假的平时也是真的', hint:'-🧠 -✨', fn: g => { g.flags.onlineMisjudgment=true; g.flags.doublesDown=true; return{intel:-5,charm:-5}; }},
+      ]},
+    { id:'social_media_outrage', icon:'😡', title:'情绪消费', category:'psychology',
+      body:'你发现——你每天在网上——都在「生气」。\n\n早上：\n- 看到一条新闻：「某地城管打人」→ 你愤怒了\n\n中午：\n- 看到一条微博：「某明星偷税」→ 你愤怒了\n\n下午：\n- 看到一条短视频：「某老人被欺负」→ 你愤怒了\n\n晚上：\n- 看到一条公众号：「某公司996」→ 你愤怒了\n\n你一天愤怒了4次——\n\n但你——做了什么？\n- 转发了4条\n- 评论了8条\n- 点了20个赞\n\n然后——你睡了——明天继续愤怒。\n\n你开始理解：情绪消费——不是「你在关心社会」——是「社会在消费你的情绪」。\n\n你的愤怒——被算法——精准投放——因为「愤怒」让你停留更久。\n\n你不是在「关注社会」——你是在「被社会消费」。\n\n「情绪消费：你不是在生气——你是被算法设计成「生气」——因为生气的人看得更久。」',
+      cond: g => g.age >= 16 && !g.flags.socialMediaOutrage && g.mood < 60,
+      choices:[
+        { label:'开始「新闻断食」一周只看一次新闻', hint:'+😊 +🧠 +❤️', fn: g => { g.flags.socialMediaOutrage=true; g.flags.newsFaster=true; return{mood:10,intel:5,health:5}; }},
+        { label:'减少了刷新闻的频率', hint:'+😊 +🧠', fn: g => { g.flags.socialMediaOutrage=true; return{mood:5,intel:3}; }},
+        { label:'觉得关注社会是自己的责任', hint:'+🧠 -😊', fn: g => { g.flags.socialMediaOutrage=true; g.flags.civicDuty=true; return{intel:5,mood:-5}; }},
+      ]},
+    { id:'internet_fame_trap', icon:'🌟', title:'一夜爆红', category:'career',
+      body:'你的一条视频——突然火了。\n\n你随手拍的——你家猫打翻了一杯水——\n\n播放量：5000万\n点赞：300万\n评论：50万\n涨粉：20万\n\n你一夜之间——成了「网红」。\n\nMCN公司找上门了：\n- 「签约我们，保证你月入10万。」\n- 「独家签约，签约费50万。」\n\n你开始想：\n- 你真的有才华吗？\n- 还是只是运气好？\n- 这种流量——能持续吗？\n\n你看了数据：\n- 90%的网红——1年内过气\n- 你下一条视频——播放量：50万（比第一条少了99%）\n- 你的粉丝——开始流失\n\n你开始理解：一夜爆红——不是「机会」——是「陷阱」。\n\n你以为你找到了「风口」——其实你只是被风吹了一下。\n\n风停了——你还是要走路。\n\n「一夜爆红：你不是红了——你只是被算法选中了一次。」',
+      cond: g => g.age >= 16 && !g.flags.internetFameTrap && g.charm >= 20,
+      choices:[
+        { label:'签了MCN但坚持原创', hint:'+💰 +✨ -😊', fn: g => { g.flags.internetFameTrap=true; g.flags.signedMCN=true; g.money += 200000; return{charm:10,mood:-5}; }},
+        { label:'没签约，自己慢慢做内容', hint:'+🧠 +✨', fn: g => { g.flags.internetFameTrap=true; g.flags.independentCreator=true; g.money += 10000; return{intel:5,charm:5}; }},
+        { label:'觉得只是运气，继续原来的生活', hint:'+🧠 +😊', fn: g => { g.flags.internetFameTrap=true; g.flags.rejectedFame=true; return{intel:8,mood:5}; }},
+      ]},
+    { id:'troll_vs_troll', icon:'⚔️', title:'网络对线', category:'social',
+      body:'你在网上跟人「对线」了。\n\n起因：你在知乎回答了一个问题——关于「996是不是福报」。\n\n你的观点：996不是福报，是违法。\n\n然后——\n\n你收到了200条反对回复：\n- 「你不努力还想成功？」\n- 「你以为钱是大风刮来的？」\n- 「不想996就回家种地」\n- 「你这种人就是懒」\n\n你跟其中一个人「对线」了——\n\n你们来回了50条消息——\n\n3小时后——\n\n你发现：\n- 你没有说服他\n- 他没有说服你\n- 你们都浪费了半天\n\n你开始理解：网络对线——不是「辩论」——是「两个人的自说自话」。\n\n你们不是在「交流观点」——你们是在「捍卫自己的立场」。\n\n没有人会在网上说：「你说得对，我错了。」\n\n「网络对线：你不是在辩论——你是在跟一面镜子吵架。」',
+      cond: g => g.age >= 16 && !g.flags.trollVsTroll && g.intel >= 20,
+      choices:[
+        { label:'意识到了对线没用，以后不参与', hint:'+🧠 +😊 +✨', fn: g => { g.flags.trollVsTroll=true; g.flags.debateReformed=true; return{intel:8,mood:5,charm:3}; }},
+        { label:'虽然没赢但学到了很多', hint:'+🧠', fn: g => { g.flags.trollVsTroll=true; return{intel:5}; }},
+        { label:'继续对线，一定要说服他', hint:'-😊 -🧠 -❤️', fn: g => { g.flags.trollVsTroll=true; g.flags.argumentAddict=true; return{mood:-8,intel:-3,health:-3}; }},
+      ]},
+    { id:'digital_reputation', icon:'🏷️', title:'数字身份', category:'society',
+      body:'你被公司HR查了「网络背景」。\n\nHR说：「我们看了你的社交媒体——有些内容——不太合适。」\n\n你问：「哪些内容？」\n\nHR：\n- 你3年前转发的一条「政治敏感」内容\n- 你5年前发的一条「吐槽前公司」的内容\n- 你去年发的一条「穿得比较暴露」的照片\n\n你开始想：\n- 你10年前发的——还在网上\n- 你删了——但截图还在\n- 你以为的「私人空间」——其实是「公开档案」\n\n你开始理解：数字身份——不是「你控制得了的」——是「互联网替你记住的」。\n\n你在网上的每一条发言——都是你「未来的自己」的「案底」。\n\n互联网有记忆——而你——没有「删除键」。\n\n「数字身份：你不是在网上「做自己」——你是在给未来的自己「留证据」。」',
+      cond: g => g.age >= 22 && !g.flags.digitalReputation && g.jobSalary > 0,
+      choices:[
+        { label:'全面清理了社交媒体历史', hint:'+🧠 +✨ -😊', fn: g => { g.flags.digitalReputation=true; g.flags.digitalCleanSlate=true; return{intel:8,charm:3,mood:-5}; }},
+        { label:'设置了社交媒体仅自己可见', hint:'+🧠 +✨', fn: g => { g.flags.digitalReputation=true; g.flags.privacySettings=true; return{intel:5,charm:3}; }},
+        { label:'觉得无所谓，那是真实的我', hint:'+✨ -🧠', fn: g => { g.flags.digitalReputation=true; g.flags.authenticDigital=true; return{charm:5,intel:-3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -15571,6 +15652,14 @@ const ACHIEVEMENTS = [
     { id:'scholarship_student_ach', icon:'✈️', name:'奖学金留学', desc:'申请到奖学金去留学', check: g => g.flags.scholarshipStudent },
     { id:'simple_wedding_ach', icon:'💒', name:'简约婚礼', desc:'简单办了婚礼省了10万', check: g => g.flags.simpleWedding },
     { id:'smart_substitute_ach', icon:'💎', name:'平替达人', desc:'买了个平替省了几万块', check: g => g.flags.smartSubstitute },
+    // v28.1: 网络暴力成就
+    { id:'legal_fighter_ach', icon:'💻', name:'法律反击', desc:'被网暴后报警并起诉了带头的人', check: g => g.flags.legalFighter },
+    { id:'reformed_troll_ach', icon:'⌨️', name:'键盘侠回头', desc:'当了键盘侠后反思并道歉', check: g => g.flags.reformedTroll },
+    { id:'truth_reviewer_ach', icon:'🌊', name:'真实评价者', desc:'面对水军坚持真实评价', check: g => g.flags.truthReviewer },
+    { id:'public_apology_ach', icon:'⚖️', name:'公开道歉', desc:'参与网络误判后公开道歉', check: g => g.flags.publicApology },
+    { id:'news_faster_ach', icon:'😡', name:'新闻断食', desc:'开始新闻断食只看一次新闻', check: g => g.flags.newsFaster },
+    { id:'debate_reformed_ach', icon:'⚔️', name:'对线戒断', desc:'意识到网络对线没用不再参与', check: g => g.flags.debateReformed },
+    { id:'defended_colleague_ach', icon:'🚫', name:'仗义执言', desc:'为被网络审判的同事发声', check: g => g.flags.defendedColleague },
 ];
 
 // === ENDINGS === (order matters: first match wins)
