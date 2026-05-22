@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v33.7
+// 都市浮生记 - Game Engine v33.8
 // ============================================
 
 // === GAME STATE ===
@@ -19067,6 +19067,98 @@ const EVENTS = [
         { label:'学会了看见日常的魔法', hint:'+🧠 +😊', fn: g => { g.flags.urbanDiary=true; return{intel:10,mood:8}; }},
       ]},
 
+    // ===== MBTI与人格测试文化 (v33.8) =====
+
+    { id:'mbti_test_v33_8', icon:'🧪', title:'MBTI初体验', category:'mbti',
+      body:'深夜两点，你点开了一个MBTI测试链接。\n\n93道题做完，屏幕弹出一个结果：「INFP — 调停者」。你读着那一大段描述，越读越心惊：\n\n「你外表平静，内心有着丰富的情感世界。你渴望被理解，但又害怕被看穿。你在人群中常常感到孤独……」\n\n这不就是在说你吗？！你激动地把结果截图发到朋友圈：「终于知道我是谁了！」\n\n底下评论两极分化——一半人说「太准了」，另一半人说「这不就是巴纳姆效应吗」。',
+      cond: g => g.age >= 18 && g.age <= 35 && g.intel > 30,
+      choices:[
+        { label:'深信不疑，改写了社交签名', hint:'+😊 +👥', fn: g => { g.flags.mbtiTest=true; g.flags.mbtiBeliever=true; return{mood:8,social:5}; }},
+        { label:'觉得有趣但保持怀疑', hint:'+🧠 +😊', fn: g => { g.flags.mbtiTest=true; g.flags.mbtiSkeptic=true; return{intel:8,mood:5}; }},
+        { label:'连续做了五个不同的人格测试', hint:'+🧠 +✨', fn: g => { g.flags.mbtiTest=true; g.flags.personalityNerd=true; return{intel:10,charm:3}; }},
+      ]},
+
+    { id:'mbti_social_v33_8', icon:'🏷️', title:'人格标签社交', category:'mbti',
+      body:'你把MBTI类型写进了所有社交平台的个人简介。\n\n微信签名改成了「INFP | 理想主义的浪漫派」，小红书加上了 #MBTI 标签，连招聘网站都写上了。\n\n效果立竿见影——你收到了好多私信：「我也是INFP！」「终于找到同类了！」还有人给你推荐了INFP专属歌单、INFP书单、INFP旅行目的地。\n\n但你也注意到一些奇怪的事：有人因为你是INFP就默认你「很脆弱很敏感」，有HR因为你是P型直接把你简历筛掉了，还有个相亲对象说「你是I人，我们是不会合得来的」。\n\n标签给了你归属感，但也给了你一个笼子。',
+      cond: g => g.flags.mbtiTest && g.age >= 18,
+      choices:[
+        { label:'继续用标签找同类', hint:'+👥 +✨', fn: g => { g.flags.mbtiSocial=true; return{social:8,charm:5}; }},
+        { label:'把标签从简介里删掉', hint:'+🧠 +😊', fn: g => { g.flags.mbtiSocial=true; return{intel:8,mood:5}; }},
+        { label:'把标签改成了「别定义我」', hint:'+✨ +🧠', fn: g => { g.flags.mbtiSocial=true; g.flags.antiLabel=true; return{charm:10,intel:5}; }},
+      ]},
+
+    { id:'mbti_dating_v33_8', icon:'💘', title:'MBTI配对学', category:'mbti',
+      body:'你迷上了用MBTI筛选约会对象。\n\n你建了一个Excel表格，列出了所有类型的兼容性评分。ENFP和INFJ是天作之合，INTJ和ENFP是黄金搭档，而你和ISTP……表格显示「匹配度23%」。\n\n一个你聊了很久的人发来消息：「我是ISTP。」你盯着表格犹豫了半天。\n\n但后来你们见面了。对方迟到了十分钟，手里拿着两杯你最喜欢的奶茶，说：「我在网上查了你这个类型喜欢什么。」\n\n你突然觉得，那个表格蠢透了。\n\n后来你把表格删了，但Excel里那个人的名字，你一直留着。',
+      cond: g => g.flags.mbtiTest && g.age >= 20 && g.age <= 40,
+      choices:[
+        { label:'删掉表格，跟着感觉走', hint:'+😊 +👥', fn: g => { g.flags.mbtiDating=true; return{mood:10,social:8}; }},
+        { label:'继续用MBTI做参考', hint:'+🧠 +👥', fn: g => { g.flags.mbtiDating=true; return{intel:5,social:5}; }},
+        { label:'开始研究更科学的依恋理论', hint:'+🧠 +✨', fn: g => { g.flags.mbtiDating=true; g.flags.attachmentTheory=true; return{intel:12,charm:3}; }},
+      ]},
+
+    { id:'mbti_workplace_v33_8', icon:'🏢', title:'公司搞MBTI团建', category:'mbti',
+      body:'公司请了个「组织发展顾问」来搞团建，核心项目是：全员做MBTI测试。\n\n结果出来后，会议室的白板上贴满了四个字母的贴纸。领导兴奋地分析：\n\n「我们部门全是T人，难怪内部沟通效率低！」「小刘你是J型，适合做项目管理。」「这个团队缺F型，需要招一个有同理心的人。」\n\n你注意到同事们表情各异——有人觉得被理解了，有人觉得被贴了标签，还有人偷偷把贴纸撕了。\n\n最讽刺的是，顾问收费五万，而测试本身是免费的。\n\n一周后，你的KPI表格里多了一行：「团队协作风格：J型-执行导向」。你不知道该笑还是该哭。',
+      cond: g => g.flags.mbtiTest && g.jobSalary > 0 && g.age >= 22,
+      choices:[
+        { label:'认真参与，确实有些启发', hint:'+👥 +🧠', fn: g => { g.flags.mbtiWork=true; return{social:5,intel:5}; }},
+        { label:'觉得是浪费时间，偷偷刷手机', hint:'+😊', fn: g => { g.flags.mbtiWork=true; return{mood:3}; }},
+        { label:'主动找领导谈了人格多样性的误区', hint:'+✨ +🧠', fn: g => { g.flags.mbtiWork=true; return{charm:8,intel:5}; }},
+      ]},
+
+    { id:'mbti_war_v33_8', icon:'⚔️', title:'人格类型大战', category:'mbti',
+      body:'你在网上围观了一场MBTI类型大战。\n\n起因是一个帖子：「INTJ是不是都是没有感情的机器人？」\n\n然后评论区炸了：\n\nINTJ：「我们只是不需要向陌生人证明自己有感情。」\nENFP：「你们就是嫉妒我们社交能力强！」\nISTJ：「你们能不能别吵了，有这时间不如去做个计划表。」\nINFP：*默默写了一篇三千字的感受发在公众号*\nESTP：「谁要打架？出来单挑啊！」\nENTP：「其实从哲学角度看，MBTI本身就是一个值得解构的话语体系……」\n\n你笑着看完，发现自己也忍不住评论了一句。\n\n然后你意识到：你已经被这个「人格部落」困住了。',
+      cond: g => g.flags.mbtiTest && g.age >= 18,
+      choices:[
+        { label:'下场为自己的类型辩护', hint:'+👥 +✨', fn: g => { g.flags.mbtiWar=true; return{social:5,charm:5}; }},
+        { label:'默默退出，去看了本书', hint:'+🧠 +😊', fn: g => { g.flags.mbtiWar=true; return{intel:8,mood:5}; }},
+        { label:'写了一篇分析MBTI争议的文章', hint:'+✨ +🧠', fn: g => { g.flags.mbtiWar=true; g.flags.mbtiWriter=true; return{charm:10,intel:8}; }},
+      ]},
+
+    { id:'mbti_change_v33_8', icon:'🔄', title:'人格变了', category:'mbti',
+      body:'距离你第一次做MBTI测试已经过了三年。你心血来潮又测了一次。\n\n结果变了。\n\n从INFP变成了INFJ。从P（感知型）变成了J（判断型）。\n\n你有点慌。这算什么？你变了？还是测试本身就不靠谱？\n\n你查了很多资料，发现一个事实：MBTI的重测信度只有约50%——也就是说，一半的人隔一段时间再测就会得到不同的结果。\n\n你不知道该松一口气还是该失落。你以为四个字母能定义你，但其实你比任何标签都复杂得多。\n\n三年里你经历了升职、搬家、分手、独居。不是你的人格变了，是你成长了。',
+      cond: g => g.flags.mbtiTest && g.age >= 23,
+      choices:[
+        { label:'接受自己的变化，继续探索', hint:'+🧠 +😊', fn: g => { g.flags.mbtiChange=true; return{intel:10,mood:8}; }},
+        { label:'有点失落，觉得自己被「骗」了', hint:'+🧠', fn: g => { g.flags.mbtiChange=true; return{intel:5}; }},
+        { label:'开始研究心理学的测量方法', hint:'+🧠 +✨', fn: g => { g.flags.mbtiChange=true; g.flags.psychStudy=true; return{intel:15,charm:3}; }},
+      ]},
+
+    { id:'mbti_trap_v33_8', icon:'🪤', title:'人格的牢笼', category:'mbti',
+      body:'你发现MBTI开始「反噬」你的生活了。\n\n找工作的时候，你看到一个岗位写着「偏好ENTJ/ESTJ」，你是INFP，连简历都没投。\n\n朋友约你去KTV，你下意识说「我是I人，不适合这种场合」，但其实你挺想去的。\n\n遇到冲突的时候，你会说「我是P型嘛，就是拖延」，然后心安理得地继续拖。\n\n你用四个字母解释了所有你不愿意面对的事。\n\n直到有一天，一个朋友说了一句：「你有没有想过，你不是I人，你只是害怕被拒绝？」\n\n这句话像一把刀子，但你知道它是对的。',
+      cond: g => g.flags.mbtiTest && g.flags.mbtiBeliever && g.age >= 20,
+      choices:[
+        { label:'开始正视自己的恐惧', hint:'+🧠 +😊', fn: g => { g.flags.mbtiTrap=true; return{intel:12,mood:5}; }},
+        { label:'跟朋友大吵了一架', hint:'+👥', fn: g => { g.flags.mbtiTrap=true; return{social:-5}; }},
+        { label:'删掉了所有MBTI相关内容', hint:'+✨ +😊', fn: g => { g.flags.mbtiTrap=true; g.flags.mbtiDetox=true; return{charm:5,mood:10}; }},
+      ]},
+
+    { id:'mbti_community_v33_8', icon:'🫂', title:'人格部落', category:'mbti',
+      body:'你加入了一个INFP线上社群。\n\n群里全是「同类」——大家都有丰富的内心世界、都在大城市漂泊、都喜欢在深夜写长长长的文字。\n\n你们聊村上春树、聊存在主义、聊为什么I人在大城市会格外孤独。有人分享了自己的诗集，有人画了插画，有人推荐了一首很冷门的冰岛后摇。\n\n你第一次觉得：原来世界上有这么多跟我一样的人。\n\n但渐渐地你发现，群里也有小团体、也有站队、也有人在背后议论「她一点都不像INFP」。你以为找到了避风港，结果发现哪里都一样。\n\n不过你还是交了两个真朋友。这就够了。',
+      cond: g => g.flags.mbtiTest && g.age >= 18,
+      choices:[
+        { label:'享受归属感，但不依赖它', hint:'+👥 +😊', fn: g => { g.flags.mbtiCommunity=true; return{social:10,mood:5}; }},
+        { label:'发现哪里都一样，有点失望', hint:'+🧠', fn: g => { g.flags.mbtiCommunity=true; return{intel:8}; }},
+        { label:'和两个真朋友组成了小群', hint:'+👥 +✨', fn: g => { g.flags.mbtiCommunity=true; g.flags.smallCircle=true; return{social:8,charm:5}; }},
+      ]},
+
+    { id:'mbti_biz_v33_8', icon:'💰', title:'人格变现', category:'mbti',
+      body:'你发现MBTI已经变成了一门生意。\n\n朋友圈里有人卖「MBTI职业规划咨询」，收费1999。有人做「INFP专属理财课」，99元一节。还有人在闲鱼上卖「人格类型定制手串」，一条288。\n\n最离谱的是一个「MBTI脱单训练营」，收费5980，宣传语写着：「帮你找到灵魂伴侣——根据科学的人格匹配算法。」\n\n你算了一下，一个MBTI博主靠卖课、接广告、做咨询，年收入可能比你上班还多。\n\n你有点心动：要不要也做一个「XX型人格成长社群」？\n\n你看了看自己空空的钱包，又看了看那个「16Personalities」的网页。',
+      cond: g => g.flags.mbtiTest && g.age >= 22 && g.money < 50000,
+      choices:[
+        { label:'算了，不想消费焦虑', hint:'+🧠 +😊', fn: g => { g.flags.mbtiBiz=true; return{intel:8,mood:5}; }},
+        { label:'研究了一下怎么做MBTI自媒体', hint:'+✨ +💰', fn: g => { g.flags.mbtiBiz=true; g.flags.mbtiCreator=true; return{charm:8,money:3000}; }},
+        { label:'花了1999买了个「职业咨询」', hint:'-💰 +🧠', fn: g => { g.flags.mbtiBiz=true; return{money:-1999,intel:5}; }},
+      ]},
+
+    { id:'mbti_philosophy_v33_8', icon:'🌊', title:'我是什么', category:'mbti',
+      body:'一个失眠的夜晚，你开始认真思考一个问题：\n\n「我到底是谁？」\n\nMBTI说你是INFP。星座说你是双子座。九型人格说你是4号。盖洛普说你前五项优势是「学习力、思维、关联、适应、战略」。生肖说你属龙。\n\n每一个系统都给了你一个标签，每一个标签都对，但每一个都不完整。\n\n你突然明白了一件事：你不需要被定义。你不是任何四个字母的组合，不是任何星座的描述，不是任何测试的结果。\n\n你是一个活生生的、会变化的、复杂的、矛盾的人。\n\n你关掉了所有测试网页，打开窗户，深吸一口气。\n\n夜风带着一点花香。你不知道那是什么花，但你觉得很好闻。\n\n这就够了。',
+      cond: g => g.flags.mbtiTest && g.flags.mbtiChange,
+      choices:[
+        { label:'接纳了复杂的自己', hint:'+😊 +✨ +🧠', fn: g => { g.flags.mbtiPhilosophy=true; g.flags.selfAccept=true; return{mood:15,charm:8,intel:10}; }},
+        { label:'决定不再做任何性格测试', hint:'+🧠 +😊', fn: g => { g.flags.mbtiPhilosophy=true; g.flags.noMoreTests=true; return{intel:12,mood:10}; }},
+        { label:'给每个朋友写了一封长信', hint:'+👥 +✨', fn: g => { g.flags.mbtiPhilosophy=true; g.flags.deepConnect=true; return{social:12,charm:10}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -20912,6 +21004,17 @@ const ACHIEVEMENTS = [
     { id:'night_stroll_ach', icon:'🌙', name:'凌晨漫步', desc:'看到了凌晨两点最真实的城市', check: g => g.flags.nightStroll },
     { id:'old_bookstore_ach', icon:'📚', name:'旧书寻宝', desc:'在旧书店淘到了有故事的书', check: g => g.flags.oldBookstore },
     { id:'urban_diary_ach', icon:'📝', name:'城市观察者', desc:'开始记录城市的日常细节', check: g => g.flags.urbanDiary },
+    // --- MBTI与人格测试文化 (v33.8) ---
+    { id:'mbti_test_v33_8_ach', icon:'🧪', name:'我是谁', desc:'做了第一次MBTI测试', check: g => g.flags.mbtiTest },
+    { id:'mbti_social_v33_8_ach', icon:'🏷️', name:'人格标签', desc:'把MBTI写进了社交简介', check: g => g.flags.mbtiSocial },
+    { id:'mbti_dating_v33_8_ach', icon:'💘', name:'灵魂匹配', desc:'用MBTI筛选过约会对象', check: g => g.flags.mbtiDating },
+    { id:'mbti_work_v33_8_ach', icon:'🏢', name:'人格团建', desc:'参加了公司的MBTI团建', check: g => g.flags.mbtiWork },
+    { id:'mbti_war_v33_8_ach', icon:'⚔️', name:'部落战争', desc:'围观了一场人格类型大战', check: g => g.flags.mbtiWar },
+    { id:'mbti_change_v33_8_ach', icon:'🔄', name:'我在变化', desc:'发现MBTI结果变了', check: g => g.flags.mbtiChange },
+    { id:'mbti_trap_v33_8_ach', icon:'🪤', name:'标签牢笼', desc:'意识到被MBTI框住了自己', check: g => g.flags.mbtiTrap },
+    { id:'mbti_community_v33_8_ach', icon:'🫂', name:'找到同类', desc:'加入了人格类型社群', check: g => g.flags.mbtiCommunity },
+    { id:'mbti_biz_v33_8_ach', icon:'💰', name:'人格经济', desc:'见证了MBTI变成一门生意', check: g => g.flags.mbtiBiz },
+    { id:'mbti_philosophy_v33_8_ach', icon:'🌊', name:'不被定义', desc:'接受了自己比任何标签都复杂', check: g => g.flags.mbtiPhilosophy },
 ];
 
 // === ENDINGS === (order matters: first match wins)
