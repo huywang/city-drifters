@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v11.6
+// 都市浮生记 - Game Engine v11.7
 // ============================================
 
 // === GAME STATE ===
@@ -5486,7 +5486,7 @@ const EVENTS = [
         { label:'省钱合租', hint:'-💰 +👥', fn: g => { return{money:-1000,social:5}; }},
         { label:'搬到郊区', hint:'-💰 +💪', fn: g => { g.flags.movedSuburb=true; return{money:-500,health:5,mood:3}; }},
       ]},
-    { id:'hometown_visit', icon:'🚄', title:'回趟老家',
+    { id:'hometown_visit_v2', icon:'🚄', title:'回趟老家',
       body:'你回了一趟老家。\n\n你发现：街角的小卖部变成了奶茶店，你家楼下的路修了三次还是坑坑洼洼，你的高中同学已经结婚生了两个孩子。\n\n你妈做了你最爱吃的菜。你爸喝了两杯酒后说："在外面累了就回来。"\n\n"故乡是一个你离开后才会想念的地方——但回去了你会发现，你已经不属于这里了。"',
       cond: g => g.months > 24 && g.money > 2000,
       choices:[
@@ -5510,7 +5510,7 @@ const EVENTS = [
         { label:'投资养老基金', hint:'-💰 🎲', fn: g => { if(g.investments) g.investments.fund = (g.investments.fund||0)+10000; return{money:-10000,intel:3}; }},
         { label:'活在当下', hint:'+😊', fn: g => { return{mood:10}; }},
       ]},
-    { id:'learn_instrument', icon:'🎸', title:'学一门乐器',
+    { id:'learn_instrument_v2', icon:'🎸', title:'学一门乐器',
       body:'你买了一把吉他/尤克里里/口琴。你想：如果我会弹一首歌就好了。\n\n你跟着B站教程学了两周。你的手指磨出了茧，但你终于能弹一首《小星星》了。\n\n你发了条朋友圈，收到了50个赞。有人说："来一首！"\n\n"学乐器是成年人最低成本的自我投资——你花500块就能获得终身的快乐。"',
       cond: g => g.age >= 20 && g.age <= 40 && g.money > 300,
       choices:[
@@ -5518,7 +5518,7 @@ const EVENTS = [
         { label:'学了两个月放弃', hint:'+😊', fn: g => { return{mood:3}; }},
         { label:'报班学习', hint:'-💰 +🧠', fn: g => { g.flags.instrumentPlayer=true; return{money:-3000,intel:8,charm:5,mood:10}; }},
       ]},
-    { id:'volunteer_work', icon:'❤️', title:'志愿者',
+    { id:'volunteer_work_v2', icon:'❤️', title:'志愿者',
       body:'你报名了一个周末志愿者活动：去养老院陪老人聊天/去动物收容所帮忙/去社区教小朋友画画。\n\n你发现：帮助别人带来的快乐，比消费带来的快乐更持久。\n\n一个老人拉着你的手说："谢谢你来看我，好久没人陪我说话了。"\n\n"做志愿者不是为了简历，是为了提醒自己：你拥有的比你以为的多。"',
       cond: g => g.age >= 20 && g.months > 6 && g.social >= 25,
       choices:[
@@ -5583,9 +5583,89 @@ const EVENTS = [
         { label:'养好这一盆', hint:'+😊', fn: g => { g.flags.plantParent=true; return{mood:5}; }},
         { label:'养什么死什么', hint:'', fn: g => { return{mood:-3}; }},
       ]},
+    // === v11.7 当代青年生存图鉴 ===
+    { id:'civil_service_exam_v2', icon:'📋', title:'宇宙的尽头是编制',
+      body:'你刷到一条视频：一个985硕士辞掉大厂工作去考公务员，考了三年终于上岸。评论区一片「恭喜」。\n\n你心动了。你妈更心动——她已经开始在亲戚面前吹嘘「我儿子/女儿要考公务员了」。\n\n考公资料费3000，培训班费15000。你看着银行卡余额，陷入了沉思。\n\n"宇宙的尽头是编制——但通往宇宙尽头的船票，比宇宙还贵。"',
+      cond: g => g.intel >= 50 && g.age >= 22 && g.age <= 35 && !g.flags.civilServant && g.money > 5000,
+      choices:[
+        { label:'全力备考', hint:'-💰💰 +🧠', fn: g => { g.flags.preparingCivilExam=true; return{money:-18000,intel:15,mood:-5}; }},
+        { label:'边工作边考', hint:'-💰 -❤️', fn: g => { g.flags.preparingCivilExam=true; return{money:-8000,intel:8,health:-5,mood:-3}; }},
+        { label:'算了，我不配', hint:'', fn: g => { return{mood:-3}; }},
+      ]},
+    { id:'consumption_downgrade_v2', icon:'📉', title:'消费降级实录',
+      body:'你打开手机记账软件，发现自己这个月的消费结构发生了重大变化：\n\n咖啡：星巴克→瑞幸→速溶→公司免费的\n午餐：外卖→便利店→自带饭→泡面\n社交：日料→火锅→烧烤→路边摊\n\n你发了条朋友圈：「我不是穷，我是在践行极简主义。」\n\n三分钟后你删了——因为你的同事在下面评论：「你上个月借我的50还没还。」\n\n"消费降级的本质不是省钱，是你终于承认自己没钱。"',
+      cond: g => g.money < 15000 && g.months > 6 && g.age >= 23,
+      choices:[
+        { label:'记账省钱', hint:'+💰 +🧠', fn: g => { g.flags.minimalist=true; return{money:2000,intel:3,mood:-5}; }},
+        { label:'该花就花', hint:'+😊 -💰', fn: g => { return{mood:10,money:-3000}; }},
+        { label:'学做饭', hint:'+❤️ +😊', fn: g => { g.flags.canCook=true; return{health:5,mood:5,money:1000}; }},
+      ]},
+    { id:'blind_box_addiction', icon:'🎁', title:'盲盒上头了',
+      body:'你路过一家泡泡玛特，心想「就买一个」。两个小时后，你手里拎着六个盲盒，钱包少了400块。\n\n你拆开一看：五个重复款，一个隐藏款都没有。你看着桌上已经摆了20个塑料小人，开始思考人生。\n\n你的室友说：「你花400块买了一堆塑料。」\n\n你说：「你不懂，这是情绪价值。」\n\n"盲盒经济学：用确定性的钱，买不确定性的快乐。最后确定的只有——你穷了。"',
+      cond: g => g.money > 2000 && g.age >= 22 && g.age <= 32 && g.mood < 65,
+      choices:[
+        { label:'再来一发', hint:'-💰 赌狗本质', fn: g => { g.flags.blindBoxFan=true; return{money:-400,mood:15}; }},
+        { label:'挂闲鱼回血', hint:'+💰', fn: g => { g.flags.blindBoxFan=true; return{money:100,mood:-3}; }},
+        { label:'从此戒了', hint:'+🧠', fn: g => { return{intel:3,mood:-5}; }},
+      ]},
+    { id:'matchmaking_corner_v2', icon:'💘', title:'相亲角奇遇',
+      body:'周末你妈拉你去了公园相亲角。几百张A4纸挂在绳子上，每张纸上写着一个人的「核心资产」：\n\n「男，92年，本科，年薪25万，有房有车」「女，95年，硕士，事业编，身高165」\n\n你感觉自己像一件被明码标价的商品。一个大爷看了你的简历，摇了摇头：「没房？那不行。」\n\n你妈安慰你：「没事，下一个。」但你已经看到了第37个「下一个」了。\n\n"相亲角的残酷真相：在这里，爱情是最不被看重的条件。"',
+      cond: g => !g.flags.married && g.age >= 26 && g.age <= 38,
+      choices:[
+        { label:'配合演出', hint:'+👥 也许能遇到', fn: g => { g.flags.hadMatchmaking=true; return{social:5,mood:-8,charm:-3}; }},
+        { label:'当场逃跑', hint:'+😊 自由万岁', fn: g => { g.flags.escapedMatchmaking=true; return{mood:10,social:-5}; }},
+        { label:'跟妈妈谈心', hint:'+👥❤️', fn: g => { return{social:3,mood:3}; }},
+      ]},
+    { id:'age_35_crisis_v2', icon:'⏰', title:'35岁魔咒',
+      body:'你35岁了。或者说，你快到35岁了。\n\n你的朋友圈开始出现两种人：一种是晒娃晒房的「人生赢家」，一种是转发《35岁被裁后我是怎么活下来的》的「幸存者」。\n\nHR朋友跟你说了一句大实话：「你不是不够好，是你的性价比不够高了。比你便宜、比你能加班的年轻人，一抓一大把。」\n\n你开始理解为什么有人说：「在中国，35岁不是年龄，是一道坎。」\n\n"35岁魔咒的本质：不是你老了，是这个社会没有给中年人留位置。"',
+      cond: g => g.age >= 34 && g.age <= 37 && g.job !== '待业中' && !g.flags.age35Crisis,
+      choices:[
+        { label:'转型管理', hint:'+🧠 未雨绸缪', fn: g => { g.flags.age35Crisis=true; return{intel:8,mood:-5}; }},
+        { label:'发展副业', hint:'-💰 +💰？', fn: g => { g.flags.age35Crisis=true; g.flags.sideHustle=true; return{money:-5000,intel:5,mood:3}; }},
+        { label:'爱咋咋地', hint:'+😊 躺平', fn: g => { g.flags.age35Crisis=true; return{mood:8,health:3}; }},
+      ]},
+    { id:'rental_scam', icon:'🏚️', title:'租房踩坑记',
+      body:'你签了一年的租房合同，押一付三。搬进去第一周就发现：\n\n空调是坏的。热水器只出冷水。隔壁每晚12点开始吵架。楼下烧烤摊的烟从窗户飘进来。\n\n你找房东理论，房东说：「你搬走啊，押金不退。」\n\n你找中介，中介说：「合同上写了，设施损坏自行维修。」\n\n你看着合同上自己签的名字，感觉像个笑话。\n\n"租房是年轻人的第一堂法律课——学费是押一付三，教材是一份你根本不会看的合同。"',
+      cond: g => !g.flags.hasHouse && g.months > 2 && g.money > 3000,
+      choices:[
+        { label:'硬刚维权', hint:'+🧠 +👥', fn: g => { g.flags.rentalRights=true; return{intel:5,social:3,mood:-8,money:-500}; }},
+        { label:'忍了到期搬', hint:'-😊', fn: g => { return{mood:-10,health:-3}; }},
+        { label:'发社交媒体', hint:'+👥 舆论维权', fn: g => { g.flags.rentalRights=true; return{social:5,mood:-3,charm:2}; }},
+      ]},
+    { id:'community_group_buy', icon:'🛒', title:'薅羊毛大师',
+      body:'你加入了一个社区团购群。群里有500人，每天刷屏的都是：\n\n「鸡蛋10块一斤！」「纸巾9块9一提！」「车厘子19.9一斤（仅限前50名）」\n\n你开始定闹钟抢秒杀，比价三个平台只为省2块钱。你的购物车里全是「凑单满减」的东西——你不确定自己需不需要，但你觉得不买就亏了。\n\n月底一算：你省了300块，但多花了800块买不需要的东西。\n\n"薅羊毛的悖论：你以为自己在省钱，其实商家在笑。"',
+      cond: g => g.money < 20000 && g.age >= 22 && g.months > 4,
+      choices:[
+        { label:'继续薅', hint:'+😊 -💰？', fn: g => { g.flags.couponMaster=true; return{mood:5,money:-500}; }},
+        { label:'理性消费', hint:'+🧠', fn: g => { return{intel:5,mood:-3}; }},
+        { label:'当团长', hint:'+💰 +👥', fn: g => { g.flags.groupBuyLeader=true; return{money:800,social:5,mood:3}; }},
+      ]},
+    { id:'degree_inflation', icon:'🎓', title:'学历贬值的真相',
+      body:'你参加了一场校友聚会。来的都是名校毕业：\n\n清华的在做自媒体。北大的在卖保险。浙大的在开奶茶店。复旦的在送外卖（兼职体验生活，他强调了三次）。\n\n有人问：「你们觉得学历有用吗？」\n\n全场沉默了三秒。然后一个人大声说：「有用！至少让我在送外卖的时候能跟客户聊两句哲学！」\n\n全场笑了。笑着笑着，有人眼眶红了。\n\n"学历不是没有用——是它承诺的回报，从来就不存在。"',
+      cond: g => g.intel >= 65 && g.age >= 25 && g.age <= 35,
+      choices:[
+        { label:'继续深造', hint:'-💰💰 +🧠🧠', fn: g => { g.flags.furtherStudy=true; return{money:-30000,intel:20,mood:-5}; }},
+        { label:'能力为王', hint:'+✨ +👥', fn: g => { return{charm:5,social:5,mood:5}; }},
+        { label:'释怀了', hint:'+😊', fn: g => { return{mood:10,intel:3}; }},
+      ]},
+    { id:'pension_anxiety_v2', icon:'👴', title:'养老焦虑',
+      body:'你看到一条新闻：「专家建议年轻人从25岁开始规划养老金。」\n\n你算了算：按照现在的退休金水平，你退休后每月大概能拿3000块。而你现在每月的房租就要3000块。\n\n你开始研究：商业养老保险、个人养老金账户、以房养老、存钱靠利息生活……\n\n最后你发现：唯一靠谱的养老方案是——不生小孩、不生病、活到刚好够花。\n\n"年轻人的养老焦虑：不是怕老，是怕老了没钱。"',
+      cond: g => g.age >= 27 && g.age <= 40 && g.money < 100000,
+      choices:[
+        { label:'开始存养老钱', hint:'+💰（长期）', fn: g => { g.flags.pensionPlan=true; return{money:-5000,intel:5,mood:-3}; }},
+        { label:'活在当下', hint:'+😊', fn: g => { return{mood:10,money:-2000}; }},
+        { label:'研究投资', hint:'+🧠', fn: g => { return{intel:8}; }},
+      ]},
+    { id:'pet_humanization', icon:'🐕', title:'宠物也是家人',
+      body:'你的宠物生病了。宠物医院报价：检查费800，治疗费3000，后续药物500/月。\n\n你的同事说：「花这么多钱给一只猫/狗看病？它又不知道你花了多少钱。」\n\n但你知道。每次它蹭你的手、在你脚边打呼噜、用那双眼睛看着你的时候——你知道它值得。\n\n你刷了信用卡。这是你在这个月第二次吃泡面了。\n\n"养宠物的代价不是钱——是你多了一个会生病、会老去、会先你而去的家人。"',
+      cond: g => g.flags.hasPet && g.money > 1000,
+      choices:[
+        { label:'治好它', hint:'-💰💰 +❤️', fn: g => { g.flags.petSeriousIllness=true; return{money:-4300,mood:5,social:-3}; }},
+        { label:'找平价医院', hint:'-💰 +🧠', fn: g => { g.flags.petSeriousIllness=true; return{money:-1500,intel:2,mood:-3}; }},
+        { label:'求助众筹', hint:'+👥', fn: g => { g.flags.petSeriousIllness=true; return{money:-800,social:5,mood:-5}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
-    { id:'first_job', icon:'💼', name:'职场新人', desc:'找到第一份工作', check: g => g.flags.gotFirstJob },
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
     { id:'homeowner', icon:'🏡', name:'有房一族', desc:'在大城市买房', check: g => g.flags.hasHouse },
     { id:'married', icon:'💒', name:'人生赢家？', desc:'结婚', check: g => g.flags.married },
@@ -6055,13 +6135,21 @@ const ACHIEVEMENTS = [
     { id:'instrument_player', icon:'🎸', name:'乐器新手', desc:'学会了一门乐器', check: g => g.flags.instrumentPlayer },
     { id:'volunteer_regular', icon:'❤️', name:'常驻志愿者', desc:'定期参加志愿活动', check: g => g.flags.regularVolunteer },
     { id:'moved_up', icon:'📦', name:'消费升级', desc:'搬到了更好的房子', check: g => g.flags.movedUp },
-    { id:'retirement_planner', icon:'👴', name:'养老规划师', desc:'开始规划退休生活', check: g => g.investments && g.investments.fund >= 10000 },
+    { id:'retirement_planner_v2', icon:'👴', name:'养老规划师', desc:'开始规划退休生活', check: g => g.investments && g.investments.fund >= 10000 },
     // === v11.6 新增成就 ===
     { id:'photographer_ach', icon:'📷', name:'光影猎人', desc:'入坑摄影', check: g => g.flags.photographer },
     { id:'runner_ach', icon:'🏃', name:'跑者', desc:'养成了跑步习惯', check: g => g.flags.runner },
     { id:'marathon_finisher', icon:'🏅', name:'马拉松完赛', desc:'跑完了全程马拉松', check: g => g.flags.marathonFinish },
     { id:'artist_ach', icon:'🎨', name:'业余画家', desc:'坚持艺术创作', check: g => g.flags.artist },
     { id:'plant_parent_ach', icon:'🌿', name:'植物家长', desc:'养活了绿植', check: g => g.flags.plantParent },
+    // === v11.7 新增成就 ===
+    { id:'civil_exam_ach', icon:'📋', name:'考公路上', desc:'开始备考公务员', check: g => g.flags.preparingCivilExam },
+    { id:'frugal_master_v2', icon:'📉', name:'极简主义者', desc:'践行消费降级', check: g => g.flags.minimalist },
+    { id:'blind_box_fan_v2', icon:'🎁', name:'盲盒玩家', desc:'入了盲盒的坑', check: g => g.flags.blindBoxFan },
+    { id:'matchmaking_vet', icon:'💘', name:'相亲老手', desc:'经历过相亲角', check: g => g.flags.hadMatchmaking },
+    { id:'rental_warrior', icon:'🏚️', name:'租房斗士', desc:'为租房权益维权', check: g => g.flags.rentalRights },
+    { id:'group_leader', icon:'🛒', name:'团购团长', desc:'成了社区团购团长', check: g => g.flags.groupBuyLeader },
+    { id:'pension_planner_v2', icon:'👴', name:'未雨绸缪', desc:'开始规划养老', check: g => g.flags.pensionPlan },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -6207,12 +6295,15 @@ const ENDINGS = [
     // --- v11.3 NEW ENDINGS ---
     { id:'foodie_end', badge:'🍜', title:'城市美食家', desc:'你吃遍了这座城市的每一个角落。\n\n从路边摊到米其林，从早餐铺到深夜食堂。你知道哪条巷子有最好的小面，哪个小区藏着最正宗的川菜。\n\n你在小红书上有了1万粉丝，他们叫你"城市胃王"。\n\n"美食是城市最好的名片——你用味蕾读完了这座城市的每一页。"', cond: g => g.flags.foodExplorer && g.flags.foodBlogger && g.charm >= 50 && g.mood >= 60 },
     // --- v11.4 NEW ENDINGS ---
-    { id:'influencer_end', badge:'📱', title:'网红人生', desc:'你成了一个小网红。\n\n粉丝不多不少，刚好够养活自己。你接广告、做直播、写测评。你把自己的生活变成了一种"内容"。\n\n有人说你"活得很累"，因为你要时刻维护人设。但你觉得：能把喜欢的事变成工作，已经很幸运了。\n\n"网红的真相：你展示的是精心编排的人生，但观众需要的是真实。"', cond: g => g.flags.contentCreator && g.charm >= 55 && g.money >= 30000 && g.age >= 25 },
+    { id:'influencer_end_v2', badge:'📱', title:'网红人生', desc:'你成了一个小网红。\n\n粉丝不多不少，刚好够养活自己。你接广告、做直播、写测评。你把自己的生活变成了一种"内容"。\n\n有人说你"活得很累"，因为你要时刻维护人设。但你觉得：能把喜欢的事变成工作，已经很幸运了。\n\n"网红的真相：你展示的是精心编排的人生，但观众需要的是真实。"', cond: g => g.flags.contentCreator && g.charm >= 55 && g.money >= 30000 && g.age >= 25 },
     // --- v11.5 NEW ENDINGS ---
     { id:'volunteer_heart_end', badge:'❤️', title:'温暖的人', desc:'你成了社区里最受欢迎的人。\n\n每个周末你都会去养老院、收容所、社区中心做志愿者。你认识了很多朋友——有些比你大50岁，有些比你小20岁。\n\n有人说："你做的事情没有一分钱收入。"\n\n你笑着说："但收获的快乐，千金不换。"\n\n"生命的意义不在于你拥有多少，在于你给予了多少。"', cond: g => g.flags.regularVolunteer && g.social >= 60 && g.mood >= 65 && g.age >= 27 },
     // --- v11.6 NEW ENDINGS ---
     { id:'marathon_life_end', badge:'🏅', title:'跑马人生', desc:'你从一个走两步就喘的废柴，变成了一个能跑42公里的狠人。\n\n你参加了北马/上马/广马。冲过终点线的那一刻，你哭了——不是因为累，是因为你证明了自己。\n\n你的朋友圈签名改成了："人生就是一场马拉松，慢慢来，别着急。"\n\n"跑步教会你的不是速度，是坚持。"', cond: g => g.flags.marathonFinish && g.health >= 75 && g.age >= 26 },
     { id:'artist_life_end', badge:'🎨', title:'业余艺术家', desc:'你没有成为专业画家，但你的画挂满了出租屋的墙壁。\n\n朋友来你家都会说："哇，这都是你画的？"\n\n你在小红书上有了一个小小的粉丝群，他们叫你「城市里的心灵画师」。\n\n"艺术不需要被认可，它只需要被创造。"', cond: g => g.flags.artist && g.mood >= 65 && g.charm >= 50 && g.age >= 27 },
+    // --- v11.7 NEW ENDINGS ---
+    { id:'frugal_sage_end', badge:'📉', title:'消费觉醒', desc:'你从一个「月光族」变成了一个「极简主义者」。\n\n你不再买盲盒、不再囤货、不再为了满减凑单。你的衣柜只有十件衣服，你的厨房只有三口锅。\n\n朋友说你「活得像个苦行僧」。你笑着说：「我是活明白了。」\n\n你的存款从0变成了5万。不多，但那是你第一次觉得——自己掌控了生活。\n\n"真正的富有不是拥有更多，是不再需要更多。"', cond: g => g.flags.minimalist && g.money >= 30000 && g.mood >= 60 && g.age >= 28 },
+    { id:'civil_servant_end_v2', badge:'🏛️', title:'上岸', desc:'你考上了。\n\n三年备考，两次落榜，无数个深夜的自我怀疑。当你看到录取通知的那一刻，你妈在电话里哭了。\n\n你的工资不算高，但稳定。你的工作不算精彩，但有尊严。你终于可以过一种「不用担心明天」的生活。\n\n你爸在酒桌上说："我儿子/女儿有编制了。"——这句话他说了一辈子。\n\n"上岸不是终点，是终于可以喘口气了。"', cond: g => g.flags.civilServant && g.age >= 25 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
