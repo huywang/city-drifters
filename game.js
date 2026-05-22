@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v24.2
+// 都市浮生记 - Game Engine v24.3
 // ============================================
 
 // === GAME STATE ===
@@ -11914,6 +11914,87 @@ const EVENTS = [
         { label:'开始认真学已经买的课程', hint:'+🧠 +😊', fn: g => { g.flags.skillsSubscription=true; g.flags.seriousLearner=true; return{intel:12,mood:5}; }},
         { label:'……然后又买了一门新课', hint:'-💰', fn: g => { g.flags.skillsSubscription=true; g.money -= 1000; return{mood:-3}; }},
       ]},
+    // === v24.3: 医疗健康 + 心理健康 ===
+    { id:'gene_testing', icon:'🧬', title:'基因检测', category:'health',
+      body:'你花999元做了一个消费级基因检测。\n\n两周后，报告出来了：\n- 你有23%的概率患糖尿病（高于平均）\n- 你对咖啡因代谢较慢（难怪你下午喝咖啡晚上失眠）\n- 你的酒精耐受度低（原来你不是不能喝——是基因决定的）\n- 你有15%的尼安德特人基因（好像没什么用）\n- 你的运动天赋偏向耐力型（也许你该跑马拉松而不是举铁）\n\n你开始根据基因调整生活方式：\n- 不喝咖啡了，改喝茶\n- 减少碳水摄入\n- 开始跑步\n\n但你也不安：如果基因决定了你的一切——你的努力还有意义吗？\n\n「基因检测：了解自己——是为了改变自己，还是接受自己？」',
+      cond: g => g.age >= 20 && !g.flags.geneTesting && g.money >= 1000,
+      choices:[
+        { label:'严格按照基因报告调整生活方式', hint:'+❤️ +🧠 -💰', fn: g => { g.flags.geneTesting=true; g.flags.geneOptimized=true; g.money -= 2000; return{health:10,intel:8,mood:-2}; }},
+        { label:'当个参考，不太当真', hint:'+❤️ +🧠', fn: g => { g.flags.geneTesting=true; return{health:5,intel:5}; }},
+        { label:'看完报告就扔了，不想被基因定义', hint:'+😊', fn: g => { g.flags.geneTesting=true; g.flags.geneFree=true; return{mood:8}; }},
+      ]},
+    { id:'online_consultation', icon:'🏥', title:'在线问诊', category:'health',
+      body:'你感冒了，但不想去医院排队。\n\n你打开了在线问诊App：\n- 上传症状和照片\n- 3分钟后，医生回复了\n- 诊断：普通感冒，不需要去医院\n- 开了电子处方，药直接送到家\n\n全程花了28元。\n\n你觉得太方便了——但你也注意到：\n- 医生的回复很模板化\n- 没有面对面交流，总觉得不够放心\n- 有些复杂的症状，在线根本说不清楚\n- 有一次你朋友的误诊——差点耽误了病情\n\n「在线问诊：方便了——但你愿意把命交给屏幕吗？」',
+      cond: g => g.age >= 18 && !g.flags.onlineConsultation,
+      choices:[
+        { label:'成了在线问诊的忠实用户', hint:'+💰 +😊', fn: g => { g.flags.onlineConsultation=true; g.flags.digitalHealth=true; return{money:500,mood:5}; }},
+        { label:'小病用在线，大病还是去医院', hint:'+🧠', fn: g => { g.flags.onlineConsultation=true; g.flags.smartPatient=true; return{intel:5,health:3}; }},
+        { label:'不信任，还是喜欢面对面看医生', hint:'+❤️', fn: g => { g.flags.onlineConsultation=true; return{health:3}; }},
+      ]},
+    { id:'therapy_first_time', icon:'🛋️', title:'第一次心理咨询', category:'psychology',
+      body:'你终于鼓起勇气，预约了心理咨询。\n\n在等待的几天里，你反复纠结：\n- 我又不是「有病」，为什么要看心理医生？\n- 跟陌生人说自己的事，真的有用吗？\n- 每小时500块，值吗？\n\n第一次咨询——\n\n咨询师没有给你任何建议。她只是认真地听你说。\n\n你说着说着就哭了。\n\n不是因为难过——是因为很久没有人这样完整地听过你说话了。\n\n咨询结束时她说：「你不需要有「病」才能来这里。每个人都有需要被听见的时候。」\n\n你走出咨询室，觉得世界好像——稍微轻了一点。\n\n「心理咨询：不是治病——是治心。」',
+      cond: g => g.age >= 20 && !g.flags.therapyFirst && g.mood <= 45,
+      choices:[
+        { label:'开始定期咨询，每月2次', hint:'-💰 +😊 +❤️', fn: g => { g.flags.therapyFirst=true; g.flags.regularTherapy=true; g.money -= 4000; return{mood:15,health:5}; }},
+        { label:'试了一次觉得有帮助，偶尔去', hint:'-💰 +😊', fn: g => { g.flags.therapyFirst=true; g.money -= 1000; return{mood:10}; }},
+        { label:'觉得不适合自己，没再去', hint:'-😊', fn: g => { g.flags.therapyFirst=true; return{mood:-3}; }},
+      ]},
+    { id:'meditation_app', icon:'🧘', title:'冥想入门', category:'psychology',
+      body:'你下载了一个冥想App。\n\n每天15分钟，跟着引导做正念冥想：\n- 关注呼吸\n- 观察念头（不追随，不压制）\n- 身体扫描（从头到脚感受每个部位）\n- 慈心冥想（对自己和他人发送善意）\n\n前两周你觉得很无聊。\n\n第三周——你突然有了一个发现：你每天的念头有80%是重复的。\n\n同样的焦虑、同样的担忧、同样的自我否定——像一台坏了的唱片。\n\n当你开始「看见」这些念头——它们就不再控制你了。\n\n你不确定这算不算「开悟」——但至少你睡得好了一些。\n\n「冥想：不是让头脑安静——是看见头脑有多吵。」',
+      cond: g => g.age >= 18 && !g.flags.meditationApp,
+      choices:[
+        { label:'坚持每天冥想，成了习惯', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.meditationApp=true; g.flags.meditationHabit=true; return{mood:12,health:8,intel:5}; }},
+        { label:'断断续续地做，有些效果', hint:'+😊', fn: g => { g.flags.meditationApp=true; return{mood:5}; }},
+        { label:'觉得太玄了，不适合自己', hint:'', fn: g => { g.flags.meditationApp=true; return{intel:2}; }},
+      ]},
+    { id:'weight_loss_drug', icon:'💊', title:'减肥神药', category:'health',
+      body:'朋友圈被一种减肥药刷屏了。\n\n司美格鲁肽（GLP-1受体激动剂）——本来是糖尿病药，意外发现有强大的减肥效果。\n\n一个月瘦10斤，不节食、不运动、不挨饿。\n\n你的同事小美已经用了3个月，瘦了30斤。\n\n你心动了。但你也看到了一些信息：\n- 价格不便宜：每月800-1500元\n- 副作用：恶心、呕吐、腹泻\n- 停药后可能反弹\n- 有人产生了依赖性\n- 长期安全性数据还不充分\n\n小美说：「管它呢，先瘦了再说。」\n\n你想：当减肥可以靠打针——我们还要不要跟自己的身体和解？\n\n「减肥药：瘦下来容易——接受自己难。」',
+      cond: g => g.age >= 20 && !g.flags.weightLossDrug && g.money >= 2000,
+      choices:[
+        { label:'开始用减肥药，每月花1000元', hint:'-💰 +✨ -❤️', fn: g => { g.flags.weightLossDrug=true; g.flags.glp1User=true; g.money -= 3000; return{charm:10,health:-5,mood:5}; }},
+        { label:'太贵了，选择运动+饮食控制', hint:'+❤️ +✨ -😊', fn: g => { g.flags.weightLossDrug=true; g.flags.naturalFitness=true; return{health:10,charm:5,mood:-3}; }},
+        { label:'觉得不需要，接受自己的身体', hint:'+😊 +❤️', fn: g => { g.flags.weightLossDrug=true; g.flags.bodyPositive=true; return{mood:10,health:3}; }},
+      ]},
+    { id:'appearance_anxiety', icon:'💉', title:'容貌焦虑', category:'psychology',
+      body:'你照镜子的时候，总觉得哪里不对。\n\n鼻子不够高？眼睛不够大？下巴太方？\n\n社交媒体上的滤镜让你越来越不自信：\n- 每个人看起来都那么完美\n- 你的自拍不加滤镜都不敢发\n- 你开始研究医美项目\n\n一个朋友劝你：「做个小手术而已，现在很普遍的。」\n\n你看了看价格：\n- 双眼皮：8000-15000\n- 隆鼻：15000-30000\n- 下巴：20000-50000\n- 全套「变脸」：5-10万\n\n你站在镜子前，问自己：不满意的——是这张脸，还是镜子里那个不自信的人？\n\n「容貌焦虑：你整的不是容——是心。」',
+      cond: g => g.age >= 18 && g.age <= 40 && !g.flags.appearanceAnxiety,
+      choices:[
+        { label:'做了医美，花大钱改善容貌', hint:'-💰 +✨ ±❤️', fn: g => { g.flags.appearanceAnxiety=true; g.flags.cosmeticSurgery=true; g.money -= 20000; return{charm:15,health:-3}; }},
+        { label:'只做了最轻微的项目试试水', hint:'-💰 +✨', fn: g => { g.flags.appearanceAnxiety=true; g.money -= 5000; return{charm:8,mood:3}; }},
+        { label:'想通了，内在比外在更重要', hint:'+😊 +🧠', fn: g => { g.flags.appearanceAnxiety=true; g.flags.innerBeauty=true; return{mood:10,intel:5}; }},
+      ]},
+    { id:'sleep_economy_v24_3', icon:'😴', title:'睡眠经济', category:'health',
+      body:'你失眠了。不是偶尔——是每天。\n\n你开始尝试各种助眠产品：\n- 褪黑素：200元/月\n- 助眠喷雾：150元\n- 白噪音机：300元\n- 重力毯：500元\n- 智能床垫：8000元\n- 睡眠监测手环：600元\n- 助眠冥想课程：299元\n\n你算了一下：为了睡个好觉，你花了超过1万元。\n\n讽刺的是——花钱越多，你越焦虑自己能不能睡着。\n\n直到有一天，一个朋友告诉你：「最好的安眠药——是把手机放到客厅。」\n\n你试了。居然真的有效。\n\n「睡眠经济：你花钱买的——其实是放下手机的能力。」',
+      cond: g => g.age >= 18 && !g.flags.sleepEconomy && g.health <= 60,
+      choices:[
+        { label:'买全套助眠产品，投资睡眠', hint:'-💰 +❤️ ±😊', fn: g => { g.flags.sleepEconomy=true; g.flags.sleepInvestor=true; g.money -= 10000; return{health:8,mood:3}; }},
+        { label:'只买了褪黑素和白噪音，配合早睡', hint:'-💰 +❤️ +😊', fn: g => { g.flags.sleepEconomy=true; g.flags.sleepHabit=true; g.money -= 500; return{health:10,mood:8}; }},
+        { label:'发现放下手机就是最好的安眠药', hint:'+❤️ +😊 +🧠', fn: g => { g.flags.sleepEconomy=true; g.flags.digitalSunset=true; return{health:12,mood:10,intel:5}; }},
+      ]},
+    { id:'workplace_mental_health', icon:'🧠', title:'职场心理假', category:'career',
+      body:'公司发了一封邮件：「从本月起，每月有1天心理健康假。」\n\n同事们的反应分成了两派：\n\n支持派：\n- 「终于承认心理健康跟身体健康一样重要了」\n- 「每个月能多休一天太好了」\n\n反对派：\n- 「这是变相减员，那天工作量都摊给别人了」\n- 「请心理假不就是告诉老板你不行吗？」\n- 「不如把这一天换成涨工资」\n\n你犹豫了半天——还是请了。\n\n你在家躺了一天，什么都没做。\n\n第二天回到公司，有人悄悄问你：「你昨天……是不是去看心理医生了？」\n\n你意识到：制度变了——但观念还没变。\n\n「心理假：给了你休息的权利——但没给你休息的勇气。」',
+      cond: g => g.age >= 22 && !g.flags.workplaceMentalHealth && g.salary,
+      choices:[
+        { label:'勇敢使用心理假，并鼓励同事也使用', hint:'+😊 +🤝', fn: g => { g.flags.workplaceMentalHealth=true; g.flags.mentalHealthAdvocate=true; return{mood:12,social:8,charm:5}; }},
+        { label:'偷偷请了，没告诉别人', hint:'+😊', fn: g => { g.flags.workplaceMentalHealth=true; return{mood:8}; }},
+        { label:'不敢请，怕影响职业形象', hint:'-😊', fn: g => { g.flags.workplaceMentalHealth=true; return{mood:-5}; }},
+      ]},
+    { id:'tcm_modern', icon:'🏥', title:'中医现代化', category:'health',
+      body:'你去看中医，被震撼了。\n\n这不是你印象中的中医——\n\n- AI辅助望闻问切：摄像头分析你的面色和舌苔\n- 脉诊仪：传感器记录你的脉搏波形\n- 体质辨识系统：用大数据判断你是「气虚」还是「痰湿」\n- 个性化药方：根据你的基因和体质定制中药\n\n医生解释说：「中医的经验——正在被数字化。名老中医几十年的经验——现在AI也能学会了。」\n\n你喝了开出的药——确实有效果。\n\n你开始思考：传统和现代——也许不是对立的。\n\n最好的医学——可能是中西医结合，再加上AI。\n\n「中医现代化：千年古方+现代科技=更好的你。」',
+      cond: g => g.age >= 25 && !g.flags.tcmModern && g.health <= 70,
+      choices:[
+        { label:'按疗程调理，坚持喝中药', hint:'-💰 +❤️ +🧠', fn: g => { g.flags.tcmModern=true; g.flags.tcmPatient=true; g.money -= 5000; return{health:15,intel:5}; }},
+        { label:'试了一个疗程，有些效果', hint:'-💰 +❤️', fn: g => { g.flags.tcmModern=true; g.money -= 1500; return{health:8}; }},
+        { label:'还是更信任西医', hint:'', fn: g => { g.flags.tcmModern=true; return{intel:3}; }},
+      ]},
+    { id:'health_anxiety', icon:'🩺', title:'体检焦虑', category:'psychology',
+      body:'公司安排了年度体检。\n\n报告出来那天——你紧张得手心出汗。\n\n打开报告：\n- 血脂偏高（你喜欢吃火锅）\n- 轻度脂肪肝（你喜欢喝奶茶）\n- 颈椎曲度变直（你每天看手机10小时）\n- 甲状腺结节（医生说大多数是良性的）\n- 尿酸偏高（你爱喝啤酒）\n\n你慌了。上网一查——每个指标异常都能搜出一堆可怕的疾病。\n\n你开始恐慌性养生：戒火锅、戒奶茶、戒啤酒、每天运动。\n\n坚持了两周后——你又吃了一顿火锅。\n\n你在想：健康焦虑——到底是好事还是坏事？\n\n「体检焦虑：知道风险是好事——但别让风险吓死你。」',
+      cond: g => g.age >= 25 && !g.flags.healthAnxiety && g.health <= 65,
+      choices:[
+        { label:'认真改变生活方式，坚持了半年', hint:'+❤️ +😊 -🍔', fn: g => { g.flags.healthAnxiety=true; g.flags.lifestyleChange=true; return{health:15,mood:8}; }},
+        { label:'改变了一些习惯，但没完全戒掉', hint:'+❤️', fn: g => { g.flags.healthAnxiety=true; return{health:8,mood:3}; }},
+        { label:'焦虑了两周就忘了，该怎样还怎样', hint:'+😊 -❤️', fn: g => { g.flags.healthAnxiety=true; return{mood:5,health:-3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -12993,6 +13074,12 @@ const ACHIEVEMENTS = [
     { id:'knowledge_detox_ach', icon:'🧹', name:'知识断舍离', desc:'退订所有未看的付费课程', check: g => g.flags.knowledgeDetox },
     { id:'anti_cert_ach', icon:'📜', name:'反内卷先锋', desc:'拒绝考证焦虑，选择生活', check: g => g.flags.antiCert },
     { id:'ai_tool_user_ach', icon:'💻', name:'AI工具达人', desc:'熟练使用AI工具提升效率', check: g => g.flags.aiToolUser },
+    // v24.3: 医疗健康成就
+    { id:'meditation_habit_ach', icon:'🧘', name:'正念达人', desc:'坚持每日冥想成为习惯', check: g => g.flags.meditationHabit },
+    { id:'regular_therapy_ach', icon:'🛋️', name:'心灵勇士', desc:'勇敢面对自己，定期心理咨询', check: g => g.flags.regularTherapy },
+    { id:'body_positive_ach_v24_3', icon:'💪', name:'身体自爱', desc:'拒绝容貌焦虑，接受自己的身体', check: g => g.flags.bodyPositive },
+    { id:'digital_sunset_ach', icon:'🌙', name:'数字日落', desc:'发现放下手机就是最好的养生', check: g => g.flags.digitalSunset },
+    { id:'mental_health_advocate_ach', icon:'🧠', name:'心理健康倡导者', desc:'勇敢使用心理假并鼓励他人', check: g => g.flags.mentalHealthAdvocate },
 ];
 
 // === ENDINGS === (order matters: first match wins)
