@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v33.5
+// 都市浮生记 - Game Engine v33.6
 // ============================================
 
 // === GAME STATE ===
@@ -18885,6 +18885,97 @@ const EVENTS = [
         { label:'决定珍惜身边的每一个搭子', hint:'+👥 +😊', fn: g => { g.flags.daziPhilosophy=true; return{social:5,mood:8}; }},
       ]},
 
+    // === v33.6 情绪消费与治愈经济 ===
+    { id:'temple_incense_v33_6', icon:'🛕', title:'寺庙上香', category:'healing',
+      body:'周末你去了城郊的一座寺庙。\n\n你不是信佛，你只是想去一个安静的地方。你花30块买了三炷香，在大殿前拜了三拜。\n\n你不知道该许什么愿。你想了半天，说：「希望我能睡个好觉。」\n\n你在寺庙里走了一圈。你看到了很多年轻人——穿着潮牌、戴着AirPods、手里拿着香。你觉得这个画面很魔幻。\n\n你在法物流通处买了一串佛珠，戴在手上。你不信它有什么法力，但你觉得它挺好看的。\n\n回去的路上，你觉得心情好了一点。也许是寺庙的安静感染了你，也许只是因为你今天出门了。',
+      cond: g => g.age >= 22 && g.mood < 60,
+      choices:[
+        { label:'买了一串佛珠', hint:'-💰 +😊', fn: g => { g.flags.templeIncense=true; g.money-=100; return{mood:8}; }},
+        { label:'在寺庙坐了一个下午', hint:'+😊 +🧠', fn: g => { g.flags.templeIncense=true; return{mood:10,intel:3}; }},
+        { label:'发了条朋友圈说佛渡有缘人', hint:'+✨ +👥', fn: g => { g.flags.templeIncense=true; return{charm:5,social:3}; }},
+      ]},
+
+    { id:'stress_relief_v33_6', icon:'🧸', title:'解压消费', category:'healing',
+      body:'你在淘宝上搜「解压玩具」，发现了整整两百页的商品。\n\n你买了：一个减压魔方、一盒史莱姆泥、一个尖叫鸡、一个可以捏的慢回弹面包。\n\n你花了150块，觉得这钱花得很荒谬。但收到货的那天，你坐在办公桌前捏了半小时的面包，觉得真的减压。\n\n你同事路过问：「你在干嘛？」你说：「我在花钱治愈我的精神内耗。」\n\n她/他看了看你桌上的东西，说：「给我也发个链接。」\n\n你觉得这代人的解压方式真的很奇怪——不是去运动、不是去社交，而是花钱买一些没用的小东西，然后捏它们。但有用就行。',
+      cond: g => g.age >= 20 && g.money > 1000,
+      choices:[
+        { label:'买了一堆解压玩具', hint:'-💰 +😊', fn: g => { g.flags.stressRelief=true; g.money-=150; return{mood:8}; }},
+        { label:'推荐给了所有同事', hint:'+👥 +😊', fn: g => { g.flags.stressRelief=true; return{social:5,mood:5}; }},
+        { label:'觉得消费主义真的赢了', hint:'+🧠', fn: g => { g.flags.stressRelief=true; return{intel:5}; }},
+      ]},
+
+    { id:'paid_treehole_v33_6', icon:'🌳', title:'付费树洞', category:'healing',
+      body:'你在一个App上找到了「付费树洞」服务——花50块可以跟一个陌生人聊一个小时，对方保证不评判你。\n\n你犹豫了很久，最终下了单。\n\n对面是一个声音很温柔的女生/男生。她/他说：「你想说什么都可以，不想说也可以不说话。」\n\n你开始只是沉默。然后你慢慢说了最近的压力——工作上的、生活上的、感情上的。你没有哭，但你觉得胸口松了一点。\n\n一个小时到了。她/他说：「你做得很好。」你觉得这句话很假，但你还是被安慰到了。\n\n你关掉了App，觉得这个世界真的很荒谬——你需要花钱找人说心里话。但你同时也觉得，能被认真倾听，真的很奢侈。',
+      cond: g => g.age >= 22 && g.mood < 45 && g.money > 1000,
+      choices:[
+        { label:'跟陌生人聊了一个小时', hint:'-💰 +😊', fn: g => { g.flags.paidTreehole=true; g.money-=50; return{mood:8}; }},
+        { label:'哭了一场，感觉好多了', hint:'-💰 +😊', fn: g => { g.flags.paidTreehole=true; g.money-=50; return{mood:12}; }},
+        { label:'觉得还是朋友比较靠谱', hint:'+👥 +🧠', fn: g => { g.flags.paidTreehole=true; return{social:3,intel:3}; }},
+      ]},
+
+    { id:'healing_blogger_v33_6', icon:'📱', title:'治愈系博主', category:'healing',
+      body:'你关注了一个治愈系博主。\n\n她/他每天发的内容是：泡一杯茶、看窗外的雨、读一页书、写一段字。配上舒缓的音乐，没有滤镜，没有修图。\n\n你每天晚上睡前看她的视频，觉得心慢慢安静下来了。\n\n你看了她的个人简介：前大厂员工，裸辞后做自媒体，目前收入只有以前的三分之一，但她说：「我终于知道自己想要什么了。」\n\n你觉得这种生活很理想，但你不确定自己有没有勇气放弃现在的工作。\n\n你在评论区留了一句话：「谢谢你，让我在加班的间隙看到了一种不同的活法。」',
+      cond: g => g.age >= 22 && g.jobSalary > 0 && g.mood < 55,
+      choices:[
+        { label:'每天睡前看治愈系视频', hint:'+😊 +🧠', fn: g => { g.flags.healingBlogger=true; return{mood:8,intel:3}; }},
+        { label:'开始学她/他的生活方式', hint:'+😊 +💪', fn: g => { g.flags.healingBlogger=true; g.flags.lifestyleChange=true; return{mood:5,health:5}; }},
+        { label:'觉得自己做不到那样洒脱', hint:'+🧠', fn: g => { g.flags.healingBlogger=true; return{intel:5}; }},
+      ]},
+
+    { id:'asmr_sleep_v33_6', icon:'🎧', title:'ASMR助眠', category:'healing',
+      body:'你失眠了三个月，试过了所有方法都没用。\n\n直到有一天你在B站上看到了一个ASMR视频：一个人对着麦克风轻声说话，偶尔敲击一些物品。\n\n你戴上耳机，五分钟后你睡着了。\n\n你开始每天听ASMR入睡。你试了各种类型：轻声说话、翻书声、敲木头声、下雨声、剪发角色扮演。你发现最喜欢的是「耳语+翻书声」。\n\n你跟朋友说：「我现在靠一个陌生人在我耳边翻书才能睡着。」朋友说：「这很赛博朋克。」\n\n你觉得这很荒诞，但也很有效。在这个时代，治愈你的可能不是药物，而是一个你不认识的人录的一段声音。',
+      cond: g => g.age >= 20 && g.health < 60,
+      choices:[
+        { label:'每天听ASMR入睡', hint:'+😊 +💪', fn: g => { g.flags.asmSleep=true; return{mood:5,health:5}; }},
+        { label:'开始研究声音对心理的影响', hint:'+🧠 +😊', fn: g => { g.flags.asmSleep=true; return{intel:8,mood:3}; }},
+        { label:'自己也录了一段ASMR', hint:'+✨ +🧠', fn: g => { g.flags.asmSleep=true; return{charm:5,intel:3}; }},
+      ]},
+
+    { id:'squishy_addict_v33_6', icon:'🍞', title:'捏捏乐', category:'healing',
+      body:'你迷上了捏捏乐。\n\n你的办公桌上摆着五个不同形状的慢回弹玩具：一个面包、一个蛋糕、一个猫爪、一个桃子、一个屁股。\n\n你每次接电话的时候捏，开会的时候捏，写方案的时候也捏。你觉得捏的时候脑子会清楚一点。\n\n你同事说：「你的桌上比我女儿的玩具箱还丰富。」\n\n你在小红书上搜了一下，发现捏捏乐已经成了一个完整的产业。有人专门做手工捏捏乐，一个卖200块，还要排队等。\n\n你花400块买了两个手工捏捏乐。你捏着它们，觉得这钱花得值——因为它真的让你减压了。\n\n你觉得这代人真的很需要「可以摸得到的安慰」。',
+      cond: g => g.age >= 20 && g.jobSalary > 0,
+      choices:[
+        { label:'桌上摆了五个捏捏乐', hint:'-💰 +😊', fn: g => { g.flags.squishyAddict=true; g.money-=150; return{mood:8}; }},
+        { label:'买了手工定制款', hint:'-💰 +✨', fn: g => { g.flags.squishyAddict=true; g.money-=400; return{mood:10,charm:3}; }},
+        { label:'送了一套给朋友', hint:'-💰 +👥', fn: g => { g.flags.squishyAddict=true; g.money-=200; return{social:8}; }},
+      ]},
+
+    { id:'blindbox_addict_v33_6', icon:'🎁', title:'盲盒成瘾', category:'healing',
+      body:'你在泡泡玛特买了第一个盲盒。\n\n拆开的那一瞬间，你的心跳加速。你不知道里面是什么，这种未知感让你上瘾。\n\n你抽到了一个隐藏款。你发了朋友圈，收到了五十个赞。你觉得你是天选之人。\n\n然后你又买了十个。拆完发现都是普通款，你想要的那个一直没出。你又买了十个。\n\n你算了一下：你已经花了2000块了，但离「集齐全套」还差三个隐藏款。\n\n你看着满桌子的盲盒，觉得这个设计太精明了——它利用的不是你的理性，而是你的多巴胺。每次拆盒都是一次小型赌博。\n\n你决定收手了。但你路过泡泡玛特的时候，脚步还是会不由自主地停下来。',
+      cond: g => g.age >= 20 && g.money > 3000,
+      choices:[
+        { label:'花了2000块还没集齐全套', hint:'-💰 +😊', fn: g => { g.flags.blindboxAddict=true; g.money-=2000; return{mood:5}; }},
+        { label:'决定收手，把多余的挂闲鱼', hint:'+🧠 -💰', fn: g => { g.flags.blindboxAddict=true; g.flags.soldBlindbox=true; return{intel:5,money:500}; }},
+        { label:'觉得这就是合法赌博', hint:'+🧠', fn: g => { g.flags.blindboxAddict=true; return{intel:8}; }},
+      ]},
+
+    { id:'emotional_value_v33_6', icon:'💎', title:'情绪价值', category:'healing',
+      body:'你在网上看到一个帖子：「找对象最重要的标准是什么？」最高赞的回答是：「情绪价值。」\n\n你想了很久什么是「情绪价值」。\n\n你回忆了你的前任：她/他每次你加班到很晚都会问你「吃了吗」，你难过的时侯她/他会安静地陪你，你发脾气的时候她/他不会跟你对着来。\n\n你觉得那就是情绪价值——不是帮你解决问题，而是让你觉得被看见、被理解、被接纳。\n\n你在日记里写：「原来最好的爱，不是给你什么，而是让你觉得安全。」\n\n你觉得这代人对感情的要求变了：不求轰轰烈烈，只求一个让你不用伪装的人。',
+      cond: g => g.age >= 22 && g.social > 20,
+      choices:[
+        { label:'想明白了什么是情绪价值', hint:'+🧠 +😊', fn: g => { g.flags.emotionalValue=true; return{intel:8,mood:5}; }},
+        { label:'给在乎的人发了条消息', hint:'+👥 +😊', fn: g => { g.flags.emotionalValue=true; return{social:8,mood:5}; }},
+        { label:'决定做一个能提供情绪价值的人', hint:'+👥 +✨', fn: g => { g.flags.emotionalValue=true; return{social:5,charm:5}; }},
+      ]},
+
+    { id:'pet_cafe_v33_6', icon:'🐱', title:'宠物咖啡', category:'healing',
+      body:'你去了一个猫咖。\n\n你花了68块，得到了一杯咖啡和两个小时的撸猫时间。\n\n里面有十几只猫，有的懒洋洋地躺着，有的在追逐逗猫棒。一只橘猫跳到你腿上，开始打呼噜。\n\n你一边喝咖啡一边撸猫，觉得整个世界都安静了。\n\n你旁边坐着一个女生，她也在撸猫。她跟你说：「我养不了猫，房东不让。所以每周来这里。」你说：「我也是。」\n\n你们互相看了一眼，笑了。两个养不起猫的成年人，花钱来这里假装自己有猫。\n\n你觉得这是大城市里最温柔的骗局——你知道这是假的，但你愿意沉浸在里面。',
+      cond: g => g.age >= 20 && !g.flags.hasPet && !g.flags.hasHouse,
+      choices:[
+        { label:'撸了两个小时的猫', hint:'-💰 +😊', fn: g => { g.flags.petCafe=true; g.money-=68; return{mood:10}; }},
+        { label:'认识了同样爱猫的朋友', hint:'+👥 +😊', fn: g => { g.flags.petCafe=true; g.money-=68; return{social:8,mood:5}; }},
+        { label:'开始存钱准备养猫', hint:'+🧠 +😊', fn: g => { g.flags.petCafe=true; g.flags.savingForPet=true; return{intel:3,mood:5}; }},
+      ]},
+
+    { id:'sutra_copying_v33_6', icon:'✍️', title:'抄经静心', category:'healing',
+      body:'你在网上买了一套抄经套装：一本《心经》字帖、一支毛笔、一瓶墨汁。\n\n周末你铺开宣纸，开始一笔一笔地抄。\n\n你写了第一个字就歪了。但你没有停下来。你一个字一个字地写，写得很慢，但你发现自己不想刷手机了。\n\n你的脑子里只有下一笔该往哪里走。你写了一个小时，抄完了半部《心经》。\n\n你看着自己的字，觉得虽然很丑，但每一笔都是认真的。\n\n你发了一条朋友圈：「抄经第一天。字丑心静。」\n\n你觉得这代人找平静的方式越来越奇怪了——不是冥想、不是瑜伽，而是做一些没有用的事。但也许「没有用」本身，就是最大的用处。',
+      cond: g => g.age >= 25 && g.intel > 40,
+      choices:[
+        { label:'坚持抄了一个月', hint:'+🧠 +😊', fn: g => { g.flags.sutraCopying=true; g.flags.sutraHabit=true; return{intel:8,mood:8}; }},
+        { label:'字越来越好了', hint:'+✨ +🧠', fn: g => { g.flags.sutraCopying=true; return{charm:8,intel:3}; }},
+        { label:'觉得做没用的事才是最有用的', hint:'+🧠 +😊', fn: g => { g.flags.sutraCopying=true; return{intel:5,mood:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -20706,6 +20797,18 @@ const ACHIEVEMENTS = [
     { id:'dazi_economy_ach', icon:'💰', name:'孤独有价', desc:'见证了搭子经济的兴起', check: g => g.flags.daziEconomy },
     { id:'lose_dazi_ach', icon:'👋', name:'轻如鸿毛', desc:'失去了一个搭子，理解了这种关系的脆弱', check: g => g.flags.loseDazi },
     { id:'dazi_philosophy_ach', icon:'🤔', name:'社交哲学家', desc:'思考了搭子文化背后的社交本质', check: g => g.flags.daziPhilosophy },
+
+    // --- v33.6 情绪消费与治愈经济成就 ---
+    { id:'temple_incense_ach', icon:'🛕', name:'佛系青年', desc:'去寺庙上了一炷香', check: g => g.flags.templeIncense },
+    { id:'stress_relief_ach', icon:'🧸', name:'花钱减压', desc:'买了各种解压玩具', check: g => g.flags.stressRelief },
+    { id:'paid_treehole_ach', icon:'🌳', name:'付费倾诉', desc:'花钱找陌生人说心里话', check: g => g.flags.paidTreehole },
+    { id:'healing_blogger_ach', icon:'📱', name:'治愈系粉丝', desc:'关注了治愈系博主并改变生活方式', check: g => g.flags.healingBlogger },
+    { id:'asmr_sleep_ach', icon:'🎧', name:'声音治愈', desc:'找到了ASMR助眠的方法', check: g => g.flags.asmSleep },
+    { id:'squishy_addict_ach', icon:'🍞', name:'捏捏爱好者', desc:'迷上了慢回弹捏捏乐', check: g => g.flags.squishyAddict },
+    { id:'blindbox_addict_ach', icon:'🎁', name:'盲盒上头', desc:'为盲盒花了不少钱', check: g => g.flags.blindboxAddict },
+    { id:'emotional_value_ach', icon:'💎', name:'情绪价值', desc:'理解了什么是真正的情绪价值', check: g => g.flags.emotionalValue },
+    { id:'pet_cafe_ach', icon:'🐱', name:'云养猫', desc:'去猫咖撸了两个小时猫', check: g => g.flags.petCafe },
+    { id:'sutra_copying_ach', icon:'✍️', name:'抄经静心', desc:'通过抄经找到了内心的平静', check: g => g.flags.sutraCopying },
 ];
 
 // === ENDINGS === (order matters: first match wins)
