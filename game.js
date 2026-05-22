@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v27.2
+// 都市浮生记 - Game Engine v27.3
 // ============================================
 
 // === GAME STATE ===
@@ -13737,6 +13737,87 @@ const EVENTS = [
         { label:'试了3个月，觉得太孤独了', hint:'-💰 -😊 +🧠', fn: g => { g.flags.digitalNomadV27=true; g.money -= 10000; return{mood:-3,intel:5}; }},
         { label:'觉得还是需要稳定，放弃了', hint:'+🧠 -✨', fn: g => { g.flags.digitalNomadV27=true; return{intel:3,charm:-2}; }},
       ]},
+    // v27.3: 二手经济 + 断舍离
+    { id:'xianyu_seller', icon:'📦', title:'闲鱼卖货', category:'finance',
+      body:'你开始在闲鱼上卖闲置了。\n\n你卖了：\n- 旧手机：800元\n- 旧衣服：50元/件（卖了10件）\n- 旧书：5元/本（卖了20本）\n- 旧家具：200元\n\n你一个月赚了：1500元。\n\n你发现：\n- 你家里——有很多「不需要的东西」\n- 这些东西——买的时候很贵——卖的时候很便宜\n- 你花了钱——买了很多「用不上」的东西\n\n你开始想：\n- 我为什么买了这么多东西？\n- 我真的需要它们吗？\n- 如果我不买——我能省多少钱？\n\n你开始理解：卖闲置——不是「赚钱」——是「反思消费」。\n\n「闲鱼卖货：不是在卖东西——是在卖「你过去的冲动」。」',
+      cond: g => g.age >= 18 && !g.flags.xianyuSeller && g.money >= 100,
+      choices:[
+        { label:'坚持卖闲置，月入1500+', hint:'+💰 +🧠 +✨', fn: g => { g.flags.xianyuSeller=true; g.flags.xianyuPro=true; g.money += 1500; return{intel:5,charm:3}; }},
+        { label:'卖了一些，家里清爽了很多', hint:'+💰 +😊 +🧠', fn: g => { g.flags.xianyuSeller=true; g.money += 500; return{mood:3,intel:3}; }},
+        { label:'卖了几件就嫌麻烦，不卖了', hint:'+💰 -🧠', fn: g => { g.flags.xianyuSeller=true; g.money += 100; return{intel:-2}; }},
+      ]},
+    { id:'minimalism_v27_3', icon:'🧹', title:'极简生活', category:'psychology',
+      body:'你开始尝试「极简生活」了。\n\n你的规则：\n- 衣服：只留30件\n- 鞋子：只留5双\n- 包：只留2个\n- 书：只留正在看的\n\n你清理了：\n- 3袋衣服\n- 2箱书\n- 1箱杂物\n\n你发现：\n- 你的房间——变大了\n- 你的心——变轻了\n- 你的钱包——变厚了（因为你不买了）\n\n你开始理解：极简——不是「没有」——是「只留真正需要的」。\n\n你开始享受：\n- 少即是多\n- 简单即是自由\n- 不拥有——也可以很满足\n\n「极简生活：不是在扔东西——是在扔「不需要的欲望」。」',
+      cond: g => g.age >= 22 && !g.flags.minimalism && g.intel >= 30,
+      choices:[
+        { label:'成了极简主义者，生活简单了很多', hint:'+😊 +🧠 +💰 +✨', fn: g => { g.flags.minimalism=true; g.flags.minimalist=true; g.money += 3000; return{mood:10,intel:5,charm:5}; }},
+        { label:'清理了一波，感觉不错', hint:'+😊 +💰', fn: g => { g.flags.minimalism=true; g.money += 1000; return{mood:5}; }},
+        { label:'扔了之后又买了回来', hint:'-💰 -🧠', fn: g => { g.flags.minimalism=true; return{intel:-3,mood:-3}; }},
+      ]},
+    { id:'second_hand_luxury_v27_3', icon:'👜', title:'二手奢侈品', category:'finance',
+      body:'你在二手平台上看到了一只LV包。\n\n原价：12000元。\n二手价：4500元。\n成色：95新。\n\n你心动了。\n\n你买了。\n\n收到货后——\n\n你发现：\n- 确实很新\n- 看不出来是二手的\n- 你省了7500元\n\n但你也有点纠结：\n- 别人会知道这是二手的吗？\n- 我用二手奢侈品——是不是「装」？\n\n你开始想：\n- 奢侈品——到底在买什么？\n- 是「质量」还是「面子」？\n- 是「需要」还是「想要」？\n\n你开始理解：二手奢侈品——是「用理性的价格满足感性的需求」。\n\n「二手奢侈品：不是在买包——是在买「我负担得起的面子」。」',
+      cond: g => g.age >= 22 && !g.flags.secondHandLuxury && g.money >= 2000,
+      choices:[
+        { label:'开始系统买卖二手奢侈品赚钱', hint:'+💰 +🧠 +✨', fn: g => { g.flags.secondHandLuxury=true; g.flags.luxuryTrader=true; g.money += 5000; return{intel:5,charm:5}; }},
+        { label:'买了一个二手包，省了很多钱', hint:'+💰 +😊', fn: g => { g.flags.secondHandLuxury=true; g.money -= 4500; return{mood:3}; }},
+        { label:'觉得二手没面子，还是买了新的', hint:'-💰 +✨ -🧠', fn: g => { g.flags.secondHandLuxury=true; g.money -= 12000; return{charm:3,intel:-3}; }},
+      ]},
+    { id:'shared_economy', icon:'🔑', title:'共享生活', category:'society',
+      body:'你开始全面使用「共享经济」了。\n\n你的生活：\n- 出行：共享单车（2元/次）\n- 充电宝：共享充电宝（3元/小时）\n- 汽车：共享汽车（30元/小时）\n- 住宿：共享民宿（200元/晚）\n- 工作：共享办公（50元/天）\n\n你发现：\n- 你不需要「拥有」——只需要「使用」\n- 你省了很多钱\n- 你的生活更灵活了\n\n但你也发现：\n- 你没有「自己的东西」\n- 共享单车的座位不舒服\n- 共享充电宝总是没电\n- 共享汽车总是很远\n\n你开始理解：共享经济——是「穷人版的拥有」。\n\n你不是不想拥有——你是「暂时买不起」。\n\n「共享生活：不是在「分享」——是在用「使用权」代替「所有权」。」',
+      cond: g => g.age >= 20 && !g.flags.sharedEconomy && g.money >= 500,
+      choices:[
+        { label:'完全拥抱共享经济，省了很多钱', hint:'+💰 +🧠 -✨', fn: g => { g.flags.sharedEconomy=true; g.flags.fullSharing=true; g.money += 2000; return{intel:3,charm:-2}; }},
+        { label:'有选择地使用，挺方便', hint:'+💰 +😊', fn: g => { g.flags.sharedEconomy=true; g.money += 500; return{mood:3}; }},
+        { label:'觉得共享不靠谱，还是想买自己的', hint:'-💰 +✨', fn: g => { g.flags.sharedEconomy=true; g.money -= 5000; return{charm:3}; }},
+      ]},
+    { id:'anti_consumerism_v27_3', icon:'🚫', title:'反消费主义', category:'psychology',
+      body:'你开始「反消费主义」了。\n\n你的规则：\n- 不刷淘宝/拼多多/京东\n- 不逛商场\n- 不买打折的东西（除非真的需要）\n- 不买「品牌溢价」的东西\n\n你发现了：\n- 你的消费——从每月5000降到了2000\n- 你省了3000元/月\n- 你一年能省36000元\n\n但你也发现了：\n- 你的朋友觉得你「抠」\n- 你的对象觉得你「不舍得」\n- 你的父母觉得你「太省了」\n\n你开始理解：反消费主义——不是「不花钱」——是「只花值得花的钱」。\n\n但在一个「消费即正义」的社会——你变成了「异类」。\n\n「反消费主义：不是「省钱」——是拒绝「被消费定义」。」',
+      cond: g => g.age >= 25 && !g.flags.antiConsumerism && g.intel >= 35,
+      choices:[
+        { label:'坚持反消费主义，年省3.6万', hint:'+💰 +🧠 +✨', fn: g => { g.flags.antiConsumerism=true; g.flags.antiConsumer=true; g.money += 36000; return{intel:5,charm:3}; }},
+        { label:'开始有意识地消费，省了很多', hint:'+💰 +🧠 +😊', fn: g => { g.flags.antiConsumerism=true; g.money += 18000; return{intel:3,mood:3}; }},
+        { label:'坚持了3个月就忍不住了', hint:'-💰 -🧠', fn: g => { g.flags.antiConsumerism=true; return{intel:-2,mood:-3}; }},
+      ]},
+    { id:'thrift_store', icon:'🏪', title:'二手店', category:'hobby',
+      body:'你发现了一家二手店。\n\n这里：\n- 有二手书（5元/本）\n- 有二手衣服（20元/件）\n- 有二手家具（100元/件）\n- 有二手电子产品（半价）\n\n你淘到了：\n- 一本绝版的书（原价200元，二手15元）\n- 一件vintage外套（原价800元，二手80元）\n- 一台二手switch（原价2000元，二手800元）\n\n你花了900元——买了价值3000元的东西。\n\n你开始理解：二手——不是「穷」——是「聪明」。\n\n你开始每周去二手店「寻宝」。\n\n你发现：每一件二手商品——都有一个故事。\n\n「二手店：不是在买便宜货——是在「淘」被遗忘的价值。」',
+      cond: g => g.age >= 20 && !g.flags.thriftStore && g.money >= 200,
+      choices:[
+        { label:'成了二手店常客，开始收藏vintage', hint:'-💰 +😊 +✨ +🧠', fn: g => { g.flags.thriftStore=true; g.flags.vintageCollector=true; g.money -= 2000; return{mood:5,charm:5,intel:3}; }},
+        { label:'淘到了好东西，很开心', hint:'-💰 +😊', fn: g => { g.flags.thriftStore=true; g.money -= 500; return{mood:5}; }},
+        { label:'觉得二手质量不好，不去了', hint:'+💰 -🧠', fn: g => { g.flags.thriftStore=true; return{intel:-2}; }},
+      ]},
+    { id:'swap_party', icon:'🔄', title:'物品交换会', category:'social',
+      body:'你参加了一场「物品交换会」。\n\n规则：\n- 每人带5件不需要的东西\n- 大家互相交换\n- 不需要花钱\n\n你带了：\n- 一本书\n- 一件衣服\n- 一个马克杯\n- 一副耳机\n- 一个背包\n\n你换到了：\n- 一个瑜伽垫\n- 一盒茶叶\n- 一本你一直想看的书\n- 一条围巾\n- 一盆绿植\n\n你发现：\n- 你不需要花钱——就能得到新东西\n- 别人不需要的——可能是你需要的\n- 交换——比买卖——更有「温度」\n\n你还交了几个朋友。\n\n你开始理解：交换——是最古老的「经济」——也是最有人情味的。\n\n「物品交换会：不是「换东西」——是让「闲置」重新「流动」。」',
+      cond: g => g.age >= 20 && !g.flags.swapParty && g.social >= 20,
+      choices:[
+        { label:'成了交换会常客，交了很多朋友', hint:'+🤝 +😊 +✨', fn: g => { g.flags.swapParty=true; g.flags.swapRegular=true; g.reputation.social += 5; return{social:5,mood:5,charm:3}; }},
+        { label:'参加了一次，挺有趣', hint:'+😊 +🤝', fn: g => { g.flags.swapParty=true; return{mood:3,social:3}; }},
+        { label:'觉得没什么好换的，不喜欢', hint:'-🤝 -😊', fn: g => { g.flags.swapParty=true; return{social:-2,mood:-2}; }},
+      ]},
+    { id:'digital_minimalism', icon:'📱', title:'数字断舍离', category:'psychology',
+      body:'你开始了「数字断舍离」。\n\n你做了：\n- 删了30个不用的APP\n- 退了20个微信群\n- 取消了50个公众号关注\n- 关闭了所有推送通知\n- 把手机屏幕使用时间控制在2小时以内\n\n第一周：\n- 你很焦虑（总觉得错过了什么）\n- 你不停看手机（但没有新消息）\n- 你很不习惯（太安静了）\n\n第二周：\n- 你开始享受安静\n- 你发现：你有了更多时间\n- 你开始读书、运动、做饭\n\n你发现：\n- 你以前每天看手机6小时\n- 现在你每天多出4小时\n- 一年多了60天\n\n你开始理解：数字断舍离——不是「不看手机」——是「把时间还给自己」。\n\n「数字断舍离：不是在删APP——是在删「偷走你时间的东西」。」',
+      cond: g => g.age >= 20 && !g.flags.digitalMinimalism && g.intel >= 25,
+      choices:[
+        { label:'坚持数字断舍离，多了很多时间', hint:'+😊 +🧠 +❤️ +✨', fn: g => { g.flags.digitalMinimalism=true; g.flags.digitalDetoxer=true; return{mood:8,intel:5,health:3,charm:3}; }},
+        { label:'尝试了一周，感觉不错', hint:'+😊 +🧠', fn: g => { g.flags.digitalMinimalism=true; return{mood:3,intel:3}; }},
+        { label:'忍不住又下载回来了', hint:'-🧠 -😊', fn: g => { g.flags.digitalMinimalism=true; return{intel:-2,mood:-3}; }},
+      ]},
+    { id:'repair_culture', icon:'🔧', title:'修理文化', category:'hobby',
+      body:'你的洗衣机坏了。\n\n以前——你会直接买新的。\n\n但这次——你决定自己修。\n\n你在B站搜了「洗衣机维修」——\n\n你发现：\n- 90%的故障——只需要换一个零件\n- 零件成本：30元\n- 请人修：300元\n- 买新的：3000元\n\n你买了零件——照着视频修了2小时——\n\n修好了！\n\n你发现：\n- 你省了2970元\n- 你学了新技能\n- 你有了成就感\n\n你开始什么都自己修：\n- 修手机屏幕（50元，外面300元）\n- 修自行车（20元，外面100元）\n- 修家具（10元，外面200元）\n\n你开始理解：修理——不是「省钱」——是「跟物品建立关系」。\n\n「修理文化：不是在修东西——是在学「东西坏了可以修」的道理。」',
+      cond: g => g.age >= 22 && !g.flags.repairCulture && g.intel >= 25,
+      choices:[
+        { label:'成了修理达人，什么都自己修', hint:'+💰 +🧠 +✨', fn: g => { g.flags.repairCulture=true; g.flags.repairMaster=true; g.money += 5000; return{intel:8,charm:3}; }},
+        { label:'修好了洗衣机，很有成就感', hint:'+💰 +🧠 +😊', fn: g => { g.flags.repairCulture=true; g.money += 500; return{intel:5,mood:3}; }},
+        { label:'修了半天没修好，还是买新的了', hint:'-💰 -🧠', fn: g => { g.flags.repairCulture=true; g.money -= 3000; return{intel:-2}; }},
+      ]},
+    { id:'rent_not_buy', icon:'📋', title:'租而不买', category:'finance',
+      body:'你开始「租而不买」了。\n\n你租了：\n- 相机（旅行时用，100元/天）\n- 投影仪（看电影用，30元/天）\n- 电钻（装家具用，20元/天）\n- 礼服（参加活动用，200元/次）\n- 游戏机（周末玩，50元/天）\n\n你算了算：\n- 如果都买——要花3万\n- 租着用——一年只花了2000\n\n你发现：\n- 很多东西——你一年只用1-2次\n- 买回来——大部分时间在吃灰\n- 租——比买——更「划算」\n\n你开始理解：拥有——是一种「负担」。\n\n当你拥有——你要：存放、保养、维修、担心丢失。\n\n当你租——你只需要「使用」。\n\n「租而不买：不是在「省钱」——是在减少「拥有的负担」。」',
+      cond: g => g.age >= 22 && !g.flags.rentNotBuy && g.money >= 500,
+      choices:[
+        { label:'全面转向租而不买，轻松了很多', hint:'+💰 +🧠 +😊', fn: g => { g.flags.rentNotBuy=true; g.flags.rentLifestyle=true; g.money += 5000; return{intel:5,mood:5}; }},
+        { label:'有选择地租，省了一些钱', hint:'+💰 +🧠', fn: g => { g.flags.rentNotBuy=true; g.money += 2000; return{intel:3}; }},
+        { label:'觉得租不划算，还是买了', hint:'-💰 +✨', fn: g => { g.flags.rentNotBuy=true; g.money -= 10000; return{charm:3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -14160,7 +14241,7 @@ const ACHIEVEMENTS = [
     { id:'relative_cutter', icon:'✂️', name:'断亲勇士', desc:'选择了断亲', check: g => g.flags.cutRelatives },
     { id:'filial_v2', icon:'🏥', name:'孝心体检', desc:'带父母做体检', check: g => g.flags.parentHealthDone },
     // === v10.6 新增成就 ===
-    { id:'xianyu_seller', icon:'🐟', name:'闲鱼达人', desc:'在闲鱼卖了闲置', check: g => g.flags.xianyuSeller },
+    { id:'xianyu_seller_v27_3', icon:'🐟', name:'闲鱼达人', desc:'在闲鱼卖了闲置', check: g => g.flags.xianyuSeller },
     { id:'side_hustler', icon:'💻', name:'斜杠青年', desc:'开始做副业', check: g => g.flags.hasSideHustle },
     { id:'web_novelist_ach', icon:'✍️', name:'网文作者', desc:'开始写网络小说', check: g => g.flags.webNovelist },
     { id:'concert_goer', icon:'🎵', name:'演唱会狂热', desc:'去了一场演唱会', check: g => g.flags.wentConcert },
@@ -14948,6 +15029,14 @@ const ACHIEVEMENTS = [
     { id:'nomad_life_ach', icon:'💻', name:'数字游民', desc:'选择了不被城市绑定的生活', check: g => g.flags.nomadLife },
     { id:'chose_to_stay_ach', icon:'🏙️', name:'选择留下', desc:'决定在大城市扎根不再漂泊', check: g => g.flags.choseToStay },
     { id:'fighting_for_child_ach', icon:'👶', name:'为孩子而战', desc:'为了孩子的未来拼命落户', check: g => g.flags.fightingForChild },
+    // v27.3: 二手经济 + 断舍离成就
+    { id:'xianyu_pro_ach', icon:'📦', name:'闲鱼达人', desc:'在闲鱼上卖闲置月入过千', check: g => g.flags.xianyuPro },
+    { id:'minimalist_ach_v27_3', icon:'🧹', name:'极简主义者', desc:'践行极简生活，少即是多', check: g => g.flags.minimalist },
+    { id:'luxury_trader_ach', icon:'👜', name:'二手奢侈品商', desc:'系统买卖二手奢侈品赚钱', check: g => g.flags.luxuryTrader },
+    { id:'anti_consumer_ach', icon:'🚫', name:'反消费主义者', desc:'坚持理性消费年省3.6万', check: g => g.flags.antiConsumer },
+    { id:'repair_master_ach', icon:'🔧', name:'修理大师', desc:'什么都自己修，省了大笔钱', check: g => g.flags.repairMaster },
+    { id:'digital_detoxer_ach_v27_3', icon:'📱', name:'数字断舍离', desc:'成功戒掉手机依赖每天多出4小时', check: g => g.flags.digitalDetoxer },
+    { id:'vintage_collector_ach', icon:'🏪', name:'复古收藏家', desc:'成了二手店常客收藏vintage', check: g => g.flags.vintageCollector },
 ];
 
 // === ENDINGS === (order matters: first match wins)
