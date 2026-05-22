@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v27.1
+// 都市浮生记 - Game Engine v27.2
 // ============================================
 
 // === GAME STATE ===
@@ -13656,6 +13656,87 @@ const EVENTS = [
         { label:'录了口述视频，留给了后代', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.legacyPlanning=true; g.flags.videoLegacy=true; g.reputation.culture += 8; return{mood:8,intel:3}; }},
         { label:'觉得自己的故事不值一提', hint:'-😊 +🧠', fn: g => { g.flags.legacyPlanning=true; return{mood:-3,intel:2}; }},
       ]},
+    // v27.2: 户籍制度 + 城市归属
+    { id:'hukou_struggle', icon:'📋', title:'落户难', category:'society',
+      body:'你想在这个城市落户了。\n\n你查了落户条件：\n- 本科学历+社保满5年：可以\n- 硕士学历+社保满1年：可以\n- 买房：可以\n- 积分落户：需要100分\n\n你的条件：\n- 本科\n- 社保3年\n- 没买房\n- 积分：65分\n\n你差35分。\n\n加分项：\n- 买房：+30分\n- 硕士学历：+20分\n- 社保每年：+2分\n- 纳税每年：+1分\n\n你算了一下：如果不买房——你还需要17年才能攒够积分。\n\n你开始理解：户口——不是「一张纸」——是「你能不能在这个城市扎根」的凭证。\n\n没有户口：\n- 孩子不能在这里上学\n- 不能在这里考公务员\n- 医保报销比例低\n\n「落户难：不是在办手续——是在跟城市「谈判」你值不值得留下来。」',
+      cond: g => g.age >= 25 && !g.flags.hukouStruggle && !g.flags.hasHukou && g.months >= 36,
+      choices:[
+        { label:'开始准备考研，为了落户加分', hint:'-💰 +🧠 -😊', fn: g => { g.flags.hukouStruggle=true; g.flags.studyingForHukou=true; g.money -= 10000; return{intel:8,mood:-3}; }},
+        { label:'决定买房落户', hint:'-💰 +😊', fn: g => { g.flags.hukouStruggle=true; g.flags.buyingForHukou=true; return{mood:3}; }},
+        { label:'觉得不值得，不想为户口焦虑', hint:'+😊 +🧠 -🤝', fn: g => { g.flags.hukouStruggle=true; g.flags.rejectedHukou=true; return{mood:5,intel:3,social:-2}; }},
+      ]},
+    { id:'residence_permit', icon:'🪪', title:'居住证', category:'society',
+      body:'你办了居住证。\n\n有了居住证——你可以：\n- 办护照\n- 考驾照\n- 孩子可以上公立学校（但要排队）\n- 参加社保\n\n但你不能：\n- 买限购的房子\n- 参加摇号买车\n- 享受本地人的医保报销比例\n\n你发现：居住证——是「半个身份」。\n\n你有「住」的权利——但没有「属于」的权利。\n\n你开始理解：在大城市——「住在这里」和「属于这里」——是两回事。\n\n你每年都要去续签一次居住证。\n\n每次续签——你都在想：什么时候——我才能不需要「续」？\n\n「居住证：不是证明你「住在这里」——是证明你「还没资格真正属于这里」。」',
+      cond: g => g.age >= 20 && !g.flags.residencePermit && !g.flags.hasHukou && g.months >= 6,
+      choices:[
+        { label:'办了居住证，先解决基本问题', hint:'+🧠 +😊', fn: g => { g.flags.residencePermit=true; g.flags.hasResidencePermit=true; g.reputation.social += 3; return{intel:2,mood:2}; }},
+        { label:'觉得太麻烦了，一直没办', hint:'-🧠 -😊', fn: g => { g.flags.residencePermit=true; return{intel:-2,mood:-3}; }},
+        { label:'开始研究积分落户政策', hint:'+🧠 +✨', fn: g => { g.flags.residencePermit=true; g.flags.studyingPolicy=true; return{intel:5}; }},
+      ]},
+    { id:'city_belonging', icon:'🏙️', title:'城市归属感', category:'psychology',
+      body:'你在这个城市生活了8年了。\n\n你问自己：这里是我的「家」吗？\n\n你发现：\n- 你有工作\n- 你有朋友\n- 你有喜欢的餐厅\n- 你有熟悉的街道\n\n但你也有：\n- 没有户口\n- 没有房子\n- 父母在老家\n- 过年要「回老家」\n\n你开始想：「家」到底是什么？\n- 是户口上写的那个地址？\n- 是你住的那个出租屋？\n- 是你父母住的那个房子？\n- 还是你心里觉得「舒服」的那个地方？\n\n你发现：你不确定。\n\n你开始理解：漂泊者——不是「没有家」——是「家在哪里都不确定」。\n\n「城市归属感：不是你在选城市——是城市在「选」你。」',
+      cond: g => g.age >= 28 && !g.flags.cityBelonging && g.months >= 60,
+      choices:[
+        { label:'决定留下来，这里就是我的家', hint:'+😊 +✨ +🧠', fn: g => { g.flags.cityBelonging=true; g.flags.choseToStay=true; g.reputation.social += 8; return{mood:8,charm:5,intel:3}; }},
+        { label:'开始想回老家了', hint:'-😊 +🧠', fn: g => { g.flags.cityBelonging=true; g.flags.thinkingReturn=true; return{mood:-3,intel:3}; }},
+        { label:'觉得哪里都不是家，继续漂泊', hint:'+🧠 -😊 +✨', fn: g => { g.flags.cityBelonging=true; g.flags.drifterForever=true; return{intel:5,mood:-5,charm:3}; }},
+      ]},
+    { id:'children_education', icon:'🎒', title:'孩子上学', category:'society',
+      body:'你的孩子该上学了。\n\n但你没有户口。\n\n你的选择：\n- 公立学校：需要户口或积分入学（积分不够）\n- 私立学校：每年学费3-10万\n- 回老家上学：孩子变留守儿童\n- 国际学校：每年学费15-30万\n\n你算了算：\n- 你的年薪：10万\n- 私立学校学费：5万/年\n- 加上生活费：2万/年\n- 你一年只能存3万\n\n你跟你对象商量——\n\n她说：「不能让孩子当留守儿童。」\n\n你说：「但我们付不起私立。」\n\n你们吵了一架。\n\n你开始理解：户口——不只是「一张纸」——它决定了你孩子的「起点」。\n\n「孩子上学：不是选学校——是选「你的孩子有没有资格在这个城市长大」。」',
+      cond: g => g.flags.hasChild && !g.flags.hasHukou && !g.flags.childrenEducation && g.age >= 28,
+      choices:[
+        { label:'咬牙上了私立，花光了积蓄', hint:'-💰 +❤️ -😊', fn: g => { g.flags.childrenEducation=true; g.flags.privateSchool=true; g.money -= 70000; return{mood:-3,social:2}; }},
+        { label:'送孩子回老家上学，成了留守儿童', hint:'+💰 -❤️ -😊 -🤝', fn: g => { g.flags.childrenEducation=true; g.flags.leftBehindChild=true; return{mood:-15,social:-5}; }},
+        { label:'拼命攒积分，终于够入学了', hint:'+🧠 +😊 -❤️', fn: g => { g.flags.childrenEducation=true; g.flags.earnedPoints=true; g.reputation.social += 10; return{intel:5,mood:5,health:-3}; }},
+      ]},
+    { id:'points_settlement', icon:'📊', title:'积分落户', category:'career',
+      body:'你终于攒够了积分——可以申请落户了！\n\n你提交了材料：\n- 学历证明\n- 社保证明\n- 纳税证明\n- 住房证明\n- 无犯罪记录\n\n等待审批：3个月。\n\n你每天都在刷——\n\n终于——审批通过了。\n\n你拿到了这个城市的户口。\n\n你去派出所——领了新的户口本。\n\n你看着户口本上的地址——\n\n你哭了。\n\n不是因为高兴——是因为你觉得：终于——这个城市「接受」了你。\n\n你在这个城市待了10年——终于有了「名分」。\n\n你开始理解：落户——不是终点——是「开始」。\n\n「积分落户：不是你在「申请」——是你用10年青春「证明」了自己。」',
+      cond: g => g.flags.hukouStruggle && g.age >= 30 && !g.flags.pointsSettlement && g.months >= 60 && (g.flags.studyingForHukou || g.flags.studyingPolicy),
+      choices:[
+        { label:'终于落户了，在大城市扎了根', hint:'+😊 +🤝 +✨ +❤️', fn: g => { g.flags.pointsSettlement=true; g.flags.hasHukou=true; g.reputation.social += 15; g.reputation.economy += 5; return{mood:15,social:5,charm:5}; }},
+        { label:'落户了但觉得没意义了', hint:'+🧠 -😊', fn: g => { g.flags.pointsSettlement=true; g.flags.hasHukou=true; g.flags.hukouDisillusion=true; return{intel:5,mood:-5}; }},
+        { label:'拿到户口当天决定回老家了', hint:'-😊 +🧠 -🤝', fn: g => { g.flags.pointsSettlement=true; g.flags.hasHukou=true; g.flags.leftAfterHukou=true; return{mood:-3,intel:5}; }},
+      ]},
+    { id:'urban_village_v27_2', icon:'🏘️', title:'城中村', category:'society',
+      body:'你住在城中村。\n\n这里：\n- 房租便宜（1500/月）\n- 楼下什么都有（超市、饭馆、药店）\n- 邻居都是外地人\n- 很热闹\n\n但这里也：\n- 脏乱差\n- 电线乱拉\n- 消防隐患\n- 隔音很差\n\n有一天——你看到了通知：\n\n「本区域将于3个月后启动拆迁。」\n\n你慌了。\n\n你开始找新房子——\n- 附近的公寓：3500/月\n- 远一点的：2500/月\n- 更远的：1800/月（通勤2小时）\n\n你开始理解：城中村——是漂泊者的「第一站」——也是「最后一站」。\n\n它给你便宜的房子——也给你「不属于」的感觉。\n\n「城中村：不是你的「家」——是你在大城市的「落脚点」。」',
+      cond: g => g.age >= 20 && !g.flags.urbanVillageV27 && g.money >= 1000 && g.money <= 50000,
+      choices:[
+        { label:'搬到了更好的公寓，生活升级了', hint:'-💰 +😊 +✨', fn: g => { g.flags.urbanVillageV27=true; g.flags.upgradedLiving=true; g.money -= 3000; g.reputation.economy += 3; return{mood:5,charm:3}; }},
+        { label:'搬到了更远的地方，通勤变长了', hint:'+💰 -😊 -❤️', fn: g => { g.flags.urbanVillageV27=true; return{mood:-5,health:-3}; }},
+        { label:'跟室友合租了，分摊房租', hint:'+🤝 +💰', fn: g => { g.flags.urbanVillageV27=true; g.flags.sharedLiving=true; return{social:3,mood:2}; }},
+      ]},
+    { id:'hometown_return', icon:'🏠', title:'回老家', category:'psychology',
+      body:'你决定回老家了。\n\n你在大城市待了10年。\n\n你回到老家——\n\n你发现：\n- 街道变了\n- 很多店关了\n- 新开了很多店\n- 你小学同学已经结婚了\n- 你高中同学已经当爸了\n\n你也发现：\n- 你不认识很多人了\n- 很多人也不认识你了\n- 你的方言生疏了\n- 你习惯了大城市的节奏\n\n你开始觉得：你在老家——也是个「外人」。\n\n你在大城市——是个「外地人」。\n你在老家——是个「陌生人」。\n\n你开始理解：漂泊——不是「去了远方」——是「哪里都不是归处」。\n\n「回老家：不是「回家」——是发现「家已经不是你记忆中的样子」。」',
+      cond: g => g.age >= 30 && !g.flags.hometownReturn && g.months >= 60,
+      choices:[
+        { label:'在老家找了工作，重新开始', hint:'+😊 +🤝 -✨', fn: g => { g.flags.hometownReturn=true; g.flags.returnedHome=true; setJob(g, '本地企业员工', 5000); g.city='chengdu'; g.cityName='成都'; return{mood:5,social:5,charm:-3}; }},
+        { label:'待了一个月，发现待不住，回了大城市', hint:'-💰 -😊 +🧠', fn: g => { g.flags.hometownReturn=true; g.flags.returnedToCity=true; g.money -= 5000; return{mood:-3,intel:5}; }},
+        { label:'开始犹豫，不知道留在哪里', hint:'-😊 +🧠', fn: g => { g.flags.hometownReturn=true; return{mood:-5,intel:3}; }},
+      ]},
+    { id:'second_generation', icon:'👶', title:'二代移民', category:'society',
+      body:'你的孩子在这个城市出生了。\n\n他是这个城市的「二代」。\n\n但他的户口——跟你一样——是老家的。\n\n你开始想：他长大后——\n- 他会觉得自己是这个城市的人吗？\n- 他会说这里的方言吗？\n- 他会有「归属感」吗？\n\n你的孩子上了幼儿园。\n\n老师说：「你孩子普通话很好——但不会说本地方言。」\n\n你的孩子回家问你：「爸爸/妈妈，为什么同学说我是外地人？」\n\n你愣住了。\n\n他在这个城市出生——在这个城市长大——但他还是「外地人」？\n\n你开始理解：户籍制度——不只影响你——也影响你的下一代。\n\n「二代移民：不是「第二代」——是「第二代漂泊者」。」',
+      cond: g => g.flags.hasChild && !g.flags.hasHukou && !g.flags.secondGeneration && g.age >= 30 && g.months >= 60,
+      choices:[
+        { label:'决定为了孩子一定要落户', hint:'+🧠 +❤️ -😊', fn: g => { g.flags.secondGeneration=true; g.flags.fightingForChild=true; g.reputation.social += 5; return{intel:5,mood:-3}; }},
+        { label:'跟孩子说「哪里有家哪里就是家」', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.secondGeneration=true; return{mood:3,intel:3,charm:3}; }},
+        { label:'开始考虑送孩子回老家上学', hint:'-😊 -❤️ +🧠', fn: g => { g.flags.secondGeneration=true; return{mood:-8,intel:3}; }},
+      ]},
+    { id:'local_community', icon:'🏘️', title:'融入社区', category:'social',
+      body:'你开始尝试融入本地社区了。\n\n你参加了：\n- 社区志愿者活动\n- 社区篮球赛\n- 社区读书会\n- 居委会的邻里调解\n\n你发现：本地人——没有你想象中那么「排外」。\n\n你的邻居王阿姨——\n- 教你做本地菜\n- 帮你看快递\n- 给你介绍对象（如果你单身）\n- 过年给你送饺子\n\n你开始觉得：这个城市——有了一点「温度」。\n\n你开始理解：归属感——不是「户口给你的」——是「人给你的」。\n\n当你有了「邻居」——你就有了「社区」。\n当你有了「社区」——你就有了「城市」。\n\n「融入社区：不是让城市接受你——是你先接受这个城市。」',
+      cond: g => g.age >= 25 && !g.flags.localCommunity && g.months >= 24 && g.social >= 30,
+      choices:[
+        { label:'成了社区积极分子，有了归属感', hint:'+🤝 +😊 +✨ +❤️', fn: g => { g.flags.localCommunity=true; g.flags.communityActive=true; g.reputation.social += 10; return{social:8,mood:8,charm:3}; }},
+        { label:'参加了几次活动，认识了邻居', hint:'+🤝 +😊', fn: g => { g.flags.localCommunity=true; g.reputation.social += 5; return{social:5,mood:3}; }},
+        { label:'觉得浪费时间，不参加了', hint:'+🧠 -🤝', fn: g => { g.flags.localCommunity=true; return{intel:2,social:-3}; }},
+      ]},
+    { id:'digital_nomad_v27_2', icon:'💻', title:'数字游民', category:'career',
+      body:'你不想被「城市」绑住了。\n\n你选择了做「数字游民」。\n\n你的工作：远程开发/设计/写作。\n你的收入：15000元/月。\n你的地点：不固定。\n\n你这一年的轨迹：\n- 1-3月：大理（房租1200/月）\n- 4-6月：长沙（房租1800/月）\n- 7-9月：青岛（房租2000/月）\n- 10-12月：成都（房租1500/月）\n\n你发现：\n- 你不需要「属于」一个城市\n- 你可以「属于」所有城市\n- 你的「家」就是你的笔记本电脑\n\n但你也发现：\n- 你没有固定的朋友\n- 你没有固定的社区\n- 你没有一个可以说「我回来了」的地方\n\n你开始理解：数字游民——不是「自由」——是「用归属换自由」。\n\n「数字游民：不是在选城市——是在选「不被任何城市绑定」。」',
+      cond: g => g.age >= 25 && g.age <= 40 && !g.flags.digitalNomadV27 && g.intel >= 40 && g.money >= 20000,
+      choices:[
+        { label:'成了数字游民，到处漂泊', hint:'+😊 +✨ +🧠 -🤝', fn: g => { g.flags.digitalNomadV27=true; g.flags.nomadLife=true; g.reputation.culture += 5; return{mood:5,charm:5,intel:5,social:-3}; }},
+        { label:'试了3个月，觉得太孤独了', hint:'-💰 -😊 +🧠', fn: g => { g.flags.digitalNomadV27=true; g.money -= 10000; return{mood:-3,intel:5}; }},
+        { label:'觉得还是需要稳定，放弃了', hint:'+🧠 -✨', fn: g => { g.flags.digitalNomadV27=true; return{intel:3,charm:-2}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -14155,7 +14236,7 @@ const ACHIEVEMENTS = [
     { id:'health_wakeup', icon:'🏥', name:'健康警钟', desc:'收到异常体检报告', check: g => g.flags.healthReport },
     { id:'midlife_pivot_ach', icon:'🔄', name:'中年转型', desc:'做出了中年职业转型', check: g => g.flags.midlifePivot },
     { id:'tiger_parent_ach', icon:'📚', name:'虎妈虎爸v2', desc:'为孩子教育大力投入', check: g => g.flags.tigerParent },
-    { id:'hometown_return', icon:'🏠', name:'思乡之情', desc:'面对回乡还是留下的抉择', check: g => g.flags.hometownPull },
+    { id:'hometown_return_v27_2', icon:'🏠', name:'思乡之情', desc:'面对回乡还是留下的抉择', check: g => g.flags.hometownPull },
     { id:'life_reviewer', icon:'🪞', name:'人生复盘者', desc:'在40岁反思了自己的人生', check: g => g.flags.lifeReview40 },
     // === v12.0 新增成就 ===
     { id:'gym_card_ach', icon:'💪', name:'健身卡持有者', desc:'办了健身卡', check: g => g.flags.gymMember },
@@ -14861,6 +14942,12 @@ const ACHIEVEMENTS = [
     { id:'elegant_aging_ach', icon:'🌟', name:'优雅老去', desc:'接受衰老并活得更自在', check: g => g.flags.elegantAging },
     { id:'wrote_memoir_ach', icon:'📖', name:'回忆录作者', desc:'写了人生回忆录留给后代', check: g => g.flags.wroteMemoir },
     { id:'notarized_will_ach', icon:'📝', name:'提前安排', desc:'做了公证遗嘱心里踏实了', check: g => g.flags.notarizedWill },
+    // v27.2: 户籍归属成就
+    { id:'has_hukou_ach', icon:'📋', name:'城市新居民', desc:'终于拿到了大城市的户口', check: g => g.flags.hasHukou },
+    { id:'community_active_ach', icon:'🏘️', name:'社区达人', desc:'融入社区成了积极分子', check: g => g.flags.communityActive },
+    { id:'nomad_life_ach', icon:'💻', name:'数字游民', desc:'选择了不被城市绑定的生活', check: g => g.flags.nomadLife },
+    { id:'chose_to_stay_ach', icon:'🏙️', name:'选择留下', desc:'决定在大城市扎根不再漂泊', check: g => g.flags.choseToStay },
+    { id:'fighting_for_child_ach', icon:'👶', name:'为孩子而战', desc:'为了孩子的未来拼命落户', check: g => g.flags.fightingForChild },
 ];
 
 // === ENDINGS === (order matters: first match wins)
