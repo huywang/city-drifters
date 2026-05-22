@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v32.0
+// 都市浮生记 - Game Engine v32.1
 // ============================================
 
 // === GAME STATE ===
@@ -17519,6 +17519,97 @@ const EVENTS = [
         { label:'帮一个老人提了行李', hint:'+👥 +😊', fn: g => { g.flags.trainStationLife=true; g.flags.helpStranger=true; return{social:5,mood:5}; }},
         { label:'在车上想了一些关于离别的事', hint:'+🧠 +😊', fn: g => { g.flags.trainStationLife=true; g.flags.farewellThinking=true; return{intel:5,mood:3}; }},
       ]},
+
+    // === v32.1 舌尖与烟火（饮食文化）===
+    { id:'hotpot_alone_v32_1', icon:'🍲', title:'一个人的火锅', category:'food',
+      body:'你第一次一个人去吃火锅。\n\n服务员问：「几位？」你说：「一位。」她的表情微妙地变了一下。\n\n你坐在双人桌前，对面是空椅子。锅底翻滚着，你往里面下了毛肚、鸭血、土豆片。\n\n隔壁桌是一群人大声碰杯，再远一点是一对情侣互相夹菜。你一个人慢慢涮、慢慢吃。\n\n吃到一半你突然觉得：一个人吃火锅其实挺好的，想涮什么涮什么，不用迁就任何人。\n\n但你还是忍不住看了一眼对面的空椅子。',
+      cond: g => g.age >= 18 && g.social < 50,
+      choices:[
+        { label:'拍了一张照发朋友圈', hint:'+✨', fn: g => { g.flags.hotpotAlone=true; g.flags.foodPost=true; return{charm:3,mood:-2}; }},
+        { label:'安静吃完，觉得挺好的', hint:'+😊 +🧠', fn: g => { g.flags.hotpotAlone=true; g.flags.comfortableAlone=true; return{mood:5,intel:3}; }},
+        { label:'提前结账走了', hint:'-😊', fn: g => { g.flags.hotpotAlone=true; return{mood:-5}; }},
+      ]},
+
+    { id:'milk_tea_order_v32_1', icon:'🧋', title:'奶茶社交', category:'food',
+      body:'下午三点，同事群里有人发了句：「有人要喝奶茶吗？」\n\n群里瞬间炸了：「我要！」「+1」「杨枝甘露少冰三分糖」「我要那个新品」\n\n你看了看菜单，犹豫了半天。你其实不渴，但好像不点一杯就融不进去。\n\n最后你点了一杯最贵的——反正都花了，不如对自己好一点。\n\n外卖到了，你拿起来喝了一口。嗯，就是糖水加珍珠。但你还是拍了张照。',
+      cond: g => g.jobSalary > 0,
+      choices:[
+        { label:'每次都跟着点', hint:'-💰 +👥', fn: g => { g.flags.milkTeaSocial=true; g.money-=500; return{social:5,mood:2}; }},
+        { label:'说自己在戒糖，不点了', hint:'+🧠', fn: g => { g.flags.milkTeaSocial=true; g.flags.sugarFree=true; return{intel:3,health:3}; }},
+        { label:'自己买了个保温杯泡茶', hint:'+💪 +💰', fn: g => { g.flags.milkTeaSocial=true; g.flags.teaCup=true; return{health:5,mood:3}; }},
+      ]},
+
+    { id:'midnight_bbq_v32_1', icon:'🍢', title:'深夜烧烤摊', category:'food',
+      body:'加班到凌晨一点，你走在回家的路上。\n\n街角的烧烤摊还亮着灯。老板是个东北大哥，围裙上全是油渍，正一边翻串一边跟旁边的人聊天。\n\n你坐下来，要了十串羊肉、两个烤馒头、一瓶啤酒。\n\n旁边桌是两个穿着代驾背心的中年男人，他们在吃烤韭菜，聊着孩子上学的学费。\n\n老板端上来你的串，说：「小伙子，加个烤茄子吧，今天茄子特别好。」\n\n你咬了一口羊肉串，烟火气冲进了鼻子。你觉得这个味道叫「活着」。',
+      cond: g => g.age >= 20 && g.jobSalary > 0,
+      choices:[
+        { label:'加了茄子，多坐一会儿', hint:'+😊 +💪', fn: g => { g.flags.midnightBBQ=true; g.money-=80; return{mood:8,health:-3}; }},
+        { label:'吃完赶紧回家睡觉', hint:'+💪', fn: g => { g.flags.midnightBBQ=true; g.money-=50; return{health:3}; }},
+        { label:'跟代驾大哥聊了两句', hint:'+👥 +😊', fn: g => { g.flags.midnightBBQ=true; g.flags.talkToDriver=true; g.money-=80; return{social:5,mood:5}; }},
+      ]},
+
+    { id:'hometown_food_v32_1', icon:'📦', title:'妈妈寄的特产', category:'food',
+      body:'快递到了。你拆开纸箱，里面塞满了泡沫和报纸。\n\n一袋自己灌的香肠、两罐辣椒酱、一包花生米、几个咸鸭蛋，还有一张纸条：「少吃外卖，多吃家里的。」\n\n你把东西一样一样拿出来，每拿一样，鼻子就酸一分。\n\n你打开辣椒酱的盖子，一股熟悉的辣味冲上来。你用馒头蘸了一点，尝了一口。\n\n就是这个味道。你吃了二十多年的味道。\n\n你给妈妈发了条消息：「收到了，很好吃。」她秒回：「吃完再给你寄。」',
+      cond: g => g.age >= 18 && !g.flags.hasHukou,
+      choices:[
+        { label:'认真地做了一顿饭', hint:'+💪 +😊', fn: g => { g.flags.hometownFood=true; g.flags.cookedMeal=true; return{health:5,mood:8}; }},
+        { label:'拍了照发群里给爸妈看', hint:'+👥 +😊', fn: g => { g.flags.hometownFood=true; return{social:3,mood:5}; }},
+        { label:'一边吃一边打了个视频电话', hint:'+👥 +😊', fn: g => { g.flags.hometownFood=true; g.flags.videoCallParents=true; return{social:5,mood:10}; }},
+      ]},
+
+    { id:'lunch_group_v32_1', icon:'🥡', title:'午饭搭子', category:'food',
+      body:'新公司入职第一周，中午你不知道该去哪吃。\n\n一个同事过来说：「走，一起去吃食堂？」你赶紧跟上了。\n\n食堂里人声鼎沸，你们排着队，她给你推荐了哪个窗口好吃、哪个踩雷。\n\n坐下来后，你们聊了些有的没的——家乡、大学、追什么剧。她说：「以后中午一起啊，一个人吃饭好无聊。」\n\n你觉得在大城市里有一个午饭搭子，好像也没那么孤独了。',
+      cond: g => g.jobSalary > 0 && g.social < 60,
+      choices:[
+        { label:'成了固定的午饭搭子', hint:'+👥 +😊', fn: g => { g.flags.lunchBuddy=true; return{social:8,mood:5}; }},
+        { label:'偶尔一起，但更喜欢独处', hint:'+🧠', fn: g => { g.flags.lunchBuddy=true; return{intel:3,mood:2}; }},
+        { label:'开始自己带饭省钱', hint:'+💰 +💪', fn: g => { g.flags.lunchBuddy=true; g.flags.bringLunch=true; return{money:200,health:5}; }},
+      ]},
+
+    { id:'noodle_comfort_v32_1', icon:'🍜', title:'一碗面的治愈', category:'food',
+      body:'今天过得特别糟糕。被领导骂了，地铁上被人踩了一脚，回家发现忘带钥匙。\n\n你蹲在门口等开锁师傅的时候，闻到楼下飘来的面条香味。\n\n等门开了，你放下包就下楼了。小店只有六张桌子，老板是个四川大姐。\n\n你说：「来碗小面，多放辣。」\n\n面上来了，红油盖了一层，花椒的麻味直往鼻子里钻。你挑起一筷子面，吸溜一口。\n\n辣得眼泪都出来了。你也不确定是辣的还是别的什么。\n\n你把碗里的汤都喝完了。你觉得，好像也没那么糟糕了。',
+      cond: g => g.mood < 40,
+      choices:[
+        { label:'跟老板娘聊了两句', hint:'+😊 +👥', fn: g => { g.flags.noodleComfort=true; g.flags.talkToOwner=true; return{mood:8,social:3}; }},
+        { label:'吃完安静地坐了一会儿', hint:'+🧠 +😊', fn: g => { g.flags.noodleComfort=true; return{mood:10,intel:3}; }},
+        { label:'明天又去吃了', hint:'+😊', fn: g => { g.flags.noodleComfort=true; g.flags.noodleRegular=true; return{mood:5}; }},
+      ]},
+
+    { id:'food_photo_v32_1', icon:'📱', title:'吃饭先拍照', category:'food',
+      body:'你和朋友去了一家网红餐厅。装修很ins风，菜品摆盘精致得像艺术品。\n\n菜上来了，你习惯性地拿起手机拍照。调滤镜、换角度、摆餐具……拍了五分钟。\n\n朋友等得菜都凉了，说：「能不能别拍了，先吃啊。」\n\n你发了朋友圈，配文：「周末的小确幸✨」\n\n十分钟后收到了三十个赞。你觉得这顿饭值了。\n\n但你其实没怎么尝出味道来——光顾着拍照了。',
+      cond: g => g.charm > 40 && g.age <= 35,
+      choices:[
+        { label:'以后吃饭先吃再拍', hint:'+🧠 +💪', fn: g => { g.flags.foodPhoto=true; g.flags.eatFirstPhotoLater=true; return{intel:5,health:3}; }},
+        { label:'继续拍，这是生活记录', hint:'+✨', fn: g => { g.flags.foodPhoto=true; return{charm:3}; }},
+        { label:'干脆关了手机认真吃饭', hint:'+😊 +💪', fn: g => { g.flags.foodPhoto=true; g.flags.phoneOffMeal=true; return{mood:5,health:5}; }},
+      ]},
+
+    { id:'fly_restaurant_v32_1', icon:'🪰', title:'苍蝇馆子', category:'food',
+      body:'同事带你去了一条小巷子，七拐八拐找到一家店。\n\n店面只有巴掌大，墙上贴着手写的菜单，桌上铺着一次性塑料桌布。头顶的吊扇吱呀作响。\n\n你有点犹豫：这地方……能吃吗？\n\n同事说：「别看了，坐，我请你。」\n\n菜上来了——回锅肉、鱼香茄子、酸辣土豆丝。你吃了一口回锅肉。\n\n天哪。\n\n你从来没吃过这么好吃的回锅肉。肉片焦香、豆瓣酱浓烈、蒜苗清脆。你连扒了三碗饭。\n\n同事得意地说：「怎么样？这才是真正的中国味道。」',
+      cond: g => g.age >= 18,
+      choices:[
+        { label:'成了这里的常客', hint:'+😊 +💪', fn: g => { g.flags.flyRestaurant=true; g.flags.regularCustomer=true; return{mood:5,health:3}; }},
+        { label:'拍照推荐给了所有人', hint:'+👥 +✨', fn: g => { g.flags.flyRestaurant=true; return{social:5,charm:3}; }},
+        { label:'回去研究怎么做回锅肉', hint:'+🧠 +😊', fn: g => { g.flags.flyRestaurant=true; g.flags.learnCooking=true; return{intel:5,mood:5}; }},
+      ]},
+
+    { id:'cook_for_one_v32_1', icon:'🍳', title:'一人食', category:'food',
+      body:'周末，你决定给自己做顿饭。\n\n你去菜市场买了新鲜的西红柿、鸡蛋、一把小葱。大妈多送了你两根黄瓜：「小伙子/小姑娘一个人啊？多吃点。」\n\n回到出租屋，你系上围裙，洗菜切菜打蛋。锅热了，油下去，鸡蛋膨胀成金黄色。\n\n你炒了一个西红柿鸡蛋，煮了一碗米饭。摆在桌上，打开一罐啤酒。\n\n没有外卖的塑料盒，没有骑手打电话。这是你自己做的饭。\n\n你拍了一张照，但没发朋友圈。这顿饭是你自己的。',
+      cond: g => g.age >= 20,
+      choices:[
+        { label:'开始每周做饭', hint:'+💪 +💰', fn: g => { g.flags.cookForOne=true; g.flags.weeklyCooking=true; return{health:8,money:500}; }},
+        { label:'做了但发现太难吃了', hint:'-😊', fn: g => { g.flags.cookForOne=true; return{mood:-3}; }},
+        { label:'学了新菜发到小红书', hint:'+✨ +👥', fn: g => { g.flags.cookForOne=true; g.flags.cookingPost=true; return{charm:5,social:3}; }},
+      ]},
+
+    { id:'breakfast_stand_v32_1', icon:'🥟', title:'早餐摊消失了', category:'food',
+      body:'你每天早上都去的那个早餐摊不见了。\n\n就是那个卖煎饼果子和豆浆的摊位，阿姨总是多给你加一个蛋，说：「年轻人要吃饱。」\n\n你去问了旁边的便利店老板，他说：「城管不让摆了，她回老家了。」\n\n你站在原来摊位的位置，空荡荡的。地上还有一个油渍的印记。\n\n你突然想起，你甚至不知道她叫什么名字。你只知道她的煎饼果子是你在这个城市吃过的最温暖的味道。\n\n你去了便利店买了一个面包，又冷又硬。你想，有些东西失去了才知道多珍贵。',
+      cond: g => g.months >= 12,
+      choices:[
+        { label:'开始自己学做煎饼果子', hint:'+🧠 +💪', fn: g => { g.flags.breakfastGone=true; g.flags.learnJianbing=true; return{intel:3,health:3}; }},
+        { label:'找了一家早餐店替代', hint:'+😊', fn: g => { g.flags.breakfastGone=true; return{mood:-2}; }},
+        { label:'写了一篇关于早餐摊的文章', hint:'+✨ +🧠', fn: g => { g.flags.breakfastGone=true; g.flags.wroteAboutFood=true; return{charm:5,intel:3}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -19160,6 +19251,18 @@ const ACHIEVEMENTS = [
     { id:'park_bench_ach', icon:'🪑', name:'公园长椅', desc:'在公园长椅上听了一个故事', check: g => g.flags.parkBenchStory },
     { id:'hospital_ach', icon:'🏥', name:'医院走廊', desc:'在医院走廊里等待过', check: g => g.flags.hospitalCorridor },
     { id:'train_station_ach', icon:'🚉', name:'火车站人间', desc:'在火车站观察了人生百态', check: g => g.flags.trainStationLife },
+
+    // --- v32.1 舌尖与烟火成就 ---
+    { id:'hotpot_alone_ach', icon:'🍲', name:'一个人的火锅', desc:'勇敢地一个人吃了火锅', check: g => g.flags.hotpotAlone },
+    { id:'milk_tea_ach', icon:'🧋', name:'奶茶社交', desc:'参与了办公室奶茶拼单', check: g => g.flags.milkTeaSocial },
+    { id:'midnight_bbq_ach', icon:'🍢', name:'深夜食堂', desc:'在深夜烧烤摊感受到了烟火气', check: g => g.flags.midnightBBQ },
+    { id:'hometown_food_ach', icon:'📦', name:'家的味道', desc:'收到了妈妈寄的特产', check: g => g.flags.hometownFood },
+    { id:'lunch_buddy_ach', icon:'🥡', name:'午饭搭子', desc:'在公司找到了午饭搭子', check: g => g.flags.lunchBuddy },
+    { id:'noodle_comfort_ach', icon:'🍜', name:'一碗面的治愈', desc:'在低落时用一碗面治愈了自己', check: g => g.flags.noodleComfort },
+    { id:'food_photo_ach', icon:'📱', name:'吃饭先拍照', desc:'学会了先吃饭再拍照', check: g => g.flags.foodPhoto },
+    { id:'fly_restaurant_ach', icon:'🪰', name:'苍蝇馆子探店', desc:'找到了隐藏的苍蝇馆子宝藏', check: g => g.flags.flyRestaurant },
+    { id:'cook_for_one_ach', icon:'🍳', name:'一人食大师', desc:'开始享受给自己做饭', check: g => g.flags.cookForOne },
+    { id:'breakfast_gone_ach', icon:'🥟', name:'消失的早餐摊', desc:'记住了一个消失的早餐摊', check: g => g.flags.breakfastGone },
 ];
 
 // === ENDINGS === (order matters: first match wins)
