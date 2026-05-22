@@ -2300,13 +2300,77 @@ const EVENTS = [
         { label:'适度参与', hint:'+💰 +🧠', fn: g => { g.flags.sideProject=true; if(Math.random()>0.5){return{money:20000,intel:5}}else{return{intel:3,mood:-3}} }},
         { label:'婉拒', hint:'+😊', fn: g => { g.flags.sideProject=true; return{mood:5}; }},
       ]},
-    { id:'hometown_visit', icon:'🚄', title:'回家看看',
+    { id:'hometown_visit_v2', icon:'🚄', title:'回家看看',
       body:'你已经大半年没回家了。你妈在电话里说："有空回来看看吧。"\n\n你打开购票软件：高铁3小时，二等座200块。\n\n你算了算：请假3天，来回路费400，给爸妈买礼物2000。\n\n"回家的成本从来不是车票，是面对他们眼中的期待和你的愧疚。"',
       cond: g => !g.flags.hometownVisit && g.months>=18 && g.money>5000 && Math.random()>0.6,
       choices:[
         { label:'请假回家', hint:'-💰 +😊 +👥', fn: g => { g.flags.hometownVisit=true; g.relationships.family = clamp((g.relationships.family||50)+20,0,100); return{money:-3000,mood:20,social:10}; }},
         { label:'视频通话代替', hint:'+👥', fn: g => { g.flags.hometownVisit=true; g.relationships.family = clamp((g.relationships.family||50)+5,0,100); return{social:3,mood:5}; }},
         { label:'下次再说', hint:'-😊 -👥', fn: g => { g.flags.hometownVisit=true; g.relationships.family = clamp((g.relationships.family||50)-10,0,100); return{mood:-8,social:-5}; }},
+      ]},
+    // === v2.37 EVENTS (Chain events) ===
+    { id:'freelance_offer', icon:'💻', title:'自由职业机会',
+      body:'一个老客户联系你："我们有个项目，想找你外包做，预算3万。"\n\n你算了算：辞职的话，风险很大；不辞职的话，只能加班做。\n\n"自由职业听起来很美，但自由的代价是不稳定。"',
+      cond: g => !g.flags.freelanceOffer && g.intel>=65 && g.job!=='待业中' && g.age>=26 && Math.random()>0.6,
+      choices:[
+        { label:'辞职做自由职业', hint:'🎲 高风险高回报', fn: g => {
+            g.flags.freelanceOffer=true; g.flags.freelancer=true;
+            return{mood:10,nextEvent: g => ({
+                id:'freelance_result', icon:'💼', title:'自由职业第一年',
+                body:'你做了半年自由职业。有时候月入3万，有时候月入3千。\n\n你开始理解：自由职业不是"自由"，是"自己给自己当老板、当员工、当财务"。\n\n"自由职业最大的敌人不是客户，是你的自律。"',
+                choices:[
+                    { label:'坚持做下去', hint:'+💰 +🧠', fn: g => { if(g.intel>=70&&Math.random()>0.4){g.flags.freelanceSuccess=true;return{money:30000,intel:5,mood:10}}else{return{money:-5000,mood:-10}} }},
+                    { label:'重新找工作', hint:'+💰 +😊', fn: g => { g.flags.freelancer=false; g.flags.gotFirstJob=true; g.job='初级工程师'; g.jobSalary=10000; return{money:5000,mood:5}; }},
+                    { label:'边工作边接私活', hint:'-❤️ +💰', fn: g => { return{health:-10,money:15000,mood:5}; }},
+                ]})
+            };
+        }},
+        { label:'兼职做', hint:'+💰 -❤️', fn: g => { g.flags.freelanceOffer=true; return{money:20000,health:-10,mood:5}; }},
+        { label:'婉拒', hint:'+😊', fn: g => { g.flags.freelanceOffer=true; return{mood:3}; }},
+      ]},
+    { id:'investment_advice', icon:'📊', title:'理财顾问',
+      body:'银行理财经理给你推荐了一款产品：\n\n- 预期年化收益8%\n- 锁定期2年\n- 最低投资10万\n\n"收益越高的产品，风险越大——这句话你已经听了一百遍，但你还是想试试。"',
+      cond: g => !g.flags.investmentAdvice && g.money>=100000 && g.age>=28 && Math.random()>0.5,
+      choices:[
+        { label:'投20万试试', hint:'🎲', fn: g => {
+            g.flags.investmentAdvice=true;
+            return{money:-200000,nextEvent: g => ({
+                id:'investment_return', icon:'📈', title:'投资回报',
+                body:'2年后，你的投资到期了。\n\n' + (Math.random()>0.5 ? '好消息：收益比预期还高！' : '坏消息：实际收益只有2%，还不如存银行。'),
+                choices:[
+                    { label:'继续投资', hint:'🎲', fn: g => { if(Math.random()>0.4){return{money:232000,mood:15,intel:5}}else{return{money:180000,mood:-10}} }},
+                    { label:'见好就收', hint:'+💰', fn: g => { return{money:216000,mood:10}; }},
+                ]})
+            };
+        }},
+        { label:'投10万保守点', hint:'+💰', fn: g => { g.flags.investmentAdvice=true; return{money:-100000,mood:5,nextEvent: g => ({
+            id:'investment_small_return', icon:'📊', title:'小额回报',
+            body:'你的10万投资到期了，收益8%。\n\n不多不少，但至少没亏。\n\n"投资最重要的不是赚多少，是睡得着觉。"',
+            choices:[
+                { label:'再投一轮', hint:'+💰', fn: g => { if(Math.random()>0.5){return{money:108000+Math.floor(Math.random()*20000),mood:10}}else{return{money:95000,mood:-5}} }},
+                { label:'取出来存银行', hint:'+💰', fn: g => { return{money:108000,mood:5}; }},
+            ]})
+        }; }},
+        { label:'还是存银行吧', hint:'+🧠', fn: g => { g.flags.investmentAdvice=true; return{intel:3,mood:3}; }},
+      ]},
+    { id:'mentor_found', icon:'👨‍🏫', title:'遇到贵人',
+      body:'你在一次行业活动上认识了一位前辈。ta在行业里深耕15年，人脉广泛，见解独到。\n\nta主动加了你微信："年轻人，有空聊聊。"\n\n"贵人不是给你钱的人，是给你方向的人。"',
+      cond: g => !g.flags.mentorFound && g.social>=50 && g.age>=26 && g.age<=35 && Math.random()>0.6,
+      choices:[
+        { label:'拜师学习', hint:'+🧠 +👥', fn: g => {
+            g.flags.mentorFound=true;
+            return{intel:8,social:10,nextEvent: g => ({
+                id:'mentor_guidance', icon:'🎯', title:'贵人指点',
+                body:'你的导师给你分析了你的职业规划：\n\n"你现在的瓶颈不是能力，是视野。你应该去更大的平台看看。"\n\nta推荐了你一个不错的机会。\n\n"好的导师不是告诉你答案，是帮你看到问题。"',
+                choices:[
+                    { label:'接受推荐', hint:'+💰 +👥', fn: g => { g.jobSalary = Math.floor(g.jobSalary * 1.5) || 15000; g.job = getTitle(g, 'senior'); return{money:10000,mood:15,social:10}; }},
+                    { label:'继续现在的工作', hint:'+🧠', fn: g => { return{intel:5,mood:5}; }},
+                    { label:'请教创业经验', hint:'🎲', fn: g => { if(g.intel>=70&&Math.random()>0.5){g.flags.entrepreneur=true;return{mood:20,intel:10}}else{return{mood:-5}} }},
+                ]})
+            };
+        }},
+        { label:'加个微信就好', hint:'+👥', fn: g => { g.flags.mentorFound=true; return{social:5}; }},
+        { label:'不太想社交', hint:'-😊', fn: g => { g.flags.mentorFound=true; return{mood:-3}; }},
       ]},
 ];
 
@@ -2438,6 +2502,11 @@ const ACHIEVEMENTS = [
     { id:'marathon_runner', icon:'🏃', name:'马拉松跑者', desc:'完成了一次马拉松挑战', check: g => g.flags.marathonChallenge && g.health>=70 },
     { id:'side_project_done', icon:'💻', name:'副业起步', desc:'开始了自己的副业项目', check: g => g.flags.sideProject },
     { id:'homecoming', icon:'🚄', name:'常回家看看', desc:'回家看望了父母', check: g => g.flags.hometownVisit },
+    // v2.37 achievements
+    { id:'freelancer_start', icon:'💻', name:'自由职业者', desc:'开始了自由职业生涯', check: g => g.flags.freelancer },
+    { id:'investor', icon:'📊', name:'投资者', desc:'尝试了理财投资', check: g => g.flags.investmentAdvice },
+    { id:'mentee', icon:'👨‍🏫', name:'得到指点', desc:'遇到了职业导师', check: g => g.flags.mentorFound },
+    { id:'freelance_win', icon:'🌟', name:'自由职业成功', desc:'自由职业获得成功', check: g => g.flags.freelanceSuccess },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -2514,6 +2583,10 @@ const ENDINGS = [
     { id:'content_king', badge:'📱', title:'自媒体达人', desc:'你从一个刷短视频成瘾的人，变成了一个做短视频的人。\n\n你的账号有了10万粉丝，你开始理解：内容创作的本质，是把你的时间卖给更多人。\n\n你没有成为大V，但你找到了表达的方式。\n\n"每个人都是自己生活的导演——只是有些人的观众更多而已。"', cond: g => g.flags.contentCreator && g.charm>=70 && g.social>=60 && g.money>=30000 && g.age>=28 },
     { id:'balanced_life', badge:'⚖️', title:'平衡大师', desc:'你学会了生活的艺术：工作、健康、家庭、社交、兴趣——你每一项都照顾到了。\n\n你没有特别突出的成就，但你有一个充实而平衡的人生。\n\n"成功不是某一方面的极致，是各个方面的和谐。"', cond: g => g.health>=70 && g.mood>=70 && g.intel>=60 && g.social>=60 && g.charm>=60 && (g.relationships && g.relationships.family>=60) && g.age>=35 },
     { id:'side_hustle_success', badge:'💼', title:'副业转正', desc:'你的副业终于做起来了。\n\n收入虽然不算多，但你知道：这是你自己的事业，不是给别人打工。\n\n你开始思考：要不要辞职全职做？\n\n"副业最好的结果是：你有选择的自由。"', cond: g => g.flags.sideProject && g.flags.sideHustle && g.money>=100000 && g.intel>=70 && g.age>=30 },
+    // --- v2.37 ENDINGS ---
+    { id:'freelance_master', badge:'🌟', title:'自由职业大师', desc:'你成功转型为自由职业者。\n\n你有稳定的客户，有灵活的时间，有不错的收入。\n\n你不再需要打卡，不需要开无聊的会，不需要看老板脸色。\n\n"自由职业不是逃避工作，是选择了另一种工作方式。"', cond: g => g.flags.freelanceSuccess && g.money>=80000 && g.intel>=70 && g.mood>=65 && g.age>=30 },
+    { id:'wise_investor', badge:'📈', title:'投资高手', desc:'你学会了投资的智慧。\n\n你没有暴富，但你的资产在稳步增长。你不再追涨杀跌，不再被市场情绪左右。\n\n"投资不是赌博，是用时间换取复利。"', cond: g => g.flags.investmentAdvice && g.money>=300000 && g.intel>=75 && g.age>=35 },
+    { id:'mentored_success', badge:'🎓', title:'薪火相传', desc:'你遇到了贵人，也得到了贵人的指点。\n\n你从一个迷茫的年轻人，变成了一个有方向的职业人。\n\n现在，你开始指导比你更年轻的人。\n\n"最好的报答，是把得到的帮助传递下去。"', cond: g => g.flags.mentorFound && g.jobSalary>=20000 && g.social>=70 && g.intel>=75 && g.age>=32 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
@@ -3146,9 +3219,9 @@ function getEndingRarity(endingId) {
     // Legendary (rare endings that require specific conditions)
     const legendary = ['fire', 'immigration', 'executive', 'retire_abroad', 'wealthy', 'family_first', 'burnout_recovery', 'digital_nomad_senior', 'social_influencer_end', 'phoenix_rising', 'workplace_legend'];
     // Rare (hard to achieve)
-    const rare = ['settled', 'startup_end', 'influencer_end', 'digital_nomad', 'karoshi', 'jail', 'social_butterfly_end', 'health_guru', 'side_hustle_king', 'kaogong_success', 'mentor_end', 'community_builder', 'career_pivot', 'anti_fraud_hero', 'relationship_guru', 'comeback_kid', 'health_warrior'];
+    const rare = ['settled', 'startup_end', 'influencer_end', 'digital_nomad', 'karoshi', 'jail', 'social_butterfly_end', 'health_guru', 'side_hustle_king', 'kaogong_success', 'mentor_end', 'community_builder', 'career_pivot', 'anti_fraud_hero', 'relationship_guru', 'comeback_kid', 'health_warrior', 'freelance_master'];
     // Uncommon (moderately difficult)
-    const uncommon = ['hometown_hero', 'go_home', 'civil_end', 'ordinary', 'single', 'investment_guru', 'lying_flat_end', 'lonely_death', 'estranged', 'pet_parent', 'mortgage_default_end', 'kong_yiji_end', 'full_time_child_end', 'minimalist_life', 'slow_life', 'scam_victim', 'sandwich_generation', 'lonely_achiever', 'wanderer', 'slow_life_master', 'weather_survivor', 'content_king', 'balanced_life', 'side_hustle_success'];
+    const uncommon = ['hometown_hero', 'go_home', 'civil_end', 'ordinary', 'single', 'investment_guru', 'lying_flat_end', 'lonely_death', 'estranged', 'pet_parent', 'mortgage_default_end', 'kong_yiji_end', 'full_time_child_end', 'minimalist_life', 'slow_life', 'scam_victim', 'sandwich_generation', 'lonely_achiever', 'wanderer', 'slow_life_master', 'weather_survivor', 'content_king', 'balanced_life', 'side_hustle_success', 'wise_investor', 'mentored_success'];
 
     if (legendary.includes(endingId)) return 'legendary';
     if (rare.includes(endingId)) return 'rare';
@@ -3332,7 +3405,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.36' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.37' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
