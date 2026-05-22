@@ -1240,3 +1240,31 @@ html[style*="font-size: 18px"] .modal-content {
     0%,100% { box-shadow: 0 0 8px rgba(139,92,246,0.2); }
     50% { box-shadow: 0 0 20px rgba(139,92,246,0.4); }
 }
+
+/* v2.33 - Replay Suggestions */
+.replay-section {
+    margin: 16px 0;
+    padding: 16px;
+    background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(16,185,129,0.08));
+    border: 1px solid rgba(59,130,246,0.2);
+    border-radius: var(--radius-lg);
+}
+.replay-section h3 {
+    margin: 0 0 8px 0;
+    font-size: 1rem;
+    color: var(--text-primary);
+}
+.replay-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.replay-section li {
+    padding: 6px 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
+}
+.replay-section li:last-child {
+    border-bottom: none;
+}

@@ -2128,6 +2128,50 @@ const EVENTS = [
         { label:'不管了，活在当下', hint:'+😊 -🧠', fn: g => { g.flags.pensionAnxiety=true; return{mood:5,intel:-3}; }},
         { label:'多生孩子多保障', hint:'-💰 +👨‍👩‍👧', fn: g => { g.flags.pensionAnxiety=true; if(g.flags.hasChild){g.relationships.family=clamp((g.relationships.family||60)+5,0,100)}return{money:-10000,mood:3}; }},
       ]},
+    // === v2.33 RELATIONSHIP DEPTH & CULTURAL EVENTS ===
+    { id:'workplace_politics', icon:'🎭', title:'办公室政治',
+      body:'你的两个同事在背后互相使绊子，而你被夹在中间。\n\nA说B在领导面前告了你的状。B说A在背后说你坏话。\n\n你不知道该信谁，但你确定的是：在这场政治游戏里，中立是最危险的立场。\n\n"办公室政治不是电视剧，但比电视剧精彩——因为每个演员都是真的想弄死你。"',
+      cond: g => g.job!=='待业中' && g.relationships && g.relationships.colleagues>20 && !g.flags.officePolitics && Math.random()>0.6,
+      choices:[
+        { label:'站队A', hint:'🎲 +👥 -👥', fn: g => { g.flags.officePolitics=true; if(Math.random()>0.5){g.relationships.colleagues=clamp((g.relationships.colleagues||30)+10,0,100);return{social:8,mood:5}}else{g.relationships.colleagues=clamp((g.relationships.colleagues||30)-15,0,100);return{social:-10,mood:-10}} }},
+        { label:'保持中立', hint:'+🧠', fn: g => { g.flags.officePolitics=true; return{intel:5,mood:-3}; }},
+        { label:'两边都不得罪', hint:'+✨ +🧠', fn: g => { g.flags.officePolitics=true; return{charm:5,intel:8,social:3}; }},
+        { label:'向HR举报', hint:'-👥 +🧠', fn: g => { g.flags.officePolitics=true; g.relationships.colleagues=clamp((g.relationships.colleagues||30)-20,0,100); return{social:-15,intel:5,mood:-5}; }},
+      ]},
+    { id:'relationship_test', icon:'💔', title:'感情考验',
+      body:"你和你的另一半出现了严重的分歧。\n\n也许是关于要不要结婚，要不要孩子，要不要去另一个城市，或者只是\"你到底爱不爱我\"。\n\n你们吵了一架。TA说：\"你从来不理解我。\"你说：\"你从来不理解我的不理解。\"\n\n\"感情里最大的谎言不是'我不爱你'，而是'我理解你'——理解一个人，比爱一个人难多了。\"",
+      cond: g => g.flags.hasPartner && g.relationships && g.relationships.partner>30 && !g.flags.relationshipTest && Math.random()>0.5,
+      choices:[
+        { label:'主动道歉', hint:'+❤️ +😊', fn: g => { g.flags.relationshipTest=true; g.relationships.partner=clamp((g.relationships.partner||50)+15,0,100); return{mood:10,charm:3}; }},
+        { label:'坚持自己的立场', hint:'-❤️ +✨', fn: g => { g.flags.relationshipTest=true; g.relationships.partner=clamp((g.relationships.partner||50)-10,0,100); return{mood:-5,charm:5}; }},
+        { label:'一起做心理咨询', hint:'-💰 +❤️ +🧠', fn: g => { g.flags.relationshipTest=true; g.relationships.partner=clamp((g.relationships.partner||50)+20,0,100); return{money:-2000,mood:8,intel:5}; }},
+        { label:'冷处理，等时间解决', hint:'-❤️', fn: g => { g.flags.relationshipTest=true; g.relationships.partner=clamp((g.relationships.partner||50)-15,0,100); return{mood:-8}; }},
+      ]},
+    { id:'social_media_fame', icon:'📱', title:'意外走红',
+      body:'你随手发的一条微博/抖音/小红书突然火了。\n\n一夜之间，你的粉丝从200变成了20000。评论区炸了，有人夸你，有人骂你，有人说你蹭热度。\n\n你看着手机通知栏里999+的消息，不知道该高兴还是该害怕。\n\n"15分钟的名气，可能换来15年的网暴。"',
+      cond: g => g.charm>60 && !g.flags.socialMediaFame && g.age>=22 && g.age<=40 && Math.random()>0.8,
+      choices:[
+        { label:'趁热打铁做自媒体', hint:'+💰 +✨ +😊', fn: g => { g.flags.socialMediaFame=true; g.flags.influencer=true; return{money:10000,charm:15,mood:15,social:10}; }},
+        { label:'低调处理，删帖', hint:'+😊 -✨', fn: g => { g.flags.socialMediaFame=true; return{mood:5,charm:-5}; }},
+        { label:'回应争议，引发更多讨论', hint:'🎲 +✨ +💰', fn: g => { g.flags.socialMediaFame=true; if(Math.random()>0.5){return{charm:20,money:15000,mood:10}}else{return{charm:-10,mood:-20,social:-5}} }},
+      ]},
+    { id:'childcare_crisis', icon:'👶', title:'育儿焦虑',
+      body:'有了孩子后，你发现生活完全变了：\n\n- 奶粉、尿布、早教班——每月多出5000+开销\n- 你和另一半为了"怎么带孩子"吵了无数次\n- 你妈说"我们那时候不也这么过来的"\n- 你的同事说"有了孩子就别想升职了"\n\n你看着孩子熟睡的脸，觉得一切都值了。然后你看到了账单。\n\n"养孩子是世界上唯一一份没有工资的全职工作。"',
+      cond: g => g.flags.hasChild && !g.flags.childcareCrisis && g.age>=28,
+      choices:[
+        { label:'请月嫂/保姆', hint:'-💰 +😊 +❤️', fn: g => { g.flags.childcareCrisis=true; return{money:-15000,mood:10,health:5}; }},
+        { label:'让父母来帮忙', hint:'+👨‍👩‍👧 -😊', fn: g => { g.flags.childcareCrisis=true; g.relationships.family=clamp((g.relationships.family||60)+10,0,100); return{mood:-5,social:3}; }},
+        { label:'辞职在家带娃', hint:'-💰 -💼 +❤️ +😊', fn: g => { g.flags.childcareCrisis=true; setJob(g,'全职家长',0); return{mood:15,health:5,social:-10}; }},
+        { label:'咬牙自己扛', hint:'-❤️ -😊 +💰', fn: g => { g.flags.childcareCrisis=true; return{health:-10,mood:-10}; }},
+      ]},
+    { id:'hometown_nostalgia', icon:'🌾', title:'乡愁',
+      body:'你在朋友圈看到老家发的照片：\n\n你小时候走过的那条路被拆了。你上过的小学搬了。你家的老房子变成了一栋商业楼。\n\n你突然很想回家，但你不知道回去还能认出来吗。\n\n你妈在电话里说："家里变化很大，你回来看看嘛。"\n\n"故乡是一个你回不去的地方——不是因为路远，而是因为时间。"',
+      cond: g => g.months>=36 && !g.flags.hometownNostalgia && g.relationships && g.relationships.family>40,
+      choices:[
+        { label:'请假回家看看', hint:'-💰 +👨‍👩‍👧 +😊', fn: g => { g.flags.hometownNostalgia=true; g.relationships.family=clamp((g.relationships.family||60)+15,0,100); return{money:-3000,mood:20,health:5}; }},
+        { label:'视频通话就好', hint:'+👨‍👩‍👧', fn: g => { g.flags.hometownNostalgia=true; g.relationships.family=clamp((g.relationships.family||60)+5,0,100); return{mood:5}; }},
+        { label:'发条朋友圈感慨一下', hint:'+😊 +✨', fn: g => { g.flags.hometownNostalgia=true; return{mood:8,charm:3}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -2233,6 +2277,12 @@ const ACHIEVEMENTS = [
     { id:'philosopher', icon:'📖', name:'生活哲学家', desc:'面对存在焦虑', check: g => g.flags.existentialDread && g.intel>=70 },
     { id:'old_friend', icon:'🍻', name:'老友记', desc:'与老朋友重逢', check: g => g.flags.oldFriendReunion },
     { id:'pension_planner', icon:'👴', name:'养老规划师', desc:'开始做养老规划', check: g => g.flags.retirementPlanning },
+    // v2.33 achievements
+    { id:'office_diplomat', icon:'🎭', name:'办公室外交官', desc:'处理了办公室政治', check: g => g.flags.officePolitics && g.relationships && g.relationships.colleagues>=50 },
+    { id:'relationship_master', icon:'💑', name:'感情大师', desc:'通过了感情考验', check: g => g.flags.relationshipTest && g.relationships && g.relationships.partner>=70 },
+    { id:'viral_star', icon:'📱', name:'一夜爆红', desc:'在社交媒体意外走红', check: g => g.flags.socialMediaFame },
+    { id:'super_parent', icon:'👶', name:'超级父母', desc:'面对育儿挑战', check: g => g.flags.childcareCrisis && g.flags.hasChild },
+    { id:'hometown_heart', icon:'🌾', name:'乡愁诗人', desc:'感受到了乡愁', check: g => g.flags.hometownNostalgia },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -2857,7 +2907,53 @@ function triggerEnding() {
     if (progressEl) progressEl.textContent = progressText;
 
     document.getElementById('timeline-list').innerHTML = G.eventLog.map(e => `<div class="timeline-item"><span class="timeline-year">${e.age}岁</span><span class="timeline-text">${e.text}</span></div>`).join('');
+
+    // v2.33: Add replay suggestions
+    const replayEl = document.getElementById('replay-suggestions');
+    if (replayEl) {
+        replayEl.innerHTML = getReplaySuggestions(ending.id);
+    }
+
     showScreen('screen-ending');
+}
+
+function getReplaySuggestions(endingId) {
+    const suggestions = [];
+    const negative = ['karoshi','bankruptcy','burnout','depression','jail','startup_fail','scam_victim','mortgage_default_end','lonely_death','estranged'];
+    const positive = ['fire','executive','settled','wealthy','hometown_hero','immigration'];
+    const neutral = ['ordinary','single','lying_flat_end','digital_nomad','freelancer_end','slow_life'];
+
+    if (negative.includes(endingId)) {
+        suggestions.push('💡 试试不同的月度活动组合——运动和休息可以救命');
+        suggestions.push('💡 注意健康值，低于20就该休息了');
+        suggestions.push('💡 投资要分散风险，不要把鸡蛋放在一个篮子里');
+    }
+    if (positive.includes(endingId)) {
+        suggestions.push('🎯 挑战更高难度，看看能否再次成功');
+        suggestions.push('🎯 试试不同的城市和出身组合');
+        suggestions.push('🎯 解锁隐藏出身：拆二代、星二代、彩票中奖者');
+    }
+    if (neutral.includes(endingId)) {
+        suggestions.push('🌟 每个选择都会影响结局，试试不同的路');
+        suggestions.push('🌟 人际关系很重要，多维护家人和朋友');
+        suggestions.push('🌟 探索更多事件链，发现隐藏的故事');
+    }
+
+    // Always add these
+    const legacy = getLegacy();
+    if (legacy.totalEndings.length < 10) {
+        suggestions.push(`🔓 再解锁 ${10-legacy.totalEndings.length} 种结局可以解锁"星二代"出身`);
+    }
+    if (!legacy.totalEndings.includes('fire')) {
+        suggestions.push('🔥 试试达成"财务自由"结局');
+    }
+
+    const legacyPoints = legacy.points;
+    if (legacyPoints > 0) {
+        suggestions.push(`🌀 你有 ${legacyPoints} 人生点数，下次开局会有额外加成`);
+    }
+
+    return `<div class="replay-section"><h3>🔄 下次试试</h3><ul>${suggestions.map(s => `<li>${s}</li>`).join('')}</ul></div>`;
 }
 
 function getEndingRarity(endingId) {
@@ -3050,7 +3146,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.32' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.33' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
