@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v17.1
+// 都市浮生记 - Game Engine v17.2
 // ============================================
 
 // === GAME STATE ===
@@ -8502,6 +8502,103 @@ const EVENTS = [
         { label:'给朋友打电话聊天', hint:'+👥 +😊', fn: g => { g.flags.festivalAlone=true; return{social:12,mood:10}; }},
         { label:'早点睡，明天还要上班', hint:'+💪 +💰 -😊', fn: g => { g.flags.festivalAlone=true; return{health:5,money:1000,mood:-8}; }},
       ]},
+    // === v17.2 新增事件（医疗健康 + 看病日常 + 养生文化） ===
+    { id:'hospital_appointment', icon:'🏥', title:'挂号难', category:'health',
+      body:'你不舒服，想去医院看病。\n\n你打开挂号App：\n- 专家号：已约满（下周才有）\n- 普通号：还有3个（但要等4小时）\n- 特需门诊：500元挂号费（当天可看）\n\n你在黄牛那里问了问：专家号800块。\n\n你最终选择了普通号，在候诊区等了3个小时。医生看了你5分钟，开了200块的药。\n\n"看病5分钟，排队3小时——这就是中国医疗的日常。"',
+      cond: g => !g.flags.hospitalAppointment,
+      choices:[
+        { label:'花钱看特需门诊', hint:'-💰 +💪 +😊', fn: g => { g.flags.hospitalAppointment=true; return{money:-500,health:12,mood:5}; }},
+        { label:'普通号排队等', hint:'+💪 -😊 -💰', fn: g => { g.flags.hospitalAppointment=true; return{health:8,mood:-10,money:-200}; }},
+        { label:'去社区医院/诊所', hint:'+💪 +💰', fn: g => { g.flags.hospitalAppointment=true; return{health:5,mood:-3,money:-50}; }},
+      ]},
+    { id:'tcm_vs_western', icon:'🍵', title:'中医还是西医', category:'health',
+      body:'你身体不太舒服，在纠结看中医还是西医。\n\n中医：把脉、针灸、中药调理。慢，但治本。\n西医：CT、验血、开药。快，但可能只治标。\n\n你妈说："西药伤肝伤肾，吃中药调理。"\n你同事说："中医是玄学，西医才是科学。"\n\n你两个都看了。中医说你"气血两虚"，西医说你"一切正常"。\n\n"中医和西医：一个是哲学，一个是技术。你需要的可能只是——早点睡觉。"',
+      cond: g => !g.flags.tcmVsWestern && g.age >= 20,
+      choices:[
+        { label:'看中医，慢慢调理', hint:'-💰 +💪', fn: g => { g.flags.tcmVsWestern=true; g.flags.tcmBeliever=true; return{money:-3000,health:10,mood:5}; }},
+        { label:'看西医，做个全面检查', hint:'-💰 +💪 +🧠', fn: g => { g.flags.tcmVsWestern=true; g.flags.westernMed=true; return{money:-2000,health:12,intel:3}; }},
+        { label:'两个都看', hint:'-💰💰 +💪 +🧠', fn: g => { g.flags.tcmVsWestern=true; g.flags.bothMed=true; return{money:-5000,health:15,intel:5}; }},
+      ]},
+    { id:'dental_care', icon:'🦷', title:'看牙贵', category:'health',
+      body:'你的牙疼了一个月，终于去了牙科。\n\n医生的诊断：\n- 一颗龋齿：补牙500\n- 一颗需要根管治疗：3000\n- 一颗需要种牙：15000\n\n总价：18500。你的医保只报了2000。\n\n你看着账单，心想：牙疼不是病，但看牙是真的要命（和钱）。\n\n"种一颗牙的钱够买一部iPhone。你的嘴比你的手机值钱。"',
+      cond: g => !g.flags.dentalCare && g.age >= 20,
+      choices:[
+        { label:'全部治疗（18500）', hint:'-💰💰 +💪 +😊', fn: g => { g.flags.dentalCare=true; g.flags.healthyTeeth=true; return{money:-18500,health:15,mood:10}; }},
+        { label:'只补龋齿，其他的再说', hint:'-💰 +💪', fn: g => { g.flags.dentalCare=true; return{money:-500,health:5,mood:-5}; }},
+        { label:'太贵了，忍忍吧', hint:'+💰 -💪 -😊', fn: g => { g.flags.dentalCare=true; return{money:500,health:-10,mood:-10}; }},
+      ]},
+    { id:'myopia_glasses', icon:'👓', title:'近视配镜', category:'health',
+      body:'你的视力又下降了。你看远处的字越来越模糊。\n\n你去眼镜店验光：左眼450度，右眼500度。比上次各涨了50度。\n\n眼镜店老板推荐：\n- 普通镜片：300元\n- 防蓝光镜片：800元\n- 超薄非球面镜片：1500元\n- 品牌镜片（蔡司/依视路）：3000元\n\n你看了看手机，又看了看电脑。你的近视大概就是这么来的。\n\n"近视是现代社会最普遍的\"工伤\"——用眼睛换知识，用视力换屏幕时间。"',
+      cond: g => !g.flags.myopiaGlasses && g.age >= 18,
+      choices:[
+        { label:'配好一点的镜片', hint:'-💰 +💪 +✨', fn: g => { g.flags.myopiaGlasses=true; return{money:-1500,health:5,charm:3}; }},
+        { label:'配个普通的就行', hint:'-💰 +💪', fn: g => { g.flags.myopiaGlasses=true; return{money:-300,health:3}; }},
+        { label:'考虑做近视手术', hint:'-💰💰 +💪 +✨', fn: g => { g.flags.myopiaGlasses=true; g.flags.lasik=true; return{money:-20000,health:8,charm:8}; }},
+      ]},
+    { id:'online_doctor', icon:'📱', title:'互联网问诊', category:'health',
+      body:'你不舒服，但不想去医院排队。你打开了互联网医疗App。\n\n你花了20块挂了个线上问诊。医生通过视频看了看你的症状，说："可能是XXX，建议去医院做个检查。"\n\n你觉得这20块花得值——至少不用排队3小时了。\n\n但你也发现：线上问诊只能解决小问题，大病还是得去医院。\n\n"互联网医疗：不是替代医院——是让你在去医院之前，先安心一点。"',
+      cond: g => !g.flags.onlineDoctor && g.age >= 18,
+      choices:[
+        { label:'成为互联网医疗常客', hint:'+💪 +🧠 -💰', fn: g => { g.flags.onlineDoctor=true; g.flags.telemedicineUser=true; return{health:8,intel:5,money:-500}; }},
+        { label:'还是去医院看看', hint:'+💪 -💰 -😊', fn: g => { g.flags.onlineDoctor=true; return{health:12,money:-2000,mood:-5}; }},
+        { label:'自己买点药吃', hint:'+💪 -💰', fn: g => { g.flags.onlineDoctor=true; return{health:5,money:-200}; }},
+      ]},
+    { id:'supplement_scam', icon:'💊', title:'保健品骗局', category:'health',
+      body:'你的同事给你推荐了一款"神奇"保健品："吃了能增强免疫力、改善睡眠、延缓衰老。"\n\n你花了5000块买了一箱。吃了一个月，你觉得——跟吃糖没什么区别。\n\n你上网查了查：这款保健品的成本不到50块，利润高达100倍。\n\n你想退款，客服说："保健品不是药，不能保证效果。"\n\n"保健品骗局：不是在卖健康——是在卖焦虑。你以为你在投资健康，其实你在投资智商税。"',
+      cond: g => !g.flags.supplementScam && g.age >= 22,
+      choices:[
+        { label:'投诉维权', hint:'🎲 +💰 -😊', fn: g => { g.flags.supplementScam=true; if(Math.random()>0.5){return{money:3000,mood:-5}}else{return{money:-2000,mood:-15}} }},
+        { label:'算了，当交学费', hint:'+🧠 +😊', fn: g => { g.flags.supplementScam=true; return{intel:8,mood:-5}; }},
+        { label:'改吃维生素就行', hint:'+💪 +🧠', fn: g => { g.flags.supplementScam=true; g.flags.smartSupplement=true; return{health:5,intel:5,money:-100}; }},
+      ]},
+    { id:'personal_trainer', icon:'🏋️', title:'健身教练', category:'health',
+      body:'你办了张健身卡，请了个私教。\n\n私教说："你的体态有问题，需要系统训练。3个月见效，每周3次，每次400。"\n\n你算了算：3个月=36次=14400元。加上健身卡5000/年。\n\n你练了一个月：肌肉酸痛、体重没变、镜子里的你还是老样子。\n\n私教说："再坚持两个月就有效果了。"\n\n"健身就像投资：短期看不到回报，长期才知道值不值。但私教就像基金经理——他总是让你加仓。"',
+      cond: g => !g.flags.personalTrainer && g.age >= 20 && g.money > 20000,
+      choices:[
+        { label:'坚持请私教', hint:'-💰💰 +💪 +✨', fn: g => { g.flags.personalTrainer=true; g.flags.fitnessRegular=true; return{money:-15000,health:20,charm:10}; }},
+        { label:'自己练就好', hint:'+💪 +💰', fn: g => { g.flags.personalTrainer=true; g.flags.selfFitness=true; return{health:10,mood:5}; }},
+        { label:'算了，跑步不要钱', hint:'+💪 +😊', fn: g => { g.flags.personalTrainer=true; g.flags.runningHabit=true; return{health:8,mood:5}; }},
+      ]},
+    { id:'wellness_culture', icon:'🍵', title:'养生文化', category:'health',
+      body:'你开始养生了。\n\n你的日常变化：\n- 保温杯里泡枸杞\n- 戒了冰奶茶，改喝热水\n- 11点前睡觉（偶尔）\n- 每天早上喝一碗粥\n- 周末去公园散步\n\n你的同事嘲笑你："你怎么跟我爸一样？"\n\n你说："等你到了我这个年纪就知道了。"\n\n"养生：不是你变老了——是你终于开始认真对待这副皮囊了。"',
+      cond: g => !g.flags.wellnessCulture && g.age >= 25,
+      choices:[
+        { label:'全面拥抱养生生活', hint:'+💪 +😊 -✨', fn: g => { g.flags.wellnessCulture=true; g.flags.wellnessLifestyle=true; return{health:15,mood:10,charm:-3}; }},
+        { label:'适度养生，偶尔放纵', hint:'+💪 +😊 +✨', fn: g => { g.flags.wellnessCulture=true; g.flags.balancedWellness=true; return{health:10,mood:8,charm:3}; }},
+        { label:'年轻人不需要养生', hint:'+✨ -💪', fn: g => { g.flags.wellnessCulture=true; return{charm:5,health:-5}; }},
+      ]},
+    { id:'medical_insurance_v2', icon:'🏦', title:'医保报销', category:'health',
+      body:'你生病住院了，花了3万块。\n\n你拿着账单去医保局报销，发现：\n- 甲类药：100%报销\n- 乙类药：报销70%\n- 丙类药：不报销\n- 进口药：不报销\n- 检查费：部分报销\n\n最终医保报了1.2万，自费1.8万。\n\n你看着账单，心想：如果没有医保，这3万就全是自费了。\n\n"医保不是万能的——但没有医保是万万不能的。"',
+      cond: g => !g.flags.medicalInsurance && g.age >= 22,
+      choices:[
+        { label:'购买商业医疗保险补充', hint:'-💰 +💪 +🧠', fn: g => { g.flags.medicalInsurance=true; g.flags.commercialInsurance=true; return{money:-5000,health:5,intel:5}; }},
+        { label:'靠医保就够了', hint:'+💰 +🧠', fn: g => { g.flags.medicalInsurance=true; return{money:2000,intel:3}; }},
+        { label:'研究医保政策', hint:'+🧠 +😊', fn: g => { g.flags.medicalInsurance=true; g.flags.insuranceExpert=true; return{intel:10,mood:5}; }},
+      ]},
+    { id:'hair_loss_anxiety', icon:'😱', title:'脱发焦虑', category:'health',
+      body:'你洗完头，看着下水道的头发，心里一沉。\n\n你又看了看枕头上的头发、桌上的头发、衣服上的头发。你觉得头发越来越少。\n\n你上网搜了搜：\n- 防脱洗发水：100-500元\n- 米诺地尔：200元/月\n- 植发手术：2-5万\n\n你开始理解为什么程序员/金融人都爱戴帽子了。\n\n"脱发不是衰老的信号——是焦虑的信号。你的头发不是掉光的，是被压力"压"掉的。"',
+      cond: g => !g.flags.hairLossAnxiety && g.age >= 25,
+      choices:[
+        { label:'买防脱产品', hint:'-💰 +💪', fn: g => { g.flags.hairLossAnxiety=true; return{money:-2000,health:3,mood:5}; }},
+        { label:'去看皮肤科', hint:'-💰 +💪 +🧠', fn: g => { g.flags.hairLossAnxiety=true; return{money:-1000,health:8,intel:3}; }},
+        { label:'接受现实，剃光头', hint:'+😊 +✨ +💪', fn: g => { g.flags.hairLossAnxiety=true; g.flags.shavedHead=true; return{mood:15,charm:5,health:3}; }},
+      ]},
+    { id:'late_night_culture', icon:'🌙', title:'熬夜文化', category:'health',
+      body:'又是凌晨2点。\n\n你的手机屏幕亮着，你在刷短视频/看剧/打游戏/刷微博。你告诉自己："再看5分钟就睡。"\n\n5分钟后，你又看了5分钟。如此反复，天快亮了。\n\n你的黑眼圈越来越重，你的皮肤越来越差，你的记忆力越来越不好。\n\n但你就是停不下来——因为白天的时间属于公司，只有夜晚属于自己。\n\n"熬夜不是失眠——是报复性入睡拖延症。你在用睡眠换自由。"',
+      cond: g => !g.flags.lateNightCulture && g.age >= 18,
+      choices:[
+        { label:'设定11点强制关机', hint:'+💪 +😊 +🧠', fn: g => { g.flags.lateNightCulture=true; g.flags.earlyBird=true; return{health:15,mood:10,intel:5}; }},
+        { label:'继续熬夜，反正改不了', hint:'+😊 -💪 -🧠', fn: g => { g.flags.lateNightCulture=true; return{mood:5,health:-10,intel:-3}; }},
+        { label:'用褪黑素辅助入睡', hint:'+💪 -💰', fn: g => { g.flags.lateNightCulture=true; return{health:5,money:-200}; }},
+      ]},
+    { id:'psychological_counseling', icon:'🧠', title:'心理咨询', category:'health',
+      body:'你决定去做心理咨询。\n\n你在App上预约了一个咨询师：500元/小时。\n\n第一次咨询，你躺在沙发上，咨询师问："你最近有什么困扰？"\n\n你说了很多：工作压力、人际关系、对未来的焦虑、对过去的遗憾。\n\n咨询师说："你已经很勇敢了。愿意面对自己的问题，本身就是进步。"\n\n你走出咨询室，深吸一口气。你觉得心里轻了一点。\n\n"心理咨询不是"看精神病"——是给自己一个安全的空间，去说那些不能对任何人说的话。"',
+      cond: g => !g.flags.psychologicalCounseling && g.age >= 20 && (g.mood < 50 || g.flags.mentalHealthAware),
+      choices:[
+        { label:'坚持每周咨询', hint:'-💰 +😊 +🧠 +💪', fn: g => { g.flags.psychologicalCounseling=true; g.flags.regularTherapy=true; return{money:-20000,mood:25,intel:8,health:5}; }},
+        { label:'试几次看看效果', hint:'-💰 +😊 +🧠', fn: g => { g.flags.psychologicalCounseling=true; return{money:-5000,mood:15,intel:5}; }},
+        { label:'太贵了，用冥想App替代', hint:'+😊 +🧠', fn: g => { g.flags.psychologicalCounseling=true; g.flags.meditationApp=true; return{mood:10,intel:5}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -9312,6 +9409,17 @@ const ACHIEVEMENTS = [
     { id:'off_peak_traveler_ach', icon:'✈️', name:'错峰旅行家', desc:'学会了错峰出行', check: g => g.flags.offPeakTravel },
     { id:'zongzi_maker_ach', icon:'🎋', name:'粽子师傅', desc:'学会了自己包粽子', check: g => g.flags.learnedZongzi },
     { id:'holiday_cook_ach', icon:'🌙', name:'节日大厨', desc:'一个人过节也做了一顿大餐', check: g => g.flags.cookingHoliday },
+    // === v17.2 新增成就（医疗健康） ===
+    { id:'hospital_visitor_ach', icon:'🏥', name:'看病达人', desc:'体验了挂号看病', check: g => g.flags.hospitalAppointment },
+    { id:'tcm_fan_ach', icon:'🍵', name:'中医爱好者', desc:'看了中医调理身体', check: g => g.flags.tcmBeliever },
+    { id:'healthy_teeth_ach', icon:'🦷', name:'牙齿健康', desc:'完成了牙科治疗', check: g => g.flags.healthyTeeth },
+    { id:'fitness_regular_ach', icon:'🏋️', name:'健身常客', desc:'请了私教坚持锻炼', check: g => g.flags.fitnessRegular },
+    { id:'wellness_lifestyle_ach', icon:'🍵', name:'养生达人', desc:'全面拥抱养生生活', check: g => g.flags.wellnessLifestyle },
+    { id:'insurance_expert_ach', icon:'🏦', name:'保险专家', desc:'研究了医保政策', check: g => g.flags.insuranceExpert },
+    { id:'early_bird_ach', icon:'🌅', name:'早起鸟', desc:'戒掉了熬夜习惯', check: g => g.flags.earlyBird },
+    { id:'therapy_regular_ach', icon:'🧠', name:'心理咨询常客', desc:'坚持每周心理咨询', check: g => g.flags.regularTherapy },
+    { id:'shaved_head_ach', icon:'😎', name:'光头勇士', desc:'接受现实剃了光头', check: g => g.flags.shavedHead },
+    { id:'lasik_ach', icon:'👁️', name:'摘镜成功', desc:'做了近视手术', check: g => g.flags.lasik },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -9582,6 +9690,9 @@ const ENDINGS = [
     // --- v17.1 节日结局 ---
     { id:'travel_master_end', badge:'🌍', title:'旅行达人', desc:'你成了一个旅行达人。\n\n你去过30个国家、50个城市。你的护照上有20多个签证，你的冰箱贴摆满了一面墙。\n\n你的朋友圈不是旅行照就是在机场的自拍。有人说你"不务正业"，有人说你"活得精彩"。\n\n你说："旅行的意义不在于去了哪里——在于看到了不同的活法。"\n\n你把每一次旅行都当成一次人生的拓展。你的世界观比大多数人宽广，因为你亲眼看过那么多的不同。\n\n"世界那么大，我想去看看——而你，真的去看了。"', cond: g => g.flags.annualLeaveTrip && g.flags.offPeakTravel && g.money >= 100000 && g.mood >= 65 && g.age >= 30 },
     { id:'festival_life_end', badge:'🎊', title:'生活仪式感', desc:'你把每一个节日都过得有滋有味。\n\n春节你包饺子、端午你包粽子、中秋你赏月、七夕你给自己买花、元旦你倒数跨年。\n\n你的朋友们说："跟你一起过节总是特别有意思。"\n\n你不是在过节日——你是在用仪式感对抗日常的平淡。每一个节日都是一颗糖，甜在平凡的日子里。\n\n"仪式感：不是矫情——是提醒自己，生活值得被认真对待。"', cond: g => g.flags.newYearEve && g.flags.duanwuZongzi && g.flags.qixiValentine && g.mood >= 70 && g.age >= 25 },
+    // --- v17.2 健康结局 ---
+    { id:'health_guru_end', badge:'💪', title:'健康达人', desc:'你成了朋友圈里的健康达人。\n\n你每天跑步5公里、吃有机蔬菜、11点睡觉、每周健身3次。你的体检报告比同龄人好一个档次。\n\n你的同事说："你怎么精力这么好？"你说："因为我终于把健康当回事了。"\n\n你花了5年学会了养生，你的身体回报了你50年的健康。\n\n"健康不是投资——是保险。你不一定需要它，但没有它你什么都不是。"', cond: g => g.flags.wellnessLifestyle && g.flags.fitnessRegular && g.health >= 85 && g.age >= 30 },
+    { id:'mental_health_champion_end_v2', badge:'🧠', title:'心理健康倡导者', desc:'你从一个焦虑的打工人，变成了一个心理健康的倡导者。\n\n你做了2年的心理咨询，学会了冥想、正念、情绪管理。你开始在朋友圈分享心理健康知识，帮助了很多和你一样焦虑的人。\n\n你的一个朋友说："谢谢你，让我知道不开心不是矫情。"\n\n你说："每一个愿意面对自己内心的人，都是勇士。"\n\n"心理健康：不是永远开心——是允许自己不开心，然后找到力量站起来。"', cond: g => g.flags.regularTherapy && g.flags.psychologicalCounseling && g.mood >= 75 && g.age >= 28 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
