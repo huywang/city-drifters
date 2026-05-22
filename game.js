@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v15.0
+// 都市浮生记 - Game Engine v15.1
 // ============================================
 
 // === GAME STATE ===
@@ -7676,6 +7676,103 @@ const EVENTS = [
         { label:'告诉朋友这个热线', hint:'+👥 +😊', fn: g => { g.flags.crisisHotline=true; g.flags.helpAdvocate=true; return{social:8,mood:8}; }},
         { label:'之后去预约了咨询', hint:'-💰 +💪 +🧠', fn: g => { g.flags.crisisHotline=true; g.flags.therapyStarted=true; return{money:-500,health:8,intel:10}; }},
       ]},
+    // === v15.1 数字生活 + 平台经济 + 新职业 ===
+    { id:'short_video_addiction_v3', icon:'📱', title:'短视频黑洞',
+      body:'你打开抖音说「就看5分钟」——然后抬头已经过了2小时。\n\n你看了50个做饭视频、30个跳舞视频、20个段子、10个装修视频。你学到了什么？什么都没学到。\n\n但你停不下来。每次上划的时候，你的手指像是被施了魔法。\n\n你的眼睛开始发干、脖子开始酸痛。你的手机屏幕使用时间显示：平均每天5小时37分钟。\n\n你决定明天开始控制——明天再说。\n\n"短视频：不是你在刷视频——是视频在刷你。"',
+      cond: g => g.age >= 18 && !g.flags.shortVideoAddiction,
+      choices:[
+        { label:'设置使用时间限制', hint:'+🧠 +💪', fn: g => { g.flags.shortVideoAddiction=true; g.flags.screenTimeLimit=true; return{intel:8,health:5,mood:3}; }},
+        { label:'卸载App', hint:'+🧠 +😊 +💪', fn: g => { g.flags.shortVideoAddiction=true; g.flags.appDeleted=true; return{intel:10,mood:8,health:5}; }},
+        { label:'继续刷', hint:'-💪 -🧠 +😊', fn: g => { g.flags.shortVideoAddiction=true; return{health:-5,intel:-3,mood:5}; }},
+      ]},
+    { id:'live_stream_shopping', icon:'🛒', title:'直播带货',
+      body:'你看了一场直播带货。\n\n主播说：「3、2、1，上链接！最后500件！再不买就没了！」你的手指比你的大脑反应快——已经下单了。\n\n你买了：一个空气炸锅、一套护肤品、三件T恤、一箱芒果干。总花费：1200元。\n\n到货后你发现：空气炸锅太大了放不下、护肤品你过敏、T恤尺码不对、芒果干你根本不喜欢。\n\n你退了两件，但退货运费要自己出。你觉得自己被割了韭菜——但下个月你还是会看直播。\n\n"直播带货：买的不是商品——是「限时优惠」带来的虚假紧迫感。"',
+      cond: g => g.age >= 20 && !g.flags.liveStreamShopping,
+      choices:[
+        { label:'理性消费，只买需要的', hint:'+🧠 +💰', fn: g => { g.flags.liveStreamShopping=true; g.flags.rationalShopper=true; return{intel:8,money:500}; }},
+        { label:'也试试做直播卖货', hint:'+✨ +🧠', fn: g => { g.flags.liveStreamShopping=true; g.flags.triedLivestream=true; return{charm:8,intel:5}; }},
+        { label:'冲动下单，开心就好', hint:'-💰 +😊', fn: g => { g.flags.liveStreamShopping=true; return{money:-1200,mood:8}; }},
+      ]},
+    { id:'delivery_rider', icon:'🛵', title:'外卖骑手的一天',
+      body:'你为了体验生活（或者说为了赚钱），注册了外卖骑手。\n\n第一天：你接了20单，超时了5单，被投诉了2次。你的电动车没电了，你的手机快没电了，你快没力了。\n\n你算了一下：扣除油费、电动车租金、手机流量费，你一天赚了87块钱。\n\n一个顾客给了你差评，理由是「汤洒了一点」。你看着那条差评，想回复点什么——但你太累了。\n\n你终于明白了：那些「您的外卖已送达」的背后，是无数个在风雨中奔跑的人。\n\n"外卖骑手：不是选择了自由——是被困在了算法里。"',
+      cond: g => g.age >= 20 && g.age <= 40 && !g.flags.deliveryRider,
+      choices:[
+        { label:'继续跑单，磨练效率', hint:'+💰 +💪 -🧠', fn: g => { g.flags.deliveryRider=true; g.flags.riderVeteran=true; return{money:3000,health:-5,intel:-3}; }},
+        { label:'了解平台算法', hint:'+🧠 +✨', fn: g => { g.flags.deliveryRider=true; g.flags.algorithmAware=true; return{intel:12,charm:3}; }},
+        { label:'体验结束，回到原来的生活', hint:'+🧠 +😊', fn: g => { g.flags.deliveryRider=true; return{intel:8,mood:5}; }},
+      ]},
+    { id:'self_media_creator', icon:'📹', title:'自媒体创业',
+      body:'你决定做自媒体。\n\n你选了一个赛道（美食/科技/生活/情感），开始日更。第一个月：粉丝从0涨到37。第二个月：粉丝涨到120。第三个月：有一条视频突然爆了——5万播放。\n\n你兴奋得一夜没睡。然后你发现：那5万播放带来了2块钱的广告收入。\n\n你的家人问你：「做这个能赚钱吗？」你说：「在积累。」你心里想的是：「积累到什么时候呢？」\n\n"自媒体创业：看起来是自由职业——实际上是免费打工。但总有人能从0到1——为什么不能是你？"',
+      cond: g => g.age >= 20 && g.age <= 40 && !g.flags.selfMediaCreator,
+      choices:[
+        { label:'坚持日更，等待爆发', hint:'+✨ +🧠 -💪', fn: g => { g.flags.selfMediaCreator=true; g.flags.contentCreator=true; g.flags.dailyUploader=true; return{charm:10,intel:8,health:-5}; }},
+        { label:'学习运营技巧', hint:'+🧠 +✨', fn: g => { g.flags.selfMediaCreator=true; g.flags.contentCreator=true; g.flags.growthHacking=true; return{intel:12,charm:5}; }},
+        { label:'当爱好做，不指望赚钱', hint:'+😊 +🧠', fn: g => { g.flags.selfMediaCreator=true; g.flags.contentCreator=true; return{mood:8,intel:5}; }},
+      ]},
+    { id:'ai_tools_usage', icon:'🤖', title:'AI工具革命',
+      body:'你的同事用AI工具10分钟写完了你一天的报告。\n\n你震惊了。你问他：「你不怕被取代吗？」他说：「不是AI取代我——是会用AI的人取代不会用的人。」\n\n你开始学习使用各种AI工具：ChatGPT写文案、Midjourney做图片、Copilot写代码、Suno做音乐。\n\n你的效率翻了3倍。你的领导说：「你最近进步很大。」你没有告诉他——你一半的工作是AI做的。\n\n你偶尔会想：如果AI什么都能做，那我的价值是什么？\n\n"AI工具：不是你的对手——是你的外骨骼。但脱了外骨骼，你还剩什么？"',
+      cond: g => g.age >= 20 && g.age <= 50 && !g.flags.aiToolsUsage,
+      choices:[
+        { label:'深度学习AI技能', hint:'+🧠 +✨', fn: g => { g.flags.aiToolsUsage=true; g.flags.aiExpert=true; return{intel:15,charm:8}; }},
+        { label:'适度使用，保持思考', hint:'+🧠 +💪', fn: g => { g.flags.aiToolsUsage=true; g.flags.balancedAI=true; return{intel:10,health:3}; }},
+        { label:'抗拒新技术', hint:'-🧠 +😊', fn: g => { g.flags.aiToolsUsage=true; g.flags.techResistant=true; return{intel:-5,mood:3}; }},
+      ]},
+    { id:'digital_nomad_v5', icon:'🌍', title:'数字游民',
+      body:'你辞掉了大城市的工作，成了数字游民。\n\n你带着笔记本电脑，去了大理。你在洱海边的咖啡馆工作，上午写代码，下午看日落。\n\n你的月收入从15000变成了8000。但你的房租从4000变成了1200。你的生活质量——你觉得提高了。\n\n你的父母不理解：「好好的工作不干，跑去云南玩？」你说：「我不是在玩——我在生活。」\n\n你在大理认识了一群和你一样的数字游民。你们组了一个共享办公空间。你们叫它「云上办公室」。\n\n"数字游民：不是逃避现实——是选择了另一种现实。"',
+      cond: g => g.age >= 25 && g.age <= 40 && g.intel >= 40 && !g.flags.digitalNomad,
+      choices:[
+        { label:'享受游民生活', hint:'+😊 +💪 -💰', fn: g => { g.flags.digitalNomad=true; g.flags.nomadLifestyle=true; return{mood:15,health:8,money:-3000}; }},
+        { label:'建立远程工作网络', hint:'+👥 +✨ +🧠', fn: g => { g.flags.digitalNomad=true; g.flags.remoteNetwork=true; return{social:10,charm:8,intel:8}; }},
+        { label:'体验后回城', hint:'+🧠 +😊', fn: g => { g.flags.digitalNomad=true; return{intel:10,mood:8}; }},
+      ]},
+    { id:'online_course_v2', icon:'📚', title:'知识付费',
+      body:'你花2999买了一个在线课程。\n\n课程介绍写着：「30天精通XXX，从入门到年薪百万！」你心动了——付款的时候手都没抖。\n\n第一周你认真学了3天。第二周学了1天。第三周打开了一次。第四周你忘了密码。\n\n你的课程完成度：12%。你的知识增长：约等于0。你的钱包减少了：2999。\n\n你的收藏夹里有200多个「稍后再看」——你一个都没看。\n\n"知识付费：买的不是知识——是「我在学习」的安慰感。"',
+      cond: g => g.age >= 20 && !g.flags.onlineCourse,
+      choices:[
+        { label:'这次认真学完', hint:'+🧠 +💪', fn: g => { g.flags.onlineCourse=true; g.flags.courseCompleter=true; return{intel:15,health:-3}; }},
+        { label:'选一个免费替代', hint:'+🧠 +💰', fn: g => { g.flags.onlineCourse=true; g.flags.freeLearner=true; return{intel:10,money:500}; }},
+        { label:'算了，当交学费了', hint:'+🧠', fn: g => { g.flags.onlineCourse=true; return{intel:5}; }},
+      ]},
+    { id:'ride_hailing_driver', icon:'🚗', title:'网约车司机',
+      body:'你下班后开始跑网约车，赚点外快。\n\n晚上8点上线，跑到凌晨1点。5个小时，接了12单，流水180元。扣掉油费和平台抽成，到手110元。\n\n你遇到了各种乘客：一个喝醉的大哥吐在了你车上、一个情侣在你后座吵架、一个大妈让你帮她搬行李上楼。\n\n一个乘客问你：「师傅，你这么年轻怎么也跑网约车？」你说：「赚点零花钱。」他说：「我也是。」\n\n你们相视一笑。两个为了生活多跑一圈的人。\n\n"网约车：不是在开车——是在用方向盘丈量生活。"',
+      cond: g => g.age >= 22 && g.age <= 50 && !g.flags.rideHailingDriver,
+      choices:[
+        { label:'坚持每天跑', hint:'+💰 -💪 +🧠', fn: g => { g.flags.rideHailingDriver=true; g.flags.fulltimeRideHail=true; return{money:5000,health:-8,intel:3}; }},
+        { label:'周末跑跑就好', hint:'+💰 +😊', fn: g => { g.flags.rideHailingDriver=true; return{money:2000,mood:5}; }},
+        { label:'体验生活，不跑了', hint:'+🧠 +😊', fn: g => { g.flags.rideHailingDriver=true; return{intel:8,mood:3}; }},
+      ]},
+    { id:'social_credit_anxiety', icon:'📊', title:'信用评分',
+      body:'你查了一下自己的芝麻信用分：658。\n\n你的朋友说他810分。你突然觉得——自己好像被评分系统审判了。\n\n你的信用分影响了：能不能免押金租车、能不能先享后付、能不能获得更好的贷款利率。\n\n你开始刻意维护信用：按时还款、多使用花呗、不逾期。你觉得自己不是在管理信用——是信用在管理你。\n\n你的一个朋友说：「我从来不查信用分。」你说：「你是怎么活到现在的？」\n\n"信用评分：不是你在被评估——是你的整个生活在被量化。"',
+      cond: g => g.age >= 22 && !g.flags.socialCreditAnxiety,
+      choices:[
+        { label:'精心维护信用', hint:'+🧠 +💰', fn: g => { g.flags.socialCreditAnxiety=true; g.flags.creditOptimizer=true; return{intel:8,money:500}; }},
+        { label:'正常使用就好', hint:'+🧠 +😊', fn: g => { g.flags.socialCreditAnxiety=true; return{intel:5,mood:5}; }},
+        { label:'不太在意这些', hint:'+😊 -🧠', fn: g => { g.flags.socialCreditAnxiety=true; return{mood:5,intel:-3}; }},
+      ]},
+    { id:'online_to_offline', icon:'🤝', title:'网友见面',
+      body:'你和一个认识了一年的网友决定线下见面。\n\n你们在一个咖啡馆见面。他/她和照片上不太一样——但你觉得更真实了。\n\n你们聊了很多：从共同的兴趣爱好，到各自的工作生活。你发现——线上聊得来的人，线下未必尴尬。\n\n但也有点不一样：线上你说话很风趣，线下你有点紧张。线上他/她打字很快，线下他/她说话会结巴。\n\n你们告别的时候，他/她说：「下次再约？」你说：「好。」\n\n"网友见面：不是验证照片——是验证感觉。"',
+      cond: g => g.age >= 20 && !g.flags.onlineToOffline,
+      choices:[
+        { label:'发展线下友谊', hint:'+👥 +😊 +✨', fn: g => { g.flags.onlineToOffline=true; g.flags.offlineFriend=true; return{social:12,mood:10,charm:5}; }},
+        { label:'保持线上就好', hint:'+👥 +🧠', fn: g => { g.flags.onlineToOffline=true; return{social:5,intel:3}; }},
+        { label:'不太合适', hint:'-👥 +🧠', fn: g => { g.flags.onlineToOffline=true; return{social:-3,intel:5}; }},
+      ]},
+    { id:'gig_economy_v2', icon:'💼', title:'零工经济',
+      body:'你同时做着三份零工：白天自由撰稿、晚上教英语、周末做摄影助理。\n\n你的月收入不稳定：好的时候12000，差的时候3000。你没有社保、没有公积金、没有带薪假。\n\n你的朋友问你：「你为什么不去找个正经工作？」你说：「自由。」\n\n但你心里知道：自由的代价是不确定。你每个月都在担心下个月的钱从哪来。\n\n你的日程表上写满了不同的项目。你觉得自己在创业——但又觉得自己在打零工。\n\n"零工经济：不是自由职业——是自由地不自由。但如果你能找到节奏——那才是真正的自由。"',
+      cond: g => g.age >= 22 && g.age <= 40 && !g.flags.gigEconomy,
+      choices:[
+        { label:'专注一个领域深耕', hint:'+🧠 +✨ +💰', fn: g => { g.flags.gigEconomy=true; g.flags.specialist=true; return{intel:12,charm:8,money:3000}; }},
+        { label:'继续多线并行', hint:'+💰 -💪 +🧠', fn: g => { g.flags.gigEconomy=true; g.flags.multiTasker=true; return{money:5000,health:-8,intel:5}; }},
+        { label:'考虑找稳定工作', hint:'+🧠 +😊', fn: g => { g.flags.gigEconomy=true; g.flags.stabilitySeeker=true; return{intel:8,mood:5}; }},
+      ]},
+    { id:'privacy_concern', icon:'🔒', title:'隐私焦虑',
+      body:'你收到了一条精准推送的广告——你昨天晚上刚和朋友聊过这个话题。\n\n你确定你没有搜索过这个东西。你开始怀疑：手机在监听我说话吗？\n\n你检查了App权限：某外卖App要了你的通讯录权限、某天气App要了你的相册权限、某计算器App要了你的麦克风权限。\n\n你震惊了：一个计算器为什么要用我的麦克风？\n\n你关掉了大部分权限。但你知道——在互联网时代，隐私就像空气：你知道它重要，但你也知道你在不断失去它。\n\n"隐私焦虑：不是被害妄想——是在大数据时代，你已经是透明的了。"',
+      cond: g => g.age >= 20 && !g.flags.privacyConcern,
+      choices:[
+        { label:'严格管理App权限', hint:'+🧠 +💪', fn: g => { g.flags.privacyConcern=true; g.flags.privacyGuardian=true; return{intel:10,health:3}; }},
+        { label:'减少个人信息暴露', hint:'+🧠 +😊', fn: g => { g.flags.privacyConcern=true; g.flags.minimalData=true; return{intel:8,mood:5}; }},
+        { label:'算了，反正也没什么好泄露的', hint:'+😊 -🧠', fn: g => { g.flags.privacyConcern=true; return{mood:3,intel:-3}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -8395,6 +8492,17 @@ const ACHIEVEMENTS = [
     { id:'self_compassion_ach', icon:'💝', name:'自我关怀者', desc:'学会了自我关怀', check: g => g.flags.selfCompassion },
     { id:'support_group_ach', icon:'🫂', name:'互助参与者', desc:'加入了互助小组', check: g => g.flags.supportGroupJoin },
     { id:'crisis_caller_ach', icon:'📞', name:'求助勇者', desc:'拨打了心理热线', check: g => g.flags.crisisHotline },
+    // === v15.1 新增成就（数字生活） ===
+    { id:'short_video_ach', icon:'📱', name:'短视频觉醒', desc:'意识到短视频成瘾', check: g => g.flags.shortVideoAddiction },
+    { id:'live_shopper_ach', icon:'🛒', name:'直播观察者', desc:'体验了直播带货', check: g => g.flags.liveStreamShopping },
+    { id:'delivery_rider_ach', icon:'🛵', name:'外卖骑手', desc:'体验了外卖骑手生活', check: g => g.flags.deliveryRider },
+    { id:'self_media_ach', icon:'📹', name:'自媒体人', desc:'开始了自媒体创作', check: g => g.flags.selfMediaCreator },
+    { id:'ai_user_ach', icon:'🤖', name:'AI使用者', desc:'开始使用AI工具', check: g => g.flags.aiToolsUsage },
+    { id:'digital_nomad_ach_v2', icon:'🌍', name:'数字游民', desc:'体验了数字游民生活', check: g => g.flags.digitalNomad },
+    { id:'online_learner_ach', icon:'📚', name:'知识付费者', desc:'购买了在线课程', check: g => g.flags.onlineCourse },
+    { id:'ride_hailer_ach', icon:'🚗', name:'网约车司机', desc:'跑了网约车', check: g => g.flags.rideHailingDriver },
+    { id:'privacy_guard_ach', icon:'🔒', name:'隐私卫士', desc:'关注了个人隐私', check: g => g.flags.privacyConcern },
+    { id:'gig_worker_ach', icon:'💼', name:'零工达人', desc:'体验了零工经济', check: g => g.flags.gigEconomy },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -8631,6 +8739,10 @@ const ENDINGS = [
     { id:'inner_peace_end', badge:'🧘', title:'内心平静', desc:'你找到了内心的平静。\n\n你每天冥想15分钟、每周跑步3次、每晚写情绪日记。你的焦虑从每天发作变成了偶尔来访。\n\n你的心理咨询师说：「你已经不需要我了。」你说：「不，我只是学会了做自己最好的咨询师。」\n\n你坐在阳台上，看着夕阳。你的脑子里依然会有杂念——但你已经不会被它们带走了。\n\n"内心平静：不是没有波澜——是学会了在风浪中站稳。"', cond: g => g.flags.dailyMeditation && g.flags.regularRunner && g.flags.dailyJournal && g.mood >= 70 && g.health >= 65 && g.age >= 28 },
     { id:'self_healing_end', badge:'💝', title:'自我疗愈', desc:'你完成了从「我不够好」到「我已经很好了」的转变。\n\n你学会了自我关怀、学会了设定边界、学会了对不喜欢的事说「不」。你不再为了讨好别人而委屈自己。\n\n你的朋友说：「你变了。」你说：「我没变——我只是终于做了自己。」\n\n你给自己写了一封信。信的最后一句是：「谢谢你没有放弃自己。」\n\n"自我疗愈：不是修复破碎的自己——是接受完整的自己。"', cond: g => g.flags.selfCompassion && g.flags.cbtSelfHelp && g.flags.boundarySetting && g.mood >= 65 && g.age >= 28 },
     { id:'resilience_end', badge:'🌈', title:'逆商高手', desc:'你把每一次低谷，都变成了成长的阶梯。\n\n你经历了焦虑、抑郁、失眠、职业倦怠——但你没有被打倒。你看了心理医生、学了CBT、加了互助组、开始跑步。\n\n你的日记本上写着：「我不是一个幸运的人——但我是一个不放弃的人。」\n\n你回头看那些至暗时刻，发现每一个低谷都教会了你一些东西。痛苦不是白受的——前提是你愿意从中学习。\n\n"逆商：不是不摔倒——是每次摔倒都能爬起来，而且知道为什么摔的。"', cond: g => g.flags.anxietyAttack && g.flags.regularTherapy && g.flags.exerciseTherapy && g.flags.cbtSelfHelp && g.mood >= 60 && g.age >= 30 },
+    // --- v15.1 NEW ENDINGS (数字生活) ---
+    { id:'digital_pioneer_end', badge:'🤖', title:'数字先锋', desc:'你成了AI时代的弄潮儿。\n\n你深度掌握了各种AI工具，你的工作效率是同事的3倍。你开了一个AI教程频道，粉丝10万+。你被邀请去做演讲，主题是「如何与AI共舞」。\n\n你的领导说：「你是我们公司的AI大使。」你说：「我只是比别人早了一步。」\n\n你知道：在技术变革的浪潮中，先行者未必赢——但不学习的人一定会输。\n\n"数字先锋：不是技术改变了你——是你利用技术改变了自己。"', cond: g => g.flags.aiExpert && g.flags.selfMediaCreator && g.intel >= 75 && g.age >= 25 },
+    { id:'nomad_life_end', badge:'🌍', title:'自由灵魂', desc:'你成了一个真正的数字游民。\n\n你在大理、丽江、清迈、巴厘岛都工作过。你的办公室是咖啡馆、联合办公空间、甚至是海边的吊床。\n\n你的收入不高，但你的生活成本很低。你有时间看日落、有时间交朋友、有时间做自己。\n\n你的父母终于理解了：「你开心就好。」你的朋友圈里，全是来自世界各地的照片。\n\n"数字游民：不是逃避——是选择了自己想要的生活节奏。"', cond: g => g.flags.nomadLifestyle && g.flags.remoteNetwork && g.mood >= 70 && g.age >= 28 },
+    { id:'platform_survivor_end', badge:'🛵', title:'平台幸存者', desc:'你在平台经济中找到了自己的位置。\n\n你做过外卖骑手、跑过网约车、接过各种零工。你比任何人都了解底层劳动者的辛苦。\n\n你后来成了一个劳动权益博主，为平台工人发声。你的文章被很多媒体报道引用。\n\n你说：「每一个在风雨中奔跑的骑手，都值得被尊重。」\n\n"平台幸存者：不是逃离了平台——是让平台看见了人的价值。"', cond: g => g.flags.deliveryRider && g.flags.gigEconomy && g.flags.algorithmAware && g.social >= 60 && g.age >= 28 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
