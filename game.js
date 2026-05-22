@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v12.1
+// 都市浮生记 - Game Engine v12.2
 // ============================================
 
 // === GAME STATE ===
@@ -6011,6 +6011,87 @@ const EVENTS = [
         { label:'每天打电话', hint:'+👥 -😊', fn: g => { g.flags.emptyNestReal=true; return{social:5,mood:-5}; }},
         { label:'养个宠物', hint:'+❤️ +😊', fn: g => { g.flags.emptyNestReal=true; if(!g.flags.hasPet) g.flags.hasPet=true; return{mood:8,health:3,money:-2000}; }},
       ]},
+    // === v12.2 财务理财 + 文化娱乐 + 健康养生 ===
+    { id:'stock_crash_v2', icon:'📉', title:'股市崩盘',
+      body:'你在朋友推荐下买了5万块的股票。涨了两个星期，你赚了3000块，觉得自己是巴菲特。\n\n然后——崩盘了。不是慢慢跌，是一天跌20%的那种。\n\n你看着账户里的绿色数字，感觉自己的心脏也在跌。\n\n你开始每天刷三次股票app。涨了你开心，跌了你焦虑。你的情绪被一根K线绑架了。\n\n最终你割肉离场，亏了8000块。\n\n"股市教会你：你不是在投资——你是在赌博。区别是：赌场有免费饮料。"',
+      cond: g => g.money > 10000 && g.age >= 25 && !g.flags.stockCrash,
+      choices:[
+        { label:'割肉离场', hint:'+🧠 -💰', fn: g => { g.flags.stockCrash=true; return{money:-8000,intel:8,mood:-10}; }},
+        { label:'死扛到底', hint:'🎲', fn: g => { g.flags.stockCrash=true; if(Math.random()>0.5) return{money:5000,mood:10}; return{money:-15000,mood:-15}; }},
+        { label:'学投资知识', hint:'+🧠🧠', fn: g => { g.flags.stockCrash=true; return{intel:12,mood:-5,money:-5000}; }},
+      ]},
+    { id:'standup_comedy', icon:'🎤', title:'脱口秀之夜',
+      body:'朋友拉你去看了一场脱口秀。\n\n台上的演员说：「你们知道打工人最惨的是什么吗？不是996——是你发现996之后工资还是不够花。」\n\n全场爆笑。你笑得最大声。\n\n然后他说：「在座的有没有月薪两万还月光族的？」\n\n你默默举了手。全场鼓掌。\n\n你花180块买了两张票（含朋友），但你觉得：这是今年花得最值的180块。\n\n"脱口秀的力量：把痛苦变成段子，把段子变成力量。"',
+      cond: g => g.money > 500 && g.age >= 22 && g.age <= 38 && g.mood < 65,
+      choices:[
+        { label:'大笑一场', hint:'+😊😊 +👥', fn: g => { g.flags.standupFan=true; return{mood:15,social:5}; }},
+        { label:'自己试试', hint:'+✨ +🧠', fn: g => { g.flags.standupFan=true; g.flags.standupPerformer=true; return{charm:8,intel:3,mood:10}; }},
+        { label:'不太行', hint:'', fn: g => { return{mood:-3}; }},
+      ]},
+    { id:'escape_room_v2', icon:'🔐', title:'密室逃脱',
+      body:'你和四个朋友去玩了密室逃脱。主题：「精神病院」。\n\n进去五分钟后，你们发现：最难的不是解谜——是你朋友一直在尖叫。\n\n你是唯一在认真解谜的人。其他四个人：一个在哭，一个在拍照，一个在打电话，一个在找厕所。\n\n最终你们超时了。出来的时候，工作人员笑着说：「你们是今天第三组没逃出来的。」\n\n你发了条朋友圈：「我不是被密室困住了——我是被队友困住了。」\n\n"密室逃脱的真相：考验的不是智商——是你跟谁一起去。"',
+      cond: g => g.social >= 30 && g.money > 300 && g.age >= 22 && g.age <= 35,
+      choices:[
+        { label:'再来一局', hint:'-💰 +😊 +👥', fn: g => { g.flags.escapeRoom=true; return{money:-300,mood:10,social:5}; }},
+        { label:'回家躺着', hint:'+❤️', fn: g => { return{health:3,mood:3}; }},
+        { label:'剧本杀走起', hint:'-💰 +🧠', fn: g => { g.flags.escapeRoom=true; return{money:-200,intel:3,mood:8,social:5}; }},
+      ]},
+    { id:'weight_rebound', icon:'⚖️', title:'减肥反弹',
+      body:'你花了三个月减了15斤。你发了朋友圈：「自律给我自由！」收获200个赞。\n\n然后你停止运动了。然后你开始吃宵夜了。然后你发现：你不仅反弹了15斤，还多长了3斤。\n\n你看着体重秤上的数字，心想：这不是反弹——这是报复。\n\n你把朋友圈那条「自律给我自由」删了。\n\n"减肥的真相：不是你的意志力不够——是你的身体比你更想活着。"',
+      cond: g => g.age >= 24 && g.age <= 40 && g.health < 70,
+      choices:[
+        { label:'重新来过', hint:'+❤️ +🧠', fn: g => { g.flags.weightRebound=true; return{health:5,intel:3,mood:-5}; }},
+        { label:'接受自己', hint:'+😊 +✨', fn: g => { g.flags.weightRebound=true; return{mood:10,charm:3}; }},
+        { label:'买大一号衣服', hint:'+😊', fn: g => { return{mood:5,money:-500}; }},
+      ]},
+    { id:'tcm_wellness', icon:'🍵', title:'中医养生',
+      body:'你的同事带你去了一家中医馆。老中医给你把了脉，看了看舌头，然后说：\n\n「你湿气太重了。少吃凉的，少熬夜，多喝薏米水。」\n\n你问：「我还有什么问题？」\n\n他看了看你：「你的问题是——你知道该怎么做，但你不会做。」\n\n你被一个中医看透了。\n\n你花了800块开了一个月的中药。苦得你怀疑人生。但你不得不承认：喝了两周后，你确实睡得好了。\n\n"中医的哲学：治病先治心——你的身体知道你所有的问题。"',
+      cond: g => g.health < 65 && g.money > 1500 && g.age >= 25,
+      choices:[
+        { label:'坚持调理', hint:'-💰 +❤️❤️', fn: g => { g.flags.tcmWellness=true; return{money:-800,health:10,mood:5}; }},
+        { label:'半信半疑', hint:'+🧠', fn: g => { return{intel:3,health:3}; }},
+        { label:'不信这套', hint:'', fn: g => { return{mood:-3}; }},
+      ]},
+    { id:'livehouse_night', icon:'🎸', title:'Live House',
+      body:'你去看了一场Live House演出。一支你从没听过的乐队。\n\n场地很小，你站在第一排。鼓点的震动从地板传到你的心脏。主唱的嗓音粗粝但真诚。\n\n你举起手，跟着节奏晃。旁边一个陌生人递给你一瓶啤酒：「一起嗨！」\n\n那一刻你忘了工作、房租、父母催婚、体检报告。你只是一个在音乐里的人。\n\n演出结束后你走在街上，耳朵还在嗡嗡响。你觉得：这才是活着的感觉。\n\n"Live House的意义：不是去听歌——是去感觉自己的心跳。"',
+      cond: g => g.money > 300 && g.age >= 22 && g.age <= 35 && g.mood < 65,
+      choices:[
+        { label:'嗨到散场', hint:'-💰 +😊😊', fn: g => { g.flags.livehouseFan=true; return{money:-300,mood:18,health:3}; }},
+        { label:'拍视频分享', hint:'+✨ +👥', fn: g => { g.flags.livehouseFan=true; return{charm:5,social:5,mood:10}; }},
+        { label:'学个乐器', hint:'+🧠 +✨', fn: g => { g.flags.livehouseFan=true; g.flags.instrumentPlayer=true; return{intel:5,charm:5,mood:8}; }},
+      ]},
+    { id:'credit_card_debt', icon:'💳', title:'信用卡危机',
+      body:'你打开信用卡账单：本月应还12,580元。\n\n你看了看自己的银行卡余额：8,200元。\n\n你做了所有信用卡用户都做过的事：最低还款。然后你算了算利息——年化18%。\n\n你开始用花呗还信用卡，用信用卡还花呗。一个月后你发现：你欠的更多了。\n\n你终于明白：信用卡不是你的钱——是银行借给你的幻觉。\n\n"信用卡的陷阱：它让你觉得自己有钱——直到账单来了。"',
+      cond: g => g.money < 5000 && g.age >= 22 && g.age <= 35 && !g.flags.creditCardDebt,
+      choices:[
+        { label:'向父母求助', hint:'+👥 -✨', fn: g => { g.flags.creditCardDebt=true; return{money:10000,social:5,charm:-5,mood:-5}; }},
+        { label:'兼职还债', hint:'+💰 +❤️', fn: g => { g.flags.creditCardDebt=true; g.flags.workToPayDebt=true; return{money:5000,health:-5,mood:-8}; }},
+        { label:'以贷养贷', hint:'⚠️ 危险', fn: g => { g.flags.creditCardDebt=true; return{money:3000,mood:-10,intel:-3}; }},
+      ]},
+    { id:'mental_health_check', icon:'💭', title:'心理咨询',
+      body:'你犹豫了很久，终于预约了一个心理咨询师。\n\n第一次去，你坐在沙发上，不知道该说什么。咨询师说：「你想聊什么都行。」\n\n你开始哭。你不知道为什么哭——也许是太久没有人认真听你说话了。\n\n一个小时的咨询花了500块。你觉得很贵。但你走出咨询室的时候，感觉肩膀上的石头轻了一点。\n\n你发了条朋友圈（屏蔽了同事和家人）：「今天我做了一件勇敢的事。」\n\n"心理咨询不是因为你疯了——是因为你太久没有被听见了。"',
+      cond: g => g.mood < 50 && g.money > 1000 && g.age >= 23 && !g.flags.therapyVisit,
+      choices:[
+        { label:'继续咨询', hint:'-💰 +😊 +🧠', fn: g => { g.flags.therapyVisit=true; g.flags.seekTherapy=true; return{money:-3000,mood:15,intel:5}; }},
+        { label:'试一次就好', hint:'-💰 +😊', fn: g => { g.flags.therapyVisit=true; g.flags.seekTherapy=true; return{money:-500,mood:8}; }},
+        { label:'还是算了', hint:'', fn: g => { return{mood:-5}; }},
+      ]},
+    { id:'house_buying_trap', icon:'🏠', title:'买房踩坑',
+      body:'你攒够了首付，准备买房。中介带你看了三套房：\n\n第一套：「学区好，但楼龄30年。」\n第二套：「新楼盘，但离地铁2小时。」\n第三套：「价格刚好，但……旁边是墓地。」\n\n你最终选了第二套。签合同那天你手在抖——这是你这辈子签过的最大金额。\n\n三个月后你发现：开发商承诺的「明年交房」变成了「后年交房」。你的月供已经开始了，但房子还没建好。\n\n"买房的真相：你以为你在买一个家——其实你在买一个30年的债务。"',
+      cond: g => g.money >= 100000 && !g.flags.hasHouse && g.age >= 27 && g.age <= 40,
+      choices:[
+        { label:'咬牙供房', hint:'-💰💰💰 +🏠', fn: g => { g.flags.hasHouse=true; g.flags.mortgage=true; return{money:-80000,mood:5,health:-5}; }},
+        { label:'再等等', hint:'+🧠', fn: g => { return{intel:5,mood:-3}; }},
+        { label:'租房也挺好', hint:'+😊 +💰', fn: g => { g.flags.renter=true; return{mood:8,money:5000}; }},
+      ]},
+    { id:'fund_investment_v2', icon:'📊', title:'基金定投',
+      body:'你的同事说：「基金定投是年轻人最好的理财方式。每月投2000，十年后至少翻倍。」\n\n你开始每月定投2000块到一只指数基金。前三个月涨了5%，你觉得自己是理财天才。\n\n第四个月跌了15%。你看着账户里绿色的数字，心想：这不是定投——这是定亏。\n\n你的同事安慰你：「定投要看长期！别慌！」\n\n但你发现：他自己上周全卖了。\n\n"基金定投的真相：考验的不是眼光——是你能不能在跌的时候不卖。"',
+      cond: g => g.money > 5000 && g.age >= 23 && g.age <= 35 && !g.flags.fundInvestor,
+      choices:[
+        { label:'坚持定投', hint:'-💰 +🧠', fn: g => { g.flags.fundInvestor=true; return{money:-10000,intel:5}; }},
+        { label:'止损出局', hint:'+💰 +🧠', fn: g => { g.flags.fundInvestor=true; return{money:-2000,intel:8}; }},
+        { label:'加大力度', hint:'-💰💰 🎲', fn: g => { g.flags.fundInvestor=true; if(Math.random()>0.4) return{money:8000,mood:10}; return{money:-20000,mood:-15}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -6527,6 +6608,14 @@ const ACHIEVEMENTS = [
     { id:'puA_survivor', icon:'😤', name:'反PUA战士v2', desc:'经历了职场霸凌', check: g => g.flags.workplacePUA },
     { id:'first_love', icon:'💘', name:'心动时刻', desc:'有了第一次约会', check: g => g.flags.inRelationship },
     { id:'empty_nester', icon:'🪺', name:'空巢父母', desc:'孩子离家上大学', check: g => g.flags.emptyNestReal },
+    // === v12.2 新增成就 ===
+    { id:'stock_survivor_v2', icon:'📉', name:'韭菜觉醒', desc:'经历了股市崩盘', check: g => g.flags.stockCrash },
+    { id:'standup_lover', icon:'🎤', name:'脱口秀爱好者', desc:'看了脱口秀演出', check: g => g.flags.standupFan },
+    { id:'weight_warrior', icon:'⚖️', name:'减肥战士', desc:'经历了减肥反弹', check: g => g.flags.weightRebound },
+    { id:'tcm_believer', icon:'🍵', name:'养生达人v2', desc:'尝试了中医调理', check: g => g.flags.tcmWellness },
+    { id:'therapy_brave', icon:'💭', name:'勇敢求助者', desc:'去看了心理咨询师', check: g => g.flags.therapyVisit },
+    { id:'homebuyer', icon:'🏠', name:'房奴', desc:'买了房开始还月供', check: g => g.flags.mortgage },
+    { id:'fund_investor_ach', icon:'📊', name:'基金定投者', desc:'开始基金定投', check: g => g.flags.fundInvestor },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -6693,6 +6782,9 @@ const ENDINGS = [
     // --- v12.1 NEW ENDINGS ---
     { id:'love_story_end', badge:'💕', title:'爱情故事', desc:'你遇到了一个人，然后你们在一起了。\n\n没有什么轰轰烈烈。只是在某个平凡的日子，你们发现：彼此就是那个让自己安心的人。\n\n你们一起租房、一起还房贷、一起吵架、一起和好。你们的故事不完美，但真实。\n\n你发了一条朋友圈：「感谢你，让这座城市有了温度。」\n\n"爱情不是找到完美的人——是学会和不完美的人，一起过日子。"', cond: g => g.flags.inRelationship && g.mood >= 60 && g.age >= 25 },
     { id:'career_master_end', badge:'🏆', title:'职场精英', desc:'你从职场小白，一路做到了行业精英。\n\n你的名字在圈子里有分量了。猎头不再联系你——因为你已经是最高的那个了。\n\n你的下属叫你「大佬」，你的同行叫你「前辈」，你的父母叫你「骄傲」。\n\n但只有你自己知道：你失去了多少周末、错过了多少聚会、熬过了多少失眠的夜晚。\n\n"职场精英的代价：用青春换地位，然后用地位证明自己没有浪费青春。"', cond: g => g.jobSalary >= 40000 && g.intel >= 70 && g.age >= 32 },
+    // --- v12.2 NEW ENDINGS ---
+    { id:'healing_end', badge:'💭', title:'治愈之路', desc:'你走进了心理咨询室，然后你走出来，世界没有变——但你变了。\n\n你学会了接纳自己的情绪。你不再因为哭泣而羞耻，不再因为脆弱而自责。\n\n你开始在朋友圈分享自己的感受（屏蔽了同事和家人）。有人评论：「谢谢你说出来，我也是这样的。」\n\n你意识到：你不是一个人。\n\n"治愈不是忘记伤痛——是学会带着伤痛，继续走。"', cond: g => g.flags.therapyVisit && g.mood >= 55 && g.intel >= 50 && g.age >= 25 },
+    { id:'financial_free_end', badge:'📊', title:'理财达人', desc:'你从一个月光族，变成了一个理财高手。\n\n你的基金定投坚持了五年，收益率跑赢了通胀。你的股票虽然亏过，但你学到了：不贪、不慌、不all in。\n\n你的存款不多，但够你应急半年。你的投资不大，但每个月都有被动收入。\n\n你在朋友聚会上说：「财务自由不是有多少钱——是你不再为钱焦虑了。」\n\n"理财的本质不是赚钱——是学会和钱和平相处。"', cond: g => g.flags.fundInvestor && g.money >= 50000 && g.intel >= 60 && g.age >= 30 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
