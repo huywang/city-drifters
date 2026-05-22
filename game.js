@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v12.2
+// 都市浮生记 - Game Engine v12.3
 // ============================================
 
 // === GAME STATE ===
@@ -6012,7 +6012,7 @@ const EVENTS = [
         { label:'养个宠物', hint:'+❤️ +😊', fn: g => { g.flags.emptyNestReal=true; if(!g.flags.hasPet) g.flags.hasPet=true; return{mood:8,health:3,money:-2000}; }},
       ]},
     // === v12.2 财务理财 + 文化娱乐 + 健康养生 ===
-    { id:'stock_crash_v2', icon:'📉', title:'股市崩盘',
+    { id:'stock_crash_v2_v2', icon:'📉', title:'股市崩盘',
       body:'你在朋友推荐下买了5万块的股票。涨了两个星期，你赚了3000块，觉得自己是巴菲特。\n\n然后——崩盘了。不是慢慢跌，是一天跌20%的那种。\n\n你看着账户里的绿色数字，感觉自己的心脏也在跌。\n\n你开始每天刷三次股票app。涨了你开心，跌了你焦虑。你的情绪被一根K线绑架了。\n\n最终你割肉离场，亏了8000块。\n\n"股市教会你：你不是在投资——你是在赌博。区别是：赌场有免费饮料。"',
       cond: g => g.money > 10000 && g.age >= 25 && !g.flags.stockCrash,
       choices:[
@@ -6091,6 +6091,87 @@ const EVENTS = [
         { label:'坚持定投', hint:'-💰 +🧠', fn: g => { g.flags.fundInvestor=true; return{money:-10000,intel:5}; }},
         { label:'止损出局', hint:'+💰 +🧠', fn: g => { g.flags.fundInvestor=true; return{money:-2000,intel:8}; }},
         { label:'加大力度', hint:'-💰💰 🎲', fn: g => { g.flags.fundInvestor=true; if(Math.random()>0.4) return{money:8000,mood:10}; return{money:-20000,mood:-15}; }},
+      ]},
+    // === v12.3 科技生活 + 代际冲突 + 人生哲学 ===
+    { id:'ai_scam_call', icon:'🤖', title:'AI换脸诈骗',
+      body:'你接到了一个视频电话。画面里是你妈的脸，声音也是你妈的。\n\n「儿子/女儿，我出车祸了，急需5000块手术费，转到这个账号……」\n\n你差点就转了。但你觉得哪里不对——你妈从来不叫你「儿子/女儿」，她叫你小名。\n\n你挂掉电话，打给你妈。她正在家里看电视，啥事没有。\n\n你出了一身冷汗。\n\n"AI诈骗的恐怖之处：你看到的脸是真的，声音是真的——但人是假的。"',
+      cond: g => g.age >= 22 && g.money > 2000 && !g.flags.aiScamCall,
+      choices:[
+        { label:'报警', hint:'+🧠 +👥', fn: g => { g.flags.aiScamCall=true; g.flags.antiFraud=true; return{intel:8,social:3,mood:-5}; }},
+        { label:'发朋友圈提醒', hint:'+👥 +✨', fn: g => { g.flags.aiScamCall=true; g.flags.antiFraud=true; return{social:8,charm:3,mood:3}; }},
+        { label:'差点上当', hint:'', fn: g => { g.flags.aiScamCall=true; return{mood:-10,intel:3}; }},
+      ]},
+    { id:'smart_home_fail', icon:'🏠', title:'智能家居翻车',
+      body:'你花了8000块装了一套智能家居系统。语音控制灯光、窗帘、空调、扫地机器人。\n\n第一周：「小X小X，关灯。」「好的。」完美。\n\n第二周：「小X小X，关窗帘。」「好的，正在为您播放《关窗帘》。」？？？\n\n第三周：半夜3点，智能音箱突然大声播放：「早上好！今天的天气是……」你差点从床上跳起来。\n\n第四周：你拔了所有智能设备的电源，回到了手动时代。\n\n"智能家居的梦想：动动嘴就能控制一切。现实：它比你还不靠谱。"',
+      cond: g => g.money > 8000 && g.age >= 25 && g.age <= 40,
+      choices:[
+        { label:'继续折腾', hint:'-💰 +🧠', fn: g => { g.flags.smartHome=true; return{money:-3000,intel:5,mood:-5}; }},
+        { label:'接受现实', hint:'+😊', fn: g => { return{mood:5,intel:3}; }},
+        { label:'写测评吐槽', hint:'+✨ +👥', fn: g => { g.flags.smartHome=true; return{charm:5,social:5,mood:5}; }},
+      ]},
+    { id:'parents_want_grandchild', icon:'👶', title:'催生大军',
+      body:'你结婚了（或者有对象了），你妈开始了新一轮的催促：\n\n「你们什么时候要孩子？」\n「隔壁老王的孙子都会走路了。」\n「再不生就老了。」\n「你是不是有什么问题？要不要去看看医生？」\n\n你试图解释：「现在养一个孩子太贵了。」\n\n你妈说：「我当年养你也没花多少钱啊。」\n\n你没说的是：当年你妈也没有学区房、兴趣班、国际幼儿园的焦虑。\n\n"催生是代际战争的第二战场：第一战场是催婚，第三战场是催二胎。"',
+      cond: g => (g.flags.married || g.flags.inRelationship) && g.age >= 27 && g.age <= 38 && !g.flags.hasChild,
+      choices:[
+        { label:'考虑要孩子', hint:'+👥 +💰', fn: g => { return{social:5,mood:-5}; }},
+        { label:'坚持丁克', hint:'+😊 +🧠', fn: g => { g.flags.dink=true; return{mood:8,intel:3,social:-5}; }},
+        { label:'跟父母沟通', hint:'+👥 +😊', fn: g => { return{social:5,mood:5}; }},
+      ]},
+    { id:'midlife_rebellion', icon:'🔥', title:'中年叛逆',
+      body:'你37岁了。某天你在公司厕所里照镜子，突然觉得：这个人不是你。\n\n你做了15年的「好孩子」：听父母的话、好好学习、好好工作、好好结婚。你的每一步都是别人规划的。\n\n你第一次问自己：我想要什么？\n\n答案是：你不知道。\n\n你买了一辆摩托车。你染了头发。你辞了职。你妈打电话来哭了一个小时。\n\n但你觉得：37年来，你第一次在为自己活。\n\n"中年叛逆不是疯了——是终于醒了。"',
+      cond: g => g.age >= 35 && g.age <= 42 && g.jobSalary >= 10000 && g.mood < 55 && !g.flags.midlifeRebellion,
+      choices:[
+        { label:'彻底放飞', hint:'+😊😊 -💰', fn: g => { g.flags.midlifeRebellion=true; g.flags.midlifeChange=true; return{mood:20,money:-15000,charm:5,health:3}; }},
+        { label:'小规模叛逆', hint:'+😊 +✨', fn: g => { g.flags.midlifeRebellion=true; return{mood:10,charm:5}; }},
+        { label:'算了吧', hint:'', fn: g => { return{mood:-5}; }},
+      ]},
+    { id:'meaning_of_life', icon:'🌌', title:'存在的意义',
+      body:'你在一个失眠的夜晚，打开了备忘录，写下了一个问题：\n\n「活着到底是为了什么？」\n\n你想了很久。为了赚钱？为了买房？为了结婚？为了孩子？为了退休？\n\n如果人生的每一步都是为了下一步做准备——那你什么时候才真正活着？\n\n你没找到答案。但你把这个问题存了下来。\n\n三年后你再看这个问题，发现你已经不在乎答案了。\n\n因为答案不重要——重要的是你还在问。\n\n"人生的意义不是一个答案——是一个你永远不会停止寻找的过程。"',
+      cond: g => g.age >= 28 && g.intel >= 55 && g.mood < 55,
+      choices:[
+        { label:'记录思考', hint:'+🧠 +😊', fn: g => { g.flags.existentialThought=true; return{intel:10,mood:5}; }},
+        { label:'找人聊聊', hint:'+👥', fn: g => { g.flags.existentialThought=true; return{social:8,mood:3}; }},
+        { label:'不想了', hint:'+😊', fn: g => { return{mood:5}; }},
+      ]},
+    { id:'ev_car', icon:'🚗', title:'电动车焦虑',
+      body:'你攒钱买了一辆电动车。朋友说：「省钱！环保！智能！」\n\n开了一个月后你发现：\n\n1. 充电要排队40分钟\n2. 冬天续航打五折\n3. 自动驾驶吓得你心脏骤停\n4. 保值率：一年后直接腰斩\n\n但每次堵车的时候，你看着旁边的油车在烧钱，你在「烧电」——你笑了。\n\n"电动车不是完美的选择——是一个你能接受的妥协。就像人生。"',
+      cond: g => g.money >= 50000 && g.age >= 25 && g.age <= 40 && !g.flags.hasCar,
+      choices:[
+        { label:'买！', hint:'-💰💰💰 +😊', fn: g => { g.flags.hasCar=true; return{money:-150000,mood:15,charm:8}; }},
+        { label:'再观望', hint:'+🧠', fn: g => { return{intel:3,mood:-3}; }},
+        { label:'继续挤地铁', hint:'+💰', fn: g => { return{money:5000,mood:-5}; }},
+      ]},
+    { id:'generational_clash_v2', icon:'💥', title:'观念冲突',
+      body:'过年回家，饭桌上的对话变成了一场辩论赛：\n\n你妈：「你应该考公务员。」\n你：「我不想一辈子在体制内。」\n\n你爸：「30岁了还不结婚？」\n你：「婚姻不是人生的必修课。」\n\n你姑：「你在大城市赚那么多钱也不给家里？」\n你：「我房租就要花一半工资……」\n\n最后你爸摔了筷子：「你翅膀硬了是不是？」\n\n你默默回了房间。你知道他们爱你。只是他们表达爱的方式，是控制。\n\n"代际冲突不是谁对谁错——是两代人的世界观，隔了一个时代。"',
+      cond: g => g.age >= 25 && g.age <= 38 && g.months > 24,
+      choices:[
+        { label:'据理力争', hint:'+🧠 -👥', fn: g => { g.flags.generationalClashV2=true; return{intel:5,social:-8,mood:-5}; }},
+        { label:'沉默是金', hint:'+🧠', fn: g => { g.flags.generationalClashV2=true; return{intel:3,mood:-8}; }},
+        { label:'理解但不接受', hint:'+😊 +👥', fn: g => { g.flags.generationalClashV2=true; return{mood:3,social:3,intel:3}; }},
+      ]},
+    { id:'city_culture_shock', icon:'🏙️', title:'城市文化冲击',
+      body:'你在不同城市之间出差，感受到了巨大的文化差异：\n\n北京：出租车司机跟你聊国际政治。\n上海：咖啡馆里所有人都在用MacBook。\n深圳：地铁里每个人都在看股票。\n成都：下午三点茶馆里坐满了人。\n广州：大排档老板比写字楼白领还忙。\n杭州：每个年轻人都说自己做电商。\n\n你在朋友圈写道：「中国不是一个国家——是很多个国家。」\n\n"城市的魅力不在于地标建筑——在于生活在里面的人。"',
+      cond: g => g.months > 12 && g.age >= 23 && g.charm >= 35,
+      choices:[
+        { label:'记录城市', hint:'+✨ +🧠', fn: g => { g.flags.cityCultureFan=true; return{charm:8,intel:5,mood:5}; }},
+        { label:'写旅行攻略', hint:'+👥 +✨', fn: g => { g.flags.cityCultureFan=true; return{social:5,charm:5,money:1000}; }},
+        { label:'宅在酒店', hint:'+❤️', fn: g => { return{health:3,mood:3}; }},
+      ]},
+    { id:'digital_funeral', icon:'📱', title:'账号注销',
+      body:'你决定注销一个用了十年的社交账号。\n\n那个账号里有你的青春：大学时的自拍、第一份工作的吐槽、和前恋人（们）的合照、深夜的emo文字。\n\n你在注销前翻了一遍。看着十年前的自己，你笑了——也哭了。\n\n点击「确认注销」的那一刻，你的手抖了一下。\n\n那些记忆不会消失——只是不再存在于互联网上了。它们回到了你的脑海里。\n\n"注销账号是数字时代的断舍离：你不是在删除数据——你是在放下过去。"',
+      cond: g => g.age >= 28 && g.intel >= 50 && g.months > 24,
+      choices:[
+        { label:'彻底注销', hint:'+🧠 +😊', fn: g => { g.flags.accountDeleted=true; g.flags.digitalDetox=true; return{intel:8,mood:10,charm:-3}; }},
+        { label:'导出备份再注销', hint:'+🧠', fn: g => { g.flags.accountDeleted=true; return{intel:5,mood:5}; }},
+        { label:'算了舍不得', hint:'+😊', fn: g => { return{mood:3}; }},
+      ]},
+    { id:'redefine_success', icon:'🌟', title:'重新定义成功',
+      body:'你在一个深夜的播客里听到一句话：\n\n「成功不是你赚了多少钱——是你有没有按照自己的方式活着。」\n\n你开始反思：你追求的「成功」，真的是你想要的吗？\n\n大房子？你真的需要那么大吗？\n豪车？你真的享受开车吗？\n高管？你真的享受管人吗？\n\n你开始列了一张「我真正想要的」清单：\n1. 健康\n2. 自由的时间\n3. 几个真心的朋友\n4. 做自己喜欢的事\n\n你发现：这张清单上的东西，没有一个需要很多钱。\n\n"重新定义成功：不是降低标准——是找到真正属于你的标准。"',
+      cond: g => g.age >= 30 && g.intel >= 55 && g.mood < 60,
+      choices:[
+        { label:'改变生活方式', hint:'+😊 +🧠', fn: g => { g.flags.redefinedSuccess=true; g.flags.midlifeChange=true; return{mood:15,intel:8,money:-5000}; }},
+        { label:'想想就好', hint:'+🧠', fn: g => { g.flags.redefinedSuccess=true; return{intel:5,mood:3}; }},
+        { label:'这不现实', hint:'', fn: g => { return{mood:-3}; }},
       ]},
 ];
 const ACHIEVEMENTS = [
@@ -6616,6 +6697,14 @@ const ACHIEVEMENTS = [
     { id:'therapy_brave', icon:'💭', name:'勇敢求助者', desc:'去看了心理咨询师', check: g => g.flags.therapyVisit },
     { id:'homebuyer', icon:'🏠', name:'房奴', desc:'买了房开始还月供', check: g => g.flags.mortgage },
     { id:'fund_investor_ach', icon:'📊', name:'基金定投者', desc:'开始基金定投', check: g => g.flags.fundInvestor },
+    // === v12.3 新增成就 ===
+    { id:'anti_scam_v2', icon:'🛡️', name:'反诈先锋v2', desc:'识破了AI诈骗', check: g => g.flags.aiScamCall },
+    { id:'smart_home_user', icon:'🏠', name:'智能家居用户', desc:'尝试了智能家居', check: g => g.flags.smartHome },
+    { id:'rebel_spirit', icon:'🔥', name:'叛逆者', desc:'经历了中年叛逆', check: g => g.flags.midlifeRebellion },
+    { id:'existential_thinker', icon:'🌌', name:'存在主义思考者', desc:'思考了人生的意义', check: g => g.flags.existentialThought },
+    { id:'car_owner_v2', icon:'🚗', name:'车主', desc:'买了第一辆车', check: g => g.flags.hasCar },
+    { id:'digital_minimalist', icon:'📱', name:'数字极简主义者', desc:'注销了社交账号', check: g => g.flags.accountDeleted },
+    { id:'success_redefiner', icon:'🌟', name:'重新定义成功', desc:'找到了自己的成功标准', check: g => g.flags.redefinedSuccess },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -6785,6 +6874,9 @@ const ENDINGS = [
     // --- v12.2 NEW ENDINGS ---
     { id:'healing_end', badge:'💭', title:'治愈之路', desc:'你走进了心理咨询室，然后你走出来，世界没有变——但你变了。\n\n你学会了接纳自己的情绪。你不再因为哭泣而羞耻，不再因为脆弱而自责。\n\n你开始在朋友圈分享自己的感受（屏蔽了同事和家人）。有人评论：「谢谢你说出来，我也是这样的。」\n\n你意识到：你不是一个人。\n\n"治愈不是忘记伤痛——是学会带着伤痛，继续走。"', cond: g => g.flags.therapyVisit && g.mood >= 55 && g.intel >= 50 && g.age >= 25 },
     { id:'financial_free_end', badge:'📊', title:'理财达人', desc:'你从一个月光族，变成了一个理财高手。\n\n你的基金定投坚持了五年，收益率跑赢了通胀。你的股票虽然亏过，但你学到了：不贪、不慌、不all in。\n\n你的存款不多，但够你应急半年。你的投资不大，但每个月都有被动收入。\n\n你在朋友聚会上说：「财务自由不是有多少钱——是你不再为钱焦虑了。」\n\n"理财的本质不是赚钱——是学会和钱和平相处。"', cond: g => g.flags.fundInvestor && g.money >= 50000 && g.intel >= 60 && g.age >= 30 },
+    // --- v12.3 NEW ENDINGS ---
+    { id:'authentic_life_end', badge:'🌟', title:'真实的人生', desc:'你终于活成了自己想要的样子。\n\n你不再活在别人的期待里。你不再为了「面子」做不想做的事。你不再假装自己过得很好。\n\n你允许自己脆弱，允许自己犯错，允许自己慢下来。\n\n你的朋友说：「你变了。以前你总是很紧绷，现在你很松弛。」\n\n你笑着说：「不是我变了——是我终于不装了。」\n\n"真实不是完美——是敢于展示不完美。"', cond: g => g.flags.redefinedSuccess && g.mood >= 65 && g.age >= 32 },
+    { id:'rebel_life_end', badge:'🔥', title:'叛逆人生', desc:'你在37岁那年，做了一件所有人都觉得疯狂的事。\n\n也许是辞职环游世界，也许是卖掉房子去创业，也许是离开体制去做自由职业。\n\n一年后你没有成功。两年后你还是没有成功。三年后——你依然不后悔。\n\n因为你终于知道了：人生最大的失败不是做错选择——是从未做过自己的选择。\n\n"叛逆不是反叛——是终于听到了自己内心的声音。"', cond: g => g.flags.midlifeRebellion && g.mood >= 55 && g.age >= 38 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
