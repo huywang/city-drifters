@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v4.3
+// 都市浮生记 - Game Engine v4.4
 // ============================================
 
 // === GAME STATE ===
@@ -2939,6 +2939,25 @@ const EVENTS = [
         { label:'看沉浸式演出', hint:'-💰 +😊 +🧠', fn: g => { g.flags.emotionalValue=true; return{money:-800,mood:25,intel:8}; }},
         { label:'理性消费', hint:'+🧠 +💰', fn: g => { g.flags.emotionalValue=true; return{intel:8,mood:-5,money:500}; }},
       ]},
+    // === v4.4 EVENTS - AI打工人焦虑 ===
+    { id:'ai_anxiety', icon:'🤖', title:'AI来了',
+      body:'公司开会：我们要引入AI了。\n\n你的岗位：文案策划。AI能写。你的岗位：数据分析。AI能算。你的岗位：客服。AI能聊。\n\n同事说："AI不淘汰你，但会用AI的人淘汰你。"\n\n你看了看你的工资条：8000元。\nAI的价格：每月99元。\n\n"AI焦虑不是怕机器，是怕自己变得像机器一样可以被替代。"',
+      cond: g => !g.flags.aiAnxiety && g.age>=22 && g.age<=40 && g.job!=='待业中',
+      choices:[
+        { label:'学习AI工具', hint:'+🧠 +✨', fn: g => { g.flags.aiAnxiety=true; g.flags.aiToolUser=true; return{intel:15,charm:5,money:-1000}; }},
+        { label:'给AI当老师', hint:'+💰 +🧠', fn: g => { g.flags.aiAnxiety=true; g.flags.aiTrainer=true; return{money:5000,intel:10,mood:5}; }},
+        { label:'发展AI无法替代的技能', hint:'+🧠 +✨', fn: g => { g.flags.aiAnxiety=true; return{intel:12,charm:8,mood:8}; }},
+        { label:'假装没听见', hint:'+😊 -🧠', fn: g => { g.flags.aiAnxiety=true; return{mood:3,intel:-5}; }},
+      ]},
+    { id:'ai_side_hustle', icon:'💻', title:'AI副业',
+      body:'你在小红书看到：\n"用AI月入过万！"\n"AI写作，0基础也能做！"\n"AI绘图，在家接单！"\n\n你心动了。花了998元买了个AI课程。\n\n课程教你：如何用AI批量生成小红书文案、短视频脚本、电商详情页。\n\n你试了一个月，赚了800元。\n\n"AI副业的真相：教AI课的人赚了钱，学AI课的人亏了学费。"',
+      cond: g => !g.flags.aiSideHustle && g.age>=20 && g.age<=35 && g.intel>=50,
+      choices:[
+        { label:'认真学，认真做', hint:'+💰 +🧠', fn: g => { g.flags.aiSideHustle=true; g.flags.aiSideHustleSuccess=Math.random()>0.4; return{money:-998,intel:15,mood:5}; }},
+        { label:'批量生成内容', hint:'+💰 🎲', fn: g => { g.flags.aiSideHustle=true; if(Math.random()>0.5){return{money:3000,intel:8}}else{return{money:-998,mood:-10}} }},
+        { label:'开发AI工具', hint:'+💰 +🧠 +✨', fn: g => { g.flags.aiSideHustle=true; g.flags.aiToolDev=true; return{money:8000,intel:20,charm:10}; }},
+        { label:'不买，不学', hint:'+💰 +😊', fn: g => { g.flags.aiSideHustle=true; return{money:998,mood:3}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3148,6 +3167,9 @@ const ACHIEVEMENTS = [
     { id:'city_explorer', icon:'🏙️', name:'City玩家', desc:'体验City感生活', check: g => g.flags.cityOrNot },
     // v4.3 achievements
     { id:'emotional_shopper', icon:'💝', name:'情绪消费者', desc:'为快乐买单', check: g => g.flags.emotionalValue },
+    // v4.4 achievements
+    { id:'ai_adapter', icon:'🤖', name:'AI适应者', desc:'学会使用AI工具', check: g => g.flags.aiToolUser || g.flags.aiTrainer },
+    { id:'ai_entrepreneur', icon:'💻', name:'AI创业者', desc:'尝试AI副业', check: g => g.flags.aiSideHustle },
 ];
 
 // === ENDINGS === (order matters: first match wins)
