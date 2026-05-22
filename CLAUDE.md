@@ -36,8 +36,8 @@ npx serve .
    - `BACKGROUNDS` — 出身背景定义（含隐藏出身）
    - `CITIES` — 6个城市及其专属事件（北京/上海/深圳/杭州/广州/成都）
    - `SURPRISE_EVENTS` — 128个突发事件
-   - `EVENTS` — 1183个生活事件（含category标签，支持类别多样性系统）
-   - `ACHIEVEMENTS` — 835个成就
+   - `EVENTS` — 1193个生活事件（含category标签，支持类别多样性系统）
+   - `ACHIEVEMENTS` — 840个成就
    - `ENDINGS` — 226种结局（顺序有优先级，first match wins）
    - `TRADE_GOODS` — 8种倒卖商品
    - `RUMOR_POOL` — 24条情报/谣言

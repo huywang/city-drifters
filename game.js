@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v22.0
+// 都市浮生记 - Game Engine v22.1
 // ============================================
 
 // === GAME STATE ===
@@ -10456,6 +10456,87 @@ const EVENTS = [
         { label:'体验很好，但偶尔还是想有人分享', hint:'+😊 +👥', fn: g => { g.flags.soloTravel=true; return{mood:10,social:3,money:-3000}; }},
         { label:'太孤独了，还是喜欢结伴旅行', hint:'', fn: g => { g.flags.soloTravel=true; return{mood:3,money:-3000}; }},
       ]},
+    // === v22.1 新增事件（考公考编） ===
+    { id:'civil_exam_prep', icon:'📚', title:'考公备考', category:'education',
+      body:'你决定考公务员。\n\n你妈知道后激动得差点哭了：「终于想通了！铁饭碗好啊！」\n\n你开始了备考生活。行测、申论、面试——三座大山。\n\n你买了粉笔的课、华图的教材、中公的真题。你每天学习6小时。\n\n你的朋友圈画风变了：从「周末去哪玩」变成了「今天刷了多少题」。\n\n你的一个在大厂的同学说：「你放弃了年薪30万的工作去考月薪5000的公务员？」\n\n你回他：「30万的工作能干到35岁吗？」\n\n他沉默了。\n\n「考公的本质不是追求高薪——是追求确定性。在一个不确定的时代，确定性就是最大的奢侈品。」',
+      cond: g => !g.flags.civilExamPrep && g.age >= 22 && g.age <= 35 && g.intel >= 40 && !g.flags.civilServant,
+      choices:[
+        { label:'全力备考半年，志在必得', hint:'+🧠 -💰', fn: g => { g.flags.civilExamPrep=true; g.flags.civilExamStudying=true; return{intel:12,mood:-3,money:-5000}; }},
+        { label:'边工作边备考，两头兼顾', hint:'+🧠', fn: g => { g.flags.civilExamPrep=true; g.flags.civilExamStudying=true; return{intel:8,mood:-5}; }},
+        { label:'试了一下觉得太难，放弃了', hint:'', fn: g => { g.flags.civilExamPrep=true; return{mood:-3}; }},
+      ]},
+    { id:'civil_exam_result', icon:'📝', title:'公考放榜', category:'career',
+      body:'成绩出来了。你紧张地打开网页——\n\n行测：68分\n申论：72分\n总分：140分\n\n排名：第3名（招1个）。\n\n你差一点。就差一点。\n\n你妈打电话来安慰：「没关系，下次再考。」\n\n你挂了电话，坐在电脑前发呆。你开始想：是继续考，还是回去上班？\n\n你在考公论坛看到一个帖子：「考了三年终于上岸，给后来者一些建议。」\n\n帖子最后写着：「考公不是唯一的路——但如果你认准了这条路，就不要轻易放弃。」\n\n「考公上岸的概率大约是2%。但每一个上岸的人，都曾经落榜过。」',
+      cond: g => g.flags.civilExamStudying && !g.flags.civilExamResult,
+      choices:[
+        { label:'不甘心，决定再考一年', hint:'+🧠 -💰', fn: g => { g.flags.civilExamResult=true; g.flags.civilExamRetry=true; return{intel:8,mood:-5,money:-3000}; }},
+        { label:'接受了现实，回去继续上班', hint:'+😊', fn: g => { g.flags.civilExamResult=true; g.flags.civilExamFailed=true; return{mood:3}; }},
+        { label:'转考事业编，曲线救国', hint:'+🧠', fn: g => { g.flags.civilExamResult=true; g.flags.shiyeExam=true; return{intel:5,mood:-2}; }},
+      ]},
+    { id:'civil_servant_life', icon:'🏛️', title:'体制内生活', category:'career',
+      body:'你考上了公务员。你妈在家族群里发了红包。\n\n入职第一天，你发现：体制内和你想象的完全不一样。\n\n你以为很清闲——其实很忙。写材料、开会、接待群众、加班……\n\n你以为很稳定——确实很稳定。但稳定的代价是：你的工资涨得很慢。\n\n你的领导是个有意思的人。他告诉你：「体制内最重要的能力不是写材料——是察言观色。」\n\n你开始适应体制内的文化：\n- 说话要委婉\n- 汇报要简洁\n- 开会要表态\n- 下班不要太早\n\n你的大厂同学问你：「后悔吗？」你说：「不后悔——至少我不用35岁被裁。」\n\n「体制内不是天堂也不是地狱——是一座围城。里面的人想出去，外面的人想进来。」',
+      cond: g => g.flags.civilServant && !g.flags.civilServantLife && g.age >= 24,
+      choices:[
+        { label:'适应了体制内生活，找到了节奏', hint:'+😊 +🧠', fn: g => { g.flags.civilServantLife=true; return{mood:8,intel:5}; }},
+        { label:'觉得太压抑了，开始考虑辞职', hint:'+😊', fn: g => { g.flags.civilServantLife=true; g.flags.considerResign=true; return{mood:-5,intel:3}; }},
+        { label:'既来之则安之，慢慢熬', hint:'+😊', fn: g => { g.flags.civilServantLife=true; return{mood:3}; }},
+      ]},
+    { id:'system_outside', icon:'💼', title:'体制外的自由', category:'career',
+      body:'你的朋友辞职了——从体制内跳到了互联网。\n\n他说：「体制内太闷了，我想出去看看。」\n\n你问他感受。他说：「自由了——但也焦虑了。以前不怕被裁——现在怕了。」\n\n你开始思考体制内外的区别：\n\n体制内：\n✅ 稳定、有保障、不担心被裁\n❌ 工资低、晋升慢、文化复杂\n\n体制外：\n✅ 自由、高薪、成长快\n❌ 不稳定、35岁危机、内卷严重\n\n你发现：没有完美的选择——只有适合你的选择。\n\n你的一个长辈说：「你们这代人最大的幸福就是可以选择——你爷爷那代人，连选择都没有。」\n\n「体制内外不是对错的问题——是你要稳定还是要可能性的问题。」',
+      cond: g => !g.flags.systemOutside && g.age >= 24 && g.age <= 40,
+      choices:[
+        { label:'认真分析了利弊，做出了自己的选择', hint:'+🧠 +😊', fn: g => { g.flags.systemOutside=true; return{intel:8,mood:5}; }},
+        { label:'觉得体制外更适合自己', hint:'+😊 +✨', fn: g => { g.flags.systemOutside=true; return{mood:8,charm:3}; }},
+        { label:'觉得体制内更安全', hint:'+😊', fn: g => { g.flags.systemOutside=true; return{mood:3}; }},
+      ]},
+    { id:'shiye_exam', icon:'📋', title:'事业编考试', category:'education',
+      body:'你决定考事业编——曲线救国。\n\n事业编比公务员好考一点：竞争小，题目相对简单。\n\n但也有缺点：工资比公务员低，晋升空间有限，而且有些单位正在「转企」。\n\n你报了名。考试那天，考场里全是年轻人——你感受到了同龄人的焦虑。\n\n你的一个考友说：「我是第三次考了。前两次笔试过了面试挂了。」\n\n你问：「为什么不放弃？」\n\n他说：「因为在外面找不到安全感。」\n\n你突然理解了：考编不是追求好工作——是追求安全感。在一个缺乏安全感的时代。\n\n「考编热的本质：不是年轻人没有梦想——是他们不敢有太大的梦想。」',
+      cond: g => (g.flags.shiyeExam || g.flags.civilExamFailed) && !g.flags.shiyePassed && g.age >= 22 && g.age <= 35,
+      choices:[
+        { label:'考上了！虽然不是公务员，但也是铁饭碗', hint:'+💰 +😊', fn: g => { g.flags.shiyePassed=true; setJob(g,'事业编制',5500); return{mood:12,money:2000}; }},
+        { label:'没考上，继续投简历找工作', hint:'+🧠', fn: g => { g.flags.shiyePassed=true; return{intel:3,mood:-5}; }},
+        { label:'考上了但觉得不是自己想要的', hint:'+🧠 +😊', fn: g => { g.flags.shiyePassed=true; setJob(g,'事业编制',5500); return{intel:5,mood:3}; }},
+      ]},
+    { id:'side_job_gov', icon:'🔍', title:'体制内副业', category:'career',
+      body:'你在体制内工作了一段时间。你发现：你的同事都在偷偷搞副业。\n\n- 老张在外面开了个培训班\n- 小李在写公众号，月入过万\n- 小王在做代购\n\n你问了一个做组织工作的朋友：「这些不违规吗？」\n\n他说：「原则上不允许——但实际上大家都在做。只要不影响本职工作，没人管。」\n\n你开始思考：体制内的工资确实不够花。你也需要一份副业。\n\n但你又担心：万一被举报了呢？\n\n你查了相关规定：公务员不得在企业兼职，不得从事营利性活动。\n\n你叹了口气：铁饭碗的代价是——你不能同时端着两个碗。\n\n「体制内的隐性福利：稳定的收入、完善的保障——以及大把的「空闲时间」。但这份空闲，你敢用吗？」',
+      cond: g => g.flags.civilServant && !g.flags.sideJobGov && g.age >= 25,
+      choices:[
+        { label:'偷偷开始写公众号/做自媒体', hint:'+💰 +😊', fn: g => { g.flags.sideJobGov=true; g.flags.influencer=true; return{money:3000,mood:5}; }},
+        { label:'算了，太冒险了', hint:'+😊', fn: g => { g.flags.sideJobGov=true; return{mood:3}; }},
+        { label:'利用时间提升自己，考更高级别', hint:'+🧠', fn: g => { g.flags.sideJobGov=true; return{intel:8}; }},
+      ]},
+    { id:'resign_from_gov', icon:'🚪', title:'辞掉铁饭碗', category:'career',
+      body:'你在体制内待了三年。你决定辞职。\n\n你妈听说后差点晕过去：「你疯了？多少人想考考不上！」\n\n你爸沉默了很久，说了一句：「你想好了？」\n\n你说：「想好了。我不想30岁就能看到50岁的样子。」\n\n你递了辞职信。领导看了你一眼：「你是今年第三个辞职的。」\n\n你走出办公楼的那一刻——阳光刺眼。你深吸一口气。\n\n自由了——但也恐惧了。你没有了稳定的工资，没有了五险一金的保障。\n\n你在朋友圈发了一条：「从今天起，我要自己给自己发工资了。」\n\n评论两极分化：「勇敢！」「太冲动了！」\n\n你不在乎。你只知道：人生只有一次——你想按自己的想法活。\n\n「辞掉铁饭碗需要两种东西：勇气和存款。最好两样都有。」',
+      cond: g => g.flags.civilServant && g.flags.considerResign && !g.flags.resignedFromGov && g.age >= 25 && g.age <= 40,
+      choices:[
+        { label:'辞职创业，开始了新的人生', hint:'+💰 +😊 +✨', fn: g => { g.flags.resignedFromGov=true; g.flags.entrepreneur=true; g.flags.careerTransition=true; setJob(g,'创业者',0); return{mood:10,charm:8,money:-20000}; }},
+        { label:'辞职跳槽到企业，薪资翻倍', hint:'+💰 +😊', fn: g => { g.flags.resignedFromGov=true; g.flags.careerTransition=true; setJob(g,'企业职员',12000); return{mood:8,money:5000}; }},
+        { label:'最后还是没勇气辞职', hint:'', fn: g => { g.flags.resignedFromGov=true; return{mood:-8}; }},
+      ]},
+    { id:'exam_anxiety', icon:'😰', title:'考试焦虑', category:'psychology',
+      body:'你备考了三个月。你的焦虑指数已经到了顶点。\n\n每天晚上你都在想：「考不上怎么办？」\n\n你开始失眠。白天看书看不进去。你甚至开始怀疑自己的智商。\n\n你看了一个心理咨询师的视频：「考试焦虑的本质不是怕考不好——是怕自己不够好。」\n\n你开始做一些调整：\n- 每天只学习8小时，不再熬夜\n- 每周给自己放半天假\n- 开始运动，每天跑步30分钟\n- 告诉自己：考不上不是世界末日\n\n你发现：放松之后反而学得更好了。焦虑不是动力——是阻力。\n\n你发了条微博：「备考教会我的不是知识——是怎么和焦虑共处。」\n\n「焦虑的反义词不是放松——是接受。接受你可能考不上——然后继续准备。」',
+      cond: g => g.flags.civilExamStudying && !g.flags.examAnxiety && g.mood <= 45,
+      choices:[
+        { label:'学会了和焦虑共处，心态好了很多', hint:'+😊 +❤️', fn: g => { g.flags.examAnxiety=true; return{mood:10,health:5,intel:3}; }},
+        { label:'调整了一些，但焦虑还在', hint:'+😊', fn: g => { g.flags.examAnxiety=true; return{mood:5}; }},
+        { label:'焦虑到崩溃，放弃了备考', hint:'-😊', fn: g => { g.flags.examAnxiety=true; g.flags.civilExamStudying=false; return{mood:-15}; }},
+      ]},
+    { id:'compare_systems', icon:'⚖️', title:'体制内外大讨论', category:'social',
+      body:'你和几个朋友聚餐。话题不知怎么转到了「体制内vs体制外」。\n\n一个公务员朋友说：「稳定是稳定，但工资真的低。我月薪5500，房贷3000。」\n\n一个大厂朋友说：「我年薪40万，但每天加班到10点。而且我35了——随时可能被裁。」\n\n一个创业的朋友说：「我上个月赚了10万，但也可能下个月亏20万。」\n\n一个自由职业的朋友说：「我最自由——但也最焦虑。因为没有底薪。」\n\n你们讨论了一晚上，最后达成了一个共识：\n\n每种选择都有代价。你选的不是工作——是你愿意承受哪种代价。\n\n「人生没有完美选择——只有你能接受的trade-off。」',
+      cond: g => !g.flags.compareSystems && g.age >= 25 && g.social >= 35,
+      choices:[
+        { label:'从讨论中获得了新的视角', hint:'+🧠 +👥', fn: g => { g.flags.compareSystems=true; return{intel:8,social:5}; }},
+        { label:'觉得每个人都有自己的路', hint:'+🧠 +😊', fn: g => { g.flags.compareSystems=true; return{intel:5,mood:5}; }},
+        { label:'越比越焦虑——别人好像都比我好', hint:'', fn: g => { g.flags.compareSystems=true; return{mood:-8}; }},
+      ]},
+    { id:'internship_gov', icon:'🏢', title:'政府实习', category:'career',
+      body:'你通过关系进了一个区政府实习。为期三个月。\n\n你被分到了一个综合科室。你的日常工作：写材料、整理档案、接电话、帮领导泡茶。\n\n你发现：政府工作和你想象的完全不一样。\n\n你以为很官僚——其实基层很忙很累。你的科长每天加班到8点。\n\n你以为很腐败——其实大部分人只是在认真做平凡的工作。\n\n三个月结束了。科长问你：「毕业后想考公务员吗？」\n\n你想了想说：「不确定。但至少我了解了这个系统是怎么运转的。」\n\n他笑了：「这就是实习的意义——不是让你爱上这里，是让你看清自己。」\n\n「实习是最好的试错：用三个月的时间，避免三年的后悔。」',
+      cond: g => !g.flags.internshipGov && g.age >= 20 && g.age <= 28 && g.intel >= 35,
+      choices:[
+        { label:'实习后对体制内产生了好感', hint:'+🧠 +😊', fn: g => { g.flags.internshipGov=true; return{intel:8,mood:5,social:5}; }},
+        { label:'了解了体制运作，但确定不适合自己', hint:'+🧠 +😊', fn: g => { g.flags.internshipGov=true; return{intel:10,mood:3}; }},
+        { label:'觉得太无聊了，还是喜欢有挑战的', hint:'+😊', fn: g => { g.flags.internshipGov=true; return{mood:3}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -11429,6 +11510,12 @@ const ACHIEVEMENTS = [
     { id:'solo_explorer_ach', icon:'🧳', name:'独行侠', desc:'完成了第一次独自旅行', check: g => g.flags.soloTravel },
     { id:'downsize_ach', icon:'📦', name:'极简主义者', desc:'完成了生活的断舍离', check: g => g.flags.downsizeLife && g.flags.personalGrowth },
     { id:'health_rebuilder_ach', icon:'💪', name:'健康重建者', desc:'因体检警告彻底改变了生活方式', check: g => g.flags.rebuildHealth && g.flags.lifestyleChange },
+    // === v22.1 新增成就（考公考编） ===
+    { id:'civil_exam_ach_v22_1', icon:'📚', name:'考公人', desc:'认真备考过公务员', check: g => g.flags.civilExamStudying },
+    { id:'shiye_ach', icon:'📋', name:'事业编上岸', desc:'成功考取事业编制', check: g => g.flags.shiyePassed && g.jobSalary >= 5000 },
+    { id:'iron_bowl_ach', icon:'🏛️', name:'铁饭碗体验者', desc:'在体制内工作过', check: g => g.flags.civilServantLife },
+    { id:'resign_gov_ach', icon:'🚪', name:'辞掉铁饭碗', desc:'有勇气离开了体制', check: g => g.flags.resignedFromGov && g.flags.careerTransition },
+    { id:'exam_anxiety_ach', icon:'😰', name:'考试焦虑幸存者', desc:'学会了和考试焦虑共处', check: g => g.flags.examAnxiety },
 ];
 
 // === ENDINGS === (order matters: first match wins)
