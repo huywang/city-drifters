@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v19.1
+// 都市浮生记 - Game Engine v19.2
 // ============================================
 
 // === GAME STATE ===
@@ -9226,6 +9226,87 @@ const EVENTS = [
         { label:'我永远是个异乡人', hint:'-😊 +🧠', fn: g => { g.flags.belongingQuestion=true; g.flags.foreverStranger=true; return{mood:-8,intel:8}; }},
         { label:'哪里有家人的地方就是家', hint:'+❤️ +😊', fn: g => { g.flags.belongingQuestion=true; g.flags.familyIsHome=true; return{mood:10,social:5}; }},
       ]},
+    // === v19.2 新增事件（中年生活 + 人生下半场 + 健康觉醒） ===
+    { id:'sandwich_generation', icon:'🥪', title:'三明治一代', category:'midlife',
+      body:'你今年38岁。你的生活是这样的：\n\n上面：你爸妈70岁了，爸有高血压，妈有糖尿病。每月医疗费5000。\n下面：你的孩子8岁了，兴趣班+补课每月6000。\n中间：你的房贷每月12000，车贷每月3000。\n\n你的月薪2万。去掉这些开销，你只剩4000块给自己和老婆/老公。\n\n你的老婆/老公说："我们多久没一起看电影了？"\n你说："等孩子大了就好了。"\n\n但你心里知道：等孩子大了，父母更老了。等父母不在了，你也老了。\n\n你是"三明治一代"——被夹在上面和下面之间，自己却是最薄的那层。\n\n"三明治一代：你不是在生活——你是在撑着。但你是这个家的脊梁。"',
+      cond: g => !g.flags.sandwichGeneration && g.flags.hasChild && g.flags.parentsAlive && g.age >= 35 && g.age <= 48,
+      choices:[
+        { label:'咬牙撑着，这就是生活', hint:'+❤️ -😊 -💰', fn: g => { g.flags.sandwichGeneration=true; g.flags.bearingItAll=true; return{mood:-10,health:-5,social:5}; }},
+        { label:'跟家人商量分担', hint:'+👥 +🧠', fn: g => { g.flags.sandwichGeneration=true; g.flags.sharedBurden=true; return{social:12,mood:5,intel:5}; }},
+        { label:'给自己留一点空间', hint:'+😊 +❤️', fn: g => { g.flags.sandwichGeneration=true; g.flags.selfCareFirst=true; return{mood:12,health:8,social:-3}; }},
+      ]},
+    { id:'child_rebellion', icon:'😤', title:'孩子叛逆期', category:'midlife',
+      body:'你的孩子13岁了。叛逆期来了。\n\n你说："快做作业。" 孩子说："你管我！"\n你说："别玩手机了。" 孩子说："你天天也玩手机！"\n你说："我是为你好。" 孩子说："你根本不了解我！"\n\n你站在孩子房间门口，不知道该进去还是该走开。\n\n你突然想起了13岁的自己——你也是这样跟你爸妈吵架的。你妈当时说的话你一句也听不进去。现在你说了同样的话，你的孩子也听不进去。\n\n你开始理解：养育孩子最难的不是赚钱——是在"管教"和"尊重"之间找到平衡。\n\n"叛逆期：不是孩子在反对你——是孩子在寻找自己。而你需要学会放手。"',
+      cond: g => !g.flags.childRebellion && g.flags.hasChild && g.age >= 35 && g.age <= 50,
+      choices:[
+        { label:'学会倾听，少说多听', hint:'+👥 +🧠 +❤️', fn: g => { g.flags.childRebellion=true; g.flags.betterListener=true; return{social:10,intel:8,mood:5}; }},
+        { label:'给孩子更多自由空间', hint:'+👥 +😊', fn: g => { g.flags.childRebellion=true; g.flags.gaveFreedom=true; return{social:8,mood:8}; }},
+        { label:' stricter，不能惯着', hint:'-👥 -😊', fn: g => { g.flags.childRebellion=true; g.flags.strictParent=true; return{social:-10,mood:-8}; }},
+      ]},
+    { id:'marriage_rut', icon:'💔', title:'七年之痒', category:'midlife',
+      body:'你和你的伴侣在一起7年了。\n\n你们不再吵架了——不是因为默契，是因为懒得吵了。\n\n你们的对话变成了：\n"今晚吃什么？" "随便。" "那火锅？" "太油了。" "那你说吃什么？" "随便。"\n\n你们不再约约会了。不再送花了。不再说"我爱你"了。\n\n你们像两个合租室友——共享一个屋檐，但各过各的。\n\n你的一个朋友离婚了。他说："不是不爱了——是忘了为什么爱了。"\n\n你看了看你的伴侣。TA在看手机。你也在看手机。你们坐在同一张沙发上，但好像隔了一个世界。\n\n"七年之痒：不是爱情消失了——是习惯把它藏起来了。你们需要重新学会看见彼此。"',
+      cond: g => !g.flags.marriageRut && g.flags.married && g.flags.marriedMonths >= 60 && g.age >= 28,
+      choices:[
+        { label:'主动制造浪漫，重新约会', hint:'+❤️ +😊 -💰', fn: g => { g.flags.marriageRut=true; g.flags.rekindled=true; return{mood:15,social:8,money:-3000}; }},
+        { label:'一起做婚姻咨询', hint:'+🧠 +❤️ -💰', fn: g => { g.flags.marriageRut=true; g.flags.couplesCounseling=true; return{intel:8,mood:8,money:-5000}; }},
+        { label:'算了，都这样过', hint:'-❤️ -😊', fn: g => { g.flags.marriageRut=true; g.flags.settled=true; return{mood:-10,social:-5}; }},
+      ]},
+    { id:'midlife_reunion', icon:'🍻', title:'中年同学聚会', category:'midlife',
+      body:'大学同学聚会，20年了。\n\n你走进包间，发现：\n- 当年最帅的班草秃了\n- 当年最胖的胖子瘦了\n- 当年最安静的女生变成了话最多的\n- 当年成绩最好的在当公务员，月薪8000\n- 当年成绩最差的开了公司，年薪百万\n\n大家不再聊成绩和理想了。现在聊的是：\n- 孩子的教育\n- 房子的涨跌\n- 父母的医疗\n- 谁的头发还剩多少\n\n有人喝多了，哭了："我好累。" 另一个说："谁不累呢？"\n\n你发现：20年后，大家不再比较谁更成功了——而是在比谁更健康、谁更快乐。\n\n"中年同学聚会：不是为了炫耀——是为了确认大家都还活着、都还好。"',
+      cond: g => !g.flags.midlifeReunion && g.age >= 38 && g.age <= 50,
+      choices:[
+        { label:'跟老朋友深聊，重新联系', hint:'+👥 +❤️ +😊', fn: g => { g.flags.midlifeReunion=true; g.flags.reconnectedOldFriends=true; return{social:15,mood:12}; }},
+        { label:'感慨万千，更加珍惜当下', hint:'+🧠 +😊', fn: g => { g.flags.midlifeReunion=true; g.flags.cherishPresent=true; return{intel:8,mood:10}; }},
+        { label:'喝多了，说了不该说的话', hint:'-👥 -💰', fn: g => { g.flags.midlifeReunion=true; g.flags.drunkenConfession=true; return{social:-5,mood:-5,money:-500}; }},
+      ]},
+    { id:'second_spring', icon:'🌸', title:'第二春', category:'midlife',
+      body:'你40岁了。你以为人生就这样了——上班、下班、带娃、睡觉、重复。\n\n但有一天，你路过一家乐器店，看到了那把你年轻时梦寐以求的吉他。\n\n你买了。你开始学。你的手指磨出了茧子。你弹的第一首曲子是《小星星》。\n\n你的老婆/老公说："你疯了？40岁学吉他？"\n你说："40岁不学，50岁更不可能了。"\n\n半年后，你能弹完整的歌了。你在家里的阳台弹了一首《成都》。你的孩子说："爸/妈你好酷！"\n\n你突然觉得：40岁不是人生的下坡——是另一段上坡路的开始。\n\n"第二春：不是找到了新的爱情——是重新找到了对生活的热爱。你以为你老了——其实你只是忘了自己还年轻。"',
+      cond: g => !g.flags.secondSpring && g.age >= 38 && g.age <= 50 && g.mood < 55,
+      choices:[
+        { label:'全力投入新爱好', hint:'+✨ +😊 +❤️ -💰', fn: g => { g.flags.secondSpring=true; g.flags.passionProject=true; return{charm:12,mood:20,health:5,money:-5000}; }},
+        { label:'尝试就好，不勉强', hint:'+😊 +🧠', fn: g => { g.flags.secondSpring=true; g.flags.casualHobby=true; return{mood:10,intel:5}; }},
+        { label:'算了，没时间没精力', hint:'-😊', fn: g => { g.flags.secondSpring=true; return{mood:-8}; }},
+      ]},
+    { id:'retirement_planning_v3', icon:'📋', title:'退休倒计时', category:'midlife',
+      body:'你45岁了。你开始认真算退休的事了。\n\n距离退休：还有15-20年（可能要延迟到65岁）\n每月养老金预估：4000-6000\n你的期望退休生活：每月1万\n缺口：4000-6000/月\n\n你需要在退休前攒够：\n- 基本生活费：4000 × 12 × 25年 = 120万\n- 医疗费备用：50万\n- 旅游/爱好：30万\n- 总计：200万\n\n你看了看存款：……\n\n你开始理解为什么40岁以上的人都在谈"被动收入"和"资产配置"了。\n\n你开始认真做计划：每月存多少、投资多少、保险买什么、房子怎么处理。\n\n"退休规划：不是到了60岁才想的事——是40岁就该开始的准备。你准备的不是钱——是晚年的尊严。"',
+      cond: g => !g.flags.retirementPlanning2 && g.age >= 40 && g.age <= 55 && g.money < 500000,
+      choices:[
+        { label:'制定详细退休计划', hint:'+🧠 +💰', fn: g => { g.flags.retirementPlanning2=true; g.flags.detailedPlan=true; return{intel:12,mood:5,money:10000}; }},
+        { label:'开始投资，为退休做准备', hint:'+💰 🎲', fn: g => { g.flags.retirementPlanning2=true; g.flags.lateInvestor=true; if(Math.random()>0.4){return{money:30000,intel:8};}else{return{money:-15000,mood:-10};} }},
+        { label:'享受当下，退休的事以后再说', hint:'+😊 -🧠', fn: g => { g.flags.retirementPlanning2=true; g.flags.presentFocus=true; return{mood:10,intel:-3}; }},
+      ]},
+    { id:'health_scare_midlife', icon:'🏥', title:'中年体检惊魂', category:'midlife',
+      body:'你拿到了今年的体检报告。\n\n异常项目：\n- 血压：150/95（偏高）\n- 血糖：6.8（临界糖尿病）\n- 胆固醇：偏高\n- 尿酸：520（痛风风险）\n- 肝功能：ALT偏高\n- 颈椎：退行性变\n- 腰椎：L4-L5突出\n\n医生看着你的报告说："你才45岁，身体像55岁的。"\n\n你的手在发抖。你想起了你爸——他50岁那年中风了。\n\n你开始认真思考：你的身体还能撑多久？你的父母、孩子、伴侣——他们需要的是一个健康的你，还是一个赚更多钱的你？\n\n"中年体检：不是你害怕报告上的数字——是你害怕失去现在拥有的一切。"',
+      cond: g => !g.flags.healthScareMidlife && g.age >= 40 && g.age <= 55 && g.health < 60,
+      choices:[
+        { label:'彻底改变生活方式', hint:'+❤️ +😊 -💰', fn: g => { g.flags.healthScareMidlife=true; g.flags.lifestyleOverhaul=true; return{health:25,mood:10,money:-10000}; }},
+        { label:'看专科医生，吃药控制', hint:'+❤️ -💰', fn: g => { g.flags.healthScareMidlife=true; g.flags.medication=true; return{health:15,money:-8000}; }},
+        { label:'吃一周的药，然后忘了这事', hint:'-❤️', fn: g => { g.flags.healthScareMidlife=true; g.flags.ignored=true; return{health:-5,mood:-10}; }},
+      ]},
+    { id:'empty_nest_prep', icon:'🎓', title:'孩子离家', category:'midlife',
+      body:'你的孩子18岁了。高考结束了。TA考上了一个外地的大学。\n\n你帮TA收拾行李。你塞了很多东西进去：零食、药品、厚衣服、零花钱。\n\n你妈说："到了学校给家里打电话。"\n你爸说："好好读书，别担心钱。"\n你说："照顾好自己。"\n\n孩子说："知道了知道了，你们别操心了。"\n\n火车开了。你站在站台上，看着火车越来越小。\n\n你回到家，孩子的房间空了。桌上还有没喝完的牛奶。墙上还贴着小时候的贴纸。\n\n你坐在孩子的床上，发了会儿呆。你突然哭了——不是因为想念，是因为你意识到：你的人生中最热闹的日子，已经过去了。\n\n"空巢不是孩子离开了——是你终于有空看看自己了。"',
+      cond: g => !g.flags.emptyNestPrep && g.flags.hasChild && g.age >= 45 && g.age <= 55,
+      choices:[
+        { label:'重新找到二人世界的乐趣', hint:'+❤️ +😊 +👥', fn: g => { g.flags.emptyNestPrep=true; g.flags.coupleRediscovered=true; return{mood:15,social:10,health:5}; }},
+        { label:'开始新的事业/爱好', hint:'+✨ +🧠 +😊', fn: g => { g.flags.emptyNestPrep=true; g.flags.newChapter=true; return{charm:10,intel:8,mood:12}; }},
+        { label:'频繁给孩子打电话', hint:'+👥 -😊', fn: g => { g.flags.emptyNestPrep=true; g.flags.helicopterParent=true; return{social:5,mood:-8}; }},
+      ]},
+    { id:'aging_parents_v2', icon:'👴', title:'父母老了', category:'midlife',
+      body:'你回家看望父母。\n\n你发现：\n- 你爸走路变慢了，上楼要扶着扶手\n- 你妈做菜放盐越来越多了（味觉退化了）\n- 你爸的头发全白了\n- 你妈开始重复说同样的话\n- 你家的药柜越来越满了\n\n你爸说："没事没事，我们身体好着呢。"\n你妈说："你忙你的，不用管我们。"\n\n但你在冰箱里看到了过期的药。你在厕所看到了防滑垫。你在床头看到了紧急呼叫器。\n\n你的眼泪差点掉下来。\n\n你在网上查了查：中国60岁以上老人2.8亿，其中空巢老人超过1亿。\n\n"父母老了：你来不及陪他们变老，他们已经老了。你唯一能做的——是在他们还在的时候，多说几句我爱你。"',
+      cond: g => !g.flags.agingParents && g.flags.parentsAlive && g.age >= 35 && g.age <= 55,
+      choices:[
+        { label:'每月回家看一次', hint:'+❤️ +👥 -💰 -😊', fn: g => { g.flags.agingParents=true; g.flags.monthlyVisits=true; return{mood:8,social:10,money:-2000}; }},
+        { label:'给父母请保姆/护工', hint:'-💰💰 +❤️', fn: g => { g.flags.agingParents=true; g.flags.hiredCare=true; return{money:-30000,mood:5}; }},
+        { label:'教父母用智能手机视频通话', hint:'+👥 +🧠 +😊', fn: g => { g.flags.agingParents=true; g.flags.techBridge=true; return{social:8,intel:5,mood:8}; }},
+      ]},
+    { id:'midlife_purpose', icon:'🎯', title:'人生下半场', category:'midlife',
+      body:'你45岁了。你在一个深夜问自己：\n\n人生上半场：为了生存而活——读书、工作、结婚、生子、还房贷。\n人生下半场：该为谁而活？\n\n你列了一张清单：\n- 想做的事：学画画、环游世界、写一本书\n- 该做的事：照顾父母、陪伴孩子、攒退休金\n- 能做的事：继续上班、偶尔运动、周末看看书\n\n你发现："想做的"、"该做的"、"能做的"——几乎不重叠。\n\n但你也发现：也许不需要等到退休。也许现在就可以开始——每天30分钟画画，每年一次旅行，每周末写1000字。\n\n"人生下半场：不是为了弥补遗憾——是为了创造新的意义。你不需要等到完美的那一天——因为那一天永远不会来。"',
+      cond: g => !g.flags.midlifePurpose && g.age >= 42 && g.age <= 55 && g.intel >= 45,
+      choices:[
+        { label:'开始做想做的事，不等了', hint:'+✨ +😊 +❤️', fn: g => { g.flags.midlifePurpose=true; g.flags.startedDream=true; return{charm:10,mood:20,health:5}; }},
+        { label:'制定一个可行的计划', hint:'+🧠 +💰', fn: g => { g.flags.midlifePurpose=true; g.flags.feasiblePlan=true; return{intel:10,mood:10,money:5000}; }},
+        { label:'接受现实，继续上班', hint:'+💰 -😊', fn: g => { g.flags.midlifePurpose=true; g.flags.acceptedReality=true; return{money:5000,mood:-5}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -10101,6 +10182,12 @@ const ACHIEVEMENTS = [
     { id:'kindness_chain_ach', icon:'🤝', name:'善意传递者', desc:'把陌生人的善意传递下去', check: g => g.flags.payItForward },
     { id:'city_chronicler_ach', icon:'📸', name:'城市记录者', desc:'用文字或照片记录了城市的四季', check: g => g.flags.cityChronicler },
     { id:'home_decorator_ach', icon:'🏠', name:'温馨小窝', desc:'把出租屋布置成了家的样子', check: g => g.flags.decorated },
+    // === v19.2 新增成就（中年生活） ===
+    { id:'sandwich_hero_ach', icon:'🥪', name:'三明治勇士', desc:'撑起了上有老下有小的责任', check: g => g.flags.sandwichGeneration },
+    { id:'rekindle_ach', icon:'💕', name:'重燃爱火', desc:'在七年之痒中重新找到了爱', check: g => g.flags.rekindled },
+    { id:'second_spring_ach', icon:'🌸', name:'第二春', desc:'在中年找到了新的热爱', check: g => g.flags.secondSpring && g.flags.passionProject },
+    { id:'filial_son_ach', icon:'👴', name:'孝子贤孙', desc:'认真陪伴年迈的父母', check: g => g.flags.agingParents && (g.flags.monthlyVisits || g.flags.hiredCare) },
+    { id:'purpose_finder_ach', icon:'🎯', name:'人生下半场', desc:'找到了中年后的新方向', check: g => g.flags.midlifePurpose && g.flags.startedDream },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -10395,6 +10482,8 @@ const ENDINGS = [
     { id:'hometown_hero_end_v2', badge:'🏠', title:'小城故事', desc:'你回到了老家，在小城市找到了自己的位置。\n\n你没有在大城市买房，没有年薪百万，没有光鲜的履历。但你有：每天5点半下班的自由、周末陪父母吃饭的温暖、邻居见面打招呼的亲切。\n\n你的大城市朋友说："你不后悔吗？"\n\n你说："后悔什么？我每天睡到自然醒，有时间钓鱼、有时间陪家人、有时间做自己。这难道不是成功？"\n\n"小城市不是退路——是另一条路。不是每个人都必须在大城市证明自己。"', cond: g => g.flags.returnHometown && (g.flags.smallBusiness || g.flags.localCivilServant) && g.mood >= 70 && g.age >= 32 },
     // --- v19.1 城市记忆结局 ---
     { id:'city_belonging_end', badge:'🏙️', title:'城市归属', desc:'你终于在大城市找到了归属感。\n\n你来这里的时候，什么都不懂。你不会说本地方言，不知道哪条路通向哪里，不认识任何人。\n\n但现在：你有了自己的朋友圈，知道了最好吃的那家面馆在哪里，能在地铁里闭眼换乘。你的同事不再叫你"外地人"，你的邻居会跟你打招呼。\n\n有人问你："你是哪里人？"\n\n你笑了笑说："我就是这个城市的人。"\n\n"城市归属：不是你在这里买了房——是你在这里有了故事。当这个城市的每一条街道都有你的记忆，你就属于这里了。"', cond: g => g.flags.cityIdentity && g.flags.strangerKindness && g.flags.cityFriendCircle && g.social >= 55 && g.mood >= 60 && g.months >= 60 && g.age >= 27 },
+    // --- v19.2 中年生活结局 ---
+    { id:'graceful_aging_end', badge:'🌿', title:'优雅老去', desc:'你学会了优雅地老去。\n\n你没有对抗衰老——你拥抱了它。你45岁开始学吉他，48岁写了第一篇文章，50岁开始画画。\n\n你的体检报告从一片红变成了基本正常。你的孩子长大了，成了你的朋友。你的伴侣跟你重新约了会。\n\n你的一个年轻同事说："你怎么看起来比30岁的人还年轻？"\n\n你说："因为我不再害怕变老了。"\n\n"优雅老去：不是不变老——是在变老的过程中，依然保持对生活的热爱。"', cond: g => g.flags.secondSpring && g.flags.healthScareMidlife && g.flags.lifestyleOverhaul && g.mood >= 65 && g.health >= 60 && g.age >= 45 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
