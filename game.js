@@ -1601,7 +1601,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.9' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.10' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
@@ -1815,6 +1815,64 @@ function getLowestStat() {
     entries.sort((a, b) => a[1] - b[1]);
     const names = { money: '💰金钱', health: '❤️健康', mood: '😊心情', intel: '🧠智力', social: '👥人脉', charm: '✨魅力' };
     return names[entries[0][0]];
+}
+
+// === SOUND SYSTEM ===
+let soundEnabled = localStorage.getItem('cityDrifters_sound') !== 'false';
+
+function toggleSound() {
+    soundEnabled = !soundEnabled;
+    localStorage.setItem('cityDrifters_sound', soundEnabled);
+    notify(soundEnabled ? '🔊 音效已开启' : '🔇 音效已关闭');
+    // Update UI
+    const soundBtn = document.getElementById('toggle-sound');
+    if (soundBtn) soundBtn.checked = soundEnabled;
+}
+
+function playSound(type) {
+    if (!soundEnabled) return;
+    // Simple Web Audio API sounds
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        switch (type) {
+            case 'click':
+                osc.frequency.value = 600;
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.1);
+                break;
+            case 'success':
+                osc.frequency.value = 800;
+                gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.3);
+                break;
+            case 'fail':
+                osc.frequency.value = 300;
+                gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.4);
+                break;
+            case 'levelup':
+                osc.frequency.setValueAtTime(400, ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(800, ctx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.4);
+                break;
+        }
+    } catch (e) {
+        // Silently fail if audio not supported
+    }
 }
 
 // === MENU ===
