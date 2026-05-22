@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v3.6
+// 都市浮生记 - Game Engine v3.7
 // ============================================
 
 // === GAME STATE ===
@@ -2816,6 +2816,24 @@ const EVENTS = [
         { label:'继续做，但更注重品质', hint:'+✨ +👥', fn: g => { g.flags.influencerScandal=true; return{charm:8,social:5}; }},
         { label:'退出直播圈', hint:'+😊 -💰', fn: g => { g.flags.influencerScandal=true; g.flags.influencer=false; return{mood:15,money:-5000}; }},
       ]},
+    // === v3.7 EVENTS - 宠物经济 ===
+    { id:'adopt_pet', icon:'🐱', title:'养宠物',
+      body:'你在朋友圈看到一只流浪猫，决定领养它。\n\n你给它取名"橘猫"，每天喂它冻干、罐头、营养膏。\n\n你的开销：\n- 猫粮：月均500\n- 猫砂：月均100\n- 玩具：月均200\n- 医疗：年均2000\n\n你发了条朋友圈："我有猫了。"收获了100个赞。\n\n"养宠物是年轻人的精神寄托——它们不会催你结婚，不会问你工资，只会默默陪着你。"',
+      cond: g => !g.flags.hasPet && g.money>5000 && g.age>=22 && g.age<=35,
+      choices:[
+        { label:'领养猫咪', hint:'-💰 +😊 +❤️', fn: g => { g.flags.hasPet=true; g.flags.catOwner=true; return{money:-2000,mood:20,health:5}; }},
+        { label:'领养狗狗', hint:'-💰 +😊 +❤️', fn: g => { g.flags.hasPet=true; g.flags.dogOwner=true; return{money:-2500,mood:20,health:8}; }},
+        { label:'养异宠（仓鼠/龟）', hint:'-💰 +😊', fn: g => { g.flags.hasPet=true; return{money:-1000,mood:15}; }},
+        { label:'算了，养不起', hint:'+💰 -😊', fn: g => { g.flags.hasPet=true; return{money:500,mood:-5}; }},
+      ]},
+    { id:'pet_medical', icon:'🏥', title:'宠物看病',
+      body:'你的猫生病了，你带它去宠物医院。\n\n检查结果：\n- 血常规：200\n- B超：300\n- 药品：500\n- 手术：2000\n\n你看着账单，心想：这比我自己的体检还贵。\n\n但看着猫咪可怜的眼神，你还是付了钱。\n\n"宠物医疗是年轻人的隐形炸弹——平时不觉得，一病就是几千。"',
+      cond: g => g.flags.hasPet && !g.flags.petMedical && g.money>3000,
+      choices:[
+        { label:'花钱治疗', hint:'-💰💰 +😊 +❤️', fn: g => { g.flags.petMedical=true; return{money:-3000,mood:15,health:3}; }},
+        { label:'买宠物保险', hint:'-💰 +🧠', fn: g => { g.flags.petMedical=true; g.flags.petInsurance=true; return{money:-1000,intel:5}; }},
+        { label:'自己查资料治疗', hint:'+🧠 🎲', fn: g => { g.flags.petMedical=true; if(Math.random()>0.5){return{intel:8,mood:10}}else{return{mood:-15}} }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -2885,6 +2903,8 @@ const ACHIEVEMENTS = [
     { id:'weekend_traveler', icon:'🚄', name:'周末特种兵', desc:'周末旅游打卡', check: g => g.flags.weekendTravel },
     { id:'live_streamer', icon:'📱', name:'直播带货达人', desc:'成为主播', check: g => g.flags.liveStreaming },
     { id:'scandal_survivor', icon:'💥', name:'网红翻车幸存者', desc:'经历网红翻车', check: g => g.flags.influencerScandal },
+    { id:'pet_parent', icon:'🐱', name:'毛孩子家长', desc:'养了宠物', check: g => g.flags.hasPet },
+    { id:'pet_medical_expert', icon:'🏥', name:'宠物医疗专家', desc:'经历宠物看病', check: g => g.flags.petMedical },
     { id:'photographer', icon:'📷', name:'摄影师', desc:'爱上摄影', check: g => g.flags.photographyHobby },
     { id:'viral_star', icon:'🌟', name:'网红初体验', desc:'意外走红', check: g => g.flags.viralMoment },
     { id:'freelancer', icon:'💻', name:'自由职业者', desc:'成为自由职业者', check: g => g.flags.freelancer },
