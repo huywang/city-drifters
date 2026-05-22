@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v17.2
+// 都市浮生记 - Game Engine v17.3
 // ============================================
 
 // === GAME STATE ===
@@ -8599,6 +8599,87 @@ const EVENTS = [
         { label:'试几次看看效果', hint:'-💰 +😊 +🧠', fn: g => { g.flags.psychologicalCounseling=true; return{money:-5000,mood:15,intel:5}; }},
         { label:'太贵了，用冥想App替代', hint:'+😊 +🧠', fn: g => { g.flags.psychologicalCounseling=true; g.flags.meditationApp=true; return{mood:10,intel:5}; }},
       ]},
+    // === v17.3 新增事件（职场进阶 + 副业经济 + 自媒体） ===
+    { id:'workplace_pua_v4', icon:'😰', title:'职场PUA', category:'career',
+      body:'你的领导又开始"教育"你了：\n\n"你应该感恩公司给你这个机会。"\n"你这个年纪，在外面根本找不到更好的工作。"\n"加班是为你好，年轻人要多吃苦。"\n"你看看人家小李，每天都主动加班。"\n\n你开始怀疑：是我太差了吗？还是他在PUA我？\n\n你的同事偷偷跟你说："别信他，他就是控制欲强。"\n\n"职场PUA：不是你的能力不够——是你的领导在用你的自我怀疑来控制你。"',
+      cond: g => !g.flags.workplacePua && g.job !== '待业中' && g.age >= 22,
+      choices:[
+        { label:'据理力争，正面怼回去', hint:'+✨ +😊 -👥', fn: g => { g.flags.workplacePua=true; g.flags.standUp=true; return{charm:10,mood:15,social:-8}; }},
+        { label:'默默忍受，做好本职工作', hint:'+💰 -😊 -💪', fn: g => { g.flags.workplacePua=true; return{money:2000,mood:-15,health:-8}; }},
+        { label:'开始投简历，准备跳槽', hint:'+🧠 +😊', fn: g => { g.flags.workplacePua=true; g.flags.quietQuitting=true; return{intel:8,mood:5}; }},
+      ]},
+    { id:'office_politics_v4', icon:'🎭', title:'办公室政治', category:'career',
+      body:'你的部门换了个新领导。新官上任三把火：\n\n- 第一把火：开了两个老员工\n- 第二把火：把核心项目交给了自己的嫡系\n- 第三把火：要求所有人每天写日报\n\n你发现：在这个公司，站队比能力重要。你的同事A投靠了新领导，同事B选择了中立，同事C开始准备跳槽。\n\n你呢？\n\n"办公室政治：不是你想不想参与——是你已经被卷进去了。"',
+      cond: g => !g.flags.officePolitics && g.job !== '待业中' && g.age >= 23,
+      choices:[
+        { label:'站队新领导', hint:'+💰 -✨ -😊', fn: g => { g.flags.officePolitics=true; g.flags.teamLeader=true; return{money:5000,charm:-5,mood:-5}; }},
+        { label:'保持中立，用实力说话', hint:'+🧠 +✨', fn: g => { g.flags.officePolitics=true; g.flags.neutral=true; return{intel:8,charm:5}; }},
+        { label:'开始找下家', hint:'+😊 +🧠', fn: g => { g.flags.officePolitics=true; g.flags.quietQuitting=true; return{mood:8,intel:5}; }},
+      ]},
+    { id:'remote_work_v4', icon:'🏠', title:'远程办公', category:'career',
+      body:'你的公司开始实行混合办公模式：每周3天在公司，2天在家。\n\n在家办公的第一天：\n- 9:00 起床\n- 9:30 打开电脑\n- 10:00 开了一个线上会议\n- 11:00 开始刷手机\n- 14:00 假装在工作\n- 17:00 关了电脑\n\n你发现：远程办公的效率取决于你的自律。自律的人效率翻倍，不自律的人效率减半。\n\n"远程办公：不是在考验公司——是在考验你的自制力。"',
+      cond: g => !g.flags.remoteWork && g.job !== '待业中' && g.intel > 50,
+      choices:[
+        { label:'高效远程，证明自己', hint:'+😊 +🧠 +💪', fn: g => { g.flags.remoteWork=true; g.flags.remotePro=true; return{mood:15,intel:10,health:5}; }},
+        { label:'混日子，反正没人看', hint:'+😊 -🧠 -💰', fn: g => { g.flags.remoteWork=true; return{mood:8,intel:-5,money:-2000}; }},
+        { label:'申请全职远程', hint:'🎲 +😊 +💪', fn: g => { g.flags.remoteWork=true; if(Math.random()>0.5){return{mood:20,health:10,money:3000}}else{return{mood:-10}} }},
+      ]},
+    { id:'ai_replace_fear', icon:'🤖', title:'AI替代焦虑', category:'career',
+      body:'你的同事被AI替代了。\n\n公司引进了ChatGPT和自动化工具，3个文案、2个设计师、1个客服被裁了。\n\n你看着空了的工位，心里一沉：下一个会不会是你？\n\n你开始疯狂学AI：学Prompt Engineering、学Midjourney、学Python自动化。\n\n"AI不会替代你——但会用AI的人会替代你。"',
+      cond: g => !g.flags.aiReplaceFear && g.age >= 22 && g.job !== '待业中',
+      choices:[
+        { label:'全面学习AI工具', hint:'+🧠 +✨ -💪', fn: g => { g.flags.aiReplaceFear=true; g.flags.aiLiterate=true; return{intel:20,charm:10,health:-5}; }},
+        { label:'转型做AI无法替代的工作', hint:'+🧠 +😊', fn: g => { g.flags.aiReplaceFear=true; g.flags.careerPivot=true; return{intel:12,mood:8}; }},
+        { label:'不管了，AI还没那么厉害', hint:'+😊 -🧠', fn: g => { g.flags.aiReplaceFear=true; return{mood:5,intel:-3}; }},
+      ]},
+    { id:'knowledge_payment', icon:'📚', title:'知识付费', category:'career',
+      body:'你在知识付费平台上买了一堆课：\n\n- 时间管理：299元\n- 高效沟通：399元\n- 副业赚钱：999元\n- 理财入门：599元\n- Python全栈：1999元\n\n总共花了4296元。你看了5%就放弃了。\n\n你的收藏夹里有200个"待学"内容，但你从来没有打开过。\n\n"知识付费：不是在买知识——是在买焦虑的安慰剂。你以为买了就等于学了。"',
+      cond: g => !g.flags.knowledgePayment && g.age >= 20 && g.money > 5000,
+      choices:[
+        { label:'认真学习每一门课', hint:'+🧠 +😊 -💰', fn: g => { g.flags.knowledgePayment=true; g.flags.courseCompleter=true; return{intel:18,mood:10,money:-5000}; }},
+        { label:'选一门深入学', hint:'+🧠 +😊', fn: g => { g.flags.knowledgePayment=true; return{intel:12,mood:5,money:-1000}; }},
+        { label:'算了，B站免费课更好', hint:'+🧠 +😊 +💰', fn: g => { g.flags.knowledgePayment=true; g.flags.freeLearning=true; return{intel:10,mood:8}; }},
+      ]},
+    { id:'slash_career', icon:'⚡', title:'斜杠青年', category:'career',
+      body:'你成了一个斜杠青年：程序员/自媒体博主/自由撰稿人/摄影师。\n\n你的日程表：\n- 白天：上班\n- 晚上：写公众号\n- 周末：拍照接单\n- 深夜：写代码接外包\n\n你的收入翻了3倍，但你的睡眠少了4小时。\n\n你的妈妈说："你到底在做什么工作？"\n\n你说："我什么都做。"\n\n"斜杠青年：不是在找Plan B——是拒绝只有一个自己。但代价是，你可能每一个都做得不够好。"',
+      cond: g => !g.flags.slashCareer && g.age >= 22 && g.intel > 55 && g.job !== '待业中',
+      choices:[
+        { label:'全面展开斜杠生活', hint:'+💰 +✨ -💪 -😊', fn: g => { g.flags.slashCareer=true; g.flags.fullSlash=true; setJob(g,'斜杠青年',g.jobSalary+8000); return{money:10000,charm:15,health:-12,mood:-5}; }},
+        { label:'选一个副业专注做', hint:'+💰 +🧠 +😊', fn: g => { g.flags.slashCareer=true; g.flags.focusedSide=true; return{money:5000,intel:10,mood:8}; }},
+        { label:'还是专注主业吧', hint:'+💰 +😊', fn: g => { g.flags.slashCareer=true; return{money:3000,mood:5}; }},
+      ]},
+    { id:'salary_negotiation_v4', icon:'💰', title:'薪资谈判', category:'career',
+      body:'你收到了一个offer：月薪25K，比你现在的20K涨了25%。\n\n但你觉得自己值30K。你决定谈判。\n\nHR说："这已经是我们的上限了。"\n\n你知道：这是话术。你查了查市场行情，同岗位的中位数是28K。\n\n你深吸一口气，说："我期望28K，如果能到这个数，我可以立刻签。"\n\nHR沉默了3秒："我去跟领导商量一下。"\n\n"薪资谈判：不是你值多少——是你敢不敢开口。大多数人输在不敢谈。"',
+      cond: g => !g.flags.salaryNegotiation && g.age >= 22 && g.job !== '待业中',
+      choices:[
+        { label:'坚持要28K', hint:'🎲 +💰 +✨', fn: g => { g.flags.salaryNegotiation=true; if(g.intel>65&&Math.random()>0.4){return{money:15000,charm:10,mood:20}}else{return{money:5000,mood:-5}} }},
+        { label:'接受25K，入职再说', hint:'+💰 +😊', fn: g => { g.flags.salaryNegotiation=true; return{money:8000,mood:10}; }},
+        { label:'拒绝这个offer', hint:'+✨ +🧠', fn: g => { g.flags.salaryNegotiation=true; return{charm:5,intel:5}; }},
+      ]},
+    { id:'network_event', icon:'🤝', title:'职场社交', category:'career',
+      body:'你参加了一个行业交流会。\n\n你带了200张名片（虽然现在是加微信）。你跟30个人交换了联系方式，参加了2个圆桌讨论，听了1个主题演讲。\n\n你加了50个人的微信，但你知道：90%的联系人以后不会联系。\n\n你遇到了一个前辈，他说了一句话让你印象很深："人脉不是你认识谁——是谁认识你。"\n\n"职场社交：不是在认识人——是在让别人认识你。真正的社交，是价值交换。"',
+      cond: g => !g.flags.networkEvent && g.age >= 22 && g.social > 30,
+      choices:[
+        { label:'成为社交达人', hint:'+👥 +✨ +😊', fn: g => { g.flags.networkEvent=true; g.flags.networkPro=true; return{social:20,charm:12,mood:10}; }},
+        { label:'只跟关键人物建立联系', hint:'+👥 +🧠', fn: g => { g.flags.networkEvent=true; g.flags.strategicNetwork=true; return{social:10,intel:8}; }},
+        { label:'社恐，默默听就好', hint:'+🧠 -👥', fn: g => { g.flags.networkEvent=true; return{intel:8,social:-3}; }},
+      ]},
+    { id:'headhunted_v2', icon:'📞', title:'被挖角', category:'career',
+      body:'你接到了一个电话：\n\n"您好，我是XX公司的HR。我们CEO看了您的简历，想邀请您来聊聊。薪资方面，我们可以给到您现在的1.5倍。"\n\n你心动了。但你也很纠结：\n- 现在的公司虽然一般，但你已经很熟悉了\n- 新公司薪资高，但可能有坑\n- 跳槽有风险，不跳又不甘心\n\n"被挖角：不是你在找工作——是工作在找你。这种感觉，比主动投简历爽多了。"',
+      cond: g => !g.flags.headhunted && g.age >= 25 && g.jobSalary >= 10000 && g.intel > 60,
+      choices:[
+        { label:'去面试看看', hint:'🎲 +💰 +✨', fn: g => { g.flags.headhunted=true; if(Math.random()>0.4){setJob(g,'高级'+g.job,g.jobSalary*1.5);return{money:20000,charm:10,mood:20}}else{return{mood:-10}} }},
+        { label:'用offer跟现公司谈加薪', hint:'🎲 +💰', fn: g => { g.flags.headhunted=true; if(Math.random()>0.5){return{money:15000,mood:15}}else{return{mood:-15,social:-5}} }},
+        { label:'婉拒，现在挺好的', hint:'+😊 +👥', fn: g => { g.flags.headhunted=true; return{mood:8,social:5}; }},
+      ]},
+    { id:'midlife_career_crisis', icon:'😟', title:'中年职业危机', category:'career',
+      body:'你38岁了。\n\n你的困境：\n- 公司里比你年轻的人越来越多，他们更能加班、更便宜\n- 你的技能开始过时，但学新东西的速度越来越慢\n- 你想跳槽，但发现40岁以上的岗位少得可怜\n- 你想创业，但上有老下有小，赔不起\n\n你的一个朋友说："35岁之后，你就不是在找工作了——是在找安全感。"\n\n"中年职业危机：不是你不够好——是时代太快了。你还没学会游泳，水就已经换了。"',
+      cond: g => !g.flags.midlifeCareerCrisis && g.age >= 35 && g.age <= 45 && g.job !== '待业中',
+      choices:[
+        { label:'转型做管理', hint:'+🧠 +👥 +💰', fn: g => { g.flags.midlifeCareerCrisis=true; g.flags.managementTrack=true; setJob(g,'部门经理',g.jobSalary*1.3); return{intel:12,social:10,money:10000}; }},
+        { label:'发展副业，多条退路', hint:'+💰 +😊 -💪', fn: g => { g.flags.midlifeCareerCrisis=true; g.flags.safetyNet=true; return{money:8000,mood:10,health:-5}; }},
+        { label:'认命，就这样吧', hint:'+😊 -🧠 -💰', fn: g => { g.flags.midlifeCareerCrisis=true; return{mood:-10,intel:-5}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -9420,6 +9501,14 @@ const ACHIEVEMENTS = [
     { id:'therapy_regular_ach', icon:'🧠', name:'心理咨询常客', desc:'坚持每周心理咨询', check: g => g.flags.regularTherapy },
     { id:'shaved_head_ach', icon:'😎', name:'光头勇士', desc:'接受现实剃了光头', check: g => g.flags.shavedHead },
     { id:'lasik_ach', icon:'👁️', name:'摘镜成功', desc:'做了近视手术', check: g => g.flags.lasik },
+    // === v17.3 新增成就（职场进阶） ===
+    { id:'stand_up_ach', icon:'😤', name:'职场反抗者', desc:'正面怼了PUA你的领导', check: g => g.flags.standUp },
+    { id:'ai_literate_ach', icon:'🤖', name:'AI达人', desc:'全面学习了AI工具', check: g => g.flags.aiLiterate },
+    { id:'slash_youth_ach', icon:'⚡', name:'斜杠青年', desc:'成了多职业斜杠人', check: g => g.flags.slashCareer },
+    { id:'remote_pro_ach', icon:'🏠', name:'远程办公达人', desc:'高效完成了远程工作', check: g => g.flags.remotePro },
+    { id:'network_pro_ach', icon:'🤝', name:'社交达人', desc:'成了职场社交高手', check: g => g.flags.networkPro },
+    { id:'headhunted_ach_v2', icon:'📞', name:'被挖角', desc:'被猎头挖过', check: g => g.flags.headhunted },
+    { id:'management_ach', icon:'👔', name:'管理层', desc:'成功转型管理岗', check: g => g.flags.managementTrack },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -9693,6 +9782,9 @@ const ENDINGS = [
     // --- v17.2 健康结局 ---
     { id:'health_guru_end', badge:'💪', title:'健康达人', desc:'你成了朋友圈里的健康达人。\n\n你每天跑步5公里、吃有机蔬菜、11点睡觉、每周健身3次。你的体检报告比同龄人好一个档次。\n\n你的同事说："你怎么精力这么好？"你说："因为我终于把健康当回事了。"\n\n你花了5年学会了养生，你的身体回报了你50年的健康。\n\n"健康不是投资——是保险。你不一定需要它，但没有它你什么都不是。"', cond: g => g.flags.wellnessLifestyle && g.flags.fitnessRegular && g.health >= 85 && g.age >= 30 },
     { id:'mental_health_champion_end_v2', badge:'🧠', title:'心理健康倡导者', desc:'你从一个焦虑的打工人，变成了一个心理健康的倡导者。\n\n你做了2年的心理咨询，学会了冥想、正念、情绪管理。你开始在朋友圈分享心理健康知识，帮助了很多和你一样焦虑的人。\n\n你的一个朋友说："谢谢你，让我知道不开心不是矫情。"\n\n你说："每一个愿意面对自己内心的人，都是勇士。"\n\n"心理健康：不是永远开心——是允许自己不开心，然后找到力量站起来。"', cond: g => g.flags.regularTherapy && g.flags.psychologicalCounseling && g.mood >= 75 && g.age >= 28 },
+    // --- v17.3 职场结局 ---
+    { id:'slash_master_end', badge:'⚡', title:'斜杠大师', desc:'你成了城市里最成功的斜杠青年。\n\n你是程序员/自媒体博主/自由撰稿人。你有3个收入来源，每一个都比你的主业赚得多。\n\n你的公众号有5万粉丝，你的外包客户排队等你的档期，你的被动收入已经超过了很多人的主动收入。\n\n有人说你"不务正业"，你说："我只是把别人刷抖音的时间用在了创造价值上。"\n\n"斜杠不是三心二意——是在一个不确定的世界里，给自己建多个安全网。"', cond: g => g.flags.slashCareer && g.flags.fullSlash && g.money >= 150000 && g.charm >= 60 && g.age >= 28 },
+    { id:'career_pivot_end', badge:'🔄', title:'成功转型', desc:'你在中年成功完成了职业转型。\n\n你从技术岗转到了管理岗/咨询岗/培训岗。你的收入没有下降，但你不再需要每天加班到深夜。\n\n你终于明白：35岁之后的竞争力不是"能做多少活"——而是"能解决多大的问题"。\n\n你的前同事说："你是我们中转型最成功的一个。"\n\n你说："不是我厉害——是我比别人更早开始准备了。"\n\n"中年转型：不是推倒重来——是换一种方式继续前行。"', cond: g => g.flags.midlifeCareerCrisis && g.flags.managementTrack && g.money >= 150000 && g.age >= 38 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
