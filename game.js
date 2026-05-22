@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v7.7
+// 都市浮生记 - Game Engine v7.8
 // ============================================
 
 // === GAME STATE ===
@@ -3634,6 +3634,60 @@ const EVENTS = [
         { label:'转行做殡葬师', hint:'+💰 +😊 +🧠', fn: g => { g.flags.petFuneral=true; g.flags.careerChangePet=true; return{money:6000,mood:15,intel:10}; }},
         { label:'不再养宠物', hint:'+😊 -❤️', fn: g => { g.flags.petFuneral=true; g.flags.noMorePets=true; return{mood:8,social:-5}; }},
       ]},
+    // === v7.8 CRISIS EVENTS - 危机事件系统 ===
+    { id:'health_crisis_hospital', icon:'🚑', title:'健康危机：住院',
+      body:'你突然晕倒了，被送到医院。\n\n医生诊断：过度劳累、免疫力下降、营养不良。\n\n"你的身体在抗议——它已经撑不住了。"\n\n住院3天，花费8000元。\n\n你躺在病床上，看着天花板，开始反思：工作真的比健康重要吗？\n\n护士说："你是这个月第5个因为过劳住院的年轻人了。"\n\n"健康是1，其他都是0——但没有健康，0再多也没有意义。"',
+      cond: g => g.health <= 20 && g.health > 10 && !g.flags.healthCrisisHospital,
+      choices:[
+        { label:'请假休息一个月', hint:'-💰 +💪 +😊', fn: g => { g.flags.healthCrisisHospital=true; g.flags.healthWarning=true; return{money:-15000,health:25,mood:15}; }},
+        { label:'出院继续工作', hint:'+💰 -💪 -😊', fn: g => { g.flags.healthCrisisHospital=true; g.flags.ignoreHealthWarning=true; return{money:5000,health:-10,mood:-15}; }},
+        { label:'辞职养身体', hint:'-💰💰 +💪 +😊', fn: g => { g.flags.healthCrisisHospital=true; g.flags.quitForHealth=true; setJob(g,'待业中',0); return{money:-5000,health:30,mood:20}; }},
+      ]},
+    { id:'money_crisis_debt', icon:'💸', title:'金钱危机：催收电话',
+      body:'你的手机响了：未知号码。\n\n"您好，这里是XX贷款公司，您已逾期3个月，请问什么时候还款？"\n\n你看了看银行卡余额：-85000元。\n\n你借了网贷、信用卡、朋友钱，现在催收电话一天打20个。\n\n"贫穷不是罪，但贫穷会让你觉得自己有罪。"\n\n你开始理解：为什么有人说"钱不是万能的"——因为没钱的时候，你连说这句话的资格都没有。\n\n催收员说："如果今天不还款，我们会联系您的紧急联系人。"\n\n你的通讯录里，还有谁愿意接你的电话？',
+      cond: g => g.money <= -50000 && !g.flags.debtCrisis,
+      choices:[
+        { label:'找父母借钱', hint:'+💰 -👥 +😊', fn: g => { g.flags.debtCrisis=true; g.flags.borrowFromParents=true; if(G.relationships) G.relationships.family = clamp((G.relationships.family||60)-20,0,100); return{money:80000,mood:-10,social:-5}; }},
+        { label:'打三份工还债', hint:'+💰 -💪 -😊', fn: g => { g.flags.debtCrisis=true; g.flags.workToPayDebt=true; return{money:30000,health:-15,mood:-20}; }},
+        { label:'申请个人破产', hint:'+😊 -💰 -👥', fn: g => { g.flags.debtCrisis=true; g.flags.bankruptcy=true; return{money:50000,mood:10,social:-15,charm:-10}; }},
+        { label:'逃避，换手机号', hint:'+😊 -👥 -💰', fn: g => { g.flags.debtCrisis=true; g.flags.evade=true; return{mood:-5,social:-20,money:-10000}; }},
+      ]},
+    { id:'mood_crisis_breakdown', icon:'😭', title:'情绪危机：崩溃',
+      body:'你在公司厕所里哭了。\n\n不是因为某件事，而是所有事的叠加：工作压力、房租上涨、父母催婚、朋友疏远、身体疲惫。\n\n你蹲在地上，眼泪止不住地流。\n\n"你不是不够坚强，而是坚强太久了。"\n\n同事敲门："你没事吧？"\n\n你擦了擦眼泪，说："没事，马上出来。"\n\n但你知道：你已经有事了。而且不是一天两天了。\n\n"成年人的崩溃，往往就在一瞬间——但那根稻草，已经压了很久。"\n\n你需要帮助。不是鸡汤，不是"加油"，而是真正的、专业的帮助。',
+      cond: g => g.mood <= 20 && g.mood > 10 && !g.flags.emotionalBreakdown,
+      choices:[
+        { label:'预约心理咨询师', hint:'-💰 +😊 +🧠', fn: g => { g.flags.emotionalBreakdown=true; g.flags.seekTherapy=true; return{money:-800,mood:20,intel:5}; }},
+        { label:'请假旅行散心', hint:'-💰 +😊 +💪', fn: g => { g.flags.emotionalBreakdown=true; g.flags.mentalHealthBreak=true; return{money:-5000,mood:25,health:10}; }},
+        { label:'硬撑，告诉自己没事', hint:'+💰 -😊 -💪', fn: g => { g.flags.emotionalBreakdown=true; g.flags.suppressEmotions=true; return{money:3000,mood:-10,health:-8}; }},
+        { label:'打电话给家人/朋友', hint:'+😊 +👥', fn: g => { g.flags.emotionalBreakdown=true; g.flags.reachOut=true; if(G.relationships) { G.relationships.family = clamp((G.relationships.family||60)+10,0,100); G.relationships.friends = clamp((G.relationships.friends||40)+10,0,100); } return{mood:15,social:10}; }},
+      ]},
+    { id:'relationship_crisis_breakup', icon:'💔', title:'感情危机：分手',
+      body:'你和恋人吵架了。\n\n不是第一次，也不是最后一次。但这次，你们都说出了那句不想说的话。\n\n"我们分手吧。"\n\n你收拾东西，搬出了那个一起住了2年的房子。\n\n"爱情不是生活的全部——但没有爱情的时候，生活好像缺了一块。"\n\n你看着空荡荡的房间，想起你们刚在一起时的样子。\n\n那时候你说："我们会一直在一起。"\n\n现在你明白：永远太长了，能走过一段，已经是幸运。\n\n"分手不是失败，是两个人都不再适合彼此的未来。"\n\n你的朋友圈：有人安慰，有人看热闹，有人沉默。\n\n但你知道：真正的痛，是夜深人静时，习惯性地想给某人发消息，却发现那个号码已经不在通讯录里了。',
+      cond: g => g.flags.hasPartner && g.relationships && g.relationships.partner <= 25 && !g.flags.breakupCrisis,
+      choices:[
+        { label:'挽回，好好沟通', hint:'+😊 +👥 -💰', fn: g => { g.flags.breakupCrisis=true; g.flags.tryToReconcile=true; if(G.relationships) G.relationships.partner = clamp((G.relationships.partner||0)+15,0,100); return{mood:10,social:5,money:-2000}; }},
+        { label:'接受分手，向前看', hint:'+😊 -👥 +🧠', fn: g => { g.flags.breakupCrisis=true; g.flags.hasPartner=false; g.flags.partnerName=''; if(G.relationships) G.relationships.partner = 0; return{mood:-15,intel:10}; }},
+        { label:'借酒消愁', hint:'+😊 -💪 -💰', fn: g => { g.flags.breakupCrisis=true; g.flags.drinkToForget=true; if(G.relationships) G.relationships.partner = 0; g.flags.hasPartner=false; return{mood:5,health:-10,money:-3000}; }},
+        { label:'疯狂工作麻痹自己', hint:'+💰 -😊 -💪', fn: g => { g.flags.breakupCrisis=true; g.flags.workaholicAfterBreakup=true; if(G.relationships) G.relationships.partner = 0; g.flags.hasPartner=false; return{money:15000,mood:-20,health:-10}; }},
+      ]},
+    { id:'social_crisis_isolation', icon:'🏝️', title:'社交危机：孤立',
+      body:'你发现：你已经一个月没有和朋友见面了。\n\n手机里的微信消息，90%是工作群和广告。\n\n你发了条朋友圈，2小时过去，只有3个赞——其中一个是妈妈的。\n\n"你不是没有朋友，而是朋友们都在忙自己的生活。"\n\n你开始理解：成年人的友谊，不是疏远，而是各自忙碌。\n\n但你也在想：如果有一天你需要帮助，谁会第一个出现？\n\n"孤独不是身边没有人，而是心里没有人懂。"\n\n你打开通讯录，翻了翻，发现能打电话的人，一只手数得过来。\n\n你开始明白：社交不是数量，而是质量。\n\n"在这个连接过度的时代，真正的连接，反而成了奢侈品。"',
+      cond: g => g.social <= 20 && !g.flags.socialIsolationCrisis,
+      choices:[
+        { label:'主动联系老朋友', hint:'+👥 +😊 -💰', fn: g => { g.flags.socialIsolationCrisis=true; g.flags.reconnectFriends=true; G.relationships.friends = clamp((G.relationships.friends||40)+20,0,100); return{social:15,mood:15,money:-1000}; }},
+        { label:'加入兴趣社群', hint:'+👥 +✨ -💰', fn: g => { g.flags.socialIsolationCrisis=true; g.flags.joinCommunity=true; return{social:20,charm:10,money:-500}; }},
+        { label:'享受独处', hint:'+😊 +🧠 -👥', fn: g => { g.flags.socialIsolationCrisis=true; g.flags.embraceSolitude=true; return{mood:10,intel:10,social:-5}; }},
+        { label:'养宠物陪伴', hint:'-💰 +😊 +❤️', fn: g => { g.flags.socialIsolationCrisis=true; g.flags.hasPet=true; return{money:-3000,mood:18,health:5}; }},
+      ]},
+    { id:'family_crisis_conflict', icon:'👨‍👩‍👧', title:'家庭危机：父母施压',
+      body:'妈妈打来电话："你什么时候结婚？隔壁小王的孩子都会打酱油了。"\n\n你说："妈，我现在还不想结婚。"\n\n妈妈说："你都28了，再不结婚就晚了。你爸说你太自私了。"\n\n你沉默了。\n\n"父母的期望，是爱，也是压力。"\n\n你想起小时候，他们希望你考100分；现在，他们希望你结婚生子。\n\n你永远无法满足他们的期待——因为他们的期待，是他们未完成的人生。\n\n"孝顺不是听话，而是在爱自己的同时，也爱他们。"\n\n你挂了电话，看着窗外的城市。\n\n这座城市里有你的梦想，但也有他们的失望。\n\n"我们这一代人的困境：既不想活成父母的样子，又不想让他们失望。"',
+      cond: g => g.age >= 26 && g.age <= 35 && g.relationships && g.relationships.family <= 40 && !g.flags.familyPressureCrisis,
+      choices:[
+        { label:'回家一趟，好好沟通', hint:'+👥 +😊 -💰', fn: g => { g.flags.familyPressureCrisis=true; g.flags.familyTalk=true; G.relationships.family = clamp((G.relationships.family||60)+20,0,100); return{social:10,mood:15,money:-2000}; }},
+        { label:'妥协，开始相亲', hint:'+👥 -😊 -✨', fn: g => { g.flags.familyPressureCrisis=true; g.flags.startMatchmaking=true; G.relationships.family = clamp((G.relationships.family||60)+15,0,100); return{social:5,mood:-10,charm:-5}; }},
+        { label:'坚持自己，暂时疏远', hint:'+✨ -👥 +🧠', fn: g => { g.flags.familyPressureCrisis=true; g.flags.distanceFromFamily=true; G.relationships.family = clamp((G.relationships.family||60)-15,0,100); return{charm:5,social:-10,intel:5}; }},
+        { label:'写长信解释', hint:'+🧠 +👥 +😊', fn: g => { g.flags.familyPressureCrisis=true; g.flags.writeLetter=true; G.relationships.family = clamp((G.relationships.family||60)+10,0,100); return{intel:8,social:5,mood:10}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3970,6 +4024,13 @@ const ACHIEVEMENTS = [
     { id:'cyber_wellness_user', icon:'🤖', name:'赛博养生达人', desc:'尝试AI中医养生', check: g => g.flags.cyberWellness },
     { id:'medical_companion', icon:'🏥', name:'陪诊师', desc:'成为陪诊师或请陪诊师', check: g => g.flags.medicalCompanion },
     { id:'pet_funeral', icon:'🐾', name:'宠物告别师', desc:'体验宠物殡葬服务', check: g => g.flags.petFuneral },
+    // v7.8 crisis achievements
+    { id:'health_crisis_survivor', icon:'🚑', name:'健康危机幸存者', desc:'经历健康危机并恢复', check: g => g.flags.healthCrisisHospital && g.health > 50 },
+    { id:'debt_fighter', icon:'💪', name:'还债勇士', desc:'经历债务危机并努力还债', check: g => g.flags.workToPayDebt && g.money > 0 },
+    { id:'therapy_seeker', icon:'💭', name:'心理咨询求助者', desc:'情绪崩溃后寻求专业帮助', check: g => g.flags.seekTherapy },
+    { id:'reconciliation_master', icon:'💑', name:'感情修复大师', desc:'经历分手危机并成功挽回', check: g => g.flags.tryToReconcile && g.relationships && g.relationships.partner > 50 },
+    { id:'social_rebuilder', icon:'🤝', name:'社交重建者', desc:'从孤立危机中重建社交圈', check: g => g.flags.reconnectFriends && g.social > 50 },
+    { id:'family_healer', icon:'❤️', name:'家庭关系修复者', desc:'化解家庭危机', check: g => g.flags.familyTalk && g.relationships && g.relationships.family > 60 },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -4293,6 +4354,40 @@ function advanceMonth() {
         }
     }
 
+    // v7.8: 状态联动效果 - 低属性互相影响
+    // 健康过低影响心情和工作效率
+    if (G.health <= 30) {
+        G.mood = clamp(G.mood - 2, 0, 100);
+        G.social = clamp(G.social - 1, 0, 100); // 身体不好不想社交
+        if (Math.random() > 0.7) { // 30%概率生病请假扣钱
+            G.money -= 500;
+            addEventCard({ icon: '🤒', title: '身体不适', body: '你这个月身体不太舒服，请了几天病假。', type: 'negative' });
+        }
+    }
+
+    // 金钱过低影响心情和社交
+    if (G.money <= -30000) {
+        G.mood = clamp(G.mood - 3, 0, 100);
+        G.social = clamp(G.social - 1, 0, 100); // 没钱不想出门
+        if (G.relationships) {
+            G.relationships.friends = clamp((G.relationships.friends||40) - 1, 0, 100); // 没钱社交减少
+        }
+    }
+
+    // 心情过低影响健康和社交
+    if (G.mood <= 30) {
+        G.health = clamp(G.health - 2, 0, 100); // 情绪低落影响身体
+        G.social = clamp(G.social - 1, 0, 100); // 不想见人
+        if (G.relationships && Math.random() > 0.8) {
+            G.relationships.partner = clamp((G.relationships.partner||0) - 3, 0, 100); // 情绪低落影响感情
+        }
+    }
+
+    // 社交过低影响心情
+    if (G.social <= 30) {
+        G.mood = clamp(G.mood - 2, 0, 100);
+    }
+
     // 过劳追踪
     if (G.job !== '待业中' && G.jobSalary > 10000) {
         G.consecutiveOvertime = (G.consecutiveOvertime || 0) + 1;
@@ -4485,9 +4580,60 @@ function updateHUD() {
     // v2.20: 更新每日挑战显示
     updateDailyChallengeHUD();
 
+    // v7.8: 更新危机警告
+    updateCrisisWarnings();
+
     document.getElementById('play-months').textContent = G.months;
     document.getElementById('total-choices').textContent = G.choices;
     document.getElementById('total-events').textContent = G.eventsSeen;
+}
+
+// v7.8: 危机检测和警告系统
+function updateCrisisWarnings() {
+    const crises = detectCrises();
+    const warningContainer = document.getElementById('crisis-warnings');
+
+    if (!warningContainer) {
+        // 如果容器不存在，创建一个
+        const hud = document.getElementById('game-hud');
+        if (hud) {
+            const div = document.createElement('div');
+            div.id = 'crisis-warnings';
+            div.style.cssText = 'margin-top:10px; padding:8px; border-radius:6px; font-size:13px;';
+            hud.appendChild(div);
+        }
+        return;
+    }
+
+    if (crises.length === 0) {
+        warningContainer.style.display = 'none';
+        return;
+    }
+
+    warningContainer.style.display = 'block';
+    warningContainer.style.background = '#fee';
+    warningContainer.style.border = '2px solid #f66';
+    warningContainer.style.color = '#c33';
+
+    const crisisText = crises.map(c => c.icon + ' ' + c.name).join(' | ');
+    warningContainer.innerHTML = `<strong>⚠️ 危机警告：</strong>${crisisText}<br><small>状态过低将触发危机事件，请及时调整！</small>`;
+}
+
+function detectCrises() {
+    const crises = [];
+
+    if (G.health <= 20) crises.push({ type: 'health', name: '健康危机', icon: '💔' });
+    if (G.money <= -50000) crises.push({ type: 'money', name: '债务危机', icon: '💸' });
+    if (G.mood <= 20) crises.push({ type: 'mood', name: '情绪危机', icon: '😭' });
+    if (G.social <= 20) crises.push({ type: 'social', name: '孤立危机', icon: '🏝️' });
+
+    if (G.relationships) {
+        if (G.relationships.family <= 30) crises.push({ type: 'family', name: '家庭危机', icon: '👨‍👩‍👧' });
+        if (G.relationships.friends <= 20) crises.push({ type: 'friends', name: '友谊危机', icon: '👥' });
+        if (G.flags.hasPartner && G.relationships.partner <= 25) crises.push({ type: 'partner', name: '感情危机', icon: '💔' });
+    }
+
+    return crises;
 }
 
 // v2.20: 每日挑战HUD更新
