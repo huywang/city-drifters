@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v11.1
+// 都市浮生记 - Game Engine v11.2
 // ============================================
 
 // === GAME STATE ===
@@ -5282,6 +5282,79 @@ const EVENTS = [
         { label:'计划下次见面', hint:'+👥 +😊', fn: g => { if(g.relationships) g.relationships.family=clamp((g.relationships.family||60)+10,0,100); return{mood:15,social:5}; }},
         { label:'珍惜此刻', hint:'+😊', fn: g => { return{mood:10}; }},
       ]},
+    // === v11.2 节日/经济/城市特色 ===
+    { id:'double_eleven', icon:'🛒', title:'双11狂欢',
+      body:'双11到了。你的购物车里堆了50件商品，总价8000块。\n\n你算了一下：各种满减、红包、叠加优惠之后，实际支付6500。你觉得自己赚了1500。\n\n但你的银行卡余额告诉你：你亏了6500。\n\n"双11是一场集体催眠——你以为你在省钱，其实你在花钱。"',
+      cond: g => g.months % 12 >= 9 && g.money > 2000,
+      choices:[
+        { label:'全部下单', hint:'-💰 +😊', fn: g => { return{money:-6500,mood:15}; }},
+        { label:'只买必需品', hint:'-💰 +🧠', fn: g => { return{money:-1500,intel:3,mood:5}; }},
+        { label:'什么都不买', hint:'+🧠', fn: g => { return{intel:5,mood:-3}; }},
+      ]},
+    { id:'national_day', icon:'🇨🇳', title:'国庆长假',
+      body:'国庆7天长假。你有三个选择：\n\n1. 回家看父母（火车票抢不到）\n2. 出去旅游（人从众）\n3. 宅在家里（外卖小哥也放假了）\n\n你选了第三个，结果在朋友圈看完了全世界的风景。\n\n"国庆假期的意义：让你知道别人过得比你好。"',
+      cond: g => g.months % 12 >= 8 && g.months % 12 <= 10,
+      choices:[
+        { label:'回家', hint:'-💰 +👥', fn: g => { if(g.relationships) g.relationships.family=clamp((g.relationships.family||60)+10,0,100); return{money:-2000,mood:10,social:5}; }},
+        { label:'旅游', hint:'-💰 +😊', fn: g => { return{money:-5000,mood:15,charm:3}; }},
+        { label:'宅家', hint:'+😊', fn: g => { return{mood:8,health:3}; }},
+      ]},
+    { id:'stock_crash', icon:'📉', title:'股市崩盘',
+      body:'你的股票账户一片绿油油。\n\n大盘跌了5%，你的股票跌了15%。你亏了3个月工资。\n\n你想起了那句名言："股市是财富转移的工具——从没耐心的人转移到有耐心的人。"\n\n问题是：你已经没有耐心了。\n\n"投资有风险，入市需谨慎。但没人告诉你：不投资也有风险——通胀会吃掉你的存款。"',
+      cond: g => g.investments && g.investments.stock > 5000,
+      choices:[
+        { label:'割肉卖出', hint:'-💰', fn: g => { const loss = Math.floor(g.investments.stock * 0.4); g.investments.stock = 0; return{money:loss,mood:-15}; }},
+        { label:'死扛', hint:'🎲', fn: g => { return{mood:-10}; }},
+        { label:'抄底加仓', hint:'-💰 🎲', fn: g => { g.investments.stock += 5000; return{money:-5000,mood:-5}; }},
+      ]},
+    { id:'inflation', icon:'💹', title:'通货膨胀',
+      body:'你去便利店买瓶水，发现涨了1块。你去食堂吃饭，发现涨了2块。你打开外卖App，发现满减门槛提高了。\n\n所有东西都在涨价，除了你的工资。\n\n你在网上搜索"如何应对通胀"，看到了一个回答："少花钱，多赚钱，或者移民。"\n\n"通胀是隐形的税收——你什么都没做错，但你的钱变少了。"',
+      cond: g => g.months > 36 && g.money > 0,
+      choices:[
+        { label:'开始记账', hint:'+🧠', fn: g => { return{intel:5,mood:3}; }},
+        { label:'投资对冲', hint:'-💰 🎲', fn: g => { return{money:-3000,intel:3}; }},
+        { label:'该花花该省省', hint:'+😊', fn: g => { return{mood:5}; }},
+      ]},
+    { id:'mid_autumn', icon:'🥮', title:'中秋节',
+      body:'中秋节到了。你收到了一盒月饼——是公司发的，五仁馅的。\n\n你拍了张照片发给妈妈，妈妈说："五仁的好吃，实在。"\n\n你吃了一口，觉得没有妈妈做的好吃。但妈妈已经好几年没做月饼了。\n\n"月饼的味道变了，还是你变了？都不是——是你离家的距离变了。"',
+      cond: g => g.months % 12 >= 7 && g.months % 12 <= 9,
+      choices:[
+        { label:'给家里寄月饼', hint:'-💰 +👥', fn: g => { if(g.relationships) g.relationships.family=clamp((g.relationships.family||60)+8,0,100); return{money:-200,mood:5,social:3}; }},
+        { label:'视频赏月', hint:'+👥 +😊', fn: g => { if(g.relationships) g.relationships.family=clamp((g.relationships.family||60)+5,0,100); return{mood:8}; }},
+        { label:'一个人吃月饼', hint:'+😊', fn: g => { return{mood:-3}; }},
+      ]},
+    { id:'valentines_day', icon:'💝', title:'情人节',
+      body:'2月14日。朋友圈全是秀恩爱的：玫瑰花、烛光晚餐、钻戒……\n\n你一个人吃着泡面，看着别人的幸福。你安慰自己："单身狗不用花钱买礼物。"\n\n但你的购物车里，有一件你偷偷看了很久的情侣款T恤。\n\n"情人节不是爱情的节日，是消费的节日。但它提醒你：你也渴望被爱。"',
+      cond: g => !g.flags.married && g.age >= 20 && g.age <= 35 && g.months > 6,
+      choices:[
+        { label:'给自己买礼物', hint:'-💰 +😊', fn: g => { return{money:-500,mood:8}; }},
+        { label:'约朋友出去', hint:'+👥', fn: g => { return{social:5,mood:5}; }},
+        { label:'关机睡觉', hint:'+💪', fn: g => { return{health:3,mood:-5}; }},
+      ]},
+    { id:'housing_bubble', icon:'🏘️', title:'房价波动',
+      body:'你看新闻说：你所在的城市房价又涨了/跌了。\n\n如果你有房，你的身家涨了几十万——虽然你不能卖掉自己住的房子。\n\n如果你没房，你离买房又远了十万——虽然你本来也买不起。\n\n"房价是中国人最大的焦虑来源之一——买不起的焦虑，买了怕跌的焦虑。"',
+      cond: g => g.age >= 25 && g.months > 24,
+      choices:[
+        { label:'关注房市', hint:'+🧠', fn: g => { return{intel:3,mood:-3}; }},
+        { label:'不看新闻', hint:'+😊', fn: g => { return{mood:5}; }},
+        { label:'考虑回老家买房', hint:'+🧠 -💰', fn: g => { g.flags.considerHometownHouse=true; return{intel:3,mood:3}; }},
+      ]},
+    { id:'new_year_resolution', icon:'🎯', title:'新年计划',
+      body:'1月1日，你写了今年的计划：\n\n1. 存钱5万\n2. 减肥10斤\n3. 学会一项新技能\n4. 找到一个对象\n\n你翻了翻去年的计划——一模一样。你完成了0个。\n\n"新年计划的意义：让你有一个新的理由对自己充满希望——即使这个希望和去年一样。"',
+      cond: g => g.months % 12 === 0 && g.months > 0,
+      choices:[
+        { label:'认真执行', hint:'+🧠 +💪', fn: g => { g.flags.newYearResolution=true; return{intel:3,health:3,mood:5}; }},
+        { label:'降低目标', hint:'+😊', fn: g => { return{mood:8}; }},
+        { label:'不写了', hint:'+🧠', fn: g => { return{intel:2}; }},
+      ]},
+    { id:'street_festival', icon:'🏮', title:'庙会/夜市',
+      body:'周末你去逛了庙会/夜市。\n\n你吃了糖葫芦、臭豆腐、烤冷面、章鱼小丸子。你花了200块，吃了8种小吃。\n\n你还套了圈、打了气球、买了个气球（对，就是气球）。\n\n"夜市是大城市的游乐场——花最少的钱，做最快乐的事。"',
+      cond: g => g.months > 3 && g.money > 300,
+      choices:[
+        { label:'吃遍全场', hint:'-💰 +😊', fn: g => { return{money:-200,mood:15,health:-3}; }},
+        { label:'只逛逛不吃', hint:'+😊', fn: g => { return{mood:5}; }},
+        { label:'拍照发朋友圈', hint:'+✨', fn: g => { return{charm:5,mood:8}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'first_job', icon:'💼', name:'职场新人', desc:'找到第一份工作', check: g => g.flags.gotFirstJob },
@@ -5736,6 +5809,10 @@ const ACHIEVEMENTS = [
     { id:'dual_identity_ach', icon:'🎭', name:'双面人生', desc:'同时拥有主业和成功的副业', check: g => g.flags.hasSideHustle && (g.flags.webNovelist || g.flags.triedLivestream || g.flags.influencer) && g.money >= 50000 },
     { id:'quiet_victory_ach', icon:'🕊️', name:'无声的胜利', desc:'实现了工作与生活的平衡', check: g => g.flags.workLifeBalance && g.health >= 65 && g.mood >= 65 },
     { id:'gen_bridge_ach', icon:'🌉', name:'代际桥梁', desc:'连接了三代人的感情', check: g => g.flags.hasChild && g.relationships && g.relationships.family >= 75 },
+    // === v11.2 新增成就 ===
+    { id:'resolution_keeper', icon:'🎯', name:'新年践行者', desc:'认真执行了新年计划', check: g => g.flags.newYearResolution },
+    { id:'stock_survivor', icon:'📉', name:'股市幸存者', desc:'经历了股市崩盘', check: g => g.investments && g.investments.stock >= 0 },
+    { id:'frugal_master', icon:'💹', name:'节俭大师', desc:'在通胀中保持理性', check: g => g.money >= 10000 && g.months > 48 && g.intel >= 50 },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -5876,6 +5953,8 @@ const ENDINGS = [
     // --- v11.1 NEW ENDINGS (HIDDEN) ---
     { id:'perfect_life_end', badge:'🌟', title:'人生赢家', desc:'你做到了。\n\n有房、有车、有家庭、有事业。你从一个月薪3000的打工仔，变成了一个拥有完整人生的成年人。\n\n你的孩子叫你爸爸/妈妈的时候，你想起自己刚来这座城市时的样子——那个什么都没有却什么都不怕的年轻人。\n\n"人生赢家不是拥有一切，是珍惜拥有的一切。"', cond: g => g.flags.hasHouse && g.flags.married && g.flags.hasChild && g.money >= 200000 && g.mood >= 65 && g.age >= 36 },
     { id:'free_soul_end', badge:'🦅', title:'自由灵魂', desc:'你选择了大多数人不敢选择的路。\n\n没有房贷、没有婚姻的枷锁、没有固定的工作。你有的是：一只猫、几个好朋友、一颗自由的心。\n\n你在朋友圈写道："我不是什么都没有，我拥有自由。"\n\n有人说你勇敢，有人说你疯了。但你知道：真正的自由，是不在乎别人的评价。\n\n"自由不是逃避，是另一种活法。"', cond: g => !g.flags.married && !g.flags.hasHouse && g.flags.hasPet && g.mood >= 70 && g.charm >= 55 && g.age >= 32 },
+    // --- v11.2 NEW ENDINGS ---
+    { id:'festival_lover_end', badge:'🏮', title:'生活家', desc:'你把每一个平凡的日子都过成了节日。\n\n春节你会包饺子、贴春联。中秋你会赏月、吃月饼。国庆你会出去浪。双11你会买买买。\n\n你的朋友说："跟你在一起，每天都有意思。"\n\n"生活不在于有多少大事件，在于你能不能把小事过得有滋味。"', cond: g => g.mood >= 70 && g.charm >= 45 && g.age >= 28 && g.social >= 50 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
