@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v10.7
+// 都市浮生记 - Game Engine v10.8
 // ============================================
 
 // === GAME STATE ===
@@ -5121,6 +5121,87 @@ const EVENTS = [
         { label:'试一次', hint:'-💰 +😊', fn: g => { g.flags.sawTherapist=true; return{money:-300,mood:8}; }},
         { label:'觉得没用', hint:'', fn: g => { return{mood:-3}; }},
       ]},
+    // === v10.8 职场进阶/创业深度 ===
+    { id:'promotion_offer', icon:'📈', title:'升职加薪',
+      body:'领导找你谈话："公司决定提拔你当小组长，月薪涨30%。"\n\n你很激动，但随即想到：当了管理层，意味着更多的会议、更多的KPI、更多的加班。\n\n你还想到了一句老话："不想当将军的士兵不是好士兵。但当了将军的士兵，已经不是士兵了。"\n\n"升职不是终点，是另一种开始。"',
+      cond: g => g.jobSalary >= 8000 && g.months > 18 && !g.flags.promoted && g.intel >= 45,
+      choices:[
+        { label:'接受升职', hint:'+💰 +👥', fn: g => { g.flags.promoted=true; g.jobSalary=Math.floor(g.jobSalary*1.3); return{money:2000,mood:12,social:5}; }},
+        { label:'要求更高薪水', hint:'+💰 🎲', fn: g => { g.flags.promoted=true; g.jobSalary=Math.floor(g.jobSalary*1.5); return{money:3000,mood:15,social:3}; }},
+        { label:'只想做技术', hint:'+🧠', fn: g => { return{intel:5,mood:-3}; }},
+      ]},
+    { id:'headhunter_call', icon:'📞', title:'猎头来电',
+      body:'一个陌生号码打来了电话："您好，我是XX猎头公司的。我们这边有一个岗位很适合您……"\n\n对方开出了比你现在高50%的薪资。但公司在一个你从没听过的创业公司。\n\n你犹豫了：是留在稳定的大公司，还是跳到一个充满未知的新地方？\n\n"跳槽就像换牌——你不知道下一张是王炸还是废牌。"',
+      cond: g => g.jobSalary >= 10000 && g.months > 24 && g.intel >= 50,
+      choices:[
+        { label:'接受offer', hint:'+💰 🎲', fn: g => { g.flags.jobHopped=true; g.jobSalary=Math.floor(g.jobSalary*1.5); return{money:5000,mood:10,social:-3}; }},
+        { label:'拒绝', hint:'+😊', fn: g => { return{mood:3}; }},
+        { label:'谈谈条件', hint:'+💰 +🧠', fn: g => { g.flags.jobHopped=true; g.jobSalary=Math.floor(g.jobSalary*1.8); return{money:8000,intel:3,mood:12}; }},
+      ]},
+    { id:'layoff_event', icon:'📦', title:'被裁了',
+      body:'HR找你谈话："公司业务调整，你的岗位被优化了。N+1赔偿，下周一走人。"\n\n你抱着一个纸箱走出办公楼。同事们假装不知道，但你知道他们的眼神里写着："下一个会不会是我？"\n\n你在公司楼下站了很久。三年的青春，浓缩在一个纸箱里。\n\n"被裁不是你的错，是时代的错。但时代不在乎。"',
+      cond: g => g.jobSalary >= 8000 && g.months > 24 && g.age >= 25 && !g.flags.wasLaidOff,
+      choices:[
+        { label:'拿赔偿走人', hint:'+💰', fn: g => { g.flags.wasLaidOff=true; const comp=g.jobSalary*2; g.money+=comp; return{mood:-15}; }},
+        { label:'仲裁维权', hint:'+💰 +🧠', fn: g => { g.flags.wasLaidOff=true; const comp=g.jobSalary*4; g.money+=comp; return{mood:-10,intel:5}; }},
+        { label:'趁机休息', hint:'+😊 +💪', fn: g => { g.flags.wasLaidOff=true; return{mood:5,health:5}; }},
+      ]},
+    { id:'startup_idea', icon:'💡', title:'创业想法',
+      body:'你在洗澡的时候突然有了一个绝妙的创业想法。\n\n你激动地打开电脑，写了一份商业计划书。你给三个朋友看了，两个说"不靠谱"，一个说"可以试试"。\n\n你查了查存款：够活一年。\n\n"创业是疯子做的事——但每个改变世界的人，曾经都被叫做疯子。"',
+      cond: g => g.intel >= 55 && g.money >= 30000 && g.age >= 25 && !g.flags.entrepreneur,
+      choices:[
+        { label:'辞职创业', hint:'🎲 -💰', fn: g => { g.flags.entrepreneur=true; g.flags.startupPhase='early'; return{money:-20000,mood:15,intel:5}; }},
+        { label:'先做MVP', hint:'+🧠 +💰', fn: g => { g.flags.entrepreneur=true; g.flags.startupPhase='side'; return{money:-5000,intel:8,mood:8}; }},
+        { label:'放弃想法', hint:'+😊', fn: g => { return{mood:-5}; }},
+      ]},
+    { id:'startup_funding', icon:'💰', title:'融资路演',
+      body:'你的创业项目需要融资。你准备了一份PPT，开始见投资人。\n\n第一个投资人说："你的赛道不错，但团队太弱。"\n第二个说："你的团队不错，但市场太小。"\n第三个说："都很好，但我们只投985和常春藤。"\n\n你开始怀疑人生。\n\n"融资就像相亲——你永远不知道自己缺什么，直到被拒绝。"',
+      cond: g => g.flags.entrepreneur && g.flags.startupPhase==='early' && g.months > 6,
+      choices:[
+        { label:'继续找', hint:'+🧠 +👥', fn: g => { g.flags.startupPhase='funded'; return{intel:5,social:8,mood:5}; }},
+        { label:'用积蓄硬撑', hint:'-💰', fn: g => { return{money:-15000,mood:-5}; }},
+        { label:'放弃融资', hint:'+😊', fn: g => { g.flags.startupPhase='bootstrapped'; return{mood:5,intel:3}; }},
+      ]},
+    { id:'workplace_burnout', icon:'😵', title:'职场倦怠',
+      body:'你已经连续加班两个月了。每天早上闹钟响的时候，你都想辞职。\n\n你的工作效率越来越低，开会的时候经常走神。你开始怀疑：这份工作到底值不值得？\n\n你在网上搜索"职业倦怠怎么办"，看到了一个回答："不是你倦怠了，是你太久没有被好好对待了。"\n\n"倦怠不是你的错——但只有你能决定要不要改变。"',
+      cond: g => g.jobSalary >= 8000 && g.mood < 45 && g.months > 24,
+      choices:[
+        { label:'请年假休息', hint:'+😊 +💪', fn: g => { return{mood:12,health:5}; }},
+        { label:'和领导谈谈', hint:'+👥', fn: g => { return{social:5,mood:5}; }},
+        { label:'裸辞', hint:'+😊 🎲', fn: g => { g.flags.bareResigned=true; return{mood:15,health:8}; }},
+      ]},
+    { id:'mentor_event', icon:'🎯', title:'职场导师',
+      body:'公司给你配了一个mentor——一个在公司十年的老员工。\n\nTA教了你很多"书上不写的东西"：怎么向上管理、怎么跨部门沟通、怎么在会议上发言。\n\nTA说："在这个公司，能力决定你的下限，关系决定你的上限。"\n\n你觉得这是你听过的最现实的职场忠告。\n\n"导师不是教你怎么成功，是教你怎么少踩坑。"',
+      cond: g => g.jobSalary >= 6000 && g.months > 12 && !g.flags.hasMentor,
+      choices:[
+        { label:'认真学习', hint:'+🧠 +👥', fn: g => { g.flags.hasMentor=true; return{intel:8,social:8,mood:5}; }},
+        { label:'保持距离', hint:'+🧠', fn: g => { g.flags.hasMentor=true; return{intel:5}; }},
+        { label:'觉得是画大饼', hint:'', fn: g => { return{mood:-3}; }},
+      ]},
+    { id:'office_politics', icon:'🏢', title:'办公室政治',
+      body:'你发现你的同事在背后说你坏话。TA在领导面前把你的功劳据为己有。\n\n你很愤怒，但不知道该怎么做。是正面刚，还是忍气吞声？\n\n你想起了那句话："办公室政治就像空气——你不想呼吸它，但你不能不呼吸。"\n\n"职场最大的敌人不是工作，是人心。"',
+      cond: g => g.months > 18 && g.social >= 30,
+      choices:[
+        { label:'正面沟通', hint:'+👥 +🧠', fn: g => { return{social:5,intel:5,mood:-3}; }},
+        { label:'用实力说话', hint:'+🧠 +💪', fn: g => { return{intel:8,mood:5}; }},
+        { label:'找领导告状', hint:'+👥 🎲', fn: g => { return{social:-3,mood:-5}; }},
+      ]},
+    { id:'side_project_success', icon:'🎉', title:'副业成功',
+      body:'你的副业终于有了起色。\n\n月收入从0到1000，从1000到5000。你第一次觉得：也许我可以不用打工了。\n\n你在考虑要不要辞职全职做。你妈说："别做梦了，好好上班。"\n\n但你知道：每一个成功创业的人，都曾经被家人说"别做梦了"。\n\n"梦想不是别人给你画的，是你自己一笔一笔涂出来的。"',
+      cond: g => g.flags.hasSideHustle && g.money >= 50000 && g.intel >= 55,
+      choices:[
+        { label:'全职做副业', hint:'🎲 +💰', fn: g => { g.flags.fulltimeHustle=true; return{money:5000,mood:15}; }},
+        { label:'继续双线', hint:'+💰 +💪', fn: g => { return{money:3000,mood:8,health:-3}; }},
+        { label:'见好就收', hint:'+💰 +😊', fn: g => { return{money:2000,mood:5}; }},
+      ]},
+    { id:'work_life_balance', icon:'⚖️', title:'工作生活平衡',
+      body:'你做了一个时间统计：每天工作10小时，通勤2小时，睡觉7小时，留给自己只有5小时。\n\n你问自己：我到底是为了什么在活？\n\n你开始每天准时6点下班，拒绝了所有不必要的应酬。你的领导觉得你"不上进"，但你觉得你终于开始"活着"了。\n\n"工作生活平衡不是偷懒，是重新定义什么叫「成功」。"',
+      cond: g => g.months > 36 && g.mood < 55 && g.jobSalary >= 8000,
+      choices:[
+        { label:'坚持准时下班', hint:'+😊 +💪', fn: g => { g.flags.workLifeBalance=true; return{mood:15,health:5}; }},
+        { label:'只坚持一周', hint:'+😊', fn: g => { return{mood:8}; }},
+        { label:'还是加班吧', hint:'+💰', fn: g => { return{money:1000,mood:-8}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'first_job', icon:'💼', name:'职场新人', desc:'找到第一份工作', check: g => g.flags.gotFirstJob },
@@ -5561,6 +5642,14 @@ const ACHIEVEMENTS = [
     { id:'podcaster_ach', icon:'🎧', name:'播客主播', desc:'开了自己的播客', check: g => g.flags.podcaster },
     { id:'shopaholic_reformed', icon:'📦', name:'购物戒断', desc:'戒掉了购物瘾', check: g => g.flags.shoppingDetox },
     { id:'therapy_goer', icon:'🧠', name:'心理勇者', desc:'尝试了心理咨询', check: g => g.flags.sawTherapist },
+    // === v10.8 新增成就 ===
+    { id:'promoted_ach', icon:'📈', name:'升职加薪', desc:'获得了升职', check: g => g.flags.promoted },
+    { id:'job_hopper', icon:'📞', name:'跳槽达人', desc:'成功跳槽', check: g => g.flags.jobHopped },
+    { id:'layoff_survivor', icon:'📦', name:'裁员幸存者', desc:'经历了裁员', check: g => g.flags.wasLaidOff },
+    { id:'startup_founder', icon:'💡', name:'创业者', desc:'开始创业', check: g => g.flags.startupPhase },
+    { id:'mentor_found', icon:'🎯', name:'有师可学', desc:'找到了职场导师', check: g => g.flags.hasMentor },
+    { id:'wlb_master', icon:'⚖️', name:'生活大师', desc:'实现了工作生活平衡', check: g => g.flags.workLifeBalance },
+    { id:'fulltime_hustler', icon:'🎉', name:'全职追梦人', desc:'全职做副业', check: g => g.flags.fulltimeHustle },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -5694,6 +5783,10 @@ const ENDINGS = [
     { id:'digital_minimalist', badge:'📵', title:'数字极简主义者', desc:'你学会了放下手机。\n\n你关闭了朋友圈通知，卸载了三个购物App，把屏幕时间控制在每天2小时以内。\n\n你开始有更多的时间看书、运动、和朋友面对面聊天。\n\n"放下手机不是与世界断联，是与自己重新连接。"', cond: g => g.flags.digitalDetox && g.flags.closedMoments && g.mood >= 65 && g.health >= 55 },
     { id:'healed_heart', badge:'💚', title:'治愈之心', desc:'你经历了人生的低谷，但你走出来了。\n\n你看了心理咨询师，学会了和自己和解。你不再逃避情绪，而是面对它、理解它。\n\n你在日记里写道："我不需要完美，我只需要真实。"\n\n"治愈不是忘记伤痛，是学会带着伤痛继续前行。"', cond: g => g.flags.sawTherapist && g.mood >= 65 && g.age >= 26 },
     { id:'podcaster_end', badge:'🎧', title:'声音的旅人', desc:'你开了一档播客。\n\n从0个听众到100个，从100个到10000个。你在麦克风前聊生活、聊工作、聊那些没人敢说的真话。\n\n有听众说："你的节目陪我度过了最难的时候。"\n\n"声音是最温暖的媒介——你听不到我的表情，但你能听到我的心。"', cond: g => g.flags.podcaster && g.charm >= 50 && g.social >= 50 && g.months > 24 },
+    // --- v10.8 NEW ENDINGS ---
+    { id:'startup_success_end', badge:'🚀', title:'创业成功', desc:'你的创业项目活了。\n\n从一个人到十个人，从一个想法到一个产品。你经历了融资失败、合伙人跑路、产品被骂，但你挺过来了。\n\n你在公司年会上说："创业不是赌博，是把所有筹码都押在自己身上。"\n\n"创业者是疯子，但正是这些疯子，让这个世界变得更好。"', cond: g => g.flags.startupPhase && (g.flags.startupPhase==='funded'||g.flags.startupPhase==='bootstrapped') && g.money >= 100000 && g.age >= 30 },
+    { id:'wlb_end', badge:'⚖️', title:'工作生活平衡', desc:'你终于找到了工作和生活的平衡点。\n\n你不再996，不再把生命浪费在无意义的加班上。你有了时间运动、看书、陪家人。\n\n你的领导觉得你"不上进"，但你觉得自己终于开始"活着"了。\n\n"人生不是赛跑，不需要每时每刻都在冲刺。"', cond: g => g.flags.workLifeBalance && g.mood >= 70 && g.health >= 65 && g.age >= 28 },
+    { id:'layoff_comeback', badge:'📦', title:'裁员逆袭', desc:'你被裁了，但你没有被打败。\n\n你拿了赔偿，休息了三个月，然后找到了一份更好的工作。薪资涨了50%，还不加班。\n\n你发了一条朋友圈："感谢被裁，让我看清了什么是真正重要的。"\n\n"被裁不是失败，是被生活推了一把——推向了更好的方向。"', cond: g => g.flags.wasLaidOff && g.jobSalary >= 15000 && g.mood >= 60 && g.age >= 28 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
