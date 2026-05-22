@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v31.3
+// 都市浮生记 - Game Engine v31.4
 // ============================================
 
 // === GAME STATE ===
@@ -16952,6 +16952,87 @@ const EVENTS = [
         { label:'买了桌游在家组织局', hint:'+👥 -💰', fn: g => { g.flags.boardGameCafe=true; g.flags.homeGameHost=true; return{social:5,money:-300}; }},
         { label:'开始研究策略桌游', hint:'+🧠 +😊', fn: g => { g.flags.boardGameCafe=true; g.flags.strategyGamer=true; return{intel:5,mood:3}; }},
       ]},
+    // --- v31.4 生存困境与民生现实 ---
+    { id:'solo_doctor_visit', icon:'🏥', title:'一个人看病', category:'life',
+      body:'你发烧39度，浑身酸痛。你拿起手机翻了翻通讯录——没有人能陪你去医院。\n\n你一个人挂号、排队、抽血、等结果。护士问你：「家属呢？」你说：「我一个人来的。」\n\n你在输液室坐了两个多小时，旁边是一个妈妈带着孩子。孩子哭了，妈妈安慰他。\n\n你看着他们，突然有点想哭。但你忍住了——你已经是一个人了，不能连自己都安慰不了。',
+      cond: g => g.age >= 20 && g.age <= 40 && g.social < 45 && g.health < 55,
+      choices:[
+        { label:'学会一个人照顾好自己', hint:'+🧠 +💪', fn: g => { g.flags.soloDoctorVisit=true; g.flags.selfReliant=true; return{intel:5,health:3}; }},
+        { label:'叫了一个陪诊师', hint:'+💰 +😊', fn: g => { g.flags.soloDoctorVisit=true; g.flags.hiredEscort=true; return{mood:3,money:-300}; }},
+        { label:'给远方的父母打了个电话', hint:'+👥 +😊', fn: g => { g.flags.soloDoctorVisit=true; g.flags.calledParents=true; return{social:3,mood:3}; }},
+      ]},
+    { id:'medical_escort_v31_4', icon:'👩‍⚕️', title:'陪诊师', category:'career',
+      body:'你发现了一个新职业——陪诊师。\n\n陪人看病、帮人挂号、代人排队、帮忙取药。一天200-500块。\n\n你的客户有独居老人、有独自看病的年轻人、有不会用智能机的老人。\n\n一个80岁的奶奶拉着你的手说：「谢谢你啊，我儿子在国外，我每次看病都不知道怎么办。」\n\n你觉得这个工作虽然辛苦，但你在做一件有意义的事。',
+      cond: g => g.age >= 22 && g.age <= 40 && g.job === '待业中',
+      choices:[
+        { label:'全职做陪诊师', hint:'+💰 +👥', fn: g => { g.flags.medicalEscort=true; g.flags.fullTimeEscort=true; setJob(g,'陪诊师',5000); return{money:500,social:5}; }},
+        { label:'兼职做积累口碑', hint:'+💰 +✨', fn: g => { g.flags.medicalEscort=true; g.flags.partTimeEscort=true; return{money:300,charm:3}; }},
+        { label:'觉得没前途继续找工作', hint:'+🧠', fn: g => { g.flags.medicalEscort=true; g.flags.keepSearching=true; return{intel:2}; }},
+      ]},
+    { id:'overtime_culture_v31_4', icon:'🌙', title:'深夜加班', category:'workplace',
+      body:'晚上10点，你终于写完了今天的代码。你准备下班。\n\n你的leader走过来说：「这个需求明天要上线，你今晚能改完吗？」\n\n你看了看窗外的夜色，看了看桌上已经凉了的晚饭，看了看手机上女朋友发的10条未读消息。\n\n你说：「好。」\n\n凌晨2点，你终于改完了。你发了一条朋友圈：「又是美好的一天。」配了一张加班的照片。\n\n你的领导点了个赞。',
+      cond: g => g.job && g.job!=='待业中' && g.age >= 22 && g.age <= 38 && g.health < 60,
+      choices:[
+        { label:'开始记录加班时间准备仲裁', hint:'+🧠 +💰', fn: g => { g.flags.overtimeCulture=true; g.flags.recordOvertime=true; return{intel:5,money:200}; }},
+        { label:'学会合理拒绝', hint:'+😊 +🧠', fn: g => { g.flags.overtimeCulture=true; g.flags.learnRefuse=true; return{mood:8,intel:3}; }},
+        { label:'拼命干争取升职', hint:'+💰 -💪', fn: g => { g.flags.overtimeCulture=true; g.flags.hustleMode=true; return{money:2000,health:-8,mood:-3}; }},
+      ]},
+    { id:'urban_village_gone', icon:'🏚️', title:'城中村拆迁', category:'life',
+      body:'你住了3年的城中村要拆了。\n\n墙上喷着大大的「拆」字。你的房东通知你：一个月内搬走。\n\n你舍不得这里——房租只要800块，楼下就是菜市场，邻居们很热情，巷子里的煎饼果子5块钱一个。\n\n你搬到了郊区的一间合租房，房租1500。你的通勤时间从20分钟变成了1小时。\n\n你站在窗前看着远处的城中村——推土机正在推倒你住过的那栋楼。你的记忆也被推倒了。',
+      cond: g => g.age >= 20 && g.age <= 40 && g.money < 50000,
+      choices:[
+        { label:'找更便宜的地方继续省', hint:'+💰 -😊', fn: g => { g.flags.urbanVillageGone=true; g.flags.findCheaper=true; return{money:300,mood:-5}; }},
+        { label:'趁机和室友合租分担', hint:'+👥 +💰', fn: g => { g.flags.urbanVillageGone=true; g.flags.shareRent=true; return{social:3,money:200}; }},
+        { label:'反思是否该离开这座城市', hint:'+🧠', fn: g => { g.flags.urbanVillageGone=true; g.flags.questionCity=true; return{intel:5}; }},
+      ]},
+    { id:'return_youth_v31_4', icon:'🌾', title:'返乡青年', category:'life',
+      body:'你决定回老家了。\n\n你的父母很高兴：「终于回来了！」你的亲戚很热情：「在外面混不下去了吧？」\n\n你发现——老家变了，也没变。变的是一切都涨价了，没变的是人们的想法。\n\n你投了20份简历，只有3个面试机会，工资最高的是3500。\n\n你在考虑：是接受低薪安稳的生活，还是再回大城市拼一把？\n\n你的大学同学说：「回来也好，我们一起考公务员。」',
+      cond: g => g.age >= 25 && g.age <= 35 && g.mood < 50 && g.money < 30000,
+      choices:[
+        { label:'接受现实在小城扎根', hint:'+😊 +👥', fn: g => { g.flags.returnYouth=true; g.flags.settleSmallTown=true; setJob(g,'普通职员',3500); return{mood:5,social:5}; }},
+        { label:'考公务员求稳定', hint:'+🧠 +💰', fn: g => { g.flags.returnYouth=true; g.flags.civilExamPath=true; return{intel:5,money:300}; }},
+        { label:'休整后再回大城市', hint:'+💪 +💰', fn: g => { g.flags.returnYouth=true; g.flags.returnToCity=true; return{health:5,mood:3,money:-1000}; }},
+      ]},
+    { id:'labor_rights_v31_4', icon:'⚖️', title:'劳动仲裁', category:'workplace',
+      body:'你的公司不给你交社保、不给加班费、还变相裁员。\n\n你查了劳动法，发现——你的公司违法了至少5条。\n\n你决定申请劳动仲裁。你的同事说：「你疯了？以后哪个公司敢要你？」\n\n你的父母说：「忍忍算了，别惹事。」\n\n你去了劳动局，填了表，交了材料。工作人员说：「等通知吧，大概3个月。」\n\n你走出劳动局，阳光很好。你觉得——至少你做了该做的事。',
+      cond: g => g.job && g.job!=='待业中' && g.age >= 22 && g.age <= 45,
+      choices:[
+        { label:'坚持到底拿到赔偿', hint:'+💰 +🧠', fn: g => { g.flags.laborRights=true; g.flags.wonArbitration=true; return{money:5000,intel:5}; }},
+        { label:'和公司和解算了', hint:'+💰 -😊', fn: g => { g.flags.laborRights=true; g.flags.settledArbitration=true; return{money:2000,mood:-3}; }},
+        { label:'把经历发到网上帮更多人', hint:'+👥 +✨', fn: g => { g.flags.laborRights=true; g.flags.rightsAdvocate=true; return{social:5,charm:5}; }},
+      ]},
+    { id:'retirement_scam_v31_4', icon:'👴', title:'父母的理财骗局', category:'family',
+      body:'你妈给你打电话：「儿子/女儿，我买的理财产品爆雷了，10万块全没了。」\n\n你赶回家，发现你妈买了一个年化收益15%的「稳健理财」。销售人员已经跑了，公司已经注销了。\n\n你妈哭了一整天。她说：「我只是想多赚点钱，给你减轻负担。」\n\n你报了警。警察说：「这种案子太多了，追回的可能性不大。」\n\n你看着你妈花白的头发，心里又气又心疼。',
+      cond: g => g.age >= 28 && g.age <= 50 && g.relationships && g.relationships.family >= 50,
+      choices:[
+        { label:'帮父母追回损失', hint:'+💰 +🧠', fn: g => { g.flags.retirementScam=true; g.flags.chaseRefund=true; return{intel:5,money:1000}; }},
+        { label:'教父母识别骗局', hint:'+🧠 +👥', fn: g => { g.flags.retirementScam=true; g.flags.educateParents=true; return{intel:3,social:3}; }},
+        { label:'自掏腰包补上损失', hint:'+👥 -💰', fn: g => { g.flags.retirementScam=true; g.flags.coverLoss=true; return{social:5,money:-5000}; }},
+      ]},
+    { id:'factory_closure_v31_4', icon:'🏭', title:'工厂倒闭', category:'career',
+      body:'你工作了5年的工厂突然宣布倒闭。\n\n老板跑了，工资欠了3个月。你和200个工友站在厂门口，不知道该去哪里。\n\n你的工友老张说：「我45了，去哪里找工作？」小李说：「我还有房贷没还完。」\n\n你们一起去劳动局讨薪，但老板已经转移了资产。\n\n你站在厂门口，看着那扇你每天进出的大门，觉得——5年的青春，就这么没了。',
+      cond: g => g.job && g.jobSalary <= 5000 && g.age >= 25 && g.age <= 50,
+      choices:[
+        { label:'和工友一起讨薪维权', hint:'+👥 +🧠', fn: g => { g.flags.factoryClosure=true; g.flags.collectiveAction=true; setJob(g,'待业中',0); return{social:8,intel:3}; }},
+        { label:'赶紧找新工作', hint:'+💰 +💪', fn: g => { g.flags.factoryClosure=true; g.flags.quickRebound=true; setJob(g,'普通工人',3500); return{money:500,health:-2}; }},
+        { label:'趁此机会学一门技术', hint:'+🧠 +💰', fn: g => { g.flags.factoryClosure=true; g.flags.skillRetrain=true; setJob(g,'待业中',0); return{intel:8,money:-500}; }},
+      ]},
+    { id:'migrant_worker_v31_4', icon:'🧱', title:'农民工的城市', category:'life',
+      body:'你从农村来到城市，在建筑工地上干活。\n\n你建了10栋楼，但你住在一间板房里。你铺了无数块砖，但你的孩子上不了这个城市的学校。\n\n你每个月寄3000块回家。你的孩子已经一年没见你了。\n\n过年的时候，你坐20小时的硬座回家。你的孩子看着你，有点陌生。\n\n你说：「爸爸/妈妈在外面赚钱，是为了让你过更好的生活。」\n\n你的孩子说：「我不要更好的生活，我只要你在家。」',
+      cond: g => g.age >= 25 && g.age <= 50 && g.money < 30000 && g.intel < 50,
+      choices:[
+        { label:'再干几年多攒点钱', hint:'+💰 -👥', fn: g => { g.flags.migrantWorker=true; g.flags.keepWorking=true; return{money:1000,social:-5}; }},
+        { label:'回家找份活干陪孩子', hint:'+👥 +😊', fn: g => { g.flags.migrantWorker=true; g.flags.goHome=true; setJob(g,'普通工人',2500); return{social:5,mood:8}; }},
+        { label:'在城里学手艺开小店', hint:'+💰 +🧠', fn: g => { g.flags.migrantWorker=true; g.flags.learnTrade=true; return{intel:5,money:-500}; }},
+      ]},
+    { id:'gig_worker_rights_v31_4', icon:'📋', title:'灵活就业保障', category:'career',
+      body:'你是一名外卖骑手/网约车司机/快递小哥。\n\n你没有社保、没有医保、没有带薪假。你每天工作12小时，风雨无阻。\n\n你摔了一跤，膝盖肿了。但你不敢休息——休息就没钱。\n\n你看到一条新闻：「灵活就业人员权益保障意见出台。」\n\n你不太确定这跟你有什么关系。但你觉得——至少有人开始关注你了。\n\n你对着手机说了一句：「我也算劳动者吧。」',
+      cond: g => g.job && (g.job === '外卖骑手' || g.job === '网约车司机' || g.job === '快递员' || g.jobSalary <= 5000) && g.age >= 20 && g.age <= 45,
+      choices:[
+        { label:'自己买商业保险', hint:'+💪 -💰', fn: g => { g.flags.gigWorkerRights=true; g.flags.selfInsure=true; return{health:3,money:-200}; }},
+        { label:'加入骑手互助群', hint:'+👥 +🧠', fn: g => { g.flags.gigWorkerRights=true; g.flags.mutualAid=true; return{social:5,intel:3}; }},
+        { label:'考虑转行找有保障的工作', hint:'+🧠 +💰', fn: g => { g.flags.gigWorkerRights=true; g.flags.seekStableJob=true; return{intel:5,mood:3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
 
@@ -18517,6 +18598,16 @@ const ACHIEVEMENTS = [
     { id:'city_storyteller_ach_v31_3', icon:'📷', name:'城市记录者', desc:'用镜头记录城市故事', check: g => g.flags.cityStoryteller },
     { id:'vinyl_collector_ach', icon:'💿', name:'黑胶收藏家', desc:'开始收藏黑胶唱片', check: g => g.flags.vinylCollector },
     { id:'home_game_host_ach', icon:'🎲', name:'桌游主人', desc:'在家组织桌游局', check: g => g.flags.homeGameHost },
+    // --- v31.4 生存困境成就 ---
+    { id:'self_reliant_ach', icon:'🏥', name:'独自坚强', desc:'学会了一个人看病', check: g => g.flags.selfReliant },
+    { id:'medical_escort_ach', icon:'👩‍⚕️', name:'陪诊师', desc:'成为了一名陪诊师', check: g => g.flags.medicalEscort },
+    { id:'learn_refuse_ach', icon:'🌙', name:'学会拒绝', desc:'学会了拒绝不合理加班', check: g => g.flags.learnRefuse },
+    { id:'question_city_ach', icon:'🏚️', name:'去留思考', desc:'思考是否该离开这座城市', check: g => g.flags.questionCity },
+    { id:'settle_small_ach', icon:'🌾', name:'小城扎根', desc:'选择在小城扎根生活', check: g => g.flags.settleSmallTown },
+    { id:'rights_advocate_ach', icon:'⚖️', name:'维权先锋', desc:'通过劳动仲裁维护了权益', check: g => g.flags.rightsAdvocate },
+    { id:'educate_parents_ach', icon:'👴', name:'反哺教育', desc:'教父母识别理财骗局', check: g => g.flags.educateParents },
+    { id:'skill_retrain_ach', icon:'🏭', name:'重新出发', desc:'工厂倒闭后选择学新技术', check: g => g.flags.skillRetrain },
+    { id:'mutual_aid_ach', icon:'📋', name:'互助力量', desc:'加入了灵活就业互助群', check: g => g.flags.mutualAid },
 ];
 
 // === ENDINGS === (order matters: first match wins)
