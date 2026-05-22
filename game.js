@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v31.2
+// 都市浮生记 - Game Engine v31.3
 // ============================================
 
 // === GAME STATE ===
@@ -16871,6 +16871,87 @@ const EVENTS = [
         { label:'找兼职增加收入', hint:'+💰 -💪', fn: g => { g.flags.urbanWorkingClass=true; g.flags.sideGig=true; return{money:800,health:-5}; }},
         { label:'接受现状认真生活', hint:'+😊 +💪', fn: g => { g.flags.urbanWorkingClass=true; g.flags.acceptAndLive=true; return{mood:5,health:3}; }},
       ]},
+    // --- v31.3 生活方式与休闲文化 ---
+    { id:'lure_fishing_v31_3', icon:'🎣', title:'路亚钓鱼', category:'hobby',
+      body:'你的同事拉你去了河边钓鱼。\n\n你以为钓鱼是老年人的运动。但你的同事说：「这不是钓鱼，这是路亚——用假饵骗鱼上钩，很酷的。」\n\n你花了2000块买了一根路亚竿和一堆假饵。你站在河边甩了100次，一条鱼也没钓到。\n\n你的同事钓了5条。他说：「路亚是一种修行——学会等待，学会接受空军。」\n\n空军，就是什么都没钓到。你空了3次，但你开始喜欢上了站在河边的感觉。',
+      cond: g => g.age >= 22 && g.age <= 50 && g.mood < 65,
+      choices:[
+        { label:'入坑买了全套装备', hint:'+😊 -💰', fn: g => { g.flags.lureFishing=true; g.flags.fishingGear=true; return{mood:8,money:-2000}; }},
+        { label:'享受河边发呆的时光', hint:'+😊 +💪', fn: g => { g.flags.lureFishing=true; g.flags.fishingMeditation=true; return{mood:5,health:3}; }},
+        { label:'钓到第一条鱼后发朋友圈', hint:'+✨ +😊', fn: g => { g.flags.lureFishing=true; g.flags.firstCatch=true; return{charm:3,mood:5}; }},
+      ]},
+    { id:'cycling_culture_v31_3', icon:'🚴', title:'骑行入坑', category:'hobby',
+      body:'你的朋友圈突然被骑行刷屏了。\n\n你的同事买了一辆公路车，8000块。你的前同事买了一辆，12000块。你的大学同学买了一辆，30000块。\n\n你看了看自己的共享单车，觉得有点丢人。\n\n你咬咬牙花5000块买了一辆入门公路车。你第一次骑了30公里，屁股疼了3天。\n\n但你在江边骑行的时候，风吹过来，你觉得——这钱花得值。',
+      cond: g => g.age >= 20 && g.age <= 45 && g.health >= 40,
+      choices:[
+        { label:'升级装备加入骑行群', hint:'+👥 -💰', fn: g => { g.flags.cyclingCulture=true; g.flags.cyclingGroup=true; return{social:8,money:-3000}; }},
+        { label:'享受独自骑行的自由', hint:'+😊 +💪', fn: g => { g.flags.cyclingCulture=true; g.flags.soloCycling=true; return{mood:5,health:8}; }},
+        { label:'开始骑行通勤省交通费', hint:'+💰 +💪', fn: g => { g.flags.cyclingCulture=true; g.flags.cyclingCommute=true; return{money:200,health:5}; }},
+      ]},
+    { id:'hiking_group_v31_3', icon:'⛰️', title:'徒步群', category:'social',
+      body:'你加了一个本地徒步群。\n\n周末，20个人一起去郊外爬山。你不认识任何人，但走了2小时后，你们聊了很多。\n\n有程序员、有老师、有设计师、有全职妈妈。你们聊工作、聊生活、聊房价、聊育儿。\n\n一个姐姐说：「我每周都来，不是为了锻炼，是为了跟人说说话。在公司说话要谨慎，在这里可以随便说。」\n\n到了山顶，你们合了影。你觉得这是你最近最开心的一天。',
+      cond: g => g.age >= 22 && g.age <= 50 && g.social < 60,
+      choices:[
+        { label:'成了徒步群常客', hint:'+👥 +💪', fn: g => { g.flags.hikingGroup=true; g.flags.regularHiker=true; return{social:8,health:5}; }},
+        { label:'和一个人成了好朋友', hint:'+👥 +😊', fn: g => { g.flags.hikingGroup=true; g.flags.hikingFriend=true; return{social:5,mood:5}; }},
+        { label:'自己组织了下一次活动', hint:'+✨ +👥', fn: g => { g.flags.hikingGroup=true; g.flags.hikingOrganizer=true; return{charm:5,social:5}; }},
+      ]},
+    { id:'rock_climbing_v31_3', icon:'🧗', title:'室内攀岩', category:'hobby',
+      body:'你第一次走进攀岩馆。\n\n墙很高，颜色很鲜艳，上面有各种颜色的石头。你穿上攀岩鞋，系上安全带，开始往上爬。\n\n你爬到一半就掉下来了。你的手臂酸得不行，手指抓不住任何东西。\n\n旁边一个10岁的小女孩轻轻松松爬到了顶。她看了看你说：「叔叔/阿姨，你要用脚踩，不是光用手拉。」\n\n你觉得被一个10岁小孩教育了。但你决定再来一次。',
+      cond: g => g.age >= 18 && g.age <= 40 && g.health >= 40,
+      choices:[
+        { label:'办卡每周来练', hint:'+💪 -💰', fn: g => { g.flags.rockClimbing=true; g.flags.climbingRegular=true; return{health:8,money:-500}; }},
+        { label:'挑战最难的线路', hint:'+💪 +😊', fn: g => { g.flags.rockClimbing=true; g.flags.climbingChallenge=true; return{health:5,mood:5}; }},
+        { label:'拍照打卡发朋友圈', hint:'+✨', fn: g => { g.flags.rockClimbing=true; g.flags.climbingCheckin=true; return{charm:3}; }},
+      ]},
+    { id:'coffee_third_space', icon:'☕', title:'第三空间', category:'lifestyle',
+      body:'你发现了一家很好的咖啡馆。\n\n不在商圈，在一条安静的巷子里。有书、有音乐、有插座。一杯美式28块，可以坐一下午。\n\n你开始每天下班后来这里坐2小时。不是加班，不是摸鱼，就是——待着。\n\n你在这里写了日记、读了3本书、想了很多事。\n\n老板认识你了，他说：「你的位子我留着。」\n\n你觉得这是你的第三空间——不是家，不是公司，是属于你的地方。',
+      cond: g => g.age >= 20 && g.age <= 45 && g.mood < 65,
+      choices:[
+        { label:'把咖啡馆当成日常仪式', hint:'+😊 +🧠', fn: g => { g.flags.coffeeThirdSpace=true; g.flags.dailyRitual=true; return{mood:8,intel:3}; }},
+        { label:'和老板成了朋友', hint:'+👥 +😊', fn: g => { g.flags.coffeeThirdSpace=true; g.flags.cafeOwnerFriend=true; return{social:5,mood:3}; }},
+        { label:'在咖啡馆认识了志同道合的人', hint:'+👥 +✨', fn: g => { g.flags.coffeeThirdSpace=true; g.flags.cafeConnection=true; return{social:5,charm:3}; }},
+      ]},
+    { id:'home_baking_v31_3', icon:'🧁', title:'居家烘焙', category:'hobby',
+      body:'疫情期间你入了烘焙坑，现在你已经出不去了。\n\n你的厨房堆满了模具、面粉、黄油。你的冰箱里有3种奶油、5种芝士。\n\n你每个周末都烤一炉蛋糕或面包。你的朋友圈成了你的烘焙展览。\n\n你的同事说：「你能不能别带蛋糕来公司了，我都胖了5斤。」\n\n你觉得烘焙是一种冥想——揉面团的时候，你的脑子安静了。看着蛋糕在烤箱里膨胀，你觉得世界很美好。',
+      cond: g => g.age >= 20 && g.age <= 50 && g.mood < 70,
+      choices:[
+        { label:'开始做定制蛋糕卖', hint:'+💰 +✨', fn: g => { g.flags.homeBaking=true; g.flags.bakingBusiness=true; return{money:500,charm:5}; }},
+        { label:'纯粹享受烘焙的过程', hint:'+😊 +💪', fn: g => { g.flags.homeBaking=true; g.flags.bakingTherapy=true; return{mood:8,health:2}; }},
+        { label:'给朋友做生日蛋糕', hint:'+👥 +😊', fn: g => { g.flags.homeBaking=true; g.flags.bakingGift=true; return{social:5,mood:5}; }},
+      ]},
+    { id:'skiing_culture_v31_3', icon:'⛷️', title:'滑雪初体验', category:'hobby',
+      body:'你被朋友拉去了滑雪场。\n\n你穿了半小时装备，在初级道摔了8次。你的屁股青了，你的膝盖肿了。\n\n但当你终于从初级道滑下来的那一刻——风在耳边呼啸，雪在阳光下闪闪发光——你觉得自己在飞。\n\n你的朋友圈全是滑雪照片。你的同事说：「白色鸦片，一旦沾上就戒不掉。」\n\n你看了看雪场的年卡价格：6000块。你看了看你的存款。\n\n你决定——值。',
+      cond: g => g.age >= 20 && g.age <= 40 && g.money >= 5000,
+      choices:[
+        { label:'办年卡彻底入坑', hint:'+😊 -💰', fn: g => { g.flags.skiingCulture=true; g.flags.skiAddict=true; return{mood:10,money:-6000}; }},
+        { label:'每年去一次当旅行', hint:'+😊 +💰', fn: g => { g.flags.skiingCulture=true; g.flags.skiTravel=true; return{mood:5,money:-2000}; }},
+        { label:'学单板挑战更高难度', hint:'+💪 +😊', fn: g => { g.flags.skiingCulture=true; g.flags.snowboard=true; return{health:5,mood:8}; }},
+      ]},
+    { id:'photography_walk_v31_3', icon:'📷', title:'街头摄影', category:'hobby',
+      body:'你用手机开始拍街头的照片。\n\n你拍菜市场的阿姨、拍路边的猫、拍黄昏的光线穿过老楼。\n\n你发现——你住了3年的城市，你从来没有认真看过它。\n\n你把照片发到小红书上，有人评论：「你拍出了这座城市的烟火气。」\n\n你开始带着相机（后来你花5000块买了一台二手微单）走遍了大街小巷。\n\n你拍了1000张照片，选了10张打印出来挂在墙上。你的家突然有了灵魂。',
+      cond: g => g.age >= 18 && g.age <= 50 && g.charm < 60,
+      choices:[
+        { label:'开始认真学摄影', hint:'+🧠 +✨', fn: g => { g.flags.photographyWalk=true; g.flags.seriousPhotography=true; return{intel:5,charm:5}; }},
+        { label:'用照片记录城市故事', hint:'+😊 +🧠', fn: g => { g.flags.photographyWalk=true; g.flags.cityStoryteller=true; return{mood:5,intel:5}; }},
+        { label:'给朋友拍写真赚外快', hint:'+💰 +👥', fn: g => { g.flags.photographyWalk=true; g.flags.photoSideGig=true; return{money:500,social:3}; }},
+      ]},
+    { id:'vinyl_record_v31_3', icon:'💿', title:'黑胶唱片', category:'hobby',
+      body:'你在旧货市场发现了一台老式黑胶唱片机，200块。\n\n你买了一堆二手黑胶唱片：邓丽君、张国荣、Beatles、Pink Floyd。\n\n你把唱针放下去的那一刻，音乐从音箱里流出来——不是数字的、不是压缩的、是温暖的、有颗粒感的。\n\n你觉得这才是音乐应该有的样子。\n\n你开始收集黑胶。你的钱包不同意，但你的耳朵同意了。',
+      cond: g => g.age >= 22 && g.age <= 50 && g.mood < 65,
+      choices:[
+        { label:'认真收藏稀有唱片', hint:'+😊 -💰', fn: g => { g.flags.vinylRecord=true; g.flags.vinylCollector=true; return{mood:8,money:-1500}; }},
+        { label:'享受模拟音乐的仪式感', hint:'+😊 +🧠', fn: g => { g.flags.vinylRecord=true; g.flags.analogRitual=true; return{mood:5,intel:3}; }},
+        { label:'开一个黑胶音乐分享号', hint:'+✨ +👥', fn: g => { g.flags.vinylRecord=true; g.flags.musicContentCreator=true; return{charm:5,social:3}; }},
+      ]},
+    { id:'board_game_cafe_v31_3', icon:'🎲', title:'桌游吧之夜', category:'social',
+      body:'你的同事带你去了一家桌游吧。\n\n6个人围着一张桌子，玩阿瓦隆。你们互相欺骗、互相怀疑、互相大笑。\n\n你发现——你很久没有面对面跟人玩了。不是手机上的游戏，是真的看着对方的眼睛。\n\n你们玩了3小时，喝了4壶茶，笑了无数次。\n\n你的同事说：「比喝酒好多了吧？」\n\n你觉得他说得对。清醒的快乐——比微醺更难得。',
+      cond: g => g.age >= 20 && g.age <= 40 && g.social < 65,
+      choices:[
+        { label:'成了桌游吧常客', hint:'+👥 +😊', fn: g => { g.flags.boardGameCafe=true; g.flags.boardGameRegular=true; return{social:8,mood:5}; }},
+        { label:'买了桌游在家组织局', hint:'+👥 -💰', fn: g => { g.flags.boardGameCafe=true; g.flags.homeGameHost=true; return{social:5,money:-300}; }},
+        { label:'开始研究策略桌游', hint:'+🧠 +😊', fn: g => { g.flags.boardGameCafe=true; g.flags.strategyGamer=true; return{intel:5,mood:3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
 
@@ -18425,6 +18506,17 @@ const ACHIEVEMENTS = [
     { id:'stand_up_dating_ach', icon:'💔', name:'不当备胎', desc:'勇敢拒绝相亲PUA', check: g => g.flags.standUp },
     { id:'conscious_ai_ach', icon:'💻', name:'清醒AI用户', desc:'享受AI陪伴但保持清醒', check: g => g.flags.consciousAIUse },
     { id:'skill_builder_ach', icon:'🔧', name:'底层奋斗者', desc:'打工之余坚持学习技能', check: g => g.flags.skillBuilding },
+    // --- v31.3 生活方式成就 ---
+    { id:'fishing_meditation_ach', icon:'🎣', name:'路亚修行者', desc:'在钓鱼中找到了平静', check: g => g.flags.fishingMeditation },
+    { id:'cycling_commute_ach', icon:'🚴', name:'骑行通勤者', desc:'用骑行代替通勤', check: g => g.flags.cyclingCommute },
+    { id:'hiking_organizer_ach', icon:'⛰️', name:'徒步组织者', desc:'组织了徒步活动', check: g => g.flags.hikingOrganizer },
+    { id:'climbing_challenge_ach', icon:'🧗', name:'攀岩挑战者', desc:'挑战了攀岩高难度线路', check: g => g.flags.climbingChallenge },
+    { id:'third_space_ach_v31_3', icon:'☕', name:'第三空间', desc:'找到了属于自己的咖啡馆', check: g => g.flags.coffeeThirdSpace },
+    { id:'baking_therapy_ach', icon:'🧁', name:'烘焙疗愈', desc:'在烘焙中找到了快乐', check: g => g.flags.bakingTherapy },
+    { id:'ski_addict_ach', icon:'⛷️', name:'白色鸦片', desc:'彻底爱上了滑雪', check: g => g.flags.skiAddict },
+    { id:'city_storyteller_ach_v31_3', icon:'📷', name:'城市记录者', desc:'用镜头记录城市故事', check: g => g.flags.cityStoryteller },
+    { id:'vinyl_collector_ach', icon:'💿', name:'黑胶收藏家', desc:'开始收藏黑胶唱片', check: g => g.flags.vinylCollector },
+    { id:'home_game_host_ach', icon:'🎲', name:'桌游主人', desc:'在家组织桌游局', check: g => g.flags.homeGameHost },
 ];
 
 // === ENDINGS === (order matters: first match wins)
