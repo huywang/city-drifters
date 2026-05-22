@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v4.2
+// 都市浮生记 - Game Engine v4.3
 // ============================================
 
 // === GAME STATE ===
@@ -2929,6 +2929,16 @@ const EVENTS = [
         { label:'发朋友圈', hint:'+👥 +✨', fn: g => { g.flags.cityOrNot=true; return{social:12,charm:8,mood:5}; }},
         { label:'不懂，也不care', hint:'+🧠 +😊', fn: g => { g.flags.cityOrNot=true; return{intel:5,mood:3}; }},
       ]},
+    // === v4.3 EVENTS - 情绪价值消费 ===
+    { id:'emotional_value', icon:'💝', title:'为快乐买单',
+      body:'你看到一个潮玩盲盒：69元。你犹豫了。\n\n然后你想想：今天被领导骂了，和同事吵架了，地铁被挤成照片了。\n\n你买了。\n\n"情绪消费——用一杯奶茶的钱，换24小时的好心情。"\n\n数据：超过90%的年轻人认可情绪价值，近60%愿意为情绪价值付费。\n\n2025年，中国情绪消费市场规模突破2万亿元。\n\n"我们消费的不是商品，而是情绪——多巴胺、治愈感、小确幸。"',
+      cond: g => !g.flags.emotionalValue && g.age>=18 && g.age<=35 && g.mood<70,
+      choices:[
+        { label:'买盲盒', hint:'-💰 +😊', fn: g => { g.flags.emotionalValue=true; g.flags.blindBoxFan=true; return{money:-200,mood:15,charm:3}; }},
+        { label:'买手办', hint:'-💰 +😊 +✨', fn: g => { g.flags.emotionalValue=true; g.flags.figureCollector=true; return{money:-500,mood:20,charm:5}; }},
+        { label:'看沉浸式演出', hint:'-💰 +😊 +🧠', fn: g => { g.flags.emotionalValue=true; return{money:-800,mood:25,intel:8}; }},
+        { label:'理性消费', hint:'+🧠 +💰', fn: g => { g.flags.emotionalValue=true; return{intel:8,mood:-5,money:500}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3136,6 +3146,8 @@ const ACHIEVEMENTS = [
     // v4.2 achievements
     { id:'budget_traveler', icon:'🎒', name:'特种兵游客', desc:'体验特种兵旅游', check: g => g.flags.specialForcesTravel },
     { id:'city_explorer', icon:'🏙️', name:'City玩家', desc:'体验City感生活', check: g => g.flags.cityOrNot },
+    // v4.3 achievements
+    { id:'emotional_shopper', icon:'💝', name:'情绪消费者', desc:'为快乐买单', check: g => g.flags.emotionalValue },
 ];
 
 // === ENDINGS === (order matters: first match wins)
