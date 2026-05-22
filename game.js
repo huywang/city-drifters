@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v7.6
+// 都市浮生记 - Game Engine v7.7
 // ============================================
 
 // === GAME STATE ===
@@ -3597,6 +3597,43 @@ const EVENTS = [
         { label:'养宠物陪伴', hint:'-💰 +😊 +❤️', fn: g => { g.flags.singleEconomy=true; g.flags.hasPet=true; return{money:-3000,mood:18,health:5}; }},
         { label:'渴望脱单', hint:'+😊 -💰', fn: g => { g.flags.singleEconomy=true; return{mood:8,money:-2000}; }},
       ]},
+    // === v7.7 EVENTS - 预制朋友圈、赛博养生、新型职业 ===
+    { id:'premade_moments', icon:'📸', title:'预制朋友圈',
+      body:'你发现了一个新玩法：预制朋友圈。\n\n"扛起相机就是兵，换装七套，挑战一天拍完一个月朋友圈。"\n\n你花了6个小时，拍了1536张照片，够发两个月的朋友圈了。\n\n接下来的日子里，你按计划分批发布：\n- 周一：咖啡厅读书照（配文：周末的慵懒时光）\n- 周三：健身房自拍（配文：自律给我自由）\n- 周五：美食打卡（配文：生活需要仪式感）\n- 周日：旅行风景（配文：诗和远方）\n\n朋友们纷纷点赞："你的生活好精彩！"\n\n但你知道，这些照片都是同一天拍的，你换了7套衣服，化了3次妆。\n\n"在数字的世界里，人们展示的不是生活，而是对生活的诠释。"\n\n"朋友圈可以预制，但真实的生活无法预演。"\n\n你开始思考：当"生活"被预制，我们在朋友圈中看到的，还是真实的自我吗？',
+      cond: g => !g.flags.premadeMoments && g.age>=20 && g.age<=35 && g.charm>=50,
+      choices:[
+        { label:'精心打造人设', hint:'+✨ +👥 -💰', fn: g => { g.flags.premadeMoments=true; g.flags.socialMediaPersona=true; return{charm:15,social:10,money:-2000}; }},
+        { label:'真实记录生活', hint:'+😊 +👥', fn: g => { g.flags.premadeMoments=true; g.flags.authenticSharing=true; return{mood:12,social:8}; }},
+        { label:'用于个人品牌', hint:'+💰 +✨', fn: g => { g.flags.premadeMoments=true; g.flags.personalBranding=true; return{money:5000,charm:10}; }},
+        { label:'关闭朋友圈', hint:'+😊 -👥', fn: g => { g.flags.premadeMoments=true; g.flags.closeMoments=true; return{mood:15,social:-10}; }},
+      ]},
+    { id:'cyber_wellness', icon:'🤖', title:'赛博养生',
+      body:'你最近身体不太舒服，但不想去医院排队。\n\n朋友推荐："试试赛博养生吧！"\n\n你下载了一个AI中医APP，对着手机：\n- 拍舌头：AI分析你的舌苔、舌质\n- 拍面部：AI识别你的面色、气血\n- 填问卷：AI问你睡眠、饮食、情绪\n- 把脉仪：智能设备模拟中医把脉\n\n10秒后，AI给出诊断：\n"您属于气虚体质，建议服用黄芪补气汤，配合艾灸足三里穴。"\n\n你半信半疑地照做了，居然感觉好了一些。\n\n"赛博养生——让千年中医智慧借科技重生。"\n\n但你也在想：AI真的能替代老中医的望闻问切吗？\n\n"当《黄帝内经》遇上深度学习，是传承还是亵渎？"',
+      cond: g => !g.flags.cyberWellness && g.age>=22 && g.age<=45 && g.health<70,
+      choices:[
+        { label:'相信AI诊断', hint:'+💪 +🧠 -💰', fn: g => { g.flags.cyberWellness=true; g.flags.trustAI=true; return{health:10,intel:8,money:-500}; }},
+        { label:'只当参考', hint:'+🧠 +💪', fn: g => { g.flags.cyberWellness=true; g.flags.skepticalUser=true; return{intel:10,health:5}; }},
+        { label:'还是去看医生', hint:'-💰 +💪', fn: g => { g.flags.cyberWellness=true; g.flags.traditionalDoctor=true; return{money:-800,health:15}; }},
+        { label:'买个智能手环', hint:'-💰 +💪 +✨', fn: g => { g.flags.cyberWellness=true; g.flags.wearableDevice=true; return{money:-1500,health:8,charm:5}; }},
+      ]},
+    { id:'medical_companion', icon:'🏥', title:'陪诊师',
+      body:'你听说了一个新职业：陪诊师。\n\n工作内容：\n- 陪老人去医院看病\n- 帮忙挂号、排队、取药\n- 记录医嘱、提醒用药\n- 提供情感支持\n\n薪资：日薪500+，月入过万不是梦。\n\n你看到一个真实故事：\n"95后女孩辞去文员工作，转行做陪诊师。第一单客户是独居老人王奶奶，子女在外地。我陪她看了3个小时病，帮她记下了所有医嘱。王奶奶拉着我的手说：'姑娘，谢谢你，今天有你陪着，我不害怕了。'"\n\n"陪诊师——不只是职业，更是一种陪伴。"\n\n2025年，陪诊师职位同比增长30.7%，56.4%不限学历，77.4%不限经验。\n\n你开始思考：在这个原子化的社会，陪伴竟然成了一种商品。\n\n"当亲情缺席，陌生人填补了空白。"',
+      cond: g => !g.flags.medicalCompanion && g.age>=22 && g.age<=40 && g.social>=50,
+      choices:[
+        { label:'转行做陪诊师', hint:'+💰 +😊 +👥', fn: g => { g.flags.medicalCompanion=true; g.flags.careerChangeMedical=true; return{money:8000,mood:15,social:12}; }},
+        { label:'兼职做陪诊师', hint:'+💰 +😊', fn: g => { g.flags.medicalCompanion=true; g.flags.partTimeCompanion=true; return{money:3000,mood:10}; }},
+        { label:'请陪诊师陪父母', hint:'-💰 +😊 +👥', fn: g => { g.flags.medicalCompanion=true; g.flags.hireCompanion=true; return{money:-2000,mood:8,social:5}; }},
+        { label:'觉得不靠谱', hint:'+🧠', fn: g => { g.flags.medicalCompanion=true; return{intel:5}; }},
+      ]},
+    { id:'pet_funeral', icon:'🐾', title:'宠物殡葬师',
+      body:'你的猫/狗陪伴了你10年，今天它走了。\n\n你不知道该怎么办，朋友推荐了一个新职业：宠物殡葬师。\n\n你来到宠物殡葬中心：\n- 温柔的告别仪式：播放舒缓音乐，鲜花环绕\n- 专业的遗体整理：擦拭、梳毛、穿上最爱的衣服\n- 个性化的火化：可以选择单独火化，保留骨灰\n- 纪念品制作：爪印银饰、骨灰钻石、纪念相册\n\n殡葬师说："我们不仅是送别，更是生命教育。"\n\n你看着它安详的样子，泪水止不住地流。\n\n"宠物殡葬师——让告别有尊严，让爱有归处。"\n\n2025年，中国宠物数量超过1.2亿只，每年有数百万只宠物离世。宠物殡葬师成为年轻人择业的新方向。\n\n"73.6%的宠物主将宠物视为家庭成员，81.2%愿意为宠物安排正式告别。"\n\n你开始理解：告别也是一种爱。\n\n"死亡不是终点，遗忘才是。"',
+      cond: g => !g.flags.petFuneral && g.age>=20 && g.age<=45 && g.flags.hasPet,
+      choices:[
+        { label:'为宠物办仪式', hint:'-💰 +😊 +❤️', fn: g => { g.flags.petFuneral=true; g.flags.properFarewell=true; return{money:-3000,mood:20,social:5}; }},
+        { label:'简单火化', hint:'-💰 +😊', fn: g => { g.flags.petFuneral=true; g.flags.simpleFarewell=true; return{money:-800,mood:12}; }},
+        { label:'转行做殡葬师', hint:'+💰 +😊 +🧠', fn: g => { g.flags.petFuneral=true; g.flags.careerChangePet=true; return{money:6000,mood:15,intel:10}; }},
+        { label:'不再养宠物', hint:'+😊 -❤️', fn: g => { g.flags.petFuneral=true; g.flags.noMorePets=true; return{mood:8,social:-5}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3926,6 +3963,13 @@ const ACHIEVEMENTS = [
     { id:'county_civil_servant', icon:'📋', name:'县城公务员', desc:'在县城考上编制', check: g => g.flags.countyCivilServant },
     { id:'gown_remover', icon:'🎓', name:'脱下长衫者', desc:'放下学历包袱', check: g => g.flags.tookOffGown },
     { id:'gap_year_taker', icon:'🌍', name:'间隔年体验者', desc:'选择gap year', check: g => g.flags.gapYear },
+    // v7.7 achievements
+    { id:'social_media_persona', icon:'📸', name:'人设打造师', desc:'预制朋友圈打造人设', check: g => g.flags.socialMediaPersona },
+    { id:'authentic_sharer', icon:'💯', name:'真实分享者', desc:'坚持真实记录生活', check: g => g.flags.authenticSharing },
+    { id:'personal_brand', icon:'🎯', name:'个人品牌专家', desc:'用社交媒体打造个人品牌', check: g => g.flags.personalBranding },
+    { id:'cyber_wellness_user', icon:'🤖', name:'赛博养生达人', desc:'尝试AI中医养生', check: g => g.flags.cyberWellness },
+    { id:'medical_companion', icon:'🏥', name:'陪诊师', desc:'成为陪诊师或请陪诊师', check: g => g.flags.medicalCompanion },
+    { id:'pet_funeral', icon:'🐾', name:'宠物告别师', desc:'体验宠物殡葬服务', check: g => g.flags.petFuneral },
 ];
 
 // === ENDINGS === (order matters: first match wins)
