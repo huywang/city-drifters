@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v23.5
+// 都市浮生记 - Game Engine v24.0
 // ============================================
 
 // === GAME STATE ===
@@ -11671,6 +11671,87 @@ const EVENTS = [
         { label:'在自己的圈子里推广环保理念', hint:'+🤝 +😊', fn: g => { g.flags.greenFuture=true; return{social:10,mood:10,intel:5}; }},
         { label:'继续默默做着自己的环保行动', hint:'+😊 +🧠', fn: g => { g.flags.greenFuture=true; return{mood:10,intel:8}; }},
       ]},
+    // === v24.0: AI时代 + 新能源 + 低空经济 + 数字人生 ===
+    { id:'ai_agent_assistant', icon:'🤖', title:'AI生活管家', category:'tech',
+      body:'你下载了一个AI个人助理App。\n\n它比你自己还了解你：\n- 自动帮你规划每天的行程\n- 根据你的消费习惯推荐省钱方案\n- 分析你的聊天记录，提醒你该联系谁\n- 根据你的健康数据，安排运动和休息\n\n用了三个月后，你发现：\n- 你的效率提高了40%\n- 每月省了2000元\n- 和朋友的关系反而更好了\n- 但你开始觉得不安：它知道的太多了\n\n你开始思考：当AI比你更了解你自己——你还是自己的主人吗？\n\n「AI管家：把生活交给算法——把思考留给自己。」',
+      cond: g => g.age >= 20 && !g.flags.aiAgent && g.intel >= 25,
+      choices:[
+        { label:'全面拥抱AI管理，享受高效生活', hint:'+🧠 +💰 -😊', fn: g => { g.flags.aiAgent=true; g.flags.aiDependent=true; return{intel:10,money:2000,mood:-3}; }},
+        { label:'只让AI管理工作和财务，保留私人空间', hint:'+🧠 +💰', fn: g => { g.flags.aiAgent=true; return{intel:8,money:1000}; }},
+        { label:'觉得太可怕了，卸载了App', hint:'+😊', fn: g => { g.flags.aiSkeptic=true; return{mood:5}; }},
+      ]},
+    { id:'ev_startup', icon:'⚡', title:'新能源风口', category:'career',
+      body:'你的大学同学老王，从比亚迪辞职创业了。\n\n他做的是固态电池回收——把废旧电池里的锂、钴、镍提取出来，卖给电池厂。\n\n他给你看了数据：\n- 中国新能源汽车保有量已超3000万辆\n- 第一批电池即将进入报废期\n- 电池回收市场规模将超千亿\n- 政府补贴和碳交易收入可观\n\n他邀请你入伙：「兄弟，这是最后一波大风口了。错过新能源——就像20年前错过互联网。」\n\n你看着他的PPT，心里打鼓：上一次有人这么说的——是P2P。\n\n「新能源：风口上的猪也能飞——问题是风停了怎么办？」',
+      cond: g => g.age >= 24 && g.age <= 45 && !g.flags.evStartup && g.money >= 30000,
+      choices:[
+        { label:'投30万入伙，搏一把千亿市场', hint:'-💰 ±💰 +🧠', fn: g => { g.flags.evStartup=true; g.flags.evInvestor=true; g.money -= 30000; return{intel:8,charm:5}; }},
+        { label:'不投钱，但去做技术顾问', hint:'+💰 +🧠', fn: g => { g.flags.evStartup=true; g.flags.evConsultant=true; return{money:3000,intel:10,charm:5}; }},
+        { label:'觉得风险太大，婉拒了', hint:'+😊', fn: g => { return{mood:3}; }},
+      ]},
+    { id:'drone_delivery', icon:'🚁', title:'无人机送外卖', category:'tech',
+      body:'今天点外卖，送餐的是一架无人机。\n\n你跑到楼下取餐点，看到无人机精准地把外卖放在柜子里。\n\n从下单到送达，只用了12分钟。\n\n你后来了解到：\n- 无人机配送已经覆盖了50个城市\n- 每单配送成本降到了2元\n- 无人机飞手成了新兴热门职业\n- 考证费1.5万，月薪可达1.5万\n\n你心动了。这不比送外卖强？\n\n但你又看到新闻：有人用无人机偷拍、运毒、干扰航班……监管越来越严了。\n\n「无人机配送：科技改变生活——也改变法律边界。」',
+      cond: g => g.age >= 18 && !g.flags.droneDelivery,
+      choices:[
+        { label:'花1.5万考无人机飞手证', hint:'-💰 +💰 +🧠', fn: g => { g.flags.droneDelivery=true; g.flags.dronePilot=true; g.money -= 15000; return{intel:10,charm:5}; }},
+        { label:'投资了无人机配送公司的股票', hint:'±💰', fn: g => { g.flags.droneDelivery=true; g.flags.droneStock=true; return{intel:5}; }},
+        { label:'纯粹享受无人机送餐的便利', hint:'+😊', fn: g => { g.flags.droneDelivery=true; return{mood:5}; }},
+      ]},
+    { id:'virtual_idol', icon:'🎤', title:'虚拟偶像演唱会', category:'social',
+      body:'朋友拉你去看了一场虚拟偶像的演唱会。\n\n舞台上没有人——只有一个巨大的全息投影。\n\n一个永远18岁、永远不塌房、永远不恋爱的「数字人」在台上唱歌跳舞。\n\n台下粉丝疯狂打call，荧光棒和尖叫声一样真实。\n\n你震惊地发现：\n- 虚拟偶像的年收入已经超过真人顶流\n- 周边产品（手办、皮肤、语音包）卖得比真人偶像还好\n- 粉丝知道它是假的——但感情是真的\n- 一个朋友每月花3000给虚拟偶像打榜\n\n你问朋友：「你喜欢的是代码——还是偶像？」\n\n朋友说：「有什么区别？真人偶像也是公司包装的产品。」\n\n「虚拟偶像：完美是假的——但快乐是真的。」',
+      cond: g => g.age >= 16 && g.age <= 35 && !g.flags.virtualIdol,
+      choices:[
+        { label:'成了虚拟偶像的粉丝，开始打榜', hint:'-💰 +😊', fn: g => { g.flags.virtualIdol=true; g.flags.vtuberFan=true; g.money -= 5000; return{mood:10,charm:3}; }},
+        { label:'觉得这是商机，研究虚拟偶像产业', hint:'+🧠 +💰', fn: g => { g.flags.virtualIdol=true; g.flags.vtuberBusiness=true; return{intel:10,money:2000}; }},
+        { label:'完全不理解，默默离开了', hint:'', fn: g => { g.flags.virtualIdol=true; return{mood:-2}; }},
+      ]},
+    { id:'data_privacy_crisis', icon:'🔐', title:'数据泄露', category:'society',
+      body:'你的手机号、身份证号、家庭住址、消费记录——全部在网上被公开出售。\n\n500万条数据，打包价500元。\n\n你的数据就在其中。\n\n接下来的日子：\n- 骚扰电话暴增，一天20个\n- 有人用你的信息注册了网贷\n- 收到精准诈骗短信，连你妈的名字都知道\n- 征信报告出现了你没办过的信用卡\n\n你报警，但警察说这类案件太多了，追回概率很低。\n\n你开始反思：我们在网上留下的每一个痕迹——都是在给未来的自己埋雷。\n\n「数据泄露：你的隐私，在黑市上值500块。」',
+      cond: g => g.age >= 18 && !g.flags.dataPrivacy && Math.random() < 0.15,
+      choices:[
+        { label:'花大钱请律师处理，修复征信', hint:'-💰 +🧠', fn: g => { g.flags.dataPrivacy=true; g.money -= 8000; return{intel:8,mood:-5}; }},
+        { label:'冻结所有网贷账户，加强信息安全', hint:'+🧠 -😊', fn: g => { g.flags.dataPrivacy=true; g.flags.securityAware=true; return{intel:10,mood:-8}; }},
+        { label:'认命了，反正信息已经泄露了', hint:'-😊', fn: g => { g.flags.dataPrivacy=true; return{mood:-10}; }},
+      ]},
+    { id:'space_tourism', icon:'🚀', title:'太空旅游抽奖', category:'era',
+      body:'中国第一家商业太空旅游公司开始售票了。\n\n亚轨道飞行，体验5分钟失重，票价300万。\n\n你的公司搞了个团建活动——抽奖送一张太空船票。\n\n你居然中奖了！\n\n但仔细一看合同：\n- 需要3个月体能训练\n- 签生死免责协议\n- 保险只赔50万\n- 训练期间无工资\n\n同事们都羡慕你：「这可是太空啊！300万的体验！」\n\n但你心里犯嘀咕：太空旅游——有钱人的游戏，打工人的赌命。\n\n「太空旅游：人类的一大步——你的一大赌。」',
+      cond: g => g.age >= 22 && g.age <= 50 && !g.flags.spaceTourism && g.health >= 50,
+      choices:[
+        { label:'去！人生能有几回去太空？', hint:'+😊 +✨ ±❤️', fn: g => { g.flags.spaceTourism=true; g.flags.spaceTraveler=true; return{mood:25,charm:15,health:-5}; }},
+        { label:'放弃船票，把机会卖了', hint:'+💰', fn: g => { g.flags.spaceTourism=true; g.money += 50000; return{mood:5}; }},
+        { label:'不敢去，把票让给同事', hint:'+🤝 -😊', fn: g => { g.flags.spaceTourism=true; return{social:10,mood:-5}; }},
+      ]},
+    { id:'ai_replace_job', icon:'🔄', title:'AI替代危机', category:'career',
+      body:'公司开了一个全员大会。\n\nCEO宣布：公司引入了AI系统，可以自动完成60%的日常工作。\n\n翻译：要裁员了。\n\n你看着自己工位上的工作内容：\n- 数据整理？AI比你快100倍\n- 写报告？AI写得比你好\n- 做PPT？AI自动排版更漂亮\n- 回复客户？AI客服7×24小时不休息\n\n你突然意识到：你以为你在为公司工作——其实你在和AI赛跑。\n\n而AI不需要睡觉、不需要加薪、不需要团建。\n\n「AI替代：你不是被裁了——你是被进化淘汰了。」',
+      cond: g => g.age >= 22 && g.age <= 55 && !g.flags.aiReplaceCrisis && g.salary && g.salary < 20000,
+      choices:[
+        { label:'拼命学习AI技能，让自己不可替代', hint:'+🧠 -😊 -❤️', fn: g => { g.flags.aiReplaceCrisis=true; g.flags.aiUpskilled=true; return{intel:15,mood:-8,health:-5}; }},
+        { label:'趁被裁之前跳槽到AI创业公司', hint:'+💰 +🧠', fn: g => { g.flags.aiReplaceCrisis=true; g.flags.aiCompany=true; setJob(g,'AI公司运营',g.salary*1.2); return{intel:8,mood:3}; }},
+        { label:'佛系接受，反正也跑不过AI', hint:'-💰 -😊', fn: g => { g.flags.aiReplaceCrisis=true; g.flags.aiReplaced=true; g.salary = Math.floor(g.salary*0.6); return{mood:-12}; }},
+      ]},
+    { id:'digital_inheritance', icon:'💾', title:'数字遗产', category:'society',
+      body:'一个同事突然去世了。32岁，心梗。\n\n家属处理后事时发现一个问题：他的数字资产怎么办？\n\n- 微信零钱里有5万块，但不知道密码\n- 游戏账号价值2万，但平台说「账号不可继承」\n- 网盘里有10年的照片和视频\n- 社交账号还在收到生日祝福\n- 订阅的会员还在自动扣款\n\n家属联系了所有平台，得到的回答几乎都是：「根据用户协议，账号所有权归平台。」\n\n你看着自己手机里的几十个App，突然意识到：你拥有的一切——可能从来不属于你。\n\n「数字遗产：你死后——你的数据比你活得更久。」',
+      cond: g => g.age >= 25 && !g.flags.digitalInheritance,
+      choices:[
+        { label:'立刻整理数字资产，立下数字遗嘱', hint:'+🧠 +😊', fn: g => { g.flags.digitalInheritance=true; g.flags.digitalWill=true; return{intel:8,mood:5}; }},
+        { label:'开始减少数字依赖，回归实体生活', hint:'+😊 +❤️', fn: g => { g.flags.digitalInheritance=true; g.flags.digitalMinimalist=true; return{mood:10,health:5}; }},
+        { label:'想了一下——然后继续刷手机', hint:'', fn: g => { g.flags.digitalInheritance=true; return{mood:-3}; }},
+      ]},
+    { id:'brain_computer', icon:'🧠', title:'脑机接口体验', category:'tech',
+      body:'一个朋友在脑机接口公司工作，邀请你参加产品内测。\n\n这是一种非侵入式脑机接口——戴在头上就能用。\n\n它能做什么：\n- 用「想」来控制手机和电脑\n- 监测你的情绪和注意力\n- 在你走神时自动暂停视频\n- 帮你「记住」所有看过的内容\n\n试用了一周后：\n- 你的工作效率暴增\n- 你的注意力明显提升\n- 但你也感到头痛和失眠\n- 最让你不安的是：设备知道你什么时候在走神——包括你在想什么\n\n你对朋友说：「这东西太可怕了。」\n\n朋友说：「可怕的是——下一代人会觉得这很正常。」\n\n「脑机接口：思想的边界——就是自由的边界。」',
+      cond: g => g.age >= 20 && g.age <= 45 && !g.flags.brainComputer && g.intel >= 30,
+      choices:[
+        { label:'继续深度使用，参与产品优化', hint:'+🧠 +💰 -❤️', fn: g => { g.flags.brainComputer=true; g.flags.bciPioneer=true; return{intel:15,money:5000,health:-5,mood:-3}; }},
+        { label:'只用来辅助学习和工作', hint:'+🧠', fn: g => { g.flags.brainComputer=true; return{intel:10}; }},
+        { label:'觉得侵犯隐私，拒绝继续使用', hint:'+😊', fn: g => { g.flags.brainComputer=true; g.flags.bciRefused=true; return{mood:5}; }},
+      ]},
+    { id:'digital_heritage_culture', icon:'🏛️', title:'数字敦煌', category:'era',
+      body:'你去敦煌旅游，参观了莫高窟的数字展厅。\n\n千年壁画被高精度扫描成了数字版：\n- 每一笔每一划都清晰可见\n- 可以用VR走进已经关闭的洞窟\n- AI修复了已经褪色的部分\n- 全世界的人都能在网上「走进」莫高窟\n\n导游说：「实体洞窟每年都在退化。数字版——是我们给千年后的人类留的礼物。」\n\n你突然被打动了。\n\n技术不只是用来赚钱的——它还可以让文明永生。\n\n你在想：你的人生，有什么值得「数字化」保存的呢？\n\n「数字遗产：有些东西——值得比数据活得更久。」',
+      cond: g => g.age >= 18 && !g.flags.digitalHeritage && g.intel >= 20,
+      choices:[
+        { label:'开始记录自己的人生故事和感悟', hint:'+😊 +🧠', fn: g => { g.flags.digitalHeritage=true; g.flags.lifeRecorder=true; return{mood:12,intel:8,charm:5}; }},
+        { label:'学了数字修复技术，想参与文物保护', hint:'+🧠 +💰', fn: g => { g.flags.digitalHeritage=true; g.flags.heritageTech=true; return{intel:12,money:2000}; }},
+        { label:'很感动，发了条朋友圈', hint:'+🤝', fn: g => { g.flags.digitalHeritage=true; return{social:5,mood:5}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -12732,6 +12813,12 @@ const ACHIEVEMENTS = [
     { id:'balcony_farmer_ach', icon:'🌱', name:'阳台农夫', desc:'在阳台上种出了自己的蔬菜', check: g => g.flags.balconyFarmer },
     { id:'eco_leader_ach', icon:'🌳', name:'环保领袖', desc:'成了环保社区的核心成员', check: g => g.flags.ecoLeader },
     { id:'green_future_ach', icon:'🌏', name:'绿色未来', desc:'成了有影响力的环保倡导者', check: g => g.flags.ecoInfluencer },
+    // v24.0: AI时代成就
+    { id:'ai_agent_ach', icon:'🤖', name:'AI共生', desc:'全面拥抱AI管理生活', check: g => g.flags.aiDependent },
+    { id:'space_traveler_ach', icon:'🚀', name:'太空旅客', desc:'亲自体验了太空飞行', check: g => g.flags.spaceTraveler },
+    { id:'bci_pioneer_ach', icon:'🧠', name:'脑机先锋', desc:'深度参与脑机接口测试', check: g => g.flags.bciPioneer },
+    { id:'digital_will_ach', icon:'💾', name:'数字遗嘱', desc:'整理了数字资产并立下遗嘱', check: g => g.flags.digitalWill },
+    { id:'life_recorder_ach', icon:'🏛️', name:'人生记录者', desc:'开始系统记录自己的人生故事', check: g => g.flags.lifeRecorder },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -14674,6 +14761,76 @@ function calculateLifeScore() {
     return { score: totalScore, details };
 }
 
+// v24.0: 人生关键词系统 - 根据玩家行为生成人生关键词
+function generateLifeKeywords() {
+    const keywords = [];
+    // 基于性格特质
+    if (G.traits) {
+        if (G.traits.adventurer) keywords.push('冒险者');
+        if (G.traits.rational) keywords.push('理性派');
+        if (G.traits.emotional) keywords.push('感性灵魂');
+        if (G.traits.socialite) keywords.push('社交蝴蝶');
+        if (G.traits.loner) keywords.push('独行侠');
+        if (G.traits.pragmatist) keywords.push('务实主义');
+        if (G.traits.idealist) keywords.push('理想主义');
+    }
+    // 基于人生经历
+    if (G.flags.entrepreneur) keywords.push('创业者');
+    if (G.flags.civilServant) keywords.push('体制内');
+    if (G.flags.freelanceStable) keywords.push('自由人');
+    if (G.flags.married) keywords.push('已婚');
+    if (G.flags.hasChild) keywords.push('父母');
+    if (G.flags.leftBigCity) keywords.push('逃离者');
+    if (G.flags.culturalConfidence) keywords.push('文化自觉');
+    if (G.flags.ecoInfluencer) keywords.push('环保先锋');
+    if (G.flags.midlifeStartup) keywords.push('中年创业');
+    if (G.flags.reinventionStory) keywords.push('涅槃重生');
+    if (G.flags.personalBrand) keywords.push('个人品牌');
+    if (G.flags.innerPeace) keywords.push('内心安定');
+    if (G.flags.agingGrace) keywords.push('优雅老去');
+    // 基于属性
+    if (G.money >= 200000) keywords.push('财务自由');
+    if (G.health >= 70) keywords.push('健康达人');
+    if (G.intel >= 70) keywords.push('终身学习');
+    if (G.social >= 70) keywords.push('人脉广泛');
+    if (G.charm >= 70) keywords.push('魅力四射');
+    // 基于结局倾向
+    if (G.mood >= 60) keywords.push('幸福');
+    else if (G.mood < 30) keywords.push('挣扎');
+    // 限制在7个关键词以内，优先选择更有意义的
+    const priority = ['冒险者','创业者','涅槃重生','内心安定','文化自觉','自由人','逃离者','环保先锋','优雅老去','财务自由','终身学习','个人品牌','中年创业','务实主义','理想主义','社交蝴蝶','独行侠','理性派','感性灵魂','冒险者','已婚','父母','健康达人','魅力四射','人脉广泛','幸福','挣扎','体制内'];
+    const sorted = priority.filter(k => keywords.includes(k)).slice(0, 7);
+    // 如果不够7个，补充通用词
+    if (sorted.length < 3) {
+        if (G.achievements.length > 30) sorted.push('人生赢家');
+        if (G.city) sorted.push(G.city + '人');
+        if (G.age >= 50) sorted.push('岁月如歌');
+        if (G.flags.memoir) sorted.push('记录者');
+    }
+    return sorted.slice(0, 7);
+}
+
+// v24.0: 人生时间线 - 获取关键人生事件的时间线
+function getLifeTimeline() {
+    const timeline = [];
+    // 从事件日志中提取关键事件
+    if (G.eventLog) {
+        G.eventLog.forEach(e => {
+            if (e.text && (e.text.includes('【') || e.text.includes('转折') || e.text.includes('特质'))) {
+                timeline.push({ age: e.age, text: e.text });
+            }
+        });
+    }
+    // 添加关键里程碑
+    if (G.flags.married) timeline.push({ age: G.flags._marriageAge || 30, text: '💒 结婚了' });
+    if (G.flags.hasChild) timeline.push({ age: G.flags._childAge || 32, text: '👶 有了孩子' });
+    if (G.flags.hasHouse) timeline.push({ age: G.flags._houseAge || 28, text: '🏡 买了房' });
+    if (G.flags.entrepreneur) timeline.push({ age: 30, text: '🚀 开始创业' });
+    // 按年龄排序
+    timeline.sort((a, b) => a.age - b.age);
+    return timeline.slice(0, 15); // 最多显示15个关键事件
+}
+
 function triggerEnding() {
     G.isEnded = true;
     const ending = ENDINGS.find(e => e.cond(G)) || ENDINGS[ENDINGS.length-1];
@@ -14746,6 +14903,21 @@ function triggerEnding() {
         const gradeLabel = lifeScore.score >= 90 ? 'S·传奇人生' : lifeScore.score >= 75 ? 'A·精彩人生' : lifeScore.score >= 60 ? 'B·充实人生' : lifeScore.score >= 40 ? 'C·平凡人生' : 'D·坎坷人生';
         const gradeColor = lifeScore.score >= 90 ? '#f59e0b' : lifeScore.score >= 75 ? '#60a5fa' : lifeScore.score >= 60 ? '#4ade80' : lifeScore.score >= 40 ? '#fbbf24' : '#f87171';
         scoreEl.innerHTML = existingHTML + `<h3>🎯 人生评分</h3><div class="life-score-display" style="text-align:center;margin:10px 0;"><div style="font-size:3em;font-weight:bold;color:${gradeColor}">${lifeScore.score}</div><div style="font-size:1.2em;color:${gradeColor};margin-top:5px">${gradeLabel}</div><div style="font-size:0.85em;color:#888;margin-top:8px">${lifeScore.details.map(d => d.label + ': ' + d.score).join(' · ')}</div></div>`;
+    }
+
+    // v24.0: 人生关键词展示
+    const keywords = generateLifeKeywords();
+    if (keywords.length > 0 && scoreEl) {
+        scoreEl.innerHTML += `<h3>🏷️ 人生关键词</h3><div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0">${keywords.map(k => `<span style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:4px 12px;border-radius:20px;font-size:0.9em">${k}</span>`).join('')}</div>`;
+    }
+
+    // v24.0: 人生时间线展示
+    const timeline = getLifeTimeline();
+    if (timeline.length > 0) {
+        const timelineEl = document.getElementById('life-timeline-v24');
+        if (timelineEl) {
+            timelineEl.innerHTML = `<h3>📅 人生大事记</h3><div class="timeline-v24" style="max-height:300px;overflow-y:auto;padding:10px">${timeline.map(t => `<div style="display:flex;gap:10px;margin-bottom:8px;border-left:3px solid #764ba2;padding-left:12px"><span style="color:#764ba2;font-weight:bold;min-width:40px">${t.age}岁</span><span style="color:#ccc">${t.text}</span></div>`).join('')}</div>`;
+        }
     }
 
     // Update ending progress
