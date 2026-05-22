@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v4.7
+// 都市浮生记 - Game Engine v4.8
 // ============================================
 
 // === GAME STATE ===
@@ -3015,6 +3015,16 @@ const EVENTS = [
         { label:'只是默默使用', hint:'+👥 +😊', fn: g => { g.flags.internetMeme=true; return{social:8,mood:8}; }},
         { label:'不玩梗，太累了', hint:'+🧠 +😊', fn: g => { g.flags.internetMeme=true; return{intel:5,mood:3}; }},
       ]},
+    // === v4.8 EVENTS - 断亲与轻断亲 ===
+    { id:'family_disconnect', icon:'🚪', title:'断亲',
+      body:'春节快到了。你妈打来电话：\n\n"什么时候回来？"\n"什么时候结婚？"\n"工资多少了？"\n"买房了吗？"\n\n你看着手机，沉默了。\n\n"过年回家不是充电，是耗电。"\n\n南京大学调查：90后断亲率63%，00后断亲率78%。\n\n你不是不孝，你只是累了。\n\n"断亲不是断情，而是对无效社交的淘汰，对高质量亲情的觉醒。"',
+      cond: g => !g.flags.familyDisconnect && g.age>=22 && g.age<=35,
+      choices:[
+        { label:'春节不回家', hint:'+😊 -👥', fn: g => { g.flags.familyDisconnect=true; return{mood:20,social:-15}; }},
+        { label:'退家族群', hint:'+😊 -👥', fn: g => { g.flags.familyDisconnect=true; g.flags.quitFamilyGroup=true; return{mood:15,social:-20}; }},
+        { label:'轻断亲：回乡住酒店', hint:'+😊 -💰', fn: g => { g.flags.familyDisconnect=true; g.flags.lightDisconnect=true; return{mood:12,money:-2000,social:-5}; }},
+        { label:'还是回家吧', hint:'+👥 +😊 -❤️', fn: g => { g.flags.familyDisconnect=true; return{social:10,mood:5,health:-5}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3236,6 +3246,8 @@ const ACHIEVEMENTS = [
     // v4.7 achievements
     { id:'abstract_artist', icon:'🎭', name:'抽象艺术家', desc:'体验抽象文化', check: g => g.flags.abstractCulture },
     { id:'meme_lord', icon:'😂', name:'梗王', desc:'成为网络热梗玩家', check: g => g.flags.internetMeme },
+    // v4.8 achievements
+    { id:'boundary_setter', icon:'🚪', name:'边界感大师', desc:'实践断亲或轻断亲', check: g => g.flags.familyDisconnect },
 ];
 
 // === ENDINGS === (order matters: first match wins)
