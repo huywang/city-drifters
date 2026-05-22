@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v22.4
+// 都市浮生记 - Game Engine v22.5
 // ============================================
 
 // === GAME STATE ===
@@ -10780,6 +10780,87 @@ const EVENTS = [
         { label:'试着平衡但很难坚持', hint:'+😊', fn: g => { g.flags.gamingBalance=true; return{mood:5}; }},
         { label:'还是控制不住，游戏太好玩了', hint:'', fn: g => { g.flags.gamingBalance=true; return{mood:-3}; }},
       ]},
+    // === v22.5 新增事件（二次元文化） ===
+    { id:'anime_start', icon:'🎌', title:'入坑动漫', category:'hobby',
+      body:'你偶然在B站看了一部动漫——《进击的巨人》。\n\n你本来只是无聊点开——结果一口气看到了凌晨4点。\n\n你被震撼了。不是因为画面——是因为剧情。人性的挣扎、自由的意义、牺牲的重量……\n\n你开始刷各种动漫推荐：《钢炼》《死亡笔记》《你的名字》《鬼灭之刃》……\n\n你发现：动漫不是「给小孩看的卡通」——是一种独特的艺术形式。它可以探讨任何主题。\n\n你的朋友圈画风变了：从晒美食变成了晒动漫截图。\n\n你的一个不看动漫的朋友说：「你都多大了还看动画片？」\n\n你说：「动漫的受众不是孩子——是所有还相信故事的人。」\n\n「二次元的魅力：它创造了一个比现实更美好的世界——但最好的故事，总会让你更理解现实。」',
+      cond: g => !g.flags.animeStart && g.age >= 20 && g.age <= 35,
+      choices:[
+        { label:'成了资深漫迷，开始追番', hint:'+😊 +🧠', fn: g => { g.flags.animeStart=true; g.flags.animeFan=true; return{mood:10,intel:5}; }},
+        { label:'看了几部觉得不错，偶尔看看', hint:'+😊', fn: g => { g.flags.animeStart=true; return{mood:5}; }},
+        { label:'觉得不是你的菜', hint:'', fn: g => { g.flags.animeStart=true; return{mood:2}; }},
+      ]},
+    { id:'comic_con', icon:'🎪', title:'漫展初体验', category:'social',
+      body:'你的朋友拉你去了漫展。\n\n你到了现场——惊呆了。到处都是Cosplay的人：\n- 有人穿了全套铠甲\n- 有人画了精致的妆容扮成角色\n- 有人拿着等身抱枕排队\n- 有人在舞台上表演宅舞\n\n你的朋友穿了一套角色服装。你问：「你不觉得尴尬吗？」\n\n她说：「在这里没人会觉得尴尬——因为每个人都一样。」\n\n你开始理解：漫展不是一个「奇怪的聚会」——是一个让你可以做自己的地方。\n\n你买了一些周边：手办、徽章、海报。花了800块。\n\n你发了朋友圈：「第一次来漫展——原来二次元的世界这么精彩。」\n\n「漫展的意义：在这里，你的「小众爱好」是主流。你不需要解释为什么——因为所有人都懂。」',
+      cond: g => g.flags.animeFan && !g.flags.comicCon && g.money >= 1000,
+      choices:[
+        { label:'爱上了漫展，开始定期参加', hint:'+👥 +😊 +💰-', fn: g => { g.flags.comicCon=true; return{social:8,mood:12,money:-800}; }},
+        { label:'体验很新奇，但不太适应人太多', hint:'+😊 +👥', fn: g => { g.flags.comicCon=true; return{mood:8,social:3,money:-800}; }},
+        { label:'觉得太「宅」了，不太适合你', hint:'', fn: g => { g.flags.comicCon=true; return{mood:3,money:-800}; }},
+      ]},
+    { id:'cosplay_try', icon:'👗', title:'尝试Cosplay', category:'hobby',
+      body:'你在漫展上看到了一个超级还原的Cosplay——你决定也试试。\n\n你选了一个喜欢的角色。你开始准备：\n- 假发：200元\n- 服装：500元\n- 道具：300元\n- 化妆品：200元\n\n总投入：1200元。\n\n你在家对着镜子试穿。你的室友看到了说：「你……挺好看的。」\n\n你鼓起勇气穿去了漫展。有人找你拍照！有人说：「你的还原度好高！」\n\n你从未想过：扮演一个虚构的角色——会让你感到如此自信。\n\n你发了条微博：「Cosplay教会我的：你可以成为任何人。包括更好的自己。」\n\n「Cosplay不是逃避现实——是在另一个身份里，发现现实中不敢展示的自己。」',
+      cond: g => g.flags.comicCon && !g.flags.cosplayTry && g.money >= 1500,
+      choices:[
+        { label:'爱上了Cosplay，成了漫展常客', hint:'+✨ +😊 +💰-', fn: g => { g.flags.cosplayTry=true; return{charm:10,mood:12,money:-1200}; }},
+        { label:'尝试了一次，觉得挺有趣', hint:'+✨ +😊', fn: g => { g.flags.cosplayTry=true; return{charm:5,mood:8,money:-1200}; }},
+        { label:'穿上后觉得太羞耻了', hint:'', fn: g => { g.flags.cosplayTry=true; return{mood:-3,money:-1200}; }},
+      ]},
+    { id:'otaku_life', icon:'🏠', title:'宅文化生活', category:'hobby',
+      body:'你发现自己的周末变成了这样：\n- 周六：睡到中午，吃外卖，看动漫，打游戏\n- 周日：同上\n\n你已经连续三个周末没出门了。\n\n你的微信步数从10000变成了500。你的社交活动只剩下线上聊天。\n\n但你不觉得不开心。你看动漫、打游戏、刷B站——你觉得很充实。\n\n你的一个朋友说：「你这样下去不行，要出去走走。」\n\n你说：「你觉得我孤独——但我觉得自由。」\n\n你在网上看到一句话：「宅不是病——是你选择了一种低消耗的生活方式。」\n\n但你偶尔也会想：如果出去走走，会不会遇到更多有趣的事？\n\n「宅文化的本质：不是逃避社交——是选择了一种让自己舒服的方式活着。关键是：你是主动选择的——还是被迫的？」',
+      cond: g => g.flags.animeFan && !g.flags.otakuLife && g.age >= 22,
+      choices:[
+        { label:'接受了宅的生活方式，觉得很自在', hint:'+😊', fn: g => { g.flags.otakuLife=true; return{mood:8}; }},
+        { label:'意识到太宅了，开始试着出去走走', hint:'+😊 +👥', fn: g => { g.flags.otakuLife=true; return{mood:5,social:5,health:3}; }},
+        { label:'宅得很快乐，但身体开始抗议', hint:'+😊 -❤️', fn: g => { g.flags.otakuLife=true; return{mood:8,health:-5}; }},
+      ]},
+    { id:'figure_collection', icon:'🗿', title:'手办收藏', category:'hobby',
+      body:'你买了你的第一个手办——一个你最爱的动漫角色。\n\n价格：380元。你犹豫了很久——但下单的那一刻，你觉得值了。\n\n你把手办放在书桌上。每天看到它，你都会微笑。\n\n你开始研究手办市场：\n- 普通手办：200-500元\n- 景品手办：100-200元\n- 正版比例手办：1000-5000元\n- 限定版：可能涨到原价的10倍\n\n你开始收集。你的柜子慢慢填满了。你的存款慢慢减少了。\n\n你的一个朋友来你家：「你这些塑料小人花了多少钱？」\n\n你说：「它们不是塑料——是回忆。」\n\n「手办收藏的本质：你买的不是一块塑料——是一段让你感动的故事。」',
+      cond: g => g.flags.animeFan && !g.flags.figureCollection && g.money >= 1000,
+      choices:[
+        { label:'认真收藏，成了手办爱好者', hint:'+😊 +💰-', fn: g => { g.flags.figureCollection=true; return{mood:10,money:-3000}; }},
+        { label:'买了几个喜欢的，不沉迷', hint:'+😊 +💰-', fn: g => { g.flags.figureCollection=true; return{mood:5,money:-1000}; }},
+        { label:'太贵了，只买了一个景品', hint:'+😊', fn: g => { g.flags.figureCollection=true; return{mood:3,money:-150}; }},
+      ]},
+    { id:'anime_pilgrimage', icon:'⛩️', title:'圣地巡礼', category:'hobby',
+      body:'你看了《你的名字》——然后查了一下：电影中那个著名的阶梯，在东京的须贺神社。\n\n你决定：去日本做一次「圣地巡礼」。\n\n你攒了钱，请了假，飞到了日本。你找到了那个阶梯——\n\n你站在那里，和动画中的画面一模一样。你的眼眶湿了。\n\n你还去了：\n- 《灌篮高手》的镰仓高校前\n- 《千与千寻》的道后温泉\n- 《秒速五厘米》的樱花道\n\n每到一个地方，你都拍了照——和动画截图放在一起。\n\n你发了朋友圈：「圣地巡礼——用脚步丈量二次元的世界。」\n\n「圣地巡礼的意义：你走进了一个你爱的故事——然后发现，现实也可以很美。」',
+      cond: g => g.flags.animeFan && !g.flags.animePilgrimage && g.money >= 10000 && g.age >= 22,
+      choices:[
+        { label:'完成了一次完美的圣地巡礼', hint:'+😊 +✨ +💰-', fn: g => { g.flags.animePilgrimage=true; return{mood:15,charm:5,money:-8000}; }},
+        { label:'去了一些地方，但没有全部找到', hint:'+😊 +💰-', fn: g => { g.flags.animePilgrimage=true; return{mood:10,money:-8000}; }},
+        { label:'去了日本但没有做圣地巡礼', hint:'+😊', fn: g => { g.flags.animePilgrimage=true; return{mood:5,money:-8000}; }},
+      ]},
+    { id:'vtuber_world', icon:'📺', title:'虚拟主播', category:'tech',
+      body:'你在B站发现了一种新物种：虚拟主播（VTuber）。\n\n他们不是真人出镜——是用动画形象直播。但他们的互动比真人主播还有趣。\n\n你关注了一个VTuber。她唱歌好听、搞笑、还会和弹幕互动。\n\n你开始每天看她的直播。你发现：虽然你知道她是「虚拟的」——但你的感情是「真实的」。\n\n你在弹幕里认识了很多同好。你们组了一个「推V群」。\n\n你的一个不看VTuber的朋友说：「你对着一堆像素产生感情？」\n\n你说：「你对着一本小说也会感动——它不也是一堆文字吗？」\n\n「虚拟主播的魅力：他们证明了一件事——连接人的不是外表——是灵魂。」',
+      cond: g => g.flags.animeFan && !g.flags.vtuberWorld && g.age >= 20 && g.age <= 35,
+      choices:[
+        { label:'成了VTuber的忠实粉丝', hint:'+😊 +👥 +💰-', fn: g => { g.flags.vtuberWorld=true; return{mood:8,social:5,money:-500}; }},
+        { label:'偶尔看看，觉得挺有意思', hint:'+😊', fn: g => { g.flags.vtuberWorld=true; return{mood:5}; }},
+        { label:'觉得太虚拟了，没有真实感', hint:'', fn: g => { g.flags.vtuberWorld=true; return{mood:2}; }},
+      ]},
+    { id:'doujin_create', icon:'✏️', title:'同人创作', category:'career',
+      body:'你太喜欢一部动漫了——你开始做同人创作。\n\n你画了同人漫画（虽然画功一般），写了同人小说（虽然文笔稚嫩）。\n\n你发到了Lofter上。第一天的阅读量：30。\n\n但有一条评论：「太太画得好可爱！请继续！」\n\n你继续画了。你的画功在进步。你的粉丝从30变成了300。\n\n有人找你约稿：「能帮我画一张吗？200块。」\n\n你不敢相信：你的爱好开始赚钱了。\n\n你在同人展上卖了自己的同人志。一天卖了50本。\n\n你发了微博：「从观众到创作者——同人让我发现了自己的另一面。」\n\n「同人创作是粉丝文化最美的样子：你不只是消费者——你也是创造者。」',
+      cond: g => g.flags.animeFan && !g.flags.doujinCreate && g.intel >= 40,
+      choices:[
+        { label:'坚持创作，成了小有名气的同人作者', hint:'+✨ +💰 +😊', fn: g => { g.flags.doujinCreate=true; return{charm:10,money:3000,mood:12}; }},
+        { label:'创作了一些但没坚持', hint:'+✨ +😊', fn: g => { g.flags.doujinCreate=true; return{charm:5,mood:8}; }},
+        { label:'试了觉得太难了，还是当观众', hint:'+😊', fn: g => { g.flags.doujinCreate=true; return{mood:3}; }},
+      ]},
+    { id:'anime_community', icon:'💬', title:'二次元社群', category:'social',
+      body:'你加入了一个动漫交流群。\n\n群里有200多人。每天的话题：\n- 新番讨论\n- 角色分析\n- CP之争（这个最容易吵架）\n- 同人创作分享\n- 线下活动约起\n\n你在群里认识了一些真正的朋友。你们不只看动漫——还聊人生、聊工作、聊感情。\n\n你们组织了一次线下聚会。在一个咖啡厅，10个人聊了4个小时。\n\n你发现：二次元社群的特别之处是——你们有共同的「语言」。你说一个角色名，所有人都知道是谁。\n\n你发了条动态：「二次元最好的不是动漫——是在动漫里遇到的人。」\n\n「二次元社交的核心：共同的爱好创造了一种特殊的纽带——你们不只是朋友，是同好。」',
+      cond: g => g.flags.animeFan && !g.flags.animeCommunity && g.social >= 25,
+      choices:[
+        { label:'成了二次元社群的核心成员', hint:'+👥 +😊', fn: g => { g.flags.animeCommunity=true; return{social:10,mood:8}; }},
+        { label:'认识了一些有趣的人', hint:'+👥 +😊', fn: g => { g.flags.animeCommunity=true; return{social:5,mood:5}; }},
+        { label:'加了群但很少说话', hint:'', fn: g => { g.flags.animeCommunity=true; return{social:2}; }},
+      ]},
+    { id:'anime_inspiration', icon:'💡', title:'动漫的启发', category:'psychology',
+      body:'你看了一部动漫——《银之匙》。讲的是城市少年去农业学校的故事。\n\n主角说了一句话让你印象深刻：「不是每个人都要做第一名。找到自己的位置——就够了。」\n\n你开始思考：你在大城市的生活，是不是也在盲目追求「第一名」？\n\n你看了更多有深度的动漫：\n- 《虫师》：关于人与自然的关系\n- 《夏目友人帐》：关于孤独和温柔\n- 《四月是你的谎言》：关于遗憾和成长\n\n你发现：好的动漫不只是娱乐——它能改变你看待世界的方式。\n\n你开始在日记里写：「从动漫中学到的道理。」\n\n你妈看到了说：「你看动画片还能学到东西？」\n\n你说：「妈，最好的故事，不管用什么形式讲——都是智慧。」\n\n「二次元最大的误解：人们以为它是逃避——其实很多时候，它是回归。回归到那些最基本的东西：爱、勇气、希望。」',
+      cond: g => g.flags.animeFan && !g.flags.animeInspiration && g.intel >= 35,
+      choices:[
+        { label:'从动漫中获得了很多人生启发', hint:'+🧠 +😊', fn: g => { g.flags.animeInspiration=true; g.flags.personalGrowth=true; return{intel:10,mood:10}; }},
+        { label:'觉得有道理但没太深想', hint:'+🧠', fn: g => { g.flags.animeInspiration=true; return{intel:5,mood:5}; }},
+        { label:'觉得动漫就是娱乐，不必太认真', hint:'', fn: g => { g.flags.animeInspiration=true; return{mood:3}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -11777,6 +11858,12 @@ const ACHIEVEMENTS = [
     { id:'indie_dev_ach', icon:'💻', name:'独立游戏开发者', desc:'做出了自己的第一款游戏', check: g => g.flags.indieGameDev },
     { id:'retro_gamer_ach', icon:'🕹️', name:'怀旧玩家', desc:'在老游戏中找回了童年的记忆', check: g => g.flags.retroGaming },
     { id:'game_balance_ach', icon:'⚖️', name:'游戏生活平衡师', desc:'学会了平衡游戏和工作', check: g => g.flags.gamingBalance },
+    // === v22.5 新增成就（二次元文化） ===
+    { id:'anime_fan_ach', icon:'🎌', name:'二次元居民', desc:'入坑了动漫世界', check: g => g.flags.animeFan },
+    { id:'cosplayer_ach', icon:'👗', name:'Cosplayer', desc:'尝试了角色扮演', check: g => g.flags.cosplayTry },
+    { id:'figure_collector_ach', icon:'🗿', name:'手办收藏家', desc:'开始收集动漫手办', check: g => g.flags.figureCollection },
+    { id:'pilgrim_ach', icon:'⛩️', name:'圣地巡礼者', desc:'去了动漫取景地朝圣', check: g => g.flags.animePilgrimage },
+    { id:'doujin_creator_ach', icon:'✏️', name:'同人创作者', desc:'开始了自己的同人创作', check: g => g.flags.doujinCreate },
 ];
 
 // === ENDINGS === (order matters: first match wins)
