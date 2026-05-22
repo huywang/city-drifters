@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v32.7
+// 都市浮生记 - Game Engine v32.8
 // ============================================
 
 // === GAME STATE ===
@@ -18156,6 +18156,97 @@ const EVENTS = [
         { label:'录了一段猫叫声当素材', hint:'+✨', fn: g => { g.flags.midnightCats=true; return{charm:3}; }},
         { label:'在猫叫声中睡着了，觉得很治愈', hint:'+😊 +💪', fn: g => { g.flags.midnightCats=true; return{mood:5,health:3}; }},
       ]},
+
+    // === v32.8 城市里的陌生人 ===
+    { id:'subway_seat_v32_8', icon:'🚇', title:'地铁上让座', category:'stranger',
+      body:'地铁上很挤，你抢到了一个座位。\n\n下一站上来一个孕妇，她一手扶着肚子，一手抓着扶手，在晃动的车厢里站不稳。\n\n你看了看周围——坐着的人都在看手机，没有人动。\n\n你站起来说：「您坐这吧。」她看了你一眼，笑了：「谢谢你啊。」\n\n你抓着扶手站了八站路。到站的时候你的腿有点麻了。\n\n但你觉得，这八站路是你今天最有意义的时间。',
+      cond: g => g.age >= 16,
+      choices:[
+        { label:'让了座，站了一路', hint:'+👥 +😊', fn: g => { g.flags.subwaySeat=true; return{social:3,mood:8}; }},
+        { label:'犹豫了很久，最后还是让了', hint:'+👥', fn: g => { g.flags.subwaySeat=true; return{social:2,mood:5}; }},
+        { label:'假装睡着了没看到', hint:'-😊', fn: g => { g.flags.subwaySeat=true; g.flags.pretendSleep=true; return{mood:-5}; }},
+      ]},
+
+    { id:'borrow_powerbank_v32_8', icon:'🔋', title:'陌生人借充电宝', category:'stranger',
+      body:'你在商场里等朋友的时候，一个女生走过来问你：「你好，我手机快没电了，能借你的充电宝用一下吗？」\n\n你看了看她——穿着得体，像是来逛街的。你犹豫了一下，还是把充电宝借给她了。\n\n她充了二十分钟，一边充电一边跟你聊天。原来她是来这个城市出差的，手机导航没电了。\n\n她把充电宝还给你的时候说：「太谢谢了，要不是你我都不知道怎么办。加个微信？以后请你喝奶茶。」\n\n你加了微信。后来你们偶尔在朋友圈互相点赞，但从来没有再见过。\n\n你觉得这就是大城市里的缘分——短暂但温暖。',
+      cond: g => g.age >= 18 && g.social > 30,
+      choices:[
+        { label:'借了充电宝还加了微信', hint:'+👥 +😊', fn: g => { g.flags.borrowPowerbank=true; return{social:5,mood:5}; }},
+        { label:'借了但没加微信', hint:'+👥', fn: g => { g.flags.borrowPowerbank=true; return{social:3,mood:3}; }},
+        { label:'婉拒了，怕被骗', hint:'-👥', fn: g => { g.flags.borrowPowerbank=true; return{social:-2}; }},
+      ]},
+
+    { id:'chat_in_line_v32_8', icon:'🗣️', title:'排队时的闲聊', category:'stranger',
+      body:'你在网红店排队，已经排了四十分钟了。\n\n排在你后面的大哥开始跟你聊天：「这家人真的好吃吗？我老婆让我来排队，她自己在家追剧。」\n\n你笑了：「我也是被朋友拉来的。」\n\n你们聊了一路：工作、房子、孩子上学、哪个超市的菜便宜。他比你大十岁，在一家物流公司做调度。\n\n排到你的时候，他帮你也排了一个位置，让你先进去点餐。\n\n你们坐下来一起吃了一顿饭。他说：「排队最爽的就是交到朋友。」\n\n你加了他的微信，觉得这个大哥挺有意思的。',
+      cond: g => g.age >= 20 && g.social > 20,
+      choices:[
+        { label:'成了微信好友偶尔聊天', hint:'+👥 +😊', fn: g => { g.flags.chatInLine=true; return{social:8,mood:5}; }},
+        { label:'聊得很开心但没留联系方式', hint:'+👥 +😊', fn: g => { g.flags.chatInLine=true; return{social:5,mood:5}; }},
+        { label:'礼貌地应付了一下', hint:'+👥', fn: g => { g.flags.chatInLine=true; return{social:2}; }},
+      ]},
+
+    { id:'help_when_lost_v32_8', icon:'🗺️', title:'迷路时有人帮忙', category:'stranger',
+      body:'你去一个陌生的小区见客户，结果迷路了。\n\n导航到了小区门口就不管了，里面的楼栋号乱七八糟。你转了两圈也没找到。\n\n一个在楼下遛弯的老大爷看到你东张西望，主动问：「小伙子/姑娘，你找哪栋？」\n\n你说了楼栋号，他笑了：「这小区新来的吧？跟我来，我带你去。」\n\n他走在前面，你跟在后面。他边走边说：「这小区设计得不好，第一次来的人都迷路。我住了十年了，闭着眼都能走。」\n\n到了楼下，你说谢谢。他挥挥手就走了。\n\n你不知道他叫什么名字，但他让你觉得这个城市有人情味。',
+      cond: g => g.age >= 18,
+      choices:[
+        { label:'真诚地道了谢', hint:'+👥 +😊', fn: g => { g.flags.helpWhenLost=true; return{social:3,mood:5}; }},
+        { label:'买了瓶水给他', hint:'-💰 +👥 +😊', fn: g => { g.flags.helpWhenLost=true; g.money-=5; return{social:5,mood:8}; }},
+        { label:'心想以后也要多帮别人', hint:'+🧠 +😊', fn: g => { g.flags.helpWhenLost=true; g.flags.helpOthers=true; return{intel:3,mood:5}; }},
+      ]},
+
+    { id:'cafe_share_table_v32_8', icon:'☕', title:'咖啡馆拼桌', category:'stranger',
+      body:'周末下午，咖啡馆里座无虚席。你端着一杯拿铁四处找位置，只剩下一个双人桌坐了一个人。\n\n你问：「你好，这里有人吗？」对方摇摇头。\n\n你坐下来，打开电脑开始工作。对面是一个女生，也在用电脑。\n\n过了一个小时，她突然问你：「你是在写代码吗？我也是程序员。」\n\n你们聊了起来。她在另一家公司做后端开发，最近在学Rust。你在做前端，正好想学后端。\n\n你们互相推荐了几个学习资源，加了GitHub互关。\n\n走的时候她说：「下次再来拼桌啊。」你觉得这杯咖啡特别值。',
+      cond: g => g.age >= 20 && g.intel > 40,
+      choices:[
+        { label:'成了编程搭子，经常交流', hint:'+🧠 +👥', fn: g => { g.flags.cafeShareTable=true; g.flags.codeBuddy=true; return{intel:8,social:5}; }},
+        { label:'聊得很开心但只是萍水相逢', hint:'+👥 +😊', fn: g => { g.flags.cafeShareTable=true; return{social:5,mood:5}; }},
+        { label:'礼貌地点了点头没怎么说话', hint:'+🧠', fn: g => { g.flags.cafeShareTable=true; return{intel:3}; }},
+      ]},
+
+    { id:'elevator_smile_v32_8', icon:'😄', title:'电梯里的微笑', category:'stranger',
+      body:'每天早上你都在同一时间坐电梯下楼。\n\n电梯里总是那几个人：一个戴耳机的男生、一个拎公文包的中年男人、一个推着婴儿车的年轻妈妈。\n\n你们从来不说话，只是各自看手机。\n\n但今天，那个婴儿车里的宝宝突然冲你笑了。你忍不住也笑了。那个年轻妈妈也笑了。\n\n然后戴耳机的男生摘下一只耳机看了看你们，也笑了。\n\n电梯到了一楼，门开了，大家各自走出去。但你觉得今天的早晨好像不太一样了。\n\n你意识到，有时候一个微笑就能改变一天的开始。',
+      cond: g => g.age >= 18 && g.jobSalary > 0,
+      choices:[
+        { label:'以后每天进电梯都主动打招呼', hint:'+👥 +😊', fn: g => { g.flags.elevatorSmile=true; g.flags.dailyGreeting2=true; return{social:5,mood:5}; }},
+        { label:'笑了但之后还是各看手机', hint:'+😊', fn: g => { g.flags.elevatorSmile=true; return{mood:3}; }},
+        { label:'跟那个妈妈聊了几句育儿经', hint:'+👥 +🧠', fn: g => { g.flags.elevatorSmile=true; return{social:5,intel:3}; }},
+      ]},
+
+    { id:'share_umbrella_v32_8', icon:'☂️', title:'雨天借伞', category:'stranger',
+      body:'下班的时候突然下了大雨。你没带伞，站在公司门口等雨小一点。\n\n旁边也站了一个人，也没带伞。你们对视了一眼，苦笑了一下。\n\n过了十分钟，一个路过的阿姨看到你们，说：「你们没带伞啊？我这把伞大，送你们到地铁站吧。」\n\n你们三个人挤在一把伞下面，阿姨走在中间。她的伞确实很大，但三个人还是都湿了一点。\n\n到了地铁站，你们说谢谢。阿姨说：「没事，我家就在旁边。下次记得带伞啊。」\n\n她转身走进了雨里。你发现她其实绕了远路来送你们的。\n\n你不知道她的名字，但你觉得这把伞是你收到过最好的礼物。',
+      cond: g => g.age >= 18 && g.jobSalary > 0,
+      choices:[
+        { label:'记住了这份善意，下次也帮别人', hint:'+🧠 +👥', fn: g => { g.flags.shareUmbrella=true; g.flags.payForward=true; return{intel:3,social:3,mood:8}; }},
+        { label:'跟另一个没带伞的人交换了微信', hint:'+👥', fn: g => { g.flags.shareUmbrella=true; return{social:5}; }},
+        { label:'感动得差点哭了', hint:'+😊', fn: g => { g.flags.shareUmbrella=true; return{mood:10}; }},
+      ]},
+
+    { id:'convenience_tacit_v32_8', icon:'🏪', title:'深夜便利店的默契', category:'stranger',
+      body:'凌晨一点，你下楼去便利店买泡面。\n\n店里只有你和另一个人——一个穿着睡衣的男生，也在泡面货架前挑。\n\n你们同时伸手去拿最后一桶老坛酸菜面。你们对视了一眼，都笑了。\n\n他说：「你先拿吧。」你说：「没事，你来。」\n\n推让了两个回合，最后你拿了老坛酸菜，他拿了红烧牛肉。\n\n你们坐在便利店窗边的桌子前，各自泡着面，各自刷着手机。\n\n但有一种奇怪的默契在空气里——两个在深夜里吃泡面的人，不需要说什么就能理解对方。\n\n走的时候你们互相点了点头。这就是深夜便利店里的友谊。',
+      cond: g => g.age >= 18 && g.age <= 35,
+      choices:[
+        { label:'跟他聊了几句，发现住同一个小区', hint:'+👥 +😊', fn: g => { g.flags.convenienceTacit=true; g.flags.sameComplex=true; return{social:5,mood:5}; }},
+        { label:'安静地吃完面各自走了', hint:'+😊', fn: g => { g.flags.convenienceTacit=true; return{mood:5}; }},
+        { label:'你请他喝了一瓶饮料', hint:'-💰 +👥', fn: g => { g.flags.convenienceTacit=true; g.money-=10; return{social:3,mood:5}; }},
+      ]},
+
+    { id:'bus_elder_v32_8', icon:'🚌', title:'公交车上的老人', category:'stranger',
+      body:'你坐公交车，旁边坐了一个七十多岁的老奶奶。\n\n她手里拎着一袋菜，问你：「小伙子/姑娘，到哪一站下车能到菜市场？」\n\n你告诉了她。她说：「谢谢你啊，我不太会坐公交车，以前都是骑自行车的。」\n\n你们聊了起来。她说她老伴去年走了，现在一个人住。子女在外地，一年回来看她一两次。\n\n「我不想去养老院，那个家住了四十年了，舍不得。」\n\n到站了，她下车前拍了拍你的手说：「谢谢你陪我说话，年轻人。」\n\n你看着她佝偻的背影走进菜市场。你突然想给自己的爷爷奶奶打个电话。',
+      cond: g => g.age >= 16,
+      choices:[
+        { label:'帮她拎了菜送到了菜市场', hint:'+👥 +😊', fn: g => { g.flags.busElder=true; g.flags.helpedElder=true; return{social:5,mood:8}; }},
+        { label:'下了车就给爷爷奶奶打了电话', hint:'+👥 +😊', fn: g => { g.flags.busElder=true; g.flags.calledGrandparents=true; return{social:5,mood:8}; }},
+        { label:'在心里默默祝福了她', hint:'+🧠 +😊', fn: g => { g.flags.busElder=true; return{intel:3,mood:5}; }},
+      ]},
+
+    { id:'stranger_kindness_v32_8', icon:'🤝', title:'陌生人的善意', category:'stranger',
+      body:'你在地铁站等车的时候，包里的东西掉了出来，散了一地。\n\n你手忙脚乱地捡，有三四个人同时蹲下来帮你捡。一个阿姨帮你捡了笔，一个学生帮你捡了文件，一个大叔帮你捡了水杯。\n\n他们把东西递给你的时候，你连声说谢谢。\n\n阿姨说：「没事没事，东西多吧？下次用个大点的包。」\n\n学生说：「没事的，我以前也掉过。」\n\n大叔什么都没说，只是点了点头就走了。\n\n你把东西放回包里，鼻子有点酸。你不知道为什么，可能是因为这个城市有时候比你想的更温暖。\n\n你决定以后看到别人需要帮忙的时候，也要第一时间伸出援手。',
+      cond: g => g.age >= 16,
+      choices:[
+        { label:'决定以后也要多帮助别人', hint:'+🧠 +👥', fn: g => { g.flags.strangerKindness=true; g.flags.helpOthersMore=true; return{intel:3,social:5}; }},
+        { label:'感动了很久', hint:'+😊', fn: g => { g.flags.strangerKindness=true; return{mood:10}; }},
+        { label:'发了条朋友圈记录这件事', hint:'+✨ +😊', fn: g => { g.flags.strangerKindness=true; return{charm:3,mood:5}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -19881,6 +19972,18 @@ const ACHIEVEMENTS = [
     { id:'piano_neighbor_ach', icon:'🎹', name:'钢琴邻居', desc:'在邻居的钢琴声中找到了美好', check: g => g.flags.neighborPiano },
     { id:'morning_horns_ach', icon:'🚗', name:'早高峰生存者', desc:'在早高峰的喇叭声中保持了冷静', check: g => g.flags.morningHorns },
     { id:'midnight_cats_ach', icon:'🐈', name:'深夜猫叫', desc:'在猫叫声中感受到了城市里的生命力', check: g => g.flags.midnightCats },
+
+    // --- v32.8 城市里的陌生人成就 ---
+    { id:'subway_seat_ach', icon:'🚇', name:'让座达人', desc:'在地铁上给别人让了座', check: g => g.flags.subwaySeat },
+    { id:'borrow_pb_ach', icon:'🔋', name:'充电宝缘分', desc:'借充电宝给陌生人并交了朋友', check: g => g.flags.borrowPowerbank },
+    { id:'chat_line_ach', icon:'🗣️', name:'排队之交', desc:'在排队时和陌生人成了朋友', check: g => g.flags.chatInLine },
+    { id:'help_lost_ach', icon:'🗺️', name:'热心路人', desc:'迷路时得到了陌生人的帮助', check: g => g.flags.helpWhenLost },
+    { id:'cafe_table_ach', icon:'☕', name:'拼桌之缘', desc:'在咖啡馆拼桌认识了新朋友', check: g => g.flags.cafeShareTable },
+    { id:'elevator_smile_ach', icon:'😄', name:'电梯微笑', desc:'在电梯里和一个微笑改变了早晨', check: g => g.flags.elevatorSmile },
+    { id:'share_umb_ach', icon:'☂️', name:'雨伞之恩', desc:'在雨天感受到了陌生人的温暖', check: g => g.flags.shareUmbrella },
+    { id:'convenience_tacit_ach', icon:'🏪', name:'深夜泡面之交', desc:'在深夜便利店和陌生人有了默契', check: g => g.flags.convenienceTacit },
+    { id:'bus_elder_ach', icon:'🚌', name:'公交故事', desc:'在公交车上听了一个老人的故事', check: g => g.flags.busElder },
+    { id:'stranger_kind_ach', icon:'🤝', name:'陌生人的善意', desc:'被陌生人的帮助感动了很久', check: g => g.flags.strangerKindness },
 ];
 
 // === ENDINGS === (order matters: first match wins)
