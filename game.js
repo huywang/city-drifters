@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v8.1
+// 都市浮生记 - Game Engine v8.2
 // ============================================
 
 // === GAME STATE ===
@@ -17,6 +17,8 @@ const G = {
     inventory: {},
     // v8.0: 连续月数追踪（用于事件链深度）
     consecutiveChoices: {},
+    // v8.2: 延迟后果系统 - 某些选择的后果在数月后显现
+    delayedEffects: [],
 };
 
 // === BACKGROUNDS ===
@@ -359,7 +361,7 @@ const EVENTS = [
       body:'老板在群里发了条消息："从今天起，我们实行弹性工作制——弹到晚上10点。"\n\n同事们面面相觑，然后纷纷打开了外卖App。你看了看时间，现在才下午3点，距离下班还有7个小时。\n\n"奋斗的青春最美丽"——你在心里默默骂了句脏话。',
       cond: g => g.job!=='待业中' && g.jobSalary>0,
       choices:[
-        { label:'接受996，为梦想窒息', hint:'+💰 -❤️', fn: g => ({money:Math.floor(g.jobSalary*0.3),health:-10,mood:-15}) },
+        { label:'接受996，为梦想窒息', hint:'+💰 -❤️', fn: g => { addDelayedEffect(Math.floor(Math.random()*3)+2, {health:-12, mood:-8}, '连续996的后果终于显现了。你在办公室突然头晕目眩，差点晕倒。同事帮你叫了120。\n\n医生说："再这样下去，下次可能就不是头晕了。"\n\n"梦想窒息——不是比喻，是字面意思。"'); return{money:Math.floor(g.jobSalary*0.3),health:-10,mood:-15}; }},
         { label:'摸鱼到下班', hint:'+😊', fn: g => ({mood:5,intel:-2}) },
         { label:'跟老板硬刚', hint:'🎲', fn: g => { if(Math.random()>0.6){return{mood:20,social:10,charm:5}}else{setJob(g,'待业中',0);return{mood:-20,money:-2000}} }},
         { label:'偷偷投简历', hint:'🤫', fn: g => ({mood:-5,social:3}) },
@@ -528,7 +530,7 @@ const EVENTS = [
       choices:[
         { label:'办健身卡', hint:'-💰 +❤️', fn: g => { if(Math.random()>0.5){return{money:-3000,health:12,mood:8}}else{return{money:-3000,health:2}} }},
         { label:'开始跑步', hint:'+❤️', fn: g => ({health:8,mood:5}) },
-        { label:'算了，反正也活不了几年', hint:'-❤️', fn: g => ({health:-5,mood:-5}) },
+        { label:'算了，反正也活不了几年', hint:'-❤️', fn: g => { addDelayedEffect(Math.floor(Math.random()*4)+2, {health:-15, mood:-10, money:-3000}, '你之前忽视了体检报告上的异常指标。今天你突然感到胸口一阵剧痛，被送进了急诊。\n\n医生说："如果再晚来两天……"\n\n你没让他说完。你开始后悔当初那个"算了"的决定。'); return{health:-5,mood:-5}; }},
         { label:'去医院复查', hint:'-💰 +❤️', fn: g => ({money:-2000,health:10,mood:5}) },
       ]},
     { id:'insomnia', icon:'😵', title:'失眠之夜', weight:2,
@@ -3869,7 +3871,7 @@ const EVENTS = [
       body:'你在网上看到一个广告："急用钱？无需征信，当天放款！"\n\n利息"只有"月息3%。你算了一下——年化36%。\n\n但你的花呗已经逾期了，信用卡也刷爆了。你看了看这个数字，又看了看账单。\n\n"当你开始考虑高利贷的时候，说明你已经走投无路了。"',
       cond: g => g.money < -20000 && !g.flags.loanShark,
       choices:[
-        { label:'借5万应急', hint:'🎲🎲', fn: g => { g.flags.loanShark=true; g.flags.onlineLoan=true; return{money:50000,mood:5,health:-5}; }},
+        { label:'借5万应急', hint:'🎲🎲', fn: g => { g.flags.loanShark=true; g.flags.onlineLoan=true; g.flags.loanSharkOwed=true; addDelayedEffect(3, function(g2){g2.flags.loanSharkUrgent=true; return {mood:-15, money:-Math.floor(g2.money*0.1)-5000};}, '高利贷到期了。利息像雪球一样越滚越大，催收电话从早打到晚。你的通讯录好友都收到了短信。\n\n"借高利贷就像喝盐水解渴——越喝越渴。"'); return{money:50000,mood:5,health:-5}; }},
         { label:'算了，自己扛', hint:'+🧠', fn: g => ({intel:5,mood:-10}) },
         { label:'跟父母坦白', hint:'+👥 -😊', fn: g => { if(g.relationships) g.relationships.family = clamp((g.relationships.family||60)-10,0,100); return{money:20000,mood:-15,social:5}; }},
       ]},
@@ -3917,7 +3919,7 @@ const EVENTS = [
       body:'双十一到了。你的购物车里堆了37件"必买"商品，总价8000块。\n\n你告诉自己："这些都是打折的，不买就是亏。"\n\n但你的银行卡告诉你："再买就是亏。"\n\n"双十一的本质：你以为你在省钱，其实你在花钱。"',
       cond: g => g.month === 11 && !g.flags.double11,
       choices:[
-        { label:'全部清空！买！', hint:'-💰 +😊', fn: g => { g.flags.double11=true; return{money:-8000,mood:15,charm:5}; }},
+        { label:'全部清空！买！', hint:'-💰 +😊', fn: g => { g.flags.double11=true; addDelayedEffect(2, {money:-3000, mood:-10}, '双十一的信用卡账单到了。你看着数字，深呼吸了一下。\n\n你买的东西有一半已经找不到了，另一半你后悔买了。\n\n"双十一买的东西，三月到了想退货——但退货比买还难。"'); return{money:-8000,mood:15,charm:5}; }},
         { label:'只买3件最需要的', hint:'-💰 +🧠', fn: g => { g.flags.double11=true; return{money:-2000,mood:5,intel:3}; }},
         { label:'一件都不买', hint:'+💰 +🧠 -😊', fn: g => { g.flags.double11=true; return{money:0,intel:5,mood:-8}; }},
         { label:'全退了', hint:'+🧠 +😊', fn: g => { g.flags.double11=true; g.flags.minimalist=true; return{intel:5,mood:3}; }},
@@ -4669,6 +4671,9 @@ function startGame() {
         recentEventIds: [],
         inventory: {},
         consecutiveChoices: {},
+        // v8.2: 延迟后果系统初始化
+        delayedEffects: [],
+        _consecutiveActivity: { type: null, count: 0 },
     });
 
     showScreen('screen-game');
@@ -4756,6 +4761,17 @@ function advanceMonth() {
 
     // v8.0: 每月更新倒卖交易价格
     updateTradePrices();
+
+    // v8.2: 延迟后果系统 - 检查是否有到期的延迟效果
+    processDelayedEffects();
+
+    // v8.2: 连续活动惩罚/奖励 - 连续选同一活动会有额外后果
+    processConsecutiveActivity();
+
+    // v8.2: 季度里程碑事件
+    if (G.months > 0 && G.months % 3 === 0 && Math.random() > 0.5) {
+        triggerQuarterlyEvent();
+    }
 
     // 季节效果
     const season = getSeason(G.month);
@@ -5103,6 +5119,106 @@ function showSurpriseEvent(event) {
     if (G.health<=0 || G.mood<=0 || G.money<=-100000) triggerEnding();
     checkAchievements();
     playSound('chain');
+}
+
+// === v8.2 延迟后果系统 ===
+function addDelayedEffect(monthsLater, effect, message) {
+    if (!G.delayedEffects) G.delayedEffects = [];
+    G.delayedEffects.push({
+        triggerMonth: G.months + monthsLater,
+        effect: effect,
+        message: message
+    });
+}
+
+function processDelayedEffects() {
+    if (!G.delayedEffects || !G.delayedEffects.length) return;
+    const triggered = G.delayedEffects.filter(e => G.months >= e.triggerMonth);
+    const remaining = G.delayedEffects.filter(e => G.months < e.triggerMonth);
+    G.delayedEffects = remaining;
+
+    triggered.forEach(de => {
+        const eff = typeof de.effect === 'function' ? de.effect(G) : de.effect;
+        if (eff.money) G.money += eff.money;
+        if (eff.health) G.health = clamp(G.health + eff.health, 0, 100);
+        if (eff.mood) G.mood = clamp(G.mood + eff.mood, 0, 100);
+        if (eff.intel) G.intel = clamp(G.intel + eff.intel, 0, 100);
+        if (eff.social) G.social = clamp(G.social + eff.social, 0, 100);
+        if (eff.charm) G.charm = clamp(G.charm + eff.charm, 0, 100);
+        if (eff.flag) G.flags[eff.flag] = true;
+
+        // 显示延迟后果通知
+        addEventCard({
+            icon: '⏰',
+            title: '过去的选择找上了你',
+            body: de.message + '\n\n<div class="meme-quote" style="color:var(--accent)">— 因果报应 —</div>',
+            type: (eff.mood||0) > 0 ? 'positive' : (eff.mood||0) < 0 ? 'negative' : ''
+        }, true);
+    });
+}
+
+// === v8.2 连续活动后果系统 ===
+function processConsecutiveActivity() {
+    if (!selectedActivity && !G._lastActivity) return;
+    const act = G._lastActivity;
+    if (!act) return;
+
+    // 追踪连续选择同一活动的月数
+    if (!G._consecutiveActivity) G._consecutiveActivity = { type: null, count: 0 };
+    if (G._consecutiveActivity.type === act) {
+        G._consecutiveActivity.count++;
+    } else {
+        G._consecutiveActivity = { type: act, count: 1 };
+    }
+
+    const count = G._consecutiveActivity.count;
+    // 连续6个月选同一活动，触发特殊后果
+    if (count >= 6) {
+        const consequences = {
+            work: { money: 5000, health: -15, mood: -10, message: '你已经连续6个月拼命工作了。你的身体开始抗议——体检报告上多了三个箭头。' },
+            rest: { money: -3000, health: 10, mood: 15, message: '你已经连续6个月休息了。你的身心恢复了不少，但银行卡余额让你开始焦虑。' },
+            study: { intel: 15, mood: -5, message: '你已经连续6个月充电了。你考了两个证，但你开始怀疑：这些证真的有用吗？' },
+            socialize: { social: 15, money: -5000, charm: 8, message: '你已经连续6个月社交了。你成了圈子里的名人，但你的钱包在哭泣。' },
+            exercise: { health: 15, charm: 10, mood: 5, message: '你已经连续6个月锻炼了。你的腹肌开始显形，你的精神状态比大多数同龄人好得多。' },
+        };
+        const c = consequences[act];
+        if (c) {
+            if (c.money) G.money += c.money;
+            if (c.health) G.health = clamp(G.health + c.health, 0, 100);
+            if (c.mood) G.mood = clamp(G.mood + c.mood, 0, 100);
+            if (c.intel) G.intel = clamp(G.intel + c.intel, 0, 100);
+            if (c.social) G.social = clamp(G.social + c.social, 0, 100);
+            if (c.charm) G.charm = clamp(G.charm + c.charm, 0, 100);
+            addEventCard({
+                icon: '🔄',
+                title: '坚持的力量',
+                body: c.message + '\n\n<div class="meme-quote" style="color:var(--accent)">— 量变引起质变 —</div>',
+                type: (c.mood||0) > 0 ? 'positive' : (c.mood||0) < 0 ? 'negative' : ''
+            }, true);
+            G._consecutiveActivity.count = 0; // 重置
+        }
+    }
+}
+
+// === v8.2 季度里程碑事件 ===
+function triggerQuarterlyEvent() {
+    const milestones = [
+        { cond: g => g.months === 3, body: '你在大城市已经活了3个月了。\n\n你开始熟悉地铁线路，知道了哪家外卖最好吃，学会了在早高峰保持优雅。\n\n但你偶尔会在深夜想家。\n\n"3个月，足够你爱上这座城市，也足够你开始讨厌它。"' },
+        { cond: g => g.months === 12, body: '一年了。你在这个城市整整一年了。\n\n你回顾这一年：换了几份工作？认识了几个人？哭过几次？笑过几次？\n\n你发了一条朋友圈："一周年。"\n\n没人点赞。但你知道，这一年你成长了很多。\n\n"一年前你拎着行李箱来，现在你拎着行李箱——但至少你知道了哪个区的房租最便宜。"' },
+        { cond: g => g.months === 24, body: '两年了。你已经是个"老漂"了。\n\n你开始给新来的朋友推荐餐厅，告诉他们哪条地铁线最挤，哪个医院看病不用排太久。\n\n你的父母在电话里问："什么时候回来？"你说："快了。"\n\n但你心里知道：你已经离不开这座城市了。\n\n"两年，你从游客变成了居民，从居民变成了……一个还不确定自己属于哪里的人。"' },
+        { cond: g => g.months === 36, body: '三年了。\n\n三年前的你，看到CBD的高楼会仰头看很久。现在的你，只是低头看手机走过。\n\n你开始理解：大城市不欠你什么，你也不欠大城市什么。\n\n你只是在这里，认真地活着。\n\n"三年，足够你从理想主义者变成现实主义者——如果你还没放弃的话。"' },
+        { cond: g => g.months === 60, body: '五年了。\n\n你在这个城市度过了整个二十代。\n\n你看着镜子里的自己：眼角有了细纹，但眼神更坚定了。你的银行余额可能没有你期望的那么多，但你积累了比钱更宝贵的东西——经验、人脉、和一种叫做"韧劲"的品质。\n\n"五年前的你，以为五年后会功成名就。五年后的你发现：活着本身就是一种成就。"' },
+    ];
+
+    const milestone = milestones.find(m => m.cond(G));
+    if (milestone) {
+        addEventCard({
+            icon: '📅',
+            title: `里程碑：${G.months}个月`,
+            body: milestone.body + `\n\n<div class="meme-quote" style="color:var(--accent)">— 时光荏苒 —</div>`,
+            type: 'neutral'
+        }, true);
+    }
 }
 
 // === v8.0 倒卖交易系统 ===
@@ -5681,7 +5797,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '8.1' };
+    const saveData = { ...G, savedAt: Date.now(), version: '8.2' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
