@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v8.2
+// 都市浮生记 - Game Engine v8.3
 // ============================================
 
 // === GAME STATE ===
@@ -4109,6 +4109,39 @@ const EVENTS = [
         { label:'认栽，找新房子', hint:'-💰', fn: g => { g.flags.rentScam=true; return{money:-5000,mood:-15}; }},
         { label:'赖着不走，跟真房东谈判', hint:'🎲', fn: g => { g.flags.rentScam=true; if(Math.random()>0.5){return{money:-2000,mood:-5}}else{return{money:-8000,mood:-20,health:-5}} }},
       ]},
+    // === v8.3 深化事件链 + 黑色幽默 ===
+    { id:'wechat_moments_crisis', icon:'📱', title:'朋友圈人设崩塌',
+      body:'你在朋友圈精心经营着"精致生活"人设：打卡网红餐厅、晒健身照、分享读书笔记。\n\n直到你的同事截图了你的朋友圈发到群里："你们看她/他，明明工资才8000，天天装有钱人。"\n\n你看到了截图，手在发抖。\n\n"朋友圈是成年人的简历——只是你不知道HR也在看。"',
+      cond: g => g.charm >= 50 && !g.flags.momentsCrisis && g.months > 6,
+      choices:[
+        { label:'删掉所有朋友圈', hint:'+🧠 -✨', fn: g => { g.flags.momentsCrisis=true; addDelayedEffect(3, {charm:10, intel:5, mood:10}, '你删掉了所有朋友圈后，反而轻松了很多。你开始活在当下，而不是活在别人的点赞里。'); return{charm:-10,mood:-15,intel:5}; }},
+        { label:'回怼！关你什么事', hint:'+😊 -👥', fn: g => { g.flags.momentsCrisis=true; return{mood:8,social:-10,charm:-5}; }},
+        { label:'假装没看到', hint:'-😊', fn: g => { g.flags.momentsCrisis=true; addDelayedEffect(2, {mood:-8}, '你假装没看到同事的截图，但每次看到那个同事都浑身不自在。\n\n"成年人的体面，就是假装什么都没发生。"'); return{mood:-5}; }},
+      ]},
+    { id:'parent_video_call', icon:'📹', title:'父母的视频电话',
+      body:'你妈突然要求视频通话。你赶紧把出租屋的背景换成了"整洁模式"——把脏衣服塞进衣柜，外卖盒扔进垃圾桶。\n\n视频接通后，你妈的第一句话是："你是不是又瘦了？"\n\n然后她把手机转向你爸："你看，孩子瘦了。"\n\n你爸说："让他多吃点肉。"\n\n你妈说："让他早点睡。"\n\n你爸说："让他别乱花钱。"\n\n你妈说："让他赶紧找对象。"\n\n你：……\n\n"父母的关心，总是以「让他」开头，以你沉默结束。"',
+      cond: g => g.months > 3 && !g.flags.parentVideoCall,
+      choices:[
+        { label:'笑着说"我都好"', hint:'+👨‍👩‍👧', fn: g => { g.flags.parentVideoCall=true; if(g.relationships) g.relationships.family = clamp((g.relationships.family||60)+8,0,100); addDelayedEffect(1, {mood:-5}, '挂了视频后你在出租屋里坐了很久。你说的"我都好"，你自己都不信。'); return{mood:5}; }},
+        { label:'哭着说想家了', hint:'+😊 -💪', fn: g => { g.flags.parentVideoCall=true; if(g.relationships) g.relationships.family = clamp((g.relationships.family||60)+15,0,100); return{mood:10,charm:-3}; }},
+        { label:'"我在忙，下次再聊"', hint:'-👨‍👩‍👧', fn: g => { g.flags.parentVideoCall=true; if(g.relationships) g.relationships.family = clamp((g.relationships.family||60)-10,0,100); addDelayedEffect(4, {mood:-15, social:-5}, '你妈在电话里哭着说："你是不是不想理我们了？"\n\n你才想起来：上次说"下次再聊"，已经是4个月前了。'); return{mood:-3}; }},
+      ]},
+    { id:'midnight_philosophy', icon:'🌃', title:'凌晨哲学时刻',
+      body:'凌晨2点，你还没睡。你打开窗户，看着城市的夜景。\n\n楼下有个外卖小哥在跑，对面有个程序员还在加班，远处有个工地还在施工。\n\n你突然开始想一些"没用"的问题：\n- 人生的意义是什么？\n- 我为什么在这里？\n- 如果当初选了另一条路会怎样？\n\n然后你看了看时间：2:15。明天还要上班。\n\n"凌晨的思考是最深刻的，也是最没用的——因为天亮后你就会忘记。"',
+      cond: g => g.mood < 50 && g.health < 60,
+      choices:[
+        { label:'写下你的想法', hint:'+🧠 +✨', fn: g => { g.flags.midnightPhilosophy=true; addDelayedEffect(6, function(g2){g2.flags.writer=true; return {intel:10,charm:8,mood:15};}, '半年前你凌晨写下的那些文字，今天被你翻了出来。你读了一遍，发现自己当时比现在清醒得多。\n\n你把它们发到了公众号上，阅读量只有37。但有一个留言说："写到我心里去了。"'); return{intel:8,charm:3,mood:-3}; }},
+        { label:'点一份外卖', hint:'+😊 -💰', fn: g => { return{mood:8,money:-80,health:-2}; }},
+        { label:'强迫自己睡觉', hint:'+❤️', fn: g => { return{health:3,mood:-3}; }},
+      ]},
+    { id:'career_crossroad', icon:'🔀', title:'职业十字路口', weight:2,
+      body:'你在这家公司干了两年了。今天领导找你谈话："公司准备提拔一个人做主管，你有兴趣吗？"\n\n你当然有兴趣。但你也知道：当了主管就要996，要管理团队，要背KPI。\n\n同时，一个猎头也找上了你："有个创业公司想挖你，薪资涨30%，期权另谈。"\n\n你站在十字路口：稳定晋升 vs 冒险跳槽。\n\n"每个选择都是一条路。你选了这条路，就永远不知道那条路的风景。"',
+      cond: g => g.job !== '待业中' && g.months > 18 && g.jobSalary > 8000 && !g.flags.careerCrossroad,
+      choices:[
+        { label:'接受提拔，做主管', hint:'+💰 -❤️', fn: g => { g.flags.careerCrossroad=true; setJob(g, getTitle(g,'lead'), Math.floor(g.jobSalary*1.5)); addDelayedEffect(6, {health:-10, mood:-5, money:10000}, '当了半年主管，你的工资涨了，但你的黑眼圈也深了。你开始理解为什么前任主管总是叹气。'); return{money:5000,mood:10,health:-5}; }},
+        { label:'跳槽去创业公司', hint:'🎲', fn: g => { g.flags.careerCrossroad=true; g.flags.careerChange=true; if(Math.random()>0.4){setJob(g,'高级'+g.job.replace('初级',''),Math.floor(g.jobSalary*1.3)); addDelayedEffect(8, function(g2){if(Math.random()>0.5){g2.flags.entrepreneur=true; return {money:50000,mood:20}}else{return {money:-20000,mood:-15}};}, '你跳槽的那家创业公司：要么上市了，要么倒闭了。无论哪种，你都学到了很多。'); return{mood:15,charm:5}}else{setJob(g,'待业中',0); return{mood:-20,money:-5000}} }},
+        { label:'都拒绝，做现在的事', hint:'+😊', fn: g => { g.flags.careerCrossroad=true; addDelayedEffect(12, {mood:8, intel:5}, '一年过去了。你没升职也没跳槽。但你在现在的岗位上越来越熟练，越来越从容。\n\n有时候，不选择也是一种选择。'); return{mood:5,intel:3}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -4469,6 +4502,12 @@ const ACHIEVEMENTS = [
     { id:'rent_scam_survivor', icon:'🏚️', name:'租房老江湖', desc:'被黑中介坑过还活着', check: g => g.flags.rentScam && g.money > -20000 },
     { id:'health_awakening_v2', icon:'⚰️', name:'生死觉悟', desc:'同事猝死后开始重视健康', check: g => g.flags.colleagueKaroshi && g.flags.fitnessJourney },
     { id:'newbie_survivor', icon:'🌱', name:'新手不死', desc:'活过了头3个月', check: g => g.months >= 3 },
+    // === v8.3 新增成就 ===
+    { id:'regret_accumulator', icon:'💭', name:'算了大师', desc:'说了5次以上"算了"', check: g => (g.flags.regretCount||0) >= 5 },
+    { id:'moments_crisis_survivor', icon:'📱', name:'人设重建', desc:'经历朋友圈人设崩塌后重建自我', check: g => g.flags.momentsCrisis && g.charm >= 50 },
+    { id:'delayed_consequence_survivor', icon:'⏰', name:'因果循环', desc:'经历了至少一个延迟后果', check: g => (g.flags.loanSharkUrgent||g.flags.writer||false) },
+    { id:'consecutive_exerciser', icon:'🏃', name:'健身狂魔', desc:'连续6个月锻炼', check: g => g._consecutiveActivity && g._consecutiveActivity.type === 'exercise' && g._consecutiveActivity.count >= 6 },
+    { id:'career_crossroad_survivor', icon:'🔀', name:'职业抉择', desc:'站在职业十字路口做出选择', check: g => g.flags.careerCrossroad },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -4998,6 +5037,15 @@ function makeChoice(i) {
     const event = G.currentEvent, choice = event.choices[i];
     G.choices++;
     const result = choice.fn(G);
+
+    // v8.2: "算了"累积追踪 - 选择放弃型选项会积累遗憾值
+    if (choice.label && (choice.label.includes('算了') || choice.label.includes('还是算了'))) {
+        G.flags.regretCount = (G.flags.regretCount || 0) + 1;
+        // 每5次"算了"，触发一次遗憾反思
+        if (G.flags.regretCount % 5 === 0 && G.flags.regretCount <= 20) {
+            addDelayedEffect(1, {mood: -10, intel: 5}, '你突然想起了那些你说"算了"的事情。\n\n那些没去追的梦想、没敢表白的暗恋、没投出的简历、没迈出的那一步。\n\n你数了数：已经说了太多次"算了"。\n\n"人生最大的遗憾不是失败，而是「我本可以」。"');
+        }
+    }
 
     if (result.money) G.money += result.money;
     if (result.health) G.health = clamp(G.health + result.health, 0, 100);
@@ -5797,7 +5845,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '8.2' };
+    const saveData = { ...G, savedAt: Date.now(), version: '8.3' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
