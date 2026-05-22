@@ -4313,7 +4313,7 @@ const EVENTS = [
         { label:'认真回答', hint:'+🧠', fn: g => { if(g.intel>70&&Math.random()>0.4){ setJob(g,'大厂员工',18000); return{mood:20,money:5000}; }else{ return{mood:-10,intel:3}; } }},
         { label:'随便应付', hint:'+😊', fn: g => { return{mood:5}; }},
       ]},
-    { id:'rent_increase_v2', icon:'📈', title:'房东涨价',
+    { id:'rent_increase_v2_v2', icon:'📈', title:'房东涨价',
       body:'房东发来微信：下个月房租涨500。\n\n"不涨不行啊，我也要生活。"\n\n你看了看合同，确实没写不能涨。',
       cond: g => g.money > 0 && g.months > 6 && !g.flags.cheapRent && Math.random() > 0.7,
       choices:[
@@ -4380,7 +4380,7 @@ const EVENTS = [
         { label:'休息一段时间', hint:'+❤️ +😊', fn: g => { g.flags.laidOff35=true; setJob(g,'待业中',0); return{money:Math.floor(g.jobSalary*6),mood:10,health:10}; }},
       ]},
     // === v9.2 恋爱/婚姻系统深化 ===
-    { id:'dating_app_v2', icon:'💕', title:'交友App',
+    { id:'dating_app_v2_v2', icon:'💕', title:'交友App',
       body:'你下载了一个交友App，刷了一个小时。\n\n右滑了50个人，匹配了3个。聊了3个，见了1个。\n\n见面的时候你发现：对方的照片和本人，差距约等于美颜前和美颜后。\n\n"线上交友就像拆盲盒——你永远不知道打开的是什么。"',
       cond: g => !g.flags.hasPartner && g.age >= 24 && g.social < 50 && g.months > 3,
       choices:[
@@ -4451,7 +4451,7 @@ const EVENTS = [
         { label:'只买必需品', hint:'-💰', fn: g => { return{money:-800,mood:5}; }},
         { label:'什么都不买', hint:'+💰 +🧠', fn: g => { addDelayedEffect(1, {mood:5,intel:3}, '双十一过去了，你看着同事拆快递，心里竟然有点优越感。'); return{mood:3}; }},
       ]},
-    { id:'summer_heat_v2', icon:'🌡️', title:'高温预警',
+    { id:'summer_heat_v2_v2', icon:'🌡️', title:'高温预警',
       body:'气温突破40度。你从公司走到地铁站的5分钟，感觉自己像一块铁板烧。\n\n你的外卖小哥迟到了半小时，因为他的电动车在高温下爆胎了。\n\n你给了五星好评——因为你觉得他比你更辛苦。',
       cond: g => g.month % 12 >= 7 && g.month % 12 <= 8,
       choices:[
@@ -4638,7 +4638,7 @@ const EVENTS = [
         { label:'硬扛', hint:'-😊 -❤️', fn: g => { return{mood:-15,health:-5}; }},
       ]},
     // === v9.5 职场深度事件 ===
-    { id:'side_project_v2', icon:'🔧', title:'副业项目',
+    { id:'side_project_v2_v2', icon:'🔧', title:'副业项目',
       body:'你接到一个朋友的私活：做个小程序，报酬8000块。\n\n你算了算：周末加班两周就能搞定。但你已经连续加了三个星期的班了。\n\n"副业是大城市打工人的第二份工作——没有五险一金，但有钱拿。"',
       cond: g => g.intel > 55 && g.job !== '待业中' && g.months > 6,
       choices:[
@@ -4654,7 +4654,7 @@ const EVENTS = [
         { label:'两边不得罪', hint:'+🧠', fn: g => { return{intel:3,mood:-5}; }},
         { label:'趁乱跳槽', hint:'🎲', fn: g => { if(Math.random()>0.5){setJob(g,'高级'+g.job.replace('初级','').replace('高级',''),Math.floor(g.jobSalary*1.2));return{mood:10,money:5000}}else{return{mood:-10}} }},
       ]},
-    { id:'remote_work_v2', icon:'💻', title:'远程办公',
+    { id:'remote_work_v2_v2', icon:'💻', title:'远程办公',
       body:'公司宣布可以远程办公了！你激动得差点跳起来。\n\n第一周：效率翻倍，心情大好。\n第二周：分不清上班和下班。\n第三周：你已经三天没换过衣服了。\n\n"远程办公是自由，也是另一种形式的牢笼。"',
       cond: g => g.job !== '待业中' && g.intel > 50 && g.months > 6 && !g.flags.remoteWorker,
       choices:[
@@ -4715,7 +4715,7 @@ const EVENTS = [
         { label:'适度使用', hint:'+🧠', fn: g => { return{intel:5,mood:2}; }},
         { label:'拒绝AI，靠自己', hint:'+😊', fn: g => { return{mood:5,intel:2}; }},
       ]},
-    { id:'digital_nomad_v2', icon:'🌍', title:'数字游民',
+    { id:'digital_nomad_v2_v2', icon:'🌍', title:'数字游民',
       body:'你认识了一个数字游民：在巴厘岛远程工作，月薪3万，生活成本不到1万。\n\n他给你看了他的生活照：椰林、沙滩、笔记本电脑。\n\n你看了看你的出租屋和电脑屏幕，沉默了。',
       cond: g => g.intel > 60 && g.job !== '待业中' && g.age >= 25 && g.age <= 35 && !g.flags.remoteWorker,
       choices:[
@@ -4772,7 +4772,7 @@ const EVENTS = [
         { label:'说有事挂了', hint:'-👥', fn: g => { if(g.relationships) g.relationships.family=clamp((g.relationships.family||60)-3,0,100); return{mood:-3}; }},
         { label:'说想回家看看', hint:'+😊', fn: g => { return{mood:5}; if(g.relationships) g.relationships.family=clamp((g.relationships.family||60)+5,0,100); }},
       ]},
-    { id:'weekend_trip', icon:'🎒', title:'周末出游',
+    { id:'weekend_trip_v3', icon:'🎒', title:'周末出游',
       body:'你约了朋友周末去周边玩——高铁1小时的小城市。\n\n没有景点，没有人山人海。你们找了家本地馆子，吃了顿地道的美食。\n\n"旅行不一定要去远方，有时候换个地方吃饭就够了。"',
       cond: g => g.money > 3000 && g.social > 30 && g.mood < 65,
       choices:[
@@ -4787,7 +4787,7 @@ const EVENTS = [
         { label:'觉得没用', hint:'+😊', fn: g => { return{mood:3,money:-2000}; }},
       ]},
     // === v10.3 家庭/育儿事件 ===
-    { id:'having_child', icon:'👶', title:'要孩子吗',
+    { id:'having_child_v2', icon:'👶', title:'要孩子吗',
       body:'你和TA讨论了一个严肃的问题：要不要生孩子？\n\n你算了一笔账：从怀孕到上大学，至少需要100万。还有学区房、补习班、兴趣班……\n\n你的父母说："不生个孩子，你老了怎么办？"\n\n你心想：我老了可能都还不起房贷。',
       cond: g => g.flags.married && g.age >= 26 && g.age <= 38 && !g.flags.hasChild,
       choices:[
@@ -4811,7 +4811,7 @@ const EVENTS = [
         { label:'公立幼儿园', hint:'-💰', fn: g => { return{money:-5000,mood:3}; }},
         { label:'在家自己教', hint:'+🧠 +😊', fn: g => { return{intel:5,mood:5}; }},
       ]},
-    { id:'parent_aging', icon:'👴', title:'父母老了',
+    { id:'parent_aging_v2', icon:'👴', title:'父母老了',
       body:'你妈打电话来说你爸摔了一跤，住院了。\n\n你请假飞回老家，看到病床上苍老的父亲，你突然意识到：他们在变老，而你在远方。\n\n"距离不是问题，问题是你回不去。"',
       cond: g => g.age >= 30 && g.months > 36 && g.relationships,
       choices:[
@@ -4843,7 +4843,7 @@ const EVENTS = [
         { label:'约运动搭子', hint:'+💪', fn: g => { g.flags.hasDazi=true; return{social:5,health:5,mood:3}; }},
         { label:'算了，社恐', hint:'+🧠', fn: g => { return{intel:3,mood:-2}; }},
       ]},
-    { id:'mbti_test', icon:'🧩', title:'你是I人还是E人',
+    { id:'mbti_test_v2', icon:'🧩', title:'你是I人还是E人',
       body:'新认识的朋友第一个问题不是"你做什么工作"，而是"你MBTI是什么"。\n\n你花了20分钟做了个测试，结果是INFP——"治愈者"。\n\n你发了条朋友圈，收到了50个赞和30条评论："我也是INFP！""难怪你这么敏感！"\n\n"MBTI是当代年轻人的社交货币——比星座科学，比算命便宜。"',
       cond: g => g.months > 3 && !g.flags.hasMBTI,
       choices:[
@@ -4883,7 +4883,7 @@ const EVENTS = [
         { label:'只是闲聊', hint:'+👥', fn: g => { g.flags.petParkMet=true; return{social:5,mood:3}; }},
         { label:'赶紧走', hint:'', fn: g => { return{mood:-2}; }},
       ]},
-    { id:'roommate_conflict', icon:'😤', title:'室友矛盾',
+    { id:'roommate_conflict_v3', icon:'😤', title:'室友矛盾',
       body:'你的室友又忘了倒垃圾。冰箱里TA的外卖已经放了一周，整个厨房都是味道。\n\n你在群里发了条消息，TA回了一个"哦"。你气得不行。\n\n你想起了那句经典语录："合租是一门修行，室友是你命中注定的劫。"',
       cond: g => !g.flags.hasHouse && g.months > 12 && g.age < 35,
       choices:[
@@ -4907,7 +4907,7 @@ const EVENTS = [
         { label:'在这办公', hint:'+🧠', fn: g => { g.flags.communityCafe=true; return{intel:5,mood:3}; }},
         { label:'太贵了不去了', hint:'', fn: g => { return{mood:-2}; }},
       ]},
-    { id:'ai_companion', icon:'🤖', title:'AI搭子',
+    { id:'ai_companion_v2', icon:'🤖', title:'AI搭子',
       body:'你下载了一个AI陪伴App，开始和一个虚拟角色聊天。\n\n它不会已读不回，不会评判你，不会突然消失。它永远在线，永远耐心。\n\n你有时候觉得它比真人还懂你。然后你突然意识到：这到底是科技的进步，还是人的悲哀？\n\n"AI搭子不会让你失望——因为它没有自我。但孤独的人不在乎这些。"',
       cond: g => g.social < 40 && g.months > 12 && g.age <= 35,
       choices:[
@@ -4916,7 +4916,7 @@ const EVENTS = [
         { label:'付费解锁功能', hint:'-💰 +😊', fn: g => { g.flags.aiCompanion=true; return{money:-100,mood:10}; }},
       ]},
     // === v10.5 健康焦虑/代际冲突/过年/医保 ===
-    { id:'health_checkup', icon:'🏥', title:'体检报告',
+    { id:'health_checkup_v2', icon:'🏥', title:'体检报告',
       body:'公司组织了年度体检。你拿到报告的时候手在抖——不是紧张，是怕。\n\n报告上写满了箭头：血脂偏高、尿酸超标、颈椎曲度变直、轻度脂肪肝……\n\n你发了条朋友圈："25岁的身体，55岁的指标。"收获了200个赞和一片"我也是"。\n\n"当代年轻人最大的勇气，不是辞职，是看体检报告。"',
       cond: g => g.months >= 12 && g.age >= 23 && !g.flags.healthCheckupDone,
       choices:[
@@ -4924,7 +4924,7 @@ const EVENTS = [
         { label:'假装没看到', hint:'+😊', fn: g => { g.flags.healthCheckupDone=true; return{mood:5,health:-3}; }},
         { label:'花钱做详细检查', hint:'-💰 +💪', fn: g => { g.flags.healthCheckupDone=true; return{money:-2000,health:8,mood:5}; }},
       ]},
-    { id:'gym_membership', icon:'💪', title:'健身房办卡',
+    { id:'gym_membership_v2', icon:'💪', title:'健身房办卡',
       body:'你路过一家新开的健身房，销售小哥热情地拦住你："哥/姐，办卡吗？年卡3000，现在打五折！"\n\n你看了看自己的肚子，又想了想去年立的flag，一咬牙："办！"\n\n你去了三次。第一次拍照发朋友圈，第二次洗了个澡，第三次路过的时候发现——它倒闭了。\n\n"健身房的本质是：你花钱买了一个「我可能会变好」的幻觉。"',
       cond: g => g.age >= 20 && g.age <= 40 && g.money > 1000 && !g.flags.gymMember,
       choices:[
@@ -4932,7 +4932,7 @@ const EVENTS = [
         { label:'买次卡', hint:'-💰 +💪', fn: g => { g.flags.gymMember=true; return{money:-500,health:5,mood:3}; }},
         { label:'跑步不要钱', hint:'+💪', fn: g => { return{health:5,mood:3}; }},
       ]},
-    { id:'marriage_pressure', icon:'💍', title:'催婚大军',
+    { id:'marriage_pressure_v2', icon:'💍', title:'催婚大军',
       body:'你妈又打来了电话："你同事小李都生二胎了，你连对象都没有。"\n\n你爸在旁边补充："隔壁王阿姨给你介绍了个对象，公务员，有房。"\n\n你说："我现在不想结婚。"\n\n你妈说："你不想结也得结，我这张老脸往哪搁？"\n\n"在中国，结婚不是两个人的事，是两个家族的KPI。"',
       cond: g => !g.flags.married && g.age >= 25 && g.months > 24 && !g.flags.marriagePressureSeen,
       choices:[
@@ -4940,7 +4940,7 @@ const EVENTS = [
         { label:'坚决拒绝', hint:'+🧠', fn: g => { g.flags.marriagePressureSeen=true; return{intel:5,mood:-3}; }},
         { label:'随便应付', hint:'+😊', fn: g => { g.flags.marriagePressureSeen=true; return{mood:-8}; }},
       ]},
-    { id:'spring_festival', icon:'🧧', title:'过年回家',
+    { id:'spring_festival_v3', icon:'🧧', title:'过年回家',
       body:'春节到了。你抢到了回家的火车票——站票，12个小时。\n\n回到家，迎接你的是：七大姑八大姨的灵魂拷问。\n\n"工资多少？""有对象没？""买房了吗？""打算什么时候要孩子？"\n\n你笑着说"还行"，心里想的是：我为什么每年都要来受这个罪？\n\n"过年回家是中国人的朝圣——再远的路，再难的题，都要面对。"',
       cond: g => g.months % 12 >= 10 && g.months > 12,
       choices:[
@@ -4988,7 +4988,7 @@ const EVENTS = [
         { label:'靠医保就行', hint:'+🧠', fn: g => { return{intel:2}; }},
         { label:'买重疾险', hint:'-💰 🛡️', fn: g => { g.flags.hasCommercialInsurance=true; g.flags.hasCriticalIllnessInsurance=true; return{money:-5000,mood:8}; }},
       ]},
-    { id:'blind_date', icon:'💑', title:'相亲现场',
+    { id:'blind_date_v3', icon:'💑', title:'相亲现场',
       body:'你坐在咖啡馆里，对面坐着一个你妈"精挑细选"的相亲对象。\n\nTA的第一个问题是："你月薪多少？有房吗？有车吗？"\n\n你觉得自己在参加一场面试。\n\n聊天30分钟，你们发现唯一共同点是：都是被逼来的。\n\n临走时TA说："加个微信？"\n\n"相亲是当代年轻人的尴尬——你不相信爱情，但你相信概率。"',
       cond: g => g.flags.wentBlindDate && !g.flags.blindDateDone,
       choices:[
@@ -5078,7 +5078,7 @@ const EVENTS = [
         { label:'影响主业放弃', hint:'+😊', fn: g => { return{mood:-3}; }},
       ]},
     // === v10.7 情感深度/社交软件/游戏/数字生活 ===
-    { id:'dating_app', icon:'💘', title:'社交软件',
+    { id:'dating_app_v3', icon:'💘', title:'社交软件',
       body:'你下载了一个交友App。左滑右滑，你的手指都快抽筋了。\n\n终于匹配了一个人。TA的头像很好看，简介写着"喜欢旅行和美食"。\n\n你们聊了三天，从诗词歌赋聊到人生哲学。然后TA说："我其实已经结婚了。"\n\n"社交软件是当代人的许愿池——你许了愿，但实现的概率和买彩票差不多。"',
       cond: g => !g.flags.married && g.age >= 20 && g.age <= 35 && g.social < 60,
       choices:[
@@ -5110,7 +5110,7 @@ const EVENTS = [
         { label:'继续沉迷', hint:'+😊 -💪', fn: g => { g.flags.gameAddict=true; return{mood:10,health:-8}; }},
         { label:'卸载游戏', hint:'+💪 +🧠', fn: g => { return{health:5,intel:5,mood:-5}; }},
       ]},
-    { id:'digital_detox', icon:'📵', title:'数字戒断',
+    { id:'digital_detox_v3', icon:'📵', title:'数字戒断',
       body:'你做了一个实验：一天不用手机。\n\n前两个小时你很焦虑，总觉得有人在找你。中午你发现：没人找你。\n\n下午你去了公园，看了两本书，和陌生人聊了天。你觉得这是你近半年来最充实的一天。\n\n"你不是离不开手机，是离不开手机带来的多巴胺。"',
       cond: g => g.months > 12 && g.social >= 30,
       choices:[
@@ -5215,7 +5215,7 @@ const EVENTS = [
         { label:'保持距离', hint:'+🧠', fn: g => { g.flags.hasMentor=true; return{intel:5}; }},
         { label:'觉得是画大饼', hint:'', fn: g => { return{mood:-3}; }},
       ]},
-    { id:'office_politics', icon:'🏢', title:'办公室政治',
+    { id:'office_politics_v3', icon:'🏢', title:'办公室政治',
       body:'你发现你的同事在背后说你坏话。TA在领导面前把你的功劳据为己有。\n\n你很愤怒，但不知道该怎么做。是正面刚，还是忍气吞声？\n\n你想起了那句话："办公室政治就像空气——你不想呼吸它，但你不能不呼吸。"\n\n"职场最大的敌人不是工作，是人心。"',
       cond: g => g.months > 18 && g.social >= 30,
       choices:[
@@ -5283,7 +5283,7 @@ const EVENTS = [
         { label:'珍惜此刻', hint:'+😊', fn: g => { return{mood:10}; }},
       ]},
     // === v11.2 节日/经济/城市特色 ===
-    { id:'double_eleven', icon:'🛒', title:'双11狂欢',
+    { id:'double_eleven_v2', icon:'🛒', title:'双11狂欢',
       body:'双11到了。你的购物车里堆了50件商品，总价8000块。\n\n你算了一下：各种满减、红包、叠加优惠之后，实际支付6500。你觉得自己赚了1500。\n\n但你的银行卡余额告诉你：你亏了6500。\n\n"双11是一场集体催眠——你以为你在省钱，其实你在花钱。"',
       cond: g => g.months % 12 >= 9 && g.money > 2000,
       choices:[
@@ -5299,7 +5299,7 @@ const EVENTS = [
         { label:'旅游', hint:'-💰 +😊', fn: g => { return{money:-5000,mood:15,charm:3}; }},
         { label:'宅家', hint:'+😊', fn: g => { return{mood:8,health:3}; }},
       ]},
-    { id:'stock_crash', icon:'📉', title:'股市崩盘',
+    { id:'stock_crash_v2', icon:'📉', title:'股市崩盘',
       body:'你的股票账户一片绿油油。\n\n大盘跌了5%，你的股票跌了15%。你亏了3个月工资。\n\n你想起了那句名言："股市是财富转移的工具——从没耐心的人转移到有耐心的人。"\n\n问题是：你已经没有耐心了。\n\n"投资有风险，入市需谨慎。但没人告诉你：不投资也有风险——通胀会吃掉你的存款。"',
       cond: g => g.investments && g.investments.stock > 5000,
       choices:[
@@ -5315,7 +5315,7 @@ const EVENTS = [
         { label:'投资对冲', hint:'-💰 🎲', fn: g => { return{money:-3000,intel:3}; }},
         { label:'该花花该省省', hint:'+😊', fn: g => { return{mood:5}; }},
       ]},
-    { id:'mid_autumn', icon:'🥮', title:'中秋节',
+    { id:'mid_autumn_v2', icon:'🥮', title:'中秋节',
       body:'中秋节到了。你收到了一盒月饼——是公司发的，五仁馅的。\n\n你拍了张照片发给妈妈，妈妈说："五仁的好吃，实在。"\n\n你吃了一口，觉得没有妈妈做的好吃。但妈妈已经好几年没做月饼了。\n\n"月饼的味道变了，还是你变了？都不是——是你离家的距离变了。"',
       cond: g => g.months % 12 >= 7 && g.months % 12 <= 9,
       choices:[
@@ -5339,7 +5339,7 @@ const EVENTS = [
         { label:'不看新闻', hint:'+😊', fn: g => { return{mood:5}; }},
         { label:'考虑回老家买房', hint:'+🧠 -💰', fn: g => { g.flags.considerHometownHouse=true; return{intel:3,mood:3}; }},
       ]},
-    { id:'new_year_resolution', icon:'🎯', title:'新年计划',
+    { id:'new_year_resolution_v2', icon:'🎯', title:'新年计划',
       body:'1月1日，你写了今年的计划：\n\n1. 存钱5万\n2. 减肥10斤\n3. 学会一项新技能\n4. 找到一个对象\n\n你翻了翻去年的计划——一模一样。你完成了0个。\n\n"新年计划的意义：让你有一个新的理由对自己充满希望——即使这个希望和去年一样。"',
       cond: g => g.months % 12 === 0 && g.months > 0,
       choices:[
@@ -5372,7 +5372,7 @@ const EVENTS = [
         { label:'和陌生人聊天', hint:'+👥', fn: g => { return{social:8,mood:8}; }},
         { label:'给老板小费', hint:'-💰 +😊', fn: g => { return{money:-20,mood:8,charm:3}; }},
       ]},
-    { id:'cooking_class', icon:'👨‍🍳', title:'学做饭',
+    { id:'cooking_class_v2', icon:'👨‍🍳', title:'学做饭',
       body:'你报了一个周末烹饪课。300块一节课，学做川菜。\n\n你切的土豆丝像薯条，炒的回锅肉像黑暗料理。但老师说："第一次做成这样已经很好了。"\n\n你回家后做了一顿饭给自己吃——虽然味道一般，但你觉得比外卖好吃一百倍。\n\n"做饭是成年人最低成本的治愈方式。"',
       cond: g => g.age >= 22 && g.money > 500 && !g.flags.cookingSkill,
       choices:[
@@ -5846,7 +5846,7 @@ const ACHIEVEMENTS = [
     { id:'livestreamer_ach', icon:'📹', name:'直播新人', desc:'尝试了直播', check: g => g.flags.triedLivestream },
     // === v10.7 新增成就 ===
     { id:'dating_app_user', icon:'💘', name:'社交软件达人', desc:'使用了交友App', check: g => g.flags.usedDatingApp },
-    { id:'digital_detoxer', icon:'📵', name:'数字戒断', desc:'完成数字戒断', check: g => g.flags.digitalDetox },
+    { id:'digital_detoxer_v2', icon:'📵', name:'数字戒断', desc:'完成数字戒断', check: g => g.flags.digitalDetox },
     { id:'gamer_controlled', icon:'🎮', name:'游戏自律', desc:'控制了游戏时间', check: g => g.flags.gamerControlled },
     { id:'moments_closer', icon:'📱', name:'朋友圈隐身', desc:'关闭了朋友圈', check: g => g.flags.closedMoments },
     { id:'podcaster_ach', icon:'🎧', name:'播客主播', desc:'开了自己的播客', check: g => g.flags.podcaster },
@@ -5855,7 +5855,7 @@ const ACHIEVEMENTS = [
     // === v10.8 新增成就 ===
     { id:'promoted_ach', icon:'📈', name:'升职加薪', desc:'获得了升职', check: g => g.flags.promoted },
     { id:'job_hopper', icon:'📞', name:'跳槽达人', desc:'成功跳槽', check: g => g.flags.jobHopped },
-    { id:'layoff_survivor', icon:'📦', name:'裁员幸存者', desc:'经历了裁员', check: g => g.flags.wasLaidOff },
+    { id:'layoff_survivor_v2', icon:'📦', name:'裁员幸存者', desc:'经历了裁员', check: g => g.flags.wasLaidOff },
     { id:'startup_founder', icon:'💡', name:'创业者', desc:'开始创业', check: g => g.flags.startupPhase },
     { id:'mentor_found', icon:'🎯', name:'有师可学', desc:'找到了职场导师', check: g => g.flags.hasMentor },
     { id:'wlb_master', icon:'⚖️', name:'生活大师', desc:'实现了工作生活平衡', check: g => g.flags.workLifeBalance },
@@ -5869,7 +5869,7 @@ const ACHIEVEMENTS = [
     // === v11.2 新增成就 ===
     { id:'resolution_keeper', icon:'🎯', name:'新年践行者', desc:'认真执行了新年计划', check: g => g.flags.newYearResolution },
     { id:'stock_survivor', icon:'📉', name:'股市幸存者', desc:'经历了股市崩盘', check: g => g.investments && g.investments.stock >= 0 },
-    { id:'frugal_master', icon:'💹', name:'节俭大师', desc:'在通胀中保持理性', check: g => g.money >= 10000 && g.months > 48 && g.intel >= 50 },
+    { id:'frugal_master_v2', icon:'💹', name:'节俭大师', desc:'在通胀中保持理性', check: g => g.money >= 10000 && g.months > 48 && g.intel >= 50 },
     // === v11.3 新增成就 ===
     { id:'food_explorer_ach', icon:'🍜', name:'美食探险家', desc:'发现了宝藏小店', check: g => g.flags.foodExplorer },
     { id:'food_blogger_ach', icon:'📸', name:'美食博主', desc:'开始在小红书分享美食', check: g => g.flags.foodBlogger },
