@@ -35,7 +35,7 @@
                 </button>
             </div>
             <div class="title-footer">
-                <span>v2.6</span> · <span>献给每一个在大城市奋斗的你</span>
+                <span>v2.7</span> · <span>献给每一个在大城市奋斗的你</span>
             </div>
         </div>
     </div>
@@ -267,6 +267,36 @@
         <div class="game-main">
             <div class="event-log" id="event-log"></div>
             <div class="current-event" id="current-event"></div>
+            <div class="monthly-activity" id="monthly-activity">
+                <p class="activity-label">这个月你想做什么？</p>
+                <div class="activity-grid">
+                    <button class="activity-btn" onclick="selectActivity('work')" data-act="work" title="拼命工作赚钱">
+                        <span class="act-icon">💼</span>
+                        <span class="act-text">拼命工作</span>
+                        <span class="act-hint">+💰 -❤️</span>
+                    </button>
+                    <button class="activity-btn" onclick="selectActivity('rest')" data-act="rest" title="好好休息放松">
+                        <span class="act-icon">😴</span>
+                        <span class="act-text">休息放松</span>
+                        <span class="act-hint">+❤️ +😊</span>
+                    </button>
+                    <button class="activity-btn" onclick="selectActivity('study')" data-act="study" title="学习充电提升自己">
+                        <span class="act-icon">📚</span>
+                        <span class="act-text">学习充电</span>
+                        <span class="act-hint">+🧠</span>
+                    </button>
+                    <button class="activity-btn" onclick="selectActivity('socialize')" data-act="socialize" title="社交聚会拓展人脉">
+                        <span class="act-icon">🎉</span>
+                        <span class="act-text">社交聚会</span>
+                        <span class="act-hint">+👥 +✨</span>
+                    </button>
+                    <button class="activity-btn" onclick="selectActivity('exercise')" data-act="exercise" title="运动锻炼身体">
+                        <span class="act-icon">🏃</span>
+                        <span class="act-text">运动锻炼</span>
+                        <span class="act-hint">+❤️ +✨</span>
+                    </button>
+                </div>
+            </div>
             <div class="action-bar" id="action-bar">
                 <button class="btn-action" onclick="advanceMonth()" id="btn-advance">
                     <span class="action-icon">⏩</span>

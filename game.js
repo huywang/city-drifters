@@ -1200,6 +1200,45 @@ function startGame() {
     G.eventLog.push({ age: G.age, text: `来到${city.name}，开始漂泊生活` });
 }
 
+// === MONTHLY ACTIVITY SYSTEM ===
+let selectedActivity = null;
+
+const ACTIVITY_EFFECTS = {
+    work: { money: 3000, health: -5, mood: -3, intel: 2, social: -2, charm: 0, label: '拼命工作' },
+    rest: { money: -500, health: 8, mood: 10, intel: 0, social: 0, charm: 2, label: '休息放松' },
+    study: { money: -200, health: 0, mood: 3, intel: 10, social: 0, charm: 3, label: '学习充电' },
+    socialize: { money: -1000, health: 0, mood: 8, intel: 0, social: 10, charm: 5, label: '社交聚会' },
+    exercise: { money: -300, health: 10, mood: 5, intel: 0, social: 0, charm: 5, label: '运动锻炼' },
+};
+
+function selectActivity(type) {
+    selectedActivity = type;
+    // 更新UI
+    document.querySelectorAll('.activity-btn').forEach(btn => {
+        btn.classList.remove('selected');
+        if (btn.dataset.act === type) btn.classList.add('selected');
+    });
+}
+
+function applyActivity() {
+    if (!selectedActivity) return null;
+    const effects = ACTIVITY_EFFECTS[selectedActivity];
+    if (!effects) return null;
+
+    G.money += effects.money;
+    G.health = clamp(G.health + effects.health, 0, 100);
+    G.mood = clamp(G.mood + effects.mood, 0, 100);
+    G.intel = clamp(G.intel + effects.intel, 0, 100);
+    G.social = clamp(G.social + effects.social, 0, 100);
+    G.charm = clamp(G.charm + effects.charm, 0, 100);
+
+    const label = effects.label;
+    selectedActivity = null;
+    // 重置UI
+    document.querySelectorAll('.activity-btn').forEach(btn => btn.classList.remove('selected'));
+    return label;
+}
+
 // === GAME FLOW ===
 function advanceMonth() {
     if (G.isEnded) return;
@@ -1221,6 +1260,12 @@ function advanceMonth() {
     // 养老金（50岁后如果退休）
     if (G.age >= 50 && G.flags.retirementPlanning && G.job === '待业中') {
         G.money += 4000; // 基础养老金
+    }
+
+    // 应用月度活动选择
+    const activityLabel = applyActivity();
+    if (activityLabel) {
+        G.eventLog.push({ age: G.age, text: `这个月选择了「${activityLabel}」` });
     }
 
     // 健康和心情自然衰减
@@ -1470,7 +1515,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.6' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.7' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();

@@ -562,3 +562,75 @@ html[style*="font-size: 18px"] .modal-content {
     opacity: 0.3;
     cursor: not-allowed;
 }
+
+/* === Monthly Activity Selector === */
+.monthly-activity {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    margin-bottom: 16px;
+}
+.activity-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0 0 12px 0;
+    text-align: center;
+}
+.activity-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+}
+.activity-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 12px 6px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    min-height: 80px;
+}
+.activity-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--accent-primary);
+    transform: translateY(-2px);
+}
+.activity-btn.selected {
+    background: rgba(var(--accent-primary-rgb, 99, 102, 241), 0.15);
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 20px rgba(var(--accent-primary-rgb, 99, 102, 241), 0.3);
+}
+.activity-btn .act-icon {
+    font-size: 1.5rem;
+}
+.activity-btn .act-text {
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+.activity-btn .act-hint {
+    font-size: 0.65rem;
+    color: var(--text-tertiary, rgba(255,255,255,0.4));
+}
+.activity-btn.selected .act-hint {
+    color: var(--accent-primary);
+}
+@media (max-width: 600px) {
+    .activity-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    .activity-btn {
+        min-height: 70px;
+        padding: 8px 4px;
+    }
+    .activity-btn .act-icon {
+        font-size: 1.2rem;
+    }
+}
