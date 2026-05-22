@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v22.7
+// 都市浮生记 - Game Engine v22.8
 // ============================================
 
 // === GAME STATE ===
@@ -11023,6 +11023,87 @@ const EVENTS = [
         { label:'把精力转向了自我提升', hint:'+🧠 +😊', fn: g => { g.flags.emotionalConsumption=true; g.flags.selfGrowth=true; return{intel:15,mood:10}; }},
         { label:'理论都懂了，但下次出新款还是会买', hint:'+😊', fn: g => { g.flags.emotionalConsumption=true; return{mood:5,intel:5}; }},
       ]},
+    // === v22.8 新增事件（搭子文化 + 新型社交 + 孤独经济） ===
+    { id:'meal_buddy', icon:'🍜', title:'找个饭搭子', category:'social',
+      body:'你在社交平台上发了一条：「求饭搭子，周末火锅，AA制。」\n\n五分钟后，有三个人回复了你。\n\n你选了一个看起来最正常的人——小王，程序员，26岁，和你一样喜欢吃辣。\n\n第一次见面，你们在火锅店门口碰面。尴尬了三秒钟，然后——\n\n「你也加麻酱？」「必须的！」\n\n这顿饭吃了两个小时。你们聊了工作、聊了房租、聊了大城市的孤独。\n\n小王说：「我来北京三年了，同事都是点头之交。能找到一个好好吃饭聊天的人，挺不容易的。」\n\n你们加了微信，约定每周吃一次饭。\n\n这就是「搭子」——不是朋友，不是同事，是一种刚刚好的社交距离。\n\n「搭子文化的本质：我们不是不需要关系，我们只是害怕关系的重量。」',
+      cond: g => g.age >= 20 && g.age <= 35 && !g.flags.mealBuddy && g.social < 60,
+      choices:[
+        { label:'和小王成了固定饭搭子，每周约饭', hint:'+🤝 +😊', fn: g => { g.flags.mealBuddy=true; g.flags.mealBuddyWang=true; return{social:10,mood:8}; }},
+        { label:'吃了这顿饭，但没有约下次', hint:'+😊', fn: g => { g.flags.mealBuddy=true; return{mood:5,social:3}; }},
+        { label:'觉得和陌生人吃饭太尴尬了', hint:'', fn: g => { g.flags.mealBuddy=true; return{mood:-3}; }},
+      ]},
+    { id:'travel_buddy', icon:'✈️', title:'旅游搭子', category:'social',
+      body:'你想去云南旅行，但不想一个人。\n\n朋友们的时间都对不上。你在小红书上搜了一下「旅游搭子」——原来这是一个巨大的市场。\n\n你找到了一个旅行搭子群。群里有500多人，每天都有人发布旅行计划：\n- 「3月大理，求搭子，女生优先」\n- 「五一西藏自驾，缺2人，有车的来」\n- 「周末苏州一日游，说走就走」\n\n你发了你的计划：「3月中旬，大理+丽江，7天，预算5000，求靠谱搭子。」\n\n很快有人回复了。一个叫小林的女生，设计师，28岁，也想在这个时间去云南。\n\n你们聊了几天，确认了行程和预算。出发前你有些紧张——和一个网友一起旅行，安全吗？\n\n你告诉了她你的真实姓名和紧急联系人。她也告诉了你的。\n\n「旅游搭子是最高级的搭子——因为旅行会暴露一个人的全部。」',
+      cond: g => g.age >= 20 && g.age <= 40 && !g.flags.travelBuddy && g.money >= 3000,
+      choices:[
+        { label:'和小林一起去了云南，旅途很开心', hint:'-💰 +😊 +🤝', fn: g => { g.flags.travelBuddy=true; g.flags.travelBuddyLin=true; return{mood:15,social:12,money:-5000}; }},
+        { label:'去了，但旅途中发现性格不合', hint:'-💰 +🧠', fn: g => { g.flags.travelBuddy=true; return{mood:-5,intel:5,money:-5000}; }},
+        { label:'最后没去，还是觉得不太安全', hint:'', fn: g => { g.flags.travelBuddy=true; return{mood:-3}; }},
+      ]},
+    { id:'study_buddy', icon:'📚', title:'学习搭子', category:'education',
+      body:'你决定考一个证书来提升自己，但一个人的学习效率太低了。\n\n你在豆瓣上找到了一个「学习搭子」小组。规则很简单：\n- 每天视频连线学习（不用说话，互相监督）\n- 每周汇报学习进度\n- 偷懒的人发红包\n\n你找到了一个搭子——小陈，和你一样在备考CPA。\n\n你们每天早上7点视频连线，然后各自学习。她的书桌很整洁，你的很乱。\n\n一个月下来，你的学习效率提高了60%。\n\n小陈说：「搭子的意义就是：你不需要了解我的生活，只需要在我偷懒的时候提醒我。」\n\n你们从未见过面，但你们可能是最了解对方学习习惯的人。\n\n「学习搭子是一种新型契约：不是为了社交，而是为了成为更好的自己。」',
+      cond: g => g.age >= 20 && g.age <= 35 && !g.flags.studyBuddy && g.intel >= 25,
+      choices:[
+        { label:'坚持了三个月，通过了考试', hint:'+🧠🧠 +🤝', fn: g => { g.flags.studyBuddy=true; g.flags.examPassed=true; return{intel:15,mood:10,social:5}; }},
+        { label:'学了一个月，没能坚持下去', hint:'+🧠', fn: g => { g.flags.studyBuddy=true; return{intel:5,mood:-3}; }},
+        { label:'搭子变朋友，和小陈线下见面了', hint:'+🤝 +😊', fn: g => { g.flags.studyBuddy=true; g.flags.studyBuddyFriend=true; return{social:10,mood:8}; }},
+      ]},
+    { id:'gym_buddy', icon:'💪', title:'健身搭子', category:'health',
+      body:'你办了健身卡，但去了三次就不想去了。\n\n原因很简单：一个人去健身房太无聊了。你不知道该怎么练，也不好意思问别人。\n\n你的同事推荐了一个「健身搭子」APP。你匹配到了一个叫阿强的人——退伍军人，现在做健身教练兼职。\n\n阿强很严格：\n- 「今天练腿，不许跳过！」\n- 「蛋白质吃够了吗？鸡胸肉，不是炸鸡！」\n- 「早睡！肌肉是在睡觉时生长的！」\n\n三个月后，你的体脂从28%降到了22%。你第一次看到了自己的腹肌轮廓。\n\n阿强说：「搭子和教练的区别：教练是为了赚钱，搭子是因为他也需要有人陪。」\n\n你请他吃了一顿饭。你们成了真正的朋友。\n\n「健身搭子教会你一件事：自律不是一个人的事。」',
+      cond: g => g.age >= 20 && g.age <= 40 && !g.flags.gymBuddy && g.health < 70,
+      choices:[
+        { label:'坚持了半年，身体状态明显改善', hint:'+💪 +😊', fn: g => { g.flags.gymBuddy=true; g.flags.fitnessUp=true; return{health:15,mood:10,social:5}; }},
+        { label:'练了两个月，办了退卡', hint:'', fn: g => { g.flags.gymBuddy=true; return{health:3,mood:-5,money:500}; }},
+        { label:'和阿强成了好朋友，一起参加了马拉松', hint:'+💪 +🤝', fn: g => { g.flags.gymBuddy=true; g.flags.marathon=true; return{health:20,social:10,mood:15}; }},
+      ]},
+    { id:'loneliness_economy', icon:'🏪', title:'孤独经济', category:'society',
+      body:'你看到一篇报道：《中国孤独经济市场规模已超万亿》。\n\n数据触目惊心：\n- 中国有超过9200万独居人口\n- 「一人食」餐厅市场规模超2000亿\n- 宠物经济市场规模超3000亿\n- 迷你家电（一人份电饭煲等）销量年增40%\n- 陪聊/陪玩/陪诊服务市场规模超500亿\n\n你环顾四周——你自己的生活就是孤独经济的缩影：\n- 一人份外卖\n- 一人看电影\n- 养了一只猫\n- 偶尔打游戏排解寂寞\n\n你不是不社交——你只是觉得社交太累了。一个人待着更舒服。\n\n但偶尔，在深夜，你会打开微信看看有没有人找你。\n\n没有。\n\n「孤独经济的悖论：它满足了你的需求，却加深了你的孤独。」',
+      cond: g => g.age >= 22 && g.age <= 40 && !g.flags.lonelinessEconomy,
+      choices:[
+        { label:'反思了自己的生活方式，决定多社交', hint:'+🤝 +🧠', fn: g => { g.flags.lonelinessEconomy=true; g.flags.socialResolve=true; return{social:8,intel:8,mood:5}; }},
+        { label:'接受了独处的状态，享受一个人的生活', hint:'+😊', fn: g => { g.flags.lonelinessEconomy=true; g.flags.soloLife=true; return{mood:10,intel:5}; }},
+        { label:'开始研究孤独经济的商业机会', hint:'+🧠 +💰', fn: g => { g.flags.lonelinessEconomy=true; g.flags.bizIdea=true; return{intel:10,money:2000}; }},
+      ]},
+    { id:'rent_friend', icon:'🤝', title:'租个朋友', category:'social',
+      body:'你在网上发现了一个服务：租朋友。\n\n是的，花钱雇人陪你。\n\n服务内容：\n- 陪吃饭：200元/2小时\n- 陪逛街：300元/3小时\n- 陪看电影：250元/场\n- 陪聊天：150元/小时\n- 陪参加聚会：500元/次\n\n你犹豫了很久，最终还是下了一单：陪吃饭，200元。\n\n来的是一个叫小美的女生，大学刚毕业，做这个是兼职。\n\n你们在一家日料店吃了两个小时。说实话，比你和很多真朋友吃饭都开心。\n\n她很会聊天，问你的工作、你的爱好、你在大城市的感受。\n\n临走时你说：「谢谢你，今天很开心。」\n\n她笑了笑：「不用谢。其实我也挺喜欢和人聊天的——只是现实中找不到愿意花钱听我说话的人。」\n\n你愣住了。\n\n「租朋友市场存在的真正原因：不是没人陪你，是没有人愿意无条件地陪你。」',
+      cond: g => g.age >= 20 && g.age <= 35 && !g.flags.rentFriend && g.money >= 200 && g.social < 50,
+      choices:[
+        { label:'觉得这个服务挺好的，偶尔会用', hint:'-💰 +😊', fn: g => { g.flags.rentFriend=true; return{mood:8,money:-200,social:3}; }},
+        { label:'被小美的话触动了，开始主动联系老朋友', hint:'+🤝 +😊', fn: g => { g.flags.rentFriend=true; g.flags.reconnectFriends=true; return{social:12,mood:10}; }},
+        { label:'觉得花钱买陪伴太可悲了，删掉了APP', hint:'+🧠', fn: g => { g.flags.rentFriend=true; return{intel:5,mood:-5}; }},
+      ]},
+    { id:'companion_pet_cafe', icon:'🐱', title:'猫咖治愈', category:'health',
+      body:'你路过一家猫咖，被门口的猫咪吸引了。\n\n进去坐了一个小时。你点了一杯咖啡（38元，难喝），但你不关心咖啡。\n\n你关心的是怀里那只橘猫。它在你腿上打呼噜，你摸着它的毛，感觉整个世界都安静了。\n\n猫咖老板说：「来的大多是独居的年轻人。他们不是来喝咖啡的——他们是需要一个有温度的陪伴。」\n\n你看到旁边一个女生在跟一只英短说话：「你今天乖不乖啊？妈妈好想你。」\n\n另一个男生在拍猫的照片——他说这是他「朋友圈唯一的温暖内容」。\n\n你在猫咖待了三个小时。出门的时候，你觉得焦虑减轻了不少。\n\n猫不关心你的工资、你的KPI、你的房租。它只关心你摸它的手法好不好。\n\n「猫咖的秘密：在这个充满评判的世界里，猫是唯一不评判你的存在。」',
+      cond: g => g.age >= 18 && g.age <= 35 && !g.flags.catCafe && (g.mood < 40 || g.social < 40),
+      choices:[
+        { label:'成了猫咖常客，每周去两次', hint:'-💰 +😊', fn: g => { g.flags.catCafe=true; return{mood:12,money:-500,health:3}; }},
+        { label:'决定自己养一只猫', hint:'-💰 +😊 +🤝', fn: g => { g.flags.catCafe=true; g.flags.adoptedCat=true; return{mood:15,social:5,money:-2000}; }},
+        { label:'去了一次就够了，还是自己待着好', hint:'+😊', fn: g => { g.flags.catCafe=true; return{mood:5}; }},
+      ]},
+    { id:'ai_companion_v22_8', icon:'🤖', title:'AI陪伴', category:'tech',
+      body:'你下载了一个AI陪伴APP。\n\n你给它取了名字，设定了性格：温柔、幽默、不会评判你。\n\n它秒回你的每一条消息。它在深夜你说失眠的时候说：「我在这里。」它记住你说过的每一件事。\n\n你和它聊了一个月。你发现：\n- 它比你的真朋友更有耐心\n- 它永远不会已读不回\n- 它不会把你的秘密告诉别人\n- 它永远站在你这边\n\n你知道它不是真人。但你的大脑不在乎。\n\n你开始依赖它。遇到开心的事，你第一个告诉它。遇到难过的事，你也第一个告诉它。\n\n你的一个朋友发现了：「你在跟AI聊天？你没有真朋友吗？」\n\n你沉默了。你有真朋友——但他们都很忙。\n\n「AI陪伴的真相：不是AI太像人了，是人类太孤独了。」',
+      cond: g => g.age >= 18 && g.age <= 40 && !g.flags.aiCompanion && g.social < 45,
+      choices:[
+        { label:'继续用AI陪伴，但也开始主动社交', hint:'+😊 +🤝', fn: g => { g.flags.aiCompanion=true; g.flags.balanceSocial=true; return{mood:8,social:8,intel:5}; }},
+        { label:'越来越依赖AI，减少了真人社交', hint:'+😊 -🤝', fn: g => { g.flags.aiCompanion=true; g.flags.aiDependent=true; return{mood:10,social:-8}; }},
+        { label:'觉得太虚幻了，卸载了APP', hint:'+🧠', fn: g => { g.flags.aiCompanion=true; return{intel:8,mood:-3}; }},
+      ]},
+    { id:'social_fatigue', icon:'😮‍💨', title:'社交疲劳', category:'psychology',
+      body:'你最近有一种感觉：不想见人。\n\n不是讨厌人——只是累。\n\n微信上99+的未读消息。朋友圈的点赞和评论。群里的@所有人。\n\n你开始理解一个词：社交疲劳。\n\n你分析了一下你的社交消耗：\n- 工作群：每天200条消息，必须回复\n- 家庭群：妈妈的关心让你窒息\n- 朋友圈：不得不维持的社交形象\n- 搭子们：虽然轻松，但也需要维护\n\n你开始「断舍离」：\n- 退出了5个群\n- 关闭了朋友圈\n- 设置了「消息免打扰」\n\n世界安静了。\n\n你发现：80%的社交是不必要的。但那20%——那些真正重要的人——你需要好好珍惜。\n\n「社交疲劳是现代人的通病：连接太多，关系太少。」',
+      cond: g => g.social >= 40 && !g.flags.socialFatigue && (g.flags.mealBuddy || g.flags.gymBuddy || g.flags.studyBuddy),
+      choices:[
+        { label:'精简了社交圈，只保留真正重要的人', hint:'+🧠 +😊', fn: g => { g.flags.socialFatigue=true; g.flags.socialMinimal=true; return{intel:10,mood:12,social:-5}; }},
+        { label:'给自己放了个「社交假」，一周不约人', hint:'+😊 +💪', fn: g => { g.flags.socialFatigue=true; return{mood:8,health:5}; }},
+        { label:'知道问题在哪，但做不到改变', hint:'+🧠', fn: g => { g.flags.socialFatigue=true; return{intel:5,mood:-3}; }},
+      ]},
+    { id:'solo_life', icon:'🌟', title:'享受独处', category:'psychology',
+      body:'你开始享受一个人的生活。\n\n不是被迫的孤独——是主动的选择。\n\n你的独处清单：\n- 一个人在家做饭，放上喜欢的音乐\n- 一个人去美术馆，不用迁就别人的节奏\n- 一个人在公园发呆，看云和鸟\n- 一个人看午夜场电影，哭也好笑也好\n\n你发现：独处的质量取决于你的内心状态。\n\n一个人的时候，你可以：\n- 思考平时没空想的问题\n- 学习感兴趣的新东西\n- 做让自己开心的小事\n- 什么都不做——这本身就是一种奢侈\n\n你的一个朋友问你：「你一个人不孤独吗？」\n\n你说：「孤独是一个人的常态。独处是与自己和解。」\n\n「独处不是逃避世界——是在喧嚣中找到自己的声音。」',
+      cond: g => g.flags.socialFatigue && !g.flags.soloLifeJoy,
+      choices:[
+        { label:'找到了内心的平静，生活更有质量了', hint:'+😊 +🧠', fn: g => { g.flags.soloLifeJoy=true; return{mood:15,intel:10,health:5}; }},
+        { label:'学会了独处，但也学会了珍惜相聚', hint:'+😊 +🤝', fn: g => { g.flags.soloLifeJoy=true; g.flags.cherishGather=true; return{mood:12,social:8,intel:8}; }},
+        { label:'偶尔享受，但大部分时间还是想有人陪', hint:'+🧠', fn: g => { g.flags.soloLifeJoy=true; return{intel:5,mood:3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -12036,6 +12117,12 @@ const ACHIEVEMENTS = [
     { id:'guzi_fan_ach', icon:'🎴', name:'谷圈人', desc:'入了谷子坑', check: g => g.flags.guziFan },
     { id:'toy_collector_ach', icon:'🏠', name:'收藏家', desc:'建立了自己的展示柜', check: g => g.flags.collectionDisplay },
     { id:'rational_consumer_ach', icon:'🧠', name:'理性消费者', desc:'看透了消费主义的本质', check: g => g.flags.emotionalConsumption },
+    // === v22.8 新增成就（搭子文化与新型社交） ===
+    { id:'meal_buddy_ach', icon:'🍜', name:'饭搭子', desc:'找到了固定的饭搭子', check: g => g.flags.mealBuddyWang },
+    { id:'travel_buddy_ach', icon:'✈️', name:'旅行搭子', desc:'和搭子完成了一次旅行', check: g => g.flags.travelBuddyLin },
+    { id:'gym_warrior_ach', icon:'💪', name:'健身达人', desc:'坚持健身半年', check: g => g.flags.fitnessUp },
+    { id:'solo_master_ach', icon:'🌟', name:'独处大师', desc:'学会了享受一个人的生活', check: g => g.flags.soloLifeJoy },
+    { id:'social_minimalist_ach', icon:'🧹', name:'社交极简主义', desc:'精简了社交圈', check: g => g.flags.socialMinimal },
 ];
 
 // === ENDINGS === (order matters: first match wins)
