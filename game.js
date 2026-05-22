@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v6.4
+// 都市浮生记 - Game Engine v6.5
 // ============================================
 
 // === GAME STATE ===
@@ -3266,6 +3266,34 @@ const EVENTS = [
         { label:'投资养老产业', hint:'-💰💰 💰', fn: g => { g.flags.silverEconomy=true; if(Math.random()>0.5){return{money:50000}}else{return{money:-20000}} }},
         { label:'太复杂，不碰', hint:'+🧠', fn: g => { g.flags.silverEconomy=true; return{intel:3}; }},
       ]},
+    // === v6.5 EVENTS - 数字游民与考公热 ===
+    { id:'digital_nomad', icon:'💻', title:'数字游民',
+      body:'你厌倦了朝九晚五的通勤生活，看到了一个数字游民社区：安徽黟县"黑多岛"。\n\n"工作但不上班，边休闲边挣钱。"\n\n你辞了职，搬到山水间。你的工位：咖啡馆、民宿、共享办公空间。\n\n你的工作：远程编程、自由撰稿、设计接单、新媒体运营。\n\n"数字游民——把工位搬进山水间，利用现代信息技术进行远程工作，追求自由、灵活的生活方式。"\n\n2025年，全球超过34%的员工长期处于远程办公状态。中国也涌现出安吉DNA数字游民公社、上海漕泾数字游民国际村等实体空间。\n\n但你也看到了问题：收入不稳定、社交孤立、自律要求高、没有五险一金。\n\n"数字游民不是不工作，而是换一种方式工作——自由是代价，也是收获。"',
+      cond: g => !g.flags.digitalNomad && g.age>=22 && g.age<=35 && g.intel>=60,
+      choices:[
+        { label:'辞职做数字游民', hint:'-💰 +😊 +✨', fn: g => { g.flags.digitalNomad=true; g.flags.freelancer=true; if(Math.random()>0.5){return{money:-5000,mood:25,charm:12,intel:8}}else{return{money:-10000,mood:10}} }},
+        { label:'先兼职试试', hint:'+💰 +😊', fn: g => { g.flags.digitalNomad=true; g.flags.sideHustler=true; return{money:3000,mood:15,intel:5}; }},
+        { label:'加入游民社区', hint:'-💰 +👥 +😊', fn: g => { g.flags.digitalNomad=true; g.flags.communityMember=true; return{money:-2000,social:18,mood:20}; }},
+        { label:'太不稳定，算了', hint:'+🧠', fn: g => { g.flags.digitalNomad=true; return{intel:3,mood:-5}; }},
+      ]},
+    { id:'civil_service_exam', icon:'📋', title:'考公上岸',
+      body:'你决定考公务员。看了看数据：2025年国考报名341.6万人，竞争比86:1，录取率仅1.35%。\n\n"考公热——从'下海潮'到'考公热'，30年间，年轻人的选择从'敢闯敢试'变成'避险求稳'。"\n\n你的备考：\n- 行测：言语理解、数量关系、判断推理、资料分析\n- 申论：阅读理解、综合分析、提出对策、贯彻执行、大作文\n- 面试：结构化面试、无领导小组讨论\n\n"体制内的岗位终究有限，唯有市场的舞台才广阔无边。"\n\n但你看到了现实：经济下行、就业压力大、35岁危机、996加班文化。公务员虽然工资不高，但有五险一金、稳定、不裁员。\n\n"考公不是躺平，而是在不确定的时代，寻找确定性。"',
+      cond: g => !g.flags.civilServiceExam && g.age>=22 && g.age<=35 && g.intel>=50,
+      choices:[
+        { label:'全职备考一年', hint:'-💰 +🧠', fn: g => { g.flags.civilServiceExam=true; if(Math.random()>0.85){g.flags.civilServant=true; return{money:-20000,intel:15,mood:30,charm:10}}else{return{money:-20000,intel:10,mood:-15}} }},
+        { label:'在职备考', hint:'+🧠 -😊', fn: g => { g.flags.civilServiceExam=true; if(Math.random()>0.9){g.flags.civilServant=true; return{intel:8,mood:20}}else{return{intel:5,mood:-10,health:-5}} }},
+        { label:'考事业编', hint:'+🧠', fn: g => { g.flags.civilServiceExam=true; if(Math.random()>0.8){g.flags.civilServant=true; return{intel:8,mood:25,charm:5}}else{return{intel:5,mood:-8}} }},
+        { label:'放弃考公', hint:'+😊', fn: g => { g.flags.civilServiceExam=true; return{mood:5,intel:-3}; }},
+      ]},
+    { id:'second_career', icon:'🔄', title:'二战三战',
+      body:'你第一次考公失败了。排名86:1，你是那85个分母之一。\n\n你犹豫：要不要二战？三战？\n\n"考公是一场录取率极低的'锦标赛'。超过95%的人会成为'分母'，每一次失败都是时间和金钱的沉没成本。"\n\n你看了看自己：25岁，简历空白，同龄人已经工作3年了。\n\n如果继续考，你可能错过职业技能的"黄金窗口期"。如果放弃，你的备考时间全部浪费。\n\n"早期劣势会像'疤痕'一样，在考公失败人群的整个职业生涯中持续存在。"\n\n但你不甘心：已经投入了这么多，再试一次也许就上岸了？',
+      cond: g => !g.flags.secondCareer && g.flags.civilServiceExam && !g.flags.civilServant && g.age>=23 && g.age<=35,
+      choices:[
+        { label:'二战！再考一年', hint:'-💰 +🧠', fn: g => { g.flags.secondCareer=true; if(Math.random()>0.8){g.flags.civilServant=true; return{money:-15000,intel:10,mood:25}}else{return{money:-15000,intel:5,mood:-20}} }},
+        { label:'边工作边考', hint:'+💰 +🧠 -😊', fn: g => { g.flags.secondCareer=true; if(Math.random()>0.85){g.flags.civilServant=true; return{money:5000,intel:8,mood:15}}else{return{money:5000,intel:3,mood:-10,health:-5}} }},
+        { label:'放弃，找工作', hint:'+💰 +😊', fn: g => { g.flags.secondCareer=true; g.flags.backToJobMarket=true; return{money:8000,mood:10,intel:-3}; }},
+        { label:'考其他编制', hint:'+🧠', fn: g => { g.flags.secondCareer=true; if(Math.random()>0.75){g.flags.civilServant=true; return{intel:8,mood:20}}else{return{intel:3,mood:-5}} }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3534,6 +3562,11 @@ const ACHIEVEMENTS = [
     { id:'renter_life', icon:'📦', name:'租房一族', desc:'选择租房生活', check: g => g.flags.renter },
     { id:'single_forever', icon:'💍', name:'不婚主义', desc:'坚持不婚不育', check: g => g.flags.singleForever },
     { id:'silver_entrepreneur', icon:'👴', name:'银发经济创业者', desc:'投身养老产业', check: g => g.flags.silverEconomy },
+    // v6.5 achievements
+    { id:'digital_nomad_pro', icon:'💻', name:'数字游民', desc:'成为自由职业者', check: g => g.flags.digitalNomad },
+    { id:'freelancer', icon:'🎨', name:'自由职业者', desc:'远程工作或自由接单', check: g => g.flags.freelancer },
+    { id:'civil_service_veteran', icon:'📋', name:'考公老手', desc:'参加公务员考试', check: g => g.flags.civilServiceExam },
+    { id:'persistent_examinee', icon:'🔄', name:'二战三战', desc:'多次参加考公', check: g => g.flags.secondCareer },
 ];
 
 // === ENDINGS === (order matters: first match wins)
