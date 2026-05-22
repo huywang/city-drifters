@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v26.4
+// 都市浮生记 - Game Engine v26.5
 // ============================================
 
 // === GAME STATE ===
@@ -13087,6 +13087,87 @@ const EVENTS = [
         { label:'偶尔去，增长见识', hint:'+🧠 +😊', fn: g => { g.flags.museumVisit=true; return{intel:5,mood:3}; }},
         { label:'看不懂，觉得无聊', hint:'-🧠', fn: g => { g.flags.museumVisit=true; return{intel:-2}; }},
       ]},
+    // v26.5: 旅行探索 + 度假文化
+    { id:'solo_travel_v26_5', icon:'🎒', title:'独自旅行', category:'hobby',
+      body:'你第一次一个人旅行。\n\n你选了：云南大理。\n\n你一个人：\n- 订机票\n- 找民宿\n- 规划行程\n- 吃饭\n- 看风景\n- 发呆\n\n你发现：\n- 一个人旅行——比想象中更自由\n- 想走就走，想停就停\n- 不需要迁就任何人\n\n但你也发现：\n- 一个人吃饭——有点孤单\n- 看到美景——没人分享\n- 晚上——会想家\n\n你在洱海边坐了一下午。你问自己：我为什么要一个人来？\n\n你突然明白：一个人旅行——不是去一个地方——是「跟自己相处」。\n\n「独自旅行：不是在旅行——是在「见」自己。」',
+      cond: g => g.age >= 20 && !g.flags.soloTravel && g.money >= 3000,
+      choices:[
+        { label:'爱上了独自旅行，计划下一次', hint:'-💰 +😊 +🧠 +✨', fn: g => { g.flags.soloTravel=true; g.flags.soloTraveler=true; g.money -= 3000; return{mood:8,intel:5,charm:5}; }},
+        { label:'体验了一次，挺有收获', hint:'-💰 +😊 +🧠', fn: g => { g.flags.soloTravel=true; g.money -= 3000; return{mood:5,intel:3}; }},
+        { label:'太孤单了，下次还是要有人陪', hint:'-😊 +🤝', fn: g => { g.flags.soloTravel=true; g.money -= 3000; return{mood:-3,social:3}; }},
+      ]},
+    { id:'travel_photography', icon:'📷', title:'旅行摄影', category:'hobby',
+      body:'你开始认真拍照了。\n\n你买了：\n- 一台入门相机（5000元）\n- 两个镜头\n- 三脚架\n- 后期软件\n\n你开始学习：\n- 构图\n- 光线\n- 后期调色\n- 主题策划\n\n你发现：\n- 摄影——是一种「看见」的能力\n- 以前你看到美景——只是「好看」\n- 现在你看到美景——你能看到「层次」、「故事」、「情绪」\n\n你把照片发到网上——有人给你点赞，有人给你留言。\n\n你开始理解：摄影——不只是「拍照」——是「用镜头说话」。\n\n「旅行摄影：你不是在拍照——你是在用快门「收藏」人生。」',
+      cond: g => g.age >= 18 && g.age <= 55 && !g.flags.travelPhotography && g.money >= 5000 && g.intel >= 25,
+      choices:[
+        { label:'成了摄影爱好者，作品小有名气', hint:'-💰 +✨ +🧠 +😊', fn: g => { g.flags.travelPhotography=true; g.flags.photoEnthusiast=true; g.money -= 8000; return{charm:8,intel:5,mood:5}; }},
+        { label:'当兴趣玩玩，拍得挺开心', hint:'-💰 +😊 +🧠', fn: g => { g.flags.travelPhotography=true; g.money -= 5000; return{mood:5,intel:3}; }},
+        { label:'觉得太烧钱，放弃了', hint:'+💰 -🧠', fn: g => { g.flags.travelPhotography=true; return{intel:-2}; }},
+      ]},
+    { id:'gap_year_v26_5', icon:'🌍', title:'间隔年', category:'hobby',
+      body:'你辞职了。你准备用一年时间——环游世界。\n\n你的计划：\n- 东南亚（3个月）\n- 欧洲（3个月）\n- 南美（3个月）\n- 回国（思考人生）\n\n你的积蓄：15万。\n\n你的体验：\n- 在泰国学了潜水\n- 在印度做了瑜伽\n- 在土耳其坐了热气球\n- 在秘鲁走了印加古道\n- 在阿根廷吃了烤肉\n\n你也遇到了：\n- 被骗\n- 生病\n- 语言不通\n- 想家\n\n一年后你回国了。朋友问你：「这一年有什么收获？」\n\n你想了想：「我知道了——我不想要什么。」\n\n「间隔年：不是逃避——是「重新出发」前的「停」。」',
+      cond: g => g.age >= 22 && g.age <= 35 && !g.flags.gapYear && g.money >= 100000 && g.job !== '待业中',
+      choices:[
+        { label:'辞职间隔了一年，改变了人生观', hint:'-💰 +🧠 +😊 +✨ -💼', fn: g => { g.flags.gapYear=true; g.flags.gapYearTaker=true; g.money -= 150000; g.job='待业中'; g.jobSalary=0; return{intel:15,mood:10,charm:8}; }},
+        { label:'只间隔了3个月，然后回来工作', hint:'-💰 +🧠 +😊 +✨', fn: g => { g.flags.gapYear=true; g.flags.shortGap=true; g.money -= 50000; return{intel:8,mood:5,charm:5}; }},
+        { label:'计划了很久但不敢辞职，放弃了', hint:'+💰 -😊 -🧠', fn: g => { g.flags.gapYear=true; return{mood:-5,intel:-3}; }},
+      ]},
+    { id:'cultural_heritage_v26_5', icon:'🏯', title:'文化遗产', category:'hobby',
+      body:'你去参观了故宫。\n\n你租了一个讲解器。\n\n每走过一座宫殿——讲解器就告诉你：\n- 这是哪朝皇帝建的\n- 这里发生过什么故事\n- 这个建筑有什么特色\n\n你站在一座600年的宫殿前——\n\n你想：600年前——这里是权力的中心。\n而现在——你可以自由地走进来、拍照、发呆。\n\n你突然感到一种「历史的重量」。\n\n你也看到：\n- 很多人在拍抖音\n- 很多人在打卡\n- 很少人在认真听讲解\n\n你问自己：文化遗产——是「景点」还是「记忆」？\n\n「文化遗产：不是看古建筑——是看「我们从哪里来」。」',
+      cond: g => g.age >= 18 && !g.flags.culturalHeritage && g.intel >= 25 && g.money >= 200,
+      choices:[
+        { label:'开始系统参观文化遗产，成了文化爱好者', hint:'-💰 +🧠 +✨ +😊', fn: g => { g.flags.culturalHeritage=true; g.flags.heritageLover=true; g.money -= 3000; return{intel:10,charm:5,mood:5}; }},
+        { label:'认真参观了一次，很有收获', hint:'-💰 +🧠 +😊', fn: g => { g.flags.culturalHeritage=true; g.money -= 200; return{intel:5,mood:3}; }},
+        { label:'打卡了一下，没认真看', hint:'-💰 -🧠', fn: g => { g.flags.culturalHeritage=true; g.money -= 200; return{intel:-2}; }},
+      ]},
+    { id:'hot_spring', icon:'♨️', title:'温泉度假', category:'hobby',
+      body:'你跟朋友去泡温泉了。\n\n你选的是一家高端温泉度假村：\n- 室外温泉\n- 山林环绕\n- 私密性好\n- 服务一流\n\n你泡了：\n- 玫瑰浴\n- 牛奶浴\n- 药浴\n- 碳酸浴\n\n你泡在水里——看着远处的山——什么都不想。\n\n你发现：你已经很久——没有「什么都不想」了。\n\n工作中——你总在思考「下一步」。\n生活中——你总在担心「明天」。\n而在这里——你终于可以「只是存在」。\n\n你开始理解：温泉——不只是「泡澡」——是「停下来」。\n\n「温泉度假：你不是在泡温泉——你是在泡「慢生活」。」',
+      cond: g => g.age >= 25 && !g.flags.hotSpring && g.money >= 1000,
+      choices:[
+        { label:'爱上了温泉，每年去一次', hint:'-💰 +😊 +❤️', fn: g => { g.flags.hotSpring=true; g.flags.springRegular=true; g.money -= 3000; return{mood:5,health:3}; }},
+        { label:'体验了一次，挺舒服', hint:'-💰 +😊 +❤️', fn: g => { g.flags.hotSpring=true; g.money -= 1000; return{mood:3,health:2}; }},
+        { label:'觉得太贵了，不划算', hint:'+💰 -😊', fn: g => { g.flags.hotSpring=true; return{mood:-2}; }},
+      ]},
+    { id:'desert_crossing', icon:'🏜️', title:'沙漠穿越', category:'hobby',
+      body:'你报名了沙漠穿越。\n\n3天2夜——穿越腾格里沙漠。\n\n你的体验：\n- 第一天：兴奋，觉得好美\n- 第二天：累到崩溃，脚磨出血泡\n- 第三天：看到绿洲的那一刻——哭了\n\n你在沙漠里看到了：\n- 日落\n- 星空（银河！）\n- 沙漠里的狐狸\n- 自己的「极限」\n\n你也学到了：\n- 水——比金子更重要\n- 脚步——要稳，不要急\n- 团队——比个人更重要\n- 你自己——比想象中更强\n\n你开始理解：沙漠——是一种「极简」的老师。\n\n「沙漠穿越：不是征服沙漠——是征服自己。」',
+      cond: g => g.age >= 20 && g.age <= 50 && !g.flags.desertCrossing && g.money >= 3000 && g.health >= 40,
+      choices:[
+        { label:'成了户外探险爱好者，挑战更多极限', hint:'-💰 +✨ +😊 +❤️', fn: g => { g.flags.desertCrossing=true; g.flags.adventureLover=true; g.money -= 5000; return{charm:8,mood:8,health:5}; }},
+        { label:'完成了一次，成了珍贵回忆', hint:'-💰 +😊 +🧠 +❤️', fn: g => { g.flags.desertCrossing=true; g.money -= 3000; return{mood:5,intel:3,health:3}; }},
+        { label:'太苦了，发誓再也不去', hint:'-❤️ -😊', fn: g => { g.flags.desertCrossing=true; g.money -= 3000; return{health:-5,mood:-3}; }},
+      ]},
+    { id:'island_vacation', icon:'🏝️', title:'海岛游', category:'hobby',
+      body:'你去了马尔代夫。\n\n你住的是一间水上别墅：\n- 推开门就是海\n- 玻璃地板能看到鱼\n- 私人泳池\n- 管家服务\n\n你的日常：\n- 早上：浮潜\n- 中午：海鲜大餐\n- 下午：沙滩发呆\n- 晚上：看星空\n\n你发现：\n- 在这里——你不需要想任何事情\n- 你只需要「存在」\n- 时间——变得很慢\n\n你问自己：这才是「生活」该有的样子吧？\n\n但你也知道：这不是「常态」——这是「度假」。\n\n回到城市后——你更加讨厌工作了。\n\n「海岛游：不是去一个地方——是去「另一个世界」。」',
+      cond: g => g.age >= 25 && !g.flags.islandVacation && g.money >= 15000,
+      choices:[
+        { label:'爱上了海岛，开始集齐各大海岛', hint:'-💰 +😊 +✨', fn: g => { g.flags.islandVacation=true; g.flags.islandCollector=true; g.money -= 30000; return{mood:10,charm:5}; }},
+        { label:'去了一次，成了珍贵回忆', hint:'-💰 +😊 +✨', fn: g => { g.flags.islandVacation=true; g.money -= 15000; return{mood:8,charm:3}; }},
+        { label:'觉得太贵了，下次选平价海岛', hint:'-💰 +🧠 +😊', fn: g => { g.flags.islandVacation=true; g.money -= 15000; return{intel:3,mood:5}; }},
+      ]},
+    { id:'ancient_town', icon:'🏘️', title:'古镇游', category:'hobby',
+      body:'你去了一个古镇。\n\n这里：\n- 有600年历史\n- 石板路\n- 青砖瓦房\n- 小桥流水\n- 茶馆、书店、手工铺\n\n你喜欢这里的：\n- 慢节奏\n- 老建筑\n- 本地人的笑容\n- 手工艺品\n\n但你也看到了：\n- 很多店都是「连锁店」（全国古镇都一样）\n- 很多商品都是义乌批发的\n- 很多「原住民」已经搬走了\n- 剩下的——都是「表演」\n\n你问自己：这是「古镇」——还是「古镇主题公园」？\n\n你开始思考：「真实」和「表演」的边界在哪里？\n\n「古镇游：不是去古镇——是去「想象中的古镇」。」',
+      cond: g => g.age >= 18 && !g.flags.ancientTown && g.money >= 500,
+      choices:[
+        { label:'爱上了古镇，开始集齐各大古镇', hint:'-💰 +😊 +🧠 +✨', fn: g => { g.flags.ancientTown=true; g.flags.townCollector=true; g.money -= 3000; return{mood:5,intel:5,charm:3}; }},
+        { label:'去了一次，挺有氛围', hint:'-💰 +😊 +🧠', fn: g => { g.flags.ancientTown=true; g.money -= 500; return{mood:3,intel:3}; }},
+        { label:'觉得太商业化，不喜欢', hint:'-😊 +🧠', fn: g => { g.flags.ancientTown=true; return{mood:-2,intel:3}; }},
+      ]},
+    { id:'temple_retreat', icon:'🛕', title:'寺庙修行', category:'hobby',
+      body:'你去了一座寺庙——参加了3天的「禅修」。\n\n你的日程：\n- 早上5点：起床\n- 6点：早课\n- 7点：早餐（素食）\n- 8点：坐禅\n- 10点：听师父讲经\n- 下午：行禅、抄经、打扫\n- 晚上：晚课\n\n前三天你很不适应：\n- 睡不着\n- 坐不住\n- 心里很乱\n\n但第四天——你突然安静了。\n\n你发现：\n- 安静——不是「没有声音」——是「心不吵」\n- 简单——不是「没有」——是「够了」\n\n你回到城市后——开始每天打坐10分钟。\n\n「寺庙修行：不是去「成佛」——是去「成人」。」',
+      cond: g => g.age >= 25 && !g.flags.templeRetreat && g.money >= 1000 && g.intel >= 25,
+      choices:[
+        { label:'开始长期修行，每天打坐', hint:'-💰 +😊 +🧠 +❤️', fn: g => { g.flags.templeRetreat=true; g.flags.meditationPractitioner=true; g.money -= 1000; return{mood:10,intel:8,health:5}; }},
+        { label:'体验了一次，挺有收获', hint:'-💰 +😊 +🧠', fn: g => { g.flags.templeRetreat=true; g.money -= 1000; return{mood:5,intel:5}; }},
+        { label:'太苦了，不适合自己', hint:'-😊 -🧠', fn: g => { g.flags.templeRetreat=true; return{mood:-3,intel:-2}; }},
+      ]},
+    { id:'ski_resort', icon:'⛷️', title:'滑雪场', category:'hobby',
+      body:'你第一次去滑雪。\n\n你租了：\n- 滑雪板\n- 雪鞋\n- 雪服\n- 头盔\n\n你站在初级道上——腿发抖。\n\n第一次滑：\n- 3秒就摔了\n- 屁股超疼\n- 你怀疑人生\n\n第二次：\n- 滑了10米\n- 又摔了\n- 你开始怀疑智商\n\n第三次：\n- 居然滑下来了\n- 那种风驰电掣的感觉——太爽了！\n\n你开始上瘾：\n- 速度\n- 控制\n- 专注（不专注就摔）\n\n你发现：滑雪——是一种「动态的冥想」。\n\n在雪道上——你只能想「现在」——不能想「昨天」或「明天」。\n\n「滑雪场：你不是在滑雪——你是在跟重力对话。」',
+      cond: g => g.age >= 18 && g.age <= 55 && !g.flags.skiResort && g.money >= 1000 && g.health >= 30,
+      choices:[
+        { label:'成了滑雪爱好者，每年雪季必去', hint:'-💰 +😊 +❤️ +✨', fn: g => { g.flags.skiResort=true; g.flags.skiAddict=true; g.money -= 5000; return{mood:8,health:5,charm:5}; }},
+        { label:'体验了一次，挺有趣', hint:'-💰 +😊 +❤️', fn: g => { g.flags.skiResort=true; g.money -= 1000; return{mood:5,health:3}; }},
+        { label:'摔伤了，再也不去了', hint:'-❤️ -😊', fn: g => { g.flags.skiResort=true; g.money -= 1000; return{health:-5,mood:-3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -14250,6 +14331,12 @@ const ACHIEVEMENTS = [
     { id:'open_mic_performer_ach', icon:'🎤', name:'开放麦演员', desc:'鼓起勇气参加了脱口秀开放麦', check: g => g.flags.openMicPerformer },
     { id:'camping_lover_ach', icon:'⛺', name:'露营爱好者', desc:'买了全套装备成了露营达人', check: g => g.flags.campingLover },
     { id:'road_trip_addict_ach', icon:'🚗', name:'自驾达人', desc:'爱上了自驾游计划每年一次', check: g => g.flags.roadTripAddict },
+    // v26.5: 旅行探索成就
+    { id:'photo_enthusiast_ach', icon:'📷', name:'旅行摄影师', desc:'开始认真拍照，用镜头收藏人生', check: g => g.flags.photoEnthusiast },
+    { id:'heritage_lover_ach', icon:'🏯', name:'文化传承者', desc:'系统参观文化遗产，成了文化爱好者', check: g => g.flags.heritageLover },
+    { id:'adventure_lover_ach', icon:'🏜️', name:'户外探险家', desc:'完成沙漠穿越，爱上极限挑战', check: g => g.flags.adventureLover },
+    { id:'meditation_practitioner_ach', icon:'🛕', name:'修行者', desc:'寺庙禅修后开始每日打坐', check: g => g.flags.meditationPractitioner },
+    { id:'gap_year_taker_ach', icon:'🌍', name:'间隔年勇士', desc:'勇敢辞职环游世界', check: g => g.flags.gapYearTaker },
 ];
 
 // === ENDINGS === (order matters: first match wins)
