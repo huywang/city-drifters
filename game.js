@@ -1634,6 +1634,11 @@ const ENDINGS = [
     { id:'family_first', badge:'👨‍👩‍👧‍👦', title:'家庭至上', desc:'你选择了家庭。在事业和家庭之间，你选择了后者。\n\n你可能没有成为职场精英，但你是孩子眼中的好父母，父母眼中的好儿女，伴侣眼中的好另一半。\n\n周末一家人去公园，晚上围在一起吃饭。你妈说："一家人在一起，比什么都强。"\n\n"成功的定义有很多种。家人幸福，是其中最温暖的一种。"', cond: g => g.flags.married && g.relationships.family>=80 && g.relationships.partner>=70 && g.mood>=60 && g.age>=40 },
     { id:'estranged', badge:'💔', title:'亲情断裂', desc:'你和家人的关系破裂了。也许是太久没联系，也许是某次争吵说了不该说的话。\n\n你妈的微信消息你已读不回，你爸的电话你假装没看到。\n\n直到某天你接到亲戚的电话："你爸住院了，想见你最后一面。"\n\n你赶到医院，看着他苍白的脸，突然觉得自己好混蛋。\n\n"有些关系，失去了才知道珍贵。"', cond: g => g.relationships.family<=10 && g.age>=30 },
     { id:'social_butterfly_end', badge:'🦋', title:'社交达人', desc:'你成了圈子里的"人脉王"。每个人都认识你，你也认识每个人。\n\n你组织了无数场聚会，撮合了无数对朋友，促成了无数个项目。\n\n你的名字就是最好的名片。\n\n但偶尔夜深人静的时候，你会想：这些人脉里，有几个是真正的朋友？\n\n"人脉是资产，朋友是财富。你拥有了前者，但不确定有没有后者。"', cond: g => g.social>=90 && g.relationships.friends>=70 && g.relationships.colleagues>=70 && g.age>=35 },
+    // --- v2.19 NEW ENDINGS ---
+    { id:'health_guru', badge:'🏃', title:'健康达人', desc:'你把健康放在了第一位。规律作息、健康饮食、坚持运动。\n\n你的体检报告比简历还漂亮。同事们都说你"越活越年轻"。\n\n你用行动证明：健康不是投资，是习惯。\n\n"身体是革命的本钱——你是最富有的人。"', cond: g => g.health>=90 && g.flags.healthyLifestyle && g.age>=35 },
+    { id:'side_hustle_king', badge:'💡', title:'副业达人', desc:'你的副业收入超过了主业。从独立开发到内容创作，你成了真正的"斜杠青年"。\n\n白天上班摸鱼，晚上副业赚钱。你找到了属于自己的节奏。\n\n有人说你不务正业，但你知道：多条路，多个选择。\n\n"主业是生存，副业是生活。你两者都兼顾了。"', cond: g => g.flags.sideHustle && g.money>=150000 && g.intel>=70 && g.age>=30 },
+    { id:'burnout_recovery', badge:'🌱', title:'浴火重生', desc:'你曾经差点过劳死，但你选择了改变。\n\n你辞掉了高薪但高压的工作，找了一份能平衡生活的工作。\n\n现在的你：准点下班，周末爬山，晚上陪家人。\n\n"人生不是百米冲刺，是马拉松。你学会了配速。"', cond: g => g.health>=70 && g.mood>=70 && g.flags.healthyLifestyle && g.age>=40 && g.consecutiveOvertime===0 },
+    { id:'pet_parent', badge:'🐾', title:'铲屎官人生', desc:'你和你的宠物成了最好的朋友。\n\n每天下班回家，它都在门口等你。周末你们一起窝在沙发上，你看剧，它睡觉。\n\n有人说："养宠物不如养孩子。"但你知道：它不会叛逆，不会催婚，不会借钱。\n\n"有猫/狗的人生，是最好的人生。"', cond: g => g.flags.hasPet && g.mood>=65 && g.relationships.partner<50 && g.age>=30 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
@@ -2129,11 +2134,11 @@ function triggerEnding() {
 
 function getEndingRarity(endingId) {
     // Legendary (rare endings that require specific conditions)
-    const legendary = ['fire', 'immigration', 'executive', 'retire_abroad', 'wealthy', 'family_first'];
+    const legendary = ['fire', 'immigration', 'executive', 'retire_abroad', 'wealthy', 'family_first', 'burnout_recovery'];
     // Rare (hard to achieve)
-    const rare = ['settled', 'startup_end', 'influencer_end', 'digital_nomad', 'karoshi', 'jail', 'social_butterfly_end'];
+    const rare = ['settled', 'startup_end', 'influencer_end', 'digital_nomad', 'karoshi', 'jail', 'social_butterfly_end', 'health_guru', 'side_hustle_king'];
     // Uncommon (moderately difficult)
-    const uncommon = ['hometown_hero', 'go_home', 'civil_end', 'ordinary', 'single', 'investment_guru', 'lying_flat_end', 'lonely_death', 'estranged'];
+    const uncommon = ['hometown_hero', 'go_home', 'civil_end', 'ordinary', 'single', 'investment_guru', 'lying_flat_end', 'lonely_death', 'estranged', 'pet_parent'];
 
     if (legendary.includes(endingId)) return 'legendary';
     if (rare.includes(endingId)) return 'rare';
@@ -2210,7 +2215,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.18' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.19' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
