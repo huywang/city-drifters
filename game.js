@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v31.5
+// 都市浮生记 - Game Engine v31.6
 // ============================================
 
 // === GAME STATE ===
@@ -17114,6 +17114,87 @@ const EVENTS = [
         { label:'洗个热水澡早点睡', hint:'+💪 +😊', fn: g => { g.flags.nightReturner=true; g.flags.selfCare=true; return{health:5,mood:3}; }},
         { label:'写一篇日记记录今天', hint:'+🧠 +😊', fn: g => { g.flags.nightReturner=true; g.flags.nightJournal=true; return{intel:5,mood:5}; }},
       ]},
+    // --- v31.6 都市人的矛盾与自洽 ---
+    { id:'persona_vs_real', icon:'🎭', title:'人设与真实', category:'psychology',
+      body:'你发了一条朋友圈：「周末在家看书，岁月静好。」配了一张咖啡和书的照片。\n\n实际上——你看书看了10分钟就开始刷手机，咖啡是速溶的，书是摆拍的。\n\n你的同事评论：「好文艺啊！」你回了一个微笑表情。\n\n你开始想：你在朋友圈里的那个人，和真实的你，差了多少？\n\n你的朋友圈是一座精心设计的博物馆，你的生活是一间乱七八糟的仓库。',
+      cond: g => g.age >= 20 && g.age <= 40 && g.charm < 60,
+      choices:[
+        { label:'发一条真实的朋友圈', hint:'+😊 +✨', fn: g => { g.flags.personaVsReal=true; g.flags.authenticPost=true; return{mood:8,charm:3}; }},
+        { label:'减少发朋友圈的频率', hint:'+🧠 +😊', fn: g => { g.flags.personaVsReal=true; g.flags.lessPosting=true; return{intel:3,mood:3}; }},
+        { label:'继续经营精心打造的人设', hint:'+✨ -🧠', fn: g => { g.flags.personaVsReal=true; g.flags.keepPersona=true; return{charm:3,intel:-2}; }},
+      ]},
+    { id:'midnight_emo_v31_6', icon:'🌙', title:'深夜emo', category:'emotion',
+      body:'凌晨2点，你还没有睡。\n\n不是因为失眠——是因为你打开了网易云音乐，然后emo了。\n\n一首歌让你想起了一个人。一个人让你想起了一段时光。一段时光让你想起了一种感觉。\n\n你在备忘录里写了200字的感想。你看了两遍，删了。\n\n你觉得深夜的自己特别矫情，但你也觉得——只有深夜的自己才是真的。',
+      cond: g => g.age >= 18 && g.age <= 35 && g.mood < 55,
+      choices:[
+        { label:'把感想发给那个想念的人', hint:'+👥 +😊', fn: g => { g.flags.midnightEmoV31=true; g.flags.reachOut=true; return{social:5,mood:5}; }},
+        { label:'听完歌关灯睡觉', hint:'+💪 +😊', fn: g => { g.flags.midnightEmoV31=true; g.flags.letItGo=true; return{health:3,mood:3}; }},
+        { label:'写进日记留给自己', hint:'+🧠 +😊', fn: g => { g.flags.midnightEmoV31=true; g.flags.privateDiary=true; return{intel:5,mood:5}; }},
+      ]},
+    { id:'fomo_dread', icon:'😰', title:'错过恐惧', category:'psychology',
+      body:'你刷了10分钟朋友圈，觉得全世界都在过你过不上的生活。\n\n你的同事去了马尔代夫，你的同学提了新车，你的前同事创了业融了A轮。\n\n你觉得自己在原地踏步，而所有人都在飞速前进。\n\n你开始焦虑：我是不是错过了什么？我是不是不够努力？我是不是已经被同龄人甩在了身后？\n\n你放下手机，深呼吸了一下。你提醒自己：朋友圈里的好——是筛选过的。',
+      cond: g => g.age >= 22 && g.age <= 38 && g.mood < 55 && g.intel >= 40,
+      choices:[
+        { label:'关闭朋友圈一周', hint:'+🧠 +😊', fn: g => { g.flags.fomoDread=true; g.flags.socialMediaBreak=true; return{intel:5,mood:5}; }},
+        { label:'提醒自己每个人节奏不同', hint:'+😊 +🧠', fn: g => { g.flags.fomoDread=true; g.flags.ownPace=true; return{mood:5,intel:3}; }},
+        { label:'把焦虑变成行动开始学新东西', hint:'+🧠 +💪', fn: g => { g.flags.fomoDread=true; g.flags.channelAnxiety=true; return{intel:8,health:-2}; }},
+      ]},
+    { id:'peer_pressure_v31_6', icon:'⚖️', title:'同辈压力', category:'psychology',
+      body:'你的大学室友群今天特别热闹。\n\n一个说刚换了年薪50万的工作，一个说买了第二套房，一个说孩子考上了重点小学。\n\n你默默看着，不知道该说什么。你的工资没他们高，你还没买房，你还是单身。\n\n你退出了群聊。但你知道——比较不会因为退出群聊就停止。\n\n你躺在床上想：为什么别人的人生看起来那么顺利，而你的人生看起来像在加载中？',
+      cond: g => g.age >= 25 && g.age <= 40 && g.mood < 50,
+      choices:[
+        { label:'列出自己拥有的东西', hint:'+😊 +🧠', fn: g => { g.flags.peerPressureV31=true; g.flags.gratitudeList=true; return{mood:8,intel:3}; }},
+        { label:'和信任的朋友倾诉', hint:'+👥 +😊', fn: g => { g.flags.peerPressureV31=true; g.flags.openUp=true; return{social:5,mood:5}; }},
+        { label:'制定自己的成长计划', hint:'+🧠 +💰', fn: g => { g.flags.peerPressureV31=true; g.flags.ownPlan=true; return{intel:5,money:300}; }},
+      ]},
+    { id:'revenge_spending', icon:'💸', title:'报复性消费', category:'finance',
+      body:'你这个月加班了15天。今天发工资了。\n\n你打开淘宝，一口气加了10件东西到购物车：新衣服、新耳机、一套厨具、一个按摩仪……\n\n你的理性说：「你不需要这些。」你的情绪说：「我辛苦了这么久，我值得！」\n\n你花了4000块。你收到快递的时候很开心，拆完快递后——你觉得空虚。\n\n你的房间又多了几件「用了两次就吃灰」的东西。\n\n你开始想：花钱买的快乐，能持续多久？',
+      cond: g => g.job && g.job!=='待业中' && g.age >= 22 && g.age <= 38 && g.mood < 55,
+      choices:[
+        { label:'设一个月度消费上限', hint:'+💰 +🧠', fn: g => { g.flags.revengeSpending=true; g.flags.spendingLimit=true; return{money:500,intel:5}; }},
+        { label:'把消费变成体验（旅行/课程）', hint:'+😊 +🧠', fn: g => { g.flags.revengeSpending=true; g.flags.experienceOverStuff=true; return{mood:5,intel:3}; }},
+        { label:'算了开心就好', hint:'+😊 -💰', fn: g => { g.flags.revengeSpending=true; g.flags.treatYourself=true; return{mood:5,money:-2000}; }},
+      ]},
+    { id:'small_joy_moment', icon:'🌻', title:'小确幸', category:'emotion',
+      body:'今天发生了一些小事：\n\n早上出门刚好赶上了地铁。中午食堂多给了你一个鸡腿。下午的阳光刚好照到你的工位。下班路上看到了一只橘猫在晒太阳。\n\n你回到家，洗了个热水澡，换上了干净的衣服，打开了一罐啤酒。\n\n你突然觉得——今天还不错。\n\n没有什么大事发生，但也没有坏事。你觉得这就够了。\n\n你发了条朋友圈：「今天天气真好。」没有配图。但你觉得这是你最真实的一条。',
+      cond: g => g.age >= 18 && g.age <= 50,
+      choices:[
+        { label:'记录每天的三件小确幸', hint:'+😊 +🧠', fn: g => { g.flags.smallJoyMoment=true; g.flags.gratitudeJournal=true; return{mood:8,intel:3}; }},
+        { label:'和朋友分享今天的好心情', hint:'+👥 +😊', fn: g => { g.flags.smallJoyMoment=true; g.flags.shareJoy=true; return{social:3,mood:5}; }},
+        { label:'享受当下什么都不想', hint:'+😊 +💪', fn: g => { g.flags.smallJoyMoment=true; g.flags.presentMoment=true; return{mood:5,health:3}; }},
+      ]},
+    { id:'social_battery_drain', icon:'🔋', title:'社交电池耗尽', category:'social',
+      body:'你已经参加了3天的团建、2次聚餐、1次同学聚会。\n\n你回到家，关上房门的那一刻——你长长地呼了一口气。\n\n你不想说话、不想回消息、不想接电话。你的社交电池已经0%了。\n\n你妈打电话来，你犹豫了5秒，没有接。你发了一条消息：「今天累了，明天打。」\n\n你躺在床上，什么也不做。你觉得——一个人待着，是你最奢侈的消费。',
+      cond: g => g.age >= 20 && g.age <= 40 && g.social >= 40 && g.mood < 55,
+      choices:[
+        { label:'给自己放一天社交假', hint:'+😊 +💪', fn: g => { g.flags.socialBatteryDrain=true; g.flags.socialBreak=true; return{mood:8,health:3}; }},
+        { label:'学会说不拒绝不必要的社交', hint:'+🧠 +😊', fn: g => { g.flags.socialBatteryDrain=true; g.flags.learnSayNo=true; return{intel:5,mood:3}; }},
+        { label:'只和最亲密的人待在一起', hint:'+👥 +😊', fn: g => { g.flags.socialBatteryDrain=true; g.flags.innerCircle=true; return{social:3,mood:5}; }},
+      ]},
+    { id:'solo_travel_v31_6', icon:'🧳', title:'一个人的旅行', category:'life',
+      body:'你买了张机票，一个人去了一个陌生的城市。\n\n没有攻略、没有同伴、没有计划。你走到哪吃到哪，想停就停，想走就走。\n\n你在路边的小摊吃了一碗面，和老板聊了10分钟。他在你的城市没有亲人，但他觉得这里的面很好吃。\n\n你在公园的长椅上坐了一下午，看老人下棋、看孩子玩耍、看夕阳落下。\n\n你觉得——一个人的旅行，不是孤独，是自由。',
+      cond: g => g.age >= 22 && g.age <= 45 && g.money >= 3000,
+      choices:[
+        { label:'延长旅行多待几天', hint:'+😊 -💰', fn: g => { g.flags.soloTravelV31=true; g.flags.extendTrip=true; return{mood:10,money:-2000}; }},
+        { label:'旅行中认识了新朋友', hint:'+👥 +😊', fn: g => { g.flags.soloTravelV31=true; g.flags.travelFriends=true; return{social:5,mood:5}; }},
+        { label:'回来后用新视角看生活', hint:'+🧠 +😊', fn: g => { g.flags.soloTravelV31=true; g.flags.freshPerspective=true; return{intel:5,mood:5}; }},
+      ]},
+    { id:'choice_paralysis_v31_6', icon:'🤯', title:'选择困难症', category:'psychology',
+      body:'你在外卖App上选了40分钟，最终——饿得受不了，随便点了一份盖浇饭。\n\n你觉得你有选择困难症。不是因为没有选择，是因为选择太多了。\n\n换工作有3个offer你不知道去哪个。买手机有10个型号你不知道选哪个。周末有5个活动你不知道去哪个。\n\n你开始想：如果有选择是一种幸福，那选择困难是不是一种富贵病？\n\n你决定——从今天开始，给自己设一个5分钟决策时限。',
+      cond: g => g.age >= 20 && g.age <= 40 && g.intel >= 50,
+      choices:[
+        { label:'学会快速决策接受不完美', hint:'+🧠 +😊', fn: g => { g.flags.choiceParalysis=true; g.flags.quickDecide=true; return{intel:5,mood:5}; }},
+        { label:'做选择前做充分研究', hint:'+🧠 -💪', fn: g => { g.flags.choiceParalysis=true; g.flags.deepResearch=true; return{intel:5,health:-2}; }},
+        { label:'掷硬币让命运决定', hint:'+😊', fn: g => { g.flags.choiceParalysis=true; g.flags.coinFlip=true; return{mood:3}; }},
+      ]},
+    { id:'self_reconcile_v31_6', icon:'🕊️', title:'和自己和解', category:'emotion',
+      body:'你30岁了。你坐在阳台上，看着远处的城市。\n\n你想了很多：你没成为你想成为的人，你没有达到你定下的目标，你的生活不像你计划的那么顺利。\n\n但你也有了一些东西：一份还算稳定的工作、几个真心的朋友、一个健康的身体、一段不算完美但真实的感情。\n\n你深吸一口气，对自己说：「够了。你已经很努力了。你可以慢慢来。」\n\n你不知道这算不算放弃。但你觉得——这更像是接受。接受自己是一个普通人，然后继续认真地活着。',
+      cond: g => g.age >= 28 && g.age <= 50 && g.intel >= 50 && g.mood >= 40,
+      choices:[
+        { label:'写下给未来自己的一封信', hint:'+🧠 +😊', fn: g => { g.flags.selfReconcile=true; g.flags.futureLetter=true; return{intel:5,mood:8}; }},
+        { label:'删掉那些让你焦虑的App', hint:'+😊 +🧠', fn: g => { g.flags.selfReconcile=true; g.flags.digitalCleanse=true; return{mood:8,intel:3}; }},
+        { label:'从今天起做让自己开心的事', hint:'+😊 +💪', fn: g => { g.flags.selfReconcile=true; g.flags.prioritizeJoy=true; return{mood:10,health:3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
 
@@ -18700,6 +18781,17 @@ const ACHIEVEMENTS = [
     { id:'homesick_healer_ach', icon:'🌙', name:'乡愁疗愈', desc:'学会了在异乡安顿自己', check: g => g.flags.homesicknessV31 },
     { id:'graceful_single_ach', icon:'💒', name:'优雅单身', desc:'参加婚礼后依然从容', check: g => g.flags.gracefulBlessing },
     { id:'night_journal_ach', icon:'🌃', name:'深夜日记', desc:'养成了写日记的习惯', check: g => g.flags.nightJournal },
+    // --- v31.6 矛盾与自洽成就 ---
+    { id:'authentic_post_ach_v31_6', icon:'🎭', name:'真实表达者', desc:'发了真实的朋友圈', check: g => g.flags.authenticPost },
+    { id:'private_diary_ach', icon:'🌙', name:'深夜独白', desc:'把深夜感想写进日记', check: g => g.flags.privateDiary },
+    { id:'own_pace_ach', icon:'😰', name:'自己的节奏', desc:'学会了不跟别人比较', check: g => g.flags.ownPace },
+    { id:'gratitude_list_ach', icon:'⚖️', name:'感恩清单', desc:'列出自己拥有的东西', check: g => g.flags.gratitudeList },
+    { id:'spending_limit_ach', icon:'💸', name:'理性消费者', desc:'设了月度消费上限', check: g => g.flags.spendingLimit },
+    { id:'gratitude_journal_ach', icon:'🌻', name:'小确幸记录者', desc:'每天记录三件小确幸', check: g => g.flags.gratitudeJournal },
+    { id:'inner_circle_ach', icon:'🔋', name:'核心圈子', desc:'只和最亲密的人在一起', check: g => g.flags.innerCircle },
+    { id:'fresh_perspective_ach', icon:'🧳', name:'新视角', desc:'旅行后获得了新的生活视角', check: g => g.flags.freshPerspective },
+    { id:'quick_decide_ach', icon:'🤯', name:'果断决策者', desc:'学会了快速决策', check: g => g.flags.quickDecide },
+    { id:'self_reconcile_ach', icon:'🕊️', name:'与自己和解', desc:'接受了自己是普通人', check: g => g.flags.selfReconcile },
 ];
 
 // === ENDINGS === (order matters: first match wins)
