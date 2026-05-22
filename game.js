@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v14.0
+// 都市浮生记 - Game Engine v14.1
 // ============================================
 
 // === GAME STATE ===
@@ -7190,6 +7190,87 @@ const EVENTS = [
         { label:'偶尔去一次', hint:'+😊', fn: g => { g.flags.urbanExploration=true; return{mood:8,charm:3}; }},
         { label:'太累了不去', hint:'-😊', fn: g => { g.flags.urbanExploration=true; return{mood:-3}; }},
       ]},
+    // === v14.1 城乡差异 + 返乡创业 + 小城生活 ===
+    { id:'hometown_return_thought', icon:'🏡', title:'返乡念头',
+      body:'你在加班到凌晨2点后，突然冒出一个念头：回老家吧。\n\n你算了一笔账：\n- 大城市：月薪2万，房租5000，通勤2小时，加班到深夜\n- 老家：月薪5000，住家里，通勤10分钟，朝九晚五\n\n你妈在电话里说：「回来吧，家里什么都好。」\n你的同事说：「别傻了，回去了就再也回不来了。」\n\n你站在出租屋的窗前，看着城市的夜景。你想：这里灯火通明——但没有一盏灯是我的。\n\n"返乡的念头：不是因为你不行——是因为你累了。"',
+      cond: g => g.age >= 28 && g.months >= 36 && !g.flags.hometownReturnThought,
+      choices:[
+        { label:'辞职回老家', hint:'+😊 -💰', fn: g => { g.flags.hometownReturnThought=true; g.flags.returnedHometown=true; return{mood:15,money:-10000}; }},
+        { label:'再坚持一下', hint:'+💰 -😊', fn: g => { g.flags.hometownReturnThought=true; return{money:5000,mood:-8}; }},
+        { label:'先回去看看', hint:'+🧠', fn: g => { g.flags.hometownReturnThought=true; g.flags.hometownVisit=true; return{intel:5,mood:5}; }},
+      ]},
+    { id:'small_town_life', icon:'🏘️', title:'小城生活',
+      body:'你回到了老家——一个四线小城。\n\n第一天：你觉得好安静，空气好新鲜。\n第一周：你发现外卖选择只有10家，电影院只有1家，咖啡馆只有2家。\n第一月：你开始怀念大城市的便利了。\n\n但你也发现：你的睡眠质量变好了，你的焦虑减少了，你开始有时间看书了。\n\n你的高中同学说：「欢迎回来，我们这里也有奶茶。」\n\n"小城生活：不是退步——是换一种活法。"',
+      cond: g => g.flags.returnedHometown && !g.flags.smallTownLife,
+      choices:[
+        { label:'享受慢节奏', hint:'+😊 +💪', fn: g => { g.flags.smallTownLife=true; return{mood:12,health:10}; }},
+        { label:'开始创业', hint:'+💰 +✨', fn: g => { g.flags.smallTownLife=true; g.flags.hometownEntrepreneur=true; return{money:10000,charm:8,mood:5}; }},
+        { label:'准备回大城市', hint:'+💰 -😊', fn: g => { g.flags.smallTownLife=true; return{money:3000,mood:-10}; }},
+      ]},
+    { id:'county_economy', icon:'🏪', title:'县城经济',
+      body:'你在县城开了一家店：奶茶店/咖啡馆/花店/书店。\n\n你的顾客大多是：高中生、带娃的宝妈、退休的大爷大妈。\n\n你的月收入：8000。比大城市少了一半，但你的支出也少了一半。\n\n你的高中同学来捧场，说：「你这是降维打击。」\n你说：「我这是降维生活。」\n\n"县城经济：不是没有机会——是机会不一样。"',
+      cond: g => g.flags.hometownEntrepreneur && !g.flags.countyEconomy,
+      choices:[
+        { label:'扩大规模', hint:'+💰 +✨', fn: g => { g.flags.countyEconomy=true; return{money:15000,charm:10}; }},
+        { label:'维持现状', hint:'+😊', fn: g => { g.flags.countyEconomy=true; return{mood:8}; }},
+        { label:'转手店铺', hint:'+💰', fn: g => { g.flags.countyEconomy=true; return{money:20000,mood:-5}; }},
+      ]},
+    { id:'small_town_social', icon:'🍻', title:'小城社交',
+      body:'在小城，你的社交圈变了。\n\n以前在大城市：同事、同行、网友。\n现在在小城：高中同学、邻居、亲戚。\n\n你每周都要参加饭局：同学聚会、亲戚聚餐、邻居婚礼。你喝了很多酒，说了很多客套话。\n\n你开始怀念大城市的「边界感」了——在那里，没人管你几点回家、有没有对象、赚多少钱。\n\n"小城社交：不是更亲近——是没有距离。"',
+      cond: g => g.flags.smallTownLife && !g.flags.smallTownSocial,
+      choices:[
+        { label:'融入当地圈子', hint:'+👥 +😊', fn: g => { g.flags.smallTownSocial=true; return{social:15,mood:8}; }},
+        { label:'保持独立', hint:'+🧠 -👥', fn: g => { g.flags.smallTownSocial=true; return{intel:8,social:-5,mood:3}; }},
+        { label:'开一个读书会', hint:'+🧠 +👥', fn: g => { g.flags.smallTownSocial=true; return{intel:10,social:8,mood:5}; }},
+      ]},
+    { id:'urban_rural_gap', icon:'📊', title:'城乡差距',
+      body:'你在老家待了半年，深刻感受到了城乡差距：\n\n- 医疗：县城医院看不了的病，要去省城\n- 教育：县城最好的学校，不如大城市的普通学校\n- 就业：除了公务员和老师，好工作几乎没有\n- 娱乐：电影院只有1家，KTV只有2家\n\n但你也发现：县城的人更快乐、更知足、更有人情味。\n\n你的邻居阿姨说：「你们在大城市累不累啊？」\n你说：「累。」\n她笑了：「那就回来嘛。」\n\n"城乡差距：不是哪个好哪个坏——是选择不同的人生。"',
+      cond: g => g.flags.smallTownLife && g.age >= 30 && !g.flags.urbanRuralGap,
+      choices:[
+        { label:'留在小城改变它', hint:'+✨ +👥', fn: g => { g.flags.urbanRuralGap=true; return{charm:10,social:8,mood:5}; }},
+        { label:'接受差距享受生活', hint:'+😊 +🧠', fn: g => { g.flags.urbanRuralGap=true; return{mood:10,intel:8}; }},
+        { label:'计划回大城市', hint:'+💰', fn: g => { g.flags.urbanRuralGap=true; return{money:5000,mood:-5}; }},
+      ]},
+    { id:'hometown_food_v2', icon:'🍜', title:'家乡味道',
+      body:'你终于吃到了正宗的家乡菜。\n\n你妈做的红烧肉、你爸炒的小菜、街角那家开了30年的面馆。\n\n你吃了三碗饭，打了个饱嗝，说：「这才是人吃的。」\n\n你想起了在大城市吃的那些外卖：标准化的味道、冰冷的温度、塑料的包装。\n\n你说：「家乡的味道，是任何米其林餐厅都做不出来的。」\n\n"家乡味道：不是食物好吃——是有人在等你回家吃饭。"',
+      cond: g => g.flags.returnedHometown && !g.flags.hometownFoodTaste,
+      choices:[
+        { label:'学做家乡菜', hint:'+💪 +😊', fn: g => { g.flags.hometownFoodTaste=true; g.flags.cookingSkill=true; return{health:8,mood:12}; }},
+        { label:'每天回家吃饭', hint:'+👨‍👩‍👧 +😊', fn: g => { g.flags.hometownFoodTaste=true; return{mood:15,social:5}; }},
+        { label:'拍了发朋友圈', hint:'+✨', fn: g => { g.flags.hometownFoodTaste=true; return{charm:5,mood:8}; }},
+      ]},
+    { id:'small_town_entertainment', icon:'🎤', title:'小城娱乐',
+      body:'在小城，你的娱乐方式变了：\n\n- 以前：看展、听音乐会、参加沙龙\n- 现在：打麻将、唱KTV、逛夜市\n\n你第一次打麻将，输了200块。你的邻居说：「交学费了。」\n你第一次唱KTV，发现你的歌单都是10年前的老歌。\n你第一次逛夜市，发现这里的小吃比大城市好吃还便宜。\n\n你说：「原来快乐可以这么简单。」\n\n"小城娱乐：不是低级——是接地气。"',
+      cond: g => g.flags.smallTownLife && !g.flags.smallTownEntertainment,
+      choices:[
+        { label:'学会打麻将', hint:'+👥 +😊', fn: g => { g.flags.smallTownEntertainment=true; return{social:10,mood:8,money:-200}; }},
+        { label:'组织户外活动', hint:'+💪 +👥', fn: g => { g.flags.smallTownEntertainment=true; return{health:8,social:8,mood:10}; }},
+        { label:'继续宅家看书', hint:'+🧠', fn: g => { g.flags.smallTownEntertainment=true; return{intel:10,mood:5}; }},
+      ]},
+    { id:'reverse_migration', icon:'🔄', title:'反向迁徙',
+      body:'你发现：你不是唯一一个回小城的人。\n\n你的高中同学A从上海回来了，开了家火锅店。\n你的大学室友B从北京回来了，考了公务员。\n你的前同事C从深圳回来了，在家带孩子。\n\n你们聚在一起，聊起了大城市的生活。你们笑了，也沉默了。\n\n你说：「我们都回来了。」\n他们说：「但我们不后悔出去过。」\n\n"反向迁徙：不是失败——是另一种选择。"',
+      cond: g => g.flags.returnedHometown && g.flags.smallTownSocial && !g.flags.reverseMigration,
+      choices:[
+        { label:'一起创业', hint:'+💰 +👥', fn: g => { g.flags.reverseMigration=true; g.flags.hometownEntrepreneur=true; return{money:10000,social:10,mood:8}; }},
+        { label:'互相支持', hint:'+👥 +😊', fn: g => { g.flags.reverseMigration=true; return{social:12,mood:10}; }},
+        { label:'各自安好', hint:'+😊', fn: g => { g.flags.reverseMigration=true; return{mood:5}; }},
+      ]},
+    { id:'hometown_change', icon:'🏗️', title:'家乡变化',
+      body:'你在小城待了一年，发现家乡也在变：\n\n- 新修了一条高速公路\n- 开了第一家星巴克\n- 建了一个创业园区\n- 有了共享电动车\n\n你的同学说：「小城也在发展，只是慢一点。」\n\n你突然意识到：不是小城没有机会——是你以前没有发现。\n\n"家乡变化：不是你变了——是你终于看见了。"',
+      cond: g => g.flags.smallTownLife && g.age >= 30 && !g.flags.hometownChange,
+      choices:[
+        { label:'参与家乡建设', hint:'+✨ +👥', fn: g => { g.flags.hometownChange=true; return{charm:10,social:8,mood:8}; }},
+        { label:'记录家乡变化', hint:'+🧠 +✨', fn: g => { g.flags.hometownChange=true; return{intel:8,charm:5,mood:5}; }},
+        { label:'继续观望', hint:'+🧠', fn: g => { g.flags.hometownChange=true; return{intel:5}; }},
+      ]},
+    { id:'life_balance_choice', icon:'⚖️', title:'人生选择',
+      body:'你在小城生活了一年，终于想明白了一件事：\n\n大城市有小城市没有的机会，小城市有大城市没有的生活。\n没有哪个选择是绝对正确的——只有哪个选择更适合你。\n\n你不再纠结了。你选择了当下。\n\n你发了条朋友圈：「我在小城，过得很好。」\n你的大城市朋友点赞了。你的小城朋友也点赞了。\n\n"人生选择：不是选最好的——是选最适合的。"',
+      cond: g => g.flags.urbanRuralGap && g.flags.hometownChange && !g.flags.lifeBalanceChoice,
+      choices:[
+        { label:'扎根小城', hint:'+😊 +👥', fn: g => { g.flags.lifeBalanceChoice=true; return{mood:15,social:10}; }},
+        { label:'两边跑', hint:'+💰 +🧠', fn: g => { g.flags.lifeBalanceChoice=true; return{money:5000,intel:8,mood:5}; }},
+        { label:'还在思考', hint:'+🧠', fn: g => { g.flags.lifeBalanceChoice=true; return{intel:10}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -7848,6 +7929,17 @@ const ACHIEVEMENTS = [
     { id:'urban_farmer_v2', icon:'🌱', name:'都市农夫', desc:'在阳台种了菜', check: g => g.flags.urbanGardening },
     { id:'podcast_fan', icon:'🎧', name:'播客爱好者', desc:'成了播客听众', check: g => g.flags.podcastListener },
     { id:'urban_explorer', icon:'🗺️', name:'城市探险家', desc:'探索了城市的角落', check: g => g.flags.urbanExploration },
+    // === v14.1 新增成就 ===
+    { id:'hometown_returner', icon:'🏡', name:'返乡者', desc:'考虑过回老家', check: g => g.flags.hometownReturnThought },
+    { id:'small_towner', icon:'🏘️', name:'小城居民', desc:'体验了小城生活', check: g => g.flags.smallTownLife },
+    { id:'county_entrepreneur', icon:'🏪', name:'县城创业者', desc:'在县城开了店', check: g => g.flags.countyEconomy },
+    { id:'small_town_social_ach', icon:'🍻', name:'小城社交达人', desc:'融入了小城社交圈', check: g => g.flags.smallTownSocial },
+    { id:'gap_witnesser', icon:'📊', name:'城乡差距见证者', desc:'感受了城乡差异', check: g => g.flags.urbanRuralGap },
+    { id:'hometown_food_lover', icon:'🍜', name:'家乡味道爱好者', desc:'吃到了正宗家乡菜', check: g => g.flags.hometownFoodTaste },
+    { id:'small_town_entertainer', icon:'🎤', name:'小城娱乐家', desc:'体验了小城的娱乐', check: g => g.flags.smallTownEntertainment },
+    { id:'reverse_migrant', icon:'🔄', name:'反向迁徙者', desc:'选择了返乡生活', check: g => g.flags.reverseMigration },
+    { id:'hometown_changer', icon:'🏗️', name:'家乡建设者', desc:'见证了家乡的变化', check: g => g.flags.hometownChange },
+    { id:'life_balance_chooser', icon:'⚖️', name:'人生选择者', desc:'做出了人生选择', check: g => g.flags.lifeBalanceChoice },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -8062,6 +8154,9 @@ const ENDINGS = [
     { id:'digital_minimalist_end', badge:'📵', title:'数字极简主义者', desc:'你学会了与数字世界和解。\n\n你卸载了一半的App，关闭了朋友圈，把屏幕时间控制在每天2小时以内。\n\n你开始有更多的时间看书、运动、和朋友面对面聊天。你的注意力回来了，你的焦虑消失了。\n\n你的朋友圈签名改成了：「离线中，请勿打扰。」\n\n"数字极简：不是与世界断联——是选择性地连接。"', cond: g => g.flags.digitalDetoxWeek && g.flags.socialMediaAddiction && g.mood >= 70 && g.age >= 28 },
     { id:'urban_farmer_end', badge:'🌱', title:'都市农夫', desc:'你在城市里种出了一片绿洲。\n\n你的阳台变成了小菜园：番茄、辣椒、生菜、薄荷。你每天花1小时照顾它们。\n\n你的邻居说：「你这是在城市里种田。」你说：「我这是在种田里找城市。」\n\n你送了一些菜给邻居。你们成了朋友。\n\n"都市农夫：不是为了自给自足——是为了在水泥森林里找到泥土的温度。"', cond: g => g.flags.urbanGardening && g.flags.urbanExploration && g.mood >= 65 && g.age >= 30 },
     { id:'conscious_consumer_end', badge:'🛒', title:'理性消费者', desc:'你从一个购物狂变成了一个理性消费者。\n\n你不再冲动购物，不再被直播带货忽悠，不再为了满减凑单。你的购物车永远只有3件东西。\n\n你的存款从0变成了3万。不多，但那是你第一次觉得——自己掌控了欲望。\n\n"理性消费：不是不花钱——是花得值。"', cond: g => g.flags.onlineShoppingAddiction && g.flags.subscriptionFatigue && g.flags.minimalist && g.money >= 30000 && g.mood >= 60 },
+    // --- v14.1 NEW ENDINGS ---
+    { id:'hometown_hero_end', badge:'🏡', title:'小城之光', desc:'你回到了小城，成了当地的传奇。\n\n你在县城开了第一家精品咖啡馆/网红奶茶店/独立书店。你的店成了小城年轻人的打卡圣地。\n\n你的月收入只有8000，但你有了时间陪父母、有了精力做自己喜欢的事。\n\n你的同学说：「你是我们小城的名人。」你笑着说：「我只是想过自己想要的生活。」\n\n"返乡创业：不是退而求其次——是选择另一种精彩。"', cond: g => g.flags.countyEconomy && g.flags.hometownChange && g.mood >= 65 && g.age >= 30 },
+    { id:'balanced_living_end', badge:'⚖️', title:'双城生活', desc:'你找到了大城市和小城市之间的平衡。\n\n你在大城市工作，在小城市有家。你每周往返，像候鸟一样。\n\n你享受大城市的便利，也享受小城市的安逸。你的同事说：「你活得太累了。」你说：「但我活得很完整。」\n\n"双城生活：不是两头跑——是两头都要。"', cond: g => g.flags.lifeBalanceChoice && g.flags.reverseMigration && g.mood >= 60 && g.age >= 32 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
