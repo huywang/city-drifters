@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v13.0
+// 都市浮生记 - Game Engine v13.1
 // ============================================
 
 // === GAME STATE ===
@@ -6826,6 +6826,87 @@ const EVENTS = [
         { label:'跟朋友讨论', hint:'+👥 +🧠', fn: g => { g.flags.lifePhilosophy=true; return{social:5,intel:8}; }},
         { label:'想不明白就不想了', hint:'', fn: g => { return{mood:-3}; }},
       ]},
+    // === v13.1 婚恋关系 + 相亲文化 + 单身生活 ===
+    { id:'blind_date_v2_v2', icon:'🍽️', title:'相亲',
+      body:'你妈给你安排了一次相亲。\n\n对方条件：有房有车，月薪2万，身高175，不抽烟不喝酒。\n\n你到了餐厅。对方比你照片上胖了一圈。聊天话题：房子几套、车什么牌子、年薪多少。\n\n你问：「你有什么爱好？」\n对方说：「赚钱。」\n\n你吃完饭，AA制。对方说：「我觉得你挺适合结婚的。」\n你说：「谢谢。」然后你拉黑了他/她的微信。\n\n"相亲不是找对象——是两个家庭在做商业谈判。"',
+      cond: g => g.age >= 25 && g.age <= 38 && !g.flags.married && !g.flags.blindDate,
+      choices:[
+        { label:'继续见下一个', hint:'+👥', fn: g => { g.flags.blindDate=true; return{social:5,mood:-5}; }},
+        { label:'算了不去了', hint:'+😊', fn: g => { g.flags.blindDate=true; return{mood:5}; }},
+        { label:'给个机会再处处', hint:'+👥 +😊', fn: g => { g.flags.blindDate=true; return{social:8,mood:3}; }},
+      ]},
+    { id:'cohabitation', icon:'🏠', title:'同居',
+      body:'你和对象决定同居了。\n\n第一周：甜蜜到腻。\n第一月：你发现他/她睡觉打呼噜、挤牙膏从中间挤、袜子乱扔。\n第三月：你们为了「谁洗碗」吵了三次架。\n\n你开始理解：同居是婚姻的最佳彩排——因为它让你提前知道了：你能不能接受这个人最真实的样子。\n\n"同居的真相：你不是在跟一个人生活——你是在跟一个人的所有习惯生活。"',
+      cond: g => g.age >= 24 && g.flags.partnerName && !g.flags.cohabitation,
+      choices:[
+        { label:'磨合！', hint:'+😊 +🧠', fn: g => { g.flags.cohabitation=true; if(g.relationships) g.relationships.partner=Math.min(100,g.relationships.partner+10); return{mood:8,intel:5}; }},
+        { label:'算了还是分开住', hint:'', fn: g => { return{mood:-5}; }},
+        { label:'制定家务分工表', hint:'+🧠 +👥', fn: g => { g.flags.cohabitation=true; return{intel:5,social:3,mood:5}; }},
+      ]},
+    { id:'marriage_pressure_v2_v2', icon:'💍', title:'催婚',
+      body:'过年回家，你妈又开始了：\n\n「你xxx都结婚了，你呢？」\n「再不找就来不及了！」\n「你是不是有什么问题？」\n\n你爸在旁边不说话（他已经被你妈骂了20年了）。\n\n你的七大姑八大姨轮流上阵。你笑着应付，心里想：婚姻是人生的一个选项——不是必选题。\n\n"催婚是中国式亲情的终极武器——出发点是爱，落点是伤害。"',
+      cond: g => g.age >= 26 && !g.flags.married && !g.flags.marriagePressure,
+      choices:[
+        { label:'理解他们的关心', hint:'+👨‍👩‍👧 +🧠', fn: g => { g.flags.marriagePressure=true; if(g.relationships) g.relationships.family=Math.min(100,g.relationships.family+5); return{intel:5,mood:-3}; }},
+        { label:'据理力争', hint:'-👨‍👩‍👧', fn: g => { g.flags.marriagePressure=true; if(g.relationships) g.relationships.family=Math.max(0,g.relationships.family-8); return{mood:-5}; }},
+        { label:'假装在找了', hint:'', fn: g => { g.flags.marriagePressure=true; return{mood:-3}; }},
+      ]},
+    { id:'wedding_cost_v2', icon:'💒', title:'婚礼预算',
+      body:'你要结婚了。然后你看到了婚礼报价单：\n\n酒店：5万\n婚庆：3万\n婚纱：1万\n摄影：8千\n司仪：5千\n请柬+喜糖：5千\n总计：约10万\n\n你看了看存款。你看了看对方。你说：「要不……旅行结婚？」\n\n对方说：「不行，我妈说要办。」\n你妈说：「不行，我朋友的孩子都办了。」\n\n"婚礼不是给新人办的——是给新人父母办的。新郎新娘只是演员。"',
+      cond: g => g.flags.married && !g.flags.weddingCost,
+      choices:[
+        { label:'办！一辈子一次', hint:'-💰💰 +😊', fn: g => { g.flags.weddingCost=true; return{money:-80000,mood:15,charm:5}; }},
+        { label:'简办', hint:'-💰 +😊', fn: g => { g.flags.weddingCost=true; return{money:-30000,mood:8}; }},
+        { label:'旅行结婚', hint:'-💰 +😊 +🧠', fn: g => { g.flags.weddingCost=true; return{money:-20000,mood:12,intel:3}; }},
+      ]},
+    { id:'single_life', icon:'🙋', title:'单身宣言',
+      body:'你在朋友圈发了一条：「我选择不结婚。」\n\n评论区炸了：\n你妈：「你等着，我马上给你安排相亲。」\n你朋友：「等你遇到对的人就不这么想了。」\n你同事：「佩服你的勇气。」\n\n你不反对婚姻——你只是不想为了结婚而结婚。你觉得：一个人也可以过得很好。\n\n"单身不是找不到人——是不愿意将就。而「不将就」是这个时代最奢侈的品质。"',
+      cond: g => g.age >= 28 && !g.flags.married && !g.flags.singleLife,
+      choices:[
+        { label:'坚持自己的选择', hint:'+😊 +🧠', fn: g => { g.flags.singleLife=true; return{mood:12,intel:8}; }},
+        { label:'有点动摇了', hint:'', fn: g => { g.flags.singleLife=true; return{mood:-3}; }},
+        { label:'发完就删了', hint:'+👨‍👩‍👧', fn: g => { g.flags.singleLife=true; if(g.relationships) g.relationships.family=Math.min(100,g.relationships.family+3); return{mood:-5}; }},
+      ]},
+    { id:'relationship_fight', icon:'⚡', title:'吵架',
+      body:'你和对象又吵架了。\n\n起因：谁没倒垃圾。结果：翻出了三年前你没回消息的事。\n\n你们吵了2个小时。最后他/她说了一句：「你跟你爸一样！」\n\n你愣住了。这是你听过的最伤人的一句话。\n\n你们冷战了3天。第四天，他/她给你买了你最爱吃的草莓。你们和好了。\n\n"吵架是亲密关系的必修课——因为只有在最亲近的人面前，你才敢暴露最真实的自己。"',
+      cond: g => g.flags.partnerName && !g.flags.relationshipFight,
+      choices:[
+        { label:'主动道歉', hint:'+👥 +😊', fn: g => { g.flags.relationshipFight=true; if(g.relationships) g.relationships.partner=Math.min(100,g.relationships.partner+5); return{mood:5,social:3}; }},
+        { label:'等对方先开口', hint:'-😊', fn: g => { g.flags.relationshipFight=true; return{mood:-5}; }},
+        { label:'认真谈谈', hint:'+🧠 +👥', fn: g => { g.flags.relationshipFight=true; if(g.relationships) g.relationships.partner=Math.min(100,g.relationships.partner+8); return{intel:5,social:5,mood:3}; }},
+      ]},
+    { id:'prenup_talk_v2', icon:'📄', title:'婚前协议',
+      body:'你们讨论婚前协议。\n\n对方说：「我名下有一套房，婚前买的。这个不能算共同财产。」\n你说：「可以。」\n对方又说：「但我父母出的首付，这部分……」\n\n你突然觉得：这不是在讨论婚姻——这是在讨论合同。\n\n你妈说：「不签！签了就是不相信对方！」\n你朋友说：「签！这是保护自己。」\n\n"婚前协议是理性还是冷酷？取决于你更相信爱情还是更相信法律。"',
+      cond: g => g.flags.married && g.age >= 26 && !g.flags.prenupTalk,
+      choices:[
+        { label:'签了更安心', hint:'+🧠 +💰', fn: g => { g.flags.prenupTalk=true; return{intel:5,mood:3}; }},
+        { label:'不签，信任比协议重要', hint:'+😊', fn: g => { g.flags.prenupTalk=true; return{mood:8}; }},
+        { label:'算了太伤感情', hint:'-😊', fn: g => { return{mood:-5}; }},
+      ]},
+    { id:'divorce_thought', icon:'💔', title:'离婚念头',
+      body:'你第一次想到了离婚。\n\n不是因为出轨，不是因为家暴——只是因为……你们不再像以前那样了。\n\n你们不再聊天。不再一起吃饭。不再说「晚安」。甚至吵架都懒得吵了。\n\n你看着对方的背影，想：我们什么时候变成了这样？\n\n你知道：婚姻最大的杀手不是第三者——是冷漠。\n\n"离婚不是因为不爱了——是因为你们忘了怎么爱。"',
+      cond: g => g.flags.married && g.age >= 30 && g.mood <= 45 && !g.flags.divorceThought,
+      choices:[
+        { label:'试着修复', hint:'+😊 +👥', fn: g => { g.flags.divorceThought=true; if(g.relationships) g.relationships.partner=Math.min(100,g.relationships.partner+10); return{mood:8,social:5}; }},
+        { label:'去做婚姻咨询', hint:'+😊 -💰', fn: g => { g.flags.divorceThought=true; if(g.relationships) g.relationships.partner=Math.min(100,g.relationships.partner+15); return{mood:10,money:-2000}; }},
+        { label:'也许真的该分开', hint:'-😊', fn: g => { g.flags.divorceThought=true; if(g.relationships) g.relationships.partner=Math.max(0,g.relationships.partner-15); return{mood:-15}; }},
+      ]},
+    { id:'child_decision', icon:'👶', title:'要不要生孩子',
+      body:'你们讨论要不要孩子。\n\n你妈说：「趁年轻赶紧生！我还能帮你们带。」\n你对象说：「你觉得我们准备好了吗？」\n你的同事说：「千万别生！你会后悔的。」\n你的闺蜜说：「赶紧生！孩子太可爱了！」\n\n你算了一笔账：从怀孕到大学毕业，大约需要100万。\n你又算了一笔账：一个孩子给你带来的快乐——无法计算。\n\n"生不生孩子的决定，没有对错——只有你准备好承担哪一种后果。"',
+      cond: g => g.flags.married && g.age >= 26 && g.age <= 40 && !g.flags.hasChild && !g.flags.childDecision,
+      choices:[
+        { label:'生！', hint:'+😊 +👨‍👩‍👧 -💰', fn: g => { g.flags.childDecision=true; g.flags.hasChild=true; return{mood:15,money:-20000}; }},
+        { label:'再等等', hint:'', fn: g => { g.flags.childDecision=true; return{mood:3}; }},
+        { label:'丁克', hint:'+💰 +😊', fn: g => { g.flags.childDecision=true; return{mood:5,money:5000}; }},
+      ]},
+    { id:'couple_travel', icon:'✈️', title:'情侣旅行',
+      body:'你和对象第一次一起旅行。\n\n第一天：甜蜜到冒泡。你们在海边看日落，在小巷里接吻。\n第二天：开始吵架。为了去哪里吃、走哪条路、拍照姿势不好看。\n第三天：你们不说话。各走各的。\n第四天：你们和好了。因为你们发现：在一起的时候虽然吵，但不在一起的时候更想对方。\n\n"情侣旅行是关系最好的试金石——能一起旅行不吵架的人，能一起过一辈子。"',
+      cond: g => g.flags.partnerName && !g.flags.coupleTravel,
+      choices:[
+        { label:'拍了很多照片', hint:'+✨ +😊', fn: g => { g.flags.coupleTravel=true; if(g.relationships) g.relationships.partner=Math.min(100,g.relationships.partner+8); return{charm:5,mood:12,money:-3000}; }},
+        { label:'吵了一架但和好了', hint:'+🧠 +👥', fn: g => { g.flags.coupleTravel=true; if(g.relationships) g.relationships.partner=Math.min(100,g.relationships.partner+5); return{intel:5,social:3,mood:5,money:-3000}; }},
+        { label:'决定以后各玩各的', hint:'-👥', fn: g => { g.flags.coupleTravel=true; if(g.relationships) g.relationships.partner=Math.max(0,g.relationships.partner-5); return{mood:-8,money:-3000}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -7440,6 +7521,17 @@ const ACHIEVEMENTS = [
     { id:'hobby_entrepreneur', icon:'💡', name:'爱好创业者', desc:'把爱好变成了副业', check: g => g.flags.hobbyBusiness },
     { id:'age_wise', icon:'🎂', name:'年龄智者', desc:'面对了年龄焦虑', check: g => g.flags.ageAnxiety },
     { id:'philosopher_v2', icon:'🌟', name:'生活哲学家', desc:'找到了自己的人生哲学', check: g => g.flags.lifePhilosophy },
+    // === v13.1 新增成就 ===
+    { id:'blind_dater', icon:'💕', name:'相亲老手', desc:'经历了相亲', check: g => g.flags.blindDate },
+    { id:'cohabiter', icon:'🏠', name:'同居时代', desc:'开始了同居生活', check: g => g.flags.cohabitation },
+    { id:'marriage_pressured', icon:'💍', name:'催婚受害者', desc:'被催婚了', check: g => g.flags.marriagePressure },
+    { id:'wedding_planner', icon:'💒', name:'婚礼筹备者', desc:'筹备了婚礼', check: g => g.flags.weddingCost },
+    { id:'single_happy_v2', icon:'🎉', name:'快乐单身', desc:'享受单身生活', check: g => g.flags.singleLife },
+    { id:'fighter_love', icon:'🥊', name:'爱情战士', desc:'和对象大吵一架', check: g => g.flags.relationshipFight },
+    { id:'prenup_talker', icon:'📋', name:'婚前协议', desc:'谈了婚前协议', check: g => g.flags.prenupTalk },
+    { id:'divorce_thinker', icon:'💔', name:'围城思考者', desc:'想过离婚', check: g => g.flags.divorceThought },
+    { id:'child_decider', icon:'👶', name:'生育抉择者', desc:'面对了生育选择', check: g => g.flags.childDecision },
+    { id:'couple_traveler', icon:'✈️', name:'情侣旅行家', desc:'和对象一起旅行', check: g => g.flags.coupleTravel },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -7637,6 +7729,11 @@ const ENDINGS = [
     { id:'free_spirit_end', badge:'🌍', title:'自由灵魂', desc:'你成了一个数字游民。\n\n你去过大理、丽江、厦门、厦门、清迈。你在每个城市的咖啡馆里工作，在每个城市的街头巷尾生活。\n\n你没有固定的地址，没有固定的收入，没有固定的社交圈。但你有固定的自由。\n\n你妈说：「你这辈子什么时候能稳定下来？」\n你说：「妈，稳定不是安全——自由才是。」\n\n"自由不是没有根——是你的根，扎在了整个世界。"', cond: g => g.flags.digitalNomad && g.flags.cityWalk && g.mood >= 60 && g.age >= 28 },
     { id:'wise_liver_end', badge:'🌟', title:'活明白了的人', desc:'你终于活明白了。\n\n你不再追求「更好」——因为你已经是「最好」的了。不是因为你成功了，而是因为你终于接受了自己。\n\n你有自己的爱好、自己的朋友、自己的节奏。你不跟别人比，不跟社会比，只跟昨天的自己比。\n\n你妈说：「你怎么一点都不焦虑了？」\n你说：「因为我想通了——人生没有标准答案。」\n\n"活明白不是什么都懂——是不再问那些没有答案的问题。"', cond: g => g.flags.lifePhilosophy && g.flags.ageAnxiety && g.flags.minimalistLife && g.mood >= 65 && g.age >= 35 },
     { id:'community_heart_end', badge:'🤝', title:'社区的温度', desc:'你成了社区里最受欢迎的人。\n\n你做志愿者、组织读书会、帮邻居收快递、给独居老人送饭。\n\n你不是最有钱的人，也不是最成功的人。但你是最被需要的人。\n\n你的邻居说：「这个社区因为有了你，变得更好了。」\n\n"成功的最高形式不是自己过得好——是让身边的人也过得好。"', cond: g => g.flags.volunteerWork && g.flags.bookClub && g.social >= 70 && g.age >= 30 },
+    // --- v13.1 NEW ENDINGS ---
+    { id:'marriage_veteran_end', badge:'💍', title:'婚姻老兵', desc:'你结婚了，经历了婚姻的酸甜苦辣。\n\n从相亲时的尴尬，到同居时的磨合，到婚礼上的泪水，到婚后的柴米油盐。你们吵过、闹过、冷战过，但也笑过、哭过、拥抱过。\n\n你的对象说：「嫁给/娶了你，是我这辈子最正确的决定。」\n你说：「娶了/嫁给你，是我这辈子最不后悔的选择。」\n\n"婚姻不是童话——是两个不完美的人，一起创造相对完美的生活。"', cond: g => g.flags.marriagePressure && g.flags.weddingCost && g.flags.married && g.mood >= 60 && g.age >= 30 },
+    { id:'single_champion_end', badge:'🎊', title:'单身冠军', desc:'你选择了单身，而且活得很精彩。\n\n你没有对象，但你有自由。你可以随时加班、随时旅行、随时吃火锅、随时看午夜场电影。\n\n你妈依然每周催婚，但你学会了微笑以对。你的朋友圈签名是：「一个人，也要活得热气腾腾。」\n\n"单身不是没人要——是我还没遇到让我愿意放弃自由的人。"', cond: g => g.flags.singleLife && !g.flags.married && g.mood >= 70 && g.age >= 32 },
+    { id:'relationship_survivor_end', badge:'💪', title:'爱情幸存者', desc:'你经历了爱情的考验，但你们挺过来了。\n\n你们吵过架、冷战过、差点分手过。但每次你们都选择了和解，选择了继续。\n\n你的朋友说：「你们是怎么做到的？」\n你笑着说：「因为我们都知道，放弃比坚持更容易——但我们选择了更难的那条路。」\n\n"爱情不是找到完美的人——是学会和不完美的人，一起成长。"', cond: g => g.flags.relationshipFight && g.flags.coupleTravel && g.mood >= 65 && g.age >= 28 },
+    { id:'childfree_end', badge:'🌿', title:'丁克家族', desc:'你和对象决定不要孩子。\n\n你们把省下来的钱用来旅行、学习、享受生活。周末睡到自然醒，假期想去哪就去哪。\n\n有人说你们自私，有人说你们潇洒。但你知道，这只是你们的选择——一个不需要向任何人解释的选择。\n\n"不是所有人都需要成为父母，有些人选择成为自己。"', cond: g => g.flags.childDecision && g.flags.cohabitation && g.age >= 35 && g.mood >= 65 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
