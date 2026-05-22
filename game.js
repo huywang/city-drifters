@@ -1210,6 +1210,120 @@ const EVENTS = [
         { label:'先提高收入再说', hint:'+💰', fn: g => ({money:10000,intel:5}) },
         { label:'FIRE太遥远，过好当下', hint:'+😊', fn: g => ({mood:10}) },
       ]},
+    // === v2.14 RELATIONSHIP EVENTS ===
+    { id:'family_call', icon:'📞', title:'家人的电话',
+      body:'你妈又来电话了："吃饭了吗？""穿秋裤了吗？""什么时候回来看看？"\n\n你说"挺好的"，但其实你已经三天没好好吃饭了。\n\n挂了电话，你看着窗外的霓虹灯，突然有点想家。\n\n"家人是你最后的港湾，但你总是在最远的地方。"',
+      cond: g => g.months>3 && Math.random()>0.5,
+      choices:[
+        { label:'周末回家看看', hint:'+👨‍👩‍👧 -💰', fn: g => { g.relationships.family = clamp((g.relationships.family||60)+15, 0, 100); return{mood:15,money:-800}; }},
+        { label:'视频聊天半小时', hint:'+👨‍👩‍👧', fn: g => { g.relationships.family = clamp((g.relationships.family||60)+8, 0, 100); return{mood:8}; }},
+        { label:'说忙，下次吧', hint:'-👨‍👩‍👧', fn: g => { g.relationships.family = clamp((g.relationships.family||60)-5, 0, 100); return{mood:-5}; }},
+      ]},
+    { id:'friend_wedding', icon:'💒', title:'朋友的婚礼',
+      body:'大学室友要结婚了，发来请帖。\n\n你看了看份子钱的标准：普通朋友500，好朋友1000，死党2000。\n\n你算了算这个月已经参加了两场婚礼了。\n\n"友情不是用金钱衡量的——但份子钱是。"',
+      cond: g => g.age>=24 && g.age<=35 && g.months>6,
+      choices:[
+        { label:'包大红包，友情无价', hint:'-💰 +👥', fn: g => { g.relationships.friends = clamp((g.relationships.friends||40)+12, 0, 100); return{money:-2000,mood:10,social:8}; }},
+        { label:'随大流，意思意思', hint:'-💰', fn: g => { g.relationships.friends = clamp((g.relationships.friends||40)+5, 0, 100); return{money:-800,mood:3}; }},
+        { label:'找借口不去', hint:'+💰 -👥', fn: g => { g.relationships.friends = clamp((g.relationships.friends||40)-10, 0, 100); return{mood:-8,social:-5}; }},
+      ]},
+    { id:'colleague_conflict', icon:'⚡', title:'同事矛盾',
+      body:'你和同事因为项目分工吵起来了。他觉得你在摸鱼，你觉得他在甩锅。\n\nHR找你们谈话："大家是一个team，要和谐共处。"\n\n你心里想：和谐个鬼，KPI都是各背各的。\n\n"职场没有朋友，只有利益——但有时候利益也会打架。"',
+      cond: g => g.job!=='待业中' && g.months>3,
+      choices:[
+        { label:'主动道歉，大局为重', hint:'+👥 -😊', fn: g => { g.relationships.colleagues = clamp((g.relationships.colleagues||30)+10, 0, 100); return{mood:-8,social:5}; }},
+        { label:'据理力争', hint:'🎲', fn: g => { g.relationships.colleagues = clamp((g.relationships.colleagues||30)-8, 0, 100); if(Math.random()>0.5){return{mood:10,charm:5}}else{return{mood:-15,social:-5}} }},
+        { label:'找领导评理', hint:'🎲', fn: g => { if(Math.random()>0.6){return{mood:10,social:5}}else{g.relationships.colleagues = clamp((g.relationships.colleagues||30)-15, 0, 100);return{mood:-10}} }},
+      ]},
+    { id:'lonely_holiday', icon:'🎊', title:'一个人的节日',
+      body:'又是情人节/七夕/圣诞节。朋友圈里全是秀恩爱的。\n\n你一个人吃了顿火锅，服务员问你："先生/女士，对面还坐人吗？"\n\n你说："坐空气。"\n\n"单身不是罪，是选择——一种被迫的选择。"',
+      cond: g => !g.flags.hasPartner && !g.flags.married && (g.month===2 || g.month===8 || g.month===12),
+      choices:[
+        { label:'下载交友App', hint:'🎲 +👥', fn: g => { if(Math.random()>0.5 && g.charm>40){g.flags.hasPartner=true;g.relationships.partner=50;return{mood:20,charm:5,social:10}}else{return{mood:-5,money:-200}} }},
+        { label:'约朋友出来玩', hint:'+👥 +😊', fn: g => { g.relationships.friends = clamp((g.relationships.friends||40)+8, 0, 100); return{mood:10,social:8,money:-500}; }},
+        { label:'一个人也挺好', hint:'+😊 -👥', fn: g => ({mood:5,social:-3}) },
+      ]},
+    { id:'relationship_crisis', icon:'💔', title:'感情危机',
+      body:'你和对象又吵架了。原因是你又在加班，TA觉得你不在乎这段感情。\n\n"你到底是要工作还是要我？"\n\n你想说"两个都要"，但你知道这不是正确答案。\n\n"爱情需要经营，但996的人连自己都经营不好。"',
+      cond: g => g.flags.hasPartner && g.relationships.partner < 50 && g.job!=='待业中',
+      choices:[
+        { label:'请假陪TA', hint:'-💰 +❤️', fn: g => { g.relationships.partner = clamp((g.relationships.partner||0)+20, 0, 100); return{money:-2000,mood:15,health:5}; }},
+        { label:'买礼物道歉', hint:'-💰 +❤️', fn: g => { g.relationships.partner = clamp((g.relationships.partner||0)+10, 0, 100); return{money:-1500,mood:8}; }},
+        { label:'算了，分手吧', hint:'💔', fn: g => { g.flags.hasPartner=false;g.relationships.partner=0;g.flags.divorced=true; return{mood:-25,social:-10}; }},
+      ]},
+    { id:'parent_sick', icon:'🏥', title:'父母生病了',
+      body:'你接到电话：你爸/妈住院了。不是大病，但需要人照顾几天。\n\n你看了看手头的项目deadline，又看了看机票价格。\n\n"子欲养而亲不待——但请假扣的钱也很痛。"',
+      cond: g => g.age>=28 && g.relationships.family > 30,
+      choices:[
+        { label:'请假回家照顾', hint:'-💰 +👨‍👩‍👧 +😊', fn: g => { g.relationships.family = clamp((g.relationships.family||60)+20, 0, 100); return{money:-3000,mood:15,health:-5}; }},
+        { label:'转钱让亲戚帮忙', hint:'-💰 +👨‍👩‍👧', fn: g => { g.relationships.family = clamp((g.relationships.family||60)+5, 0, 100); return{money:-5000,mood:-5}; }},
+        { label:'视频问候，工作走不开', hint:'-👨‍👩‍👧 -😊', fn: g => { g.relationships.family = clamp((g.relationships.family||60)-15, 0, 100); return{mood:-20}; }},
+      ]},
+    // === v2.14 SOCIAL NEWS EVENTS ===
+    { id:'kaogong_fever', icon:'📚', title:'考公热',
+      body:'你刷朋友圈，发现又有三个同学考上公务员了。\n\n"宇宙的尽头是编制"——这句话最近特别火。\n\n你看了看自己996的工作，又看了看公务员的福利待遇。\n\n考还是不考？这是个问题。\n\n"考公就像围城：外面的人想进去，里面的人想出来——但出来的人很少。"',
+      cond: g => g.age>=24 && g.age<=35 && !g.flags.civilServant && g.intel>50,
+      choices:[
+        { label:'辞职备考公务员', hint:'🎲 -💰 +🧠', fn: g => { setJob(g,'待业中',0); g.flags.kaogongPrep=true; return{mood:-10,intel:10,money:-10000}; }},
+        { label:'边工作边备考', hint:'-❤️ +🧠', fn: g => { g.flags.kaogongPrep=true; return{health:-10,intel:8,mood:-5}; }},
+        { label:'算了，我适合打拼', hint:'+😊', fn: g => ({mood:5}) },
+      ]},
+    { id:'bride_price', icon:'💍', title:'天价彩礼',
+      body:'你要结婚了，但女方家要求30万彩礼+一套房。\n\n你算了算：彩礼30万+房子首付100万+装修30万+婚礼20万=180万。\n\n你的存款：20万。\n\n你妈说："要不把老家的房子卖了？"\n\n"婚姻是爱情的坟墓——但首先，你得买得起墓地。"',
+      cond: g => g.flags.hasPartner && g.relationships.partner>60 && g.age>=26 && g.age<=35 && !g.flags.married && !g.flags.hasHouse,
+      choices:[
+        { label:'借钱凑彩礼结婚', hint:'-💰 +❤️', fn: g => { g.flags.married=true;g.flags.marriedMonths=g.months;g.money-=150000;g.relationships.partner=clamp((g.relationships.partner||0)+10,0,100);g.relationships.family=clamp((g.relationships.family||60)+15,0,100);return{mood:20}; }},
+        { label:'跟对方商量降低', hint:'🎲', fn: g => { if(Math.random()>0.5){g.flags.married=true;g.money-=50000;g.relationships.partner=clamp((g.relationships.partner||0)+5,0,100);return{mood:15}}else{g.relationships.partner=clamp((g.relationships.partner||0)-20,0,100);return{mood:-20}} }},
+        { label:'分手，结不起', hint:'💔', fn: g => { g.flags.hasPartner=false;g.relationships.partner=0;return{mood:-30,social:-10}; }},
+      ]},
+    { id:'housing_crisis', icon:'🏚️', title:'烂尾楼风波',
+      body:'你看到新闻：某楼盘烂尾了，业主们集体停贷。\n\n你瑟瑟发抖——虽然你还没买房，但这让你更不敢买了。\n\n"买房前你是甲方，买房后你是孙子——烂尾楼业主连孙子都不如。"',
+      cond: g => g.age>=25 && !g.flags.hasHouse && g.money>100000,
+      choices:[
+        { label:'还是租房安全', hint:'+😊', fn: g => ({mood:10}) },
+        { label:'研究现房/二手房', hint:'+🧠', fn: g => ({intel:8,mood:-5}) },
+        { label:'继续观望', hint:'', fn: g => ({mood:-3}) },
+      ]},
+    { id:'education_bubble', icon:'🎓', title:'学历贬值',
+      body:'你看到一个新闻：某985硕士去送外卖了。\n\n评论区炸了：\n"读书有什么用？"\n"学历不如一张外卖平台优惠券。"\n"知识改变命运——改成送外卖的命运。"\n\n你看了看自己的学历证书，突然觉得它更像一张收据。\n\n"学历是敲门砖，但门后面还有门，门后面还是门。"',
+      cond: g => g.age>=23 && g.age<=32,
+      choices:[
+        { label:'继续深造读博', hint:'-💰 +🧠', fn: g => { g.flags.phdStudent=true; return{money:-50000,intel:20,mood:-10}; }},
+        { label:'学实用技能', hint:'+🧠 +💰', fn: g => ({intel:12,money:5000,mood:5}) },
+        { label:'认命了', hint:'-😊', fn: g => ({mood:-10}) },
+      ]},
+    { id:'middle_age_anxiety', icon:'😰', title:'35岁危机',
+      body:'你快35岁了。互联网行业的"35岁魔咒"让你焦虑不已。\n\n猎头说："35岁以上的简历，很多公司系统自动过滤。"\n\n你看了看镜子里的自己：发际线后移，黑眼圈加深，肚子微微隆起。\n\n"35岁是职场的保质期——过了这个期，你就是临期商品。"',
+      cond: g => g.age>=33 && g.age<=37 && g.job!=='待业中' && !g.flags.middleAgeAnxiety,
+      choices:[
+        { label:'转型管理岗', hint:'🎲 +🧠', fn: g => { g.flags.middleAgeAnxiety=true; if(Math.random()>0.4){setJob(g,'管理岗',Math.floor(g.jobSalary*1.5));return{mood:15,intel:10}}else{return{mood:-15}} }},
+        { label:'发展副业Plan B', hint:'+💰 +🧠', fn: g => { g.flags.middleAgeAnxiety=true; g.flags.sideHustle=true; return{money:10000,intel:8,mood:5}; }},
+        { label:'焦虑但继续996', hint:'-❤️ -😊', fn: g => { g.flags.middleAgeAnxiety=true; return{health:-10,mood:-15}; }},
+      ]},
+    { id:'digital_detox', icon:'📵', title:'数字戒断',
+      body:'你发现自己每天刷手机超过8小时。抖音、小红书、微博、B站——你的注意力被切割成碎片。\n\n你试着放下手机一天，结果：焦虑、手痒、幻听（总觉得手机在响）。\n\n"你以为你在玩手机，其实是手机在玩你。"',
+      cond: g => g.mood<50 && g.intel>40,
+      choices:[
+        { label:'开始数字戒断', hint:'+🧠 +😊 -👥', fn: g => { g.flags.digitalDetox=true; return{intel:10,mood:15,social:-5,health:5}; }},
+        { label:'限制使用时间', hint:'+🧠 +😊', fn: g => ({intel:5,mood:8,health:3}) },
+        { label:'算了，离不开', hint:'-🧠', fn: g => ({intel:-3,mood:-5}) },
+      ]},
+    { id:'involution_vs_lyingflat', icon:'⚔️', title:'内卷还是躺平',
+      body:'网上又在吵"内卷vs躺平"。\n\n内卷派："不卷怎么活？"\n躺平派："卷不动了，爱咋咋地。"\n\n你夹在中间：卷也卷不赢，躺也躺不平。\n\n"45度人生——既没有90度的拼搏，也没有0度的躺平。"',
+      cond: g => g.age>=22 && g.age<=35,
+      choices:[
+        { label:'选择内卷', hint:'+💰 -❤️', fn: g => { g.flags.choseInvolution=true; return{money:8000,health:-8,mood:-5,intel:5}; }},
+        { label:'选择躺平', hint:'+😊 -💰', fn: g => { g.flags.lyingFlat=true; g.flags.choseLyingFlat=true; return{mood:15,health:8,money:-3000}; }},
+        { label:'45度人生', hint:'', fn: g => ({mood:5,health:3,intel:3}) },
+      ]},
+    { id:'friends_drift_apart', icon:'🌊', title:'渐行渐远的朋友',
+      body:'你翻看手机通讯录，发现很多曾经的好朋友已经很久没联系了。\n\n你试着约了一个老朋友吃饭，结果发现：除了回忆过去，你们已经没什么可聊的了。\n\n"朋友不是消失了，只是被生活冲淡了。"',
+      cond: g => g.months>24 && g.relationships.friends < 50,
+      choices:[
+        { label:'主动联系老朋友们', hint:'+👥 -💰', fn: g => { g.relationships.friends = clamp((g.relationships.friends||40)+15, 0, 100); return{social:10,mood:12,money:-500}; }},
+        { label:'接受现实', hint:'-👥 +😊', fn: g => { g.relationships.friends = clamp((g.relationships.friends||40)-5, 0, 100); return{mood:5}; }},
+        { label:'交新朋友', hint:'+👥', fn: g => { g.relationships.friends = clamp((g.relationships.friends||40)+8, 0, 100); return{social:8,mood:5,money:-300}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -1252,6 +1366,13 @@ const ACHIEVEMENTS = [
     { id:'volunteer', icon:'🤝', name:'志愿者', desc:'参加过志愿者活动', check: g => g.flags.volunteer },
     { id:'personal_brand', icon:'🌟', name:'个人品牌', desc:'建立个人品牌', check: g => g.flags.personalBrand },
     { id:'fire_planner', icon:'🎯', name:'FIRE计划', desc:'开始FIRE计划', check: g => g.flags.firePlan },
+    // v2.14 Relationship achievements
+    { id:'family_love', icon:'👨‍👩‍👧', name:'孝顺子女', desc:'家人关系达到90+', check: g => g.relationships && g.relationships.family>=90 },
+    { id:'best_friends', icon:'🤝', name:'知心好友', desc:'朋友关系达到90+', check: g => g.relationships && g.relationships.friends>=90 },
+    { id:'true_love', icon:'💕', name:'真爱', desc:'恋人关系达到90+', check: g => g.relationships && g.relationships.partner>=90 },
+    { id:'team_player', icon:'👥', name:'团队之星', desc:'同事关系达到90+', check: g => g.relationships && g.relationships.colleagues>=90 },
+    { id:'kaogong_prepper', icon:'📚', name:'考公预备役', desc:'开始备考公务员', check: g => g.flags.kaogongPrep },
+    { id:'digital_detox', icon:'📵', name:'数字排毒', desc:'完成数字戒断', check: g => g.flags.digitalDetox },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -1286,6 +1407,11 @@ const ENDINGS = [
     { id:'teacher_end', badge:'👨‍🏫', title:'教育培训师', desc:'你转型做了教育培训师。教孩子编程，教成人英语，教职场新人沟通技巧。\n\n虽然收入不如大厂，但你觉得有意义。\n\n"教育的本质是一棵树摇动另一棵树，一朵云推动另一朵云。"', cond: g => g.intel>=75 && g.social>=50 && g.mood>=55 && g.age>=30 },
     { id:'small_business', badge:'🏪', title:'小店老板', desc:'你开了家小店——也许是咖啡厅，也许是花店，也许是书店。\n\n没有996，但有7×24。你既是老板也是员工。\n\n但你享受这种踏实感：每天开门营业，看到熟客微笑。\n\n"开一家小店，是很多人的梦想。你把它变成了现实。"', cond: g => g.flags.entrepreneur && g.money>=30000 && g.mood>=50 && g.age>=32 },
     { id:'retire_abroad', badge:'🌴', title:'海外养老', desc:'你在东南亚买了套小房子，开始了海外养老生活。\n\n泰国的物价是中国的1/3，空气好，人友善。\n\n你用国内的退休金，过着当地中产的生活。\n\n"此心安处是吾乡——前提是签证不给你找麻烦。"', cond: g => g.money>=400000 && g.age>=50 && g.health>=50 && g.charm>=50 },
+    // --- v2.14 RELATIONSHIP-BASED ENDINGS ---
+    { id:'lonely_death', badge:'🕯️', title:'孤独终老', desc:'你老了。没有伴侣，没有孩子，朋友也越来越少。\n\n你一个人住在养老院里，护工叫你吃饭的时候，你才发现今天是你生日。\n\n没有蛋糕，没有祝福，只有一个"生日快乐"的系统短信。\n\n你打开通讯录，翻了一遍又一遍——找不到一个可以打的人。\n\n"孤独不是身边没有人，是心里没有人。"\n\n但你也想说：一个人的日子，也可以有尊严。', cond: g => g.age>=55 && !g.flags.married && !g.flags.hasPartner && g.relationships.friends<30 && g.relationships.family<30 },
+    { id:'family_first', badge:'👨‍👩‍👧‍👦', title:'家庭至上', desc:'你选择了家庭。在事业和家庭之间，你选择了后者。\n\n你可能没有成为职场精英，但你是孩子眼中的好父母，父母眼中的好儿女，伴侣眼中的好另一半。\n\n周末一家人去公园，晚上围在一起吃饭。你妈说："一家人在一起，比什么都强。"\n\n"成功的定义有很多种。家人幸福，是其中最温暖的一种。"', cond: g => g.flags.married && g.relationships.family>=80 && g.relationships.partner>=70 && g.mood>=60 && g.age>=40 },
+    { id:'estranged', badge:'💔', title:'亲情断裂', desc:'你和家人的关系破裂了。也许是太久没联系，也许是某次争吵说了不该说的话。\n\n你妈的微信消息你已读不回，你爸的电话你假装没看到。\n\n直到某天你接到亲戚的电话："你爸住院了，想见你最后一面。"\n\n你赶到医院，看着他苍白的脸，突然觉得自己好混蛋。\n\n"有些关系，失去了才知道珍贵。"', cond: g => g.relationships.family<=10 && g.age>=30 },
+    { id:'social_butterfly_end', badge:'🦋', title:'社交达人', desc:'你成了圈子里的"人脉王"。每个人都认识你，你也认识每个人。\n\n你组织了无数场聚会，撮合了无数对朋友，促成了无数个项目。\n\n你的名字就是最好的名片。\n\n但偶尔夜深人静的时候，你会想：这些人脉里，有几个是真正的朋友？\n\n"人脉是资产，朋友是财富。你拥有了前者，但不确定有没有后者。"', cond: g => g.social>=90 && g.relationships.friends>=70 && g.relationships.colleagues>=70 && g.age>=35 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
@@ -1341,7 +1467,15 @@ function startGame() {
         months: 0, choices: 0, eventsSeen: 0, eventLog: [], achievements: [],
         money: bg.money, health: bg.health, mood: bg.mood,
         intel: bg.intel, social: bg.social, charm: bg.charm,
-        flags: {}, currentEvent: null, isEnded: false, consecutiveOvertime: 0,
+        // 人际关系系统 v2.14
+        relationships: {
+            family: 60,      // 家人关系 (0-100)
+            friends: 40,     // 朋友关系
+            partner: 0,      // 恋人/伴侣关系 (单身时0)
+            colleagues: 30,  // 同事关系
+        },
+        flags: { hasPartner: false, partnerName: '', marriedMonths: 0 },
+        currentEvent: null, isEnded: false, consecutiveOvertime: 0,
     });
 
     showScreen('screen-game');
@@ -1393,6 +1527,18 @@ function applyActivity() {
     G.social = clamp(G.social + effects.social, 0, 100);
     G.charm = clamp(G.charm + effects.charm, 0, 100);
 
+    // v2.14: 活动也影响人际关系
+    if (G.relationships) {
+        if (selectedActivity === 'socialize') {
+            G.relationships.friends = clamp((G.relationships.friends||40) + 8, 0, 100);
+            G.relationships.colleagues = clamp((G.relationships.colleagues||30) + 3, 0, 100);
+        }
+        if (selectedActivity === 'rest') {
+            G.relationships.partner = clamp((G.relationships.partner||0) + 3, 0, 100);
+            G.relationships.family = clamp((G.relationships.family||60) + 2, 0, 100);
+        }
+    }
+
     const label = effects.label;
     selectedActivity = null;
     // 重置UI
@@ -1432,6 +1578,23 @@ function advanceMonth() {
     // 健康和心情自然衰减
     G.health = clamp(G.health - (G.job==='待业中'?0:1), 0, 100);
     G.mood = clamp(G.mood - 1, 0, 100);
+
+    // 人际关系自然衰减 (v2.14)
+    if (G.relationships) {
+        G.relationships.family = clamp((G.relationships.family||60) - 1, 0, 100);  // 家人关系缓慢衰减
+        G.relationships.friends = clamp((G.relationships.friends||40) - 1, 0, 100);  // 朋友关系衰减更快
+        // 同事关系：工作时衰减，不工作时衰减更快
+        if (G.job !== '待业中') {
+            G.relationships.colleagues = clamp((G.relationships.colleagues||30) - 0.5, 0, 100);
+        } else {
+            G.relationships.colleagues = clamp((G.relationships.colleagues||30) - 2, 0, 100);
+        }
+        // 恋人关系：有恋人时衰减，需要维护
+        if (G.flags.hasPartner) {
+            G.relationships.partner = clamp((G.relationships.partner||0) - 2, 0, 100);
+            G.flags.marriedMonths = (G.flags.marriedMonths||0) + 1;
+        }
+    }
 
     // 过劳追踪
     if (G.job !== '待业中' && G.jobSalary > 10000) {
@@ -1684,11 +1847,11 @@ function triggerEnding() {
 
 function getEndingRarity(endingId) {
     // Legendary (rare endings that require specific conditions)
-    const legendary = ['fire', 'immigration', 'executive', 'retire_abroad', 'wealthy'];
+    const legendary = ['fire', 'immigration', 'executive', 'retire_abroad', 'wealthy', 'family_first'];
     // Rare (hard to achieve)
-    const rare = ['settled', 'startup_end', 'influencer_end', 'digital_nomad', 'karoshi', 'jail'];
+    const rare = ['settled', 'startup_end', 'influencer_end', 'digital_nomad', 'karoshi', 'jail', 'social_butterfly_end'];
     // Uncommon (moderately difficult)
-    const uncommon = ['hometown_hero', 'go_home', 'civil_end', 'ordinary', 'single', 'investment_guru', 'lying_flat_end'];
+    const uncommon = ['hometown_hero', 'go_home', 'civil_end', 'ordinary', 'single', 'investment_guru', 'lying_flat_end', 'lonely_death', 'estranged'];
 
     if (legendary.includes(endingId)) return 'legendary';
     if (rare.includes(endingId)) return 'rare';
@@ -1765,7 +1928,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.13' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.14' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
