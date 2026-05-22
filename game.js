@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v26.0
+// 都市浮生记 - Game Engine v26.1
 // ============================================
 
 // === GAME STATE ===
@@ -12763,6 +12763,87 @@ const EVENTS = [
         { label:'给妈妈打了电话，约了过年回家', hint:'+😊 +🤝', fn: g => { g.flags.foodNostalgia=true; g.flags.homesickCall=true; return{mood:8,social:3}; }},
         { label:'接受了「大城市吃不到正宗家乡味」的现实', hint:'+🧠 -😊', fn: g => { g.flags.foodNostalgia=true; return{intel:3,mood:-3}; }},
       ]},
+    // v26.1: 职场生存 + 中年转型
+    { id:'age_35_crisis_v26_1', icon:'🎂', title:'35岁危机', category:'career',
+      body:'你今天35岁了。\n\n你刷到一篇文章：「35岁——是职场的一道坎」。\n\n里面说：\n- 35岁以后，很多公司不再招你\n- 35岁是「被优化」的高危年龄\n- 如果你还没做到管理层——你就要开始担心了\n- 体制内招考也限制35岁以下\n\n你看着这篇文章——心里五味杂陈。\n\n35岁——身体还年轻，但职场已经「老了」。\n\n你也想：这到底是个人的问题，还是系统的问题？为什么一个健康的人——在35岁就要开始担心「被淘汰」？\n\n「35岁危机：不是你真的老了——是这个系统太怕老了。」',
+      cond: g => g.age === 35 && !g.flags.age35Crisis && g.job !== '待业中',
+      choices:[
+        { label:'开始焦虑，拼命加班证明自己', hint:'+💰 -❤️ -😊', fn: g => { g.flags.age35Crisis=true; g.flags.panicGrinder=true; return{money:3000,health:-5,mood:-8}; }},
+        { label:'开始规划B计划：技能提升、理财、副业', hint:'+🧠 +💰', fn: g => { g.flags.age35Crisis=true; g.flags.planBMaker=true; return{intel:8,money:2000}; }},
+        { label:'坦然接受：该来的总会来', hint:'+😊 +🧠', fn: g => { g.flags.age35Crisis=true; g.flags.calmAccepter=true; return{mood:5,intel:3}; }},
+      ]},
+    { id:'quiet_quitting_v26_1', icon:'🤫', title:'安静离职', category:'career',
+      body:'你学到了一新词：「安静离职」（Quiet Quitting）。\n\n不是真的辞职——而是：\n- 只做份内事\n- 不加班\n- 不主动揽活\n- 不参加无意义的会议\n- 准时下班\n\n你开始实践：\n- 领导让你加班——你说「今天有安排」\n- 周末@你——你不回\n- 评优——你无所谓\n- 升职——随缘\n\n你发现：\n- 你的工作质量——没有下降\n- 你的心情——明显变好了\n- 领导对你的态度——开始冷淡了\n- 同事看你的眼神——有羡慕也有不解\n\n你问自己：这才是「工作」该有的样子吧？为什么以前不是？\n\n「安静离职：不是躺平——是终于把工作当成了工作。」',
+      cond: g => g.age >= 25 && g.age <= 45 && !g.flags.quietQuitting && g.job !== '待业中' && g.salary,
+      choices:[
+        { label:'彻底践行安静离职，找回生活', hint:'+😊 +❤️ -💰 -✨', fn: g => { g.flags.quietQuitting=true; g.flags.quietQuitter=true; return{mood:10,health:5,money:-2000,charm:-3}; }},
+        { label:'适度安静：重要的事认真，其他的随缘', hint:'+😊 +🧠', fn: g => { g.flags.quietQuitting=true; g.flags.balancedWorker=true; return{mood:5,intel:3}; }},
+        { label:'算了，还是卷吧，怕被优化', hint:'-😊 -❤️ +💰', fn: g => { g.flags.quietQuitting=true; return{mood:-5,health:-3,money:1000}; }},
+      ]},
+    { id:'performance_review', icon:'📊', title:'绩效考核', category:'career',
+      body:'公司要搞半年度绩效考核了。\n\n规则：\n- 前10%：A（加薪、晋升）\n- 中间70%：B（维持原状）\n- 后20%：C（警告、可能优化）\n\n你算了算：你是中间偏上，但不确定能到A。\n\n你的领导找你谈话：「这次你可能是B+，下次再努力。」\n\n你心里不服：\n- 我做的活比A多\n- 但A会汇报、会表演\n- 你做的活——领导看不见\n\n你突然明白了一个职场真相：\n- 做了什么——不重要\n- 让领导知道你做了什么——才重要\n\n「绩效考核：不是评工作——是评关系。」',
+      cond: g => g.age >= 23 && g.age <= 50 && !g.flags.performanceReview && g.job !== '待业中',
+      choices:[
+        { label:'学会汇报，主动让领导看到你的贡献', hint:'+💰 +✨ -🧠', fn: g => { g.flags.performanceReview=true; g.flags.smartReporter=true; return{money:5000,charm:3,intel:-2}; }},
+        { label:'继续埋头干活，相信金子总会发光', hint:'+🧠 -💰', fn: g => { g.flags.performanceReview=true; return{intel:3}; }},
+        { label:'跟领导谈了谈，要求公平的待遇', hint:'+✨ +🧠 -🤝', fn: g => { g.flags.performanceReview=true; g.flags.fairnessFighter=true; return{charm:3,intel:3,social:-3}; }},
+      ]},
+    { id:'office_politics_v26_1', icon:'♟️', title:'办公室政治', category:'career',
+      body:'你发现：公司里——每个人都在「站队」。\n\nA总监派 vs B总监派\n老员工派 vs 新员工派\n本地派 vs 外地派\n嫡系 vs 外人\n\n你一直没站队。你以为这样最安全。\n\n但你发现：\n- 重要项目——轮不到你\n- 升职名单——没有你\n- 裁员名单——有你\n\n一个老同事悄悄跟你说：「在职场——不站队，就是两边都不讨好。」\n\n你开始明白：职场——不只是做事的地方，更是「做人」的地方。\n\n你问自己：我愿意玩这个游戏吗？\n\n「办公室政治：你不想玩——但你已经在里面了。」',
+      cond: g => g.age >= 25 && g.age <= 50 && !g.flags.officePolitics && g.job !== '待业中',
+      choices:[
+        { label:'加入了某个派系，开始玩职场游戏', hint:'+💰 +✨ -🧠 -🤝', fn: g => { g.flags.officePolitics=true; g.flags.politicalPlayer=true; return{money:3000,charm:5,intel:-3}; }},
+        { label:'坚持中立，靠能力说话', hint:'+🧠 +✨ -💰', fn: g => { g.flags.officePolitics=true; g.flags.neutralPro=true; return{intel:5,charm:3}; }},
+        { label:'受不了这种氛围，开始找下家', hint:'+😊 -💰', fn: g => { g.flags.officePolitics=true; g.flags.exitPlanner=true; return{mood:3}; }},
+      ]},
+    { id:'gig_economy_v26_1', icon:'🛵', title:'零工经济', category:'career',
+      body:'你最近开始做零工了。\n\n你的日常：\n- 早上：送外卖\n- 中午：做网约车司机\n- 下午：做家教\n- 晚上：接设计单\n\n你算了算：\n- 月收入：8000元（比以前上班高）\n- 工作时间：每天12小时\n- 没有社保、公积金、带薪假\n- 想请假？不接单就没收入\n\n你发现：零工经济——\n- 自由是自由了——但没有保障\n- 收入是高了——但没有成长\n- 你是自己的老板——也是自己的奴隶\n\n「零工经济：你以为获得了自由——其实只是换了一种不自由。」',
+      cond: g => g.age >= 18 && g.age <= 50 && !g.flags.gigEconomy,
+      choices:[
+        { label:'全职做零工，追求自由', hint:'+💰 +😊 -❤️ -🧠', fn: g => { g.flags.gigEconomy=true; g.flags.fullTimeGig=true; g.money += 3000; return{mood:3,health:-5,intel:-3}; }},
+        { label:'把零工当副业，保留主业', hint:'+💰 +🧠 -❤️', fn: g => { g.flags.gigEconomy=true; g.flags.sideGig=true; g.money += 2000; return{intel:3,health:-3}; }},
+        { label:'尝试一个月就放弃了，太累', hint:'-💰 +❤️', fn: g => { g.flags.gigEconomy=true; return{health:3}; }},
+      ]},
+    { id:'midlife_career_change', icon:'🔄', title:'中年转型', category:'career',
+      body:'你40岁了。你在现在的行业干了18年。\n\n但你觉得：\n- 越来越没激情\n- 上升空间到顶了\n- 行业在走下坡路\n- 年轻人比你更拼\n\n你有一个念头：转行。\n\n但你也知道：\n- 40岁转行——成功率不到20%\n- 你的技能在另一个行业可能一文不值\n- 你有房贷、孩子、老人——不能冒险\n- 但如果不转——你可能就这样「熬到」退休\n\n你问自己：人生的下半场——要怎么过？\n\n「中年转型：不是重新开始——是重新选择。」',
+      cond: g => g.age >= 38 && g.age <= 48 && !g.flags.midlifeCareerChange && g.job !== '待业中' && g.intel >= 30,
+      choices:[
+        { label:'彻底转行，从零开始', hint:'-💰 +🧠 +😊 -❤️', fn: g => { g.flags.midlifeCareerChange=true; g.flags.careerPivot=true; g.money -= 50000; return{intel:10,mood:5,health:-5}; }},
+        { label:'在现有行业找新方向，平稳过渡', hint:'+🧠 +💰', fn: g => { g.flags.midlifeCareerChange=true; g.flags.smoothTransition=true; return{intel:5,money:2000}; }},
+        { label:'算了，熬到退休吧', hint:'-😊 -🧠 +💰', fn: g => { g.flags.midlifeCareerChange=true; return{mood:-5,intel:-3,money:3000}; }},
+      ]},
+    { id:'side_hustle_v26_1', icon:'💼', title:'副业', category:'career',
+      body:'你开始做副业了。\n\n你尝试过：\n- 开网店（卖自制手工）\n- 做自媒体（写职场经验）\n- 接外包项目（设计/编程）\n- 开直播带货\n- 做家教/培训\n\n你发现：\n- 副业很累——但充实\n- 副业收入——可能比主业高\n- 但副业——挤占了你的休息和社交时间\n- 更重要的是：副业让你开始思考——主业是不是在浪费生命\n\n你问自己：如果副业能养活我——我还愿意上班吗？\n\n「副业：不是为了多赚钱——是为了多一种选择。」',
+      cond: g => g.age >= 22 && g.age <= 50 && !g.flags.sideHustle && g.job !== '待业中' && g.intel >= 25,
+      choices:[
+        { label:'认真经营副业，目标做到主业水平', hint:'+💰 +🧠 -❤️ -😊', fn: g => { g.flags.sideHustle=true; g.flags.seriousHustler=true; g.money += 5000; return{intel:5,health:-5,mood:-3}; }},
+        { label:'当兴趣做，不求赚大钱', hint:'+🧠 +😊 +💰', fn: g => { g.flags.sideHustle=true; g.flags.casualHustler=true; g.money += 1500; return{intel:3,mood:3}; }},
+        { label:'做了一段时间就放弃了，太累', hint:'-💰 +❤️', fn: g => { g.flags.sideHustle=true; return{health:3}; }},
+      ]},
+    { id:'burnout_v26_1', icon:'🔥', title:'职场倦怠', category:'career',
+      body:'你最近特别不想上班。\n\n不是因为累——而是：\n- 对工作完全失去了热情\n- 看到工作内容就想吐\n- 对同事和领导充满了消极情绪\n- 每天早上起床——第一件事是叹气\n\n你查了一下：这叫「职业倦怠」（Burnout）。\n\n症状：\n- 情绪疲惫\n- 去人格化（把人当东西）\n- 成就感丧失\n\n你也知道：这不是你一个人的问题——是整整一代人的问题。\n\n在一个要求你「热爱工作」的时代——你连「不讨厌工作」都做不到了。\n\n「职场倦怠：不是你太脆弱——是这个系统太榨人了。」',
+      cond: g => g.age >= 25 && g.age <= 50 && !g.flags.burnout && g.job !== '待业中',
+      choices:[
+        { label:'休了个长假，去旅行散心', hint:'-💰 +😊 +❤️', fn: g => { g.flags.burnout=true; g.flags.longBreak=true; g.money -= 5000; return{mood:8,health:5}; }},
+        { label:'开始做心理咨询，学习调节', hint:'-💰 +🧠 +😊', fn: g => { g.flags.burnout=true; g.flags.therapySeeker=true; g.money -= 2000; return{intel:5,mood:5}; }},
+        { label:'硬撑着继续干，告诉自己「大家都这样」', hint:'+💰 -❤️ -😊', fn: g => { g.flags.burnout=true; return{mood:-8,health:-5}; }},
+      ]},
+    { id:'resignation_negotiation', icon:'🤝', title:'离职谈判', category:'career',
+      body:'你决定辞职了。但辞职——不是那么简单。\n\n你要谈的是：\n- 离职时间（提前30天？）\n- 年假折算\n- 股票期权\n- 竞业协议\n- N+1赔偿（如果是被动离职）\n\nHR跟你说：「公司对你很好，希望你考虑清楚。」\n\n你知道这是套话。但你也知道：\n- 谈得好——多拿几万\n- 谈得差——可能损失十几万\n- 谈崩了——可能被公司拖住\n\n你发现：辞职——是职场最重要的技能之一。但从来没人教过你。\n\n「离职谈判：不是告别——是算账。」',
+      cond: g => g.age >= 23 && g.age <= 55 && !g.flags.resignationNegotiation && g.job !== '待业中' && g.salary,
+      choices:[
+        { label:'找了律师/前辈帮忙，谈出了最好的条件', hint:'+💰 +🧠 +✨', fn: g => { g.flags.resignationNegotiation=true; g.flags.smartNegotiator=true; g.money += 30000; return{intel:5,charm:3}; }},
+        { label:'自己谈，拿到了合理的补偿', hint:'+💰 +🧠', fn: g => { g.flags.resignationNegotiation=true; return{money:15000,intel:3}; }},
+        { label:'嫌麻烦，直接走了', hint:'-💰 +😊', fn: g => { g.flags.resignationNegotiation=true; g.flags.quickExit=true; return{mood:3}; }},
+      ]},
+    { id:'retirement_planning_v26_1', icon:'🌅', title:'退休规划', category:'career',
+      body:'你50岁了。你开始认真思考：退休后怎么办？\n\n你算了一下：\n- 法定退休年龄：60-65岁\n- 你还有10-15年工作\n- 退休后：没有工资，只有养老金\n- 养老金：每月3000-5000元\n\n你的问题：\n- 这点钱够活吗？\n- 如果生病了呢？\n- 如果想旅游呢？\n- 如果想帮孩子呢？\n\n你开始规划：\n- 多存钱\n- 买商业养老保险\n- 学一门退休后能赚钱的技能\n- 保持健康——这是最大的资产\n\n你突然明白：退休——不是「休息」，是「另一种人生」。\n\n「退休规划：不是为老去做准备——是为自由做准备。」',
+      cond: g => g.age >= 48 && g.age <= 58 && !g.flags.retirementPlanning && g.money >= 100000,
+      choices:[
+        { label:'开始严格执行退休储蓄计划', hint:'+💰 +🧠 -😊', fn: g => { g.flags.retirementPlanning=true; g.flags.strictSaver=true; g.money += 20000; return{intel:5,mood:-3}; }},
+        { label:'买了商业养老保险，给自己兜底', hint:'+💰 +🧠', fn: g => { g.flags.retirementPlanning=true; g.flags.insuranceBuyer=true; g.money -= 30000; return{intel:5}; }},
+        { label:'决定退休后继续做点事，不靠养老金', hint:'+😊 +🧠 +✨', fn: g => { g.flags.retirementPlanning=true; g.flags.activeRetiree=true; return{mood:5,intel:3,charm:3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -13902,6 +13983,12 @@ const ACHIEVEMENTS = [
     { id:'veggie_hunter_ach', icon:'🌱', name:'野菜猎人', desc:'爱上了挖野菜每个周末都去', check: g => g.flags.veggieHunter },
     { id:'recipe_researcher_ach', icon:'📖', name:'菜谱研究者', desc:'开始研究并复刻家乡菜', check: g => g.flags.recipeResearcher },
     { id:'local_foodie_ach', icon:'🥘', name:'本地美食家', desc:'转而去支持楼下的小馆子', check: g => g.flags.localFoodie },
+    // v26.1: 职场生存成就
+    { id:'plan_b_maker_ach', icon:'🎯', name:'B计划家', desc:'35岁开始规划副业和理财', check: g => g.flags.planBMaker },
+    { id:'balanced_worker_ach', icon:'⚖️', name:'平衡打工人', desc:'适度安静离职，重要的事认真', check: g => g.flags.balancedWorker },
+    { id:'neutral_pro_ach', icon:'🕊️', name:'职场中立派', desc:'坚持中立靠能力说话', check: g => g.flags.neutralPro },
+    { id:'serious_hustler_ach', icon:'💪', name:'副业达人', desc:'认真经营副业做到主业水平', check: g => g.flags.seriousHustler },
+    { id:'active_retiree_ach', icon:'🌅', name:'积极退休派', desc:'决定退休后继续做事不靠养老金', check: g => g.flags.activeRetiree },
 ];
 
 // === ENDINGS === (order matters: first match wins)
