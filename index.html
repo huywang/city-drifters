@@ -41,12 +41,15 @@
                 <button class="btn btn-ghost" onclick="showPlaythroughStats()" aria-label="查看游戏统计">
                     <span class="btn-icon" aria-hidden="true">📊</span> 游戏统计
                 </button>
+                <button class="btn btn-ghost" onclick="showLegacyInfo()" aria-label="查看人生传承">
+                    <span class="btn-icon" aria-hidden="true">🌀</span> 人生传承
+                </button>
                 <button class="btn btn-ghost" onclick="openSettings()" aria-label="打开设置">
                     <span class="btn-icon" aria-hidden="true">⚙️</span> 设置
                 </button>
             </nav>
             <div class="title-footer">
-                <span>v2.29</span> · <span>献给每一个在大城市奋斗的你</span>
+                <span>v2.30</span> · <span>献给每一个在大城市奋斗的你</span>
             </div>
         </div>
     </div>
@@ -86,6 +89,34 @@
             <p class="create-desc">每个人的起点不同，但大城市的入场券是一样的——一张火车票。</p>
 
             <div id="create-step1">
+                <!-- v2.30: Difficulty Selector -->
+                <div class="difficulty-selector">
+                    <h3>🎯 人生难度</h3>
+                    <p class="diff-desc">选择你这辈子的难度。难度越高，衰减越快，但成就感也越强。</p>
+                    <div class="diff-grid">
+                        <div class="diff-card" data-diff="easy" onclick="setDifficulty('easy')">
+                            <div class="diff-emoji">😊</div>
+                            <div class="diff-name">简单人生</div>
+                            <div class="diff-info">💰+50% ❤️衰减慢</div>
+                        </div>
+                        <div class="diff-card selected" data-diff="normal" onclick="setDifficulty('normal')">
+                            <div class="diff-emoji">😐</div>
+                            <div class="diff-name">普通人生</div>
+                            <div class="diff-info">标准平衡</div>
+                        </div>
+                        <div class="diff-card" data-diff="hard" onclick="setDifficulty('hard')">
+                            <div class="diff-emoji">😰</div>
+                            <div class="diff-name">困难人生</div>
+                            <div class="diff-info">💰-30% ❤️衰减快</div>
+                        </div>
+                        <div class="diff-card" data-diff="hell" onclick="setDifficulty('hell')">
+                            <div class="diff-emoji">🔥</div>
+                            <div class="diff-name">地狱人生</div>
+                            <div class="diff-info">💰-50% ❤️衰减极快</div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="background-grid">
                     <div class="bg-card" onclick="selectBackground('cs')" data-bg="cs">
                         <div class="bg-icon">💻</div>
@@ -151,6 +182,46 @@
                             <span class="stat-down">💰负债</span>
                             <span class="stat-up">✨高</span>
                             <span class="stat-up">🧠高</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- v2.30: Hidden Backgrounds (unlockable via legacy) -->
+                <div class="hidden-backgrounds">
+                    <h3>🔓 隐藏出身 <small style="color:var(--text-muted)">(通过多次游玩解锁)</small></h3>
+                    <div class="background-grid hidden-grid">
+                        <div class="bg-card bg-locked" onclick="selectBackground('chai2dai')" data-bg="chai2dai">
+                            <div class="bg-icon">🏗️</div>
+                            <h3>拆二代</h3>
+                            <p class="bg-tag">💰💰💰 天选之人</p>
+                            <p class="bg-desc">家里拆迁赔了200万。你带着这笔钱来到大城市，准备证明自己不只是"有钱的土鳖"。</p>
+                            <div class="bg-stats">
+                                <span class="stat-up">💰200K</span>
+                                <span class="stat-down">🧠低</span>
+                                <span class="stat-neutral">🔒 5结局</span>
+                            </div>
+                        </div>
+                        <div class="bg-card bg-locked" onclick="selectBackground('star2dai')" data-bg="star2dai">
+                            <div class="bg-icon">⭐</div>
+                            <h3>星二代</h3>
+                            <p class="bg-tag">✨✨✨ 天选之人</p>
+                            <p class="bg-desc">父母是娱乐圈的人。你隐姓埋名来到大城市，想靠自己的本事闯出一片天。</p>
+                            <div class="bg-stats">
+                                <span class="stat-up">✨极高</span>
+                                <span class="stat-up">👥高</span>
+                                <span class="stat-neutral">🔒 10结局</span>
+                            </div>
+                        </div>
+                        <div class="bg-card bg-locked" onclick="selectBackground('lottery_winner')" data-bg="lottery_winner">
+                            <div class="bg-icon">🎰</div>
+                            <h3>彩票中奖者</h3>
+                            <p class="bg-tag">💰💰💰💰 天选之人</p>
+                            <p class="bg-desc">中了500万彩票。你带着这笔横财来到大城市，但你知道：90%的中奖者5年内破产。</p>
+                            <div class="bg-stats">
+                                <span class="stat-up">💰500K</span>
+                                <span class="stat-down">🧠低</span>
+                                <span class="stat-neutral">🔒 自由结局</span>
+                            </div>
                         </div>
                     </div>
                 </div>

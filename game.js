@@ -27,6 +27,16 @@ const BACKGROUNDS = {
         intro: '你是大专毕业，但你有一门好手艺。在这个人人都在卷学历的年代，你选择了一条不同的路。\n\n大城市不缺985毕业生，但缺靠谱的水电工、汽修师傅和装修工人。你相信：手艺人，饿不死。' },
     returnee: { name: '海归留学生', money: -30000, health: 75, mood: 50, intel: 80, social: 30, charm: 70, startJob: '待业中', startSalary: 0,
         intro: '你在英国读了两年硕士，花了家里60万。回国后发现：海归硕士遍地走，你的学历在HR眼里跟国内211差不多。\n\n你妈说："花了那么多钱，总得找个好工作吧？"你不敢告诉她，你最拿得出手的技能是——做正宗的fish and chips。' },
+    // === HIDDEN BACKGROUNDS (Unlocked via legacy system) ===
+    chai2dai: { name: '拆二代', money: 200000, health: 80, mood: 75, intel: 40, social: 50, charm: 60, startJob: '待业中', startSalary: 0, hidden: true,
+        unlockCond: '解锁5种结局后可用',
+        intro: '你家的老房子拆迁了。一夜之间，你从普通家庭变成了"拆二代"。\n\n补偿款200万到手，你妈说："别乱花，存着以后买房。"你爸说："给你娶媳妇用。"你说："我要去大城市闯一闯。"\n\n你开着新买的车去了大城市。朋友圈发了条："有钱人的快乐，就是这么朴实无华且枯燥。"\n\n但你知道：钱来得快，去得也快。' },
+    star2dai: { name: '星二代', money: 50000, health: 85, mood: 60, intel: 55, social: 80, charm: 90, startJob: '待业中', startSalary: 0, startAge: 22, hidden: true,
+        unlockCond: '解锁10种结局后可用',
+        intro: '你的父母是娱乐圈的人。你从小就在聚光灯下长大，综艺节目、红毯、发布会——你都见惯了。\n\n但你说："我不想靠父母。我要证明自己。"\n\n于是你独自来到大城市，隐姓埋名。你的微博有50万粉丝，但没人知道你是谁的孩子。\n\n"星二代的标签，是光环也是枷锁。"' },
+    lottery_winner: { name: '彩票中奖者', money: 500000, health: 70, mood: 85, intel: 50, social: 30, charm: 55, startJob: '待业中', startSalary: 0, startAge: 25, hidden: true,
+        unlockCond: '达成"财务自由"结局后可用',
+        intro: '你买彩票中了500万。税后400万，你选了50万给爸妈，剩下的带着去了大城市。\n\n你妈说："别告诉任何人。"你爸说："省着点花。"你说："我知道。"\n\n但中了彩票的人，90%在5年内破产。你知道这个统计数字。\n\n"钱不是万能的，但没有钱是万万不能的。至于多了会怎样——你准备亲自试试。"' },
 };
 
 // === CITIES ===
@@ -1968,6 +1978,59 @@ const EVENTS = [
         { label:'写下来，以后再说', hint:'+🧠', fn: g => { g.flags.creativeBreakthrough=true; return{intel:10,mood:8}; }},
         { label:'算了，只是想想', hint:'-😊', fn: g => ({mood:-10}) },
       ]},
+    // === v2.30 DRAMATIC EVENTS ===
+    { id:'age_35_crisis', icon:'🔴', title:'35岁危机',
+      body:'你35岁了。\n\n你的公司开始了新一轮"优化"。HR的目光在你身上停留的时间越来越长。新来的00后同事叫你"叔叔/阿姨"。\n\n你打开招聘网站，发现80%的岗位要求"35岁以下"。\n\n你不是不努力，是年龄成了原罪。\n\n"在中国互联网行业，35岁就是退休年龄——如果你还没当上管理层的话。"',
+      cond: g => g.age===35 && g.job!=='待业中' && !g.flags.age35Crisis && g.jobSalary>8000,
+      choices:[
+        { label:'拼命证明自己', hint:'-❤️ +💰 +🧠', fn: g => { g.flags.age35Crisis=true; return{health:-15,money:10000,intel:8,mood:-10}; }},
+        { label:'提前规划转型', hint:'+🧠 +👥 -💰', fn: g => { g.flags.age35Crisis=true; g.flags.careerTransition=true; return{intel:12,social:8,money:-5000,mood:5}; }},
+        { label:'考公务员/事业编', hint:'🎲 +😊', fn: g => { g.flags.age35Crisis=true; if(g.intel>70&&Math.random()>0.5){g.flags.civilServant=true;setJob(g,'公务员',10000);return{mood:20,money:-3000}}else{return{mood:-15,money:-3000}} }},
+        { label:'接受现实，躺平', hint:'+😊 +❤️ -💰', fn: g => { g.flags.age35Crisis=true; g.flags.lyingFlat=true; return{mood:10,health:10,money:-8000}; }},
+      ]},
+    { id:'zhushapan', icon:'🐷', title:'杀猪盘',
+      body:'你在交友App上遇到了一个人。\n\nTA温柔体贴、事业有成、每天给你发早安晚安。你们聊了3个月，TA说："我有一个很好的投资机会，只告诉你。"\n\n你心里有个声音说："这是杀猪盘。"但TA太温柔了，你不会相信TA是骗子吧？\n\n"感情是真的，骗钱也是真的。这就是杀猪盘的可怕之处。"',
+      cond: g => g.flags.hasDatingApp && g.money>10000 && !g.flags.romanceScam && g.age>=25 && g.age<=45,
+      choices:[
+        { label:'投资5万试试', hint:'🎲 -💰', fn: g => { g.flags.romanceScam=true; if(Math.random()>0.8){return{money:15000,mood:10}}else{return{money:-50000,mood:-30,social:-10}} }},
+        { label:'投资20万（all in）', hint:'🎲🎲 -💰💰', fn: g => { g.flags.romanceScam=true; if(Math.random()>0.95){return{money:80000,mood:20}}else{return{money:-200000,mood:-50,health:-15}} }},
+        { label:'报警+举报', hint:'+🧠 +😊', fn: g => { g.flags.romanceScam=true; g.flags.antiFraud=true; return{intel:8,mood:5,social:3}; }},
+        { label:'拉黑，当没发生过', hint:'+😊', fn: g => { g.flags.romanceScam=true; return{mood:3}; }},
+      ]},
+    { id:'windfall', icon:'💰', title:'天降横财',
+      body:'你意外收到了一笔钱：\n\n- 远房亲戚的遗产？\n- 公司赔偿金？\n- 退税？\n- 朋友还了你早就忘了借款？\n\n不管来源如何，这笔钱让你突然有了选择的余地。\n\n"意外之财，往往是意外之灾的开始。"',
+      cond: g => g.months>=24 && !g.flags.gotWindfall && Math.random()>0.85,
+      choices:[
+        { label:'存银行定期', hint:'+💰 稳妥', fn: g => { g.flags.gotWindfall=true; return{money:50000,mood:5}; }},
+        { label:'投资股市', hint:'🎲 +💰?', fn: g => { g.flags.gotWindfall=true; if(Math.random()>0.5){return{money:100000,mood:15,intel:5}}else{return{money:-10000,mood:-10}} }},
+        { label:'请朋友们大吃一顿', hint:'+👥 +✨ -💰', fn: g => { g.flags.gotWindfall=true; g.relationships.friends=clamp((g.relationships.friends||40)+15,0,100); return{money:20000,social:15,charm:8,mood:20}; }},
+        { label:'给自己买一直想要的东西', hint:'+😊 +✨', fn: g => { g.flags.gotWindfall=true; return{money:30000,mood:25,charm:10}; }},
+      ]},
+    { id:'digital_legacy', icon:'📱', title:'数字遗产',
+      body:'你看到一个新闻：一个年轻人意外去世后，家人无法访问他的数字账号——微信、支付宝、网盘、游戏账号……\n\n你突然意识到：如果明天你出了意外，你的数字人生会怎样？\n\n你的聊天记录、照片、文档、加密货币……全都锁在手机和云端里。\n\n"人死了，数据还活着。但活着的人，未必能打开。"',
+      cond: g => g.age>=28 && g.intel>50 && !g.flags.digitalLegacy,
+      choices:[
+        { label:'整理数字遗产清单', hint:'+🧠 +😊', fn: g => { g.flags.digitalLegacy=true; g.flags.digitalDetox=true; return{intel:8,mood:10}; }},
+        { label:'设置紧急联系人', hint:'+👨‍👩‍👧 +🧠', fn: g => { g.flags.digitalLegacy=true; g.relationships.family=clamp((g.relationships.family||60)+10,0,100); return{intel:5,mood:8}; }},
+        { label:'算了，死了就死了', hint:'-😊', fn: g => { g.flags.digitalLegacy=true; return{mood:-5}; }},
+      ]},
+    { id:'midlife_awakening', icon:'🌅', title:'中年觉醒',
+      body:'你40岁了。\n\n某天早上醒来，你突然问自己："我这辈子到底在干什么？"\n\n你有工作，但不知道意义。你有房子，但觉得不是家。你有社交，但觉得都是应酬。\n\n你不是抑郁，你只是……醒了。\n\n"中年危机不是想换辆跑车，是想换种活法。"',
+      cond: g => g.age===40 && !g.flags.midlifeAwakening,
+      choices:[
+        { label:'辞职，做一直想做的事', hint:'🎲 -💰 +😊 +🧠', fn: g => { g.flags.midlifeAwakening=true; if(Math.random()>0.4){setJob(g,'自由职业者',8000);return{money:-30000,mood:30,intel:15,charm:10}}else{return{money:-50000,mood:-10}} }},
+        { label:'开始学一样新东西', hint:'+🧠 +😊', fn: g => { g.flags.midlifeAwakening=true; return{intel:20,mood:15,charm:5}; }},
+        { label:'重新审视人际关系', hint:'+👥 +❤️', fn: g => { g.flags.midlifeAwakening=true; g.relationships.family=clamp((g.relationships.family||60)+20,0,100); g.relationships.friends=clamp((g.relationships.friends||40)+15,0,100); return{social:15,mood:12,health:5}; }},
+        { label:'继续这样过吧', hint:'-😊', fn: g => { g.flags.midlifeAwakening=true; return{mood:-15}; }},
+      ]},
+    { id:'parent_illness', icon:'🏥', title:'父母重病',
+      body:'你接到了家里的电话：你爸/你妈住院了。\n\n不是什么大病，但医生说需要手术。费用大概5-10万。你在外地，赶回去要4个小时高铁。\n\n你妈在电话里说："不用回来了，小手术。"但你听出了她的声音在发抖。\n\n"子欲养而亲不待——这句古话，只有真正面对时才知道有多重。"',
+      cond: g => g.age>=30 && g.relationships && g.relationships.family>30 && !g.flags.parentIllness && Math.random()>0.7,
+      choices:[
+        { label:'立刻赶回去', hint:'-💰 +👨‍👩‍👧 +😊', fn: g => { g.flags.parentIllness=true; g.relationships.family=clamp((g.relationships.family||60)+25,0,100); return{money:-80000,mood:15,health:-5}; }},
+        { label:'转钱回去，人不到', hint:'-💰 +👨‍👩‍👧', fn: g => { g.flags.parentIllness=true; g.relationships.family=clamp((g.relationships.family||60)+10,0,100); return{money:-100000,mood:-5}; }},
+        { label:'请假一周回去照顾', hint:'-💰 -💼 +👨‍👩‍👧', fn: g => { g.flags.parentIllness=true; g.relationships.family=clamp((g.relationships.family||60)+20,0,100); if(g.jobSalary>15000&&Math.random()>0.6){return{money:-90000,mood:5,jobSalary:-3000}}else{return{money:-90000,mood:10}} }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -2055,6 +2118,12 @@ const ACHIEVEMENTS = [
     { id:'winter_warrior', icon:'❄️', name:'冬日战士', desc:'度过了冬天', check: g => g.flags.winterDepression },
     { id:'shopaholic', icon:'🛒', name:'购物狂', desc:'经历过购物成瘾', check: g => g.flags.shoppingAddiction },
     { id:'generous_friend', icon:'💸', name:'慷慨朋友', desc:'借过钱给朋友', check: g => g.flags.friendBorrowMoney },
+    // v2.30 achievements - dramatic events
+    { id:'age35_survivor', icon:'🔴', name:'35岁幸存者', desc:'度过了35岁职场危机', check: g => g.flags.age35Crisis && g.age>35 },
+    { id:'scam_aware', icon:'🛡️', name:'反诈先锋', desc:'识破杀猪盘', check: g => g.flags.antiFraud },
+    { id:'digital_planner', icon:'💾', name:'数字遗嘱人', desc:'规划了数字遗产', check: g => g.flags.digitalLegacy },
+    { id:'filial_crisis', icon:'🏥', name:'亲情守护者', desc:'照顾过生病的父母', check: g => g.flags.parentIllness },
+    { id:'midlife_rebel', icon:'🌅', name:'中年叛逆者', desc:'40岁重新出发', check: g => g.flags.midlifeAwakening && g.mood>=60 },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -2133,11 +2202,42 @@ function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     const s = document.getElementById(id);
     if (s) s.classList.add('active');
+    // v2.30: Update hidden backgrounds when showing create screen
+    if (id === 'screen-create') updateHiddenBgDisplay();
+    // v2.30: Load saved difficulty when showing create screen
+    if (id === 'screen-create') {
+        const legacy = getLegacy();
+        setDifficulty(legacy.difficulty || 'normal');
+    }
+}
+
+function updateHiddenBgDisplay() {
+    ['chai2dai','star2dai','lottery_winner'].forEach(bgId => {
+        const card = document.querySelector(`.bg-card[data-bg="${bgId}"]`);
+        if (!card) return;
+        const unlocked = isHiddenBgUnlocked(bgId);
+        if (unlocked) {
+            card.classList.remove('bg-locked');
+            card.classList.add('bg-unlocked');
+            const lockIcon = card.querySelector('.bg-stats .stat-neutral');
+            if (lockIcon && lockIcon.textContent.includes('🔒')) {
+                lockIcon.textContent = '🔓 已解锁';
+                lockIcon.classList.remove('stat-neutral');
+                lockIcon.classList.add('stat-up');
+            }
+        }
+    });
 }
 
 // === CREATION ===
 let selectedBg = null, selectedCity = null;
 function selectBackground(bg) {
+    // v2.30: Check if hidden background is unlocked
+    const bgData = BACKGROUNDS[bg];
+    if (bgData && bgData.hidden && !isHiddenBgUnlocked(bg)) {
+        notify(`🔒 ${bgData.unlockCond}`);
+        return;
+    }
     selectedBg = bg;
     document.querySelectorAll('.bg-card').forEach(c => c.classList.remove('selected'));
     document.querySelector(`.bg-card[data-bg="${bg}"]`).classList.add('selected');
@@ -2159,13 +2259,21 @@ function startGame() {
     if (!name) { notify('请输入你的名字！'); return; }
     const bg = BACKGROUNDS[selectedBg], city = CITIES[selectedCity];
 
+    // v2.30: Apply difficulty modifier
+    const diff = getDifficultyModifier();
+    const legacy = getLegacy();
+    const legacyBonus = Math.min(legacy.points, 20); // Up to +20 from legacy points
+
     Object.assign(G, {
         name, age: bg.startAge||22, month: 1, year: 2024,
         city: selectedCity, cityName: city.name, background: selectedBg,
         job: bg.startJob, jobSalary: bg.startSalary,
         months: 0, choices: 0, eventsSeen: 0, eventLog: [], achievements: [],
-        money: bg.money, health: bg.health, mood: bg.mood,
+        money: Math.floor(bg.money * diff.moneyMul) + legacyBonus * 500,
+        health: clamp(bg.health + legacyBonus, 0, 100),
+        mood: clamp(bg.mood + Math.floor(legacyBonus/2), 0, 100),
         intel: bg.intel, social: bg.social, charm: bg.charm,
+        difficulty: diff.label,
         // 人际关系系统 v2.14
         relationships: {
             family: 60,      // 家人关系 (0-100)
@@ -2183,12 +2291,13 @@ function startGame() {
     const log = document.getElementById('event-log');
     log.innerHTML = '';
 
+    const diffEmoji = diff.emoji;
     addEventCard({ icon: '🚀', title: `${bg.name} · 来到${city.name}`, body: bg.intro + `\n\n<div class="meme-quote">${city.meme}</div>`, type: 'milestone' }, false);
-    addEventCard({ icon: '📍', title: '新起点', body: `你来到了${city.name}——"${city.trait}"。\n\n房租：${fmtMoney(city.rent)}/月\n生活成本：${city.cost>1.1?'较高':city.cost>1.0?'适中':'还行'}\n\n每个伟大的故事都从一间出租屋开始。`, type: 'special' }, false);
+    addEventCard({ icon: '📍', title: `新起点 ${diffEmoji} ${diff.label}`, body: `你来到了${city.name}——"${city.trait}"。\n\n房租：${fmtMoney(city.rent)}/月\n生活成本：${city.cost>1.1?'较高':city.cost>1.0?'适中':'还行'}\n难度：${diff.label}${legacy.points>0?`\n传承加成：+${legacyBonus}点`:''}\n\n每个伟大的故事都从一间出租屋开始。`, type: 'special' }, false);
 
     document.getElementById('current-event').innerHTML = '';
     document.getElementById('btn-advance').disabled = false;
-    G.eventLog.push({ age: G.age, text: `来到${city.name}，开始漂泊生活` });
+    G.eventLog.push({ age: G.age, text: `来到${city.name}，开始漂泊生活（${diff.label}）` });
 
     // Show tutorial for first-time players
     showTutorial();
@@ -2280,9 +2389,10 @@ function advanceMonth() {
         G.eventLog.push({ age: G.age, text: `这个月选择了「${activityLabel}」` });
     }
 
-    // 健康和心情自然衰减
-    G.health = clamp(G.health - (G.job==='待业中'?0:1), 0, 100);
-    G.mood = clamp(G.mood - 1, 0, 100);
+    // 健康和心情自然衰减 (v2.30: difficulty modifier)
+    const decayMul = getDifficultyModifier().decayMul;
+    G.health = clamp(G.health - (G.job==='待业中'?0:1) * decayMul, 0, 100);
+    G.mood = clamp(G.mood - 1 * decayMul, 0, 100);
 
     // 人际关系自然衰减 (v2.14)
     if (G.relationships) {
@@ -2584,6 +2694,9 @@ function triggerEnding() {
     // v2.17: Update cross-playthrough statistics
     updatePlaythroughStats(ending.id);
 
+    // v2.30: Apply legacy rewards
+    const legacyPoints = applyLegacyReward(ending.id);
+
     // Calculate ending rarity
     const rarity = getEndingRarity(ending.id);
     const rarityLabel = { common: '普通', uncommon: '罕见', rare: '稀有', legendary: '传说' }[rarity];
@@ -2605,7 +2718,8 @@ function triggerEnding() {
         <div class="summary-item"><div class="summary-value">${Math.floor(G.months/12)}年${G.months%12}个月</div><div class="summary-label">漂泊时长</div></div>
         <div class="summary-item"><div class="summary-value">${G.choices}次</div><div class="summary-label">做出选择</div></div>
         <div class="summary-item"><div class="summary-value">${G.eventsSeen}个</div><div class="summary-label">经历事件</div></div>
-        <div class="summary-item"><div class="summary-value">${G.achievements.length}个</div><div class="summary-label">解锁成就</div></div>`;
+        <div class="summary-item"><div class="summary-value">${G.achievements.length}个</div><div class="summary-label">解锁成就</div></div>
+        <div class="summary-item legacy-reward"><div class="summary-value">+${legacyPoints}</div><div class="summary-label">🌀 人生点数</div></div>`;
 
     // Add achievement showcase
     const achievementShowcase = document.getElementById('achievement-showcase');
@@ -2700,12 +2814,119 @@ function showTimeline() {
     toggleMenu();
 }
 
+// === v2.30 LEGACY / META-PROGRESSION SYSTEM ===
+const LEGACY_KEY = 'cityDrifters_legacy';
+
+function getLegacy() {
+    return JSON.parse(localStorage.getItem(LEGACY_KEY) || '{"points":0,"totalEndings":[],"totalAchievements":[],"difficulty":"normal","playthroughs":0}');
+}
+
+function saveLegacy(data) {
+    localStorage.setItem(LEGACY_KEY, JSON.stringify(data));
+}
+
+function calculateLegacyReward(endingId) {
+    const rarity = getEndingRarity(endingId);
+    const basePoints = { legendary: 50, rare: 30, uncommon: 15, common: 5 }[rarity] || 5;
+    const achievementBonus = G.achievements.length * 3;
+    const survivalBonus = Math.floor(G.months / 12);
+    return basePoints + achievementBonus + survivalBonus;
+}
+
+function applyLegacyReward(endingId) {
+    const legacy = getLegacy();
+    const points = calculateLegacyReward(endingId);
+    legacy.points += points;
+    legacy.playthroughs++;
+    if (!legacy.totalEndings.includes(endingId)) legacy.totalEndings.push(endingId);
+    G.achievements.forEach(a => { if (!legacy.totalAchievements.includes(a)) legacy.totalAchievements.push(a); });
+    saveLegacy(legacy);
+    return points;
+}
+
+function isHiddenBgUnlocked(bgId) {
+    const legacy = getLegacy();
+    const endingsCount = legacy.totalEndings.length;
+    if (bgId === 'chai2dai') return endingsCount >= 5;
+    if (bgId === 'star2dai') return endingsCount >= 10;
+    if (bgId === 'lottery_winner') return legacy.totalEndings.includes('fire') || legacy.totalEndings.includes('wealthy');
+    return false;
+}
+
+function getDifficultyModifier() {
+    const legacy = getLegacy();
+    const d = legacy.difficulty || 'normal';
+    return {
+        easy:   { moneyMul: 1.5, decayMul: 0.7, eventMul: 0.8, label: '简单人生', emoji: '😊' },
+        normal: { moneyMul: 1.0, decayMul: 1.0, eventMul: 1.0, label: '普通人生', emoji: '😐' },
+        hard:   { moneyMul: 0.7, decayMul: 1.3, eventMul: 1.2, label: '困难人生', emoji: '😰' },
+        hell:   { moneyMul: 0.5, decayMul: 1.6, eventMul: 1.5, label: '地狱人生', emoji: '🔥' },
+    }[d];
+}
+
+function setDifficulty(d) {
+    const legacy = getLegacy();
+    legacy.difficulty = d;
+    saveLegacy(legacy);
+    // Update UI
+    document.querySelectorAll('.diff-card').forEach(c => c.classList.remove('selected'));
+    const card = document.querySelector(`.diff-card[data-diff="${d}"]`);
+    if (card) card.classList.add('selected');
+}
+
+function showLegacyInfo() {
+    const legacy = getLegacy();
+    const modal = document.getElementById('modal-legacy') || createLegacyModal();
+    const content = modal.querySelector('.legacy-content');
+    if (!content) return;
+
+    const unlockedBgs = ['chai2dai','star2dai','lottery_winner'].filter(id => isHiddenBgUnlocked(id));
+    const bgNames = { chai2dai: '🏗️ 拆二代', star2dai: '⭐ 星二代', lottery_winner: '🎰 彩票中奖者' };
+
+    content.innerHTML = `
+        <div class="legacy-stats-grid">
+            <div class="legacy-stat"><div class="legacy-num">${legacy.points}</div><div class="legacy-label">人生点数</div></div>
+            <div class="legacy-stat"><div class="legacy-num">${legacy.totalEndings.length}</div><div class="legacy-label">解锁结局</div></div>
+            <div class="legacy-stat"><div class="legacy-num">${legacy.totalAchievements.length}</div><div class="legacy-label">累计成就</div></div>
+            <div class="legacy-stat"><div class="legacy-num">${legacy.playthroughs}</div><div class="legacy-label">游玩次数</div></div>
+        </div>
+        <div class="legacy-unlocks">
+            <h3>🔓 已解锁隐藏出身</h3>
+            ${unlockedBgs.length > 0 ? unlockedBgs.map(id => `<div class="legacy-unlock">${bgNames[id]}</div>`).join('') : '<p style="color:var(--text-muted)">还没有解锁隐藏出身</p>'}
+            <h3 style="margin-top:16px">🎯 解锁条件</h3>
+            <div class="legacy-conditions">
+                <div class="legacy-cond ${legacy.totalEndings.length>=5?'done':''}">🏗️ 拆二代：解锁5种结局 (${legacy.totalEndings.length}/5)</div>
+                <div class="legacy-cond ${legacy.totalEndings.length>=10?'done':''}">⭐ 星二代：解锁10种结局 (${legacy.totalEndings.length}/10)</div>
+                <div class="legacy-cond ${legacy.totalEndings.includes('fire')||legacy.totalEndings.includes('wealthy')?'done':''}">🎰 彩票中奖者：达成财务自由结局</div>
+            </div>
+        </div>
+    `;
+    modal.classList.add('open');
+}
+
+function createLegacyModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.id = 'modal-legacy';
+    modal.innerHTML = `
+        <div class="modal-overlay" onclick="closeModal('modal-legacy')"></div>
+        <div class="modal-content modal-large">
+            <button class="modal-close" onclick="closeModal('modal-legacy')" aria-label="关闭">×</button>
+            <h2>🌀 人生传承</h2>
+            <div class="legacy-content"></div>
+            <button class="btn btn-secondary" onclick="closeModal('modal-legacy')" style="margin-top:16px">关闭</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    return modal;
+}
+
 // === SAVE/LOAD (Multi-slot system) ===
 const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.29' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.30' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();

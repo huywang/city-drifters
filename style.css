@@ -976,3 +976,200 @@ html[style*="font-size: 18px"] .modal-content {
     color: var(--text-primary);
     flex: 1;
 }
+
+/* ============================================
+   v2.30 - Difficulty Selector & Legacy System
+   ============================================ */
+
+/* Difficulty Selector */
+.difficulty-selector {
+    margin-bottom: 24px;
+    padding: 16px;
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+}
+.difficulty-selector h3 {
+    margin: 0 0 4px 0;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+}
+.diff-desc {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin: 0 0 12px 0;
+}
+.diff-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+.diff-card {
+    padding: 12px 8px;
+    border-radius: var(--radius-md);
+    border: 2px solid var(--border);
+    background: var(--bg-secondary);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.diff-card:hover {
+    border-color: var(--accent-primary);
+    transform: translateY(-2px);
+}
+.diff-card.selected {
+    border-color: var(--accent-primary);
+    background: rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.2);
+}
+.diff-emoji {
+    font-size: 1.5rem;
+    margin-bottom: 4px;
+}
+.diff-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+.diff-info {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* Hidden Backgrounds Section */
+.hidden-backgrounds {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px dashed var(--border);
+}
+.hidden-backgrounds h3 {
+    color: var(--text-primary);
+    font-size: 1rem;
+    margin: 0 0 12px 0;
+}
+.hidden-grid {
+    opacity: 0.7;
+}
+.bg-locked {
+    position: relative;
+    overflow: hidden;
+}
+.bg-locked::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(135deg, rgba(0,0,0,0.3), rgba(0,0,0,0.1));
+    pointer-events: none;
+    border-radius: inherit;
+}
+.bg-locked:hover::after {
+    background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(59,130,246,0.05));
+}
+
+/* Legacy Reward on Ending Screen */
+.legacy-reward {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(59, 130, 246, 0.15));
+    border-radius: var(--radius-md);
+    padding: 8px;
+    border: 1px solid rgba(139, 92, 246, 0.3);
+}
+.legacy-reward .summary-value {
+    color: #a78bfa !important;
+}
+
+/* Legacy Modal */
+.legacy-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+.legacy-stat {
+    text-align: center;
+    padding: 12px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+}
+.legacy-num {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-primary);
+}
+.legacy-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+.legacy-unlocks {
+    padding: 12px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+}
+.legacy-unlocks h3 {
+    margin: 0 0 8px 0;
+    font-size: 0.95rem;
+}
+.legacy-unlock {
+    display: inline-block;
+    padding: 6px 12px;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: var(--radius-sm);
+    margin: 4px;
+    font-size: 0.9rem;
+    color: var(--accent-primary);
+}
+.legacy-conditions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.legacy-cond {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    padding: 4px 0;
+}
+.legacy-cond.done {
+    color: #4ade80;
+}
+.legacy-cond.done::before {
+    content: '✅ ';
+}
+
+/* Modal large variant */
+.modal-large {
+    max-width: 600px;
+    width: 90%;
+}
+.modal-close {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+}
+.modal-close:hover {
+    color: var(--text-primary);
+    background: var(--bg-secondary);
+}
+
+/* Responsive: difficulty selector */
+@media (max-width: 768px) {
+    .diff-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .legacy-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .difficulty-selector {
+        padding: 12px;
+    }
+}
