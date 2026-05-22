@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v4.8
+// 都市浮生记 - Game Engine v4.9
 // ============================================
 
 // === GAME STATE ===
@@ -3025,6 +3025,25 @@ const EVENTS = [
         { label:'轻断亲：回乡住酒店', hint:'+😊 -💰', fn: g => { g.flags.familyDisconnect=true; g.flags.lightDisconnect=true; return{mood:12,money:-2000,social:-5}; }},
         { label:'还是回家吧', hint:'+👥 +😊 -❤️', fn: g => { g.flags.familyDisconnect=true; return{social:10,mood:5,health:-5}; }},
       ]},
+    // === v4.9 EVENTS - 精神离职与职场倦怠 ===
+    { id:'quiet_quitting', icon:'😶', title:'精神离职',
+      body:'你开始实践"精神离职"：\n\n- 上班，绝不早到\n- 下班，绝不多待\n- 只做份内之事，拒绝额外责任\n- 下班后绝不回工作消息\n\n盖洛普数据：全球59%的员工处于"安静离职"状态。\n\n你不是不努力，你只是累了。\n\n"精神离职不是躺平，而是在工作和生活之间找到平衡。"\n\n"工作不是生活的全部，没必要也不值得。"',
+      cond: g => !g.flags.quietQuitting && g.age>=22 && g.age<=40 && g.job!=='待业中' && g.mood<65,
+      choices:[
+        { label:'彻底精神离职', hint:'+😊 +❤️ -💰', fn: g => { g.flags.quietQuitting=true; g.flags.fullQuietQuit=true; return{mood:20,health:10,money:-3000}; }},
+        { label:'适度精神离职', hint:'+😊 +❤️', fn: g => { g.flags.quietQuitting=true; g.flags.moderateQuietQuit=true; return{mood:15,health:8}; }},
+        { label:'发展副业', hint:'+💰 +🧠', fn: g => { g.flags.quietQuitting=true; g.flags.sideHustleFocus=true; return{money:5000,intel:8,mood:10}; }},
+        { label:'算了，还是卷吧', hint:'+💰 -😊', fn: g => { g.flags.quietQuitting=true; return{money:3000,mood:-10,health:-5}; }},
+      ]},
+    { id:'job_burnout', icon:'🔥', title:'职业倦怠',
+      body:'你发现自己：\n\n- 闹钟响了，不想起来\n- 上班时盼着下班\n- 下班后什么都不想做\n- 感觉自己被工作"掏空"\n\n你可能已经"职业倦怠"了。\n\n"职业倦怠不是你不努力，而是你太努力了——努力到忘了自己。"\n\n心理学家说：这不是懒，这是自我保护。\n\n"当你还有工作能力，但心理上已经丧失了持续工作的动力，说明你的能量已经消耗殆尽了。"',
+      cond: g => !g.flags.jobBurnout && g.age>=23 && g.age<=45 && g.job!=='待业中' && g.health<65,
+      choices:[
+        { label:'请假休息', hint:'+❤️ +😊 -💰', fn: g => { g.flags.jobBurnout=true; g.flags.restAndRecover=true; return{health:15,mood:15,money:-5000}; }},
+        { label:'寻求心理咨询', hint:'+🧠 +❤️', fn: g => { g.flags.jobBurnout=true; g.flags.therapySeeker=true; return{intel:10,health:8,mood:10,money:-2000}; }},
+        { label:'换工作', hint:'+😊 +✨ -💰', fn: g => { g.flags.jobBurnout=true; g.flags.jobChanger=true; setJob(g,'新工作',g.jobSalary*0.9); return{mood:20,charm:5,money:-3000}; }},
+        { label:'硬撑', hint:'+💰 -❤️ -😊', fn: g => { g.flags.jobBurnout=true; return{money:2000,health:-15,mood:-20}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3248,6 +3267,9 @@ const ACHIEVEMENTS = [
     { id:'meme_lord', icon:'😂', name:'梗王', desc:'成为网络热梗玩家', check: g => g.flags.internetMeme },
     // v4.8 achievements
     { id:'boundary_setter', icon:'🚪', name:'边界感大师', desc:'实践断亲或轻断亲', check: g => g.flags.familyDisconnect },
+    // v4.9 achievements
+    { id:'quiet_quitter', icon:'😶', name:'精神离职者', desc:'实践安静离职', check: g => g.flags.quietQuitting },
+    { id:'burnout_survivor', icon:'🔥', name:'职业倦怠幸存者', desc:'经历职业倦怠', check: g => g.flags.jobBurnout },
 ];
 
 // === ENDINGS === (order matters: first match wins)
