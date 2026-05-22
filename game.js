@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v5.1
+// 都市浮生记 - Game Engine v5.2
 // ============================================
 
 // === GAME STATE ===
@@ -3082,6 +3082,16 @@ const EVENTS = [
         { label:'放弃，专注主业', hint:'+💰 +🧠', fn: g => { g.flags.sideHustleFail=true; return{money:3000,intel:8,mood:-5}; }},
         { label:'继续尝试新副业', hint:'+✨ +😊', fn: g => { g.flags.sideHustleFail=true; if(Math.random()>0.5){return{money:8000,mood:20,charm:10}}else{return{mood:-10,money:-1000}} }},
       ]},
+    // === v5.2 EVENTS - 电子爸妈与虚拟亲情 ===
+    { id:'digital_parents', icon:'👨‍👩‍👧', title:'电子爸妈',
+      body:'你刷到一个视频：\n\n"女儿女儿，你那边热不热？"\n"爸爸妈妈对你永远就是支持，不需要你回报。"\n\n这是一对中年夫妇以父母视角拍的短视频。\n\n你看着看着，眼眶湿了。\n\n你想起了自己的爸妈：催婚、催工资、催买房。\n\n"电子爸妈——是年轻人对理想父母的想象，也是对现实亲情的补偿。"\n\n你在评论区写下："谢谢你，我的互联网妈妈。"',
+      cond: g => !g.flags.digitalParents && g.age>=20 && g.age<=32,
+      choices:[
+        { label:'关注电子爸妈', hint:'+😊 +👥', fn: g => { g.flags.digitalParents=true; g.flags.emotionalSupport=true; return{mood:18,social:8}; }},
+        { label:'发私信倾诉', hint:'+😊 +👥 +✨', fn: g => { g.flags.digitalParents=true; return{mood:15,social:12,charm:5}; }},
+        { label:'学习他们的方式', hint:'+🧠 +✨ +👥', fn: g => { g.flags.digitalParents=true; g.flags.parentingLearner=true; return{intel:10,charm:8,social:10}; }},
+        { label:'觉得太假了', hint:'+🧠', fn: g => { g.flags.digitalParents=true; return{intel:5,mood:-3}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3314,6 +3324,8 @@ const ACHIEVEMENTS = [
     // v5.1 achievements
     { id:'slash_master', icon:'⚡', name:'斜杠青年', desc:'开展副业', check: g => g.flags.slashYouth },
     { id:'side_hustle_survivor', icon:'💔', name:'副业幸存者', desc:'经历副业翻车', check: g => g.flags.sideHustleFail },
+    // v5.2 achievements
+    { id:'digital_child', icon:'👨‍👩‍👧', name:'电子孩子', desc:'关注电子爸妈', check: g => g.flags.digitalParents },
 ];
 
 // === ENDINGS === (order matters: first match wins)
