@@ -455,3 +455,110 @@ html[style*="font-size: 18px"] .modal-content {
     font-size: inherit;
 }
 
+/* === Save Slot UI === */
+.save-slots {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin: 24px 0;
+}
+.save-slot {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-md);
+    padding: 16px 20px;
+    transition: all 0.2s ease;
+}
+.save-slot:hover {
+    border-color: var(--accent-primary);
+    background: rgba(255, 255, 255, 0.05);
+}
+.save-slot.empty {
+    opacity: 0.6;
+    border-style: dashed;
+}
+.slot-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+.slot-number {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--accent-primary);
+}
+.slot-status {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+}
+.slot-status.used {
+    background: rgba(var(--accent-primary-rgb, 99, 102, 241), 0.2);
+    color: var(--accent-primary);
+}
+.slot-info {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px 16px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+}
+.slot-info p {
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.slot-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.btn-small {
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-default);
+    background: transparent;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.btn-small:hover {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+}
+.btn-small.btn-save {
+    border-color: var(--accent-primary);
+    background: rgba(var(--accent-primary-rgb, 99, 102, 241), 0.1);
+    color: var(--accent-primary);
+}
+.btn-small.btn-save:hover {
+    background: var(--accent-primary);
+    color: white;
+}
+.btn-small.btn-load {
+    border-color: var(--accent-emerald);
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--accent-emerald);
+}
+.btn-small.btn-load:hover {
+    background: var(--accent-emerald);
+    color: white;
+}
+.btn-small.btn-danger {
+    border-color: var(--accent-rose);
+    color: var(--accent-rose);
+}
+.btn-small.btn-danger:hover {
+    background: var(--accent-rose);
+    color: white;
+}
+.btn-small:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}

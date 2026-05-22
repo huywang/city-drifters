@@ -24,7 +24,7 @@
                 <button class="btn btn-primary btn-glow" onclick="showScreen('screen-create')">
                     <span class="btn-icon">🚀</span> 开始新人生
                 </button>
-                <button class="btn btn-secondary" onclick="loadGame()" id="btn-continue">
+                <button class="btn btn-secondary" onclick="showSaveMenu()" id="btn-continue">
                     <span class="btn-icon">💾</span> 继续游戏
                 </button>
                 <button class="btn btn-ghost" onclick="showScreen('screen-about')">
@@ -35,7 +35,7 @@
                 </button>
             </div>
             <div class="title-footer">
-                <span>v2.0</span> · <span>献给每一个在大城市奋斗的你</span>
+                <span>v2.3</span> · <span>献给每一个在大城市奋斗的你</span>
             </div>
         </div>
     </div>
@@ -279,7 +279,7 @@
             <div class="menu-overlay" onclick="toggleMenu()"></div>
             <div class="menu-panel">
                 <h3>📋 菜单</h3>
-                <button class="menu-item" onclick="saveGame()">💾 保存游戏</button>
+                <button class="menu-item" onclick="showSaveMenu()">💾 存档管理</button>
                 <button class="menu-item" onclick="showAchievements()">🏆 成就</button>
                 <button class="menu-item" onclick="showTimeline()">📜 人生轨迹</button>
                 <button class="menu-item" onclick="showScreen('screen-title'); toggleMenu()">🏠 返回标题</button>
@@ -334,6 +334,16 @@
             <h2>📜 人生轨迹</h2>
             <div class="timeline-scroll" id="timeline-scroll"></div>
             <button class="btn btn-secondary" onclick="closeModal('modal-timeline')">关闭</button>
+        </div>
+    </div>
+
+    <!-- ===== 存档管理弹窗 ===== -->
+    <div class="modal" id="modal-save">
+        <div class="modal-overlay" onclick="closeModal('modal-save')"></div>
+        <div class="modal-content">
+            <h2>💾 存档管理</h2>
+            <div class="save-slots" id="save-slots"></div>
+            <button class="btn btn-secondary" onclick="closeModal('modal-save')">关闭</button>
         </div>
     </div>
 

@@ -1083,13 +1083,134 @@ function showTimeline() {
     toggleMenu();
 }
 
-// === SAVE/LOAD ===
-function saveGame() { localStorage.setItem('cityDrifters_save', JSON.stringify(G)); notify('💾 游戏已保存！'); toggleMenu(); }
-function loadGame() {
-    const s = localStorage.getItem('cityDrifters_save');
-    if (!s) { notify('没有找到存档'); return; }
+// === SAVE/LOAD (Multi-slot system) ===
+const MAX_SAVE_SLOTS = 3;
+const SAVE_PREFIX = 'cityDrifters_save_';
+
+function saveGame(slot = 1) {
+    const saveData = { ...G, savedAt: Date.now(), version: '2.3' };
+    localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
+    notify(`💾 已保存到槽位 ${slot}！`);
+    toggleMenu();
+}
+
+function loadGame(slot = 1) {
+    const s = localStorage.getItem(SAVE_PREFIX + slot);
+    if (!s) {
+        // Fallback to old save format
+        const oldSave = localStorage.getItem('cityDrifters_save');
+        if (oldSave) {
+            Object.assign(G, JSON.parse(oldSave));
+            showScreen('screen-game');
+            updateHUD();
+            notify('💾 旧存档已加载！');
+            return;
+        }
+        notify('没有找到存档');
+        return;
+    }
     Object.assign(G, JSON.parse(s));
-    showScreen('screen-game'); updateHUD(); notify('💾 存档已加载！');
+    showScreen('screen-game');
+    updateHUD();
+    notify(`💾 槽位 ${slot} 已加载！`);
+}
+
+function getSaveSlots() {
+    const slots = [];
+    for (let i = 1; i <= MAX_SAVE_SLOTS; i++) {
+        const save = localStorage.getItem(SAVE_PREFIX + i);
+        if (save) {
+            const data = JSON.parse(save);
+            slots.push({
+                slot: i,
+                name: data.name || '未命名',
+                age: data.age || 22,
+                city: data.cityName || '未知',
+                savedAt: data.savedAt ? new Date(data.savedAt).toLocaleString('zh-CN') : '未知时间',
+                hasSave: true
+            });
+        } else {
+            slots.push({ slot: i, hasSave: false });
+        }
+    }
+    return slots;
+}
+
+function showSaveMenu() {
+    const slots = getSaveSlots();
+    const modal = document.getElementById('modal-save');
+    const list = document.getElementById('save-slots');
+    list.innerHTML = slots.map(s => `
+        <div class="save-slot ${s.hasSave ? '' : 'empty'}">
+            <div class="slot-header">
+                <span class="slot-number">槽位 ${s.slot}</span>
+                <span class="slot-status ${s.hasSave ? 'used' : ''}">${s.hasSave ? '已保存' : '空闲'}</span>
+            </div>
+            ${s.hasSave ? `
+                <div class="slot-info">
+                    <p>👤 ${s.name}</p>
+                    <p>📅 ${s.age}岁</p>
+                    <p>🏙️ ${s.city}</p>
+                    <p>💾 ${s.savedAt}</p>
+                </div>
+                <div class="slot-actions">
+                    <button class="btn-small btn-save" onclick="saveGame(${s.slot}); closeModal('modal-save'); toggleMenu()">覆盖保存</button>
+                    <button class="btn-small btn-load" onclick="loadGame(${s.slot}); closeModal('modal-save')">加载</button>
+                    <button class="btn-small btn-danger" onclick="deleteSave(${s.slot})">删除</button>
+                </div>
+            ` : `
+                <div class="slot-info">
+                    <p>这个槽位还没有存档</p>
+                </div>
+                <div class="slot-actions">
+                    <button class="btn-small btn-save" onclick="saveGame(${s.slot}); closeModal('modal-save'); toggleMenu()">保存到这里</button>
+                </div>
+            `}
+        </div>
+    `).join('');
+    modal.classList.add('open');
+}
+
+function deleteSave(slot) {
+    if (!confirm(`确定要删除槽位 ${slot} 的存档吗？`)) return;
+    localStorage.removeItem(SAVE_PREFIX + slot);
+    notify(`🗑️ 槽位 ${slot} 已删除`);
+    showSaveMenu();
+}
+
+// === MOBILE SWIPE NAVIGATION ===
+function initMobileSwipe() {
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    const gameScreen = document.getElementById('screen-game');
+    if (!gameScreen) return;
+
+    gameScreen.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    gameScreen.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    }, { passive: true });
+
+    function handleSwipe() {
+        const swipeThreshold = 50;
+        const diff = touchStartX - touchEndX;
+
+        if (Math.abs(diff) < swipeThreshold) return;
+
+        if (diff > 0) {
+            // Swipe left - next month
+            if (!document.getElementById('btn-advance').disabled) {
+                advanceMonth();
+            }
+        } else {
+            // Swipe right - open menu
+            toggleMenu();
+        }
+    }
 }
 
 // === MENU ===
@@ -1237,5 +1358,7 @@ function loadSettings() {
 document.addEventListener('DOMContentLoaded', () => {
     loadSettings();
     initParticles();
-    if (!localStorage.getItem('cityDrifters_save')) document.getElementById('btn-continue').style.opacity = '0.4';
+    initMobileSwipe();
+    const hasAnySave = localStorage.getItem(SAVE_PREFIX + '1') || localStorage.getItem(SAVE_PREFIX + '2') || localStorage.getItem(SAVE_PREFIX + '3') || localStorage.getItem('cityDrifters_save');
+    if (!hasAnySave) document.getElementById('btn-continue').style.opacity = '0.4';
 });
