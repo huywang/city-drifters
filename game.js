@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v14.4
+// 都市浮生记 - Game Engine v15.0
 // ============================================
 
 // === GAME STATE ===
@@ -566,6 +566,31 @@ const SURPRISE_EVENTS = [
     { id:'surprise_queue', icon:'🧍', title:'排队地狱', weight:3,
       body:'你去网红店打卡，排队2小时。\n\n你看着前面还有50个人，后面又来了50个人。你进退两难。\n\n终于轮到你了，你发现：也就那样吧。\n\n你发了条小红书：「不值得排队。」收获了1000个赞——大家都在排队。\n\n"排队的真相：你排的不是队，是从众心理。"',
       fn: g => ({mood: -10, money: -100, charm: -2}) },
+    // === v15.0 新增惊喜事件（心理健康主题） ===
+    { id:'surprise_therapy_breakthrough', icon:'💡', title:'咨询突破', weight:2,
+      body:'今天的心理咨询，你突然想通了一件事。\n\n你意识到：你一直在为别人的期待而活——父母的、领导的、社会的。你从来没有问过自己：「我到底想要什么？」\n\n咨询师说：「这就是你今天最大的突破。」\n\n你走出咨询室，抬头看了看天空。天还是那个天，但你觉得——空气变甜了一点。\n\n"突破：不是改变了世界——是改变了自己看世界的角度。"',
+      fn: g => ({mood: 15, intel: 8, health: 3}) },
+    { id:'surprise_runners_high', icon:'🏃', title:'跑步者高潮', weight:2,
+      body:'你跑步的时候，突然进入了一种奇妙的状态。\n\n你的脚步变得轻盈，呼吸变得均匀，大脑放空了。你不再想工作、不再想烦恼，只有「左脚、右脚」的简单节奏。\n\n跑了5公里，你觉得整个人都通透了。这就是传说中的「跑步者高潮」。\n\n你发了条朋友圈：「跑步治百病。」你的一个朋友评论：「我懒癌能治吗？」\n\n"跑步者高潮：不是兴奋——是平静。一种只有运动后才能体会的平静。"',
+      fn: g => ({mood: 12, health: 8, intel: 3}) },
+    { id:'surprise_deep_talk', icon:'🌙', title:'深夜谈心', weight:3,
+      body:'凌晨1点，你和朋友在路边摊喝酒聊天。\n\n你们聊了很多：关于工作、关于感情、关于未来、关于那些说不出口的压力。你们平时都是「我很好」的人，今天突然都卸下了伪装。\n\n你的朋友说：「谢谢你愿意和我说这些。」你说：「谢谢你愿意听。」\n\n你们喝到凌晨3点。第二天都迟到了。但你觉得——值。\n\n"深夜谈心：不是在喝酒——是在找一个可以脆弱的空间。"',
+      fn: g => ({mood: 10, social: 12, charm: 3}) },
+    { id:'surprise_crying_release', icon:'😢', title:'哭一场', weight:2,
+      body:'你在看一部电影的时候突然哭了。\n\n不是因为电影多感人——是因为你太久没有哭了。你的眼泪像是开了闸的水龙头，止不住。\n\n你哭了整整20分钟。哭完之后，你觉得胸口的那块大石头——消失了。\n\n你的室友看到你红肿的眼睛说：「怎么了？」你说：「没事——只是哭了一场。」\n\n"哭泣：不是脆弱——是身体自带的排毒系统。"',
+      fn: g => ({mood: 8, health: 5, intel: 3}) },
+    { id:'surprise_digital_detox_v2', icon:'📵', title:'数字排毒', weight:2,
+      body:'你的手机掉进马桶了。\n\n你被迫断网24小时。一开始你焦虑得要命：看不到微信、刷不了抖音、连外卖都点不了。\n\n但到了下午，你发现——世界没有因为你断网而崩塌。你看了2本书、做了1顿饭、在小区里散了1小时步。\n\n你修好手机后，发现只有3条消息：2条是广告，1条是你妈问你吃了吗。\n\n"数字排毒：不是戒掉手机——是发现没有手机的世界也很精彩。"',
+      fn: g => ({mood: 10, intel: 8, health: 5, charm: -2}) },
+    { id:'surprise_kindness_stranger', icon:'🤗', title:'陌生人的善意', weight:2,
+      body:'你在地铁上没忍住红了眼眶。\n\n一个阿姨递给你一包纸巾。她没有问你怎么了，只是轻轻拍了拍你的肩膀。\n\n你说：「谢谢。」她笑了笑就下车了。\n\n你不知道她叫什么名字，她也不知道你经历了什么。但那一刻的善意——你觉得比任何心理治疗都有效。\n\n"陌生人的善意：不是因为认识你才帮你——是因为看见了你。"',
+      fn: g => ({mood: 15, social: 5, charm: 3}) },
+    { id:'surprise_nature_healing', icon:'🌿', title:'自然疗愈', weight:2,
+      body:'你周末去了郊外爬山。\n\n远离了城市的喧嚣，你听到了鸟叫、风声、溪流。你的手机没有信号——你第一次觉得这是一件好事。\n\n你在一棵大树下坐了一个小时。什么都没做，只是看着远处的云慢慢飘。\n\n你觉得自己的焦虑像是被风吹走了。也许古人说的「天人合一」——就是这种感觉。\n\n"自然疗愈：不是逃离城市——是提醒自己，世界比你的烦恼大得多。"',
+      fn: g => ({mood: 15, health: 10, intel: 5}) },
+    { id:'surprise_overthinking', icon:'🤯', title:'过度思考', weight:3,
+      body:'你躺在床上，大脑开始了它的「深夜节目」。\n\n你在想：明天开会要说什么、下周的项目怎么推进、上个月说的话是不是得罪了谁、三年后自己会在哪里、人活着的意义是什么……\n\n你从凌晨1点想到了凌晨3点。什么问题都没解决，但你已经累得不行了。\n\n你的大脑是一个24小时不打烊的公司——问题是，它的CEO是你自己，而你没法开除他。\n\n"过度思考：不是在解决问题——是在制造问题。学会停下来，比想明白更重要。"',
+      fn: g => ({mood: -8, health: -5, intel: 3}) },
 ];
 
 // === EVENTS (100+) ===
@@ -7530,6 +7555,127 @@ const EVENTS = [
         { label:'安排全面体检', hint:'-💰 +💪 +👥', fn: g => { g.flags.parentAging=true; g.flags.parentHealthDone=true; return{money:-5000,health:5,social:5,mood:5}; }},
         { label:'接父母来城里住', hint:'-💰 +👥 +😊', fn: g => { g.flags.parentAging=true; g.flags.cohabitation=true; return{money:-3000,social:12,mood:10}; }},
       ]},
+    // === v15.0 心理健康 + 自我疗愈 ===
+    { id:'anxiety_attack', icon:'😰', title:'焦虑发作',
+      body:'凌晨3点，你突然从床上坐起来。\n\n心跳加速、呼吸急促、手心出汗。你觉得天花板在往下压，墙壁在往内收。\n\n你知道这是焦虑发作。你已经不是第一次了。你打开手机，搜索「如何缓解焦虑」——搜索结果的第一条是广告。\n\n你试着深呼吸：4秒吸气、7秒屏住、8秒呼气。第5次的时候，你好了一点。\n\n你的同事第二天问你：「你脸色好差。」你说：「昨晚没睡好。」你没说的是：你已经连续一周没睡好了。\n\n"焦虑不是矫情——是你的身体在告诉你，你撑太久了。"',
+      cond: g => g.age >= 22 && g.mood < 40 && !g.flags.anxietyAttack,
+      choices:[
+        { label:'去医院看心理科', hint:'-💰 +💪 +🧠', fn: g => { g.flags.anxietyAttack=true; g.flags.therapyStarted=true; return{money:-500,health:10,intel:8}; }},
+        { label:'下载冥想App', hint:'+🧠 +😊', fn: g => { g.flags.anxietyAttack=true; g.flags.mindfulnessPractice=true; return{intel:8,mood:5}; }},
+        { label:'硬扛，告诉自己没事', hint:'-💪 +🧠', fn: g => { g.flags.anxietyAttack=true; return{health:-8,intel:3}; }},
+      ]},
+    { id:'depression_fog', icon:'🌧️', title:'情绪低谷',
+      body:'你已经连续两周不想出门了。\n\n不是不能——是不想。不想上班、不想社交、不想做饭、不想洗澡。你每天躺在床上刷手机，刷到凌晨2点。\n\n你的朋友说：「你振作一点。」你的父母说：「想开点。」你自己说：「我也想。」\n\n但「想开」不是开关——啪嗒一下就能亮。\n\n你看到一条帖子：「抑郁症不是心情不好——是丧失了快乐的能力。」你盯着看了很久。\n\n"抑郁不是软弱——是扛了太久太久的坚强。"',
+      cond: g => g.age >= 20 && g.mood < 30 && !g.flags.depressionFog,
+      choices:[
+        { label:'预约心理咨询师', hint:'-💰 +💪 +🧠', fn: g => { g.flags.depressionFog=true; g.flags.therapyStarted=true; return{money:-600,health:8,intel:10}; }},
+        { label:'告诉信任的人', hint:'+👥 +😊', fn: g => { g.flags.depressionFog=true; g.flags.openedUp=true; return{social:12,mood:8}; }},
+        { label:'一个人扛着', hint:'-😊 -💪', fn: g => { g.flags.depressionFog=true; return{mood:-10,health:-8}; }},
+      ]},
+    { id:'therapy_session_v3', icon:'🛋️', title:'第一次心理咨询',
+      body:'你走进了心理咨询室。\n\n房间不大，有一张沙发、一盏暖灯、一盒纸巾。咨询师是一个温和的女性，她让你随便聊聊。\n\n你说了20分钟。关于工作、关于父母、关于失眠、关于那个让你窒息的凌晨。\n\n她没有说「想开点」，也没有说「你没事的」。她只是说：「你的感受是合理的。」\n\n你哭了。那是你很久没有哭过了。\n\n走出咨询室的时候，你觉得胸口轻了一点。只有一点——但够了。\n\n"心理咨询：不是有病才去——是在还没病的时候，给自己一个出口。"',
+      cond: g => g.flags.therapyStarted && !g.flags.therapySession,
+      choices:[
+        { label:'继续定期咨询', hint:'-💰 +💪 +🧠 +😊', fn: g => { g.flags.therapySession=true; g.flags.regularTherapy=true; return{money:-2400,health:10,intel:12,mood:10}; }},
+        { label:'试试自助方法', hint:'+🧠 +😊', fn: g => { g.flags.therapySession=true; g.flags.selfHelp=true; return{intel:8,mood:5}; }},
+        { label:'觉得没用，不去了', hint:'-😊', fn: g => { g.flags.therapySession=true; return{mood:-5}; }},
+      ]},
+    { id:'mindfulness_meditation', icon:'🧘', title:'正念冥想',
+      body:'你的同事推荐你一个冥想App。\n\n你下载了「潮汐」，戴上耳机，跟着引导词做了一次10分钟的正念呼吸。\n\n前3分钟你在想工作上的事。中间3分钟你在想晚饭吃什么。最后4分钟你终于安静了——然后闹钟响了。\n\n你觉得有点傻。但第二天你又做了一次。第三次的时候，你第一次感受到了「什么都不想」的感觉。\n\n那是一种奇妙的宁静。像是暴风雨中的风眼。\n\n"正念冥想：不是让大脑停下来——是学会和杂念共处。"',
+      cond: g => g.age >= 22 && !g.flags.mindfulnessMeditation,
+      choices:[
+        { label:'每天冥想15分钟', hint:'+💪 +🧠 +😊', fn: g => { g.flags.mindfulnessMeditation=true; g.flags.dailyMeditation=true; return{health:8,intel:10,mood:10}; }},
+        { label:'参加线下冥想课', hint:'-💰 +🧠 +👥', fn: g => { g.flags.mindfulnessMeditation=true; g.flags.meditationClass=true; return{money:-500,intel:8,social:5}; }},
+        { label:'偶尔做做就好', hint:'+🧠', fn: g => { g.flags.mindfulnessMeditation=true; return{intel:5,mood:3}; }},
+      ]},
+    { id:'social_anxiety_v2', icon:'😶', title:'社交恐惧',
+      body:'公司团建，你站在KTV门口不敢进去。\n\n不是不想——是害怕。害怕唱歌被评价、害怕聊天冷场、害怕成为焦点。\n\n你在门口站了10分钟，给同事发了条微信：「我不太舒服，先回去了。」然后转身走了。\n\n回到出租屋，你觉得轻松了——然后又觉得自责了。你知道他们不会怪你，但你会怪自己。\n\n你的日记本上写着：「今天又逃了一次。明天呢？」\n\n"社恐不是性格内向——是害怕被评判。每一个社恐的人，都在心里演了一场独角戏。"',
+      cond: g => g.age >= 20 && g.social < 30 && !g.flags.socialAnxiety,
+      choices:[
+        { label:'尝试小步暴露', hint:'+👥 +💪 +😊', fn: g => { g.flags.socialAnxiety=true; g.flags.gradualExposure=true; return{social:8,health:5,mood:5}; }},
+        { label:'加入社恐互助群', hint:'+👥 +🧠', fn: g => { g.flags.socialAnxiety=true; g.flags.supportGroup=true; return{social:10,intel:5}; }},
+        { label:'接受自己就是社恐', hint:'+🧠 +😊', fn: g => { g.flags.socialAnxiety=true; g.flags.selfAcceptance=true; return{intel:8,mood:8}; }},
+      ]},
+    { id:'insomnia_chronic', icon:'🌙', title:'慢性失眠',
+      body:'又是一个凌晨。\n\n你数了300只羊、听了3段白噪音、喝了2杯热牛奶。还是睡不着。\n\n你的手机显示凌晨3:47。你算了一下：如果现在睡着，还能睡4小时。\n\n但你越想睡就越清醒。你的大脑开始播放你最尴尬的回忆：小学被老师点名答不上来、大学表白被拒、上个月开会说错了话。\n\n你叹了口气，拿起手机——朋友圈里有人发了条：「又是失眠的一天。」你点了个赞。原来不止你一个人。\n\n"失眠不是不困——是大脑不肯关机。在凌晨的世界里，你不是一个人。"',
+      cond: g => g.age >= 22 && g.mood < 45 && !g.flags.chronicInsomnia,
+      choices:[
+        { label:'看睡眠专科', hint:'-💰 +💪 +🧠', fn: g => { g.flags.chronicInsomnia=true; g.flags.sleepSpecialist=true; return{money:-800,health:10,intel:5}; }},
+        { label:'调整作息习惯', hint:'+💪 +😊', fn: g => { g.flags.chronicInsomnia=true; g.flags.sleepHygiene=true; return{health:8,mood:5}; }},
+        { label:'吃安眠药', hint:'+😊 -💪', fn: g => { g.flags.chronicInsomnia=true; g.flags.sleepingPills=true; return{mood:5,health:-5}; }},
+      ]},
+    { id:'exercise_therapy', icon:'🏃', title:'运动处方',
+      body:'你的心理咨询师建议你试试运动。\n\n她说：「跑步30分钟相当于吃一颗抗焦虑药。」你半信半疑地开始跑步。\n\n第一天跑了800米就喘得不行。第二天腿疼得下不了楼梯。但第三天——你跑完3公里后出了一身汗，居然觉得心情好了。\n\n你开始每周跑3次。你的配速从7分钟变成6分钟。你参加了第一个5公里跑。\n\n你发现：跑步的时候，你的大脑不会想那些烦的事。只有脚步、呼吸和心跳。\n\n"运动疗愈：不是让身体疲惫——是让心灵自由。"',
+      cond: g => g.age >= 22 && !g.flags.exerciseTherapy,
+      choices:[
+        { label:'坚持每周跑步', hint:'+💪 +😊 +🧠', fn: g => { g.flags.exerciseTherapy=true; g.flags.regularRunner=true; return{health:15,mood:12,intel:5}; }},
+        { label:'尝试瑜伽', hint:'+💪 +😊', fn: g => { g.flags.exerciseTherapy=true; g.flags.yogaPractice=true; return{health:10,mood:10}; }},
+        { label:'办了健身卡', hint:'-💰 +💪', fn: g => { g.flags.exerciseTherapy=true; g.flags.gymMember=true; return{money:-3000,health:12}; }},
+      ]},
+    { id:'art_therapy', icon:'🎨', title:'艺术疗愈',
+      body:'你参加了一个艺术疗愈工作坊。\n\n老师发给每个人一张白纸和一盒蜡笔。她说：「画什么都行，不用好看。」\n\n你画了一团黑色的漩涡。你盯着它看了很久——那是你最近的心情。\n\n旁边的人画了一片蓝色的大海。你说：「你画得好美。」她说：「我画的是我想要的平静。」\n\n你突然觉得：原来把情绪画出来，比说出来容易多了。\n\n老师最后说：「艺术不是技巧——是表达。」你看着自己那团黑色的漩涡，居然笑了。\n\n"艺术疗愈：不需要会画画——只需要愿意表达。"',
+      cond: g => g.age >= 22 && !g.flags.artTherapy,
+      choices:[
+        { label:'继续参加工坊', hint:'-💰 +😊 +👥', fn: g => { g.flags.artTherapy=true; g.flags.artCommunity=true; return{money:-300,mood:12,social:8}; }},
+        { label:'开始写日记', hint:'+🧠 +😊', fn: g => { g.flags.artTherapy=true; g.flags.journaling=true; return{intel:10,mood:8}; }},
+        { label:'买了一盒画笔在家画', hint:'-💰 +😊', fn: g => { g.flags.artTherapy=true; return{money:-50,mood:10}; }},
+      ]},
+    { id:'burnout_recovery', icon:'🔥', title:'职业倦怠',
+      body:'你已经连续3个月不想上班了。\n\n不是不想赚钱——是觉得上班没有意义。你每天做的事情像是西西弗斯推石头：推上去，滚下来，推上去，滚下来。\n\n你的领导说：「你最近状态不好。」你说：「我一直都这样。」其实你以前不是这样的。\n\n你请了一周假。你去了一个海边小镇，什么都没做。你看了3天海、睡了3天觉、发了3天呆。\n\n回来之后，你觉得好了一点——至少知道了自己需要休息。\n\n"职业倦怠：不是不够努力——是太久没有被认可。"',
+      cond: g => g.age >= 25 && g.mood < 40 && g.job !== '待业中' && !g.flags.burnoutRecovery,
+      choices:[
+        { label:'和领导谈谈', hint:'+👥 +🧠', fn: g => { g.flags.burnoutRecovery=true; g.flags.workNegotiation=true; return{social:8,intel:5}; }},
+        { label:'考虑换工作', hint:'+🧠 +😊', fn: g => { g.flags.burnoutRecovery=true; g.flags.careerRethink=true; return{intel:10,mood:5}; }},
+        { label:'gap一下', hint:'-💰 +😊 +💪', fn: g => { g.flags.burnoutRecovery=true; g.flags.gapPeriod=true; return{money:-5000,mood:15,health:8}; }},
+      ]},
+    { id:'cbt_self_help', icon:'📝', title:'认知行为疗法',
+      body:'你在网上发现了一个CBT（认知行为疗法）自助工具。\n\n它教你识别自己的「认知扭曲」：\n- 非黑即白思维：「如果考不好就全完了」\n- 过度概括：「我什么都做不好」\n- 读心术：「他一定觉得我很蠢」\n\n你发现自己每天都在做这些扭曲思考。你开始记录：今天想了什么 → 这是事实还是想法 → 有没有其他解释。\n\n一个月后，你发现自己没那么容易陷入负面思维了。不是因为问题消失了——而是你看待问题的方式变了。\n\n"CBT：不是改变想法——是改变想法的方式。"',
+      cond: g => g.age >= 22 && (g.flags.anxietyAttack || g.flags.depressionFog) && !g.flags.cbtSelfHelp,
+      choices:[
+        { label:'每天记录思维日记', hint:'+🧠 +😊 +💪', fn: g => { g.flags.cbtSelfHelp=true; g.flags.thoughtDiary=true; return{intel:15,mood:10,health:5}; }},
+        { label:'找专业CBT治疗师', hint:'-💰 +🧠 +💪', fn: g => { g.flags.cbtSelfHelp=true; g.flags.cbtTherapist=true; return{money:-800,intel:12,health:8}; }},
+        { label:'了解一下就好', hint:'+🧠', fn: g => { g.flags.cbtSelfHelp=true; return{intel:8}; }},
+      ]},
+    { id:'emotional_journal', icon:'📓', title:'情绪日记',
+      body:'你开始写情绪日记了。\n\n每天睡前5分钟，你给今天的心情打分（1-10分），然后写下3件让你有情绪波动的事。\n\n第一周你发现：你的情绪大多在3-5分之间。第二周你发现：让你开心的事越来越小——一杯好喝的咖啡、一朵好看的云、一条朋友的微信。\n\n第三周你发现：你的情绪平均分从3.2变成了4.8。不是生活变好了——是你开始注意到好的部分了。\n\n"情绪日记：不是记录心情——是给心情一个被看见的机会。"',
+      cond: g => g.age >= 20 && !g.flags.emotionalJournal,
+      choices:[
+        { label:'坚持每天记录', hint:'+🧠 +😊 +💪', fn: g => { g.flags.emotionalJournal=true; g.flags.dailyJournal=true; return{intel:10,mood:10,health:5}; }},
+        { label:'用App追踪情绪', hint:'+🧠 +😊', fn: g => { g.flags.emotionalJournal=true; g.flags.moodTrackingApp=true; return{intel:8,mood:8}; }},
+        { label:'三天打鱼两天晒网', hint:'+🧠', fn: g => { g.flags.emotionalJournal=true; return{intel:5,mood:3}; }},
+      ]},
+    { id:'male_mental_health', icon:'🤐', title:'男人不能哭',
+      body:'你在公司厕所里偷偷哭了一次。\n\n因为你不敢在办公室哭——「男人不能哭」。不敢在家哭——「你是家里的顶梁柱」。不敢在朋友面前哭——「大老爷们哭什么」。\n\n只有厕所隔间是你唯一安全的空间。你蹲在里面，无声地哭了10分钟。然后洗了把脸，回到工位上继续写PPT。\n\n你的同事问你：「你眼睛怎么红了？」你说：「上厕所的时候被洗手液溅到了。」\n\n"男性心理健康：不是男人不需要哭——是他们不知道在哪里可以哭。"',
+      cond: g => g.age >= 22 && g.gender === 'male' && g.mood < 40 && !g.flags.maleMentalHealth,
+      choices:[
+        { label:'打破沉默，找人倾诉', hint:'+👥 +😊 +💪', fn: g => { g.flags.maleMentalHealth=true; g.flags.brokeSilence=true; return{social:12,mood:15,health:5}; }},
+        { label:'寻求专业帮助', hint:'-💰 +💪 +🧠', fn: g => { g.flags.maleMentalHealth=true; g.flags.therapyStarted=true; return{money:-500,health:8,intel:8}; }},
+        { label:'继续扛着', hint:'-💪 -😊', fn: g => { g.flags.maleMentalHealth=true; return{health:-10,mood:-8}; }},
+      ]},
+    { id:'self_compassion', icon:'💝', title:'自我关怀',
+      body:'你看到一句话：「对自己好一点，你已经很努力了。」\n\n你愣住了。你一直在对别人好：对同事好、对家人好、对朋友好。但你从来没有对自己好过。\n\n你总是觉得自己不够好：不够有钱、不够聪明、不够好看、不够努力。你给自己打的分永远是最低的。\n\n今天你试着做了一件「对自己好」的事：给自己买了一束花。35块钱。\n\n你把花放在桌上，看着它笑了。这也许是最便宜的心理治疗。\n\n"自我关怀：不是自私——是在照顾了全世界之后，记得照顾自己。"',
+      cond: g => g.age >= 25 && !g.flags.selfCompassion,
+      choices:[
+        { label:'每周做一件让自己开心的事', hint:'+😊 +💪 +🧠', fn: g => { g.flags.selfCompassion=true; g.flags.weeklySelfCare=true; return{mood:15,health:5,intel:8}; }},
+        { label:'学会说「不」', hint:'+🧠 +😊', fn: g => { g.flags.selfCompassion=true; g.flags.boundarySetting=true; return{intel:10,mood:8}; }},
+        { label:'给自己写一封信', hint:'+🧠 +😊', fn: g => { g.flags.selfCompassion=true; g.flags.selfLetter=true; return{intel:12,mood:10}; }},
+      ]},
+    { id:'support_group_join', icon:'🫂', title:'互助小组',
+      body:'你加入了一个心理健康互助小组。\n\n第一次聚会来了8个人。有大学生、有职场新人、有全职妈妈、有退休老人。你们围坐一圈，轮流分享。\n\n一个女孩说：「我每天都觉得自己是个负担。」一个大叔说：「我失眠了两年。」一个妈妈说：「我对着孩子吼完就后悔。」\n\n轮到你了。你说：「我有时候不知道活着为了什么。」说完你觉得轻松了——因为这里没有人会说「想开点」。\n\n"互助小组：不是你帮我、我帮你——是让你知道自己不是一个人在战斗。"',
+      cond: g => g.age >= 22 && (g.flags.anxietyAttack || g.flags.depressionFog || g.flags.socialAnxiety) && !g.flags.supportGroupJoin,
+      choices:[
+        { label:'定期参加聚会', hint:'+👥 +😊 +💪', fn: g => { g.flags.supportGroupJoin=true; g.flags.regularGroup=true; return{social:15,mood:12,health:5}; }},
+        { label:'成为志愿者', hint:'+👥 +✨ +😊', fn: g => { g.flags.supportGroupJoin=true; g.flags.volunteerHelper=true; return{social:12,charm:8,mood:10}; }},
+        { label:'线上参与就好', hint:'+👥 +🧠', fn: g => { g.flags.supportGroupJoin=true; return{social:8,intel:5}; }},
+      ]},
+    { id:'crisis_hotline', icon:'📞', title:'心理热线',
+      body:'一个深夜，你拨通了心理援助热线。\n\n电话那头是一个温柔的声音：「您好，这里是心理援助热线，请问有什么可以帮您？」\n\n你沉默了10秒。然后你说：「我不太好。」她说：「没关系，慢慢说。」\n\n你说了30分钟。关于失眠、关于焦虑、关于觉得自己没用的那些夜晚。她没有给你建议，没有说「你应该」，只是一直在听。\n\n挂电话前她说：「谢谢你打这个电话。你愿意求助，本身就是一种力量。」\n\n你挂了电话，第一次觉得：也许，被倾听就是被治愈的开始。\n\n"心理热线：不是最后的选择——是第一个可以打给的陌生人。"',
+      cond: g => g.age >= 20 && g.mood < 25 && !g.flags.crisisHotline,
+      choices:[
+        { label:'记住了这个号码', hint:'+🧠 +😊', fn: g => { g.flags.crisisHotline=true; g.flags.helpSeeker=true; return{intel:5,mood:12}; }},
+        { label:'告诉朋友这个热线', hint:'+👥 +😊', fn: g => { g.flags.crisisHotline=true; g.flags.helpAdvocate=true; return{social:8,mood:8}; }},
+        { label:'之后去预约了咨询', hint:'-💰 +💪 +🧠', fn: g => { g.flags.crisisHotline=true; g.flags.therapyStarted=true; return{money:-500,health:8,intel:10}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -8234,6 +8380,21 @@ const ACHIEVEMENTS = [
     { id:'child_growth_ach', icon:'🌱', name:'放手父母', desc:'学会了对孩子放手', check: g => g.flags.childGrowingUp },
     { id:'recipe_inheritor_ach', icon:'🍲', name:'家传味道', desc:'学会了家传菜谱', check: g => g.flags.familyRecipe },
     { id:'filial_awareness_ach', icon:'⏳', name:'孝心觉醒', desc:'意识到父母老了', check: g => g.flags.parentAging },
+    // === v15.0 新增成就（心理健康） ===
+    { id:'anxiety_survivor_ach', icon:'😰', name:'焦虑幸存者', desc:'经历了焦虑发作', check: g => g.flags.anxietyAttack },
+    { id:'depression_fighter_ach', icon:'🌧️', name:'情绪战士', desc:'面对了情绪低谷', check: g => g.flags.depressionFog },
+    { id:'therapy_seeker_ach', icon:'🛋️', name:'心理咨询者', desc:'尝试了心理咨询', check: g => g.flags.therapySession },
+    { id:'mindful_practitioner_ach', icon:'🧘', name:'正念练习者', desc:'开始正念冥想', check: g => g.flags.mindfulnessMeditation },
+    { id:'social_anxiety_ach', icon:'😶', name:'社恐斗士', desc:'面对了社交恐惧', check: g => g.flags.socialAnxiety },
+    { id:'sleep_healer_ach', icon:'🌙', name:'睡眠改善者', desc:'改善了失眠问题', check: g => g.flags.chronicInsomnia },
+    { id:'exercise_healer_ach', icon:'🏃', name:'运动疗愈师', desc:'通过运动改善心理', check: g => g.flags.exerciseTherapy },
+    { id:'art_healer_ach', icon:'🎨', name:'艺术疗愈者', desc:'尝试了艺术疗愈', check: g => g.flags.artTherapy },
+    { id:'burnout_survivor_ach', icon:'🔥', name:'倦怠恢复者', desc:'经历了职业倦怠', check: g => g.flags.burnoutRecovery },
+    { id:'cbt_practitioner_ach', icon:'📝', name:'CBT实践者', desc:'学习了认知行为疗法', check: g => g.flags.cbtSelfHelp },
+    { id:'journal_keeper_ach', icon:'📓', name:'情绪记录者', desc:'开始写情绪日记', check: g => g.flags.emotionalJournal },
+    { id:'self_compassion_ach', icon:'💝', name:'自我关怀者', desc:'学会了自我关怀', check: g => g.flags.selfCompassion },
+    { id:'support_group_ach', icon:'🫂', name:'互助参与者', desc:'加入了互助小组', check: g => g.flags.supportGroupJoin },
+    { id:'crisis_caller_ach', icon:'📞', name:'求助勇者', desc:'拨打了心理热线', check: g => g.flags.crisisHotline },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -8465,6 +8626,11 @@ const ENDINGS = [
     { id:'family_legacy_end', badge:'🏮', title:'家族之光', desc:'你成了家族里最重视传统的那个人。\n\n你整理了爷爷的家训、学会了奶奶的菜谱、组织了每年的家族聚会。你的孩子虽然觉得你有点老派，但每次过年都期待着你做的那桌菜。\n\n你的父亲看着你说：「你比我做得好。」你说：「我只是不想让这些东西消失。」\n\n你的家族相册有500多张照片。每一张都是一个故事，每一张都是一个时代。\n\n"家族传承：不是守旧——是让后来的人知道自己从哪里来。"', cond: g => g.flags.familyTradition && g.flags.familyRecipe && g.flags.familyReunion && g.age >= 40 && g.mood >= 65 },
     { id:'bridge_builder_end', badge:'🌉', title:'代际桥梁', desc:'你成了三代人之间的桥梁。\n\n你让父母理解了你的教育方式，让孩子理解了爷爷奶奶的爱。你用耐心和智慧，缝合了两代人之间的裂痕。\n\n你的父母和你的孩子坐在一张桌子前吃饭。你的父亲给你的孩子夹了一块红烧肉——那是你奶奶的配方。\n\n你看着这一幕，觉得这辈子做的最正确的事，就是没有让代沟变成鸿沟。\n\n"代际桥梁：不是让所有人想法一样——是让不同的想法都能被理解。"', cond: g => g.flags.generationGap && g.flags.peacemaker && g.flags.grandparentBond && g.age >= 40 && g.social >= 70 },
     { id:'filial_champion_end', badge:'💕', title:'孝心典范', desc:'你用行动诠释了什么叫「百善孝为先」。\n\n你每周给父母打电话、每年带他们体检、假期一定回家。你的父母在小区里逢人就说：「我家孩子可孝顺了。」\n\n你的同事问你：「你不觉得累吗？」你说：「累。但我更怕来不及。」\n\n你的父母老了，但他们的笑容比以前更多了。因为有你。\n\n"孝心：不是等有钱了再说——是在来得及的时候，多做一点。"', cond: g => g.flags.parentAging && g.flags.weeklyCall && g.flags.parentHealthDone && g.age >= 38 && g.mood >= 60 },
+    // --- v15.0 NEW ENDINGS (心理健康) ---
+    { id:'mental_health_champion_end', badge:'🧠', title:'心理健康倡导者', desc:'你从一个心理困境中走出来的人，变成了帮助别人的人。\n\n你公开分享了自己的焦虑和抑郁经历。你在社交媒体上写心理健康科普。你成了互助小组的组织者。\n\n有人说：「你的故事救了我。」你说：「是你自己救了自己——我只是让你知道你不需要一个人。」\n\n你的微博有10万粉丝。他们叫你「心理老师」。你笑着说：「我只是个普通人——只是愿意说出来而已。」\n\n"心理健康倡导：不是因为你好了才去帮人——是因为帮人的过程中，你也在治愈自己。"', cond: g => g.flags.therapySession && g.flags.supportGroupJoin && g.flags.volunteerHelper && g.mood >= 65 && g.age >= 28 },
+    { id:'inner_peace_end', badge:'🧘', title:'内心平静', desc:'你找到了内心的平静。\n\n你每天冥想15分钟、每周跑步3次、每晚写情绪日记。你的焦虑从每天发作变成了偶尔来访。\n\n你的心理咨询师说：「你已经不需要我了。」你说：「不，我只是学会了做自己最好的咨询师。」\n\n你坐在阳台上，看着夕阳。你的脑子里依然会有杂念——但你已经不会被它们带走了。\n\n"内心平静：不是没有波澜——是学会了在风浪中站稳。"', cond: g => g.flags.dailyMeditation && g.flags.regularRunner && g.flags.dailyJournal && g.mood >= 70 && g.health >= 65 && g.age >= 28 },
+    { id:'self_healing_end', badge:'💝', title:'自我疗愈', desc:'你完成了从「我不够好」到「我已经很好了」的转变。\n\n你学会了自我关怀、学会了设定边界、学会了对不喜欢的事说「不」。你不再为了讨好别人而委屈自己。\n\n你的朋友说：「你变了。」你说：「我没变——我只是终于做了自己。」\n\n你给自己写了一封信。信的最后一句是：「谢谢你没有放弃自己。」\n\n"自我疗愈：不是修复破碎的自己——是接受完整的自己。"', cond: g => g.flags.selfCompassion && g.flags.cbtSelfHelp && g.flags.boundarySetting && g.mood >= 65 && g.age >= 28 },
+    { id:'resilience_end', badge:'🌈', title:'逆商高手', desc:'你把每一次低谷，都变成了成长的阶梯。\n\n你经历了焦虑、抑郁、失眠、职业倦怠——但你没有被打倒。你看了心理医生、学了CBT、加了互助组、开始跑步。\n\n你的日记本上写着：「我不是一个幸运的人——但我是一个不放弃的人。」\n\n你回头看那些至暗时刻，发现每一个低谷都教会了你一些东西。痛苦不是白受的——前提是你愿意从中学习。\n\n"逆商：不是不摔倒——是每次摔倒都能爬起来，而且知道为什么摔的。"', cond: g => g.flags.anxietyAttack && g.flags.regularTherapy && g.flags.exerciseTherapy && g.flags.cbtSelfHelp && g.mood >= 60 && g.age >= 30 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
@@ -9156,6 +9322,12 @@ const DAILY_MODIFIERS = [
     { id:'social_energy', icon:'🦋', name:'社交能量', desc:'今天特别想见人', effect: {social:5,mood:3} },
     { id:'lazy_day', icon:'🛋️', name:'懒癌发作', desc:'什么都不想干', effect: {mood:3,health:2,intel:-1} },
     { id:'productive', icon:'⚡', name:'效率爆棚', desc:'今天效率特别高', effect: {intel:3,money:200,mood:3} },
+    // === v15.0 新增每日修正 ===
+    { id:'mindful_morning', icon:'🧘', name:'正念清晨', desc:'早上冥想了10分钟', effect: {mood:5,health:2,intel:2} },
+    { id:'gratitude_day', icon:'🙏', name:'感恩日', desc:'今天感恩了三件小事', effect: {mood:8,social:2} },
+    { id:'anxiety_spike', icon:'😰', name:'焦虑来袭', desc:'今天莫名焦虑', effect: {mood:-5,health:-2} },
+    { id:'exercise_boost', icon:'💪', name:'运动加成', desc:'今天运动了，心情大好', effect: {health:5,mood:5} },
+    { id:'creative_flow', icon:'🎨', name:'心流状态', desc:'进入了心流状态', effect: {intel:5,mood:5,charm:3} },
 ];
 
 function getDailyModifier() {
