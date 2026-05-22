@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v29.5
+// 都市浮生记 - Game Engine v29.6
 // ============================================
 
 // === GAME STATE ===
@@ -15551,6 +15551,87 @@ const EVENTS = [
         { label:'接受线上线下都是真实的自己', hint:'+😊 +🧠', fn: g => { g.flags.realVsOnline=true; g.flags.acceptBothSelves=true; return{mood:8,intel:3}; }},
         { label:'继续躲在线上世界里', hint:'-💪 +😊', fn: g => { g.flags.realVsOnline=true; return{mood:2,social:-3}; }},
       ]},
+    // === v29.6 医疗健康与看病焦虑 ===
+    { id:'health_check_anxiety', icon:'🏥', title:'体检报告恐惧症', category:'health',
+      body:'公司年度体检——你收到了报告。\n\n你不敢打开。\n\n你害怕看到的：\n- 肝功能异常（熬夜+喝酒）\n- 血糖偏高（外卖+奶茶）\n- 颈椎病（久坐+低头）\n- 甲状腺结节（焦虑+压力）\n- 尿酸超标（啤酒+海鲜）\n- 脂肪肝（久坐+夜宵）\n\n你终于打开了——\n「异常项目：8项」（红色）\n「建议复查：3项」（黄色）\n\n25岁的你——身体年龄42岁。\n\n你不是不知道自己不健康——你只是「不敢面对」。\n\n「体检报告：你的身体——在用数据——向你求救。」',
+      cond: g => g.age >= 22 && g.health < 60 && !g.flags.healthCheckAnxiety,
+      choices:[
+        { label:'痛下决心开始健康生活', hint:'+💪 +😊', fn: g => { g.flags.healthCheckAnxiety=true; g.flags.healthReform=true; return{health:8,mood:5}; }},
+        { label:'焦虑了3天然后继续摆烂', hint:'-💪 -😊', fn: g => { g.flags.healthCheckAnxiety=true; g.flags.healthDenial=true; return{mood:-3,health:-2}; }},
+        { label:'开始研究中医养生调理', hint:'+🧠 +💰', fn: g => { g.flags.healthCheckAnxiety=true; g.flags.tcmHealth=true; return{intel:3,money:-2000}; }},
+      ]},
+    { id:'hospital_registration_v29_6', icon:'🎫', title:'挂号大作战', category:'health',
+      body:'你病了——需要看医生。\n\n挂号之旅：\n- 第1天：专家号——已约满（3个月后）\n- 第2天：普通号——已约满（2周后）\n- 第3天：急诊——排队4小时看病3分钟\n- 黄牛：「专家号800要不要？」\n\n你终于看到了医生——\n医生：「先去做检查」\n你：「什么检查？」\n医生：「CT、验血、B超、心电图」\n你：「多少钱？」\n医生：「大概3000」\n\n你做完检查——等结果3天。\n结果出来了——「没大问题，注意休息」。\n\n你花了3000元+3天时间——换来一句话：「注意休息」。\n\n「挂号看病：在大城市——生病是一种「奢侈」。」',
+      cond: g => g.money >= 3000 && !g.flags.hospitalRegistration,
+      choices:[
+        { label:'花钱去私立医院看', hint:'-💰 +😊', fn: g => { g.flags.hospitalRegistration=true; g.flags.privateHospital=true; return{money:-5000,mood:3,health:5}; }},
+        { label:'学会了网上抢号技巧', hint:'+🧠 +💪', fn: g => { g.flags.hospitalRegistration=true; g.flags.onlineBooking=true; return{intel:3}; }},
+        { label:'算了小病扛着吧', hint:'-💪 -😊', fn: g => { g.flags.hospitalRegistration=true; g.flags.ignoreIllness=true; return{health:-5,mood:-3}; }},
+      ]},
+    { id:'therapy_journey_v29_6', icon:'🧠', title:'心理咨询第一步', category:'health',
+      body:'你终于决定——去看心理咨询师。\n\n预约的时候你的手在抖——不是害怕——是「羞耻」。\n你从小被教育：「心理有问题的人是弱者」。\n\n第一次咨询：\n- 你坐在沙发上——不知道该说什么\n- 咨询师问你：「你最近好吗？」\n- 你说了「挺好的」——然后哭了\n\n你不知道自己为什么哭——\n- 也许是太久没有人问你「好不好」了\n- 也许是你太久没允许自己「不好」了\n- 也许是你终于——可以「不坚强」了\n\n60分钟——300元。你觉得贵。\n但你发现：这60分钟——是你这个月——唯一一次——「被真正听到」。\n\n「心理咨询：不是你有病——是你终于愿意照顾自己了。」',
+      cond: g => g.mood < 50 && g.money >= 1000 && !g.flags.therapyJourney,
+      choices:[
+        { label:'坚持每周做一次咨询', hint:'+😊 -💰', fn: g => { g.flags.therapyJourney=true; g.flags.regularTherapy=true; return{mood:10,money:-1200}; }},
+        { label:'尝试了一次觉得没用', hint:'-😊 +🧠', fn: g => { g.flags.therapyJourney=true; return{mood:-2,intel:2}; }},
+        { label:'开始学习心理学自助', hint:'+🧠 +😊', fn: g => { g.flags.therapyJourney=true; g.flags.selfPsychology=true; return{intel:5,mood:5}; }},
+      ]},
+    { id:'tcm_wellness_v29_6', icon:'🍵', title:'养生血脉觉醒', category:'health',
+      body:'你25岁以后——突然理解了爸妈的养生。\n\n你的养生清单：\n- 保温杯里泡枸杞\n- 开始喝热水（不是冰水）\n- 艾灸、拔罐、刮痧\n- 泡脚加中药材\n- 早睡早起（虽然做不到）\n- 开始看中医调理\n\n你的中药柜：\n- 黄芪、党参、当归、枸杞\n- 陈皮、茯苓、薏米、红枣\n\n你从「朋克养生」进化到了「真养生」：\n- 朋克养生：熬夜+敷面膜\n- 真养生：11点睡觉+7点起床\n\n你开始理解：养生——不是老了才做——是「不让自己老得那么快」。\n\n「养生血脉觉醒：你终于从「作死」进化到了「惜命」。」',
+      cond: g => g.age >= 25 && !g.flags.tcmWellness,
+      choices:[
+        { label:'开始系统学习中医养生', hint:'+🧠 +💪', fn: g => { g.flags.tcmWellness=true; g.flags.tcmStudent=true; return{intel:5,health:5}; }},
+        { label:'买一堆养生产品但坚持不了', hint:'-💰 +😊', fn: g => { g.flags.tcmWellness=true; g.flags.wellnessConsumer=true; return{money:-3000,mood:2}; }},
+        { label:'养生和运动结合效果翻倍', hint:'+💪 +😊', fn: g => { g.flags.tcmWellness=true; g.flags.holisticHealth=true; return{health:8,mood:5}; }},
+      ]},
+    { id:'occupational_disease', icon:'💻', title:'职业病大赏', category:'health',
+      body:'你去医院看颈椎病——医生问：「做什么工作的？」\n\n你的职业病清单：\n- 颈椎病（低头看电脑/手机）\n- 腰椎间盘突出（久坐不动）\n- 干眼症（长时间盯屏幕）\n- 腱鞘炎（打字太多）\n- 胃病（不按时吃饭）\n- 失眠（加班+焦虑）\n- 焦虑症（KPI+deadline）\n\n医生说：「你们这些年轻人——比我这个60岁的老头子病还多。」\n\n你不是在「用健康换钱」——你是在「用命换钱」。\n而命——比钱值钱多了。\n\n「职业病：你的工作——在慢慢「杀死」你——而你还觉得这是「奋斗」。」',
+      cond: g => g.jobSalary > 0 && g.health < 70 && !g.flags.occupationalDisease,
+      choices:[
+        { label:'买人体工学椅升降桌开始自救', hint:'-💰 +💪', fn: g => { g.flags.occupationalDisease=true; g.flags.ergonomicSetup=true; return{money:-3000,health:5}; }},
+        { label:'每天午休时间做颈椎操', hint:'+💪 +😊', fn: g => { g.flags.occupationalDisease=true; g.flags.dailyExercise=true; return{health:5,mood:3}; }},
+        { label:'觉得这是打工人的宿命放弃了', hint:'-💪 -😊', fn: g => { g.flags.occupationalDisease=true; g.flags.healthFatalism=true; return{health:-5,mood:-3}; }},
+      ]},
+    { id:'sleep_disorder', icon:'😴', title:'睡眠障碍', category:'health',
+      body:'你已经连续一个月没睡好觉了。\n\n你的睡眠日志：\n- 11点：上床\n- 12点：还在刷手机\n- 1点：放下手机闭眼\n- 2点：脑子里全是工作的事\n- 3点：终于睡着了\n- 6点：闹钟响了\n- 白天：困到灵魂出窍\n\n你试过的方法：\n- 褪黑素：有效但怕依赖\n- 白噪音：有用但不够\n- 冥想APP：听着听着开始想工作\n- 数羊：数到500只还是清醒的\n\n你不是失眠——你是「不敢关机」。\n你害怕睡着后错过什么——害怕明天起不来——害怕一切。\n\n「睡眠障碍：你的身体想休息——你的大脑不肯。」',
+      cond: g => g.mood < 60 && g.health < 70 && !g.flags.sleepDisorder,
+      choices:[
+        { label:'严格执行10点半断网入睡', hint:'+💪 +😊', fn: g => { g.flags.sleepDisorder=true; g.flags.sleepReform=true; return{health:8,mood:5}; }},
+        { label:'看医生开了助眠药', hint:'+🧠 -💰', fn: g => { g.flags.sleepDisorder=true; g.flags.sleepMedication=true; return{intel:2,money:-500,health:3}; }},
+        { label:'放弃挣扎接受失眠', hint:'-😊 -💪', fn: g => { g.flags.sleepDisorder=true; g.flags.insomniaAccept=true; return{mood:-5,health:-3}; }},
+      ]},
+    { id:'medical_insurance_maze', icon:'📋', title:'医保迷宫', category:'health',
+      body:'你第一次认真研究医保——然后你懵了。\n\n医保规则：\n- 门诊报销：起付线1800，报销比例70%\n- 住院报销：起付线1300，报销比例85%\n- 异地就医：先备案再报销\n- 医保目录：甲类全报，乙类部分，丙类自费\n- 大病保险：超过2万的部分\n\n你看病花了8000——\n- 医保报销：2000\n- 自费：6000\n\n你问为什么——\n「这个药不在目录内」「这个检查是丙类」「你还没到起付线」\n\n你不是不想看病——你是「看不懂」怎么看病。\n\n「医保迷宫：国家给了你一张保障网——但忘了给你说明书。」',
+      cond: g => g.jobSalary > 0 && !g.flags.medicalInsuranceMaze,
+      choices:[
+        { label:'花时间研究透了医保政策', hint:'+🧠 +💰', fn: g => { g.flags.medicalInsuranceMaze=true; g.flags.insuranceExpert=true; return{intel:5,mood:3}; }},
+        { label:'买了商业保险做补充', hint:'-💰 +💪', fn: g => { g.flags.medicalInsuranceMaze=true; g.flags.commercialInsurance=true; return{money:-5000,mood:3}; }},
+        { label:'算了不研究了听天由命', hint:'-🧠 -💪', fn: g => { g.flags.medicalInsuranceMaze=true; return{intel:-2,mood:-3}; }},
+      ]},
+    { id:'health_anxiety_disorder', icon:'😰', title:'疑病症', category:'health',
+      body:'你开始怀疑自己得了重病。\n\n你的症状：\n- 头疼：「是不是脑瘤？」\n- 胸闷：「是不是心脏病？」\n- 肚子疼：「是不是胃癌？」\n- 皮肤上有颗痣：「是不是黑色素瘤？」\n\n你做了检查——全部正常。\n但你还是不信：\n- 「是不是检查不够精确？」\n- 「要不要再做一个更贵的？」\n- 「是不是潜伏期查不出来？」\n\n你不是真的有病——你是「害怕」有病。\n焦虑——比疾病本身——更折磨人。\n\n你最大的病——不是身体的——是心理的。\n\n「疑病症：你不是在担心健康——你是在用担心填满内心的空虚。」',
+      cond: g => g.mood < 40 && g.intel >= 30 && !g.flags.healthAnxietyDisorder,
+      choices:[
+        { label:'认识到是焦虑在作祟开始调节', hint:'+🧠 +😊', fn: g => { g.flags.healthAnxietyDisorder=true; g.flags.anxietyAwareness=true; return{intel:5,mood:8}; }},
+        { label:'继续反复检查求安心', hint:'-💰 -😊', fn: g => { g.flags.healthAnxietyDisorder=true; g.flags.repeatedChecking=true; return{money:-5000,mood:-5}; }},
+        { label:'开始正念冥想减少焦虑', hint:'+😊 +💪', fn: g => { g.flags.healthAnxietyDisorder=true; g.flags.mindfulnessPractice=true; return{mood:8,health:3}; }},
+      ]},
+    { id:'wellness_trap', icon:'💊', title:'养生消费陷阱', category:'health',
+      body:'你被「养生」收割了。\n\n你的养生消费清单：\n- 酵素：800元/月（其实就是糖水）\n- 胶原蛋白：500元/月（吃进去就被分解了）\n- 足贴排毒：300元/月（变黑是因为出汗不是排毒）\n- 磁疗床垫：8000元（没有科学依据）\n- 保健品年卡：12000元（大部分是智商税）\n\n你花了3万——身体没有任何变化。\n\n你看了一篇科普文章——发现：\n- 最好的养生是「睡觉+运动+吃好」\n- 最贵的不一定最好\n- 大部分养生产品——卖的是「焦虑」不是「健康」\n\n「养生消费陷阱：你花钱买的不是健康——是「以为自己在变健康」的感觉。」',
+      cond: g => g.money >= 10000 && !g.flags.wellnessTrap,
+      choices:[
+        { label:'学会辨别伪科学养生', hint:'+🧠 +💰', fn: g => { g.flags.wellnessTrap=true; g.flags.scienceLiteracy=true; return{intel:8,mood:3}; }},
+        { label:'转向免费的健康方式', hint:'+💪 +😊', fn: g => { g.flags.wellnessTrap=true; g.flags.freeHealth=true; return{health:8,mood:5}; }},
+        { label:'继续买因为万一有用呢', hint:'-💰 -🧠', fn: g => { g.flags.wellnessTrap=true; g.flags.wellnessAddict=true; return{money:-10000,intel:-2}; }},
+      ]},
+    { id:'burnout_recovery_v29_6', icon:'🔋', title:'职业倦怠康复', category:'health',
+      body:'你终于承认——你「倦怠」了。\n\n不是累——是「心累」。\n\n倦怠的症状：\n- 早上醒来第一反应是「又要上班了」\n- 对工作完全没有任何热情\n- 对同事越来越不耐烦\n- 觉得自己做的一切都没意义\n- 开始频繁请病假\n- 周末两天完全不想动\n\n你去看心理医生——诊断：「职业倦怠」\n\n医生说：「你不是懒——你是被消耗光了。就像手机电量0%——不是你坏了——是你需要充电。」\n\n你需要做的不是「更努力」——而是「停下来」。\n\n「职业倦怠：不是你不够强——是你太久没有「为自己活」了。」',
+      cond: g => g.jobSalary > 0 && g.mood < 40 && g.months >= 24 && !g.flags.burnoutRecovery,
+      choices:[
+        { label:'请假一周完全断联休息', hint:'+😊 +💪', fn: g => { g.flags.burnoutRecovery=true; g.flags.recoveryWeek=true; return{mood:10,health:5}; }},
+        { label:'开始找心理咨询师', hint:'+🧠 +😊', fn: g => { g.flags.burnoutRecovery=true; g.flags.burnoutTherapy=true; return{intel:3,mood:5}; }},
+        { label:'硬撑着不承认倦怠', hint:'-💪 -😊', fn: g => { g.flags.burnoutRecovery=true; g.flags.denialBurnout=true; return{health:-5,mood:-8}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -16956,6 +17037,15 @@ const ACHIEVEMENTS = [
     { id:'offline_warrior_ach', icon:'🤝', name:'线下社交达人', desc:'克服社恐每周至少一次线下社交', check: g => g.flags.offlinePractice },
     { id:'digital_detox_ach_v29_5', icon:'🌿', name:'数字断联者', desc:'成功完成24小时断网挑战', check: g => g.flags.dailyDisconnect },
     { id:'self_compare_ach', icon:'🪞', name:'只和自己比', desc:'学会了不和朋友圈里的人比较', check: g => g.flags.selfComparison },
+    // v29.6 achievements - 医疗健康与看病焦虑
+    { id:'health_reform_ach', icon:'🏥', name:'健康觉醒', desc:'体检报告后痛下决心开始健康生活', check: g => g.flags.healthReform },
+    { id:'therapy_first_ach', icon:'🧠', name:'勇敢第一步', desc:'迈出了看心理咨询师的第一步', check: g => g.flags.therapyJourney },
+    { id:'tcm_student_ach', icon:'🍵', name:'养生学徒', desc:'开始系统学习中医养生知识', check: g => g.flags.tcmStudent },
+    { id:'ergonomic_ach', icon:'💻', name:'工位改造师', desc:'买了人体工学椅和升降桌拯救颈椎', check: g => g.flags.ergonomicSetup },
+    { id:'sleep_reform_ach', icon:'😴', name:'睡眠革命', desc:'严格执行早睡断网的睡眠改革', check: g => g.flags.sleepReform },
+    { id:'insurance_expert_ach_v29_6', icon:'📋', name:'医保通', desc:'研究透了复杂的医保政策', check: g => g.flags.insuranceExpert },
+    { id:'science_literacy_ach', icon:'🔬', name:'科学养生', desc:'学会了辨别伪科学养生产品', check: g => g.flags.scienceLiteracy },
+    { id:'recovery_week_ach', icon:'🔋', name:'充电完成', desc:'请假一周完全断联治愈了职业倦怠', check: g => g.flags.recoveryWeek },
 ];
 
 // === ENDINGS === (order matters: first match wins)
