@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v10.0
+// 都市浮生记 - Game Engine v10.1
 // ============================================
 
 // === GAME STATE ===
@@ -4254,7 +4254,7 @@ const EVENTS = [
         { label:'认真回答', hint:'+🧠', fn: g => { if(g.intel>70&&Math.random()>0.4){ setJob(g,'大厂员工',18000); return{mood:20,money:5000}; }else{ return{mood:-10,intel:3}; } }},
         { label:'随便应付', hint:'+😊', fn: g => { return{mood:5}; }},
       ]},
-    { id:'rent_increase', icon:'📈', title:'房东涨价',
+    { id:'rent_increase_v2', icon:'📈', title:'房东涨价',
       body:'房东发来微信：下个月房租涨500。\n\n"不涨不行啊，我也要生活。"\n\n你看了看合同，确实没写不能涨。',
       cond: g => g.money > 0 && g.months > 6 && !g.flags.cheapRent && Math.random() > 0.7,
       choices:[
@@ -4295,7 +4295,7 @@ const EVENTS = [
         { label:'吃顿好的压压惊', hint:'+😊 -❤️', fn: g => { return{mood:10,health:-5,money:-200}; }},
         { label:'算了，年轻人的常态', hint:'+😊', fn: g => { addDelayedEffect(6, {health:-15}, '半年后你再次体检，指标更差了……'); return{mood:3}; }},
       ]},
-    { id:'pet_adoption', icon:'🐱', title:'撸猫诱惑',
+    { id:'pet_adoption_v2', icon:'🐱', title:'撸猫诱惑',
       body:'你路过一家猫咖，一只橘猫一直蹭你的手。\n\n店员说："这只猫特别亲人，要不领养吧？"\n\n你看了看自己的出租屋——10平米，放不下一张双人床。\n\n但那只猫看着你，你也看着它。',
       cond: g => g.mood < 60 && g.money > 3000 && g.months > 3,
       choices:[
@@ -4321,7 +4321,7 @@ const EVENTS = [
         { label:'休息一段时间', hint:'+❤️ +😊', fn: g => { g.flags.laidOff35=true; setJob(g,'待业中',0); return{money:Math.floor(g.jobSalary*6),mood:10,health:10}; }},
       ]},
     // === v9.2 恋爱/婚姻系统深化 ===
-    { id:'dating_app', icon:'💕', title:'交友App',
+    { id:'dating_app_v2', icon:'💕', title:'交友App',
       body:'你下载了一个交友App，刷了一个小时。\n\n右滑了50个人，匹配了3个。聊了3个，见了1个。\n\n见面的时候你发现：对方的照片和本人，差距约等于美颜前和美颜后。\n\n"线上交友就像拆盲盒——你永远不知道打开的是什么。"',
       cond: g => !g.flags.hasPartner && g.age >= 24 && g.social < 50 && g.months > 3,
       choices:[
@@ -4368,7 +4368,7 @@ const EVENTS = [
         { label:'理性观望', hint:'+🧠', fn: g => { addDelayedEffect(6, {mood:5,intel:3}, '半年后比特币暴跌50%，你庆幸自己没冲动。'); return{intel:5,mood:3}; }},
       ]},
     // === v9.2 季节事件 ===
-    { id:'spring_festival', icon:'🧧', title:'春节回家',
+    { id:'spring_festival_v2', icon:'🧧', title:'春节回家',
       body:'春节到了。你抢到了回家的火车票——硬座，26小时。\n\n到家后你发现：你妈老了很多，你爸头发白了不少。\n\n年夜饭上亲戚轮番问候：工资多少？有对象没？买房了吗？\n\n你笑着说"都挺好的"，然后偷偷在桌下攥紧了拳头。',
       cond: g => g.month % 12 === 1 && g.months > 12,
       choices:[
@@ -4392,7 +4392,7 @@ const EVENTS = [
         { label:'只买必需品', hint:'-💰', fn: g => { return{money:-800,mood:5}; }},
         { label:'什么都不买', hint:'+💰 +🧠', fn: g => { addDelayedEffect(1, {mood:5,intel:3}, '双十一过去了，你看着同事拆快递，心里竟然有点优越感。'); return{mood:3}; }},
       ]},
-    { id:'summer_heat', icon:'🌡️', title:'高温预警',
+    { id:'summer_heat_v2', icon:'🌡️', title:'高温预警',
       body:'气温突破40度。你从公司走到地铁站的5分钟，感觉自己像一块铁板烧。\n\n你的外卖小哥迟到了半小时，因为他的电动车在高温下爆胎了。\n\n你给了五星好评——因为你觉得他比你更辛苦。',
       cond: g => g.month % 12 >= 7 && g.month % 12 <= 8,
       choices:[
@@ -4462,7 +4462,7 @@ const EVENTS = [
         { label:'请他吃大餐', hint:'-💰 +👥', fn: g => { if(g.relationships) g.relationships.friends=clamp((g.relationships.friends||40)+15,0,100); return{money:-500,mood:15,social:10}; }},
         { label:'AA制', hint:'+👥', fn: g => { if(g.relationships) g.relationships.friends=clamp((g.relationships.friends||40)+8,0,100); return{mood:10,social:5}; }},
       ]},
-    { id:'colleague_conflict', icon:'😤', title:'职场冲突',
+    { id:'colleague_conflict_v2', icon:'😤', title:'职场冲突',
       body:'你的同事在背后说你坏话，被另一个同事告诉你了。\n\n你纠结了一整天：要不要找他当面对质？\n\n你想起职场前辈说过的话："在公司里，没有永远的朋友，只有永远的利益。"',
       cond: g => g.job !== '待业中' && g.months > 6,
       choices:[
@@ -4470,14 +4470,14 @@ const EVENTS = [
         { label:'默默记住，以后防备', hint:'+🧠', fn: g => { return{intel:5,mood:-5}; }},
         { label:'找领导投诉', hint:'🎲', fn: g => { if(Math.random()>0.6){return{mood:8,social:-3}}else{return{mood:-15,social:-10}} }},
       ]},
-    { id:'mentor_found', icon:'🧓', title:'遇到贵人',
+    { id:'mentor_found_v2', icon:'🧓', title:'遇到贵人',
       body:'你在一个行业活动上遇到了一位前辈。他跟你聊了一个小时，给了你很多建议。\n\n最后他说："年轻人，最重要的不是赚多少钱，是想清楚自己要什么。"\n\n你回去后想了很久——你到底要什么？',
       cond: g => g.intel > 50 && g.age < 30 && g.months > 6,
       choices:[
         { label:'定期请教', hint:'+🧠 +👥', fn: g => { g.flags.hasMentor=true; return{intel:10,social:8,mood:8}; }},
         { label:'加了微信就没联系了', hint:'+😊', fn: g => { return{intel:3}; }},
       ]},
-    { id:'roommate_conflict', icon:'🏠', title:'室友矛盾',
+    { id:'roommate_conflict_v2', icon:'🏠', title:'室友矛盾',
       body:'你的室友又半夜带人回来，还把厨房搞得一团糟。\n\n你发了条微信："能不能注意点？"\n\n他回了个"好的"，然后继续我行我素。\n\n"合租是大城市最残酷的社交实验：你被迫跟一个陌生人共享生活。"',
       cond: g => g.money < 30000 && g.months > 3 && !g.flags.hasHouse,
       choices:[
@@ -4486,7 +4486,7 @@ const EVENTS = [
         { label:'搬家', hint:'-💰', fn: g => { return{money:-3000,mood:10}; }},
       ]},
     // === v9.4 教育/考证系统 ===
-    { id:'civil_service_exam', icon:'📝', title:'考公之路',
+    { id:'civil_service_exam_v2', icon:'📝', title:'考公之路',
       body:'你决定考公务员。买了一套行测+申论教材，开始了漫长的备考。\n\n你的时间表：白天上班，晚上刷题，周末模考。\n\n同事问你："你确定要考？上岸率只有3%。"\n\n你说："总得试试吧。"其实你心里也没底。',
       cond: g => g.intel > 55 && g.age >= 22 && g.age <= 35 && !g.flags.civilServant && !g.flags.tookCivilExam,
       choices:[
@@ -4579,7 +4579,7 @@ const EVENTS = [
         { label:'硬扛', hint:'-😊 -❤️', fn: g => { return{mood:-15,health:-5}; }},
       ]},
     // === v9.5 职场深度事件 ===
-    { id:'side_project', icon:'🔧', title:'副业项目',
+    { id:'side_project_v2', icon:'🔧', title:'副业项目',
       body:'你接到一个朋友的私活：做个小程序，报酬8000块。\n\n你算了算：周末加班两周就能搞定。但你已经连续加了三个星期的班了。\n\n"副业是大城市打工人的第二份工作——没有五险一金，但有钱拿。"',
       cond: g => g.intel > 55 && g.job !== '待业中' && g.months > 6,
       choices:[
@@ -4587,7 +4587,7 @@ const EVENTS = [
         { label:'太累了，不接', hint:'+❤️ +😊', fn: g => { return{health:5,mood:5}; }},
         { label:'介绍给别人', hint:'+👥', fn: g => { return{social:8,mood:3}; }},
       ]},
-    { id:'office_politics', icon:'🎭', title:'站队',
+    { id:'office_politics_v2', icon:'🎭', title:'站队',
       body:'公司两个领导在争权，你的直属领导和隔壁部门领导不对付。\n\n你的直属领导暗示你："关键时刻要站在对的人身边。"\n\n你心想：我只想好好写代码/做业务，不想卷进政治。',
       cond: g => g.job !== '待业中' && g.jobSalary > 8000 && g.months > 12,
       choices:[
@@ -4595,7 +4595,7 @@ const EVENTS = [
         { label:'两边不得罪', hint:'+🧠', fn: g => { return{intel:3,mood:-5}; }},
         { label:'趁乱跳槽', hint:'🎲', fn: g => { if(Math.random()>0.5){setJob(g,'高级'+g.job.replace('初级','').replace('高级',''),Math.floor(g.jobSalary*1.2));return{mood:10,money:5000}}else{return{mood:-10}} }},
       ]},
-    { id:'remote_work', icon:'💻', title:'远程办公',
+    { id:'remote_work_v2', icon:'💻', title:'远程办公',
       body:'公司宣布可以远程办公了！你激动得差点跳起来。\n\n第一周：效率翻倍，心情大好。\n第二周：分不清上班和下班。\n第三周：你已经三天没换过衣服了。\n\n"远程办公是自由，也是另一种形式的牢笼。"',
       cond: g => g.job !== '待业中' && g.intel > 50 && g.months > 6 && !g.flags.remoteWorker,
       choices:[
@@ -4656,7 +4656,7 @@ const EVENTS = [
         { label:'适度使用', hint:'+🧠', fn: g => { return{intel:5,mood:2}; }},
         { label:'拒绝AI，靠自己', hint:'+😊', fn: g => { return{mood:5,intel:2}; }},
       ]},
-    { id:'digital_nomad', icon:'🌍', title:'数字游民',
+    { id:'digital_nomad_v2', icon:'🌍', title:'数字游民',
       body:'你认识了一个数字游民：在巴厘岛远程工作，月薪3万，生活成本不到1万。\n\n他给你看了他的生活照：椰林、沙滩、笔记本电脑。\n\n你看了看你的出租屋和电脑屏幕，沉默了。',
       cond: g => g.intel > 60 && g.job !== '待业中' && g.age >= 25 && g.age <= 35 && !g.flags.remoteWorker,
       choices:[
@@ -4664,7 +4664,7 @@ const EVENTS = [
         { label:'先攒钱再说', hint:'+💰', fn: g => { return{money:3000,mood:5}; }},
         { label:'不现实', hint:'+😊', fn: g => { return{mood:3}; }},
       ]},
-    { id:'generational_gap', icon:'👴', title:'代沟',
+    { id:'generational_gap_v2', icon:'👴', title:'代沟',
       body:'你跟你爸视频通话，他说："你们这代人太脆弱了，我们那时候……"\n\n你没反驳，只是默默关掉了摄像头。\n\n你爸不知道的是：你刚被裁了，房租涨了，对象也分手了。\n\n"每一代人都有自己的苦，但上一代人永远觉得下一代人不够苦。"',
       cond: g => g.age >= 25 && g.age <= 35 && g.mood < 50 && g.relationships,
       choices:[
@@ -4687,6 +4687,45 @@ const EVENTS = [
         { label:'换个城市', hint:'🗺️', fn: g => { return{mood:5}; }}, // 会触发城市切换提示
         { label:'找到新的乐趣', hint:'+😊', fn: g => { return{mood:8,intel:3}; }},
         { label:'接受这种倦怠', hint:'+🧠', fn: g => { return{intel:5,mood:3}; }},
+      ]},
+    // === v10.1 新增事件 ===
+    { id:'second_job', icon:'🌙', title:'兼职打工',
+      body:'你觉得工资不够花，决定找份兼职。\n\n周末去咖啡店打工，时薪25块。站了8个小时，赚了200块。\n\n你算了一下：你的主业时薪80，兼职时薪25。但你没有别的选择。\n\n"兼职不是副业，是用命换钱。"',
+      cond: g => g.money < 10000 && g.job !== '待业中' && g.months > 3,
+      choices:[
+        { label:'坚持做兼职', hint:'+💰 -❤️', fn: g => { return{money:3000,health:-8,mood:-5}; }},
+        { label:'做一个月就算了', hint:'+💰', fn: g => { return{money:3000,health:-3,mood:-3}; }},
+        { label:'不如提升技能涨工资', hint:'+🧠', fn: g => { return{intel:5,mood:3}; }},
+      ]},
+    { id:'social_media_addiction', icon:'📱', title:'手机依赖',
+      body:'你打开了"屏幕使用时间"：日均8小时23分钟。\n\n其中4小时在刷短视频，2小时在刷朋友圈，1小时在刷微博。\n\n你觉得自己"很忙"，但实际上你的时间都喂给了算法。\n\n"你不是在用手机，是手机在用你。"',
+      cond: g => g.months > 6 && g.intel < 70,
+      choices:[
+        { label:'开启专注模式', hint:'+🧠 +😊', fn: g => { return{intel:8,mood:5,health:3}; }},
+        { label:'卸载短视频App', hint:'+😊 +❤️', fn: g => { return{mood:8,health:5,intel:3}; }},
+        { label:'算了，快乐就好', hint:'+😊 -🧠', fn: g => { return{mood:5,intel:-3,health:-2}; }},
+      ]},
+    { id:'family_video_call', icon:'📞', title:'视频通话',
+      body:'你妈打来视频电话，你接了。\n\n她第一句话是："瘦了。"第二句是："有对象没？"第三句是："什么时候回家？"\n\n你笑着说"都挺好的"，镜头外的你正吃着泡面。\n\n"成年人的演技，在父母面前发挥到极致。"',
+      cond: g => g.relationships && g.months > 3,
+      choices:[
+        { label:'多聊一会儿', hint:'+👥', fn: g => { if(g.relationships) g.relationships.family=clamp((g.relationships.family||60)+8,0,100); return{mood:8,social:3}; }},
+        { label:'说有事挂了', hint:'-👥', fn: g => { if(g.relationships) g.relationships.family=clamp((g.relationships.family||60)-3,0,100); return{mood:-3}; }},
+        { label:'说想回家看看', hint:'+😊', fn: g => { return{mood:5}; if(g.relationships) g.relationships.family=clamp((g.relationships.family||60)+5,0,100); }},
+      ]},
+    { id:'weekend_trip', icon:'🎒', title:'周末出游',
+      body:'你约了朋友周末去周边玩——高铁1小时的小城市。\n\n没有景点，没有人山人海。你们找了家本地馆子，吃了顿地道的美食。\n\n"旅行不一定要去远方，有时候换个地方吃饭就够了。"',
+      cond: g => g.money > 3000 && g.social > 30 && g.mood < 65,
+      choices:[
+        { label:'好好享受', hint:'-💰 +😊 +❤️', fn: g => { return{money:-1500,mood:18,health:5,social:5}; }},
+        { label:'拍很多照片', hint:'-💰 +✨', fn: g => { return{money:-1500,charm:8,mood:12}; }},
+      ]},
+    { id:'career_mentor', icon:'🧭', title:'职业规划',
+      body:'你找了一个职业规划师做咨询，花了2000块。\n\n她问你："五年后你想做什么？"\n\n你想了半天，说："不想加班。"\n\n她笑了："这不是职业规划，这是人生规划。但没关系，它们本来就是一回事。"',
+      cond: g => g.intel > 55 && g.age >= 25 && g.job !== '待业中' && !g.flags.hasMentor,
+      choices:[
+        { label:'认真做规划', hint:'+🧠 +💰', fn: g => { g.flags.hasCareerPlan=true; return{intel:10,mood:5,money:-2000}; }},
+        { label:'觉得没用', hint:'+😊', fn: g => { return{mood:3,money:-2000}; }},
       ]},
 ];
 
@@ -5060,13 +5099,13 @@ const ACHIEVEMENTS = [
     { id:'social_intel', icon:'🗣️', name:'社交达人', desc:'通过社交获得过情报', check: g => g.flags._rumorCooldown && g.flags._rumorCooldown.length >= 3 },
     { id:'rumor_victim', icon:'🪤', name:'交了学费', desc:'被谣言坑过一次', check: g => g.flags.rumorCrypto && g.money < 0 },
     { id:'rumor_savvy', icon:'🧠', name:'消息灵通', desc:'累计获得5条以上情报', check: g => g.flags._rumorCooldown && g.flags._rumorCooldown.length >= 5 },
-    { id:'pet_owner', icon:'🐱', name:'铲屎官', desc:'领养了一只宠物', check: g => g.flags.hasPet },
+    { id:'pet_owner_v2', icon:'🐱', name:'铲屎官', desc:'领养了一只宠物', check: g => g.flags.hasPet },
     { id:'subsidy_winner', icon:'📋', name:'薅到羊毛', desc:'成功申请到人才补贴', check: g => g.flags.hasSubsidy },
     { id:'gym_member', icon:'💪', name:'健身会员', desc:'办了健身年卡', check: g => g.flags.hasGymCard },
     { id:'cheap_rent_ach', icon:'🏠', name:'租房达人', desc:'成功申请到公租房', check: g => g.flags.cheapRent },
     { id:'emo_night', icon:'🌙', name:'深夜emo', desc:'经历过一次深夜情绪低落', check: g => g.mood < 30 && g.months > 12 },
     // === v9.2 新增成就 ===
-    { id:'investor', icon:'💰', name:'理财新手', desc:'第一次进行投资', check: g => g.flags.hasInvestment },
+    { id:'investor_v2', icon:'💰', name:'理财新手', desc:'第一次进行投资', check: g => g.flags.hasInvestment },
     { id:'stock_master', icon:'📈', name:'股海沉浮', desc:'在股市中存活超过一年', check: g => g.investments && g.investments.stock > 0 && g.months > 12 },
     { id:'married_ach', icon:'💍', name:'已婚人士', desc:'成功结婚', check: g => g.flags.married },
     { id:'crisis35_survivor', icon:'⚡', name:'35岁突围', desc:'经历过35岁危机', check: g => g.flags.crisis35seen },
@@ -5074,7 +5113,7 @@ const ACHIEVEMENTS = [
     { id:'double11_survivor', icon:'🛒', name:'双十一战士', desc:'经历了双十一', check: g => g.flags.double11spent },
     // === v9.3 新增成就 ===
     { id:'mentor_found_ach', icon:'🧓', name:'良师益友', desc:'遇到了一位人生导师', check: g => g.flags.hasMentor },
-    { id:'city_explorer', icon:'🏙️', name:'城市探索者', desc:'体验过至少3个城市的特色事件', check: g => { let c=0; if(g.flags.beijingExplored)c++; if(g.flags.shanghaiExplored)c++; if(g.flags.chengduExplored)c++; return c>=3; } },
+    { id:'city_explorer_v2', icon:'🏙️', name:'城市探索者', desc:'体验过至少3个城市的特色事件', check: g => { let c=0; if(g.flags.beijingExplored)c++; if(g.flags.shanghaiExplored)c++; if(g.flags.chengduExplored)c++; return c>=3; } },
     // === v9.4 新增成就 ===
     { id:'civil_servant_ach', icon:'📝', name:'公考上岸', desc:'通过公务员考试', check: g => g.flags.civilServant },
     { id:'mba_graduate', icon:'🎓', name:'MBA毕业生', desc:'完成MBA学业', check: g => g.flags.hasMBA },
@@ -5091,7 +5130,7 @@ const ACHIEVEMENTS = [
     { id:'midlife_change', icon:'🪞', name:'中年觉醒', desc:'在中年做出了重大改变', check: g => g.flags.midlifeChange },
     // === v10.0 新增成就 ===
     { id:'digital_nomad_ach', icon:'🌍', name:'数字游民', desc:'成为数字游民', check: g => g.flags.digitalNomad },
-    { id:'minimalist', icon:'🧹', name:'断舍离', desc:'完成一次断舍离', check: g => g.money > 5000 && g.mood > 70 && g.months > 24 },
+    { id:'minimalist_v2', icon:'🧹', name:'断舍离', desc:'完成一次断舍离', check: g => g.money > 5000 && g.mood > 70 && g.months > 24 },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -6927,7 +6966,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '10.0' };
+    const saveData = { ...G, savedAt: Date.now(), version: '10.1' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
