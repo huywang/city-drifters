@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v30.5
+// 都市浮生记 - Game Engine v30.6
 // ============================================
 
 // === GAME STATE ===
@@ -16385,6 +16385,87 @@ const EVENTS = [
         { label:'我的意义是连接和帮助他人', hint:'+👥 +😊', fn: g => { g.flags.lifeMeaningQuest=true; g.flags.meaningConnect=true; return{social:8,mood:5}; }},
         { label:'我的意义是体验和感受', hint:'+😊 +💪', fn: g => { g.flags.lifeMeaningQuest=true; g.flags.meaningExperience=true; return{mood:8,health:3}; }},
       ]},
+    // v30.6 事件 - 中年危机与第二人生
+    { id:'midlife_awakening_v30_6', icon:'🔔', title:'中年觉醒', category:'midlife',
+      body:'你在35岁生日那天——突然「觉醒」了。\n\n你的感受：\n- 「人生已经过了一半了」\n- 「我做了什么？」\n- 「我还想要什么？」\n- 「我还来得及吗？」\n\n你的盘点：\n- 「事业」——做到了中层，但「上不去了」\n- 「家庭」——稳定，但「没有激情了」\n- 「健康」——开始「走下坡路」\n- 「梦想」——「还在吗？」\n\n你的焦虑：\n- 「时间不多了」——你开始「计算剩余的时间」\n- 「机会不多了」——你开始「害怕错过」\n- 「体力不多了」——你开始「意识到衰老」\n\n你的反思：\n- 「中年危机」不是「危机」——是「重新评估」\n- 「觉醒」不是「太晚了」——是「刚刚好」\n- 「第二人生」不是「推翻一切」——是「重新选择」\n\n「中年」不是「终点」——是「新的起点」。\n\n（中国35岁以上职场人：超过4亿。「35岁危机」不是「个人问题」——是「社会偏见」。）',
+      cond: g => g.age >= 34 && g.age <= 38 && !g.flags.midlifeAwakening,
+      choices:[
+        { label:'认真盘点人生重新出发', hint:'+🧠 +😊', fn: g => { g.flags.midlifeAwakening=true; g.flags.restartLife=true; return{intel:8,mood:5}; }},
+        { label:'这不是危机只是累了', hint:'+😊', fn: g => { g.flags.midlifeAwakening=true; g.flags.notCrisis=true; return{mood:3}; }},
+        { label:'感到恐慌不知道怎么办', hint:'-😊', fn: g => { g.flags.midlifeAwakening=true; g.flags.midlifePanic=true; return{mood:-5}; }},
+      ]},
+    { id:'career_pivot_v30_6', icon:'🔄', title:'职业转型', category:'midlife',
+      body:'你做了一个大胆的决定——「转行」。\n\n你的原因：\n- 现在的行业「夕阳了」\n- 现在的工作「没意思了」\n- 你想做「一直想做但没敢做的事」\n\n你的选择：\n- 从「互联网」转「教育」\n- 从「金融」转「心理咨询」\n- 从「程序员」转「咖啡师」\n- 从「销售」转「手艺人」\n\n你的困难：\n- 「收入下降」——新手期「赚得少」\n- 「经验清零」——要「从头开始」\n- 「家人不理解」——「好好的为什么要换？」\n- 「自我怀疑」——「我是不是在逃避？」\n\n你的收获：\n- 「新的可能」——你发现「自己还能学新东西」\n- 「新的圈子」——你遇到了「不同的人生」\n- 「新的自己」——你「不再只是「那个职位」」\n\n「转行」不是「失败」——是「重新选择」。\n\n（中国每年有超过1000万人转行——其中35岁以上的占30%。）',
+      cond: g => g.age >= 30 && g.age <= 45 && g.jobSalary > 0 && !g.flags.careerPivot,
+      choices:[
+        { label:'勇敢转型追求真正想做的事', hint:'+😊 -💰', fn: g => { g.flags.careerPivot=true; g.flags.bravePivot=true; return{mood:8,money:-3000,intel:5}; }},
+        { label:'边工作边学新技能慢慢转', hint:'+🧠', fn: g => { g.flags.careerPivot=true; g.flags.gradualPivot=true; return{intel:8,mood:3}; }},
+        { label:'算了太冒险了还是继续吧', hint:'-😊', fn: g => { g.flags.careerPivot=true; g.flags.staySafe=true; return{mood:-3}; }},
+      ]},
+    { id:'second_act_v30_6', icon:'🎬', title:'第二人生', category:'midlife',
+      body:'你开始规划你的「第二人生」——不是「退休后的生活」，是「现在的另一种可能」。\n\n你的探索：\n- 你开始「学画画」——因为你一直喜欢但「没时间」\n- 你开始「写小说」——因为你有「很多故事想说」\n- 你开始「学乐器」——因为你小时候的梦想\n- 你开始「做志愿者」——因为你想「做有意义的事」\n\n你的发现：\n- 「第二人生」不需要「辞职」——可以「并行」\n- 「第二人生」不需要「完美」——可以「笨拙」\n- 「第二人生」不需要「成功」——可以「只是喜欢」\n\n你的感悟：\n- 「人生」不是「一条路」——是「很多条路」\n- 「成功」不是「唯一的」——是「多样的」\n- 「幸福」不是「终点」——是「过程」\n\n「第二人生」不是「逃避现实」——是「创造另一种现实」。',
+      cond: g => g.age >= 35 && !g.flags.secondAct,
+      choices:[
+        { label:'找到第二人生方向全力投入', hint:'+😊 +🧠', fn: g => { g.flags.secondAct=true; g.flags.commitSecondAct=true; return{mood:10,intel:5}; }},
+        { label:'慢慢探索不急', hint:'+😊', fn: g => { g.flags.secondAct=true; g.flags.slowExplore=true; return{mood:5}; }},
+        { label:'第二人生太奢侈了我还是先活好第一人生', hint:'', fn: g => { g.flags.secondAct=true; g.flags.skipSecond=true; return{mood:-2}; }},
+      ]},
+    { id:'age_discrimination_v30_6', icon:'📋', title:'35岁歧视', category:'midlife',
+      body:'你在找工作——发现「35岁」是一道「隐形门槛」。\n\n你的经历：\n- 投了100份简历——只有5个回复\n- 面试时——HR问：「你35岁了，为什么还要换工作？」\n- 岗位要求——写着「35岁以下」（但没明说）\n- 你的经验——被说「太资深了」（其实是「太贵了」）\n\n你的愤怒：\n- 「35岁」为什么是「分界线」？\n- 「经验」为什么变成了「劣势」？\n- 「成熟」为什么变成了「不够灵活」？\n\n你的反思：\n- 「35岁歧视」不是「你的问题」——是「社会偏见」\n- 「年龄」不等于「能力」——「经验」是「资产」不是「负债」\n- 「被拒绝」不代表「你不行」——是「他们不识货」\n\n你的应对：\n- 去「不看重年龄」的公司\n- 做「自己的事业」\n- 用「作品」说话而不是「简历」\n\n「35岁危机」不是「中年危机」——是「职场偏见」。\n\n（中国80%的招聘要求「35岁以下」——但35岁以上人口占劳动力市场的60%。）',
+      cond: g => g.age >= 34 && g.age <= 40 && !g.flags.ageDiscrimination,
+      choices:[
+        { label:'不被年龄限制继续找工作', hint:'+💪 +🧠', fn: g => { g.flags.ageDiscrimination=true; g.flags.persistJob=true; return{intel:5,mood:3}; }},
+        { label:'考虑自己创业不再被人挑选', hint:'+💰 +🧠', fn: g => { g.flags.ageDiscrimination=true; g.flags.startBusiness=true; return{money:-5000,intel:8}; }},
+        { label:'接受现实降低预期', hint:'-😊', fn: g => { g.flags.ageDiscrimination=true; g.flags.lowerExpect=true; return{mood:-5}; }},
+      ]},
+    { id:'midlife_hobby', icon:'🎨', title:'中年爱好', category:'midlife',
+      body:'你在中年——发现了一个「新爱好」。\n\n可能是：\n- 马拉松——你开始「跑步」，从5公里到42公里\n- 摄影——你开始「拍照」，记录生活\n- 钓鱼——你开始「钓鱼」，享受宁静\n- 园艺——你开始「种花」，感受生命\n- 木工——你开始「做手工」，创造实体\n\n你的感受：\n- 这个爱好让你「重新活过来了」\n- 你在这个领域「从零开始」——但你「很享受」\n- 你遇到了「志同道合的人」——他们「不看你的职位」\n- 你找到了「工作之外的身份」——你「不只是员工/父母/伴侣」\n\n你的理解：\n- 「爱好」不是「浪费时间」——是「给灵魂充电」\n- 「中年」不是「定型」——是「重新发现」\n- 「快乐」不需要「理由」——只需要「喜欢」\n\n「爱好」是「人生」的「第二曲线」。\n\n（中国中年人群体中，有固定爱好的幸福感高出40%。）',
+      cond: g => g.age >= 35 && !g.flags.midlifeHobby,
+      choices:[
+        { label:'全身心投入这个新爱好', hint:'+😊 +💪', fn: g => { g.flags.midlifeHobby=true; g.flags.deepHobby=true; return{mood:8,health:5}; }},
+        { label:'把爱好变成社交认识新朋友', hint:'+👥 +😊', fn: g => { g.flags.midlifeHobby=true; g.flags.socialHobby=true; return{social:8,mood:5}; }},
+        { label:'只是偶尔玩玩不投入太多', hint:'+😊', fn: g => { g.flags.midlifeHobby=true; g.flags.casualHobby=true; return{mood:3}; }},
+      ]},
+    { id:'parent_aging_v30_6', icon:'👴', title:'父母老了', category:'midlife',
+      body:'你突然发现——「父母老了」。\n\n你的觉察：\n- 父亲的「背」弯了\n- 母亲的「头发」白了\n- 他们的「步伐」慢了\n- 他们的「记忆」差了\n\n你的心情：\n- 「心酸」——他们「曾经那么强大」\n- 「焦虑」——「如果他们病了怎么办？」\n- 「内疚」——「我陪他们的时间太少了」\n- 「无力」——「衰老是不可逆的」\n\n你的行动：\n- 每周「打一次电话」\n- 每年「带他们体检」\n- 教他们「用智能手机」\n- 给他们「买保险」\n\n你的思考：\n- 「孝顺」不是「给钱」——是「陪伴」\n- 「赡养」不是「义务」——是「爱」\n- 「来不及」不是「以后再说」——是「现在就做」\n\n「父母在，人生尚有来处。父母去，人生只剩归途。」\n\n（中国60岁以上老年人：2.8亿。「养老」不是「未来的问题」——是「现在的问题」。）',
+      cond: g => g.age >= 35 && !g.flags.parentAging,
+      choices:[
+        { label:'多抽时间陪伴父母', hint:'+😊 -⏰', fn: g => { g.flags.parentAging=true; g.flags.moreCompany=true; return{mood:5,social:3}; }},
+        { label:'为父母做好养老规划', hint:'+🧠 -💰', fn: g => { g.flags.parentAging=true; g.flags.elderPlan=true; return{intel:5,money:-3000}; }},
+        { label:'接受现实每个人都会老', hint:'+🧠', fn: g => { g.flags.parentAging=true; g.flags.acceptAging=true; return{intel:3,mood:-2}; }},
+      ]},
+    { id:'empty_nest_v30_6', icon:'🏠', title:'空巢期', category:'midlife',
+      body:'你的孩子「离家」了——去上大学/工作/结婚。\n\n你的感受：\n- 「安静」——家里「突然安静了」\n- 「空虚」——你不知道「该做什么」\n- 「骄傲」——你的孩子「长大了」\n- 「失落」——你「不再被需要了」\n\n你的变化：\n- 你「不用」每天做饭了\n- 你「不用」辅导作业了\n- 你「不用」早起送孩子了\n- 你「有」了自己的时间\n\n你的选择：\n- 「重新发现」自己和伴侣的关系\n- 「重新发现」自己的兴趣和爱好\n- 「重新发现」自己的人生意义\n\n你的理解：\n- 「空巢」不是「失去」——是「新的开始」\n- 「孩子离开」不是「抛弃」——是「成长」\n- 「你」不只是「父母」——是「你自己」\n\n「空巢」是「第二人生的开始」。',
+      cond: g => g.age >= 45 && g.flags.hasChild && !g.flags.emptyNest,
+      choices:[
+        { label:'享受二人世界重新约会', hint:'+😊 +👥', fn: g => { g.flags.emptyNest=true; g.flags.enjoyCouple=true; return{mood:8,social:3}; }},
+        { label:'开始自己的新事业或爱好', hint:'+🧠 +😊', fn: g => { g.flags.emptyNest=true; g.flags.newBeginning=true; return{intel:5,mood:5}; }},
+        { label:'感到失落需要时间适应', hint:'-😊', fn: g => { g.flags.emptyNest=true; g.flags.feelLoss=true; return{mood:-5}; }},
+      ]},
+    { id:'midlife_fitness', icon:'🏃', title:'中年健身', category:'midlife',
+      body:'你在中年——开始了「健身」。\n\n你的动机：\n- 体检报告「不好看了」\n- 你「爬楼梯」开始「喘了」\n- 你看到「同龄人」的「健康差异」\n- 你想「活得久一点」\n\n你的开始：\n- 第一天：跑了500米——累到不行\n- 第一周：跑了2公里——膝盖疼\n- 第一个月：跑了5公里——开始「上瘾」\n- 第三个月：跑了10公里——你「变了」\n\n你的变化：\n- 「身体」变好了——「精力充沛」\n- 「心情」变好了——「运动产生内啡肽」\n- 「自信」变高了——「我可以做到」\n- 「社交」变广了——「跑友圈」\n\n你的理解：\n- 「健身」不是「减肥」——是「投资健康」\n- 「中年」不是「太晚了」——是「刚刚好」\n- 「坚持」不是「意志力」——是「习惯」\n\n「运动」是「最好的抗衰药」。',
+      cond: g => g.age >= 35 && g.health <= 60 && !g.flags.midlifeFitness,
+      choices:[
+        { label:'坚持健身养成习惯', hint:'+💪 +😊', fn: g => { g.flags.midlifeFitness=true; g.flags.fitnessHabit=true; return{health:10,mood:5}; }},
+        { label:'请教练科学训练', hint:'+💪 -💰', fn: g => { g.flags.midlifeFitness=true; g.flags.hireTrainer=true; return{health:8,money:-3000}; }},
+        { label:'太累了坚持不下去', hint:'-💪', fn: g => { g.flags.midlifeFitness=true; g.flags.giveUpFitness=true; return{health:-3,mood:-2}; }},
+      ]},
+    { id:'legacy_thinking_v30_6', icon:'🌳', title:'留下什么', category:'midlife',
+      body:'你在中年——开始思考「遗产」——不是「钱」，是「你留给世界的东西」。\n\n你的思考：\n- 「如果我明天就走了——人们会记得我什么？」\n- 「我做了什么「有意义」的事？」\n- 「我给「谁」带来了「正面的影响」？」\n\n你的探索：\n- 「遗产」可以是「孩子」——但你希望不只是「基因」\n- 「遗产」可以是「作品」——书/音乐/艺术/发明\n- 「遗产」可以是「影响」——你帮助过的人\n- 「遗产」可以是「精神」——你的价值观/态度/爱\n\n你的行动：\n- 你开始「写回忆录」\n- 你开始「教年轻人」\n- 你开始「做公益」\n- 你开始「说「我爱你」」\n\n你的理解：\n- 「遗产」不是「死后」的事——是「现在」的事\n- 「遗产」不是「大小」的问题——是「真假」的问题\n- 「遗产」不是「别人」的评价——是「自己」的满足\n\n「你想留下什么——决定了你现在怎么活。',
+      cond: g => g.age >= 40 && g.intel >= 30 && !g.flags.legacyThinking,
+      choices:[
+        { label:'开始创作留下自己的作品', hint:'+🧠 +😊', fn: g => { g.flags.legacyThinking=true; g.flags.createLegacy=true; return{intel:8,mood:5}; }},
+        { label:'多花时间陪伴重要的人', hint:'+👥 +😊', fn: g => { g.flags.legacyThinking=true; g.flags.peopleLegacy=true; return{social:8,mood:5}; }},
+        { label:'做公益帮助更多人', hint:'+👥 +😊', fn: g => { g.flags.legacyThinking=true; g.flags.giveBack=true; return{social:5,mood:5,money:-2000}; }},
+      ]},
+    { id:'midlife_wisdom_v30_6', icon:'🦉', title:'中年智慧', category:'midlife',
+      body:'你在中年——获得了一种「新的智慧」。\n\n你的变化：\n- 你「不再」那么「在意别人的看法」了\n- 你「不再」那么「追求完美」了\n- 你「不再」那么「急于证明自己」了\n- 你「开始」接受「不确定性」\n- 你「开始」珍惜「当下」\n- 你「开始」理解「每个人都有自己的难处」\n\n你的智慧：\n- 「成功」不是「有钱」——是「心安」\n- 「幸福」不是「得到」——是「知足」\n- 「成熟」不是「变老」——是「变宽容」\n- 「智慧」不是「知道更多」——是「放下更多」\n\n你的感悟：\n- 中年不是「失去」——是「收获」\n- 中年不是「下坡」——是「另一种上坡」\n- 中年不是「危机」——是「觉醒」\n\n「中年智慧」是「岁月」给你的「礼物」——但你需要「打开」它。\n\n（研究表明：人的幸福感呈「U型曲线」——中年最低，但之后会回升。「中年」是「转折点」——不是「终点」。）',
+      cond: g => g.age >= 40 && !g.flags.midlifeWisdom,
+      choices:[
+        { label:'接纳自己享受当下', hint:'+😊 +🧠', fn: g => { g.flags.midlifeWisdom=true; g.flags.acceptAndEnjoy=true; return{mood:10,intel:5}; }},
+        { label:'把智慧传递给年轻人', hint:'+👥 +🧠', fn: g => { g.flags.midlifeWisdom=true; g.flags.passWisdom=true; return{social:5,intel:5}; }},
+        { label:'继续探索人生还有太多未知', hint:'+🧠 +😊', fn: g => { g.flags.midlifeWisdom=true; g.flags.keepExploring=true; return{intel:8,mood:5}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -17880,6 +17961,15 @@ const ACHIEVEMENTS = [
     { id:'practice_saying_no_ach', icon:'🚧', name:'学会说不', desc:'学会了设立边界和拒绝不合理的要求', check: g => g.flags.practiceSayingNo },
     { id:'deep_healing_ach', icon:'💕', name:'深度疗愈', desc:'认真面对和疗愈了自己的内在小孩', check: g => g.flags.deepHealing },
     { id:'meaning_create_ach', icon:'🌟', name:'意义创造者', desc:'找到了属于自己的人生意义', check: g => g.flags.meaningCreate },
+    // v30.6 achievements - 中年危机与第二人生
+    { id:'restart_life_ach', icon:'🔔', name:'重新出发', desc:'在中年认真盘点人生重新出发', check: g => g.flags.restartLife },
+    { id:'brave_pivot_ach', icon:'🔄', name:'勇敢转型', desc:'勇敢转行追求真正想做的事', check: g => g.flags.bravePivot },
+    { id:'commit_second_act_ach', icon:'🎬', name:'第二人生', desc:'找到了第二人生方向并全力投入', check: g => g.flags.commitSecondAct },
+    { id:'persist_job_ach', icon:'💪', name:'不被年龄定义', desc:'不被35岁年龄歧视限制继续前行', check: g => g.flags.persistJob },
+    { id:'deep_hobby_ach', icon:'🎨', name:'中年爱好', desc:'全身心投入了一个中年新爱好', check: g => g.flags.deepHobby },
+    { id:'more_company_ach', icon:'👴', name:'陪伴父母', desc:'多抽时间陪伴年迈的父母', check: g => g.flags.moreCompany },
+    { id:'fitness_habit_ach', icon:'🏃', name:'中年健身', desc:'在中年养成了坚持健身的好习惯', check: g => g.flags.fitnessHabit },
+    { id:'accept_and_enjoy_ach', icon:'🦉', name:'中年智慧', desc:'获得了接纳自己享受当下的中年智慧', check: g => g.flags.acceptAndEnjoy },
 ];
 
 // === ENDINGS === (order matters: first match wins)
