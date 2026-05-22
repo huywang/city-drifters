@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v31.7
+// 都市浮生记 - Game Engine v31.8
 // ============================================
 
 // === GAME STATE ===
@@ -17276,6 +17276,87 @@ const EVENTS = [
         { label:'学煲一锅暖身汤', hint:'+💪 +😊', fn: g => { g.flags.northSouthHeat=true; g.flags.winterSoup=true; return{health:5,mood:5}; }},
         { label:'约朋友吃火锅暖身', hint:'+👥 +😊', fn: g => { g.flags.northSouthHeat=true; g.flags.winterHotpot=true; return{social:5,mood:5,money:-200}; }},
       ]},
+    // --- v31.8 人生转折与重大抉择 ---
+    { id:'career_switch_v31_8', icon:'🔄', title:'辞职转行', category:'career',
+      body:'你干了5年的行业，你厌倦了。\n\n不是不喜欢——是看不到未来。你每天都在做重复的事，你的技能在贬值，你的热情在消退。\n\n你决定转行。你的父母说：「你疯了吗？好好的工作不做？」你的朋友说：「我支持你。」\n\n你辞了职，花了3个月学新技能。你的存款在减少，你的焦虑在增加。\n\n但你面试新行业的时候，面试官说：「你为什么转行？」\n\n你说：「因为我不想40岁的时候，后悔30岁没有勇气。」',
+      cond: g => g.job && g.job!=='待业中' && g.age >= 26 && g.age <= 40 && g.intel >= 50,
+      choices:[
+        { label:'全力以赴学新技能', hint:'+🧠 -💰', fn: g => { g.flags.careerSwitchV31=true; g.flags.allInNewCareer=true; setJob(g,'待业中',0); return{intel:8,money:-3000}; }},
+        { label:'边工作边学（骑驴找马）', hint:'+💰 +🧠', fn: g => { g.flags.careerSwitchV31=true; g.flags.graduateTransition=true; return{intel:5,money:500}; }},
+        { label:'先休息一段时间再决定', hint:'+😊 +💪', fn: g => { g.flags.careerSwitchV31=true; g.flags.sabbatical=true; setJob(g,'待业中',0); return{mood:5,health:5,money:-2000}; }},
+      ]},
+    { id:'divorce_choice_v31_8', icon:'💔', title:'离婚的十字路口', category:'relationship',
+      body:'你和伴侣吵了无数次。每一次吵架，都在消耗你们的感情。\n\n你们试过沟通、试过冷战、试过旅行修复、试过婚姻咨询。但问题还在。\n\n你站在十字路口：继续——可能会慢慢好起来，也可能会更糟。离婚——可能解脱，也可能后悔。\n\n你的妈妈说：「为了孩子，忍忍吧。」你的闺蜜/兄弟说：「你值得更好的。」\n\n你不知道哪个是对的。你只知道——你不能再这样下去了。',
+      cond: g => g.flags.married && g.age >= 28 && g.age <= 50 && g.mood < 40,
+      choices:[
+        { label:'决定离婚开始新生活', hint:'+😊 -👥', fn: g => { g.flags.divorceChoice=true; g.flags.chooseDivorce=true; g.flags.married=false; return{mood:8,social:-5,money:-10000}; }},
+        { label:'再给彼此一次机会', hint:'+👥 +😊', fn: g => { g.flags.divorceChoice=true; g.flags.giveAnotherChance=true; return{social:3,mood:3}; }},
+        { label:'分居冷静一段时间', hint:'+🧠 +😊', fn: g => { g.flags.divorceChoice=true; g.flags.separation=true; return{intel:5,mood:3,money:-3000}; }},
+      ]},
+    { id:'losing_parent_v31_8', icon:'🕯️', title:'失亲之痛', category:'family',
+      body:'你的父亲/母亲走了。\n\n没有预兆，或者说——你忽略了预兆。他/她突然倒下，你在医院走廊里等了一整夜。\n\n天亮的时候，医生出来了。他摇了摇头。\n\n你站在太平间门口，觉得世界突然安静了。那种安静——不是平静，是空洞。\n\n你回到家，看到他/她的拖鞋还摆在门口。你蹲下来，哭了很久。\n\n你终于明白了一句话：「父母在，人生尚有来处；父母去，人生只剩归途。」',
+      cond: g => g.age >= 30 && g.age <= 55 && g.relationships && g.relationships.family >= 40,
+      choices:[
+        { label:'允许自己悲伤好好告别', hint:'+😊 +🧠', fn: g => { g.flags.losingParent=true; g.flags.allowGrief=true; return{mood:-5,intel:8}; }},
+        { label:'化悲痛为力量好好活着', hint:'+💪 +😊', fn: g => { g.flags.losingParent=true; g.flags.liveForThem=true; return{health:3,mood:3}; }},
+        { label:'更加珍惜还在身边的人', hint:'+👥 +😊', fn: g => { g.flags.losingParent=true; g.flags.cherishRemaining=true; return{social:8,mood:3}; }},
+      ]},
+    { id:'gap_year_v31_8', icon:'🌍', title:'Gap Year', category:'life',
+      body:'你决定给自己一个Gap Year——一年不工作，去做自己一直想做但没时间做的事。\n\n你的存款够你活12个月。你的计划是：前3个月旅行，中间6个月做志愿者/学东西，最后3个月找工作。\n\n你的父母不理解：「好好的工作不做，去浪费一年？」\n你的朋友们羡慕你：「我也想，但我不敢。」\n\n你背上行囊，出发了。你不知道一年后你会变成什么样。但你知道——至少你试过了。',
+      cond: g => g.age >= 22 && g.age <= 35 && g.money >= 30000 && g.job !== '待业中',
+      choices:[
+        { label:'按计划去旅行和做志愿者', hint:'+😊 +🧠', fn: g => { g.flags.gapYearV31=true; g.flags.travelGap=true; setJob(g,'待业中',0); return{mood:10,intel:5,money:-10000}; }},
+        { label:'在家学新技能重新出发', hint:'+🧠 +💪', fn: g => { g.flags.gapYearV31=true; g.flags.skillGap=true; setJob(g,'待业中',0); return{intel:10,health:3,money:-5000}; }},
+        { label:'Gap了3个月就忍不住回去工作了', hint:'+💰 +😊', fn: g => { g.flags.gapYearV31=true; g.flags.shortGap=true; setJob(g,'普通职员',6000); return{money:2000,mood:3}; }},
+      ]},
+    { id:'midlife_startup_v31_8', icon:'🚀', title:'中年创业', category:'career',
+      body:'你42岁了。你在一家公司当了15年的螺丝钉。\n\n今天，你辞职了。你要创业。\n\n你的妻子/丈夫说：「你确定吗？我们还有房贷。」你的孩子说：「爸爸/妈妈，你要当老板了？」\n\n你租了一间小办公室，招了2个员工，开始了你的创业之路。\n\n前三个月，你一分钱没赚。你开始怀疑自己——42岁创业，是不是太晚了？\n\n你的大学同学（也是创业者）说：「创业没有太晚，只有太早放弃。」',
+      cond: g => g.age >= 38 && g.age <= 50 && g.money >= 50000 && g.intel >= 55,
+      choices:[
+        { label:'咬牙坚持等转机', hint:'+💰 +💪', fn: g => { g.flags.midlifeStartupV31=true; g.flags.persistStartup=true; setJob(g,'创业者',0); return{money:-5000,health:-3,intel:5}; }},
+        { label:'调整方向做小本生意', hint:'+💰 +🧠', fn: g => { g.flags.midlifeStartupV31=true; g.flags.pivotStartup=true; setJob(g,'小店老板',5000); return{money:-2000,intel:3}; }},
+        { label:'认清现实回去打工', hint:'+💰 -😊', fn: g => { g.flags.midlifeStartupV31=true; g.flags.backToWork=true; setJob(g,'普通职员',8000); return{money:1000,mood:-5}; }},
+      ]},
+    { id:'unexpected_pregnancy_v31_8', icon:'🤰', title:'意外的生命', category:'family',
+      body:'你的伴侣拿着一根验孕棒走过来。两条杠。\n\n你们没有计划要孩子。你们的房子还没买，你们的存款还不够，你们的事业还在上升期。\n\n你的第一反应是：怎么办？\n你的第二反应是：要还是不要？\n\n你们聊了一整夜。你们讨论了经济、职业、家庭、未来。\n\n最后你们看着彼此，做了一个决定。不管这个决定是什么——你们知道，你们的人生从这一刻起，不一样了。',
+      cond: g => g.flags.married && g.age >= 24 && g.age <= 40 && !g.flags.hasChild,
+      choices:[
+        { label:'留下来迎接新生命', hint:'+😊 +👥', fn: g => { g.flags.unexpectedPregnancy=true; g.flags.keepBaby=true; g.flags.hasChild=true; return{mood:8,social:5,money:-3000}; }},
+        { label:'现在不是时候', hint:'+💰 -😊', fn: g => { g.flags.unexpectedPregnancy=true; g.flags.notNow=true; return{money:500,mood:-8}; }},
+        { label:'纠结了很久最终接受', hint:'+🧠 +😊', fn: g => { g.flags.unexpectedPregnancy=true; g.flags.acceptAfterStruggle=true; g.flags.hasChild=true; return{intel:5,mood:3,money:-2000}; }},
+      ]},
+    { id:'infertility_v31_8', icon:'😢', title:'求子之路', category:'family',
+      body:'你们想要孩子，但一直怀不上。\n\n你们去了医院，做了检查，吃了药，打了针。你们的生活变成了一张排卵表和一管体温计。\n\n你的婆婆/岳母开始旁敲侧击：「你们什么时候要孩子？」你的同事在晒娃，你的同学在怀二胎。\n\n你开始觉得——怀孕这件事，对有些人来说轻而易举，对有些人来说却是一场战争。\n\n你的伴侣握着你的手说：「不管有没有孩子，我们都在一起。」',
+      cond: g => g.flags.married && g.age >= 28 && g.age <= 42 && !g.flags.hasChild && g.mood < 50,
+      choices:[
+        { label:'尝试试管婴儿', hint:'+💰 +🧠', fn: g => { g.flags.infertilityV31=true; g.flags.tryIVF=true; return{money:-30000,intel:3}; }},
+        { label:'接受丁克享受二人世界', hint:'+😊 +👥', fn: g => { g.flags.infertilityV31=true; g.flags.acceptDink=true; return{mood:8,social:3}; }},
+        { label:'考虑领养', hint:'+👥 +😊', fn: g => { g.flags.infertilityV31=true; g.flags.considerAdopt=true; return{social:5,mood:5,money:-5000}; }},
+      ]},
+    { id:'immigration_decision_v31_8', icon:'✈️', title:'走还是留', category:'life',
+      body:'你拿到了一个海外工作的offer。年薪翻倍，绿卡有望。\n\n但代价是：离开父母、离开朋友、离开你熟悉的一切。\n\n你的父母说：「你走了，我们怎么办？」你的孩子说：「我不想去，我的朋友都在这里。」\n\n你在深夜的天台上站了很久。你看着这座你生活了10年的城市——它的灯火、它的喧嚣、它的拥堵。\n\n你问自己：你是在追求更好的生活，还是在逃离现在的生活？',
+      cond: g => g.age >= 28 && g.age <= 45 && g.intel >= 55 && g.money >= 20000,
+      choices:[
+        { label:'带着全家一起移民', hint:'+💰 +😊', fn: g => { g.flags.immigrationDecision=true; g.flags.familyImmigrate=true; return{money:10000,mood:5,social:-5}; }},
+        { label:'放弃offer留在中国', hint:'+👥 +😊', fn: g => { g.flags.immigrationDecision=true; g.flags.stayChina=true; return{social:8,mood:5}; }},
+        { label:'一个人先去试试再说', hint:'+💰 -👥', fn: g => { g.flags.immigrationDecision=true; g.flags.soloImmigrate=true; return{money:5000,social:-8,mood:3}; }},
+      ]},
+    { id:'serious_illness_v31_8', icon:'🏥', title:'大病一场', category:'health',
+      body:'你的体检报告上写着几个你看不懂的医学术语。医生的表情很严肃。\n\n「需要做一个小手术，不过不用担心，成功率很高。」\n\n你躺在手术台上，灯光很亮。你突然想到了很多人——你的父母、你的朋友、你还没做完的事。\n\n手术很成功。你在病床上躺了两周。\n\n你的同事来看你，你的父母打了电话来哭，你的老板说「好好休息」。\n\n你出院后做的第一件事——删掉了加班的日历，加了一个「每周运动3次」的计划。',
+      cond: g => g.age >= 30 && g.age <= 55 && g.health < 50,
+      choices:[
+        { label:'彻底改变生活方式', hint:'+💪 +🧠', fn: g => { g.flags.seriousIllnessV31=true; g.flags.lifestyleChange=true; return{health:10,intel:5}; }},
+        { label:'康复后更加珍惜每一天', hint:'+😊 +💪', fn: g => { g.flags.seriousIllnessV31=true; g.flags.cherishDays=true; return{mood:8,health:5}; }},
+        { label:'买了一份重疾险', hint:'+💰 +🧠', fn: g => { g.flags.seriousIllnessV31=true; g.flags.boughtInsurance=true; return{intel:3,money:-3000}; }},
+      ]},
+    { id:'life_redefine_v31_8', icon:'🌟', title:'人生重新定义', category:'life',
+      body:'你坐在公园的长椅上，看着夕阳。\n\n你想了很多：你的前半生，你做了很多「应该做」的事——读书、工作、结婚、买房。但你很少做「想做」的事。\n\n你问自己：如果人生可以重新定义，你会怎么活？\n\n也许你会换一份更有意义的工作，也许你会花更多时间陪家人，也许你会去学画画/弹吉他/写小说。\n\n你深吸一口气。你决定——从今天开始，不再活别人的人生。\n\n你站起来，走回家，打开电脑，写下了你的「人生重新定义宣言」。',
+      cond: g => g.age >= 35 && g.age <= 55 && g.intel >= 60 && g.mood >= 40,
+      choices:[
+        { label:'立刻开始做一直想做的事', hint:'+😊 +✨', fn: g => { g.flags.lifeRedefine=true; g.flags.startDream=true; return{mood:10,charm:5}; }},
+        { label:'制定一个5年改变计划', hint:'+🧠 +💰', fn: g => { g.flags.lifeRedefine=true; g.flags.fiveYearPlan=true; return{intel:8,money:500}; }},
+        { label:'先和重要的人分享你的想法', hint:'+👥 +😊', fn: g => { g.flags.lifeRedefine=true; g.flags.shareVision=true; return{social:8,mood:5}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
 
@@ -18883,6 +18964,16 @@ const ACHIEVEMENTS = [
     { id:'annual_review_ach', icon:'🎆', name:'年度总结', desc:'写了一份年度总结给自己', check: g => g.flags.annualReview },
     { id:'rainy_reading_ach', icon:'🌧️', name:'雨天读书', desc:'梅雨季在家读了一本好书', check: g => g.flags.rainyReading },
     { id:'winter_soup_ach', icon:'❄️', name:'暖身暖汤', desc:'学煲了一锅暖身汤', check: g => g.flags.winterSoup },
+    // --- v31.8 人生转折成就 ---
+    { id:'brave_switch_ach', icon:'🔄', name:'勇敢转行者', desc:'勇敢转行追求新方向', check: g => g.flags.careerSwitchV31 },
+    { id:'give_chance_ach', icon:'💔', name:'再试一次', desc:'给婚姻再给了一次机会', check: g => g.flags.giveAnotherChance },
+    { id:'cherish_remaining_ach', icon:'🕯️', name:'珍惜身边人', desc:'失亲后更加珍惜还在的人', check: g => g.flags.cherishRemaining },
+    { id:'skill_gap_ach', icon:'🌍', name:'间隔年学习者', desc:'Gap Year在家学习新技能', check: g => g.flags.skillGap },
+    { id:'persist_startup_ach', icon:'🚀', name:'中年创业家', desc:'中年创业并坚持了下来', check: g => g.flags.persistStartup },
+    { id:'accept_dink_ach', icon:'😢', name:'接受丁克', desc:'接受不要孩子的选择', check: g => g.flags.acceptDink },
+    { id:'stay_china_ach', icon:'✈️', name:'选择留下', desc:'放弃海外offer选择留下', check: g => g.flags.stayChina },
+    { id:'lifestyle_change_ach_v31_8', icon:'🏥', name:'重获新生', desc:'大病后彻底改变生活方式', check: g => g.flags.lifestyleChange },
+    { id:'start_dream_ach', icon:'🌟', name:'追梦人', desc:'开始做一直想做的事', check: g => g.flags.startDream },
 ];
 
 // === ENDINGS === (order matters: first match wins)
