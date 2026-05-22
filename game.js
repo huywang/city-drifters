@@ -2206,6 +2206,58 @@ const EVENTS = [
         { label:'只买必需品', hint:'-💰 +🧠', fn: g => { g.flags.consumerTrap=true; return{money:-2000,intel:5,mood:3}; }},
         { label:'什么都不买', hint:'+💰 +🧠 +😊', fn: g => { g.flags.consumerTrap=true; g.flags.minimalist=true; return{intel:8,mood:8}; }},
       ]},
+    // === v2.35 EVENTS ===
+    { id:'rainy_season', icon:'🌧️', title:'梅雨季',
+      body:'连续下了两周的雨。你的衣服永远晒不干，你的心情永远阴沉沉。\n\n你打开天气预报：未来7天，全是雨。\n\n你开始理解为什么南方人那么爱煲汤——因为身体里的湿气，需要一点温暖来驱散。\n\n"梅雨季是大城市的隐喻：你以为天晴了，其实只是两场雨之间的间歇。"',
+      cond: g => (g.city==='shanghai' || g.city==='hangzhou' || g.city==='guangzhou') && (g.month>=5 && g.month<=7) && !g.flags.rainySeason && Math.random()>0.5,
+      choices:[
+        { label:'买台烘干机', hint:'-💰 +😊', fn: g => { g.flags.rainySeason=true; return{money:-2000,mood:10}; }},
+        { label:'学会和潮湿共处', hint:'+🧠 +😊', fn: g => { g.flags.rainySeason=true; return{intel:3,mood:5,health:-3}; }},
+        { label:'去北方躲一躲', hint:'-💰 +😊 +❤️', fn: g => { g.flags.rainySeason=true; return{money:-3000,mood:15,health:5}; }},
+      ]},
+    { id:'typhoon_day', icon:'🌀', title:'台风来了',
+      body:'气象台发布红色预警：超强台风即将登陆。\n\n公司发来邮件："台风天照常上班，如有困难请提前请假。"\n\n你看了看窗外已经开始摇晃的树，又看了看那条"如有困难"的邮件——什么算"困难"？被风吹走算吗？\n\n"打工人的命，没有台风值钱。"',
+      cond: g => (g.city==='shenzhen' || g.city==='guangzhou' || g.city==='shanghai') && (g.month>=7 && g.month<=10) && !g.flags.typhoonDay && Math.random()>0.6,
+      choices:[
+        { label:'冒着台风去上班', hint:'-❤️ +💼', fn: g => { g.flags.typhoonDay=true; if(Math.random()>0.7){return{health:-15,mood:-10,money:500}}else{return{health:-5,mood:-8}} }},
+        { label:'请假在家', hint:'+😊 -💰', fn: g => { g.flags.typhoonDay=true; return{mood:5,money:-500}; }},
+        { label:'在家远程办公', hint:'+🧠 +😊', fn: g => { g.flags.typhoonDay=true; g.flags.remoteWork=true; return{intel:3,mood:3}; }},
+      ]},
+    { id:'classmate_reunion', icon:'🍻', title:'同学聚会',
+      body:'大学同学群突然有人张罗聚会。\n\n你看了看群里：\n- 张三：某大厂P8，年薪百万\n- 李四：创业成功，刚融了A轮\n- 王五：已经买了两套房\n- 你：……\n\n你开始纠结：去，还是不去？去了是叙旧，还是比较？\n\n"同学聚会是成年人最残酷的社交——你不是在回忆青春，你是在被青春审判。"',
+      cond: g => g.age>=26 && !g.flags.classmateReunion && Math.random()>0.6,
+      choices:[
+        { label:'去！坦然面对', hint:'+👥 +😊', fn: g => { g.flags.classmateReunion=true; if(g.jobSalary>=15000||g.money>=100000){return{social:10,mood:8,charm:3}}else{return{social:5,mood:-5}} }},
+        { label:'去，但低调点', hint:'+👥', fn: g => { g.flags.classmateReunion=true; return{social:5,mood:0}; }},
+        { label:'找借口不去', hint:'-👥 +😊', fn: g => { g.flags.classmateReunion=true; return{social:-5,mood:3}; }},
+        { label:'删了同学群', hint:'-👥 +🧠', fn: g => { g.flags.classmateReunion=true; return{social:-10,intel:3,mood:5}; }},
+      ]},
+    { id:'cafe_office', icon:'☕', title:'咖啡馆办公',
+      body:'你发现了一家不错的咖啡馆：\n\n- WiFi快\n- 插座多\n- 咖啡不贵\n- 没人赶你\n\n你开始每周去那里办公/学习。你发现：换了个环境，效率居然高了。\n\n咖啡馆里的人都在假装很忙——和你一样。\n\n"咖啡馆是大城市的公共客厅，也是孤独者的避难所。"',
+      cond: g => !g.flags.cafeOffice && g.age>=24 && g.intel>=50 && Math.random()>0.5,
+      choices:[
+        { label:'成为常客', hint:'-💰 +🧠 +😊', fn: g => { g.flags.cafeOffice=true; return{money:-1500,intel:5,mood:8,charm:3}; }},
+        { label:'偶尔去去', hint:'+😊', fn: g => { g.flags.cafeOffice=true; return{money:-300,mood:5}; }},
+        { label:'还是在家吧', hint:'+💰', fn: g => { g.flags.cafeOffice=true; return{mood:-3}; }},
+      ]},
+    { id:'health_scare', icon:'🏥', title:'体检报告',
+      body:'公司组织了年度体检。一周后，报告出来了：\n\n- 血脂偏高 ⚠️\n- 颈椎曲度变直 ⚠️\n- 视力下降 ⚠️\n- 体重超标 ⚠️\n\n你看了看报告，又看了看桌上的外卖——突然觉得手里的炸鸡不香了。\n\n"体检报告是成年人最害怕的成绩单。"',
+      cond: g => g.age>=28 && !g.flags.healthScare && g.health<70 && Math.random()>0.5,
+      choices:[
+        { label:'开始健身养生', hint:'+❤️ +😊 -💰', fn: g => { g.flags.healthScare=true; g.flags.fitnessJourney=true; return{health:15,mood:10,money:-3000}; }},
+        { label:'焦虑三天后忘记', hint:'-❤️', fn: g => { g.flags.healthScare=true; return{mood:-5,health:-5}; }},
+        { label:'买一堆保健品', hint:'-💰', fn: g => { g.flags.healthScare=true; return{money:-5000,health:3,mood:3}; }},
+        { label:'预约专家门诊', hint:'-💰 +❤️', fn: g => { g.flags.healthScare=true; return{money:-2000,health:8,mood:5}; }},
+      ]},
+    { id:'rent_increase', icon:'📈', title:'房东涨价',
+      body:'房东发来消息："下个月开始，房租涨500。"\n\n你算了算：这已经是你来这个城市后第3次涨房租了。\n\n每次涨房租，你都会想：是不是该买房了？然后你看了看房价——算了，还是继续租吧。\n\n"房租是大城市的月租税，交的是你在这里呼吸的权利。"',
+      cond: g => !g.flags.hasHouse && g.months>=12 && !g.flags.rentIncrease && Math.random()>0.6,
+      choices:[
+        { label:'接受涨价', hint:'-💰 +😊', fn: g => { g.flags.rentIncrease=true; return{money:-500,mood:-5}; }},
+        { label:'搬家找便宜的', hint:'-💰 -😊 +❤️', fn: g => { g.flags.rentIncrease=true; g.flags.movedHouse=true; return{money:-3000,mood:-10,health:-5}; }},
+        { label:'找室友分摊', hint:'-😊 +👥', fn: g => { g.flags.rentIncrease=true; return{mood:-5,social:5}; }},
+        { label:'和房东谈判', hint:'🎲', fn: g => { g.flags.rentIncrease=true; if(g.charm>=60&&Math.random()>0.5){return{mood:5,charm:3}}else{return{mood:-10}} }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -2323,6 +2375,12 @@ const ACHIEVEMENTS = [
     { id:'night_thinker', icon:'🌙', name:'深夜思想家', desc:'经历了一次深夜独白', check: g => g.flags.midnightReflection },
     { id:'smart_shopper', icon:'🧘', name:'理性消费者', desc:'抵制了消费主义陷阱', check: g => g.flags.minimalist },
     { id:'five_year_drift', icon:'🎒', name:'五年漂泊', desc:'在大城市漂泊超过5年', check: g => g.months >= 60 },
+    // v2.35 achievements
+    { id:'weather_warrior', icon:'⛈️', name:'风雨无阻', desc:'经历了极端天气仍然坚持', check: g => g.flags.typhoonDay || g.flags.rainySeason },
+    { id:'cafe_regular', icon:'☕', name:'咖啡馆常客', desc:'在咖啡馆找到了第二个家', check: g => g.flags.cafeOffice },
+    { id:'health_awakening', icon:'🏥', name:'健康觉醒', desc:'从体检报告中醒悟', check: g => g.flags.healthScare && g.flags.fitnessJourney },
+    { id:'classmate_brave', icon:'🍻', name:'坦然面对', desc:'勇敢参加了同学聚会', check: g => g.flags.classmateReunion && g.social>=60 },
+    { id:'smart_renter', icon:'🏠', name:'租房达人', desc:'和房东成功谈判', check: g => g.flags.rentIncrease && g.charm>=65 },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -2391,6 +2449,10 @@ const ENDINGS = [
     { id:'lonely_achiever', badge:'🏅', title:'孤独的成功者', desc:'你成功了——有钱、有地位、有名气。\n\n但你的通讯录里找不到一个可以深夜打电话的人。你的家人不理解你，你的朋友嫉妒你，你的同事利用你。\n\n你站在高楼落地窗前，看着城市的灯火，突然觉得：这些灯没有一盏是为你亮的。\n\n"成功有很多种。你得到了全世界，却失去了自己。"', cond: g => g.money>=200000 && g.social>=60 && g.relationships && g.relationships.friends<30 && g.relationships.family<30 && g.age>=35 },
     { id:'comeback_kid', badge:'🎯', title:'逆风翻盘', desc:'所有人都觉得你完了——失业、负债、分手。\n\n但你用3年时间，从零开始，重新站了起来。\n\n你没有变得更富有，但你变得更强大。\n\n"人生最精彩的不是成功的时刻，而是从谷底爬起来的瞬间。"', cond: g => g.flags.techLayoff && g.money>=80000 && g.jobSalary>=15000 && g.mood>=60 && g.age>=32 },
     { id:'wanderer', badge:'🚶', title:'漂泊者', desc:'你在大城市漂了很多年，没有买房，没有结婚，没有扎根。\n\n但你去了很多地方，见了很多世面，活得很自由。\n\n有人说你"不稳定"，你说："我只是还没找到值得停留的地方。"\n\n"漂泊不是无根，是在寻找最适合自己的土壤。"', cond: g => !g.flags.hasHouse && !g.flags.married && g.money>=30000 && g.charm>=60 && g.months>=72 && g.age>=32 },
+    // --- v2.35 ENDINGS ---
+    { id:'health_warrior', badge:'💪', title:'健康觉醒者', desc:'你曾经是一个标准的"亚健康打工人"：熬夜、外卖、久坐、焦虑。\n\n直到那张体检报告把你惊醒。你开始跑步、做饭、早睡、冥想。\n\n你花了两年时间，把自己从悬崖边拉了回来。\n\n"健康不是目标，是一切目标的前提。"', cond: g => g.flags.healthScare && g.flags.fitnessJourney && g.health>=85 && g.mood>=70 && g.age>=30 },
+    { id:'slow_life_master', badge:'☕', title:'慢生活实践者', desc:'你没有成为有钱人，也没有成为名人。\n\n但你找到了一种让自己舒服的生活方式：在咖啡馆看书、在公园散步、和朋友聊天。\n\n你不再追求"高效"和"成功"，你追求的是——心安。\n\n"慢下来不是放弃，是终于学会了和自己和解。"', cond: g => g.flags.cafeOffice && g.flags.minimalist && g.mood>=75 && g.intel>=70 && !g.flags.entrepreneur && g.age>=30 },
+    { id:'weather_survivor', badge:'⛈️', title:'风雨同路人', desc:'你在大城市经历了很多"坏天气"：台风、暴雨、高温、寒冬。\n\n每一次极端天气，都是一次考验。你没有退缩，你挺过来了。\n\n你发现：那些打不倒你的，真的会让你更强大。\n\n"人生如天气，无法预测，只能适应。"', cond: g => (g.flags.typhoonDay || g.flags.rainySeason) && g.flags.healthScare && g.health>=70 && g.mood>=60 && g.months>=48 && g.age>=28 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
@@ -3023,9 +3085,9 @@ function getEndingRarity(endingId) {
     // Legendary (rare endings that require specific conditions)
     const legendary = ['fire', 'immigration', 'executive', 'retire_abroad', 'wealthy', 'family_first', 'burnout_recovery', 'digital_nomad_senior', 'social_influencer_end', 'phoenix_rising', 'workplace_legend'];
     // Rare (hard to achieve)
-    const rare = ['settled', 'startup_end', 'influencer_end', 'digital_nomad', 'karoshi', 'jail', 'social_butterfly_end', 'health_guru', 'side_hustle_king', 'kaogong_success', 'mentor_end', 'community_builder', 'career_pivot', 'anti_fraud_hero', 'relationship_guru', 'comeback_kid'];
+    const rare = ['settled', 'startup_end', 'influencer_end', 'digital_nomad', 'karoshi', 'jail', 'social_butterfly_end', 'health_guru', 'side_hustle_king', 'kaogong_success', 'mentor_end', 'community_builder', 'career_pivot', 'anti_fraud_hero', 'relationship_guru', 'comeback_kid', 'health_warrior'];
     // Uncommon (moderately difficult)
-    const uncommon = ['hometown_hero', 'go_home', 'civil_end', 'ordinary', 'single', 'investment_guru', 'lying_flat_end', 'lonely_death', 'estranged', 'pet_parent', 'mortgage_default_end', 'kong_yiji_end', 'full_time_child_end', 'minimalist_life', 'slow_life', 'scam_victim', 'sandwich_generation', 'lonely_achiever', 'wanderer'];
+    const uncommon = ['hometown_hero', 'go_home', 'civil_end', 'ordinary', 'single', 'investment_guru', 'lying_flat_end', 'lonely_death', 'estranged', 'pet_parent', 'mortgage_default_end', 'kong_yiji_end', 'full_time_child_end', 'minimalist_life', 'slow_life', 'scam_victim', 'sandwich_generation', 'lonely_achiever', 'wanderer', 'slow_life_master', 'weather_survivor'];
 
     if (legendary.includes(endingId)) return 'legendary';
     if (rare.includes(endingId)) return 'rare';
@@ -3209,7 +3271,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.34' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.35' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
