@@ -2076,6 +2076,58 @@ const EVENTS = [
         { label:'试着理解他们', hint:'+👨‍👩‍👧 +🧠', fn: g => { g.flags.generationalClash=true; g.flags.generationalGap=true; g.relationships.family=clamp((g.relationships.family||60)+20,0,100); return{intel:8,mood:10}; }},
         { label:'冷战，假装没发生', hint:'-👨‍👩‍👧 -😊', fn: g => { g.flags.generationalClash=true; g.relationships.family=clamp((g.relationships.family||60)-10,0,100); return{mood:-8}; }},
       ]},
+    // === v2.32 CHAIN EVENTS & SOCIAL COMMENTARY ===
+    { id:'quiet_quitting_backlash', icon:'⚡', title:'躺平被发现了',
+      body:'你quiet quitting了几个月——准点下班，只做分内事，不主动加班。\n\n你的leader找你谈话了："你最近表现不太好，是不是有什么想法？"\n\n你心里想："我只是在做我份内的工作。"\n\n但在内卷文化里，"份内"已经不够了。\n\n"躺平不是不工作，是拒绝被工作定义。但你的老板不这么看。"',
+      cond: g => g.flags.quietQuitting && g.job!=='待业中' && !g.flags.quietQuitBacklash,
+      choices:[
+        { label:'坦白自己的想法', hint:'+🧠 +😊 -💰', fn: g => { g.flags.quietQuitBacklash=true; if(g.intel>70){return{intel:5,mood:8,money:-3000}}else{return{mood:-10,money:-5000}} }},
+        { label:'假装重新振作', hint:'+💰 -😊', fn: g => { g.flags.quietQuitBacklash=true; return{money:3000,mood:-8,health:-5}; }},
+        { label:'趁机谈离职', hint:'🎲 +💰 +😊', fn: g => { g.flags.quietQuitBacklash=true; if(Math.random()>0.4){const severance=Math.floor(g.jobSalary*3);setJob(g,'待业中',0);return{money:severance,mood:15}}else{return{mood:-10}} }},
+      ]},
+    { id:'tech_layoff', icon:'📉', title:'互联网大裁员',
+      body:'你的公司宣布裁员20%。\n\nHR说这是"组织架构调整"，你的leader说"我也不想"，你的同事说"下一个就是我"。\n\n你的工牌还没被收走，但你已经开始更新简历了。\n\n"互联网行业只有两种人：被裁的，和等着被裁的。"',
+      cond: g => g.job!=='待业中' && g.jobSalary>15000 && g.age>=28 && g.age<=42 && !g.flags.techLayoff && Math.random()>0.7,
+      choices:[
+        { label:'主动辞职拿N+1', hint:'+💰 -😊', fn: g => { g.flags.techLayoff=true; const severance=Math.floor(g.jobSalary*2);setJob(g,'待业中',0);return{money:severance,mood:-10,social:-5}; }},
+        { label:'等着被裁拿N+3', hint:'🎲 +💰💰', fn: g => { g.flags.techLayoff=true; if(Math.random()>0.3){const severance=Math.floor(g.jobSalary*4);setJob(g,'待业中',0);return{money:severance,mood:-15}}else{setJob(g,'待业中',0);return{mood:-25}} }},
+        { label:'拼命表现争取留下', hint:'-❤️ +🧠', fn: g => { g.flags.techLayoff=true; if(g.intel>75&&Math.random()>0.5){return{health:-10,intel:5,mood:5}}else{setJob(g,'待业中',0);return{health:-15,mood:-20}} }},
+        { label:'开始找下家', hint:'+🧠 +👥', fn: g => { g.flags.techLayoff=true; g.flags.jobHunting=true; return{intel:5,social:5,mood:-5}; }},
+      ]},
+    { id:'side_hustle_boom', icon:'🚀', title:'副业爆单',
+      body:'你的副业突然火了！\n\n也许是你的自媒体账号突然涨粉，也许是你做的App突然有了付费用户，也许是你代购的东西突然被抢光了。\n\n这个月的副业收入超过了主业！\n\n"当副业超过主业，它就不再是副业了——它是你的第二人生。"',
+      cond: g => g.flags.sideHustle && g.job!=='待业中' && !g.flags.sideHustleBoom && g.age>=25,
+      choices:[
+        { label:'辞职全职做副业', hint:'🎲 +💰 +😊', fn: g => { g.flags.sideHustleBoom=true; if(Math.random()>0.4){setJob(g,'自由职业者',Math.floor(g.jobSalary*0.8));return{money:20000,mood:25,charm:8}}else{setJob(g,'待业中',0);return{money:-10000,mood:-15}} }},
+        { label:'两边都做', hint:'-❤️ +💰 +💰', fn: g => { g.flags.sideHustleBoom=true; return{health:-10,money:30000,intel:5,mood:10}; }},
+        { label:'保持现状，慢慢来', hint:'+😊 +🧠', fn: g => { g.flags.sideHustleBoom=true; return{money:15000,mood:12,intel:5}; }},
+      ]},
+    { id:'existential_dread', icon:'🌑', title:'存在焦虑',
+      body:'深夜3点，你躺在床上，突然被一个问题击中：\n\n"我这辈子到底在追求什么？"\n\n钱？有了也不够。地位？爬上去也会下来。爱情？也许只是荷尔蒙。\n\n你不是抑郁，你只是在思考人生。\n\n"存在焦虑不是病，是清醒的代价。"',
+      cond: g => g.age>=28 && g.intel>65 && !g.flags.existentialDread && g.mood<55 && Math.random()>0.6,
+      choices:[
+        { label:'读哲学书找答案', hint:'+🧠 +😊', fn: g => { g.flags.existentialDread=true; return{intel:15,mood:10}; }},
+        { label:'旅行放空自己', hint:'-💰 +😊 +❤️', fn: g => { g.flags.existentialDread=true; return{money:-8000,mood:20,health:10,charm:5}; }},
+        { label:'找心理咨询师', hint:'-💰 +😊 +🧠', fn: g => { g.flags.existentialDread=true; g.flags.therapy=true; return{money:-3000,mood:15,intel:5,health:5}; }},
+        { label:'不去想，继续生活', hint:'+😊 -🧠', fn: g => { g.flags.existentialDread=true; return{mood:5,intel:-3}; }},
+      ]},
+    { id:'old_friend_reunion', icon:'🍻', title:'老友重逢',
+      body:'你在朋友圈看到了一个熟悉的名字——你的大学室友/高中同学。\n\nTA来你的城市出差，约你见面。\n\n你们在烧烤摊前坐下，一杯啤酒下肚，仿佛回到了10年前。\n\nTA说："你变了。"你说："你也是。"\n\n但聊着聊着，你们发现：有些东西没有变。\n\n"老友是时间给你的礼物——即使好久不联系，一见面还是那个味道。"',
+      cond: g => g.age>=28 && g.relationships && g.relationships.friends<60 && !g.flags.oldFriendReunion && Math.random()>0.6,
+      choices:[
+        { label:'畅聊到天亮', hint:'+👥 +😊 +❤️', fn: g => { g.flags.oldFriendReunion=true; g.relationships.friends=clamp((g.relationships.friends||40)+20,0,100); return{social:15,mood:20,health:-3}; }},
+        { label:'交换近况，保持联系', hint:'+👥 +😊', fn: g => { g.flags.oldFriendReunion=true; g.relationships.friends=clamp((g.relationships.friends||40)+10,0,100); return{social:8,mood:10}; }},
+        { label:'只是礼貌性见面', hint:'+😊', fn: g => { g.flags.oldFriendReunion=true; return{mood:3}; }},
+      ]},
+    { id:'pension_anxiety', icon:'👴', title:'养老焦虑',
+      body:'你看到一条新闻："2040年养老金可能入不敷出。"\n\n你算了算：你现在每月交社保，但退休后能拿多少？\n\n你打开计算器：按现在的工资和缴费年限，退休后每月大概4000元。\n\n而你现在每月花费至少8000元。\n\n"养老焦虑不是杞人忧天，是数学题。"',
+      cond: g => g.age>=32 && g.job!=='待业中' && !g.flags.pensionAnxiety,
+      choices:[
+        { label:'开始做养老规划', hint:'-💰 +🧠 +😊', fn: g => { g.flags.pensionAnxiety=true; g.flags.retirementPlanning=true; return{money:-20000,intel:10,mood:8}; }},
+        { label:'投资养老房产', hint:'-💰💰 +💰?', fn: g => { g.flags.pensionAnxiety=true; if(Math.random()>0.5){return{money:-100000,mood:10,intel:5}}else{return{money:-150000,mood:-15}} }},
+        { label:'不管了，活在当下', hint:'+😊 -🧠', fn: g => { g.flags.pensionAnxiety=true; return{mood:5,intel:-3}; }},
+        { label:'多生孩子多保障', hint:'-💰 +👨‍👩‍👧', fn: g => { g.flags.pensionAnxiety=true; if(g.flags.hasChild){g.relationships.family=clamp((g.relationships.family||60)+5,0,100)}return{money:-10000,mood:3}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -2175,6 +2227,12 @@ const ACHIEVEMENTS = [
     { id:'credit_fixer', icon:'📊', name:'信用修复师', desc:'修复了征信', check: g => g.flags.creditRepaired },
     { id:'bridge_builder', icon:'🌉', name:'代沟桥梁师', desc:'理解了父母那一代', check: g => g.flags.generationalClash && g.relationships && g.relationships.family>=70 },
     { id:'phoenix', icon:'🔥', name:'浴火凤凰', desc:'从人生低谷重新崛起', check: g => (g.flags.romanceScam||g.flags.mortgageDefault||g.flags.parentIllness) && g.money>=50000 && g.mood>=60 },
+    // v2.32 achievements
+    { id:'layoff_survivor', icon:'📉', name:'裁员幸存者', desc:'经历了互联网大裁员', check: g => g.flags.techLayoff },
+    { id:'hustle_king', icon:'🚀', name:'副业之王', desc:'副业收入超过主业', check: g => g.flags.sideHustleBoom },
+    { id:'philosopher', icon:'📖', name:'生活哲学家', desc:'面对存在焦虑', check: g => g.flags.existentialDread && g.intel>=70 },
+    { id:'old_friend', icon:'🍻', name:'老友记', desc:'与老朋友重逢', check: g => g.flags.oldFriendReunion },
+    { id:'pension_planner', icon:'👴', name:'养老规划师', desc:'开始做养老规划', check: g => g.flags.retirementPlanning },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -2561,6 +2619,15 @@ function showEvent(event) {
             </div>
         </div>`;
     document.getElementById('btn-advance').disabled = true;
+    // v2.32: Context-sensitive sound effects
+    const dangerIds = ['karoshi','bankruptcy','jail','romanceScam','techLayoff','mortgageDefault','creditCrisis'];
+    const emotionIds = ['oldFriendReunion','parentIllness','generationalClash','existentialDread','midlifeAwakening'];
+    const moneyIds = ['windfall','lotteryTicket','salaryNegotiation','sideHustleBoom'];
+    if (dangerIds.some(id => event.id.includes(id))) playSound('danger');
+    else if (emotionIds.some(id => event.id.includes(id))) playSound('emotion');
+    else if (moneyIds.some(id => event.id.includes(id))) playSound('money');
+    else if (event.isChain) playSound('chain');
+    else playSound('click');
 }
 
 function makeChoice(i) {
@@ -2983,7 +3050,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.31' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.32' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
@@ -3250,6 +3317,44 @@ function playSound(type) {
                 gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
                 osc.start(ctx.currentTime);
                 osc.stop(ctx.currentTime + 0.4);
+                break;
+            case 'money':
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1200, ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(1800, ctx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.15);
+                break;
+            case 'danger':
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(200, ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(100, ctx.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.12, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.3);
+                break;
+            case 'chain':
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(500, ctx.currentTime);
+                osc.frequency.setValueAtTime(700, ctx.currentTime + 0.1);
+                osc.frequency.setValueAtTime(900, ctx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.35);
+                break;
+            case 'emotion':
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(350, ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(450, ctx.currentTime + 0.3);
+                osc.frequency.linearRampToValueAtTime(350, ctx.currentTime + 0.6);
+                gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.6);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.6);
                 break;
         }
     } catch (e) {
