@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v4.4
+// 都市浮生记 - Game Engine v4.5
 // ============================================
 
 // === GAME STATE ===
@@ -2958,6 +2958,25 @@ const EVENTS = [
         { label:'开发AI工具', hint:'+💰 +🧠 +✨', fn: g => { g.flags.aiSideHustle=true; g.flags.aiToolDev=true; return{money:8000,intel:20,charm:10}; }},
         { label:'不买，不学', hint:'+💰 +😊', fn: g => { g.flags.aiSideHustle=true; return{money:998,mood:3}; }},
       ]},
+    // === v4.5 EVENTS - 多巴胺穿搭与县城文学 ===
+    { id:'dopamine_dressing', icon:'👗', title:'多巴胺穿搭',
+      body:'你看了看衣柜：黑、白、灰。\n\n你打开小红书：满屏都是红、橙、黄、绿、蓝、紫。\n\n"多巴胺穿搭"——用鲜艳的色彩刺激大脑分泌多巴胺，让心情变好。\n\n你买了一件荧光绿的T恤，一条亮橙色的裤子。\n\n朋友说："你看起来像个移动的调色盘。"\n\n你说："这叫快乐穿搭。"\n\n"穿得像调色盘，活得像彩虹——多巴胺穿搭，把快乐穿在身上。"',
+      cond: g => !g.flags.dopamineDressing && g.age>=18 && g.age<=32,
+      choices:[
+        { label:'全套多巴胺穿搭', hint:'-💰 +✨ +😊', fn: g => { g.flags.dopamineDressing=true; g.flags.colorfulStyle=true; return{money:-2000,charm:15,mood:18}; }},
+        { label:'买一件彩色单品', hint:'-💰 +✨', fn: g => { g.flags.dopamineDressing=true; return{money:-500,charm:8,mood:10}; }},
+        { label:'发小红书', hint:'+👥 +✨ +😊', fn: g => { g.flags.dopamineDressing=true; g.flags.fashionBlogger=Math.random()>0.6; return{social:15,charm:12,mood:15}; }},
+        { label:'还是黑白灰舒服', hint:'+😊', fn: g => { g.flags.dopamineDressing=true; return{mood:5,charm:-3}; }},
+      ]},
+    { id:'small_town_nostalgia', icon:'🏘️', title:'县城文学',
+      body:'你看到一篇小红书：\n\n"逃离北上广，回到小县城。"\n\n配图：青石板路、老茶馆、梧桐树、猫。\n\n你心动了。\n\n但你又看到另一篇：\n\n"县城的真实生活：月薪3000，相亲5年，买房10万，买车5万，结婚30万，然后继续相亲。"\n\n"县城文学——是年轻人的乡愁，也是现实的两个版本。"',
+      cond: g => !g.flags.smallTownNostalgia && g.age>=24 && g.age<=35 && g.city!=='成都',
+      choices:[
+        { label:'回县城看看', hint:'-💰 +😊 +👥', fn: g => { g.flags.smallTownNostalgia=true; g.flags.hometownVisit=true; return{money:-2000,mood:15,social:10}; }},
+        { label:'写县城故事', hint:'+✨ +🧠', fn: g => { g.flags.smallTownNostalgia=true; g.flags.writer=true; return{charm:12,intel:10,mood:8}; }},
+        { label:'算了，还是留在大城市', hint:'+🧠 +😊', fn: g => { g.flags.smallTownNostalgia=true; return{intel:5,mood:3}; }},
+        { label:'发朋友圈感慨', hint:'+👥 +✨', fn: g => { g.flags.smallTownNostalgia=true; return{social:8,charm:5,mood:5}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3170,6 +3189,9 @@ const ACHIEVEMENTS = [
     // v4.4 achievements
     { id:'ai_adapter', icon:'🤖', name:'AI适应者', desc:'学会使用AI工具', check: g => g.flags.aiToolUser || g.flags.aiTrainer },
     { id:'ai_entrepreneur', icon:'💻', name:'AI创业者', desc:'尝试AI副业', check: g => g.flags.aiSideHustle },
+    // v4.5 achievements
+    { id:'dopamine_dresser', icon:'👗', name:'多巴胺穿搭师', desc:'尝试色彩穿搭', check: g => g.flags.colorfulStyle },
+    { id:'town_writer', icon:'🏘️', name:'县城文学作者', desc:'写县城故事', check: g => g.flags.writer && g.flags.smallTownNostalgia },
 ];
 
 // === ENDINGS === (order matters: first match wins)
