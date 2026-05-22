@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v5.9
+// 都市浮生记 - Game Engine v6.0
 // ============================================
 
 // === GAME STATE ===
@@ -3162,6 +3162,16 @@ const EVENTS = [
         { label:'拍汉服写真', hint:'-💰 +✨ +😊', fn: g => { g.flags.hanfuCulture=true; return{money:-2000,charm:15,mood:18}; }},
         { label:'了解一下就好', hint:'+🧠 +😊', fn: g => { g.flags.hanfuCulture=true; return{intel:8,mood:8}; }},
       ]},
+    // === v6.0 EVENTS - 寺庙与佛系青年 ===
+    { id:'temple_visit', icon:'🏯', title:'去寺庙',
+      body:'你去了雍和宫，挤满了烧香拜佛的年轻人。\n\n"在上班和上进之间，选择了上香。"\n\n你求了个签：中吉。\n\n法师说："佛学不是逃避，是觉悟。从生活中谈觉悟，才是修行。"\n\n"年轻人涌入寺庙，不是迷信，是在不确定性中寻找确定性。"\n\n"把希望寄托在佛祖身上，至少能把不确定的压力转移出去。"\n\n你花了200元买了手串，开了光。',
+      cond: g => !g.flags.templeVisit && g.age>=22 && g.age<=35 && g.mood<70,
+      choices:[
+        { label:'认真拜佛', hint:'+😊 +🧠 +❤️', fn: g => { g.flags.templeVisit=true; g.flags.buddhistPractice=true; return{mood:20,intel:10,health:5}; }},
+        { label:'买开光手串', hint:'-💰 +✨ +😊', fn: g => { g.flags.templeVisit=true; return{money:-200,charm:10,mood:15}; }},
+        { label:'当义工', hint:'+😊 +🧠 +👥', fn: g => { g.flags.templeVisit=true; g.flags.templeVolunteer=true; return{mood:25,intel:12,social:10}; }},
+        { label:'只是看看', hint:'+🧠 +😊', fn: g => { g.flags.templeVisit=true; return{intel:8,mood:8}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3410,6 +3420,8 @@ const ACHIEVEMENTS = [
     { id:'urban_farmer', icon:'🌱', name:'都市农夫', desc:'阳台种菜成功', check: g => g.flags.balconyGarden },
     // v5.9 achievements
     { id:'hanfu_enthusiast', icon:'👘', name:'汉服爱好者', desc:'体验汉服文化', check: g => g.flags.hanfuCulture },
+    // v6.0 achievements
+    { id:'zen_seeker', icon:'🏯', name:'佛系青年', desc:'去寺庙寻求心灵慰藉', check: g => g.flags.templeVisit },
 ];
 
 // === ENDINGS === (order matters: first match wins)
