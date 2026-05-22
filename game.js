@@ -1817,10 +1817,63 @@ const EVENTS = [
       body:'你朋友找你借钱："兄弟/姐妹，借我2万，下个月还你。"\n\n你心里想：上次借他的5000还没还呢。\n\n但他说："这次是真的急用，我妈住院了。"\n\n你不知道该不该借。\n\n"借钱给朋友，可能失去朋友，也可能失去钱。"',
       cond: g => g.money>10000 && g.relationships.friends>50 && !g.flags.friendBorrowMoney,
       choices:[
-        { label:'借，友情无价', hint:'-💰 +👥', fn: g => { g.flags.friendBorrowMoney=true; g.relationships.friends = clamp((g.relationships.friends||40)+20, 0, 100); return{money:-20000,social:15,mood:5}; }},
+        { label:'借，友情无价', hint:'-💰 +👥', fn: g => { g.flags.friendBorrowMoney=true; g.relationships.friends = clamp((g.relationships.friends||40)+20, 0, 100); return{money:-20000,social:15,mood:5,nextEvent: g => ({
+            id:'friend_repay', icon:'💰', title:'朋友还钱',
+            body:'3个月过去了，你朋友主动还了你2万块，还多给了2000块利息。\n\n他说："谢谢你在我最难的时候帮我。"\n\n你笑了：原来友情也可以是双赢。\n\n"真正的友情，经得起金钱的考验。"',
+            choices:[
+                { label:'收下利息', hint:'+💰 +😊', fn: g => { g.relationships.friends = clamp((g.relationships.friends||40)+10, 0, 100); return{money:22000,mood:15,social:10}; }},
+                { label:'只收本金', hint:'+👥 +✨', fn: g => { g.relationships.friends = clamp((g.relationships.friends||40)+15, 0, 100); return{money:20000,mood:20,charm:10,social:12}; }},
+            ]})};
+        }},
         { label:'借一半，量力而行', hint:'-💰 +👥', fn: g => { g.flags.friendBorrowMoney=true; g.relationships.friends = clamp((g.relationships.friends||40)+10, 0, 100); return{money:-10000,social:8,mood:3}; }},
         { label:'拒绝，上次还没还', hint:'+💰 -👥', fn: g => { g.flags.friendBorrowMoney=true; g.relationships.friends = clamp((g.relationships.friends||40)-15, 0, 100); return{mood:-10,social:-8}; }},
         { label:'转账，不用还了', hint:'-💰💰 +👥 +✨', fn: g => { g.flags.friendBorrowMoney=true; g.relationships.friends = clamp((g.relationships.friends||40)+30, 0, 100); return{money:-20000,social:20,charm:15,mood:15}; }},
+      ]},
+    // ===== v2.26: CHAIN EVENTS & CULTURAL DEPTH =====
+    { id:'office_gossip', icon:'🗣️', title:'办公室八卦',
+      body:'你在茶水间听到同事在八卦：\n\n"听说老板要离婚了……""小李要被裁了……""公司要被收购了……"\n\n你不确定这些消息是真是假，但你知道：在办公室，信息就是权力。\n\n"办公室八卦是职场的润滑剂——但也可能是地雷。"',
+      cond: g => g.job!=='待业中' && g.months>6 && !g.flags.officeGossip,
+      choices:[
+        { label:'加入八卦，获取信息', hint:'+👥 -🧠', fn: g => { g.flags.officeGossip=true; g.relationships.colleagues = clamp((g.relationships.colleagues||30)+8, 0, 100); return{social:8,intel:-3,mood:5,nextEvent: g => ({
+            id:'gossip_backfire', icon:'😱', title:'八卦翻车',
+            body:'你传的八卦被当事人知道了。老板找你谈话："听说你在到处说我离婚的事？"\n\n你解释了半天，但老板显然不信。\n\n你的绩效被打成了C。\n\n"管住嘴，是职场的第一课——你终于学会了，虽然有点晚。"',
+            choices:[
+                { label:'道歉，承认错误', hint:'+🧠 -😊', fn: g => { g.relationships.colleagues = clamp((g.relationships.colleagues||30)-15, 0, 100); return{intel:5,mood:-20,social:-10}; }},
+                { label:'解释，推卸责任', hint:'-👥 -✨', fn: g => { g.relationships.colleagues = clamp((g.relationships.colleagues||30)-20, 0, 100); return{mood:-15,charm:-10,social:-12}; }},
+            ]})};
+        }},
+        { label:'只听不说，保持中立', hint:'+🧠', fn: g => { g.flags.officeGossip=true; return{intel:5,mood:3}; }},
+        { label:'走开，不参与', hint:'+✨ +🧠', fn: g => { g.flags.officeGossip=true; return{charm:5,intel:3,mood:5}; }},
+      ]},
+    { id:'parent_health_scare', icon:'🏥', title:'父母体检',
+      body:'你带父母去做了年度体检。结果出来了：\n\n- 爸：高血压、高血脂、轻度脂肪肝\n- 妈：骨质疏松、血糖偏高\n\n医生说："都是老年病，注意饮食和运动。"\n\n你看着他们，突然意识到：他们真的老了。\n\n"父母的健康，是你最大的财富——但你总是在失去它。"',
+      cond: g => g.age>=28 && g.money>15000 && !g.flags.parentHealthScare,
+      choices:[
+        { label:'买保健品', hint:'-💰 +👨‍👩‍👧', fn: g => { g.flags.parentHealthScare=true; g.relationships.family = clamp((g.relationships.family||60)+12, 0, 100); return{money:-8000,mood:10,social:5,nextEvent: g => ({
+            id:'parent_lifestyle', icon:'🏃', title:'父母健康生活',
+            body:'你给父母买了运动手环、健康食谱、健身卡。\n\n3个月后，你妈打电话来："你爸瘦了10斤，血压也正常了。"\n\n你笑了：原来健康是可以管理的。\n\n"健康不是天生的，是习惯的结果。"',
+            choices:[
+                { label:'继续保持', hint:'+👨‍👩‍👧 +❤️', fn: g => { g.relationships.family = clamp((g.relationships.family||60)+10, 0, 100); return{mood:15,health:5}; }},
+            ]})};
+        }},
+        { label:'请私人医生', hint:'-💰💰 +👨‍👩‍👧', fn: g => { g.flags.parentHealthScare=true; g.relationships.family = clamp((g.relationships.family||60)+20, 0, 100); return{money:-25000,mood:15}; }},
+        { label:'多打电话关心', hint:'+👨‍👩‍👧 +😊', fn: g => { g.flags.parentHealthScare=true; g.relationships.family = clamp((g.relationships.family||60)+10, 0, 100); return{mood:8}; }},
+      ]},
+    { id:'career_milestone', icon:'🏆', title:'职场里程碑',
+      body:'你在这家公司干了3年了。领导找你谈话：\n\n"公司准备提拔你为Team Lead，带5个人的团队，涨薪30%。"\n\n你有点激动，但也有点紧张：你能胜任吗？\n\n"升职不是终点，是新的起点——也是新的压力。"',
+      cond: g => g.job!=='待业中' && g.months>=36 && g.intel>60 && !g.flags.careerMilestone,
+      choices:[
+        { label:'接受挑战', hint:'+💰 +🧠 -❤️', fn: g => { g.flags.careerMilestone=true; const raise=Math.floor(g.jobSalary*0.3); g.jobSalary+=raise; return{money:raise*6,intel:10,health:-5,mood:15,nextEvent: g => ({
+            id:'leadership_challenge', icon:'👥', title:'领导力考验',
+            body:'你当上了Team Lead，但你发现：管理团队比做业务难多了。\n\n- 有人摸鱼\n- 有人不服\n- 有人要离职\n\n你开始怀疑：我是不是不适合做管理？\n\n"领导力不是天生的，是摔出来的。"',
+            choices:[
+                { label:'学习管理技能', hint:'+🧠 +👥', fn: g => { g.relationships.colleagues = clamp((g.relationships.colleagues||30)+15, 0, 100); return{intel:12,social:10,mood:10}; }},
+                { label:'请教前辈', hint:'+🧠 +👥', fn: g => { return{intel:10,social:8,mood:8}; }},
+                { label:'申请回到技术岗', hint:'+😊 -💰', fn: g => { g.jobSalary-=raise; return{mood:15,money:-raise*3}; }},
+            ]})};
+        }},
+        { label:'要求更多薪资', hint:'+💰 🎲', fn: g => { g.flags.careerMilestone=true; if(Math.random()>0.5){const raise=Math.floor(g.jobSalary*0.4);g.jobSalary+=raise;return{money:raise*6,mood:20}}else{return{mood:-15}} }},
+        { label:'拒绝，专注技术', hint:'+🧠 +😊', fn: g => { g.flags.careerMilestone=true; return{intel:15,mood:10}; }},
       ]},
 ];
 
@@ -2559,7 +2612,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.25' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.26' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
