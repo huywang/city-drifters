@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v14.3
+// 都市浮生记 - Game Engine v14.4
 // ============================================
 
 // === GAME STATE ===
@@ -7449,6 +7449,87 @@ const EVENTS = [
         { label:'加入社区乐队', hint:'+👥 +😊', fn: g => { g.flags.hobbyRediscovery=true; g.flags.communityBand=true; return{social:12,mood:10}; }},
         { label:'挂回墙上，改天再说', hint:'+🧠', fn: g => { g.flags.hobbyRediscovery=true; return{intel:3}; }},
       ]},
+    // === v14.4 跨代关系 + 祖孙情深 + 家族传承 ===
+    { id:'grandparent_bond', icon:'👵', title:'祖孙情深',
+      body:'你的爷爷/奶奶年纪越来越大了。\n\n每次回老家，奶奶都会做一桌子菜。你说：「我吃不了这么多。」她说：「你小时候可没少吃。」\n\n她拉着你的手，说了很多以前的事：你小时候怎么哭、怎么闹、怎么第一次叫她奶奶。你听着听着，眼眶就红了。\n\n她塞给你一个大红包。你说不要。她说：「拿着，奶奶还有。」你知道她没有。\n\n"祖孙之间：是最纯粹的爱——因为隔了一代，所有的严厉都变成了温柔。"',
+      cond: g => g.age >= 25 && g.flags.hasParents && !g.flags.grandparentBond,
+      choices:[
+        { label:'多回老家陪奶奶', hint:'+😊 +👥 -💪', fn: g => { g.flags.grandparentBond=true; g.flags.frequentVisitor=true; return{mood:15,social:10,health:-3}; }},
+        { label:'教奶奶用视频通话', hint:'+🧠 +😊', fn: g => { g.flags.grandparentBond=true; g.flags.techTeacher=true; return{intel:5,mood:10}; }},
+        { label:'记下奶奶的故事', hint:'+🧠 +😊', fn: g => { g.flags.grandparentBond=true; g.flags.storyCollector=true; return{intel:10,mood:12}; }},
+      ]},
+    { id:'family_tradition', icon:'🏮', title:'家风传承',
+      body:'过年了，你带着孩子回老家。\n\n你的父亲拿出一本泛黄的笔记本，说是爷爷留下的。里面记着家训：「做人要厚道，做事要认真。」\n\n你的孩子问：「什么是家训？」你说：「就是爷爷的爷爷告诉我们该怎么做人。」他说：「那爷爷的爷爷是谁？」你：「……」\n\n你的父亲笑了：「这个孩子像我。」\n\n"家风：不是刻在墙上的字——是流淌在血脉里的规矩。"',
+      cond: g => g.age >= 30 && g.flags.hasChild && g.flags.hasParents && !g.flags.familyTradition,
+      choices:[
+        { label:'把家训教给孩子', hint:'+🧠 +👥', fn: g => { g.flags.familyTradition=true; g.flags.traditionKeeper=true; return{intel:8,social:5,mood:8}; }},
+        { label:'写一本新的家训', hint:'+🧠 +✨', fn: g => { g.flags.familyTradition=true; g.flags.modernTradition=true; return{intel:12,charm:5,mood:10}; }},
+        { label:'觉得过时了', hint:'-👥 +🧠', fn: g => { g.flags.familyTradition=true; return{intel:5,social:-5}; }},
+      ]},
+    { id:'generation_gap_v2', icon:'🔄', title:'代际冲突',
+      body:'你和父母因为教育理念吵了起来。\n\n你说：「要尊重孩子的个性。」你妈说：「我当年打你你也没长歪。」\n\n你说：「要给孩子自由。」你爸说：「自由？我当年连自由是什么都不知道，不也把你养大了？」\n\n你的孩子在旁边看着你们吵架，说了一句：「大人好幼稚。」\n\n你们同时沉默了。\n\n"代际冲突：不是因为谁对谁错——是因为每一代人都在用自己的方式爱下一代。"',
+      cond: g => g.age >= 30 && g.flags.hasChild && g.flags.hasParents && !g.flags.generationGap,
+      choices:[
+        { label:'主动道歉', hint:'+👥 +😊', fn: g => { g.flags.generationGap=true; g.flags.peacemaker=true; return{social:10,mood:8}; }},
+        { label:'坚持自己的立场', hint:'+🧠 -👥', fn: g => { g.flags.generationGap=true; g.flags.independentThinker=true; return{intel:8,social:-5}; }},
+        { label:'找中间方案', hint:'+🧠 +👥', fn: g => { g.flags.generationGap=true; g.flags.compromise=true; return{intel:10,social:8}; }},
+      ]},
+    { id:'elder_care_dilemma', icon:'🏥', title:'养老困境',
+      body:'你的父亲住院了。医生说需要长期护理。\n\n你面临一个艰难的选择：请护工太贵、送养老院不忍心、自己照顾没法上班。\n\n你的兄弟姐妹开了一个家庭会议。大哥说：「轮流照顾。」二姐说：「我没时间。」你说：「我出钱。」\n\n最后你们决定：请一个护工，每人每月出3000。你觉得不够，但你也不知道还能怎样。\n\n你父亲在病床上说：「你们别为我吵架。」你们都说：「没有。」但每个人心里都有一本账。\n\n"养老困境：不是没有爱——是爱和现实之间，隔了一个中国。"',
+      cond: g => g.age >= 35 && g.flags.hasParents && !g.flags.elderCareDilemma,
+      choices:[
+        { label:'亲自照顾', hint:'+👥 +😊 -💪 -💰', fn: g => { g.flags.elderCareDilemma=true; g.flags.fulltimeCarer=true; return{social:10,mood:5,health:-10,money:-5000}; }},
+        { label:'请护工+多探望', hint:'-💰 +👥 +😊', fn: g => { g.flags.elderCareDilemma=true; g.flags.hireCaregiver=true; return{money:-8000,social:5,mood:3}; }},
+        { label:'和兄弟姐妹分担', hint:'+👥 +🧠', fn: g => { g.flags.elderCareDilemma=true; g.flags.familySharing=true; return{social:8,intel:5,mood:5}; }},
+      ]},
+    { id:'elder_remarriage', icon:'💑', title:'黄昏恋',
+      body:'你的妈妈说：「我交了一个朋友。」\n\n你一开始没反应过来。直到她拿出手机给你看照片——一个头发花白但精神很好的叔叔。\n\n你说：「妈，你是认真的？」她说：「你爸走了十年了，我也该有自己的生活了。」\n\n你的亲戚们炸锅了。大姑说：「不像话。」二叔说：「财产怎么分？」你妈说：「我的人生我做主。」\n\n你站在妈妈这边。你说：「妈，你开心就好。」\n\n"黄昏恋：不是老不正经——是活着就要有爱。"',
+      cond: g => g.age >= 35 && g.flags.hasParents && !g.flags.elderRemarriage,
+      choices:[
+        { label:'全力支持', hint:'+👥 +😊 +✨', fn: g => { g.flags.elderRemarriage=true; g.flags.supportiveChild=true; return{social:8,mood:12,charm:5}; }},
+        { label:'帮妈妈把关', hint:'+🧠 +👥', fn: g => { g.flags.elderRemarriage=true; g.flags.protectiveChild=true; return{intel:8,social:5}; }},
+        { label:'表示担忧', hint:'-👥 +🧠', fn: g => { g.flags.elderRemarriage=true; return{social:-5,intel:5}; }},
+      ]},
+    { id:'family_reunion_v2', icon:'🎊', title:'家族聚会',
+      body:'你组织了一次大型家族聚会。\n\n来了三十多个人：叔伯姑舅姨、堂兄表妹、还有你叫不上名的远房亲戚。一个小孩叫你「爷爷」，你才28岁。\n\n大家围坐在一起，聊着聊着就开始比谁的孩子成绩好、谁的房子大、谁的车贵。你默默吃着花生米。\n\n但到了晚上，大家一起放烟花的时候，所有人都笑了——不管有钱没钱，烟花都是一样的。\n\n"家族聚会：不是在比谁过得好——是在确认我们都还在。"',
+      cond: g => g.age >= 28 && !g.flags.familyReunion,
+      choices:[
+        { label:'享受团聚时光', hint:'+😊 +👥', fn: g => { g.flags.familyReunion=true; return{mood:12,social:10}; }},
+        { label:'拍下全家福', hint:'+😊 +✨', fn: g => { g.flags.familyReunion=true; g.flags.familyPhoto=true; return{mood:15,charm:5}; }},
+        { label:'下次再说吧', hint:'+🧠', fn: g => { g.flags.familyReunion=true; return{intel:3}; }},
+      ]},
+    { id:'inheritance_talk', icon:'📋', title:'遗产话题',
+      body:'一个亲戚去世了，遗产分配成了家族热议的话题。\n\n大儿子说：「我是长子，应该多分。」女儿说：「我照顾了爸十年。」二儿子说：「爸生前说了平分。」\n\n你看着他们从哭泣变成了争吵，从亲人变成了对手。\n\n你的父亲在旁边沉默了很久，说了一句：「等我不在了，你们别这样。」\n\n你说：「爸，你不会的。」他摇了摇头：「我是说，你们提前说清楚。」\n\n"遗产：不是钱的问题——是钱暴露了人的问题。"',
+      cond: g => g.age >= 35 && g.flags.hasParents && !g.flags.inheritanceTalk,
+      choices:[
+        { label:'和家人开诚布公', hint:'+👥 +🧠', fn: g => { g.flags.inheritanceTalk=true; g.flags.openCommunication=true; return{social:10,intel:8,mood:5}; }},
+        { label:'立遗嘱太早了吧', hint:'-🧠 +😊', fn: g => { g.flags.inheritanceTalk=true; return{intel:-3,mood:3}; }},
+        { label:'建议找律师咨询', hint:'+🧠 -💰', fn: g => { g.flags.inheritanceTalk=true; g.flags.legalAdvice=true; return{intel:10,money:-2000}; }},
+      ]},
+    { id:'child_growing_up', icon:'🌱', title:'孩子长大了',
+      body:'你的孩子第一次自己做了一顿饭。\n\n虽然鸡蛋炒糊了、米饭夹生了、厨房像被洗劫过——但你吃了一口，觉得这是世界上最好吃的饭。\n\n你突然意识到：他/她不再是那个需要你帮忙穿鞋的小孩了。他有了自己的想法、自己的朋友、自己的秘密。\n\n你想翻看他的日记，但忍住了。你想查看他的手机，但也忍住了。\n\n放手，也许是最难的 parenting skill。\n\n"孩子长大：不是你教会了他什么——是他让你学会了什么。"',
+      cond: g => g.age >= 38 && g.flags.hasChild && !g.flags.childGrowingUp,
+      choices:[
+        { label:'给孩子更多空间', hint:'+😊 +🧠', fn: g => { g.flags.childGrowingUp=true; g.flags.trustingParent=true; return{mood:10,intel:8}; }},
+        { label:'珍惜最后的亲密时光', hint:'+😊 +👥', fn: g => { g.flags.childGrowingUp=true; return{mood:15,social:8}; }},
+        { label:'开始为他的未来焦虑', hint:'-😊 +🧠', fn: g => { g.flags.childGrowingUp=true; g.flags.futureAnxiety=true; return{mood:-5,intel:5}; }},
+      ]},
+    { id:'family_recipe', icon:'🍲', title:'家传菜谱',
+      body:'你的奶奶把她的拿手菜谱教给了你。\n\n红烧肉要放冰糖、鱼要先煎后炖、饺子馅要打三次水。你一边记一边尝，味道和记忆中的一模一样。\n\n奶奶说：「这些菜，你妈不会做，你得学。」你说：「为什么不让妈学？」她说：「你妈做的菜太难吃了。」\n\n你的妈妈在厨房门口听到了，翻了个白眼。\n\n"家传菜谱：不是技术——是爱的配方。"',
+      cond: g => g.age >= 25 && g.flags.hasParents && !g.flags.familyRecipe,
+      choices:[
+        { label:'认真学会每道菜', hint:'+🧠 +😊 +💪', fn: g => { g.flags.familyRecipe=true; g.flags.cookingHeritage=true; return{intel:8,mood:12,health:5}; }},
+        { label:'录下奶奶做菜的视频', hint:'+🧠 +😊', fn: g => { g.flags.familyRecipe=true; g.flags.videoArchive=true; return{intel:10,mood:15}; }},
+        { label:'以后再说吧', hint:'+🧠', fn: g => { g.flags.familyRecipe=true; return{intel:3}; }},
+      ]},
+    { id:'parent_aging_v4', icon:'⏳', title:'父母老了',
+      body:'你发现父母的白头发越来越多了。\n\n你的爸爸走路开始变慢了，你的妈妈开始忘事了。他们以前是你的超级英雄，现在变成了需要你照顾的人。\n\n你打电话回家，妈妈说：「一切都好，别操心。」但你从邻居那里听说，爸爸上周摔了一跤。\n\n你买了最近的火车票回家。你爸看到你回来，假装生气：「不是说了不用回来吗？」但你看到他笑了。\n\n"父母老了：是你终于理解了他们当年的那句话——你长大就知道了。"',
+      cond: g => g.age >= 30 && g.flags.hasParents && !g.flags.parentAging,
+      choices:[
+        { label:'每周固定打电话', hint:'+👥 +😊', fn: g => { g.flags.parentAging=true; g.flags.weeklyCall=true; return{social:8,mood:8}; }},
+        { label:'安排全面体检', hint:'-💰 +💪 +👥', fn: g => { g.flags.parentAging=true; g.flags.parentHealthDone=true; return{money:-5000,health:5,social:5,mood:5}; }},
+        { label:'接父母来城里住', hint:'-💰 +👥 +😊', fn: g => { g.flags.parentAging=true; g.flags.cohabitation=true; return{money:-3000,social:12,mood:10}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -8142,6 +8223,17 @@ const ACHIEVEMENTS = [
     { id:'digital_elder_ach', icon:'📱', name:'数字银发族', desc:'面对了数字鸿沟', check: g => g.flags.digitalElder },
     { id:'elder_friend_ach', icon:'🤝', name:'忘年之交', desc:'交了老年朋友', check: g => g.flags.elderFriendship },
     { id:'hobby_rediscoverer_ach', icon:'🎨', name:'重拾爱好', desc:'找回了年轻时的爱好', check: g => g.flags.hobbyRediscovery },
+    // === v14.4 新增成就（跨代关系） ===
+    { id:'grandparent_bond_ach', icon:'👵', name:'祖孙情深', desc:'和祖辈建立了深厚感情', check: g => g.flags.grandparentBond },
+    { id:'tradition_keeper_ach', icon:'🏮', name:'家风传承人', desc:'传承了家族传统', check: g => g.flags.familyTradition },
+    { id:'generation_bridge_ach', icon:'🌉', name:'代际桥梁', desc:'化解了代际冲突', check: g => g.flags.generationGap },
+    { id:'elder_carer_ach', icon:'🏥', name:'养老担当者', desc:'面对了养老困境', check: g => g.flags.elderCareDilemma },
+    { id:'supportive_child_ach', icon:'💕', name:'开明子女', desc:'支持了父母的黄昏恋', check: g => g.flags.elderRemarriage },
+    { id:'family_gatherer_ach', icon:'🎊', name:'家族凝聚者', desc:'组织了家族聚会', check: g => g.flags.familyReunion },
+    { id:'inheritance_planner_ach', icon:'📋', name:'遗产规划者', desc:'面对了遗产话题', check: g => g.flags.inheritanceTalk },
+    { id:'child_growth_ach', icon:'🌱', name:'放手父母', desc:'学会了对孩子放手', check: g => g.flags.childGrowingUp },
+    { id:'recipe_inheritor_ach', icon:'🍲', name:'家传味道', desc:'学会了家传菜谱', check: g => g.flags.familyRecipe },
+    { id:'filial_awareness_ach', icon:'⏳', name:'孝心觉醒', desc:'意识到父母老了', check: g => g.flags.parentAging },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -8369,6 +8461,10 @@ const ENDINGS = [
     { id:'wisdom_elder_end', badge:'📚', title:'智慧长者', desc:'你成了一个有智慧的老人。\n\n你退休后开始写回忆录、上老年大学、和年轻人交朋友。你的故事被一个记者写成了文章，标题是「70岁的人生课堂」。\n\n你收到了很多读者的来信。有人说：「你的故事让我重新思考了人生。」你说：「人生不需要重新思考——需要重新活过。」\n\n你的回忆录出版了。虽然只卖了300本，但每一本都送给了你在乎的人。\n\n"智慧长者：不是活得久——是活得明白。"', cond: g => g.flags.memoirist && g.flags.seniorUniversity && g.flags.elderFriendship && g.intel >= 80 && g.age >= 55 },
     { id:'community_pillar_end', badge:'🏛️', title:'社区支柱', desc:'你成了社区里最受欢迎的人。\n\n你是广场舞的领舞、社区乐队的吉他手、老年大学的志愿者。每个人都认识你，每个人都喜欢你。\n\n你的邻居说：「你是我们社区的灵魂。」你说：「我只是喜欢热闹。」\n\n你70岁生日那天，整个小区给你办了生日会。你感动得哭了——但你说是被风吹的。\n\n"社区支柱：不是被需要——是被爱。"', cond: g => g.flags.squareDanceLeader && g.flags.communityBand && g.social >= 80 && g.age >= 55 },
     { id:'life_reconciliation_end', badge:'🕊️', title:'人生和解', desc:'你和过去和解了。\n\n你曾经有很多遗憾：没有好好陪家人、没有坚持自己的梦想、没有说出心里的话。\n\n但在人生的后半段，你做了所有你曾经不敢做的事。你给老友打了电话、给孩子写了信、重新弹起了那把落灰的吉他。\n\n你对着镜子说：「你好，老朋友。」镜子里的你笑了——那是你很久没见过的、发自内心的笑。\n\n"人生和解：不是原谅一切——是接受一切。"', cond: g => g.flags.lifeReview && g.flags.legacyThinking && g.flags.hobbyRediscovery && g.mood >= 65 && g.age >= 50 },
+    // --- v14.4 NEW ENDINGS (跨代关系) ---
+    { id:'family_legacy_end', badge:'🏮', title:'家族之光', desc:'你成了家族里最重视传统的那个人。\n\n你整理了爷爷的家训、学会了奶奶的菜谱、组织了每年的家族聚会。你的孩子虽然觉得你有点老派，但每次过年都期待着你做的那桌菜。\n\n你的父亲看着你说：「你比我做得好。」你说：「我只是不想让这些东西消失。」\n\n你的家族相册有500多张照片。每一张都是一个故事，每一张都是一个时代。\n\n"家族传承：不是守旧——是让后来的人知道自己从哪里来。"', cond: g => g.flags.familyTradition && g.flags.familyRecipe && g.flags.familyReunion && g.age >= 40 && g.mood >= 65 },
+    { id:'bridge_builder_end', badge:'🌉', title:'代际桥梁', desc:'你成了三代人之间的桥梁。\n\n你让父母理解了你的教育方式，让孩子理解了爷爷奶奶的爱。你用耐心和智慧，缝合了两代人之间的裂痕。\n\n你的父母和你的孩子坐在一张桌子前吃饭。你的父亲给你的孩子夹了一块红烧肉——那是你奶奶的配方。\n\n你看着这一幕，觉得这辈子做的最正确的事，就是没有让代沟变成鸿沟。\n\n"代际桥梁：不是让所有人想法一样——是让不同的想法都能被理解。"', cond: g => g.flags.generationGap && g.flags.peacemaker && g.flags.grandparentBond && g.age >= 40 && g.social >= 70 },
+    { id:'filial_champion_end', badge:'💕', title:'孝心典范', desc:'你用行动诠释了什么叫「百善孝为先」。\n\n你每周给父母打电话、每年带他们体检、假期一定回家。你的父母在小区里逢人就说：「我家孩子可孝顺了。」\n\n你的同事问你：「你不觉得累吗？」你说：「累。但我更怕来不及。」\n\n你的父母老了，但他们的笑容比以前更多了。因为有你。\n\n"孝心：不是等有钱了再说——是在来得及的时候，多做一点。"', cond: g => g.flags.parentAging && g.flags.weeklyCall && g.flags.parentHealthDone && g.age >= 38 && g.mood >= 60 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
