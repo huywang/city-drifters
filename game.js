@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v32.5
+// 都市浮生记 - Game Engine v32.6
 // ============================================
 
 // === GAME STATE ===
@@ -17974,6 +17974,97 @@ const EVENTS = [
         { label:'决定继续租房，把钱投资自己', hint:'+🧠 +💪', fn: g => { g.flags.buyOrRent=true; g.flags.investSelf=true; return{intel:5,health:3}; }},
         { label:'先看看老家或者周边城市的房价', hint:'+🧠', fn: g => { g.flags.buyOrRent=true; g.flags.checkOtherCities=true; return{intel:5}; }},
       ]},
+
+    // === v32.6 城市夜归人 ===
+    { id:'late_taxi_v32_6', icon:'🚕', title:'凌晨的出租车', category:'night',
+      body:'凌晨两点，你终于加完班了。你打了一辆出租车回家。\n\n司机是个四十多岁的男人，车里放着一首老歌。他看你很累的样子，说：「小伙子/姑娘，你们也太辛苦了。」\n\n你们聊了起来。他说他开夜班出租车已经十年了。「白天太堵了，晚上清净。而且晚上坐车的人，都挺有意思的。」\n\n他说他见过喝醉了哭着打电话的、见过刚下火车一脸迷茫的年轻人、见过抱着孩子赶去医院的父亲。\n\n「这个城市的夜晚，比白天真实多了。」\n\n你下了车，回头看了一眼——出租车又汇入了夜色中，去寻找下一个乘客。',
+      cond: g => g.age >= 20 && g.jobSalary > 0,
+      choices:[
+        { label:'跟司机聊了一路，觉得被治愈了', hint:'+😊 +🧠', fn: g => { g.flags.lateTaxi=true; return{mood:8,intel:3}; }},
+        { label:'多付了二十块当小费', hint:'-💰 +👥', fn: g => { g.flags.lateTaxi=true; g.money-=20; return{social:3,mood:5}; }},
+        { label:'在后座上睡着了', hint:'+💪', fn: g => { g.flags.lateTaxi=true; return{health:3}; }},
+      ]},
+
+    { id:'allnight_bookstore_v32_6', icon:'📖', title:'24小时书店', category:'night',
+      body:'失眠的凌晨，你出了门，走到了那家24小时营业的书店。\n\n书店里灯火通明，但人不多。一个戴着耳机的年轻人在看漫画，一对情侣坐在角落里低声说话，一个老爷爷在看报纸。\n\n你随手拿起一本书，坐了下来。翻了几页，你被一句话打动了：\n\n「人不是因为看到了才相信，而是因为相信了才看到。」\n\n你把这句话抄在了手机备忘录里。\n\n书店里有咖啡，你买了一杯。你坐到了天亮。走的时候，天刚蒙蒙亮，空气是凉的。\n\n你觉得有些夜晚，是为了让你重新开始的。',
+      cond: g => g.age >= 18 && g.intel > 40,
+      choices:[
+        { label:'买了一本书回家', hint:'-💰 +🧠 +😊', fn: g => { g.flags.allnightBookstore=true; g.money-=60; return{intel:5,mood:5}; }},
+        { label:'在便利贴上写了一句话留给下一个人', hint:'+✨ +😊', fn: g => { g.flags.allnightBookstore=true; g.flags.leftNote=true; return{charm:5,mood:8}; }},
+        { label:'坐到天亮，想了很多事', hint:'+🧠 +😊', fn: g => { g.flags.allnightBookstore=true; g.flags.sunriseThinking=true; return{intel:8,mood:3}; }},
+      ]},
+
+    { id:'night_nurse_v32_6', icon:'👩‍⚕️', title:'夜班护士', category:'night',
+      body:'你因为急性肠胃炎半夜去了急诊。\n\n急诊室里灯光惨白，护士们跑来跑去。你挂上点滴后，注意到给你扎针的那个护士眼圈发黑，但手很稳。\n\n你问她：「你上了多久的夜班了？」\n\n她说：「从昨天晚上七点到现在。还有三个小时下班。」\n\n你说：「辛苦了。」\n\n她笑了笑说：「习惯了。你们是生病才来一次，我们是天天在这。」\n\n你看着她在病床之间穿梭的背影，觉得这些在深夜里守护生命的人，值得更多的尊重和理解。',
+      cond: g => g.age >= 18,
+      choices:[
+        { label:'走之前专门去跟她说了声谢谢', hint:'+👥 +😊', fn: g => { g.flags.nightNurse=true; return{social:5,mood:5}; }},
+        { label:'在网上写了一篇感谢医护的文章', hint:'+✨ +👥', fn: g => { g.flags.nightNurse=true; g.flags.wroteThanks=true; return{charm:5,social:3}; }},
+        { label:'以后对医护人员多一些耐心', hint:'+🧠 +👥', fn: g => { g.flags.nightNurse=true; g.flags.morePatient=true; return{intel:3,social:3}; }},
+      ]},
+
+    { id:'designated_driver_v32_6', icon:'🚗', title:'代驾的夜晚', category:'night',
+      body:'朋友聚会喝了酒，你叫了一个代驾。\n\n代驾小哥骑着折叠电动车来了，利索地把车折好放进后备箱。他看起来三十出头，皮肤晒得黝黑。\n\n路上你们聊了几句。他说他白天在工地干活，晚上做代驾。「两个加起来一个月能赚七八千，老家老婆孩子等着呢。」\n\n他说最晚的一次接到凌晨四点的单，最远的一次从城东骑电动车回城西，骑了一个多小时。\n\n「不过也挺好的，晚上路上车少，骑着电动车吹风，比白天舒服。」\n\n到了小区门口，你给了他五星好评，又加了二十块小费。他说：「谢谢哥/姐。」然后骑着电动车消失在夜色里。',
+      cond: g => g.age >= 22 && g.money > 1000,
+      choices:[
+        { label:'给他五星好评加了小费', hint:'-💰 +😊', fn: g => { g.flags.designatedDriver=true; g.money-=20; return{mood:5}; }},
+        { label:'跟他说注意安全，路上慢点', hint:'+👥 +😊', fn: g => { g.flags.designatedDriver=true; return{social:3,mood:5}; }},
+        { label:'以后尽量少喝酒，不麻烦别人', hint:'+💪 +🧠', fn: g => { g.flags.designatedDriver=true; g.flags.drinkLess=true; return{health:5,intel:3}; }},
+      ]},
+
+    { id:'bar_closing_v32_6', icon:'🍸', title:'酒吧打烊', category:'night',
+      body:'你在酒吧坐到了打烊。\n\n服务员过来收拾桌子了，灯光亮了起来。在昏暗灯光下看不清的一切，现在都暴露无遗——桌上的水渍、墙角的灰尘、镜子里疲惫的自己。\n\n你是跟朋友来的，但朋友已经先走了。你一个人坐在吧台，把最后一口威士忌喝完。\n\n调酒师在擦杯子，看了你一眼说：「还想喝吗？最后一杯我请你。」\n\n你接过那杯酒，不知道为什么，突然想跟他说点什么。但你最终只是说了句：「谢谢。」\n\n你走出酒吧，夜风吹过来。你深吸了一口气，觉得酒精和情绪一起散了。',
+      cond: g => g.age >= 22 && g.mood < 50,
+      choices:[
+        { label:'喝完那杯酒，跟调酒师聊了几句', hint:'+👥 +😊', fn: g => { g.flags.barClosing=true; g.flags.talkedBartender=true; return{social:5,mood:5}; }},
+        { label:'一个人走回家，想了很多', hint:'+🧠', fn: g => { g.flags.barClosing=true; return{intel:5,mood:3}; }},
+        { label:'决定以后少来酒吧了', hint:'+💪 +🧠', fn: g => { g.flags.barClosing=true; g.flags.lessBar=true; return{health:5,intel:3}; }},
+      ]},
+
+    { id:'sleepless_v32_6', icon:'🌙', title:'失眠的夜晚', category:'night',
+      body:'凌晨三点，你还是睡不着。\n\n你翻了个身，看了看手机——屏幕的光刺得你眼睛疼。你数了羊，听了白噪音，做了深呼吸——都没用。\n\n你的脑子停不下来：明天的会议、下个月的房租、爸妈的身体、那个没回你消息的人……\n\n你干脆起来了，给自己热了一杯牛奶。站在厨房里，你看着窗外的黑暗，偶尔有车灯从远处划过。\n\n你突然想到，这个城市里现在一定有很多人和你一样睡不着。你们在不同的房间里，面对着同样的黑暗。\n\n四点的时候，你终于迷迷糊糊地睡着了。闹钟六点就响了。',
+      cond: g => g.mood < 40 || g.health < 40,
+      choices:[
+        { label:'开始练习冥想助眠', hint:'+💪 +🧠', fn: g => { g.flags.sleepless=true; g.flags.meditation=true; return{health:5,intel:3}; }},
+        { label:'把失眠的想法都写在了日记里', hint:'+🧠 +😊', fn: g => { g.flags.sleepless=true; g.flags.nightJournal=true; return{intel:5,mood:5}; }},
+        { label:'第二天请了半天假补觉', hint:'+💪 -💰', fn: g => { g.flags.sleepless=true; return{health:5,mood:3}; }},
+      ]},
+
+    { id:'city_nightview_v32_6', icon:'🌃', title:'城市夜景', category:'night',
+      body:'你加班到很晚，走出大楼的时候，抬头看了一眼。\n\n城市的夜景很美。高楼大厦上的灯光像星星一样闪烁，远处的电视塔亮着彩色的光，立交桥上车流如河。\n\n你站在天桥上看了很久。一辆又一辆车从你脚下驶过，每一辆车里都有一个人，每个人都有自己的故事。\n\n你拍了一张照片。照片里是璀璨的城市，但你知道，这璀璨的背后，是无数个加班到深夜的人、赶路回家的人、在街头等待客人的人。\n\n这座城市从来不睡觉。它的每一盏灯背后，都是一个人的生活。',
+      cond: g => g.age >= 18,
+      choices:[
+        { label:'在天桥上站了很久，想了很多', hint:'+🧠 +😊', fn: g => { g.flags.cityNightview=true; return{intel:5,mood:3}; }},
+        { label:'拍了一张照片发给远方的朋友', hint:'+👥', fn: g => { g.flags.cityNightview=true; return{social:5,mood:3}; }},
+        { label:'走回家，享受夜风的凉爽', hint:'+💪 +😊', fn: g => { g.flags.cityNightview=true; return{health:3,mood:5}; }},
+      ]},
+
+    { id:'night_run_v32_6', icon:'🏃', title:'夜跑', category:'night',
+      body:'晚上十点，你穿上跑鞋出了门。\n\n夜晚的城市和白天完全不一样。路上人少了，车也少了，你能听到自己的脚步声和呼吸声。\n\n你沿着河边跑，路灯把你的影子拉得很长。偶尔有人遛狗经过，狗冲你叫了一声。\n\n你跑了两公里就喘得不行。你停下来，弯着腰，大口大口地呼吸。\n\n你抬头看天——在城市里几乎看不到星星，但月亮很亮。\n\n你觉得跑步是一种跟自己的对话。每一步都在说：「再坚持一下。」\n\n你慢慢走回家，出了一身汗，但心情好了很多。',
+      cond: g => g.age >= 18 && g.health < 70,
+      choices:[
+        { label:'决定每周夜跑三次', hint:'+💪 +😊', fn: g => { g.flags.nightRun=true; g.flags.regularRun=true; return{health:8,mood:5}; }},
+        { label:'跑了一次就放弃了，太累', hint:'-💪', fn: g => { g.flags.nightRun=true; return{health:2,mood:-2}; }},
+        { label:'加入了一个夜跑群', hint:'+👥 +💪', fn: g => { g.flags.nightRun=true; g.flags.runGroup=true; return{social:5,health:5}; }},
+      ]},
+
+    { id:'allnight_study_v32_6', icon:'📚', title:'通宵自习室', category:'night',
+      body:'考试前一周，你去了一个通宵自习室。\n\n自习室在写字楼的21层，推门进去，灯光明亮，空气里有咖啡的味道。每个人都在低头学习，没有人说话。\n\n你找了一个位置坐下来，摊开书本。你看了看周围：有人在刷题、有人在看网课、有人在敲代码。\n\n凌晨两点，你困得不行了。你去茶水间接了杯咖啡，看到一个女生趴在桌上睡着了。桌上贴着一张便利贴：「考研上岸！」\n\n你帮她披了一件外套。她醒来看了你一眼，小声说了句谢谢。\n\n你觉得这个城市里最让人感动的，不是灯红酒绿，而是深夜里还在为梦想努力的人。',
+      cond: g => g.age >= 18 && g.age <= 35 && g.intel > 30,
+      choices:[
+        { label:'通宵复习到天亮', hint:'+🧠 -💪', fn: g => { g.flags.allnightStudy=true; return{intel:8,health:-5}; }},
+        { label:'学到凌晨三点回去睡了', hint:'+🧠', fn: g => { g.flags.allnightStudy=true; return{intel:5}; }},
+        { label:'跟旁边的人互相加油', hint:'+👥 +😊', fn: g => { g.flags.allnightStudy=true; g.flags.encouraged=true; return{social:3,mood:5}; }},
+      ]},
+
+    { id:'midnight_walk_v32_6', icon:'🚶', title:'午夜散步', category:'night',
+      body:'你睡不着，决定出门走走。\n\n午夜的街道和白天完全是两个世界。白天的喧闹消失了，只剩下路灯和偶尔经过的夜班车。\n\n你走过一个24小时洗衣店，里面有一个人在等衣服洗完，坐在塑料椅子上看手机。\n\n你走过一个加油站，工作人员在打哈欠。\n\n你走过一个小区门口，保安在岗亭里打瞌睡。\n\n你走了一圈，觉得这个城市在夜晚有另一种美。不是霓虹灯的美，是安静的、真实的、不加修饰的美。\n\n回到家，你终于有了困意。你倒在床上，一分钟就睡着了。',
+      cond: g => g.age >= 18 && g.mood < 60,
+      choices:[
+        { label:'以后经常半夜出来走走', hint:'+😊 +💪', fn: g => { g.flags.midnightWalk=true; g.flags.regularWalk=true; return{mood:5,health:3}; }},
+        { label:'用手机记录了一路上的见闻', hint:'+✨ +🧠', fn: g => { g.flags.midnightWalk=true; g.flags.recorded=true; return{charm:5,intel:3}; }},
+        { label:'走了一圈心情好多了', hint:'+😊', fn: g => { g.flags.midnightWalk=true; return{mood:8}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -19675,6 +19766,18 @@ const ACHIEVEMENTS = [
     { id:'rental_scam_ach', icon:'🕸️', name:'租房避坑', desc:'识破了或经历了租房陷阱', check: g => g.flags.rentalScam2 },
     { id:'living_alone_ach', icon:'🔑', name:'独居自由', desc:'开始了一个人的独居生活', check: g => g.flags.livingAlone },
     { id:'buy_or_rent_ach', icon:'🏡', name:'买房还是租房', desc:'思考了买房与租房的人生选择', check: g => g.flags.buyOrRent },
+
+    // --- v32.6 城市夜归人成就 ---
+    { id:'late_taxi_ach', icon:'🚕', name:'深夜摆渡', desc:'在凌晨的出租车上感受到了温暖', check: g => g.flags.lateTaxi },
+    { id:'allnight_bookstore_ach', icon:'📖', name:'24小时书店', desc:'在深夜书店找到了宁静', check: g => g.flags.allnightBookstore },
+    { id:'night_nurse_ach', icon:'👩‍⚕️', name:'深夜守护者', desc:'理解了夜班医护人员的辛苦', check: g => g.flags.nightNurse },
+    { id:'designated_driver_ach', icon:'🚗', name:'代驾故事', desc:'跟代驾司机聊了他们的生活', check: g => g.flags.designatedDriver },
+    { id:'bar_closing_ach', icon:'🍸', name:'酒吧打烊', desc:'在酒吧打烊时有了新的感悟', check: g => g.flags.barClosing },
+    { id:'sleepless_ach', icon:'🌙', name:'失眠之夜', desc:'在失眠中找到了与自己的对话', check: g => g.flags.sleepless },
+    { id:'nightview_ach', icon:'🌃', name:'城市夜景', desc:'在天桥上看到了城市的另一面', check: g => g.flags.cityNightview },
+    { id:'night_run_ach', icon:'🏃', name:'夜跑者', desc:'开始了夜间跑步的习惯', check: g => g.flags.nightRun },
+    { id:'allnight_study_ach', icon:'📚', name:'通宵自习室', desc:'在通宵自习室为梦想努力', check: g => g.flags.allnightStudy },
+    { id:'midnight_walk_ach', icon:'🚶', name:'午夜漫步', desc:'在午夜的街道上找到了平静', check: g => g.flags.midnightWalk },
 ];
 
 // === ENDINGS === (order matters: first match wins)
