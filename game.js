@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v3.4
+// 都市浮生记 - Game Engine v3.5
 // ============================================
 
 // === GAME STATE ===
@@ -2773,6 +2773,32 @@ const EVENTS = [
         { label:'边读边实习', hint:'+🧠 +💰 -❤️', fn: g => { g.flags.gradSchool=true; return{intel:15,money:5000,health:-8}; }},
         { label:'退学，直接工作', hint:'+💰 -🧠', fn: g => { g.flags.gradSchool=true; setJob(g,'打工人',8000); return{money:5000,intel:-5,mood:5}; }},
       ]},
+    // === v3.5 EVENTS - 演唱会与旅游 ===
+    { id:'concert_ticket', icon:'🎤', title:'演唱会抢票',
+      body:'你喜欢的歌手要来开演唱会了！\n\n你提前5分钟打开大麦网，手指悬在屏幕上。\n\n倒计时：3、2、1、开抢！\n\n你疯狂点击，但页面一直在转圈。等你进去，票已经没了。\n\n你刷朋友圈，看到有人晒票，有人骂黄牛。\n\n黄牛票：原价800，现在卖3000。\n\n"演唱会抢票是当代年轻人的高考——拼手速、拼运气、还要防黄牛。"',
+      cond: g => !g.flags.concertTicket && g.money>3000 && g.age>=20 && g.age<=35,
+      choices:[
+        { label:'买黄牛票', hint:'-💰💰 +😊', fn: g => { g.flags.concertTicket=true; return{money:-3000,mood:30}; }},
+        { label:'继续刷大麦', hint:'🎲 +😊', fn: g => { g.flags.concertTicket=true; if(Math.random()>0.7){return{money:-800,mood:25}}else{return{mood:-15}} }},
+        { label:'算了，看直播', hint:'+😊', fn: g => { g.flags.concertTicket=true; return{mood:10}; }},
+        { label:'举报黄牛', hint:'+✨ +😊', fn: g => { g.flags.concertTicket=true; return{charm:8,mood:5}; }},
+      ]},
+    { id:'china_travel', icon:'✈️', title:'China Travel热潮',
+      body:'2025年，中国对50个国家免签，外国人来华旅游爆火。\n\n你在街上看到越来越多外国人，他们拿着手机拍短视频，喊着："China Travel！"\n\n你的外国朋友问你："中国哪里好玩？"\n\n你推荐了：\n- 北京的故宫\n- 上海的外滩\n- 成都的熊猫\n- 西安的兵马俑\n\n"China Travel让外国人看到了真实的中国——比他们想象得更现代、更方便、更安全。"',
+      cond: g => !g.flags.chinaTravel && g.charm>=50 && g.social>=40,
+      choices:[
+        { label:'当志愿者导游', hint:'+👥 +✨ +😊', fn: g => { g.flags.chinaTravel=true; return{social:15,charm:12,mood:15}; }},
+        { label:'拍短视频分享', hint:'+✨ +😊', fn: g => { g.flags.chinaTravel=true; return{charm:10,mood:10}; }},
+        { label:'推荐给朋友', hint:'+👥', fn: g => { g.flags.chinaTravel=true; return{social:8}; }},
+      ]},
+    { id:'weekend_travel', icon:'🚄', title:'周末特种兵旅游',
+      body:'你在小红书看到一条攻略："周末特种兵，2天玩3个城市。"\n\n你心动了，周五下班坐高铁出发：\n- 周五晚：到达城市A\n- 周六：打卡景点、吃美食\n- 周日：去城市B，继续打卡\n- 周日晚上：坐高铁回来\n\n你累得要死，但发了条朋友圈："生活不止眼前的苟且，还有诗和远方。"\n\n"特种兵旅游是年轻人的浪漫——用最少的钱，看最多的风景。"',
+      cond: g => !g.flags.weekendTravel && g.money>2000 && g.mood<60 && g.age>=20 && g.age<=30,
+      choices:[
+        { label:'说走就走！', hint:'-💰 +😊 +❤️', fn: g => { g.flags.weekendTravel=true; return{money:-1500,mood:20,health:5}; }},
+        { label:'约朋友一起', hint:'-💰 +👥 +😊', fn: g => { g.flags.weekendTravel=true; return{money:-1200,social:10,mood:15}; }},
+        { label:'太累了，下次吧', hint:'+💰 -😊', fn: g => { g.flags.weekendTravel=true; return{money:500,mood:-5}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -2837,6 +2863,9 @@ const ACHIEVEMENTS = [
     { id:'exam_choice', icon:'📊', name:'考公考研选择者', desc:'面对人生选择', check: g => g.flags.examVsGrad },
     { id:'system_insider', icon:'🏛️', name:'体制内人', desc:'了解体制内真相', check: g => g.flags.insideSystem },
     { id:'grad_student', icon:'🎓', name:'研究生', desc:'经历读研生活', check: g => g.flags.gradSchool },
+    { id:'concert_fan', icon:'🎤', name:'演唱会粉丝', desc:'抢到演唱会门票', check: g => g.flags.concertTicket },
+    { id:'china_travel_host', icon:'✈️', name:'China Travel大使', desc:'推广中国旅游', check: g => g.flags.chinaTravel },
+    { id:'weekend_traveler', icon:'🚄', name:'周末特种兵', desc:'周末旅游打卡', check: g => g.flags.weekendTravel },
     { id:'photographer', icon:'📷', name:'摄影师', desc:'爱上摄影', check: g => g.flags.photographyHobby },
     { id:'viral_star', icon:'🌟', name:'网红初体验', desc:'意外走红', check: g => g.flags.viralMoment },
     { id:'freelancer', icon:'💻', name:'自由职业者', desc:'成为自由职业者', check: g => g.flags.freelancer },
