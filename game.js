@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v12.0
+// 都市浮生记 - Game Engine v12.1
 // ============================================
 
 // === GAME STATE ===
@@ -5866,7 +5866,7 @@ const EVENTS = [
         { label:'忍了', hint:'-😊', fn: g => { return{mood:-8}; }},
         { label:'搬家', hint:'-💰 +😊', fn: g => { g.flags.roommateConflict=true; return{money:-5000,mood:10}; }},
       ]},
-    { id:'office_politics_v2', icon:'🏢', title:'站队时刻',
+    { id:'office_politics_v2_v2', icon:'🏢', title:'站队时刻',
       body:'公司的两个VP在争夺同一个位置。你的直属领导站了A队，你的mentor站了B队。\n\nA队领导找你谈话：「小张，你觉得A总怎么样？」\n\nB队mentor发消息：「最近有空聊聊吗？」\n\n你知道：在这种时候，不站队就是站了两边的队。\n\n你选择了沉默。但沉默本身也是一种态度。\n\n"办公室政治的生存法则：你以为自己在旁观，其实你早就被归了类。"',
       cond: g => g.job !== '待业中' && g.age >= 25 && g.months > 12 && g.social >= 40,
       choices:[
@@ -5882,7 +5882,7 @@ const EVENTS = [
         { label:'继续刷', hint:'+😊 -❤️', fn: g => { return{mood:5,health:-3}; }},
         { label:'换成功能机', hint:'+🧠 +😊', fn: g => { g.flags.digitalDetox=true; return{intel:8,mood:8,social:-5}; }},
       ]},
-    { id:'weekend_trip_v2', icon:'🏖️', title:'说走就走的周末',
+    { id:'weekend_trip_v2_v2', icon:'🏖️', title:'说走就走的周末',
       body:'周五晚上你刷到一个视频：一个人在大理的洱海边看日落。\n\n你打开12306，发现周六早上的票还有。你犹豫了三秒，点了「购买」。\n\n48小时后，你站在洱海边，看着同样的日落。你拍了一张照片，配文：「人生苦短，及时行乐。」\n\n周一你回到工位，发现：你不在的两天，什么事都没发生。原来你没你想的那么重要。\n\n"旅行的意义不在于去哪里——在于你终于决定出发了。"',
       cond: g => g.money > 3000 && g.mood < 60 && g.age >= 22 && g.age <= 38,
       choices:[
@@ -5929,6 +5929,87 @@ const EVENTS = [
         { label:'跳槽', hint:'+💰 +🧠', fn: g => { g.flags.careerChange=true; setJob(g, g.job, Math.floor(g.jobSalary*1.2)); return{mood:5,intel:5,social:-5}; }},
         { label:'留下来深耕', hint:'+🧠 +👥', fn: g => { return{intel:8,social:5}; }},
         { label:'转行试试', hint:'🎲', fn: g => { g.flags.careerChange=true; setJob(g,'新行业新人',Math.floor(g.jobSalary*0.7)); return{intel:10,mood:3,money:-5000}; }},
+      ]},
+    // === v12.1 情感关系 + 季节事件 + 职场进阶 ===
+    { id:'long_distance_love', icon:'💕', title:'异地恋的考验',
+      body:'你和恋人开始了一段异地恋。\n\n刚开始你们每天视频通话，分享一切。一个月后，通话变成了消息。两个月后，消息变成了「忙，晚点聊」。\n\n你在朋友圈看到对方和一群你不认识的人聚餐。你的第一反应不是开心——而是嫉妒。\n\n你们约定每个月见一次面。但高铁票越来越难抢，假期越来越少。\n\n"异地恋的真相：不是距离打败了爱情——是距离让你看清了爱情有多少。"',
+      cond: g => g.flags.inRelationship && !g.flags.married && g.age >= 23 && g.age <= 33,
+      choices:[
+        { label:'坚持', hint:'+❤️ +💰', fn: g => { g.flags.longDistanceLove=true; return{mood:-5,money:-2000,social:3}; }},
+        { label:'搬到一起', hint:'-💰💰 +❤️', fn: g => { g.flags.longDistanceLove=true; return{money:-8000,mood:15,social:5}; }},
+        { label:'算了', hint:'+😊 -❤️', fn: g => { g.flags.longDistanceLove=true; return{mood:-10,social:-5}; }},
+      ]},
+    { id:'headhunted', icon:'🎯', title:'被猎头盯上了',
+      body:'一个猎头加了你微信：「X总，我们有一个机会想跟您聊聊。」\n\n对方是一家竞对公司，开出了比你现在高50%的薪资，还有期权。\n\n你的领导最近对你不错：加了薪、给了好项目、还夸了你。\n\n你知道：领导对你好，有时候是因为他要走了——有时候是因为他知道你要走了。\n\n"猎头的电话是职场最甜蜜的毒药——你听了就回不去了。"',
+      cond: g => g.job !== '待业中' && g.jobSalary >= 10000 && g.age >= 25 && g.age <= 38 && g.intel >= 55,
+      choices:[
+        { label:'跳槽拿高薪', hint:'+💰💰 +🧠', fn: g => { setJob(g, g.job, Math.floor(g.jobSalary*1.5)); return{mood:10,intel:5,social:-3}; }},
+        { label:'留下来谈条件', hint:'+💰 +👥', fn: g => { setJob(g, g.job, Math.floor(g.jobSalary*1.2)); return{money:5000,social:5}; }},
+        { label:'不考虑', hint:'+😊', fn: g => { return{mood:3}; }},
+      ]},
+    { id:'spring_flower', icon:'🌸', title:'春天来了',
+      body:'三月的某个周末，你路过一个公园。樱花开了。\n\n你停下脚步，拍了一张照片。发到朋友圈，配文：「春天来了。」\n\n128个赞。你的同事评论：「你还有时间逛公园？」你的老板点了个赞——你不确定他是手滑还是真的赞。\n\n你坐在樱花树下，看着来来往往的人。老人遛弯，小孩放风筝，情侣自拍。\n\n你突然觉得：活着真好。\n\n"春天不需要理由——它就在那里，等你抬头。"',
+      cond: g => g.months % 12 >= 2 && g.months % 12 <= 4 && g.mood >= 40,
+      choices:[
+        { label:'多出去走走', hint:'+😊 +❤️', fn: g => { return{mood:12,health:5}; }},
+        { label:'约朋友赏花', hint:'+👥 +😊', fn: g => { return{social:8,mood:8}; }},
+        { label:'拍vlog', hint:'+✨', fn: g => { return{charm:5,mood:5}; }},
+      ]},
+    { id:'summer_heat_wave', icon:'☀️', title:'40度高温',
+      body:'连续一周40度。你的出租屋没有空调（或者空调坏了）。\n\n你每天晚上躺在床上，感觉自己是一块正在被煎的牛排。你开着风扇，但吹出来的全是热风。\n\n你开始在公司蹭空调到晚上10点才回家。保安大叔看你的眼神越来越同情。\n\n你花了2000块装了一台空调。那是你这辈子花得最值的2000块。\n\n"夏天教会你：在40度的城市里，空调不是奢侈品——是生存必需品。"',
+      cond: g => g.months % 12 >= 6 && g.months % 12 <= 8 && !g.flags.hasHouse,
+      choices:[
+        { label:'装空调', hint:'-💰 +❤️❤️', fn: g => { g.flags.summerAC=true; return{money:-2000,health:8,mood:10}; }},
+        { label:'蹭公司空调', hint:'+💰 +😊', fn: g => { return{mood:3,health:-3}; }},
+        { label:'回老家避暑', hint:'+👥 +❤️', fn: g => { return{social:5,health:5,mood:5,money:-1000}; }},
+      ]},
+    { id:'autumn_melancholy_v2', icon:'🍂', title:'秋天的第一杯奶茶',
+      body:'朋友圈刷屏了：「秋天的第一杯奶茶。」\n\n你打开外卖软件，发现奶茶店推出了「秋日限定款」——桂花拿铁、栗子奶茶、红薯奶盖。每杯都要30块。\n\n你犹豫了：一杯奶茶30块，够我吃一顿饭了。\n\n但你还是点了。因为这不是奶茶——这是仪式感。\n\n你拍了照片发朋友圈。三分钟后，你妈评论：「少喝甜的，对牙不好。」\n\n"秋天的第一杯奶茶：年轻人最后的浪漫——虽然它只是一杯糖水。"',
+      cond: g => g.months % 12 >= 9 && g.months % 12 <= 11,
+      choices:[
+        { label:'仪式感', hint:'-💰 +😊', fn: g => { return{money:-30,mood:8}; }},
+        { label:'自己泡', hint:'+🧠', fn: g => { return{intel:2,mood:3}; }},
+        { label:'给暗恋对象点一杯', hint:'-💰 +✨', fn: g => { return{money:-60,charm:5,mood:5}; }},
+      ]},
+    { id:'winter_depression_v2', icon:'❄️', title:'冬天不想出门',
+      body:'十二月。天黑得越来越早，你下班的时候天已经黑了。\n\n你开始不想出门。不想社交。不想说话。你把自己裹在被子里，刷了一整天的手机。\n\n你知道这不是懒——这是「季节性情绪低落」。你的身体在告诉你：阳光不够了。\n\n你买了一盏日光灯，放在桌上。同事问你：「你在干嘛？」\n\n你说：「我在进行光合作用。」\n\n"冬天是灵魂的冬眠期——你不是不想动，是你的心在休息。"',
+      cond: g => (g.months % 12 === 0 || g.months % 12 === 1 || g.months % 12 === 11) && g.mood < 60,
+      choices:[
+        { label:'运动抵抗', hint:'+❤️ +😊', fn: g => { return{health:8,mood:10,money:-500}; }},
+        { label:'接受冬眠', hint:'+😊', fn: g => { return{mood:5,health:-3}; }},
+        { label:'去南方过冬', hint:'-💰 +😊😊', fn: g => { return{money:-5000,mood:15,health:5}; }},
+      ]},
+    { id:'workplace_bullying', icon:'😤', title:'职场霸凌',
+      body:'你的新领导是个PUA大师。\n\n他会在开会的时候当众批评你：「这个方案是实习生做的吧？」（你是P7。）\n\n他会半夜给你发微信：「明天早上把方案改好。」（现在是凌晨1点。）\n\n他会在周报里把你的功劳全部归于自己，然后在你的绩效评估上写：「缺乏主动性。」\n\n你开始失眠。开始怀疑自己。开始觉得：也许真的是我不够好。\n\n直到有一天，一个同事悄悄跟你说：「不是你不好——是他对每个人都这样。」\n\n"职场PUA的本质：不是你在被打压——是你在被打压的同时，还以为是自己的错。"',
+      cond: g => g.job !== '待业中' && g.age >= 24 && g.mood < 55 && !g.flags.workplacePUA,
+      choices:[
+        { label:'收集证据举报', hint:'+🧠 +👥', fn: g => { g.flags.workplacePUA=true; g.flags.laborRights=true; return{intel:8,social:5,mood:-5}; }},
+        { label:'骑驴找马', hint:'+💰', fn: g => { g.flags.workplacePUA=true; return{money:2000,mood:-8}; }},
+        { label:'裸辞', hint:'+😊 +🧠', fn: g => { g.flags.workplacePUA=true; setJob(g,'待业中',0); return{mood:15,intel:5}; }},
+      ]},
+    { id:'first_date', icon:'💘', title:'第一次约会',
+      body:'你在交友软件上匹配了一个人。聊了两周后，你们决定见面。\n\n你提前半小时到了咖啡馆，对着镜子整理了十次头发。\n\n对方来了。比照片好看一点点（或者差一点点，但你的滤镜记忆会自动修正）。\n\n你们聊了三个小时。从工作聊到旅行，从电影聊到人生。你发现：你们都喜欢在雨天看书，都讨厌开会。\n\n走的时候对方说：「下次再约？」\n\n你笑着说：「好啊。」但你的心里在尖叫：「下次什么时候？！明天行不行？！」\n\n"第一次约会的美妙之处：一切皆有可能——而你还没有被现实打败。"',
+      cond: g => !g.flags.inRelationship && !g.flags.married && g.age >= 22 && g.age <= 38 && g.charm >= 35,
+      choices:[
+        { label:'主动约第二次', hint:'+💕 +😊', fn: g => { g.flags.inRelationship=true; return{mood:15,charm:5,social:5}; }},
+        { label:'等对方联系', hint:'+🧠', fn: g => { return{mood:5,intel:2}; }},
+        { label:'还是做朋友', hint:'+👥', fn: g => { return{social:5,mood:3}; }},
+      ]},
+    { id:'prenup_talk', icon:'💍', title:'婚前财产公证',
+      body:'你们准备结婚了。你妈说：「去做个婚前财产公证。」\n\n你的恋人脸色变了：「你是不是不信任我？」\n\n你妈说：「信任是一回事，钱是另一回事。」\n\n你的律师朋友说：「我见过太多离婚时为了房子吵得头破血流的了。」\n\n你站在两个人中间，左右为难。\n\n"婚前公证不是不信任——是对未来的不信任。但不公证，是对现在的不负责。"',
+      cond: g => g.flags.inRelationship && !g.flags.married && g.age >= 25 && g.money >= 50000,
+      choices:[
+        { label:'做公证', hint:'+🧠 +💰', fn: g => { g.flags.prenup=true; return{intel:5,money:-2000,mood:-5}; }},
+        { label:'信任对方', hint:'+❤️ +😊', fn: g => { return{mood:10,social:5}; }},
+        { label:'先缓缓再说', hint:'', fn: g => { return{mood:-3}; }},
+      ]},
+    { id:'empty_nest_real', icon:'🪺', title:'孩子离家上大学',
+      body:'你把孩子送到了大学。帮他/她铺好了床，放好了行李箱。\n\n走出宿舍楼的时候，你回头看了一眼。你的孩子站在阳台上，冲你挥了挥手。\n\n然后他/她转身进去了。去认识新的朋友，开始新的生活。\n\n你坐在车里，发动了引擎，但没有动。你在停车场坐了十分钟。\n\n你想起十八年前，你第一次抱他/她的感觉。那么小，那么轻，那么需要你。\n\n现在，他/她不需要你了。至少不需要你「每天」在了。\n\n"父母的终极课题：学会放手——然后假装自己不需要被需要。"',
+      cond: g => g.flags.hasChild && g.age >= 42 && !g.flags.emptyNestReal,
+      choices:[
+        { label:'开始新生活', hint:'+😊 +✨', fn: g => { g.flags.emptyNestReal=true; g.flags.midlifeChange=true; return{mood:10,charm:5,intel:5}; }},
+        { label:'每天打电话', hint:'+👥 -😊', fn: g => { g.flags.emptyNestReal=true; return{social:5,mood:-5}; }},
+        { label:'养个宠物', hint:'+❤️ +😊', fn: g => { g.flags.emptyNestReal=true; if(!g.flags.hasPet) g.flags.hasPet=true; return{mood:8,health:3,money:-2000}; }},
       ]},
 ];
 const ACHIEVEMENTS = [
@@ -6437,8 +6518,15 @@ const ACHIEVEMENTS = [
     { id:'office_politician', icon:'🏢', name:'办公室生存术', desc:'经历了办公室政治', check: g => g.flags.officePolitics },
     { id:'screen_conscious', icon:'📱', name:'屏幕觉醒者', desc:'开始控制屏幕时间', check: g => g.flags.screenTimeLimit },
     { id:'traveler_ach', icon:'🏖️', name:'周末旅行家', desc:'来了一次说走就走的旅行', check: g => g.flags.weekendTrip },
-    { id:'career_changer_v2', icon:'🔀', name:'职业转型者', desc:'做出了职业改变', check: g => g.flags.careerChange },
+    { id:'career_changer_v2_v2', icon:'🔀', name:'职业转型者', desc:'做出了职业改变', check: g => g.flags.careerChange },
     { id:'kindness_receiver', icon:'💝', name:'被温柔以待', desc:'感受过陌生人的善意', check: g => g.social > 60 && g.mood > 50 },
+    // === v12.1 新增成就 ===
+    { id:'long_distance_ach', icon:'💕', name:'异地恋人', desc:'经历了异地恋', check: g => g.flags.longDistanceLove },
+    { id:'headhunted_ach', icon:'🎯', name:'猎头目标', desc:'被猎头联系过', check: g => g.jobSalary >= 20000 },
+    { id:'spring_walker', icon:'🌸', name:'春日漫步者', desc:'享受了春天的美好', check: g => g.mood >= 60 && g.health >= 50 },
+    { id:'puA_survivor', icon:'😤', name:'反PUA战士v2', desc:'经历了职场霸凌', check: g => g.flags.workplacePUA },
+    { id:'first_love', icon:'💘', name:'心动时刻', desc:'有了第一次约会', check: g => g.flags.inRelationship },
+    { id:'empty_nester', icon:'🪺', name:'空巢父母', desc:'孩子离家上大学', check: g => g.flags.emptyNestReal },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -6602,6 +6690,9 @@ const ENDINGS = [
     // --- v12.0 NEW ENDINGS ---
     { id:'balanced_life_end', badge:'⚖️', title:'平衡人生', desc:'你找到了一种平衡：不躺平也不内卷，不焦虑也不麻木。\n\n你有一份不算完美但还行的工作，有几个真心朋友，有一个健康的身体，有一颗还在思考的脑袋。\n\n你的领导说你应该更「有野心」。你笑着说：「我的野心是——过好自己的每一天。」\n\n"人生的终极答案不是成功——是平衡。"', cond: g => g.mood >= 65 && g.health >= 60 && g.social >= 45 && g.money >= 20000 && g.age >= 30 && g.intel >= 55 },
     { id:'wanderer_end', badge:'🌍', title:'永远在路上', desc:'你成了一个「城市漫游者」。\n\n你在五个城市生活过，换过七份工作，搬过十二次家。你的行李箱里装着你所有的家当。\n\n有人说你「不稳定」。你说你只是还没找到让你停下来的理由。\n\n也许明天你就找到了。也许永远不会。但路上的风景，也挺好的。\n\n"不是所有流浪的人都迷了路——有些人只是在寻找。"', cond: g => g.flags.citySwitch && g.flags.weekendTrip && g.charm >= 50 && g.age >= 28 },
+    // --- v12.1 NEW ENDINGS ---
+    { id:'love_story_end', badge:'💕', title:'爱情故事', desc:'你遇到了一个人，然后你们在一起了。\n\n没有什么轰轰烈烈。只是在某个平凡的日子，你们发现：彼此就是那个让自己安心的人。\n\n你们一起租房、一起还房贷、一起吵架、一起和好。你们的故事不完美，但真实。\n\n你发了一条朋友圈：「感谢你，让这座城市有了温度。」\n\n"爱情不是找到完美的人——是学会和不完美的人，一起过日子。"', cond: g => g.flags.inRelationship && g.mood >= 60 && g.age >= 25 },
+    { id:'career_master_end', badge:'🏆', title:'职场精英', desc:'你从职场小白，一路做到了行业精英。\n\n你的名字在圈子里有分量了。猎头不再联系你——因为你已经是最高的那个了。\n\n你的下属叫你「大佬」，你的同行叫你「前辈」，你的父母叫你「骄傲」。\n\n但只有你自己知道：你失去了多少周末、错过了多少聚会、熬过了多少失眠的夜晚。\n\n"职场精英的代价：用青春换地位，然后用地位证明自己没有浪费青春。"', cond: g => g.jobSalary >= 40000 && g.intel >= 70 && g.age >= 32 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
