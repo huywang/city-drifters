@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v11.7
+// 都市浮生记 - Game Engine v11.8
 // ============================================
 
 // === GAME STATE ===
@@ -5486,7 +5486,7 @@ const EVENTS = [
         { label:'省钱合租', hint:'-💰 +👥', fn: g => { return{money:-1000,social:5}; }},
         { label:'搬到郊区', hint:'-💰 +💪', fn: g => { g.flags.movedSuburb=true; return{money:-500,health:5,mood:3}; }},
       ]},
-    { id:'hometown_visit_v2', icon:'🚄', title:'回趟老家',
+    { id:'hometown_visit_v2_v2', icon:'🚄', title:'回趟老家',
       body:'你回了一趟老家。\n\n你发现：街角的小卖部变成了奶茶店，你家楼下的路修了三次还是坑坑洼洼，你的高中同学已经结婚生了两个孩子。\n\n你妈做了你最爱吃的菜。你爸喝了两杯酒后说："在外面累了就回来。"\n\n"故乡是一个你离开后才会想念的地方——但回去了你会发现，你已经不属于这里了。"',
       cond: g => g.months > 24 && g.money > 2000,
       choices:[
@@ -5518,7 +5518,7 @@ const EVENTS = [
         { label:'学了两个月放弃', hint:'+😊', fn: g => { return{mood:3}; }},
         { label:'报班学习', hint:'-💰 +🧠', fn: g => { g.flags.instrumentPlayer=true; return{money:-3000,intel:8,charm:5,mood:10}; }},
       ]},
-    { id:'volunteer_work_v2', icon:'❤️', title:'志愿者',
+    { id:'volunteer_work_v2_v2', icon:'❤️', title:'志愿者',
       body:'你报名了一个周末志愿者活动：去养老院陪老人聊天/去动物收容所帮忙/去社区教小朋友画画。\n\n你发现：帮助别人带来的快乐，比消费带来的快乐更持久。\n\n一个老人拉着你的手说："谢谢你来看我，好久没人陪我说话了。"\n\n"做志愿者不是为了简历，是为了提醒自己：你拥有的比你以为的多。"',
       cond: g => g.age >= 20 && g.months > 6 && g.social >= 25,
       choices:[
@@ -5584,7 +5584,7 @@ const EVENTS = [
         { label:'养什么死什么', hint:'', fn: g => { return{mood:-3}; }},
       ]},
     // === v11.7 当代青年生存图鉴 ===
-    { id:'civil_service_exam_v2', icon:'📋', title:'宇宙的尽头是编制',
+    { id:'civil_service_exam_v2_v2', icon:'📋', title:'宇宙的尽头是编制',
       body:'你刷到一条视频：一个985硕士辞掉大厂工作去考公务员，考了三年终于上岸。评论区一片「恭喜」。\n\n你心动了。你妈更心动——她已经开始在亲戚面前吹嘘「我儿子/女儿要考公务员了」。\n\n考公资料费3000，培训班费15000。你看着银行卡余额，陷入了沉思。\n\n"宇宙的尽头是编制——但通往宇宙尽头的船票，比宇宙还贵。"',
       cond: g => g.intel >= 50 && g.age >= 22 && g.age <= 35 && !g.flags.civilServant && g.money > 5000,
       choices:[
@@ -5592,7 +5592,7 @@ const EVENTS = [
         { label:'边工作边考', hint:'-💰 -❤️', fn: g => { g.flags.preparingCivilExam=true; return{money:-8000,intel:8,health:-5,mood:-3}; }},
         { label:'算了，我不配', hint:'', fn: g => { return{mood:-3}; }},
       ]},
-    { id:'consumption_downgrade_v2', icon:'📉', title:'消费降级实录',
+    { id:'consumption_downgrade_v2_v2', icon:'📉', title:'消费降级实录',
       body:'你打开手机记账软件，发现自己这个月的消费结构发生了重大变化：\n\n咖啡：星巴克→瑞幸→速溶→公司免费的\n午餐：外卖→便利店→自带饭→泡面\n社交：日料→火锅→烧烤→路边摊\n\n你发了条朋友圈：「我不是穷，我是在践行极简主义。」\n\n三分钟后你删了——因为你的同事在下面评论：「你上个月借我的50还没还。」\n\n"消费降级的本质不是省钱，是你终于承认自己没钱。"',
       cond: g => g.money < 15000 && g.months > 6 && g.age >= 23,
       choices:[
@@ -5608,7 +5608,7 @@ const EVENTS = [
         { label:'挂闲鱼回血', hint:'+💰', fn: g => { g.flags.blindBoxFan=true; return{money:100,mood:-3}; }},
         { label:'从此戒了', hint:'+🧠', fn: g => { return{intel:3,mood:-5}; }},
       ]},
-    { id:'matchmaking_corner_v2', icon:'💘', title:'相亲角奇遇',
+    { id:'matchmaking_corner_v2_v2', icon:'💘', title:'相亲角奇遇',
       body:'周末你妈拉你去了公园相亲角。几百张A4纸挂在绳子上，每张纸上写着一个人的「核心资产」：\n\n「男，92年，本科，年薪25万，有房有车」「女，95年，硕士，事业编，身高165」\n\n你感觉自己像一件被明码标价的商品。一个大爷看了你的简历，摇了摇头：「没房？那不行。」\n\n你妈安慰你：「没事，下一个。」但你已经看到了第37个「下一个」了。\n\n"相亲角的残酷真相：在这里，爱情是最不被看重的条件。"',
       cond: g => !g.flags.married && g.age >= 26 && g.age <= 38,
       choices:[
@@ -5616,7 +5616,7 @@ const EVENTS = [
         { label:'当场逃跑', hint:'+😊 自由万岁', fn: g => { g.flags.escapedMatchmaking=true; return{mood:10,social:-5}; }},
         { label:'跟妈妈谈心', hint:'+👥❤️', fn: g => { return{social:3,mood:3}; }},
       ]},
-    { id:'age_35_crisis_v2', icon:'⏰', title:'35岁魔咒',
+    { id:'age_35_crisis_v2_v2', icon:'⏰', title:'35岁魔咒',
       body:'你35岁了。或者说，你快到35岁了。\n\n你的朋友圈开始出现两种人：一种是晒娃晒房的「人生赢家」，一种是转发《35岁被裁后我是怎么活下来的》的「幸存者」。\n\nHR朋友跟你说了一句大实话：「你不是不够好，是你的性价比不够高了。比你便宜、比你能加班的年轻人，一抓一大把。」\n\n你开始理解为什么有人说：「在中国，35岁不是年龄，是一道坎。」\n\n"35岁魔咒的本质：不是你老了，是这个社会没有给中年人留位置。"',
       cond: g => g.age >= 34 && g.age <= 37 && g.job !== '待业中' && !g.flags.age35Crisis,
       choices:[
@@ -5663,6 +5663,79 @@ const EVENTS = [
         { label:'治好它', hint:'-💰💰 +❤️', fn: g => { g.flags.petSeriousIllness=true; return{money:-4300,mood:5,social:-3}; }},
         { label:'找平价医院', hint:'-💰 +🧠', fn: g => { g.flags.petSeriousIllness=true; return{money:-1500,intel:2,mood:-3}; }},
         { label:'求助众筹', hint:'+👥', fn: g => { g.flags.petSeriousIllness=true; return{money:-800,social:5,mood:-5}; }},
+      ]},
+    // === v11.8 数字生活 + 新型社交 + 文化现象 ===
+    { id:'livestream_tip', icon:'🎥', title:'直播打赏上头了',
+      body:'你本来只是睡前刷一会儿直播。结果一个小姐姐/小哥哥唱歌太好听了，你一激动刷了500块的礼物。\n\n第二天醒来看着账单，你心想：我疯了吗？\n\n但那个主播在直播间喊了一句：「谢谢哥哥/姐姐的火箭！」你的虚荣心得到了前所未有的满足。\n\n你开始每个月都打赏。从500到1000到2000。你妈知道了会杀了你。\n\n"直播打赏的本质：你用真金白银，买了一句「谢谢你」的幻觉。"',
+      cond: g => g.money > 3000 && g.mood < 60 && g.age >= 22 && g.age <= 35,
+      choices:[
+        { label:'继续支持', hint:'-💰💰 +😊', fn: g => { g.flags.livestreamTipper=true; return{money:-3000,mood:15,charm:-3}; }},
+        { label:'取关冷静', hint:'+🧠', fn: g => { return{intel:5,mood:-5}; }},
+        { label:'自己也开播', hint:'+✨', fn: g => { g.flags.streamer=true; return{charm:5,mood:3,money:-500}; }},
+      ]},
+    { id:'ai_creative', icon:'🤖', title:'AI帮我写周报',
+      body:'同事教你用AI写周报。你输入几个关键词，30秒生成一篇文采飞扬的周报——比你自己写的强100倍。\n\n你的领导在周会上表扬了你：「小张这个周报写得越来越有水平了。」\n\n你笑了笑，没说话。\n\n从那以后，你的周报、PPT、邮件、方案——全部AI代劳。你每天省下2小时，用来摸鱼。\n\n直到有一天，AI生成的方案里出现了一个离谱的错误，你才发现：你已经不会自己写了。\n\n"AI工具不是让你更强——是让你更懒，然后更离不开它。"',
+      cond: g => g.intel >= 50 && g.job !== '待业中' && g.age >= 22 && g.age <= 40,
+      choices:[
+        { label:'全面拥抱AI', hint:'+🧠 +💰', fn: g => { g.flags.aiPowerUser=true; return{intel:8,money:2000,mood:3}; }},
+        { label:'适度使用', hint:'+🧠', fn: g => { g.flags.aiToolUser=true; return{intel:5}; }},
+        { label:'坚持手写', hint:'+✍️', fn: g => { return{intel:3,mood:-3}; }},
+      ]},
+    { id:'dazi_social_v2', icon:'🤝', title:'搭子文化',
+      body:'你在社交平台上发了一条「找饭搭子」的帖子。半小时后，你有了三个搭子：\n\n饭搭子：每周三一起吃火锅\n咖啡搭子：每天下午三点星巴克\n运动搭子：周末一起爬山\n\n你们的关系很微妙——比朋友浅，比陌生人深。你们不问彼此的名字、工作、感情状况。你们只有一个共同点：都喜欢同一件事。\n\n有人说这是「社恐的社交方式」。你觉得这是「精准社交」。\n\n"搭子文化的真相：我们不是不想深交——是没有精力深交了。"',
+      cond: g => g.age >= 22 && g.age <= 33 && g.social < 60 && g.months > 3,
+      choices:[
+        { label:'多多益善', hint:'+👥 +😊', fn: g => { g.flags.hasDazi=true; return{social:10,mood:8}; }},
+        { label:'保持距离', hint:'+👥', fn: g => { g.flags.hasDazi=true; return{social:5,mood:3}; }},
+        { label:'不太行', hint:'', fn: g => { return{mood:-3}; }},
+      ]},
+    { id:'short_drama_addict', icon:'📺', title:'短剧停不下来',
+      body:'你在抖音上刷到一部短剧。每集3分钟，讲的是「霸总爱上我」。\n\n你知道这很脑残。但你的手不受控制地点了「下一集」。\n\n两小时后，你看到了凌晨两点，花了68块解锁了大结局。结局是：霸总其实是女主同父异母的哥哥。\n\n你关了手机，盯着天花板想：我刚才那两个小时，本可以用来学一个Python课程。\n\n但第二天晚上，你又打开了下一部短剧。\n\n"短剧的魔力：每集3分钟，但你永远觉得「再看一集」——直到天亮了。"',
+      cond: g => g.mood < 55 && g.age >= 20 && g.age <= 38,
+      choices:[
+        { label:'继续追', hint:'-💰 +😊', fn: g => { g.flags.shortDramaFan=true; return{money:-200,mood:10,health:-3}; }},
+        { label:'卸载app', hint:'+🧠 +❤️', fn: g => { return{intel:5,health:3,mood:-5}; }},
+        { label:'写短剧赚钱', hint:'+💰 +🧠', fn: g => { g.flags.shortDramaWriter=true; return{money:3000,intel:5,mood:5}; }},
+      ]},
+    { id:'digital_vinegar', icon:'🍚', title:'电子榨菜依赖症',
+      body:'你发现了一个可怕的事实：你已经不能「干吃饭」了。\n\n吃饭必须看视频。不看视频，饭就不香。你的B站收藏夹里有500个「下饭视频」，从美食博主到历史纪录片到猫猫狗狗。\n\n有一次手机没电了，你对着一碗面发了5分钟的呆，然后——等手机充了电才开始吃。\n\n你的朋友说：「你吃饭比我还慢。」\n\n你说：「不是我慢，是我的电子榨菜还没选好。」\n\n"电子榨菜：当代年轻人吃饭的仪式感——饭可以凉，视频不能停。"',
+      cond: g => g.months > 4 && g.age >= 22 && g.age <= 35,
+      choices:[
+        { label:'正常操作', hint:'+😊', fn: g => { g.flags.digitalVinegar=true; return{mood:5,health:-2}; }},
+        { label:'尝试正念饮食', hint:'+❤️ +🧠', fn: g => { return{health:5,intel:3,mood:-3}; }},
+        { label:'自己拍视频', hint:'+✨', fn: g => { g.flags.digitalVinegar=true; return{charm:5,mood:5}; }},
+      ]},
+    { id:'social_battery', icon:'🔋', title:'社交电量耗尽',
+      body:'你是一个「间歇性社牛，持续性社恐」。\n\n上班的时候，你是会议室里最能说的那个。下班后，你连外卖小哥的电话都不想接。\n\n周末朋友约你出去，你纠结了三天要不要去。最后发了一条微信：「今天不太舒服，下次吧。」\n\n然后你在家躺了一整天，感觉自己充满了电。\n\n"当代年轻人的社交状态：不是不想见你——是我的电量只够上班用。"',
+      cond: g => g.job !== '待业中' && g.social > 40 && g.mood < 60,
+      choices:[
+        { label:'接受社恐', hint:'+😊 +❤️', fn: g => { g.flags.socialAnxiety=true; return{mood:8,health:3,social:-5}; }},
+        { label:'强迫自己出门', hint:'+👥 -😊', fn: g => { return{social:8,mood:-5}; }},
+        { label:'找搭子社交', hint:'+👥', fn: g => { g.flags.hasDazi=true; return{social:5,mood:3}; }},
+      ]},
+    { id:'digital_legacy_plan', icon:'💾', title:'数字遗产规划',
+      body:'你看到一个新闻：一个人去世后，他的家人无法登录他的各种账号。微信余额、游戏装备、网盘照片——全部随着他的离去变成了「数字幽灵」。\n\n你开始思考：如果有一天你不在了，你的B站收藏、你的Steam游戏库、你的小红书笔记……它们怎么办？\n\n你打开备忘录，开始写「数字遗嘱」：\n\n微信：密码是xxx\n支付宝：余额给爸妈\nSteam账号：送给xxx\n浏览记录：请格式化硬盘\n\n"数字遗产是当代人的新问题：你走了，但你的数据还在。"',
+      cond: g => g.age >= 28 && g.intel >= 55 && g.months > 12,
+      choices:[
+        { label:'认真规划', hint:'+🧠', fn: g => { g.flags.digitalLegacy=true; return{intel:5,mood:-3}; }},
+        { label:'想这些干嘛', hint:'+😊', fn: g => { return{mood:5}; }},
+        { label:'先删浏览记录', hint:'+✨', fn: g => { g.flags.digitalLegacy=true; return{charm:3,mood:8}; }},
+      ]},
+    { id:'aa_dating', icon:'💑', title:'AA制恋爱',
+      body:'你开始了一段新恋情。第一次约会，对方说：「我们AA吧。」\n\n你心想：也行，公平。\n\n但随着关系深入，AA制变得越来越复杂：吃饭AA、电影AA、开房AA。你们甚至建了一个共享记账表格。\n\n有一天你生病了，对方说：「药费你自己出吧，我们AA。」\n\n你突然觉得哪里不对。\n\n"AA制恋爱的悖论：钱算清了，感情算不清了。"',
+      cond: g => !g.flags.married && g.age >= 23 && g.age <= 35 && g.charm >= 40,
+      choices:[
+        { label:'AA到底', hint:'+💰 +🧠', fn: g => { g.flags.aaDating=true; return{money:500,intel:3,mood:-3}; }},
+        { label:'大方一点', hint:'-💰 +❤️', fn: g => { return{money:-2000,mood:8,charm:5}; }},
+        { label:'算了单身', hint:'+😊', fn: g => { return{mood:5,money:1000}; }},
+      ]},
+    { id:'micro_drama_creator', icon:'🎬', title:'拍短剧翻身',
+      body:'你听说有人拍短剧月入10万。你心动了。\n\n你花了3000块买了设备，拉了三个朋友当演员，用一周时间拍了一部「重生之我在大厂当PPT侠」。\n\n上传到平台后，你紧张地刷数据。第一天：100播放。第二天：500播放。第三天——\n\n10万播放！有人评论：「太真实了！这就是我的日常！」\n\n平台找你签约：保底5000/月，分成另算。你激动得手都在抖。\n\n"短剧时代的机遇：每个人都可以是导演——只要你有故事，和一部手机。"',
+      cond: g => g.charm >= 45 && g.intel >= 50 && g.money > 3000 && g.age >= 22 && g.age <= 35,
+      choices:[
+        { label:'签约！', hint:'+💰💰 +✨', fn: g => { g.flags.shortDramaCreator=true; return{money:8000,charm:10,mood:10}; }},
+        { label:'继续打磨', hint:'+🧠', fn: g => { g.flags.shortDramaCreator=true; return{intel:8,mood:5}; }},
+        { label:'算了吧', hint:'', fn: g => { return{mood:-3}; }},
       ]},
 ];
 const ACHIEVEMENTS = [
@@ -6144,12 +6217,19 @@ const ACHIEVEMENTS = [
     { id:'plant_parent_ach', icon:'🌿', name:'植物家长', desc:'养活了绿植', check: g => g.flags.plantParent },
     // === v11.7 新增成就 ===
     { id:'civil_exam_ach', icon:'📋', name:'考公路上', desc:'开始备考公务员', check: g => g.flags.preparingCivilExam },
-    { id:'frugal_master_v2', icon:'📉', name:'极简主义者', desc:'践行消费降级', check: g => g.flags.minimalist },
+    { id:'frugal_master_v2_v2', icon:'📉', name:'极简主义者', desc:'践行消费降级', check: g => g.flags.minimalist },
     { id:'blind_box_fan_v2', icon:'🎁', name:'盲盒玩家', desc:'入了盲盒的坑', check: g => g.flags.blindBoxFan },
     { id:'matchmaking_vet', icon:'💘', name:'相亲老手', desc:'经历过相亲角', check: g => g.flags.hadMatchmaking },
     { id:'rental_warrior', icon:'🏚️', name:'租房斗士', desc:'为租房权益维权', check: g => g.flags.rentalRights },
     { id:'group_leader', icon:'🛒', name:'团购团长', desc:'成了社区团购团长', check: g => g.flags.groupBuyLeader },
-    { id:'pension_planner_v2', icon:'👴', name:'未雨绸缪', desc:'开始规划养老', check: g => g.flags.pensionPlan },
+    { id:'pension_planner_v2_v2', icon:'👴', name:'未雨绸缪', desc:'开始规划养老', check: g => g.flags.pensionPlan },
+    // === v11.8 新增成就 ===
+    { id:'livestream_tipper_ach', icon:'🎥', name:'直播打赏者', desc:'给主播打赏过', check: g => g.flags.livestreamTipper },
+    { id:'ai_power_user_ach', icon:'🤖', name:'AI达人', desc:'全面拥抱AI工具', check: g => g.flags.aiPowerUser },
+    { id:'dazi_finder', icon:'🤝', name:'搭子猎手', desc:'找到了生活搭子', check: g => g.flags.hasDazi },
+    { id:'short_drama_fan_ach', icon:'📺', name:'短剧爱好者', desc:'沉迷短剧', check: g => g.flags.shortDramaFan },
+    { id:'drama_creator_ach', icon:'🎬', name:'短剧创作者', desc:'拍摄了短剧', check: g => g.flags.shortDramaCreator },
+    { id:'digital_vinegar_ach', icon:'🍚', name:'电子榨菜爱好者', desc:'吃饭必须配视频', check: g => g.flags.digitalVinegar },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -6304,6 +6384,9 @@ const ENDINGS = [
     // --- v11.7 NEW ENDINGS ---
     { id:'frugal_sage_end', badge:'📉', title:'消费觉醒', desc:'你从一个「月光族」变成了一个「极简主义者」。\n\n你不再买盲盒、不再囤货、不再为了满减凑单。你的衣柜只有十件衣服，你的厨房只有三口锅。\n\n朋友说你「活得像个苦行僧」。你笑着说：「我是活明白了。」\n\n你的存款从0变成了5万。不多，但那是你第一次觉得——自己掌控了生活。\n\n"真正的富有不是拥有更多，是不再需要更多。"', cond: g => g.flags.minimalist && g.money >= 30000 && g.mood >= 60 && g.age >= 28 },
     { id:'civil_servant_end_v2', badge:'🏛️', title:'上岸', desc:'你考上了。\n\n三年备考，两次落榜，无数个深夜的自我怀疑。当你看到录取通知的那一刻，你妈在电话里哭了。\n\n你的工资不算高，但稳定。你的工作不算精彩，但有尊严。你终于可以过一种「不用担心明天」的生活。\n\n你爸在酒桌上说："我儿子/女儿有编制了。"——这句话他说了一辈子。\n\n"上岸不是终点，是终于可以喘口气了。"', cond: g => g.flags.civilServant && g.age >= 25 },
+    // --- v11.8 NEW ENDINGS ---
+    { id:'drama_king_end', badge:'🎬', title:'短剧之王', desc:'你从一个普通打工人，变成了一个短剧创作者。\n\n你的短剧《重生之我在大厂当PPT侠》全网播放量破千万。平台给你开了专栏，投资人找上门来。\n\n你辞了职，成立了自己的工作室。虽然只有三个人，但你觉得——这才是你想做的事。\n\n你妈在亲戚面前终于有了新话题：「我儿子/女儿是拍短视频的，月入六位数。」\n\n"内容创业的黄金时代：每个人都可以讲故事，但不是每个故事都能被听见。你幸运地成为了被听见的那一个。"', cond: g => g.flags.shortDramaCreator && g.charm >= 55 && g.money >= 50000 && g.age >= 24 },
+    { id:'digital_native_end', badge:'🤖', title:'数字原住民', desc:'你是AI时代的弄潮儿。\n\n你用AI写方案、用AI做PPT、用AI分析数据。你的工作效率是同事的三倍。领导说你是「最有潜力的人」。\n\n但你知道：你不是更有潜力——你只是更会用工具。\n\n你在公司内部分享会上说：「AI不会取代你，但会用AI的人会。」全场鼓掌。\n\n"AI时代的生存法则：不是跟AI比谁更强——是比谁更会用AI。"', cond: g => g.flags.aiPowerUser && g.intel >= 70 && g.jobSalary >= 15000 && g.age >= 24 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
