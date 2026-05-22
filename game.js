@@ -5416,7 +5416,7 @@ const ACHIEVEMENTS = [
     { id:'cheap_rent_ach', icon:'🏠', name:'租房达人', desc:'成功申请到公租房', check: g => g.flags.cheapRent },
     { id:'emo_night', icon:'🌙', name:'深夜emo', desc:'经历过一次深夜情绪低落', check: g => g.mood < 30 && g.months > 12 },
     // === v9.2 新增成就 ===
-    { id:'investor_v2', icon:'💰', name:'理财新手', desc:'第一次进行投资', check: g => g.flags.hasInvestment },
+    { id:'investor_v2_v2', icon:'💰', name:'理财新手', desc:'第一次进行投资', check: g => g.flags.hasInvestment },
     { id:'stock_master', icon:'📈', name:'股海沉浮', desc:'在股市中存活超过一年', check: g => g.investments && g.investments.stock > 0 && g.months > 12 },
     { id:'married_ach', icon:'💍', name:'已婚人士', desc:'成功结婚', check: g => g.flags.married },
     { id:'crisis35_survivor', icon:'⚡', name:'35岁突围', desc:'经历过35岁危机', check: g => g.flags.crisis35seen },
@@ -5424,7 +5424,7 @@ const ACHIEVEMENTS = [
     { id:'double11_survivor', icon:'🛒', name:'双十一战士', desc:'经历了双十一', check: g => g.flags.double11spent },
     // === v9.3 新增成就 ===
     { id:'mentor_found_ach', icon:'🧓', name:'良师益友', desc:'遇到了一位人生导师', check: g => g.flags.hasMentor },
-    { id:'city_explorer_v2', icon:'🏙️', name:'城市探索者', desc:'体验过至少3个城市的特色事件', check: g => { let c=0; if(g.flags.beijingExplored)c++; if(g.flags.shanghaiExplored)c++; if(g.flags.chengduExplored)c++; return c>=3; } },
+    { id:'city_explorer_v2_v2', icon:'🏙️', name:'城市探索者', desc:'体验过至少3个城市的特色事件', check: g => { let c=0; if(g.flags.beijingExplored)c++; if(g.flags.shanghaiExplored)c++; if(g.flags.chengduExplored)c++; return c>=3; } },
     // === v9.4 新增成就 ===
     { id:'civil_servant_ach', icon:'📝', name:'公考上岸', desc:'通过公务员考试', check: g => g.flags.civilServant },
     { id:'mba_graduate', icon:'🎓', name:'MBA毕业生', desc:'完成MBA学业', check: g => g.flags.hasMBA },
@@ -5441,20 +5441,20 @@ const ACHIEVEMENTS = [
     { id:'midlife_change', icon:'🪞', name:'中年觉醒', desc:'在中年做出了重大改变', check: g => g.flags.midlifeChange },
     // === v10.0 新增成就 ===
     { id:'digital_nomad_ach', icon:'🌍', name:'数字游民', desc:'成为数字游民', check: g => g.flags.digitalNomad },
-    { id:'minimalist_v2', icon:'🧹', name:'断舍离', desc:'完成一次断舍离', check: g => g.money > 5000 && g.mood > 70 && g.months > 24 },
+    { id:'minimalist_v2_v2', icon:'🧹', name:'断舍离', desc:'完成一次断舍离', check: g => g.money > 5000 && g.mood > 70 && g.months > 24 },
     // === v10.3 新增成就 ===
     { id:'dink_ach', icon:'🍷', name:'丁克一族', desc:'选择不要孩子', check: g => g.flags.dink },
     { id:'midlife_restart_ach', icon:'🔄', name:'中年重启', desc:'在35岁后重新出发', check: g => g.flags.midlifeRestart },
-    { id:'super_parent', icon:'👨‍👩‍👧‍👦', name:'超级父母', desc:'有孩子且家庭生活幸福', check: g => g.flags.hasChild && g.mood >= 70 && g.social >= 50 },
-    { id:'filial_child', icon:'🏡', name:'孝子孝女', desc:'经常关心父母', check: g => g.relationships && g.relationships.family >= 80 },
+    { id:'super_parent_v2', icon:'👨‍👩‍👧‍👦', name:'超级父母', desc:'有孩子且家庭生活幸福', check: g => g.flags.hasChild && g.mood >= 70 && g.social >= 50 },
+    { id:'filial_child_v2', icon:'🏡', name:'孝子孝女', desc:'经常关心父母', check: g => g.relationships && g.relationships.family >= 80 },
     { id:'child_education_ach', icon:'🎒', name:'虎妈虎爸', desc:'为孩子教育投入巨大', check: g => g.flags.hasChild && g.money < 5000 && g.intel >= 60 },
     // === v10.4 新增成就 ===
-    { id:'dazi_master', icon:'🤝', name:'搭子达人', desc:'找到了生活搭子', check: g => g.flags.hasDazi },
+    { id:'dazi_master_v2', icon:'🤝', name:'搭子达人', desc:'找到了生活搭子', check: g => g.flags.hasDazi },
     { id:'mbti_expert', icon:'🧩', name:'MBTI专家', desc:'深入研究MBTI', check: g => g.flags.mbtiExpert },
     { id:'citywalker', icon:'🚶', name:'城市漫游者', desc:'发现了社区咖啡馆', check: g => g.flags.citywalkCafe || g.flags.communityCafe },
     { id:'night_rider', icon:'🚴', name:'夜骑侠', desc:'爱上了夜骑', check: g => g.flags.nightCycling },
     { id:'pet_parent_pro', icon:'🐾', name:'宠物家长', desc:'为宠物买了保险', check: g => g.flags.petInsurance },
-    { id:'ai_friend', icon:'🤖', name:'AI之友', desc:'和AI成为了朋友', check: g => g.flags.aiCompanion },
+    { id:'ai_friend_v2', icon:'🤖', name:'AI之友', desc:'和AI成为了朋友', check: g => g.flags.aiCompanion },
     { id:'home_decorator', icon:'🪴', name:'生活美学家', desc:'改造了出租屋', check: g => g.flags.renovated },
     // === v10.5 新增成就 ===
     { id:'wellness_mode', icon:'🍵', name:'养生达人', desc:'开始注重健康', check: g => g.flags.wellnessMode },
@@ -5581,7 +5581,7 @@ const ENDINGS = [
     { id:'civil_servant_end', badge:'📋', title:'体制内人生', desc:'你考上了公务员，成了"体制内"的人。\n\n工资不高不低，朝九晚五，稳定得让人安心。\n\n你妈终于不再催你找工作了。你的朋友圈从"加班打卡"变成了"养生茶推荐"。\n\n"体制内不是围城，是避风港。"', cond: g => g.flags.civilServant && g.mood >= 60 && g.age >= 28 },
     { id:'educated_end', badge:'🎓', title:'终身学习者', desc:'你从未停止学习。\n\n从考证到读研，从线上课程到线下沙龙。你的简历越来越长，你的视野越来越宽。\n\n你不确定学习能不能改变命运，但你知道：不学习一定不能。\n\n"学无止境——这不是鸡汤，是生存策略。"', cond: g => g.flags.hasMBA && g.flags.hasCertificate && g.intel >= 85 },
     // --- v10.2 NEW ENDINGS ---
-    { id:'burnout_recovery', badge:'🌱', title:'浴火重生', desc:'你经历了职业倦怠，但你挺过来了。\n\n你看心理咨询师、学冥想、换工作、重新找到生活的节奏。\n\n你比以前更懂得照顾自己，也更懂得拒绝不合理的要求。\n\n"不是所有的跌倒都叫失败，有些叫成长。"', cond: g => g.flags.sawTherapist && g.mood >= 65 && g.health >= 60 && g.age >= 30 },
+    { id:'burnout_recovery_v2', badge:'🌱', title:'浴火重生', desc:'你经历了职业倦怠，但你挺过来了。\n\n你看心理咨询师、学冥想、换工作、重新找到生活的节奏。\n\n你比以前更懂得照顾自己，也更懂得拒绝不合理的要求。\n\n"不是所有的跌倒都叫失败，有些叫成长。"', cond: g => g.flags.sawTherapist && g.mood >= 65 && g.health >= 60 && g.age >= 30 },
     { id:'simple_life_end', badge:'🌿', title:'简单生活', desc:'你没有成为有钱人，也没有成为名人。\n\n但你学会了做饭、养花、散步、看书。你有一个小圈子的好朋友，有一只猫，有一份还行的工作。\n\n你终于明白：幸福不在于拥有多少，而在于享受当下。\n\n"简单生活不是平庸，是选择。"', cond: g => g.flags.cookingSkill && g.flags.hasPet && g.mood >= 60 && g.health >= 55 && g.age >= 32 },
     { id:'hometown_return', badge:'🏡', title:'回乡发展', desc:'你终于回到了老家。\n\n没有了大城市的繁华，也没有了大城市的压力。你在老家找了份工作，买了个小房子。\n\n你妈高兴得合不拢嘴。你爸偷偷在邻居面前炫耀："我孩子回来了。"\n\n"回家不是认输，是另一种勇敢。"', cond: g => g.flags.midlifeChange && g.money >= 20000 && g.age >= 33 && g.social >= 40 },
     // --- v10.3 NEW ENDINGS ---
