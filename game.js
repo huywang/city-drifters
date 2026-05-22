@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v25.3
+// 都市浮生记 - Game Engine v25.4
 // ============================================
 
 // === GAME STATE ===
@@ -12481,6 +12481,87 @@ const EVENTS = [
         { label:'觉得很有趣，跟朋友讨论了很久', hint:'+🧠 +🤝', fn: g => { g.flags.aiConsciousness=true; return{intel:5,social:3}; }},
         { label:'觉得就是炒作，AI不可能有意识', hint:'', fn: g => { g.flags.aiConsciousness=true; return{intel:2}; }},
       ]},
+    // v25.4: 网络文化 + 青年亚文化
+    { id:'abstract_culture_v25_4', icon:'🎭', title:'抽象文化', category:'social',
+      body:'你刷短视频的时候，发现了一个新的「抽象」博主。\n\n他的视频：\n- 用离谱的语调念一些毫无逻辑的台词\n- 做一些匪夷所思的行为艺术\n- 发明一些完全看不懂的「梗」\n\n评论区全是：\n- 「太抽象了」\n- 「看不懂但大受震撼」\n- 「这是正常人能想出来的？」\n\n你看了半小时——时间就这么没了。\n\n你开始理解为什么有人把它叫做「电子海洛因」。\n\n但你也发现：这些看起来荒诞的内容——背后其实是一种对现实压力的消解。当现实太沉重——荒诞就成了出口。\n\n「抽象文化：看不懂——但这就是这一代人的表达方式。」',
+      cond: g => g.age >= 16 && g.age <= 35 && !g.flags.abstractCulture,
+      choices:[
+        { label:'成了抽象博主的粉丝，每天刷', hint:'+😊 -🧠', fn: g => { g.flags.abstractCulture=true; g.flags.abstractFan=true; return{mood:5,intel:-2}; }},
+        { label:'自己也拍了几个抽象视频，意外火了', hint:'+💰 +✨ -🧠', fn: g => { g.flags.abstractCulture=true; g.flags.abstractCreator=true; return{money:3000,charm:8,intel:-3}; }},
+        { label:'觉得低俗无聊，取关了', hint:'+🧠', fn: g => { g.flags.abstractCulture=true; return{intel:3}; }},
+      ]},
+    { id:'corporate_jargon', icon:'💼', title:'职场黑话', category:'career',
+      body:'你参加了一个行业分享会。台上的人说了一堆：\n\n- 「赋能」\n- 「抓手」\n- 「颗粒度」\n- 「方法论」\n- 「拉齐」\n- 「对齐」\n- 「打造心智」\n- 「沉淀价值」\n- 「跑通模型」\n\n你一个字一个字都懂——但连在一起就完全不知道在说什么。\n\n会后你问一个同事：「他刚才讲的那些——你真的明白吗？」\n\n同事笑着说：「不重要。重要的是——让领导觉得你很专业。」\n\n你突然意识到：这些黑话——不是为了沟通，而是为了表演。是一种身份认证。\n\n「职场黑话：说得越溜——离真话越远。」',
+      cond: g => g.age >= 22 && g.age <= 45 && !g.flags.corporateJargon && g.job !== '待业中',
+      choices:[
+        { label:'学会了这些黑话，开会时运用自如', hint:'+💰 +✨ -🧠', fn: g => { g.flags.corporateJargon=true; g.flags.jargonMaster=true; return{money:2000,charm:3,intel:-2}; }},
+        { label:'坚持说人话，被同事嘲笑太直白', hint:'+🧠 -🤝', fn: g => { g.flags.corporateJargon=true; g.flags.plainSpeaker=true; return{intel:5,social:-3}; }},
+        { label:'写了一篇吐槽文章，意外成了爆文', hint:'+💰 +✨ +😊', fn: g => { g.flags.corporateJargon=true; g.flags.jargonCritic=true; return{money:1500,charm:8,mood:5}; }},
+      ]},
+    { id:'influencer_checkin', icon:'📸', title:'网红打卡', category:'social',
+      body:'你刷到一家新开的咖啡店——号称「全城最美」。\n\n照片里：\n- 复古欧式装修\n- 鲜花环绕\n- 拉花艺术\n- 每个角度都能出片\n\n你去了。排队2小时。\n\n现实中：\n- 店很小，挤满了拍照的人\n- 咖啡很贵（68元一杯）\n- 味道一般\n- 所有人都在找角度拍照，没人认真喝咖啡\n\n你拍了几十张照片，修了半小时图，发到了朋友圈。\n\n收到了88个赞。\n\n你看着那杯68元、已经凉了的咖啡——心想：我到底是来喝咖啡的，还是来「证明我来过」的？\n\n「网红打卡：消费的不是商品——是社交货币。」',
+      cond: g => g.age >= 18 && g.age <= 40 && !g.flags.influencerCheckin && g.money >= 500,
+      choices:[
+        { label:'成了打卡达人，每周探新店', hint:'-💰 +✨ +😊', fn: g => { g.flags.influencerCheckin=true; g.flags.checkinMaster=true; g.money -= 3000; return{charm:8,mood:5}; }},
+        { label:'拍完照就走了，以后不再跟风', hint:'-💰 +🧠', fn: g => { g.flags.influencerCheckin=true; g.money -= 68; return{intel:3}; }},
+        { label:'写了一篇吐槽笔记，劝大家别去', hint:'+🧠 +😊', fn: g => { g.flags.influencerCheckin=true; return{intel:5,mood:3}; }},
+      ]},
+    { id:'livestream_shopping_v25_4', icon:'📱', title:'直播带货', category:'finance',
+      body:'你晚上刷直播，进了一个带货主播的房间。\n\n「家人们！今天这个价格——亏本！」\n「最后100单！3、2、1——上链接！」\n「抢不到的扣1！」\n\n你看着屏幕上疯狂滚动的弹幕——手不自觉地点了下单。\n\n你买了：\n- 一箱据说是「全网最低价」的零食（其实超市更便宜）\n- 一个「明星同款」的包包（你根本不认识那个明星）\n- 一台「黑科技」养生仪（其实就是个加热的垫子）\n\n总共花了2800元。\n\n三天后货到了。你看着堆在门口的快递——心想：我真的需要这些吗？\n\n你打开直播回放——发现主播一直在说「不买就亏了」。但你到底亏了什么？\n\n「直播带货：你以为在占便宜——其实是在被收割。」',
+      cond: g => g.age >= 18 && !g.flags.livestreamShopping && g.money >= 2000,
+      choices:[
+        { label:'成了直播间的忠实粉丝，每周必买', hint:'-💰 +😊', fn: g => { g.flags.livestreamShopping=true; g.flags.liveShopAddict=true; g.money -= 8000; return{mood:5}; }},
+        { label:'把不需要的东西全退了，以后理性消费', hint:'+🧠 +💰', fn: g => { g.flags.livestreamShopping=true; g.money += 2000; return{intel:5}; }},
+        { label:'干脆自己也开了个直播卖货', hint:'+💰 +✨ -😊', fn: g => { g.flags.livestreamShopping=true; g.flags.liveStreamer=true; return{money:5000,charm:8,mood:-3}; }},
+      ]},
+    { id:'electronic_pickle_v25_4', icon:'🥒', title:'电子榨菜', category:'psychology',
+      body:'你吃饭的时候——必须要看点什么。\n\n以前是电视剧。后来是综艺。再后来是短视频。\n\n现在——你吃饭的时候刷的是「10分钟看完一部电影」的解说。\n\n你已经很久没有完整看过一部电影了。\n\n你也发现自己：\n- 注意力越来越短（超过3分钟的视频就不想看了）\n- 笑点越来越高（普通段子已经无法让你笑）\n- 对什么都知道一点——但对什么都不深入\n\n一个朋友说你：「你这是把脑子喂成了电子榨菜——好消化，但没营养。」\n\n你想反驳——但发现自己连反驳的注意力都没有。\n\n「电子榨菜：喂饱了你的时间——饿瘦了你的大脑。」',
+      cond: g => g.age >= 16 && !g.flags.electronicPickle,
+      choices:[
+        { label:'决心戒掉，开始深度阅读和完整看电影', hint:'+🧠 +❤️ -😊', fn: g => { g.flags.electronicPickle=true; g.flags.deepReader=true; return{intel:8,health:3,mood:-3}; }},
+        { label:'觉得挺好，这就是现代人的生活方式', hint:'+😊 -🧠', fn: g => { g.flags.electronicPickle=true; return{mood:3,intel:-2}; }},
+        { label:'开始自己做「电子榨菜」内容', hint:'+💰 +✨ -🧠', fn: g => { g.flags.electronicPickle=true; g.flags.pickleCreator=true; return{money:2000,charm:5,intel:-3}; }},
+      ]},
+    { id:'personal_brand_v25_4', icon:'🎯', title:'人设经营', category:'social',
+      body:'你开始认真经营自己的「人设」。\n\n你给自己定位：「文艺青年 + 生活美学家」\n\n于是你的朋友圈：\n- 每天一杯手冲咖啡\n- 每周一本书（至少封面要拍）\n- 旅行只去小众地方\n- 吃饭只去私房菜\n- 穿搭必须是「日系简约」\n\n你发现：维持人设——是一件很累的事。\n\n你不能在朋友圈说「今天好累」——这不符合人设。\n你不能承认自己其实更喜欢看综艺——这太「俗」了。\n你不能让人知道你其实月薪只有8000——文艺青年不能穷。\n\n某天你发了个呆——突然想问：这个「人设」——是我，还是我演出来的？\n\n如果有一天人设塌了——还剩下什么？\n\n「人设经营：你演的太像了——连自己都信了。」',
+      cond: g => g.age >= 18 && g.age <= 40 && !g.flags.personalBrand && g.charm >= 20,
+      choices:[
+        { label:'继续维持人设，成了「圈内名人」', hint:'+✨ +🤝 -😊', fn: g => { g.flags.personalBrand=true; g.flags.brandMaster=true; return{charm:10,social:5,mood:-5}; }},
+        { label:'某天突然发了条「我不想演了」，意外收获真诚回应', hint:'+😊 +🤝 +🧠', fn: g => { g.flags.personalBrand=true; g.flags.brandCollapse=true; return{mood:8,social:5,intel:5}; }},
+        { label:'从一开始就没搞人设，真实做自己', hint:'+🧠 +😊', fn: g => { g.flags.personalBrand=true; g.flags.authenticSelf=true; return{intel:5,mood:5}; }},
+      ]},
+    { id:'keyboard_warrior_v25_4', icon:'⌨️', title:'键盘侠', category:'social',
+      body:'你在网上看到一个新闻：一个女孩被网暴了。\n\n原因是她在地铁上没给老人让座。\n\n评论区一片骂声：\n- 「没素质」\n- 「年轻人就是自私」\n- 「人肉她！」\n\n你本来想帮她说话——但看到那么多人骂——你退缩了。\n\n更糟糕的是——你发现自己也有点想骂她。\n\n你问自己：我这是在主持正义吗？还是我只是在找一个「合法」的出口——发泄自己无处安放的情绪？\n\n网暴者——真的是「正义的化身」吗？还是「沉默的懦夫」在网上的另一种形态？\n\n「键盘侠：在现实中不敢说的话——在网上也不敢说。只是换了一种方式——说别人想听的话。」',
+      cond: g => g.age >= 16 && !g.flags.keyboardWarrior,
+      choices:[
+        { label:'站出来为被网暴者发声，被一群人追着骂', hint:'+🧠 +✨ -😊', fn: g => { g.flags.keyboardWarrior=true; g.flags.cyberDefender=true; return{intel:5,charm:5,mood:-5}; }},
+        { label:'默默关掉评论区，什么也没做', hint:'-🧠 -😊', fn: g => { g.flags.keyboardWarrior=true; g.flags.bystander=true; return{intel:-3,mood:-3}; }},
+        { label:'写了一篇关于网暴的深度分析文章', hint:'+🧠 +✨', fn: g => { g.flags.keyboardWarrior=true; g.flags.cyberWriter=true; return{intel:8,charm:5}; }},
+      ]},
+    { id:'social_anxiety_v25_4', icon:'😰', title:'社恐文化', category:'psychology',
+      body:'你发现了一个新词：社恐。\n\n不是临床上的社交焦虑障碍——而是一种「文化标签」。\n\n你发现：\n- 不想接电话——社恐\n- 不想参加聚会——社恐\n- 不想回消息——社恐\n- 不想上班——也是社恐\n\n你身边的人都开始自称「社恐」。仿佛这是一种新的社交货币。\n\n但你认真想了一下：你是真的「社恐」——还是只是累了？\n\n在一个要求你「24小时在线」的时代——想要独处——难道不是一种正常的反应吗？\n\n也许「社恐」不是病——是对过度社交的自我保护。\n\n「社恐文化：不是不敢见人——是不想见不值得见的人。」',
+      cond: g => g.age >= 16 && g.age <= 40 && !g.flags.socialAnxiety,
+      choices:[
+        { label:'拥抱「社恐」标签，开始拒绝不必要的社交', hint:'+😊 +🧠 -🤝', fn: g => { g.flags.socialAnxiety=true; g.flags.boundarySetter=true; return{mood:5,intel:3,social:-5}; }},
+        { label:'强迫自己走出舒适区，每周参加一次聚会', hint:'+🤝 +✨ -😊', fn: g => { g.flags.socialAnxiety=true; g.flags.socialFighter=true; return{social:8,charm:5,mood:-3}; }},
+        { label:'开始思考：我到底需要什么样的社交', hint:'+🧠 +😊', fn: g => { g.flags.socialAnxiety=true; return{intel:5,mood:3}; }},
+      ]},
+    { id:'fan_support', icon:'🎤', title:'粉丝应援', category:'social',
+      body:'你的一个朋友——成了某个偶像的「站姐」。\n\n她每天做的事：\n- 跟拍偶像的所有行程\n- 修图、剪视频、写文案\n- 组织粉丝集资给偶像买礼物\n- 在各大平台控评、反黑、打榜\n\n她一个月在偶像身上花了8000元——比她自己的房租还高。\n\n你问她：「值得吗？」\n\n她说：「你不知道——他在舞台上发光的时候，我觉得我也在发光。」\n\n你看着她眼睛里的那种光——你有点羡慕。你不确定你的人生中——有没有过这种「为别人而燃烧」的时刻。\n\n但你也知道：当这份热情变成「必须做」的任务——它就变了味。\n\n「粉丝应援：你以为你在追星——其实你在追那个闪闪发光的自己。」',
+      cond: g => g.age >= 16 && g.age <= 35 && !g.flags.fanSupport && g.money >= 3000,
+      choices:[
+        { label:'也入了坑，成了某个偶像的铁粉', hint:'-💰 +😊 +🤝', fn: g => { g.flags.fanSupport=true; g.flags.stanAddict=true; g.money -= 8000; return{mood:8,social:5}; }},
+        { label:'被朋友感染，偶尔关注一下', hint:'+😊', fn: g => { g.flags.fanSupport=true; return{mood:3}; }},
+        { label:'完全不理解，觉得浪费时间', hint:'+🧠 -🤝', fn: g => { g.flags.fanSupport=true; return{intel:3,social:-2}; }},
+      ]},
+    { id:'meme_culture', icon:'😂', title:'梗文化', category:'social',
+      body:'你跟朋友聊天的时候发现——你们已经不会「正常说话」了。\n\n你们的对话：\n- 「6」\n- 「绝了」\n- 「笑不活了」\n- 「DNA动了」\n- 「破防了」\n- 「格局打开」\n- 「真的会谢」\n\n如果把这些梗去掉——你们可能什么都说不出来。\n\n你开始想：语言——是不是在「退化」？\n\n但你也发现：一个精准的梗——可以用5个字表达500字的情绪。它是一种压缩算法。\n\n问题不在于「梗」——而在于你是否还有「不用梗」也能表达的能力。\n\n「梗文化：语言不是变少了——是变得更快了。」',
+      cond: g => g.age >= 14 && !g.flags.memeCulture,
+      choices:[
+        { label:'成了朋友圈的「梗王」，每句话都有梗', hint:'+✨ +🤝 -🧠', fn: g => { g.flags.memeCulture=true; g.flags.memeKing=true; return{charm:8,social:5,intel:-2}; }},
+        { label:'有意识地在不同场景切换表达方式', hint:'+🧠 +✨', fn: g => { g.flags.memeCulture=true; g.flags.codeSwitcher=true; return{intel:5,charm:3}; }},
+        { label:'开始刻意练习「不用梗」的表达能力', hint:'+🧠 +✨', fn: g => { g.flags.memeCulture=true; g.flags.plainThinker=true; return{intel:8,charm:3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -13602,6 +13683,12 @@ const ACHIEVEMENTS = [
     { id:'ar_power_user_ach', icon:'👓', name:'AR重度用户', desc:'成为AR眼镜的深度使用者', check: g => g.flags.arPowerUser },
     { id:'mars_applicant_ach', icon:'🪐', name:'火星志愿者', desc:'报名了火星移民计划', check: g => g.flags.marsApplicant },
     { id:'quantum_learner_ach', icon:'💻', name:'量子学徒', desc:'开始学习量子计算知识', check: g => g.flags.quantumLearner },
+    // v25.4: 网络文化成就
+    { id:'abstract_creator_ach', icon:'🎭', name:'抽象创作者', desc:'自己拍了抽象视频并意外走红', check: g => g.flags.abstractCreator },
+    { id:'jargon_critic_ach', icon:'📝', name:'职场清醒人', desc:'吐槽职场黑话的文章成了爆文', check: g => g.flags.jargonCritic },
+    { id:'checkin_master_ach', icon:'📸', name:'打卡达人', desc:'每周探店打卡成了圈内名人', check: g => g.flags.checkinMaster },
+    { id:'live_streamer_ach_v25_4', icon:'🎥', name:'带货主播', desc:'干脆自己也开了直播卖货', check: g => g.flags.liveStreamer },
+    { id:'meme_king_ach', icon:'😂', name:'梗王', desc:'成了朋友圈公认的梗王', check: g => g.flags.memeKing },
 ];
 
 // === ENDINGS === (order matters: first match wins)
