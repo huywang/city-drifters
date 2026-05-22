@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v28.4
+// 都市浮生记 - Game Engine v28.5
 // ============================================
 
 // === GAME STATE ===
@@ -14628,6 +14628,95 @@ const EVENTS = [
         { label:'又报了一个考试', hint:'-💰 -🧠 +✨', fn: g => { g.flags.examAddiction=true; g.money -= 5000; return{intel:-3,charm:3}; }},
         { label:'觉得证书多总没坏处', hint:'+✨ -🧠', fn: g => { g.flags.examAddiction=true; g.flags.certificateHoarder=true; return{charm:3,intel:-3}; }},
       ]},
+    // === v28.5: 宠物经济 + 养宠人生 + 孤独消费 ===
+    { id:'adopt_cat_v28_5', icon:'🐱', title:'领养一只猫', category:'lifestyle',
+      body:'你路过一家宠物店，橱窗里一只橘猫盯着你看。\n\n你的内心对话：\n- 「养只猫吧，下班回家有人等你」\n- 「但租房不让养啊」\n- 「跟房东商量一下？」\n- 「万一不同意呢？」\n- 「先养了再说？」\n\n你查了一下养猫成本：\n- 猫粮：每月200-500元\n- 猫砂：每月50-100元\n- 驱虫/疫苗：每年500-1000元\n- 绝育手术：1000-2000元\n- 意外就医：2000-10000元/次\n\n你月薪8000，房租3000，吃饭2000。\n\n你开始理解：养猫——不是「买个宠物」——是「签一份5-15年的情感合同」。\n\n你不确定——你能不能「履行这份合同」。\n\n但那只橘猫——还在看你。\n\n「养猫：你以为你在领养猫——其实是猫在领养你的孤独。」',
+      cond: g => g.age >= 22 && !g.flags.hasPet && g.money >= 2000 && !g.flags.rejectedPet,
+      choices:[
+        { label:'养了！跟房东好好说', hint:'-💰 +😊 +❤️', fn: g => { g.flags.hasPet=true; g.flags.catOwner=true; g.flags.petName='橘座'; g.money -= 3000; return{mood:10,health:-2}; }},
+        { label:'算了，云吸猫挺好的', hint:'+😊', fn: g => { g.flags.cloudPetViewer=true; return{mood:2}; }},
+        { label:'等买了房再养', hint:'+🧠', fn: g => { g.flags.rejectedPet=true; return{intel:2}; }},
+      ]},
+    { id:'adopt_dog_v28_5', icon:'🐕', title:'领养一只狗', category:'lifestyle',
+      body:'你的同事送了你一只狗——他家金毛生了6只。\n\n你的第一反应：\n- 「好可爱！」\n- 「但……我每天早上6点要遛狗」\n- 「我加班到10点，狗怎么办？」\n- 「下雨天也得遛」\n- 「过年回家狗放哪？」\n\n你查了一下养狗成本：\n- 狗粮：每月300-800元\n- 驱虫/疫苗：每年800-1500元\n- 绝育：1500-3000元\n- 宠物寄养：每天80-200元\n- 咬坏沙发：2000-5000元\n\n你还查了一下：\n- 狗的平均寿命：10-15年\n- 你未来10年——可能换3个城市\n\n你开始理解：养狗——不是「找个伴」——是「承诺一段关系」。\n\n你不确定——你能不能「做一个10年的承诺」。\n\n但那只小狗——在你怀里睡着了。\n\n「养狗：你以为你在养狗——其实是狗在训练你的责任心。」',
+      cond: g => g.age >= 22 && !g.flags.hasPet && g.money >= 3000 && !g.flags.rejectedPet,
+      choices:[
+        { label:'养了！早起遛狗也愿意', hint:'-💰 +😊 +❤️ +💪', fn: g => { g.flags.hasPet=true; g.flags.dogOwner=true; g.flags.petName='旺财'; g.money -= 4000; return{mood:10,health:3}; }},
+        { label:'帮它找个好人家吧', hint:'+😊 +✨', fn: g => { g.flags.rejectedPet=true; g.flags.helpedRehome=true; return{mood:3,charm:3}; }},
+        { label:'养不了，自己的生活都不稳定', hint:'+🧠', fn: g => { g.flags.rejectedPet=true; return{intel:3}; }},
+      ]},
+    { id:'pet_hospital_bill', icon:'🏥', title:'宠物医院账单', category:'finance',
+      body:'你的猫/狗病了。\n\n症状：呕吐、不吃东西、精神萎靡。\n\n你带它去宠物医院：\n- 挂号费：50元\n- 血常规：200元\n- 生化全项：500元\n- B超：300元\n- 诊断：「疑似异物阻塞」\n- 手术费：5000元\n- 住院费：每天200元（预计3天）\n\n总计：6650元。\n\n你的月薪：8000元。\n\n你看着它——它看着你——它不知道什么是「钱」——它只知道「疼」。\n\n你开始理解：宠物医院——没有「医保」——没有「报销」——100%自费。\n\n你在网上搜了一下：\n- 「宠物看病比人贵」——10万+阅读\n- 「宠物保险值不值得买」——评论区吵起来了\n- 「因为看不起病放弃治疗」——你不敢点开\n\n「宠物医院：你以为你在给宠物看病——其实是宠物在考验你的「爱的价格」。」',
+      cond: g => g.flags.hasPet && g.age >= 23,
+      choices:[
+        { label:'治！花多少钱都治', hint:'-💰 +😊 +❤️', fn: g => { g.flags.petHospital=true; g.flags.petSaved=true; g.money -= 7000; return{mood:5,charm:3}; }},
+        { label:'买了宠物保险再治', hint:'-💰 +🧠', fn: g => { g.flags.petHospital=true; g.flags.boughtPetInsurance=true; g.money -= 5000; return{intel:3,mood:3}; }},
+        { label:'问问有没有保守治疗方案', hint:'+🧠 -💰', fn: g => { g.flags.petHospital=true; g.money -= 2000; return{intel:2,mood:-5}; }},
+      ]},
+    { id:'pet_funeral_v28_5', icon:'🕊️', title:'宠物殡葬', category:'psychology',
+      body:'你的宠物走了。\n\n它陪你度过了：\n- 3次搬家\n- 2次失恋\n- 1次裁员\n- 无数个加班到深夜的晚上\n\n你在宠物殡葬店：\n- 单独火化：800元\n- 骨灰盒：500-3000元\n- 宠物墓地（5年）：5000-20000元\n- 宠物纪念品（爪印模具）：300元\n- 宠物追悼仪式：1500元\n\n你的朋友说：「不就是只猫/狗吗？」\n\n你的妈妈说：「再养一只不就行了？」\n\n但你知道——它不是「一只猫/狗」——它是「你的家人」。\n\n你开始理解：宠物殡葬——不是「处理遗体」——是「给悲伤一个仪式感」。\n\n你哭了一整晚——不是因为「矫情」——是因为「它是唯一一个——无论你多穷多丑多失败——都不会嫌弃你的存在」。\n\n「宠物殡葬：你哭的不是它——是你再也回不去的「被无条件爱着」的日子。」',
+      cond: g => g.flags.hasPet && g.age >= 25 && g.flags.petHospital,
+      choices:[
+        { label:'办一个正式的告别仪式', hint:'-💰 +😊', fn: g => { g.flags.petFuneral=true; g.flags.petPassed=true; g.hasPet=false; g.money -= 5000; return{mood:-8,charm:5}; }},
+        { label:'默默埋在郊外的树下', hint:'-💰 +😊', fn: g => { g.flags.petFuneral=true; g.flags.petPassed=true; g.hasPet=false; g.money -= 500; return{mood:-5,intel:3}; }},
+        { label:'把骨灰带回家放在书桌上', hint:'+😊', fn: g => { g.flags.petFuneral=true; g.flags.petPassed=true; g.hasPet=false; return{mood:-10,charm:3}; }},
+      ]},
+    { id:'stray_animal_rescue', icon:'🐾', title:'流浪动物救助', category:'social',
+      body:'你下班路上看到一只流浪猫——脏兮兮的——但眼睛很亮。\n\n你的选择：\n\nA：拍照发朋友圈「好可怜的猫猫」——然后走开\nB：买根火腿肠喂一下——然后走开\nC：带回家——但你已经养了一只了\nD：联系救助组织\n\n你搜了一下本地流浪动物救助：\n- 「XX市流浪动物救助站」——志愿者30人——救助了500+只\n- 「TNR项目」——捕捉-绝育-放归——控制流浪数量\n- 「领养日」——每月一次——成功率约30%\n\n你开始理解：流浪动物——不是「城市的问题」——是「人类的问题」。\n\n每一只流浪——都曾经是「某个人的宝贝」。\n\n被遗弃的原因：\n- 搬家了养不了\n- 怀孕了对孩子不好（伪科学）\n- 养不起了\n- 不想养了\n\n「流浪动物：不是动物选择了流浪——是人类选择了遗弃。」',
+      cond: g => g.age >= 20 && !g.flags.strayRescue,
+      choices:[
+        { label:'联系救助组织当志愿者', hint:'+❤️ +✨ +😊', fn: g => { g.flags.strayRescue=true; g.flags.animalVolunteer=true; g.reputation.social += 5; return{mood:8,charm:5,social:5}; }},
+        { label:'喂了火腿肠拍照发朋友圈', hint:'+✨', fn: g => { g.flags.strayRescue=true; return{charm:2,mood:2}; }},
+        { label:'带回家吧，挤一挤总有地方', hint:'-💰 +❤️ +😊', fn: g => { g.flags.strayRescue=true; g.flags.adoptedStray=true; g.money -= 2000; return{mood:8,charm:3}; }},
+      ]},
+    { id:'cat_cafe_business', icon:'☕', title:'猫咖创业梦', category:'career',
+      body:'你辞职了——你想开一家猫咖。\n\n你的商业计划：\n- 选址：商圈附近，月租1.5万\n- 装修：10万\n- 10只猫：3万\n- 咖啡设备：5万\n- 首月备货：2万\n- 流动资金：5万\n\n总计：25万+。\n\n你的存款：8万。\n\n你的融资计划：\n- 父母借10万\n- 信用卡套现5万\n- 找合伙人分担\n\n你调研了3个月：\n- 本市已有15家猫咖\n- 平均存活期：8个月\n- 最赚钱的那家——靠的是抖音——不是猫\n\n你开始理解：猫咖——不是「猫+咖啡」——是「猫+网红经济+赌运气」。\n\n你的猫——不关心你的营业额——它们只关心「你今天有没有来陪它们」。\n\n「猫咖：你以为你在创业——其实你在用你的积蓄——给猫打工。」',
+      cond: g => g.age >= 24 && !g.flags.catCafeAttempt && g.money >= 50000,
+      choices:[
+        { label:'拼了！借钱也要开', hint:'-💰 +😊 +✨', fn: g => { g.flags.catCafeAttempt=true; g.flags.catCafeOwner=true; g.money -= 250000; setJob(g, '猫咖老板', 3000); g.reputation.culture += 5; return{mood:10,charm:8}; }},
+        { label:'算了，去猫咖打工体验一下', hint:'+🧠 +😊', fn: g => { g.flags.catCafeAttempt=true; setJob(g, '猫咖店员', 4000); return{mood:5,intel:3}; }},
+        { label:'认清现实，回去上班', hint:'+💰 +🧠', fn: g => { g.flags.catCafeAttempt=true; return{intel:5,mood:-3}; }},
+      ]},
+    { id:'pet_social_media', icon:'📱', title:'宠物网红之路', category:'career',
+      body:'你开始给你家猫/狗拍视频了。\n\n你的内容策略：\n- 抖音：搞笑日常（3个月涨粉2000）\n- 小红书：养宠干货（3个月涨粉500）\n- B站：Vlog长视频（3个月涨粉100）\n\n你的「爆款」视频：\n- 「猫咪偷吃被抓的表情包」——10万播放\n- 「狗狗第一次见到猫的反应」——5万播放\n- 「月入8000养宠开销」——3万播放（评论区：「养不起别养」）\n\n你的收入：\n- 第1个月：0元\n- 第3个月：50元（平台分成）\n- 第6个月：200元（一条广告）\n\n你开始理解：宠物网红——不是「拍猫赚钱」——是「花3倍精力赚1/10的广告费」。\n\n但——你发现——拍视频让你「更关注它了」——你开始注意到它「每个小表情」。\n\n它不知道——它是你的「同事」——它只知道——你「陪它的时间变多了」。\n\n「宠物网红：你以为你在利用它赚钱——其实是它在教你「慢下来」。」',
+      cond: g => g.flags.hasPet && g.age >= 22 && !g.flags.petInfluencer,
+      choices:[
+        { label:'认真做，当成副业', hint:'+💰 +✨ +😊', fn: g => { g.flags.petInfluencer=true; g.flags.petContentCreator=true; g.money += 500; return{charm:8,intel:3,mood:5}; }},
+        { label:'随便拍拍，记录生活', hint:'+😊 +✨', fn: g => { g.flags.petInfluencer=true; return{mood:5,charm:3}; }},
+        { label:'不拍了，不想消费它', hint:'+❤️ +🧠', fn: g => { g.flags.petInfluencer=true; g.flags.petPrivacyAdvocate=true; return{intel:3,mood:3}; }},
+      ]},
+    { id:'holiday_pet_problem', icon:'🚄', title:'春节宠物寄养', category:'lifestyle',
+      body:'春节到了——你要回老家7天。\n\n你的宠物怎么办？\n\n方案A：宠物寄养\n- 宠物店寄养：150元/天 × 7天 = 1050元\n- 家庭寄养：80元/天 × 7天 = 560元\n- 上门喂养：50元/次 × 2次/天 × 7天 = 700元\n\n方案B：带回家\n- 高铁不能带宠物\n- 飞机托运：800-2000元（单程）\n- 自驾：10小时——猫/狗可能晕车\n\n方案C：让朋友帮忙\n- 朋友A：「可以但我怕养不好」\n- 朋友B：「我家也有猫/狗」\n- 朋友C：「你给多少钱？」\n\n你开始理解：养宠物之后——你的「自由度」——断崖式下降。\n\n你以前可以说走就走——现在你连春节都要提前一个月规划。\n\n你不是「它的主人」——你是「它的后勤部长」。\n\n「春节寄养：你以为你在规划行程——其实你在为你的「不负自由」买单。」',
+      cond: g => g.flags.hasPet && !g.flags.holidayPetSolved,
+      choices:[
+        { label:'花钱寄养，安心过年', hint:'-💰 +😊', fn: g => { g.flags.holidayPetSolved=true; g.money -= 1500; return{mood:3}; }},
+        { label:'找朋友帮忙，回来请吃饭', hint:'+❤️ -💰', fn: g => { g.flags.holidayPetSolved=true; g.flags.petFriendNetwork=true; g.money -= 500; return{social:5,mood:5}; }},
+        { label:'不回去了，陪它过年', hint:'+❤️ +😊 -👨‍👩‍👧', fn: g => { g.flags.holidayPetSolved=true; g.flags.chosePetOverFamily=true; return{mood:5,social:-5}; }},
+      ]},
+    { id:'exotic_pet_trend', icon:'🦎', title:'异宠潮流', category:'lifestyle',
+      body:'你刷到一条视频：一个人养了一只柯尔鸭。\n\n你的心动清单：\n- 柯尔鸭：3000-8000元（会认主人，走路摇摇晃晃）\n- 蜜袋鼯：500-2000元（大眼睛，会滑翔）\n- 守宫：200-1000元（安静，不用遛）\n- 龙猫：800-3000元（毛茸茸，寿命15年）\n- 鹦鹉：1000-10000元（会说话，但很吵）\n\n你的理智清单：\n- 异宠医院：全城只有2家\n- 异宠粮：淘宝买——不知道正不正品\n- 异宠合法性：有些品种——养了可能违法\n- 弃养率：异宠弃养率——比猫狗高3倍\n\n你开始理解：异宠——不是「特别的宠物」——是「特别的麻烦」。\n\n那些可爱的视频——不会告诉你——柯尔鸭会在你家地板上拉屎——而且你训练不了它。\n\n「异宠：你以为你在追求特别——其实你在追求「养不好」的权利。」',
+      cond: g => g.age >= 22 && !g.flags.exoticPet && g.money >= 3000,
+      choices:[
+        { label:'养一只守宫，从简单的开始', hint:'-💰 +😊', fn: g => { g.flags.exoticPet=true; g.flags.geckoOwner=true; g.money -= 1500; return{mood:5,charm:3}; }},
+        { label:'算了，看看就好', hint:'+🧠', fn: g => { g.flags.exoticPet=true; return{intel:3,mood:2}; }},
+        { label:'养了蜜袋鼯然后后悔了', hint:'-💰 -😊', fn: g => { g.flags.exoticPet=true; g.flags.exoticPetRegret=true; g.money -= 3000; return{mood:-5,intel:3}; }},
+      ]},
+    { id:'pet_emotional_bond', icon:'💕', title:'宠物是最好的心理医生', category:'psychology',
+      body:'你今天又被领导骂了。\n\n你回到家——打开门——你的猫/狗冲过来——蹭你的腿。\n\n它不知道——你被骂了。\n它不知道——你快被裁了。\n它不知道——你的存款只剩3000块。\n\n它只知道——你回来了。\n\n你坐在沙发上——它跳到你腿上——你开始哭。\n\n它舔了舔你的手。\n\n你开始理解：\n- 心理咨询师：500元/小时——帮你分析「你为什么难过」\n- 你的宠物：0元/24小时——不分析——不评判——只是在\n\n你的宠物——是你见过的——唯一一个——\n- 不关心你的工资\n- 不关心你的学历\n- 不关心你的房子\n- 只关心「你在不在」\n\n的存在。\n\n「宠物：它不是你的「附属品」——它是你的「心理安全网」——免费的——无条件的——永远在的。」',
+      cond: g => g.flags.hasPet && g.mood <= 40,
+      choices:[
+        { label:'抱着它哭了半小时，好多了', hint:'+😊 +❤️', fn: g => { g.flags.petEmotionalBond=true; return{mood:12,charm:3}; }},
+        { label:'决定以后对它更好一点', hint:'+❤️ +✨', fn: g => { g.flags.petEmotionalBond=true; g.flags.petGratitude=true; return{mood:8,charm:5}; }},
+        { label:'突然觉得只有它不会离开你', hint:'+😊 -🧠', fn: g => { g.flags.petEmotionalBond=true; g.flags.petDependency=true; return{mood:5,social:-3}; }},
+      ]},
+    { id:'second_pet_dilemma', icon:'🐱🐕', title:'要不要养第二只', category:'lifestyle',
+      body:'你家猫/狗看起来很孤独。\n\n你每天上班10小时——它独自在家10小时。\n\n你想：「要不要再养一只陪它？」\n\n你的分析：\n\n支持：\n- 它们可以互相陪伴\n- 你下班回来不会那么内疚\n- 双倍的快乐\n\n反对：\n- 双倍的开销\n- 它们可能不合\n- 打架了怎么办\n- 一只生病另一只也传染\n\n你问了一个养了两只猫的朋友：\n- 「它们关系好吗？」\n- 「好，打了3年之后现在不打了」\n\n你开始理解：养第二只——不是「给它找个伴」——是「赌它们能合得来」。\n\n你赌输了——不是退一只——是两只都难受。\n\n「第二只宠物：你以为你在给它找朋友——其实你在给它找「室友」——而室友关系——从来都不好处理。」',
+      cond: g => g.flags.hasPet && !g.flags.secondPet && g.money >= 5000,
+      choices:[
+        { label:'养了！双倍的快乐', hint:'-💰 +😊 +❤️', fn: g => { g.flags.secondPet=true; g.flags.twoPetOwner=true; g.money -= 5000; return{mood:10,charm:3}; }},
+        { label:'先试养一周朋友的猫', hint:'+🧠 -💰', fn: g => { g.flags.secondPet=true; g.flags.triedFosteringFirst=true; g.money -= 500; return{intel:5,mood:3}; }},
+        { label:'一只就够了，精力有限', hint:'+🧠', fn: g => { g.flags.secondPet=true; return{intel:3,mood:2}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -15929,6 +16018,17 @@ const ACHIEVEMENTS = [
     { id:'certificate_hoarder_ach', icon:'📜', name:'证书收集癖', desc:'考了五个以上证书但不知道有什么用', check: g => g.flags.certificateHoarder },
     { id:'systematic_learner_ach', icon:'🎓', name:'系统学习者', desc:'建立系统化的学习方法论', check: g => g.flags.systematicLearner },
     { id:'fake_study_recovered_ach', icon:'💡', name:'从假努力中醒悟', desc:'意识到考试成瘾是在逃避现实', check: g => g.flags.wokeUpFromFakeStudy },
+    // v28.5: 宠物经济 + 养宠人生 + 孤独消费
+    { id:'cat_owner_ach_v28_5', icon:'🐱', name:'铲屎官', desc:'养了一只猫成为合格的铲屎官', check: g => g.flags.catOwner },
+    { id:'dog_owner_ach_v28_5', icon:'🐕', name:'遛狗达人', desc:'坚持每天遛狗风雨无阻', check: g => g.flags.dogOwner },
+    { id:'pet_savior_ach', icon:'🏥', name:'不离不弃', desc:'宠物生病花光积蓄也要治', check: g => g.flags.petSaved },
+    { id:'animal_volunteer_ach_v28_5', icon:'🐾', name:'动物守护者', desc:'成为流浪动物救助志愿者', check: g => g.flags.animalVolunteer },
+    { id:'cat_cafe_owner_ach', icon:'☕', name:'猫咖老板', desc:'开了一家猫咖给猫打工', check: g => g.flags.catCafeOwner },
+    { id:'pet_content_ach', icon:'📱', name:'宠物博主', desc:'认真做宠物内容创作者', check: g => g.flags.petContentCreator },
+    { id:'pet_gratitude_ach', icon:'💕', name:'感恩的心', desc:'从宠物身上学会了感恩', check: g => g.flags.petGratitude },
+    { id:'two_pet_owner_ach', icon:'🐱🐕', name:'双宠家庭', desc:'养了两只宠物双倍的快乐', check: g => g.flags.twoPetOwner },
+    { id:'adopted_stray_ach', icon:'🏠', name:'给它一个家', desc:'领养了流浪动物', check: g => g.flags.adoptedStray },
+    { id:'pet_privacy_ach', icon:'🛡️', name:'不消费它', desc:'拒绝把宠物当流量工具', check: g => g.flags.petPrivacyAdvocate },
 ];
 
 // === ENDINGS === (order matters: first match wins)
