@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v12.5
+// 都市浮生记 - Game Engine v12.6
 // ============================================
 
 // === GAME STATE ===
@@ -6335,6 +6335,87 @@ const EVENTS = [
         { label:'部分平替', hint:'+💰', fn: g => { g.flags.pintiCulture=true; return{money:1500,mood:3}; }},
         { label:'品质不能省', hint:'-💰 +✨', fn: g => { return{money:-500,charm:5}; }},
       ]},
+    // === v12.6 中国式亲情 + 家庭关系 + 节日文化 ===
+    { id:'spring_festival_home', icon:'🧧', title:'过年回家',
+      body:'春节了。你买了张火车票回家。\n\n一进门，你妈就开始数落你：「怎么又瘦了？是不是不好好吃饭？」你爸在厨房默默炒菜，假装没听见。\n\n年夜饭上，七大姑八大姨开始了年度汇报：\n「有对象了吗？」「一个月赚多少？」「打算什么时候买房？」\n\n你笑着应付，心里翻了一百个白眼。但当你妈把红包塞到你手里的时候——你鼻子酸了。\n\n"过年回家的意义：被骂一顿，被喂胖十斤，然后被塞满后备箱。"',
+      cond: g => g.age >= 22 && g.months % 12 >= 0 && !g.flags.springFestival,
+      choices:[
+        { label:'好好陪家人', hint:'+😊 +👨‍👩‍👧', fn: g => { g.flags.springFestival=true; if(g.relationships) g.relationships.family=Math.min(100,g.relationships.family+15); return{mood:12,money:-2000}; }},
+        { label:'应付一下就走了', hint:'', fn: g => { g.flags.springFestival=true; return{mood:-3,money:-1000}; }},
+        { label:'今年不回了', hint:'-👨‍👩‍👧', fn: g => { if(g.relationships) g.relationships.family=Math.max(0,g.relationships.family-10); return{mood:-8,money:500}; }},
+      ]},
+    { id:'mom_wechat', icon:'📱', title:'妈妈的微信',
+      body:'你妈给你发了一条微信：\n\n「儿子/女儿，你吃了吗？天冷了多穿点。妈做了你爱吃的红烧肉，什么时候回来吃？」\n\n你看了看时间——凌晨2点。你妈居然还没睡。\n\n你打了几个字又删掉了。你不知道怎么回复。说「忙」？说「过几天」？说「别操心了」？\n\n最后你发了一个「嗯」。\n\n你妈秒回：「好，早点睡。」\n\n"妈妈的微信不需要你回复什么——她只是想确认你还活着。"',
+      cond: g => g.age >= 22 && !g.flags.momWechat,
+      choices:[
+        { label:'回个电话', hint:'+👨‍👩‍👧 +😊', fn: g => { g.flags.momWechat=true; if(g.relationships) g.relationships.family=Math.min(100,g.relationships.family+10); return{mood:8}; }},
+        { label:'发个红包', hint:'+👨‍👩‍👧 -💰', fn: g => { g.flags.momWechat=true; if(g.relationships) g.relationships.family=Math.min(100,g.relationships.family+8); return{mood:5,money:-200}; }},
+        { label:'已读不回', hint:'-👨‍👩‍👧', fn: g => { g.flags.momWechat=true; if(g.relationships) g.relationships.family=Math.max(0,g.relationships.family-5); return{mood:-5}; }},
+      ]},
+    { id:'dad_silent', icon:'👨', title:'爸爸的沉默',
+      body:'你爸从来不给你打电话。\n\n你妈说：「你爸每次想你了就翻你的朋友圈，但从来不点赞。他说怕打扰你。」\n\n有一天你回家，发现你爸的手机上存着你从小到大的照片——比你妈存的还多。\n\n你问你爸：「你干嘛不跟我说？」\n你爸看了看电视：「说什么？」\n\n"中国爸爸的爱从来不说出口——但都在行动里。他只是不会表达。"',
+      cond: g => g.age >= 24 && !g.flags.dadSilent,
+      choices:[
+        { label:'主动给爸打电话', hint:'+👨‍👩‍👧 +😊', fn: g => { g.flags.dadSilent=true; if(g.relationships) g.relationships.family=Math.min(100,g.relationships.family+12); return{mood:10}; }},
+        { label:'下次回家再说', hint:'+👨‍👩‍👧', fn: g => { g.flags.dadSilent=true; if(g.relationships) g.relationships.family=Math.min(100,g.relationships.family+5); return{mood:5}; }},
+        { label:'算了都习惯了', hint:'', fn: g => { g.flags.dadSilent=true; return{mood:-3}; }},
+      ]},
+    { id:'parent_tech_help', icon:'📲', title:'教爸妈用手机',
+      body:'你妈打电话来：「这个手机怎么弄啊？我想学网上买菜。」\n\n你远程指导了两个小时。她学会了怎么打开App——然后忘了怎么支付。\n\n第二次她又打来了：「那个……怎么看来着？」\n你第三遍教她的时候，你终于忍不住吼了一句：「妈你怎么又忘了！」\n\n电话那头沉默了三秒。然后你妈说：「算了，我不学了。老了没用了。」\n\n你后悔了。\n\n"教父母用手机是当代最大的孝道考验——耐心比转账更难。"',
+      cond: g => g.age >= 24 && g.intel >= 50 && !g.flags.parentTechHelp,
+      choices:[
+        { label:'耐心再教一遍', hint:'+👨‍👩‍👧 +🧠', fn: g => { g.flags.parentTechHelp=true; if(g.relationships) g.relationships.family=Math.min(100,g.relationships.family+10); return{mood:8,intel:3}; }},
+        { label:'录个教程视频', hint:'+👨‍👩‍👧 +🧠', fn: g => { g.flags.parentTechHelp=true; if(g.relationships) g.relationships.family=Math.min(100,g.relationships.family+8); return{mood:5,intel:5}; }},
+        { label:'直接帮他们操作', hint:'+👨‍👩‍👧', fn: g => { g.flags.parentTechHelp=true; if(g.relationships) g.relationships.family=Math.min(100,g.relationships.family+3); return{mood:-3}; }},
+      ]},
+    { id:'mid_autumn_v3', icon:'🌕', title:'中秋独在异乡',
+      body:'中秋节。你在出租屋里吃月饼。\n\n五仁的。你妈寄来的。快递单上写着：「注意查收，勿扔。」\n\n你拍了张照片发朋友圈。配文：「千里共婵娟。」\n\n你妈在底下评论：「月饼好吃吗？够不够？妈再给你寄。」\n你爸在底下评论：「。」（他不知道怎么打字，只发了一个句号）\n\n你吃了半个月饼，剩下的放冰箱。因为你一个人吃不完。\n\n"中秋的月亮很圆，但出租屋的月亮——只有一半是亮的。"',
+      cond: g => g.age >= 22 && !g.flags.midAutumn,
+      choices:[
+        { label:'视频通话看月亮', hint:'+👨‍👩‍👧 +😊', fn: g => { g.flags.midAutumn=true; if(g.relationships) g.relationships.family=Math.min(100,g.relationships.family+10); return{mood:8}; }},
+        { label:'一个人赏月', hint:'+🧠', fn: g => { g.flags.midAutumn=true; return{mood:-5,intel:5}; }},
+        { label:'约朋友一起过', hint:'+👥 +😊', fn: g => { g.flags.midAutumn=true; return{social:8,mood:5,money:-200}; }},
+      ]},
+    { id:'parent_health_scare_v2', icon:'🏥', title:'爸妈体检报告',
+      body:'你妈发来一张体检报告的照片。\n\n你放大看了半天：血压偏高、血糖偏高、骨质疏松。\n\n你打电话过去：「妈，医生怎么说？」\n你妈：「没事没事，小毛病。你别操心，好好工作。」\n你爸在旁边说：「你妈不让我告诉你，怕你担心。」\n\n你突然意识到：你的父母老了。\n\n你以前觉得他们永远不会老。他们永远在那里——唠叨、做饭、等你回家。但现在——他们的头发白了，背驼了，走路慢了。\n\n"父母的健康状况，是你最不敢面对、又最不能逃避的事。"',
+      cond: g => g.age >= 28 && !g.flags.parentHealthScare,
+      choices:[
+        { label:'请假回家陪看病', hint:'+👨‍👩‍👧 +😊 -💰', fn: g => { g.flags.parentHealthScare=true; if(g.relationships) g.relationships.family=Math.min(100,g.relationships.family+15); return{mood:5,money:-2000}; }},
+        { label:'网上挂号+转钱', hint:'+👨‍👩‍👧 -💰', fn: g => { g.flags.parentHealthScare=true; if(g.relationships) g.relationships.family=Math.min(100,g.relationships.family+8); return{mood:-3,money:-3000}; }},
+        { label:'嘱咐他们注意身体', hint:'', fn: g => { g.flags.parentHealthScare=true; return{mood:-8}; }},
+      ]},
+    { id:'family_group_chat', icon:'💬', title:'家族群大战',
+      body:'家族群里又吵起来了。\n\n你大伯在群里转发了一条：「震惊！这种菜致癌！」\n你表妹回了一句：「大伯这是谣言。」\n你大伯：「你一个小孩懂什么？我吃的盐比你吃的饭多！」\n你妈出来打圆场：「都是家人别吵了。」\n你爸全程没说话。\n\n你看着这些聊天记录，突然觉得：这个群是你和家的最后一根线。\n\n虽然这根线经常被养生文章和拼多多链接淹没——但至少它还在。\n\n"家族群是中国家庭的数字客厅——乱，但暖。"',
+      cond: g => g.age >= 23 && !g.flags.familyGroupChat,
+      choices:[
+        { label:'发个红包缓解气氛', hint:'+👨‍👩‍👧 -💰', fn: g => { g.flags.familyGroupChat=true; if(g.relationships) g.relationships.family=Math.min(100,g.relationships.family+5); return{mood:3,money:-100}; }},
+        { label:'帮表妹说话', hint:'+🧠', fn: g => { g.flags.familyGroupChat=true; return{intel:3,mood:5}; }},
+        { label:'默默退群', hint:'-👨‍👩‍👧', fn: g => { g.flags.familyGroupChat=true; if(g.relationships) g.relationships.family=Math.max(0,g.relationships.family-8); return{mood:-5}; }},
+      ]},
+    { id:'hometown_food', icon:'🍜', title:'家乡味道',
+      body:'你在外卖App上搜了「家乡菜」。找到了一家评分4.2的。\n\n你点了你妈最拿手的那道菜。等了40分钟。打开盒子的那一刻——你闻到了熟悉的味道。\n\n不对。差了点什么。\n\n你妈做的会多放一勺醋。你妈做的肉会切得更大块。你妈做的会放在那个蓝色的搪瓷碗里。\n\n你吃了一口。眼泪掉进了饭里。\n\n你拿起手机想打电话说「妈我想吃你做的菜」——但你看了一眼时间，凌晨1点了。\n\n"大城市的餐厅什么都有——唯独没有妈妈的味道。"',
+      cond: g => g.age >= 22 && g.mood <= 55 && !g.flags.hometownFood,
+      choices:[
+        { label:'学做那道菜', hint:'+❤️ +🧠', fn: g => { g.flags.hometownFood=true; g.flags.cookingSkill=true; return{health:5,intel:5,mood:8}; }},
+        { label:'打电话给妈', hint:'+👨‍👩‍👧 +😊', fn: g => { g.flags.hometownFood=true; if(g.relationships) g.relationships.family=Math.min(100,g.relationships.family+10); return{mood:10}; }},
+        { label:'吃完继续加班', hint:'-😊', fn: g => { g.flags.hometownFood=true; return{mood:-5,health:-3}; }},
+      ]},
+    { id:'parent_visiting', icon:'🚄', title:'爸妈来看你',
+      body:'你爸妈坐了6个小时的高铁来看你。\n\n他们带了一后备箱的东西：自家腌的咸菜、你爱吃的腊肉、一箱你小时候用的被子（「这个暖和」）、还有你妈织了三个月的毛衣（「你肯定不穿，但我还是织了」）。\n\n他们在你的出租屋里转了一圈。你妈说：「这么小？能住吗？」你爸说：「还行，比我当年住的好。」\n\n他们住了三天。你妈做了三天的饭。你爸修了三天的水龙头（其实没坏）。\n\n走的时候你妈在门口站了很久。你爸说：「走了。」没回头。\n\n"父母来看你的那几天，是你一年里吃得最好、睡得最踏实的日子。"',
+      cond: g => g.age >= 24 && !g.flags.parentVisiting,
+      choices:[
+        { label:'请假陪他们玩', hint:'+👨‍👩‍👧 +😊 -💰', fn: g => { g.flags.parentVisiting=true; if(g.relationships) g.relationships.family=Math.min(100,g.relationships.family+15); return{mood:15,money:-1000}; }},
+        { label:'下班后陪他们', hint:'+👨‍👩‍👧', fn: g => { g.flags.parentVisiting=true; if(g.relationships) g.relationships.family=Math.min(100,g.relationships.family+8); return{mood:8}; }},
+        { label:'太忙了只能见一面', hint:'-👨‍👩‍👧 -😊', fn: g => { g.flags.parentVisiting=true; if(g.relationships) g.relationships.family=Math.max(0,g.relationships.family-5); return{mood:-10}; }},
+      ]},
+    { id:'parent_aging_v3', icon:'👴', title:'发现父母老了',
+      body:'国庆回家，你在门口等你妈开门。\n\n门开了。你愣了一下——你妈的头发白了很多。她的腰也不像以前那么直了。\n\n吃饭的时候你发现你爸夹菜的手在抖。他说：「没事，年纪大了。」\n\n晚上你在客厅翻到一本相册。里面全是你的照片——从出生到毕业到工作。最后一页是你最近发在朋友圈的一张自拍，被你妈打印出来贴在了上面。\n\n你合上相册，去了阳台。外面的月亮很亮。你哭了一会儿。\n\n"发现父母老了的那一刻，比任何一次失恋都心痛。因为这是不可逆的。"',
+      cond: g => g.age >= 30 && !g.flags.parentAging,
+      choices:[
+        { label:'决定多回家看看', hint:'+👨‍👩‍👧 +😊', fn: g => { g.flags.parentAging=true; if(g.relationships) g.relationships.family=Math.min(100,g.relationships.family+15); return{mood:5,intel:5}; }},
+        { label:'给爸妈买保险', hint:'+👨‍👩‍👧 -💰', fn: g => { g.flags.parentAging=true; if(g.relationships) g.relationships.family=Math.min(100,g.relationships.family+10); return{mood:3,money:-5000}; }},
+        { label:'心里难受但说不出口', hint:'-😊', fn: g => { g.flags.parentAging=true; return{mood:-8}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -6890,6 +6971,17 @@ const ACHIEVEMENTS = [
     { id:'slow_worker', icon:'🐌', name:'慢就业青年', desc:'选择慢慢找工作', check: g => g.flags.slowEmployment },
     { id:'ai_survivor_ach', icon:'🤖', name:'AI时代适应者', desc:'面对AI替代选择了学习', check: g => g.flags.aiReplacement },
     { id:'pingti_master', icon:'🏷️', name:'平替大师', desc:'觉醒消费意识', check: g => g.flags.pintiCulture },
+    // === v12.6 新增成就 ===
+    { id:'spring_festival_ach_v2', icon:'🧧', name:'过年回家', desc:'回家过了春节', check: g => g.flags.springFestival },
+    { id:'mom_wechat_ach', icon:'📱', name:'妈妈的微信', desc:'收到了妈妈的微信消息', check: g => g.flags.momWechat },
+    { id:'dad_silent_ach', icon:'👨', name:'沉默的父爱', desc:'感受到了爸爸的爱', check: g => g.flags.dadSilent },
+    { id:'tech_teacher', icon:'📲', name:'手机教练', desc:'教爸妈用手机', check: g => g.flags.parentTechHelp },
+    { id:'moon_gazer', icon:'🌕', name:'异乡赏月', desc:'中秋独在异乡', check: g => g.flags.midAutumn },
+    { id:'parent_health_ach', icon:'🏥', name:'牵挂', desc:'关心了父母的健康', check: g => g.flags.parentHealthScare },
+    { id:'family_group_ach', icon:'💬', name:'家族群成员', desc:'经历了家族群大战', check: g => g.flags.familyGroupChat },
+    { id:'hometown_taste', icon:'🍜', name:'家乡味道', desc:'想念妈妈做的菜', check: g => g.flags.hometownFood },
+    { id:'parent_visit_ach', icon:'🚄', name:'爸妈来了', desc:'爸妈来看你了', check: g => g.flags.parentVisiting },
+    { id:'parent_aging_ach', icon:'👴', name:'岁月不饶人', desc:'发现父母老了', check: g => g.flags.parentAging },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -7071,6 +7163,9 @@ const ENDINGS = [
     { id:'balance_life_end', badge:'📐', title:'45度人生赢家', desc:'你既没有成为卷王，也没有彻底躺平。\n\n你活成了所有人觉得「还行」的样子：工作还行，收入还行，生活还行，身体还行。\n\n但你知道：这个「还行」是你拼了命才维持住的。\n\n你偶尔会想：如果当初再努力一点会怎样？如果当初彻底躺平会怎样？\n\n然后你笑了——45度人生没有如果，只有当下。\n\n"45度不是妥协——是在不确定的世界里，找到了自己的确定。"', cond: g => g.flags.fortyFiveDegree && g.mood >= 55 && g.age >= 30 },
     { id:'ai_pioneer_end', badge:'🤖', title:'AI时代弄潮儿', desc:'当所有人都害怕AI抢饭碗的时候，你选择了拥抱它。\n\n你学会了用AI写代码、做PPT、分析数据、生成图片。你的效率翻了三倍，你的同事被裁了一半。\n\n你成了公司里「最会用AI的人」。猎头开始频繁联系你。\n\n你妈说：「你小时候玩电脑我就说你有出息。」\n\n"AI不会淘汰所有人——但你得确保自己不是被淘汰的那一个。"', cond: g => g.flags.aiReplacement && g.intel >= 75 && g.age >= 28 },
     { id:'minimalist_end', badge:'🏷️', title:'平替人生', desc:'你把人生也做成了平替。\n\n大牌学历？不需要——你有真本事。高端社交？不需要——你有真朋友。豪华婚礼？不需要——你有真爱。\n\n你妈说：「你看看人家，什么都用最好的。」\n你说：「妈，我用的是最适合我的。」\n\n你过得不奢华，但很充实。不耀眼，但很踏实。\n\n"平替人生的本质不是将就——是终于分清了：什么是别人要的，什么是我需要的。"', cond: g => g.flags.pintiCulture && g.money >= 30000 && g.mood >= 60 && g.age >= 30 },
+    // --- v12.6 NEW ENDINGS ---
+    { id:'filial_child_end', badge:'👨‍👩‍👧', title:'回家的人', desc:'你最终选择了离父母更近的地方生活。\n\n也许是一份薪水更低的工作，也许是一个不那么繁华的城市。但每个周末你都能回家吃饭。每次你妈打电话，你半小时就到。\n\n你爸终于不再只翻你的朋友圈了——他每周都能见到你。\n\n你妈逢人就说：「我孩子就在我身边。」说这话的时候，她笑得比任何时候都开心。\n\n"成功有很多种定义——但能让父母安心变老的那种，最温暖。"', cond: g => g.flags.parentAging && g.flags.parentVisiting && g.relationships && g.relationships.family >= 85 },
+    { id:'homesick_end', badge:'🍜', title:'永远想家的人', desc:'你在外漂泊了十年，最终还是决定回老家。\n\n不是因为混不下去——是因为你终于想明白了：大城市的霓虹灯再亮，也照不暖你半夜想家时的那颗心。\n\n你在老家开了一家小店。你妈每天来帮你看店。你爸负责送货。\n\n收入比以前少了一半。但你终于吃得下饭了。\n\n"回家不是认输——是你终于分清了：什么是梦想，什么是生活。"', cond: g => g.flags.hometownFood && g.flags.springFestival && g.age >= 32 && g.mood < 50 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
