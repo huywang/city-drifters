@@ -2417,6 +2417,51 @@ const EVENTS = [
         { label:'算了，单身也挺好', hint:'+😊 +🧠', fn: g => { g.flags.datingApp=true; g.flags.singleHappy=true; return{mood:8,intel:3}; }},
         { label:'充VIP看看', hint:'-💰 +👥', fn: g => { g.flags.datingApp=true; return{money:-299,social:10,mood:5}; }},
       ]},
+    // === v2.39 EVENTS ===
+    { id:'city_switch', icon:'🚄', title:'换个城市？',
+      body:'你在这个城市已经漂了好几年了。\n\n有时候你会想：是不是换个城市会更好？\n\n- 去北京？机会多但压力大\n- 去上海？精致但贵\n- 去深圳？年轻但内卷\n- 去杭州？互联网但996\n- 去成都？安逸但收入低\n\n"换城市不是逃避，是寻找更适合的土壤。"',
+      cond: g => !g.flags.citySwitch && g.months>=36 && g.age>=26 && Math.random()>0.6,
+      choices:[
+        { label:'去北京闯一闯', hint:'+💰 -😊', fn: g => { g.flags.citySwitch=true; g.city='beijing'; g.cityName='北京'; return{money:-5000,mood:-5,intel:5}; }},
+        { label:'去上海试试', hint:'+💰 +✨', fn: g => { g.flags.citySwitch=true; g.city='shanghai'; g.cityName='上海'; return{money:-5000,charm:5}; }},
+        { label:'去深圳拼搏', hint:'+💰 +🧠', fn: g => { g.flags.citySwitch=true; g.city='shenzhen'; g.cityName='深圳'; return{money:-5000,intel:5}; }},
+        { label:'留在现在的地方', hint:'+😊', fn: g => { g.flags.citySwitch=true; return{mood:8}; }},
+      ]},
+    { id:'midlife_crisis_40', icon:'🎂', title:'四十不惑？',
+      body:'你40岁了。\n\n你开始问自己：\n- 我的人生有意义吗？\n- 我留下了什么？\n- 剩下的时间，我应该怎么过？\n\n"40岁不是中年危机的开始，是终于开始想清楚的时候。"',
+      cond: g => g.age===40 && !g.flags.midlifeCrisis40,
+      choices:[
+        { label:'重新审视人生目标', hint:'+🧠 +😊', fn: g => { g.flags.midlifeCrisis40=true; return{intel:10,mood:10}; }},
+        { label:'开始养生', hint:'+❤️ +😊', fn: g => { g.flags.midlifeCrisis40=true; return{health:10,mood:5,money:-5000}; }},
+        { label:'追求年轻时没实现的梦想', hint:'+😊 -💰', fn: g => { g.flags.midlifeCrisis40=true; g.flags.chaseDream=true; return{mood:20,money:-10000}; }},
+        { label:'接受现实，安于现状', hint:'+😊', fn: g => { g.flags.midlifeCrisis40=true; return{mood:5}; }},
+      ]},
+    { id:'learning_new_skill', icon:'📚', title:'学习新技能',
+      body:'你决定学习一个新技能：\n\n- 编程？可以转行\n- 设计？可以做副业\n- 写作？可以表达自己\n- 摄影？可以记录生活\n- 外语？可以开拓视野\n\n"学习是最好的投资——回报率无限大。"',
+      cond: g => !g.flags.learnNewSkill && g.intel>=50 && g.age>=24 && Math.random()>0.5,
+      choices:[
+        { label:'报班系统学习', hint:'-💰 +🧠🧠', fn: g => { g.flags.learnNewSkill=true; return{money:-8000,intel:15,mood:5}; }},
+        { label:'自学入门', hint:'+🧠', fn: g => { g.flags.learnNewSkill=true; return{intel:8,mood:3}; }},
+        { label:'先看看免费教程', hint:'+🧠', fn: g => { g.flags.learnNewSkill=true; return{intel:5}; }},
+        { label:'算了，没时间', hint:'-😊', fn: g => { g.flags.learnNewSkill=true; return{mood:-5}; }},
+      ]},
+    { id:'parent_health_issue', icon:'🏥', title:'父母体检',
+      body:'你妈打电话说：你爸体检发现了一些问题，需要复查。\n\n你的心一下子揪紧了。\n\n你开始想：\n- 要不要请假回去陪他们？\n- 要不要给他们买更好的医疗保险？\n- 要不要接他们来大城市？\n\n"父母的健康，是你在外打拼最大的牵挂。"',
+      cond: g => !g.flags.parentHealthIssue && g.age>=30 && Math.random()>0.5,
+      choices:[
+        { label:'请假回去陪他们', hint:'-💰 +👥 +😊', fn: g => { g.flags.parentHealthIssue=true; g.relationships.family = clamp((g.relationships.family||50)+25,0,100); return{money:-5000,mood:15,social:10}; }},
+        { label:'买最好的医疗保险', hint:'-💰💰 +😊', fn: g => { g.flags.parentHealthIssue=true; g.flags.parentInsurance=true; return{money:-20000,mood:10}; }},
+        { label:'视频关心，寄钱回去', hint:'-💰 +👥', fn: g => { g.flags.parentHealthIssue=true; g.relationships.family = clamp((g.relationships.family||50)+10,0,100); return{money:-5000,social:5,mood:5}; }},
+        { label:'告诉他们注意身体', hint:'-😊', fn: g => { g.flags.parentHealthIssue=true; g.relationships.family = clamp((g.relationships.family||50)-5,0,100); return{mood:-10}; }},
+      ]},
+    { id:'weekend_trip', icon:'🏖️', title:'周末旅行',
+      body:'你发现了一个周末短途旅行的好去处：\n\n- 高铁2小时\n- 住宿200/晚\n- 风景不错\n\n你已经很久没有出去走走了。\n\n"旅行不是为了逃避生活，是为了让生活不再需要逃避。"',
+      cond: g => !g.flags.weekendTrip && g.money>5000 && g.mood<60 && Math.random()>0.5,
+      choices:[
+        { label:'说走就走！', hint:'-💰 +😊 +❤️', fn: g => { g.flags.weekendTrip=true; return{money:-1000,mood:20,health:5,charm:3}; }},
+        { label:'约朋友一起去', hint:'-💰 +👥 +😊', fn: g => { g.flags.weekendTrip=true; return{money:-800,social:10,mood:15}; }},
+        { label:'下次再说', hint:'-😊', fn: g => { g.flags.weekendTrip=true; return{mood:-5}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -2558,6 +2603,12 @@ const ACHIEVEMENTS = [
     { id:'year_reviewer', icon:'📊', name:'年终总结', desc:'认真回顾了自己的这一年', check: g => g.flags.yearEndReview },
     { id:'conflict_resolver', icon:'🤝', name:'矛盾调解员', desc:'成功解决了室友矛盾', check: g => g.flags.roommateConflict && g.social>=55 },
     { id:'dating_explorer', icon:'💘', name:'交友探索者', desc:'尝试了交友软件', check: g => g.flags.datingApp },
+    // v2.39 achievements
+    { id:'city_explorer', icon:'🗺️', name:'城市探索者', desc:'在多个城市生活过', check: g => g.flags.citySwitch },
+    { id:'midlife_reflection', icon:'🎂', name:'四十不惑', desc:'在40岁时重新审视人生', check: g => g.flags.midlifeCrisis40 },
+    { id:'skill_learner', icon:'📚', name:'终身学习', desc:'学习了新技能', check: g => g.flags.learnNewSkill },
+    { id:'good_child', icon:'👨‍👩‍👦', name:'孝顺子女', desc:'照顾好了父母的健康', check: g => (g.flags.parentHealthIssue || g.flags.hometownVisit) && g.relationships && g.relationships.family>=70 },
+    { id:'traveler', icon:'🏖️', name:'周末旅行家', desc:'来了一次说走就走的旅行', check: g => g.flags.weekendTrip },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -2642,6 +2693,10 @@ const ENDINGS = [
     { id:'ai_pioneer', badge:'🤖', title:'AI先驱者', desc:'你没有被AI淘汰，反而成为了AI时代的主角。\n\n你学会了用AI工具，你的效率翻倍，你的竞争力增强。\n\n"未来不是AI的，是会用AI的人的。"', cond: g => g.flags.aiSkills && g.intel>=80 && g.jobSalary>=20000 && g.money>=100000 && g.age>=30 },
     { id:'labor_hero', badge:'⚖️', title:'劳动权益捍卫者', desc:'你勇敢站出来，维护了自己的劳动权益。\n\n你拿到了应得的赔偿，你也帮助了其他人。\n\n"维权不是为了钱，是为了尊严。"', cond: g => g.flags.laborRights && g.money>=50000 && g.intel>=70 && g.social>=60 && g.age>=28 },
     { id:'happy_single', badge:'💝', title:'快乐单身族', desc:'你没有结婚，没有恋爱，但你活得很快乐。\n\n你有自己的爱好，有自己的朋友，有自己的节奏。\n\n"单身不是失败，是选择了另一种幸福。"', cond: g => g.flags.singleHappy && !g.flags.married && g.mood>=75 && g.social>=60 && g.charm>=60 && g.age>=32 },
+    // --- v2.39 ENDINGS ---
+    { id:'city_hopper', badge:'🗺️', title:'城市探索者', desc:'你在多个大城市生活过，体验了不同的城市文化。\n\n你发现：没有完美的城市，只有适合你的城市。\n\n"旅行的意义不是去更多地方，是在每个地方都认真生活。"', cond: g => g.flags.citySwitch && g.months>=60 && g.charm>=65 && g.social>=55 && g.age>=30 },
+    { id:'lifelong_learner', badge:'📖', title:'终身学习者', desc:'你从未停止学习。\n\n你学了新技能、读了很多书、保持了思考的习惯。\n\n你没有成为专家，但你成为了一个有深度的人。\n\n"学习不是为了知道答案，是为了提出更好的问题。"', cond: g => g.flags.learnNewSkill && g.intel>=85 && g.mood>=65 && g.age>=35 },
+    { id:'filial_child', badge:'👨‍👩‍👦', title:'孝顺子女', desc:'你在打拼事业的同时，也照顾好了父母。\n\n你经常回家看他们，给他们买保险，带他们体检。\n\n"孝顺不是给多少钱，是让父母知道你心里有他们。"', cond: g => (g.flags.parentHealthIssue || g.flags.hometownVisit) && (g.relationships && g.relationships.family>=80) && g.mood>=70 && g.age>=35 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
@@ -3276,7 +3331,7 @@ function getEndingRarity(endingId) {
     // Rare (hard to achieve)
     const rare = ['settled', 'startup_end', 'influencer_end', 'digital_nomad', 'karoshi', 'jail', 'social_butterfly_end', 'health_guru', 'side_hustle_king', 'kaogong_success', 'mentor_end', 'community_builder', 'career_pivot', 'anti_fraud_hero', 'relationship_guru', 'comeback_kid', 'health_warrior', 'freelance_master', 'labor_hero'];
     // Uncommon (moderately difficult)
-    const uncommon = ['hometown_hero', 'go_home', 'civil_end', 'ordinary', 'single', 'investment_guru', 'lying_flat_end', 'lonely_death', 'estranged', 'pet_parent', 'mortgage_default_end', 'kong_yiji_end', 'full_time_child_end', 'minimalist_life', 'slow_life', 'scam_victim', 'sandwich_generation', 'lonely_achiever', 'wanderer', 'slow_life_master', 'weather_survivor', 'content_king', 'balanced_life', 'side_hustle_success', 'wise_investor', 'mentored_success', 'happy_single'];
+    const uncommon = ['hometown_hero', 'go_home', 'civil_end', 'ordinary', 'single', 'investment_guru', 'lying_flat_end', 'lonely_death', 'estranged', 'pet_parent', 'mortgage_default_end', 'kong_yiji_end', 'full_time_child_end', 'minimalist_life', 'slow_life', 'scam_victim', 'sandwich_generation', 'lonely_achiever', 'wanderer', 'slow_life_master', 'weather_survivor', 'content_king', 'balanced_life', 'side_hustle_success', 'wise_investor', 'mentored_success', 'happy_single', 'city_hopper', 'lifelong_learner', 'filial_child'];
 
     if (legendary.includes(endingId)) return 'legendary';
     if (rare.includes(endingId)) return 'rare';
@@ -3460,7 +3515,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.38' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.39' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
