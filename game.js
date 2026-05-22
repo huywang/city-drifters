@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v29.3
+// 都市浮生记 - Game Engine v29.4
 // ============================================
 
 // === GAME STATE ===
@@ -15389,6 +15389,87 @@ const EVENTS = [
         { label:'教父母用智能设备拉近距离', hint:'+❤️ +🧠', fn: g => { g.flags.parentsHappyBack=true; g.flags.techBridgeParents=true; return{mood:5,intel:3}; }},
         { label:'开始认真规划全家的未来', hint:'+🧠 +💰', fn: g => { g.flags.parentsHappyBack=true; g.flags.familyFuturePlan=true; return{intel:5,mood:5}; }},
       ]},
+    // === v29.4 职场内卷与反内卷 ===
+    { id:'quiet_quitting_v29_4', icon:'🤫', title:'安静离职', category:'workplace',
+      body:'你没有辞职——但你已经「精神离职」了。\n\n每天准时打卡，绝不加班。领导发消息已读不回。会议上只说「收到」「好的」。\n\n你不是不努力——你只是不再「假装」努力了。\n\n同事开始叫你「摸鱼王」。但你知道：你不是在摸鱼——你是在「自我保护」。\n\n「安静离职：不是躺平，是不再为不值得的事站起来。」',
+      cond: g => g.jobSalary > 0 && g.months >= 12 && !g.flags.quietQuitting,
+      choices:[
+        { label:'正式进入安静离职模式', hint:'+😊 -💰', fn: g => { g.flags.quietQuitting=true; g.flags.quietQuitMode=true; return{mood:5,health:3}; }},
+        { label:'算了还是继续卷吧', hint:'-😊 +💰', fn: g => { g.flags.triedQuietQuit=false; return{mood:-3}; }},
+        { label:'开始找新工作', hint:'+🧠 -💰', fn: g => { g.flags.quietQuitting=true; g.flags.lookingForNewJob=true; return{intel:2,mood:2}; }},
+      ]},
+    { id:'moyu_master', icon:'🐟', title:'摸鱼大师', category:'workplace',
+      body:'你已经把摸鱼发展成了一项「专业技能」。\n\n你的摸鱼技巧：\n- 屏幕永远开着Excel（其实在看小说）\n- 开会时拿个笔记本（其实在画画）\n- 戴着耳机（其实在听播客）\n- 厕所是你的「冥想室」\n\n你的工作效率：刚好不被开除。\n你的生活质量：比996的同事高3倍。\n\n你不是在偷懒——你是在「用最小的代价换取最大的自由」。\n\n「摸鱼大师：工作是为了活着，活着不是为了工作。」',
+      cond: g => g.jobSalary > 0 && g.flags.quietQuitting && !g.flags.moyuMaster,
+      choices:[
+        { label:'把摸鱼发展成生活哲学', hint:'+😊 +🧠', fn: g => { g.flags.moyuMaster=true; return{mood:8,intel:2}; }},
+        { label:'教同事摸鱼形成摸鱼联盟', hint:'+😊 +👥', fn: g => { g.flags.moyuMaster=true; g.flags.moyuAlliance=true; return{mood:5,social:5}; }},
+        { label:'担心被发现开始收敛', hint:'-😊 +💰', fn: g => { return{mood:-3}; }},
+      ]},
+    { id:'gen_z_workplace_v29_4', icon:'⚡', title:'00后整顿职场', category:'workplace',
+      body:'你是公司里唯一的00后。\n\n你做了前辈们不敢做的事：\n- 拒绝无偿加班：「合同上写的是9到6，6点我走」\n- 拒绝给领导端茶倒水：「我是来工作的不是来当保姆的」\n- 拒绝团建：「占用休息时间的团建是变相加班」\n- 在群里怼PUA领导：「这是职场霸凌，我已经录音了」\n\n全公司都在看你——\n- 70后：「年轻人太冲了」\n- 80后：「当年我们不敢这样」\n- 90后：「好样的！但小心点」\n\n你不是在叛逆——你只是在「捍卫自己的权利」。\n\n「00后整顿职场：不是我们变了，是我们不再忍了。」',
+      cond: g => g.jobSalary > 0 && g.age <= 25 && !g.flags.genZRebel,
+      choices:[
+        { label:'继续当职场判官', hint:'+😊 +💪', fn: g => { g.flags.genZRebel=true; g.flags.workplaceRebel=true; return{mood:8,charm:3}; }},
+        { label:'收敛一点别被开除了', hint:'-😊 +💰', fn: g => { g.flags.genZRebel=true; g.flags.cautiousRebel=true; return{mood:-2}; }},
+        { label:'联合其他年轻同事一起维权', hint:'+👥 +😊', fn: g => { g.flags.genZRebel=true; g.flags.workerAlliance=true; return{social:8,mood:5}; }},
+      ]},
+    { id:'lying_flat_v29_4', icon:'🛋️', title:'躺平主义', category:'workplace',
+      body:'你选择了「躺平」。\n\n不是放弃——是「不再参加一场你永远不会赢的游戏」。\n\n你的躺平宣言：\n- 不买房：「30年的房贷是30年的枷锁」\n- 不结婚：「一个人的自由好过两个人的将就」\n- 不生娃：「不把孩子带到这个世界上来受苦」\n- 不升职：「管理层的焦虑比工资多」\n- 不消费：「我不需要的东西再便宜也是浪费」\n\n你的父母不理解。你的同事觉得你疯了。社会说你「摆烂」。\n\n但你知道：你不是摆烂——你只是「不再为别人的期望活着」。\n\n「躺平：不是我输了，是我不想玩了。」',
+      cond: g => g.age >= 22 && g.money < 50000 && !g.flags.lyingFlat,
+      choices:[
+        { label:'正式宣布躺平', hint:'+😊 -💰', fn: g => { g.flags.lyingFlat=true; g.flags.tangPingLife=true; return{mood:10,health:5}; }},
+        { label:'躺平但偷偷攒钱', hint:'+😊 +💰', fn: g => { g.flags.lyingFlat=true; g.flags.sneakySaver=true; return{mood:5,money:2000}; }},
+        { label:'算了还是站起来吧', hint:'-😊 +🧠', fn: g => { g.flags.triedLyingFlat=true; return{mood:-3,intel:2}; }},
+      ]},
+    { id:'performance_review_v29_4', icon:'📊', title:'绩效考核', category:'workplace',
+      body:'又到了一年一度的绩效考核。\n\n你的领导找你「谈话」：\n「今年部门名额有限，你今年是B（合格）。」\n「不是你不够好，是名额真的有限。」\n「明年一定给你A。」\n\n你看了看周围：\n- 那个天天拍马屁的同事：A\n- 那个关系户：A\n- 那个天天加班到11点的：B+\n- 你：B\n\n你开始理解：绩效考核——不是考核你的「能力」——是考核你的「听话程度」。\n\n「绩效考核：公司用一张表格告诉你——你的价值，由别人定义。」',
+      cond: g => g.jobSalary > 0 && g.months >= 6 && !g.flags.performanceReview,
+      choices:[
+        { label:'接受结果继续努力', hint:'-😊 +🧠', fn: g => { g.flags.performanceReview=true; g.flags.acceptedBadReview=true; return{mood:-5,intel:2}; }},
+        { label:'据理力争要求重新评估', hint:'+💪 -😊', fn: g => { g.flags.performanceReview=true; g.flags.challengedReview=true; return{mood:3,charm:2}; }},
+        { label:'开始投简历准备跳槽', hint:'+🧠 +💰', fn: g => { g.flags.performanceReview=true; g.flags.lookingForNewJob=true; return{intel:3,mood:2}; }},
+      ]},
+    { id:'workplace_pua_v29_4', icon:'😤', title:'职场PUA现场', category:'workplace',
+      body:'你的领导开始了新一轮的PUA。\n\n经典语录：\n- 「年轻人要多学习，不要太计较工资」\n- 「你不干有的是人干」\n- 「公司给你机会要感恩」\n- 「你看看别人再看看你」\n- 「不想干可以走，没人拦你」\n\n你开始怀疑自己：是不是真的是你不够好？\n\n直到你在网上看到一句话：「PUA的核心不是让你变好——是让你觉得自己不够好。」\n\n你醒了。\n\n「职场PUA：不是你不配——是他们不配拥有你。」',
+      cond: g => g.jobSalary > 0 && !g.flags.workplacePUA_v29,
+      choices:[
+        { label:'学会识别PUA保护自己', hint:'+🧠 +💪', fn: g => { g.flags.workplacePUA_v29=true; g.flags.puaAwareness=true; return{intel:5,mood:3}; }},
+        { label:'被PUA到开始自我怀疑', hint:'-😊 -💪', fn: g => { g.flags.workplacePUA_v29=true; g.flags.puaVictim=true; return{mood:-8,charm:-3}; }},
+        { label:'当场怼回去并录音留证', hint:'+💪 +😊', fn: g => { g.flags.workplacePUA_v29=true; g.flags.confrontedPUA=true; return{mood:5,charm:5}; }},
+      ]},
+    { id:'useless_meetings', icon:'🗣️', title:'无效会议地狱', category:'workplace',
+      body:'你今天开了6个会。\n\n会议总结：\n- 第1个会：讨论为什么会议太多\n- 第2个会：复盘上一个项目（做完了还要复盘？）\n- 第3个会：对齐OKR（你的OKR是领导写的）\n- 第4个会：头脑风暴（只有领导在说话）\n- 第5个会：跨部门沟通（谁都不想让步）\n- 第6个会：周会（每个人念PPT）\n\n你算了一下：6个会 × 1.5小时 = 9小时\n你今天实际工作时间：0小时\n\n所以你只能——加班。\n\n「无效会议：用所有人的时间浪费一个人的想法。」',
+      cond: g => g.jobSalary > 0 && g.jobSalary >= 8000 && !g.flags.uselessMeetings,
+      choices:[
+        { label:'学会在会议上摸鱼', hint:'+😊 +🧠', fn: g => { g.flags.uselessMeetings=true; g.flags.meetingMoyu=true; return{mood:3,intel:2}; }},
+        { label:'提议减少会议提高效率', hint:'+🧠 +💪', fn: g => { g.flags.uselessMeetings=true; g.flags.meetingReformer=true; return{intel:3,charm:2}; }},
+        { label:'忍了反正大家都这样', hint:'-😊 -💪', fn: g => { g.flags.uselessMeetings=true; return{mood:-5,health:-2}; }},
+      ]},
+    { id:'bullshit_job', icon:'💼', title:'狗屁工作', category:'workplace',
+      body:'你开始怀疑：你的工作——有意义吗？\n\n你每天做的事：\n- 写没人看的报告\n- 做没人用的PPT\n- 回没必要的邮件\n- 开没结论的会\n- 填没意义的表格\n\n如果明天你的岗位消失了——公司会受影响吗？\n你想了很久——答案是：不会。\n\n你是「狗屁工作」的从业者——你不是不努力——你的努力——只是「表演」。\n\n大卫·格雷伯说得对：「世界上有40%的工作毫无意义。」\n\n你不是在创造价值——你是在「假装」创造价值。\n\n「狗屁工作：你的工资不是买你的劳动——是买你的时间。」',
+      cond: g => g.jobSalary > 0 && g.jobSalary >= 10000 && g.months >= 24 && !g.flags.bullshitJob,
+      choices:[
+        { label:'接受现实继续做下去', hint:'-😊 +💰', fn: g => { g.flags.bullshitJob=true; g.flags.acceptedBullshit=true; return{mood:-5,money:2000}; }},
+        { label:'开始寻找有意义的工作', hint:'+🧠 +😊', fn: g => { g.flags.bullshitJob=true; g.flags.seekingMeaning=true; g.flags.lookingForNewJob=true; return{intel:3,mood:5}; }},
+        { label:'在工作之外找到人生价值', hint:'+😊 +🧠', fn: g => { g.flags.bullshitJob=true; g.flags.lifeOutsideWork=true; return{mood:8,charm:3}; }},
+      ]},
+    { id:'resignation_dream', icon:'✈️', title:'辞职梦', category:'workplace',
+      body:'你做了一个梦——你辞职了。\n\n在梦里：\n- 你把辞职信摔在领导桌上\n- 你说出了所有想说但不敢说的话\n- 你头也不回地走出公司\n- 你在大理开了间民宿\n- 你每天睡到自然醒\n\n然后你醒了。\n闹钟响了。今天要开晨会。\n\n你不是不想辞职——你是不敢。\n房贷、车贷、父母、社保——每一样都是你不能辞职的理由。\n\n你不是在工作——你是在「用自由换安全感」。\n\n「辞职梦：每个打工人的心里——都有一封没寄出去的辞职信。」',
+      cond: g => g.jobSalary > 0 && g.mood < 50 && !g.flags.resignationDream,
+      choices:[
+        { label:'把梦藏在心里继续工作', hint:'-😊 +💰', fn: g => { g.flags.resignationDream=true; return{mood:-3}; }},
+        { label:'真的开始准备辞职计划', hint:'+🧠 +😊', fn: g => { g.flags.resignationDream=true; g.flags.resignPlan=true; return{intel:3,mood:5}; }},
+        { label:'先休个假冷静一下', hint:'+😊 +💰', fn: g => { g.flags.resignationDream=true; g.flags.needVacation=true; return{mood:5,health:3}; }},
+      ]},
+    { id:'worker_awakening', icon:'✊', title:'打工人觉醒', category:'workplace',
+      body:'你突然「觉醒」了。\n\n不是鸡汤式的觉醒——是现实的觉醒：\n- 你算了一笔账：工作40年能攒多少钱？答：不够看一次大病\n- 你看了看你的领导：45岁，秃顶，三高，离婚两次\n- 你算了算时薪：996的时薪还不如送外卖\n- 你想了想退休：65岁退休，活到75岁，只有10年自由\n\n你开始问自己：「这就是我的人生吗？」\n\n你不是不感恩——你只是「不再被感恩绑架」。\n\n你不是不努力——你只是「不再为别人的梦想努力」。\n\n「打工人觉醒：不是我变了，是我终于看清了。」',
+      cond: g => g.jobSalary > 0 && g.age >= 25 && g.months >= 36 && !g.flags.workerAwakening,
+      choices:[
+        { label:'觉醒后开始为自己而活', hint:'+😊 +💪', fn: g => { g.flags.workerAwakening=true; g.flags.liveForSelf=true; return{mood:10,charm:5}; }},
+        { label:'觉醒后开始做副业Plan B', hint:'+🧠 +💰', fn: g => { g.flags.workerAwakening=true; g.flags.planBSideHustle=true; return{intel:5,mood:5}; }},
+        { label:'觉醒后发现无力改变', hint:'-😊 +🧠', fn: g => { g.flags.workerAwakening=true; g.flags.helplessAwakening=true; return{mood:-5,intel:5}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -16776,6 +16857,15 @@ const ACHIEVEMENTS = [
     { id:'hometown_biz_ach', icon:'🏪', name:'小城创业家', desc:'在老家开了自己的店', check: g => g.flags.hometownEntrepreneur },
     { id:'family_reunion_ach', icon:'❤️', name:'团圆', desc:'回老家陪父母度过了一段时光', check: g => g.flags.qualityTimeWithParents },
     { id:'local_products_ach', icon:'📦', name:'家乡好物', desc:'开始做家乡特产的线上生意', check: g => g.flags.onlineLocalProducts },
+    // v29.4 achievements - 职场内卷与反内卷
+    { id:'quiet_quit_ach', icon:'🤫', name:'安静离职', desc:'精神离职但还在上班', check: g => g.flags.quietQuitMode },
+    { id:'moyu_master_ach', icon:'🐟', name:'摸鱼大师', desc:'把摸鱼发展成了一项专业技能', check: g => g.flags.moyuMaster },
+    { id:'gen_z_rebel_ach', icon:'⚡', name:'职场判官', desc:'00后整顿职场', check: g => g.flags.workplaceRebel },
+    { id:'lying_flat_ach', icon:'🛋️', name:'躺平主义', desc:'选择不参加这场永远不会赢的游戏', check: g => g.flags.tangPingLife },
+    { id:'pua_survivor_ach', icon:'🛡️', name:'反PUA战士', desc:'识破并对抗了职场PUA', check: g => g.flags.puaAwareness },
+    { id:'meeting_reformer_ach', icon:'🗣️', name:'会议改革者', desc:'提议减少无效会议', check: g => g.flags.meetingReformer },
+    { id:'life_outside_work_ach', icon:'🌅', name:'工作之外', desc:'在狗屁工作之外找到了人生价值', check: g => g.flags.lifeOutsideWork },
+    { id:'worker_awakened_ach', icon:'✊', name:'打工人觉醒', desc:'不再为别人的梦想而努力', check: g => g.flags.liveForSelf },
 ];
 
 // === ENDINGS === (order matters: first match wins)
