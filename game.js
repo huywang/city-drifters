@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v4.9
+// 都市浮生记 - Game Engine v5.0
 // ============================================
 
 // === GAME STATE ===
@@ -3044,6 +3044,25 @@ const EVENTS = [
         { label:'换工作', hint:'+😊 +✨ -💰', fn: g => { g.flags.jobBurnout=true; g.flags.jobChanger=true; setJob(g,'新工作',g.jobSalary*0.9); return{mood:20,charm:5,money:-3000}; }},
         { label:'硬撑', hint:'+💰 -❤️ -😊', fn: g => { g.flags.jobBurnout=true; return{money:2000,health:-15,mood:-20}; }},
       ]},
+    // === v5.0 EVENTS - 单身经济与不婚主义 ===
+    { id:'single_economy', icon:'💎', title:'单身经济',
+      body:'你看了看数据：\n\n- 2024年结婚登记创47年新低\n- 中国单身人口超2.4亿\n- 单身经济规模逼近8万亿元\n\n你是一个人住，吃一人食，养一只猫/狗。\n\n"单身不是问题，单身是选择。"\n\n"比起孤独，这届年轻人更爱自由。"\n\n你的消费：Mini家电、一人食套餐、宠物陪伴、自我投资。\n\n"单身经济的核心：为自我愉悦、未来投资和情感寄托买单。"',
+      cond: g => !g.flags.singleEconomy && g.age>=22 && g.age<=38 && !g.flags.married,
+      choices:[
+        { label:'享受单身生活', hint:'+😊 +✨ +💰', fn: g => { g.flags.singleEconomy=true; g.flags.singleAndHappy=true; return{mood:20,charm:10,money:3000}; }},
+        { label:'买Mini家电', hint:'-💰 +😊', fn: g => { g.flags.singleEconomy=true; return{money:-3000,mood:12,charm:5}; }},
+        { label:'养宠物陪伴', hint:'-💰 +😊 +❤️', fn: g => { g.flags.singleEconomy=true; g.flags.hasPet=true; return{money:-4000,mood:18,health:5}; }},
+        { label:'投资自己', hint:'+🧠 +✨ -💰', fn: g => { g.flags.singleEconomy=true; g.flags.selfInvest=true; return{intel:15,charm:12,money:-8000}; }},
+      ]},
+    { id:'no_marriage', icon:'💍', title:'不婚主义',
+      body:'你妈又催婚了：\n\n"你都30了，还不结婚？"\n"你看隔壁小王，孩子都上学了。"\n"你是不是有什么问题？"\n\n你沉默了。\n\n你不是不想结婚，你是：\n- 买不起房\n- 养不起孩子\n- 找不到合适的人\n- 或者，就是不想\n\n"不婚不是叛逆，是清醒。"\n\n"当代年轻人的婚姻观：不是不想要爱情，而是不想要将就。"',
+      cond: g => !g.flags.noMarriage && g.age>=26 && g.age<=38 && !g.flags.married,
+      choices:[
+        { label:'坚持不婚', hint:'+😊 -👥', fn: g => { g.flags.noMarriage=true; g.flags.committedSingle=true; return{mood:18,social:-15,charm:5}; }},
+        { label:'考虑冻卵/冻精', hint:'-💰 +🧠', fn: g => { g.flags.noMarriage=true; g.flags.fertilityPreserved=true; return{money:-30000,intel:8,mood:5}; }},
+        { label:'跟父母谈谈', hint:'+👥 +😊', fn: g => { g.flags.noMarriage=true; g.flags.familyTalk=true; return{social:12,mood:10,intel:5}; }},
+        { label:'算了，还是结吧', hint:'+👥 +😊 -✨', fn: g => { g.flags.noMarriage=true; return{social:10,mood:5,charm:-5}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3270,6 +3289,9 @@ const ACHIEVEMENTS = [
     // v4.9 achievements
     { id:'quiet_quitter', icon:'😶', name:'精神离职者', desc:'实践安静离职', check: g => g.flags.quietQuitting },
     { id:'burnout_survivor', icon:'🔥', name:'职业倦怠幸存者', desc:'经历职业倦怠', check: g => g.flags.jobBurnout },
+    // v5.0 achievements
+    { id:'single_and_proud', icon:'💎', name:'单身贵族', desc:'享受单身生活', check: g => g.flags.singleAndHappy },
+    { id:'marriage_free', icon:'💍', name:'不婚主义者', desc:'坚持不婚主义', check: g => g.flags.committedSingle },
 ];
 
 // === ENDINGS === (order matters: first match wins)
