@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v9.3
+// 都市浮生记 - Game Engine v9.4
 // ============================================
 
 // === GAME STATE ===
@@ -4485,7 +4485,102 @@ const EVENTS = [
         { label:'好好谈谈', hint:'+👥', fn: g => { if(Math.random()>0.4){return{mood:8,social:3}}else{return{mood:-5,social:-5}} }},
         { label:'搬家', hint:'-💰', fn: g => { return{money:-3000,mood:10}; }},
       ]},
+    // === v9.4 教育/考证系统 ===
+    { id:'civil_service_exam', icon:'📝', title:'考公之路',
+      body:'你决定考公务员。买了一套行测+申论教材，开始了漫长的备考。\n\n你的时间表：白天上班，晚上刷题，周末模考。\n\n同事问你："你确定要考？上岸率只有3%。"\n\n你说："总得试试吧。"其实你心里也没底。',
+      cond: g => g.intel > 55 && g.age >= 22 && g.age <= 35 && !g.flags.civilServant && !g.flags.tookCivilExam,
+      choices:[
+        { label:'全力以赴备考', hint:'+🧠 -💰 -❤️', fn: g => { g.flags.tookCivilExam=true; return{intel:15,health:-8,mood:-5,money:-3000}; }},
+        { label:'边工作边复习', hint:'+🧠 -❤️', fn: g => { g.flags.tookCivilExam=true; return{intel:8,health:-3,mood:-3,money:-1000}; }},
+        { label:'还是算了', hint:'+😊', fn: g => { return{mood:5}; }},
+      ]},
+    { id:'civil_service_result', icon:'🎯', title:'公考放榜',
+      body:'成绩出来了！你紧张地打开查询页面……',
+      cond: g => g.flags.tookCivilExam && !g.flags.civilServant && g.months > 3,
+      choices:[
+        { label:'查看成绩', hint:'🎲', fn: g => {
+            g.flags.tookCivilExam=false;
+            if(g.intel>75 && Math.random()>(g.flags.tookCivilExam?0.4:0.65)){
+                g.flags.civilServant=true;
+                setJob(g,'公务员',10000);
+                return{mood:25,social:10,money:5000};
+            } else {
+                addDelayedEffect(6, {mood:5}, '你决定明年再考一次……');
+                return{mood:-20,money:-1000};
+            }
+        }},
+        { label:'不敢看', hint:'+😊', fn: g => { g.flags.tookCivilExam=false; return{mood:-10}; }},
+      ]},
+    { id:'mba_dream', icon:'🎓', title:'考研念头',
+      body:'你看到同事的简历上写着"某985硕士"，突然觉得自己学历不够。\n\n你开始了解MBA：学费20万，脱产2年。读完出来大概能涨薪30%。\n\n你算了算：20万学费 + 2年不工作 = 差不多50万的成本。\n\n"学历是敲门砖，但MBA是块金砖——前提是你付得起。"',
+      cond: g => g.intel > 60 && g.age >= 25 && g.age <= 35 && !g.flags.hasMBA && g.money > 20000,
+      choices:[
+        { label:'读MBA！投资自己', hint:'-💰 +🧠', fn: g => { g.flags.hasMBA=true; addDelayedEffect(24, function(g2){ g2.intel=Math.min(100,g2.intel+15); g2.charm=Math.min(100,g2.charm+10); if(g2.job!=='待业中'){setJob(g2,'高级'+g2.job.replace('初级','').replace('高级',''),Math.floor(g2.jobSalary*1.5));} return{mood:15}; }, 'MBA毕业！你的视野和人脉都上了一个台阶。'); return{money:-200000,intel:5,mood:-10}; }},
+        { label:'读在职研究生', hint:'-💰 +🧠', fn: g => { g.flags.hasMBA=true; addDelayedEffect(24, {intel:8,charm:5}, '在职读研结束，你学到了不少东西。'); return{money:-80000,intel:3,health:-5}; }},
+        { label:'学历不重要', hint:'+😊', fn: g => { return{mood:5}; }},
+      ]},
+    { id:'certificate_pmp', icon:'📋', title:'考证热潮',
+      body:'你的朋友圈被各种证书刷屏了：PMP、CFA、CPA、软考……\n\n你的同事已经考了3个证了，你连一个都没有。\n\n"在大城市，证书就是你的军功章——虽然不一定能打仗。"',
+      cond: g => g.intel > 50 && g.age >= 24 && g.job !== '待业中' && !g.flags.hasCertificate,
+      choices:[
+        { label:'考PMP', hint:'-💰 +🧠', fn: g => { g.flags.hasCertificate=true; return{money:-5000,intel:8,charm:3,mood:5}; }},
+        { label:'考软考高级', hint:'-💰 +🧠', fn: g => { g.flags.hasCertificate=true; return{money:-2000,intel:10,mood:5}; }},
+        { label:'算了，经验比证书重要', hint:'+😊', fn: g => { return{mood:3,intel:2}; }},
+      ]},
+    // === v9.4 心理健康事件 ===
+    { id:'burnout', icon:'🔥', title:'职业倦怠',
+      body:'你已经连续三个月不想上班了。\n\n每天早上醒来，你都想请假。但你知道：请假扣的钱够你吃一周外卖。\n\n你开始在网上搜"辞职信模板"，又默默关掉。\n\n"职业倦怠不是矫情，是你的灵魂在喊救命。"',
+      cond: g => g.health < 50 && g.mood < 40 && g.job !== '待业中' && g.months > 12,
+      choices:[
+        { label:'看心理咨询师', hint:'-💰 +😊', fn: g => { g.flags.sawTherapist=true; return{money:-800,mood:15,health:5,intel:3}; }},
+        { label:'请假休息一周', hint:'-💰 +❤️', fn: g => { return{money:-2000,health:10,mood:12}; }},
+        { label:'硬撑', hint:'-❤️ -😊', fn: g => { addDelayedEffect(3, {health:-15,mood:-10}, '你硬撑了三个月，终于在办公室崩溃大哭。同事递来纸巾，你说了句"没事"。'); return{health:-5,mood:-10}; }},
+      ]},
+    { id:'imposter_syndrome', icon:'🎭', title:'冒名顶替综合征',
+      body:'你升了职，但你觉得自己不配。\n\n你看着周围比你优秀的同事，总觉得自己的成功是运气。\n\n"冒名顶替综合征：越优秀的人，越觉得自己是骗子。"',
+      cond: g => g.jobSalary >= 15000 && g.charm < 60 && g.months > 12,
+      choices:[
+        { label:'接受不完美', hint:'+😊 +🧠', fn: g => { return{mood:10,intel:5,charm:5}; }},
+        { label:'更加努力工作', hint:'+💰 -❤️', fn: g => { return{money:3000,health:-5,mood:-5}; }},
+        { label:'跟朋友倾诉', hint:'+👥', fn: g => { return{social:5,mood:8}; }},
+      ]},
+    // === v9.4 自媒体/短视频事件 ===
+    { id:'tiktok_dream', icon:'🎬', title:'短视频创业',
+      body:'你看到一个视频：一个跟你差不多的人，拍日常vlog，粉丝50万。\n\n你心动了。你买了个三脚架，注册了账号，发了第一条视频。\n\n播放量：23。其中10个是你自己点的。',
+      cond: g => g.charm > 40 && g.age <= 35 && !g.flags.tiktokCreator,
+      choices:[
+        { label:'坚持日更', hint:'-❤️ +✨', fn: g => { g.flags.tiktokCreator=true; addDelayedEffect(6, function(g2){ if(Math.random()>0.6){g2.flags.tiktokSuccess=true;return{money:10000,mood:20,charm:10,social:10}}else{return{mood:-5,health:-5}} }, '你的短视频账号……'); return{mood:5,charm:3,health:-3}; }},
+        { label:'做知识博主', hint:'+🧠', fn: g => { g.flags.tiktokCreator=true; addDelayedEffect(8, function(g2){ if(g2.intel>70){return{money:8000,mood:15,charm:8,intel:5}}else{return{mood:-8}} }, '你的知识博主之路……'); return{intel:5,mood:3}; }},
+        { label:'算了，看别人拍就好', hint:'+😊', fn: g => { return{mood:3}; }},
+      ]},
+    // === v9.4 车房系统事件 ===
+    { id:'buy_car', icon:'🚗', title:'买车诱惑',
+      body:'你同事刚提了一辆特斯拉，在朋友圈晒了九张图。\n\n你看了看自己的通勤路线：地铁1小时，公交1.5小时。\n\n你打开汽车App，看了看价格——首付10万，月供5000。\n\n"在大城市，车不是代步工具，是身份象征。也是新的月供。"',
+      cond: g => g.money > 100000 && g.age >= 25 && !g.flags.hasCar,
+      choices:[
+        { label:'买！', hint:'-💰 +✨', fn: g => { g.flags.hasCar=true; return{money:-100000,charm:10,mood:15,health:5}; }},
+        { label:'买二手的', hint:'-💰', fn: g => { g.flags.hasCar=true; return{money:-50000,charm:5,mood:10}; }},
+        { label:'继续地铁', hint:'+💰 +😊', fn: g => { return{mood:-3,intel:2}; }},
+      ]},
+    { id:'mortgage_pressure', icon:'🏠', title:'房贷压力',
+      body:'你终于凑够了首付，买了人生中第一套房。\n\n月供12000，比你的房租贵了三倍。你从"租房奴"变成了"房贷奴"。\n\n但你站在阳台上看着城市的夜景，觉得这一切都值了。\n\n"中国人对房子的执念，不是执念，是安全感。"',
+      cond: g => g.money > 200000 && g.age >= 27 && !g.flags.hasHouse,
+      choices:[
+        { label:'买！', hint:'-💰 +😊', fn: g => { g.flags.hasHouse=true; g.flags.hasMortgage=true; return{money:-200000,mood:25,social:10}; }},
+        { label:'再攒攒', hint:'+💰', fn: g => { return{mood:-5,intel:2}; }},
+        { label:'租房挺好的', hint:'+😊', fn: g => { return{mood:5}; }},
+      ]},
+    { id:'mortgage_crisis', icon:'💸', title:'月供压力',
+      body:'这个月工资晚发了5天，你的房贷差点逾期。\n\n你打电话给银行申请延期，客服说："先生/女士，我们理解您的困难，但逾期记录已经上报了。"\n\n你看了看自己的银行卡余额，第一次觉得房子是个负担。',
+      cond: g => g.flags.hasMortgage && g.money < 15000,
+      choices:[
+        { label:'找朋友借钱', hint:'+👥 -💰', fn: g => { if(g.relationships) g.relationships.friends=clamp((g.relationships.friends||40)-5,0,100); return{money:12000,mood:-10,social:-5}; }},
+        { label:'卖掉房子', hint:'🎲', fn: g => { if(Math.random()>0.4){g.flags.hasHouse=false;g.flags.hasMortgage=false;return{money:250000,mood:10}}else{return{mood:-20,money:50000}} }},
+        { label:'硬扛', hint:'-😊 -❤️', fn: g => { return{mood:-15,health:-5}; }},
+      ]},
 ];
+
+// === ACHIEVEMENTS ===
 const ACHIEVEMENTS = [
     { id:'first_job', icon:'💼', name:'职场新人', desc:'找到第一份工作', check: g => g.flags.gotFirstJob },
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -4870,6 +4965,14 @@ const ACHIEVEMENTS = [
     // === v9.3 新增成就 ===
     { id:'mentor_found_ach', icon:'🧓', name:'良师益友', desc:'遇到了一位人生导师', check: g => g.flags.hasMentor },
     { id:'city_explorer', icon:'🏙️', name:'城市探索者', desc:'体验过至少3个城市的特色事件', check: g => { let c=0; if(g.flags.beijingExplored)c++; if(g.flags.shanghaiExplored)c++; if(g.flags.chengduExplored)c++; return c>=3; } },
+    // === v9.4 新增成就 ===
+    { id:'civil_servant_ach', icon:'📝', name:'公考上岸', desc:'通过公务员考试', check: g => g.flags.civilServant },
+    { id:'mba_graduate', icon:'🎓', name:'MBA毕业生', desc:'完成MBA学业', check: g => g.flags.hasMBA },
+    { id:'certified', icon:'📋', name:'考证达人', desc:'考取了专业证书', check: g => g.flags.hasCertificate },
+    { id:'therapy_ach', icon:'💚', name:'心理健康卫士', desc:'看过心理咨询师', check: g => g.flags.sawTherapist },
+    { id:'car_owner', icon:'🚗', name:'有车一族', desc:'买了车', check: g => g.flags.hasCar },
+    { id:'homeowner_ach', icon:'🏠', name:'有房一族', desc:'在大城市买了房', check: g => g.flags.hasHouse },
+    { id:'tiktok_creator', icon:'🎬', name:'短视频创作者', desc:'开始做短视频', check: g => g.flags.tiktokCreator },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -4973,6 +5076,11 @@ const ENDINGS = [
     { id:'investor_end', badge:'💰', title:'理财达人', desc:'你从一个"月光族"变成了"理财达人"。\n\n你的投资组合从余额宝到A股，从基金到比特币，收益率跑赢了90%的散户。\n\n你在知乎上写了篇《我的投资心得》，获得了10万+阅读。\n\n"钱不是万能的，但没有钱是万万不能的。而你，已经学会了让钱为你工作。"', cond: g => g.flags.hasInvestment && g.investments && Object.values(g.investments).some(v => v > 50000) && g.money >= 100000 && g.intel >= 65 },
     { id:'happy_family_end', badge:'👨‍👩‍👧', title:'幸福家庭', desc:'你结了婚，有了家。\n\n在大城市里，你们有了自己的小天地。虽然房子是租的，但生活是自己的。\n\n每个周末你们会一起做饭、看电影、逛公园。你觉得这就是幸福。\n\n"幸福不是拥有多少，而是和谁在一起。"', cond: g => g.flags.married && g.mood >= 70 && g.age >= 30 },
     { id:'crisis35_triumph', badge:'⚡', title:'35岁逆袭', desc:'35岁危机？你把它变成了转折点。\n\n当别人在焦虑中躺平时，你找到了新的方向——可能是创业，可能是转行，可能是考公。\n\n你证明了一件事：35岁不是终点，而是另一段旅程的起点。\n\n"人生没有太晚的开始。"', cond: g => g.flags.crisis35seen && g.age >= 38 && g.mood >= 65 && (g.flags.entrepreneur || g.job === '公务员' || g.jobSalary >= 20000) },
+    // --- v9.4 NEW ENDINGS ---
+    { id:'tiktok_star_end', badge:'🎬', title:'短视频达人', desc:'你从0粉丝做到了50万粉丝的短视频博主。\n\n你拍过日常vlog、知识分享、搞笑段子。你学会了剪辑、编剧、表演。\n\n虽然你还没有实现"财务自由"，但你找到了比上班更有意义的事。\n\n"每个人都是自己的导演——即使观众只有你自己。"', cond: g => g.flags.tiktokSuccess && g.charm >= 60 && g.money >= 30000 },
+    { id:'homeowner_end', badge:'🏠', title:'有房一族', desc:'你在大城市买了房。\n\n从租10平米的隔断间，到拥有自己的两室一厅。你用了整整十年。\n\n站在阳台上看着城市的夜景，你想起刚来这座城市时的自己。\n\n"房子不是家，但有了房子，才敢把这里叫做家。"', cond: g => g.flags.hasHouse && g.money >= 0 && g.age >= 30 },
+    { id:'civil_servant_end', badge:'📋', title:'体制内人生', desc:'你考上了公务员，成了"体制内"的人。\n\n工资不高不低，朝九晚五，稳定得让人安心。\n\n你妈终于不再催你找工作了。你的朋友圈从"加班打卡"变成了"养生茶推荐"。\n\n"体制内不是围城，是避风港。"', cond: g => g.flags.civilServant && g.mood >= 60 && g.age >= 28 },
+    { id:'educated_end', badge:'🎓', title:'终身学习者', desc:'你从未停止学习。\n\n从考证到读研，从线上课程到线下沙龙。你的简历越来越长，你的视野越来越宽。\n\n你不确定学习能不能改变命运，但你知道：不学习一定不能。\n\n"学无止境——这不是鸡汤，是生存策略。"', cond: g => g.flags.hasMBA && g.flags.hasCertificate && g.intel >= 85 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
@@ -6657,7 +6765,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '9.3' };
+    const saveData = { ...G, savedAt: Date.now(), version: '9.4' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
