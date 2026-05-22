@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v12.3
+// 都市浮生记 - Game Engine v12.4
 // ============================================
 
 // === GAME STATE ===
@@ -6173,7 +6173,89 @@ const EVENTS = [
         { label:'想想就好', hint:'+🧠', fn: g => { g.flags.redefinedSuccess=true; return{intel:5,mood:3}; }},
         { label:'这不现实', hint:'', fn: g => { return{mood:-3}; }},
       ]},
+    // === v12.4 退休晚年 + 友情社交 + 生活仪式 ===
+    { id:'friend_drift_v2', icon:'👋', title:'朋友渐行渐远',
+      body:'你翻看手机通讯录，发现：曾经每天聊天的人，已经半年没联系了。\n\n你们没有吵架。没有闹翻。只是——生活把你们推向了不同的方向。\n\n他/她结了婚，有了孩子。你加了班，搬了家。你们的世界越来越不一样了。\n\n你试着发了一条消息：「最近怎么样？」\n\n对方回了三个字：「挺好的。」\n\n然后——就没有然后了。\n\n"成年人的友情不是死于争吵——是死于沉默。"',
+      cond: g => g.age >= 28 && g.social < 50,
+      choices:[
+        { label:'主动联系', hint:'+👥 +😊', fn: g => { g.flags.friendDrift=true; return{social:8,mood:5}; }},
+        { label:'接受变化', hint:'+🧠', fn: g => { g.flags.friendDrift=true; return{intel:5,mood:-3}; }},
+        { label:'交新朋友', hint:'+👥 +✨', fn: g => { g.flags.friendDrift=true; return{social:10,charm:3,mood:3}; }},
+      ]},
+    { id:'birthday_alone', icon:'🎂', title:'一个人的生日',
+      body:'今天是你的生日。\n\n凌晨0点，手机震了一下。是你妈发来的微信：「生日快乐，记得吃蛋糕。」\n\n你的朋友圈收到23个生日祝福。其中15个是同事发的（因为看到了朋友圈提醒），5个是群发的，只有3个是真心记得的。\n\n你给自己买了一个小蛋糕。插了一根蜡烛。许了一个愿望。\n\n吹灭蜡烛的那一刻，你想：也许长大就是学会一个人庆祝。\n\n"一个人的生日不是孤独——是成熟。你不再需要别人来证明你的存在。"',
+      cond: g => g.months > 12 && g.age >= 25 && g.age <= 40 && g.mood < 60,
+      choices:[
+        { label:'请朋友吃饭', hint:'-💰 +👥 +😊', fn: g => { g.flags.birthdayAlone=true; return{money:-500,social:8,mood:10}; }},
+        { label:'享受独处', hint:'+😊 +🧠', fn: g => { g.flags.birthdayAlone=true; return{mood:8,intel:5}; }},
+        { label:'给妈妈打电话', hint:'+👥❤️', fn: g => { g.flags.birthdayAlone=true; return{social:5,mood:8}; }},
+      ]},
+    { id:'community_garden', icon:'🌻', title:'社区花园',
+      body:'你所在的小区建了一个「社区花园」。居民可以认领一小块地，种菜种花。\n\n你认领了一块2平方米的地。你种了西红柿、小葱、薄荷。\n\n三个月后，你的西红柿大丰收。你分给了邻居们。\n\n你的邻居王阿姨回赠了你一盘她包的饺子。你们在花园里聊了一个下午。\n\n你发现：社区花园种出的不只是菜——是邻里关系。\n\n"在钢筋水泥的城市里，一块泥土就能让你找到归属感。"',
+      cond: g => g.months > 6 && g.age >= 25 && !g.flags.communityGarden,
+      choices:[
+        { label:'认真种菜', hint:'+❤️ +😊', fn: g => { g.flags.communityGarden=true; g.flags.plantParent=true; return{health:5,mood:10,social:5}; }},
+        { label:'社交为主', hint:'+👥 +😊', fn: g => { g.flags.communityGarden=true; return{social:10,mood:5}; }},
+        { label:'算了', hint:'', fn: g => { return{mood:-3}; }},
+      ]},
+    { id:'bucket_list', icon:'📋', title:'人生清单',
+      body:'你写了一份「人生清单」——50岁之前想做的事：\n\n1. 去一次西藏 ✓（去年去了）\n2. 学一门乐器 ✗\n3. 跑一次马拉松 ✗\n4. 写一本书 ✗\n5. 给父母买一套房 ✗\n6. 学会做饭 ✓\n7. 做一次义工 ✗\n8. 存够100万 ✗\n\n你算了算：完成了2/8。还有15年。\n\n你在清单上加了一条：「9. 学会享受当下。」\n\n然后你划掉了它——因为你已经做到了。\n\n"人生清单不是用来完成的——是用来提醒你：你还有梦想。"',
+      cond: g => g.age >= 30 && g.intel >= 50 && !g.flags.bucketList,
+      choices:[
+        { label:'逐条完成', hint:'+😊 +✨', fn: g => { g.flags.bucketList=true; return{mood:10,charm:5,intel:3}; }},
+        { label:'选最重要的做', hint:'+🧠 +😊', fn: g => { g.flags.bucketList=true; return{intel:5,mood:8}; }},
+        { label:'活在当下', hint:'+😊😊', fn: g => { g.flags.bucketList=true; return{mood:15}; }},
+      ]},
+    { id:'online_dating', icon:'💻', title:'网恋',
+      body:'你在交友软件上认识了一个人。你们聊了两个月，从诗词歌赋聊到人生哲学。\n\n你觉得自己找到了灵魂伴侣。\n\n然后你们决定见面。\n\n见面的那一刻——他/她和照片不太一样。不是丑了，是……不一样了。\n\n你们尴尬地吃了顿饭。你发现：文字里的默契，不一定能转化为面对面的化学反应。\n\n"网恋的悖论：你在脑海里创造了一个完美的人——然后现实告诉你：没有人是完美的。"',
+      cond: g => !g.flags.inRelationship && !g.flags.married && g.age >= 22 && g.age <= 38 && g.charm >= 30,
+      choices:[
+        { label:'继续了解', hint:'+👥 +😊', fn: g => { g.flags.onlineDating=true; g.flags.inRelationship=true; return{social:8,mood:8}; }},
+        { label:'做朋友', hint:'+👥', fn: g => { g.flags.onlineDating=true; return{social:5,mood:-3}; }},
+        { label:'删软件', hint:'+🧠', fn: g => { g.flags.onlineDating=true; return{intel:3,mood:-5}; }},
+      ]},
+    { id:'retirement_countdown', icon:'⏳', title:'退休倒计时',
+      body:'你突然意识到：你离退休只有不到20年了。\n\n你算了一下：如果60岁退休，按现在的存款速度，你的退休金大概是……不够花的。\n\n你开始研究：社保缴了多少年？企业年金有没有？个人养老金账户开了没？\n\n你的同事说：「你想这些干嘛，还早着呢。」\n\n但你知道：20年听着多，其实就是一眨眼。\n\n"退休焦虑不是老年人的专利——是中年人提前预支的恐惧。"',
+      cond: g => g.age >= 40 && g.age <= 50 && g.money < 200000 && !g.flags.retirementCountdown,
+      choices:[
+        { label:'加速储蓄', hint:'+💰 +🧠', fn: g => { g.flags.retirementCountdown=true; g.flags.pensionPlan=true; return{money:10000,intel:5,mood:-5}; }},
+        { label:'投资增值', hint:'🎲 +💰？', fn: g => { g.flags.retirementCountdown=true; return{money:-20000,intel:8}; }},
+        { label:'享受当下', hint:'+😊', fn: g => { g.flags.retirementCountdown=true; return{mood:10,money:-3000}; }},
+      ]},
+    { id:'moving_upgrade', icon:'📦', title:'搬家升级',
+      body:'你终于搬出了那个住了三年的出租屋。\n\n旧房子：隔断间、没有窗户、隔壁天天吵架。\n\n新房子：独立一居室、有阳台、阳光充足。\n\n搬家那天，你看着空荡荡的新房间，深吸一口气。虽然家具还没到，虽然墙上还有钉子洞——但这是你的空间。\n\n你站在阳台上，看着城市的夜景。你第一次觉得：这个城市也有属于我的一小块地方。\n\n"搬家不只是换地址——是给自己一个新开始。"',
+      cond: g => !g.flags.hasHouse && g.money > 8000 && g.months > 12 && g.age >= 23,
+      choices:[
+        { label:'好好装修', hint:'-💰 +😊 +✨', fn: g => { g.flags.movedUp=true; g.flags.renovated=true; return{money:-5000,mood:15,charm:5}; }},
+        { label:'简单住', hint:'+😊', fn: g => { g.flags.movedUp=true; return{mood:10,health:3}; }},
+        { label:'继续攒钱买房', hint:'+🧠', fn: g => { return{intel:3,mood:-3}; }},
+      ]},
+    { id:'eco_living', icon:'♻️', title:'环保生活',
+      body:'你开始尝试「零浪费生活」。\n\n第一周：你带了保温杯去买咖啡，被店员翻了白眼（因为他们不会操作「自带杯减5元」的系统）。\n\n第二周：你去超市自带购物袋，收银员问：「您确定不要袋子吗？三毛一个很便宜。」\n\n第三周：你开始在家堆肥。你的室友说：「你那个桶里有虫子。」\n\n第四周：你放弃了零浪费——但你还是坚持带保温杯。\n\n"环保不是做到完美——是比昨天的自己好一点。"',
+      cond: g => g.age >= 23 && g.intel >= 45 && g.months > 6,
+      choices:[
+        { label:'坚持环保', hint:'+🧠 +✨', fn: g => { g.flags.ecoLiving=true; return{intel:5,charm:5,mood:5}; }},
+        { label:'适度就好', hint:'+😊', fn: g => { g.flags.ecoLiving=true; return{mood:8,intel:3}; }},
+        { label:'太难了', hint:'', fn: g => { return{mood:-3}; }},
+      ]},
+    { id:'midnight_crisis', icon:'🆘', title:'深夜急诊',
+      body:'凌晨2点，你突然胸口疼痛。你打了120。\n\n在医院等了一个小时。做了一系列检查：心电图、血液、胸片。\n\n医生说：「没什么大问题，是焦虑引起的胸闷。注意休息，少喝咖啡。」\n\n你付了800块检查费，走出医院。凌晨4点的街道空无一人。\n\n你第一次觉得：活着真好。\n\n"深夜急诊是身体给你发的最后通牒——这一次是假的，但下一次呢？"',
+      cond: g => g.age >= 28 && g.health < 60 && g.mood < 50,
+      choices:[
+        { label:'认真改变', hint:'+❤️❤️ +🧠', fn: g => { g.flags.midnightCrisis=true; g.flags.healthReport=true; return{health:10,intel:5,mood:5,money:-800}; }},
+        { label:'虚惊一场', hint:'+😊', fn: g => { g.flags.midnightCrisis=true; return{mood:10,money:-800}; }},
+        { label:'该咋活咋活', hint:'-❤️', fn: g => { g.flags.midnightCrisis=true; return{mood:-3,health:-5,money:-800}; }},
+      ]},
+    { id:'friend_wedding_v2', icon:'💒', title:'朋友结婚',
+      body:'你最好的朋友结婚了。\n\n你坐在台下，看着他/她穿着婚纱/西装，说出「我愿意」的那一刻——你哭了。\n\n不是因为感动（好吧，也因为感动）——是因为你想起：十年前你们还在宿舍里吃泡面，讨论以后要嫁给什么样的人。\n\n现在他/她找到了。而你——还在寻找的路上。\n\n婚礼结束后，你的朋友对你说：「下一个就是你了。」\n\n你笑着说：「不急。」但你心里想：是啊，什么时候轮到我呢？\n\n"参加朋友婚礼的感受：一半是祝福，一半是焦虑。"',
+      cond: g => g.age >= 25 && g.age <= 38 && g.social >= 30 && !g.flags.married,
+      choices:[
+        { label:'随份子', hint:'-💰 +👥 +😊', fn: g => { g.flags.friendWedding=true; return{money:-1000,social:8,mood:5}; }},
+        { label:'当伴郎/伴娘', hint:'+👥 +✨', fn: g => { g.flags.friendWedding=true; return{social:10,charm:5,mood:8}; }},
+        { label:'不太想去', hint:'', fn: g => { return{mood:-3,social:-3}; }},
+      ]},
 ];
+
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
     { id:'homeowner', icon:'🏡', name:'有房一族', desc:'在大城市买房', check: g => g.flags.hasHouse },
@@ -6705,6 +6787,17 @@ const ACHIEVEMENTS = [
     { id:'car_owner_v2', icon:'🚗', name:'车主', desc:'买了第一辆车', check: g => g.flags.hasCar },
     { id:'digital_minimalist', icon:'📱', name:'数字极简主义者', desc:'注销了社交账号', check: g => g.flags.accountDeleted },
     { id:'success_redefiner', icon:'🌟', name:'重新定义成功', desc:'找到了自己的成功标准', check: g => g.flags.redefinedSuccess },
+    // === v12.4 新增成就 ===
+    { id:'friend_drift_ach', icon:'👋', name:'渐行渐远', desc:'和朋友渐行渐远', check: g => g.flags.friendDrift },
+    { id:'birthday_alone_ach', icon:'🎂', name:'一个人的生日', desc:'独自过了生日', check: g => g.flags.birthdayAlone },
+    { id:'community_garden_ach', icon:'🌱', name:'社区园丁', desc:'参加了社区花园', check: g => g.flags.communityGarden },
+    { id:'bucket_list_ach', icon:'📝', name:'人生清单', desc:'列了人生愿望清单', check: g => g.flags.bucketList },
+    { id:'online_dating_ach', icon:'💑', name:'网恋达人', desc:'尝试了线上交友', check: g => g.flags.onlineDating },
+    { id:'retirement_planner_v3', icon:'🧓', name:'退休规划师', desc:'开始倒计时退休', check: g => g.flags.retirementCountdown },
+    { id:'upward_mover', icon:'📦', name:'越搬越好', desc:'搬到了更好的地方', check: g => g.flags.movedUp },
+    { id:'eco_warrior', icon:'♻️', name:'环保先锋', desc:'践行低碳生活', check: g => g.flags.ecoLiving },
+    { id:'midnight_survivor', icon:'🆘', name:'深夜幸存者', desc:'经历了深夜急诊', check: g => g.flags.midnightCrisis },
+    { id:'wedding_guest', icon:'💒', name:'婚礼常客', desc:'参加了朋友婚礼', check: g => g.flags.friendWedding },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -6877,6 +6970,11 @@ const ENDINGS = [
     // --- v12.3 NEW ENDINGS ---
     { id:'authentic_life_end', badge:'🌟', title:'真实的人生', desc:'你终于活成了自己想要的样子。\n\n你不再活在别人的期待里。你不再为了「面子」做不想做的事。你不再假装自己过得很好。\n\n你允许自己脆弱，允许自己犯错，允许自己慢下来。\n\n你的朋友说：「你变了。以前你总是很紧绷，现在你很松弛。」\n\n你笑着说：「不是我变了——是我终于不装了。」\n\n"真实不是完美——是敢于展示不完美。"', cond: g => g.flags.redefinedSuccess && g.mood >= 65 && g.age >= 32 },
     { id:'rebel_life_end', badge:'🔥', title:'叛逆人生', desc:'你在37岁那年，做了一件所有人都觉得疯狂的事。\n\n也许是辞职环游世界，也许是卖掉房子去创业，也许是离开体制去做自由职业。\n\n一年后你没有成功。两年后你还是没有成功。三年后——你依然不后悔。\n\n因为你终于知道了：人生最大的失败不是做错选择——是从未做过自己的选择。\n\n"叛逆不是反叛——是终于听到了自己内心的声音。"', cond: g => g.flags.midlifeRebellion && g.mood >= 55 && g.age >= 38 },
+    // --- v12.4 NEW ENDINGS ---
+    { id:'quiet_friendship_end', badge:'👋', title:'散场的人', desc:'你和曾经最好的朋友，终于成了彼此朋友圈里的陌生人。\n\n没有吵架，没有矛盾——只是各自忙着各自的生活。他结了婚，你加了班。她去了另一个城市，你留在了原地。\n\n某天你翻看旧照片，发现那个笑得最开心的人——已经三年没联系了。\n\n你犹豫了一下，还是放下了手机。\n\n"有些友情不是断裂了——是安静地毕业了。"', cond: g => g.flags.friendDrift && g.age >= 30 && g.social < 50 },
+    { id:'bucket_list_end', badge:'📝', title:'愿望清单', desc:'你列了一张人生愿望清单，然后开始一个一个划掉。\n\n跳伞✓ 学吉他✓ 去西藏✓ 写一本书✓ 给妈妈买金项链✓\n\n你没有完成所有的愿望——但每划掉一个，你都觉得自己真正活过。\n\n你65岁的时候，那张清单已经被折得皱巴巴的。上面有些愿望永远不会被打勾了。但也有些——是你当初做梦都没想到的。\n\n"人生不是划掉多少项——是你敢不敢写下第一项。"', cond: g => g.flags.bucketList && g.age >= 45 && g.mood >= 60 },
+    { id:'eco_life_end', badge:'♻️', title:'低碳人生', desc:'你成了一个「环保怪人」。\n\n你骑自行车上班，用布袋买菜，拒绝一次性餐具，把空调温度永远设在26度。\n\n你的同事觉得你矫情。你的家人觉得你抠门。你的邻居觉得你奇怪。\n\n但你不在乎。因为你知道：一个人改变不了世界——但如果每个人都这么想，世界就永远不会改变。\n\n"环保不是苦行僧——是终于想明白了：够就好。"', cond: g => g.flags.ecoLiving && g.age >= 35 && g.mood >= 55 },
+    { id:'second_chance_end', badge:'🆘', title:'第二次机会', desc:'那次深夜急诊改变了你。\n\n你辞掉了996的工作，搬到了郊区的小房子。你开始跑步、做饭、早睡早起。\n\n你的收入少了一半，但你的体检报告比十年前还好。\n\n你妈说：「你怎么越活越回去了？」\n你说：「妈，我这不是回去了——是重新开始了。」\n\n"有些觉醒需要一次濒死体验——但最好不需要。"', cond: g => g.flags.midnightCrisis && g.health >= 75 && g.mood >= 65 && g.age >= 35 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
