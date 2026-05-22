@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v27.6
+// 都市浮生记 - Game Engine v27.7
 // ============================================
 
 // === GAME STATE ===
@@ -14061,6 +14061,87 @@ const EVENTS = [
         { label:'调整了消费结构，减少不必要支出', hint:'+💰 +🧠', fn: g => { g.flags.citySurvivalCost=true; g.flags.smartSpender=true; g.money += 1000; return{intel:5}; }},
         { label:'开始考虑是不是该离开大城市了', hint:'-😊 +🧠', fn: g => { g.flags.citySurvivalCost=true; g.flags.consideringLeaving=true; return{mood:-5,intel:5}; }},
       ]},
+    // v27.7: 户外文化 + City Walk + 周末生活
+    { id:'city_walk_v27_7', icon:'🚶', title:'City Walk', category:'hobby',
+      body:'你参加了一次City Walk。\n\n路线：老法租界 → 武康路 → 安福路 → 衡山路\n\n距离：5公里\n时间：3小时\n\n你看到了：\n- 老洋房（你住不起的）\n- 网红咖啡店（你喝不起的）\n- 精品买手店（你买不起的）\n- 外国人在遛狗（你养不起的）\n\n你拍了200张照片——发了朋友圈——\n\n配文：「漫步城市，发现生活的美好🌿」\n\n你的评论：\n- 同事A：「好文艺！」\n- 你妈：「注意安全」\n- 你爸：「走这么远不累吗？」\n\n你开始理解：City Walk——不是「散步」——是「用脚步丈量你消费不起的城市」。\n\n你不是在「发现美好」——你是在「假装你是这个城市的一部分」。\n\n「City Walk：你不是在走路——你是在用5公里发一条朋友圈。」',
+      cond: g => g.age >= 18 && !g.flags.cityWalk && g.mood >= 20,
+      choices:[
+        { label:'爱上了City Walk，每周都走', hint:'+😊 +❤️ +✨ +🧠', fn: g => { g.flags.cityWalk=true; g.flags.cityWalkRegular=true; return{mood:8,health:3,charm:5,intel:3}; }},
+        { label:'走了一次挺有趣', hint:'+😊 +🤝', fn: g => { g.flags.cityWalk=true; return{mood:5,social:3}; }},
+        { label:'走了5公里累死了，不去了', hint:'-❤️ -😊', fn: g => { g.flags.cityWalk=true; return{health:-3,mood:-3}; }},
+      ]},
+    { id:'camping_culture', icon:'⛺', title:'露营热', category:'hobby',
+      body:'你决定去露营了。\n\n你的装备清单：\n- 帐篷：800元（迪卡侬入门款）\n- 睡袋：200元\n- 折叠椅：150元\n- 折叠桌：100元\n- 卡式炉：80元\n- 锅碗瓢盆：200元\n- 食材：150元\n- 营地费：100元\n\n总计：1780元\n\n你到了营地——\n\n你发现：\n- 你的帐篷搭了40分钟（别人的5分钟）\n- 你的饭菜糊了（别人的像米其林）\n- 你的睡袋不够暖（半夜冻醒了）\n- 你的邻居在弹吉他（你只有手机）\n\n但你也发现了：\n- 星空真的很美\n- 虫鸣声很好听\n- 没有WiFi的晚上——你居然睡得很香\n\n你开始理解：露营——不是「省钱旅行」——是「花钱体验原始生活」。\n\n你花了1780元——来体验「没有空调、没有热水、没有WiFi」的生活。\n\n「露营：你在城市拼命追求舒适——然后花钱来体验不舒适。」',
+      cond: g => g.age >= 18 && !g.flags.campingCulture && g.money >= 1780,
+      choices:[
+        { label:'成了露营爱好者，每月都去', hint:'-💰 +😊 +❤️ +✨', fn: g => { g.flags.campingCulture=true; g.flags.campingEnthusiast=true; g.money -= 5000; return{mood:10,health:5,charm:3}; }},
+        { label:'体验了一次，挺特别的', hint:'-💰 +😊', fn: g => { g.flags.campingCulture=true; g.money -= 1780; return{mood:5}; }},
+        { label:'再也不去了，太折磨了', hint:'-💰 -😊', fn: g => { g.flags.campingCulture=true; g.money -= 1780; return{mood:-5}; }},
+      ]},
+    { id:'cycling_boom', icon:'🚴', title:'骑行热', category:'hobby',
+      body:'你入坑骑行了。\n\n你的装备：\n- 自行车：3500元（入门公路车）\n- 头盔：300元\n- 骑行裤：200元\n- 骑行手套：80元\n- 码表：500元\n- 骑行眼镜：150元\n\n总计：4730元\n\n你的第一次骑行：\n- 距离：30公里\n- 时间：2小时\n- 均速：15km/h（大佬均速35km/h）\n- 屁股：痛到怀疑人生\n\n你加了骑行群——\n\n群里的话题：\n- 「今天破风了，均速32！」\n- 「新换了碳纤维轮组，轻了500克」\n- 「这辆S-Works，8万，值吗？」\n\n你看了看你的3500块的车——\n\n你开始理解：骑行——不是「省钱出行」——是「另一种消费升级」。\n\n你以为骑行很便宜——直到你发现——别人的车比你一个月工资还贵。\n\n「骑行：你不是在骑车——你是在用两条腿追逐一个无底洞。」',
+      cond: g => g.age >= 18 && !g.flags.cyclingBoom && g.money >= 4730,
+      choices:[
+        { label:'坚持骑行，身体变好了很多', hint:'-💰 +❤️ +😊 +✨', fn: g => { g.flags.cyclingBoom=true; g.flags.cyclingRegular=true; g.money -= 3000; return{health:10,mood:5,charm:3}; }},
+        { label:'骑了几次，觉得挺舒服', hint:'-💰 +❤️ +😊', fn: g => { g.flags.cyclingBoom=true; g.money -= 4730; return{health:5,mood:3}; }},
+        { label:'屁股太痛了，放弃了', hint:'-💰 -❤️', fn: g => { g.flags.cyclingBoom=true; g.money -= 4730; return{health:-3}; }},
+      ]},
+    { id:'frisbee_social', icon:'🥏', title:'飞盘社交', category:'social',
+      body:'你被朋友拉去玩飞盘了。\n\n地点：公园草坪\n人数：20人（10男10女）\n费用：AA，人均30元\n\n你发现：\n- 80%的人不是来运动的——是来社交的\n- 飞盘只是借口——拍照才是正经事\n- 每玩10分钟——拍照20分钟\n- 有人在飞盘场上加了15个微信\n\n你开始观察：\n- 男生：穿lululemon，戴Oakley\n- 女生：穿运动内衣，头发编成辫子\n- 所有人：都在发朋友圈\n\n你也发了——配文：「飞盘🥏，快乐很简单」\n\n你收到了28个赞。\n\n你开始理解：飞盘——不是「运动」——是「穿得好看去社交」。\n\n你不是在扔飞盘——你是在扔「社交名片」。\n\n「飞盘社交：你不是在运动——你是在用一个塑料盘子交朋友。」',
+      cond: g => g.age >= 18 && g.age <= 35 && !g.flags.frisbeeSocial && g.social >= 15,
+      choices:[
+        { label:'成了飞盘常客，交了很多朋友', hint:'+🤝 +😊 +✨', fn: g => { g.flags.frisbeeSocial=true; g.flags.frisbeeRegular=true; g.reputation.social += 3; return{social:8,mood:5,charm:3}; }},
+        { label:'去玩了一次，认识了几个人', hint:'+🤝 +😊', fn: g => { g.flags.frisbeeSocial=true; return{social:3,mood:3}; }},
+        { label:'觉得太装了，不去了', hint:'-🤝 -✨', fn: g => { g.flags.frisbeeSocial=true; return{social:-3,charm:-3}; }},
+      ]},
+    { id:'fishing_middle_age', icon:'🎣', title:'钓鱼入坑', category:'hobby',
+      body:'你开始钓鱼了。\n\n你不知道为什么——突然就觉得——钓鱼很有意思。\n\n你以前觉得：钓鱼是中年男人的爱好。\n\n现在你发现：你就是那个中年男人。\n\n你的装备：\n- 鱼竿：500元（入门级）\n- 鱼线/鱼钩/浮漂：200元\n- 鱼饵：50元\n- 折叠椅：100元\n- 保温杯：80元\n\n你去了河边——\n\n你坐了4小时——\n\n收获：0条鱼。\n\n但你发现：\n- 你发了4小时的呆——脑子空空的——很舒服\n- 你看了夕阳——很美\n- 你喝了热茶——很暖\n- 没有手机打扰——很安静\n\n你开始理解：钓鱼——不是「抓鱼」——是「给自己一个发呆的理由」。\n\n你不是在钓鱼——你是在钓「属于自己的时间」。\n\n「钓鱼：中年男人的冥想——不用盘腿——只需要一根鱼竿。」',
+      cond: g => g.age >= 28 && !g.flags.fishingMiddleAge && g.money >= 500,
+      choices:[
+        { label:'成了钓鱼佬，每周都去', hint:'+😊 +❤️ -💰', fn: g => { g.flags.fishingMiddleAge=true; g.flags.fishingAddict=true; g.money -= 2000; return{mood:10,health:3}; }},
+        { label:'偶尔去钓钓，挺放松的', hint:'+😊 +❤️', fn: g => { g.flags.fishingMiddleAge=true; return{mood:5,health:2}; }},
+        { label:'坐不住，太无聊了', hint:'-😊', fn: g => { g.flags.fishingMiddleAge=true; return{mood:-3}; }},
+      ]},
+    { id:'hiking_challenge_v27_7', icon:'⛰️', title:'徒步挑战', category:'hobby',
+      body:'你报名了一次徒步活动。\n\n路线：某座山\n难度：中等\n距离：15公里\n爬升：800米\n\n你出发了——\n\n第1小时：\n- 你精力充沛\n- 你拍了很多照片\n- 你觉得「这也太简单了」\n\n第3小时：\n- 你的腿开始酸\n- 你的水快喝完了\n- 你问：「还有多远？」\n\n第5小时：\n- 你到了山顶\n- 你看到了云海\n- 你觉得——一切都值了\n\n下山后：\n- 你的腿疼了3天\n- 你的朋友圈收获了100+赞\n- 你的微信步数：38000步\n\n你开始理解：徒步——不是「走路」——是「用身体的疲惫换精神的满足」。\n\n你在山顶的那一刻——你觉得——你比99%的人都强。\n\n虽然——99%的人根本不想来。\n\n「徒步：你不是在爬山——你是在用800米的海拔证明「我可以」。」',
+      cond: g => g.age >= 18 && !g.flags.hikingChallenge && g.health >= 30,
+      choices:[
+        { label:'爱上了徒步，开始挑战更高的山', hint:'+❤️ +😊 +✨', fn: g => { g.flags.hikingChallenge=true; g.flags.hikingEnthusiast=true; return{health:8,mood:8,charm:3}; }},
+        { label:'完成了挑战，很有成就感', hint:'+😊 +❤️', fn: g => { g.flags.hikingChallenge=true; return{mood:5,health:5}; }},
+        { label:'下山后腿疼了一周，不去了', hint:'-❤️ -😊', fn: g => { g.flags.hikingChallenge=true; return{health:-5,mood:-3}; }},
+      ]},
+    { id:'outdoor_gear_arms_race', icon:'🎒', title:'户外装备军备竞赛', category:'finance',
+      body:'你入了户外坑。\n\n你的装备升级之路：\n\n第1个月：\n- 入门款：全套3000元\n- 你觉得：够了\n\n第3个月：\n- 「这个冲锋衣不防水」→ 换始祖鸟：4000元\n- 「这个背包太重」→ 换Osprey：1500元\n\n第6个月：\n- 「这个帐篷不抗风」→ 换MSR：3000元\n- 「这个睡袋不够暖」→ 换鹅绒款：2000元\n\n第12个月：\n- 你的装备总价值：25000元\n- 你今年户外次数：4次\n- 每次成本：6250元\n\n你看了看你的装备——\n\n它们99%的时间——在你的储物间里。\n\n你开始理解：户外装备——不是「工具」——是「中年男人的玩具」。\n\n你不是在「准备户外活动」——你是在「收集装备」。\n\n你的装备——比你的技术——进步得更快。\n\n「户外装备军备竞赛：你不是在玩户外——你是在玩「谁的装备更贵」。」',
+      cond: g => g.age >= 25 && !g.flags.outdoorGearArms && g.money >= 10000,
+      choices:[
+        { label:'控制了购买欲，够用就好', hint:'+🧠 +💰 +✨', fn: g => { g.flags.outdoorGearArms=true; g.flags.gearMinimalist=true; return{intel:8,charm:3}; }},
+        { label:'继续升级装备，开心就好', hint:'-💰 +😊 +✨', fn: g => { g.flags.outdoorGearArms=true; g.money -= 10000; return{mood:5,charm:5}; }},
+        { label:'发现自己只是喜欢买不喜欢用', hint:'+🧠 -💰', fn: g => { g.flags.outdoorGearArms=true; g.flags.gearCollectorNotUser=true; return{intel:5,mood:-3}; }},
+      ]},
+    { id:'weekend_farm', icon:'🌱', title:'周末农场', category:'hobby',
+      body:'你在郊区租了一小块地。\n\n月租：300元\n面积：10平方米\n\n你种了：\n- 西红柿\n- 黄瓜\n- 小白菜\n- 辣椒\n\n你每周去一次——\n\n你的收获（3个月后）：\n- 西红柿：5个（市场价约15元）\n- 黄瓜：3根（市场价约6元）\n- 小白菜：被虫吃了\n- 辣椒：还没长出来\n\n你的投入：\n- 地租：900元（3个月）\n- 种子/肥料：200元\n- 交通费：300元\n- 工具：150元\n\n总计：1550元\n\n你的产出：21元\n\n你的「投资回报率」：-98.6%\n\n但你发现：\n- 你在农场的时候——很开心\n- 你种出的西红柿——比超市的好吃100倍\n- 你终于理解了「粒粒皆辛苦」\n\n你开始理解：周末农场——不是「种菜」——是「用1550元买21元的快乐」。\n\n「周末农场：你不是在种菜——你是在种「跟土地的connection」。」',
+      cond: g => g.age >= 22 && !g.flags.weekendFarm && g.money >= 1550,
+      choices:[
+        { label:'坚持种地，成了都市农夫', hint:'+😊 +❤️ +🧠 -💰', fn: g => { g.flags.weekendFarm=true; g.flags.urbanFarmer=true; g.money -= 3000; return{mood:8,health:5,intel:3}; }},
+        { label:'种了一季体验了一下', hint:'+😊 +🧠', fn: g => { g.flags.weekendFarm=true; g.money -= 1550; return{mood:5,intel:3}; }},
+        { label:'菜都被虫吃了，放弃了', hint:'-💰 -😊', fn: g => { g.flags.weekendFarm=true; g.money -= 1550; return{mood:-3}; }},
+      ]},
+    { id:'running_marathon', icon:'🏃', title:'跑步与马拉松', category:'hobby',
+      body:'你开始跑步了。\n\n因为你的同事说：「我上个月跑了半马。」\n\n你的跑步进化史：\n\n第1周：跑1公里就喘\n第1个月：能跑5公里\n第3个月：能跑10公里\n第6个月：半马完赛（2小时15分）\n第12个月：全马完赛（5小时02分）\n\n你的朋友圈：\n- 每月至少3条跑步打卡\n- 每个马拉松都有参赛照\n- 配文永远是：「坚持就是胜利💪」\n\n你的花费：\n- 跑鞋：800元/双（每年2双）\n- 比赛报名：200元/场（每年4场）\n- 运动手表：2000元\n- 运动服装：1000元\n\n你的膝盖：开始隐隐作痛。\n\n你开始理解：跑步——不是「最便宜的运动」——是「你以为最便宜的运动」。\n\n你的膝盖——不会因为你发了朋友圈——就不疼了。\n\n「跑步与马拉松：你不是在跑步——你是在用膝盖换朋友圈素材。」',
+      cond: g => g.age >= 20 && !g.flags.runningMarathon && g.health >= 35,
+      choices:[
+        { label:'坚持科学跑步，身体越来越好', hint:'+❤️ +😊 +🧠', fn: g => { g.flags.runningMarathon=true; g.flags.scientificRunner=true; return{health:10,mood:5,intel:3}; }},
+        { label:'跑了半马，很有成就感', hint:'+😊 +❤️ +✨', fn: g => { g.flags.runningMarathon=true; return{mood:8,health:5,charm:3}; }},
+        { label:'膝盖疼了，改游泳了', hint:'-❤️ +🧠', fn: g => { g.flags.runningMarathon=true; g.flags.kneeInjured=true; return{health:-5,intel:3}; }},
+      ]},
+    { id:'glamping_luxury', icon:'🏕️', title:'精致露营', category:'hobby',
+      body:'你体验了一次「精致露营」（Glamping）。\n\n跟普通露营的区别：\n- 帐篷：不是你的——是营地搭好的（带空调）\n- 睡袋：不是你的——是羽绒被\n- 食物：不是你自己做的——是营地厨师做的\n- 卫生间：不是公共的——是独立的\n\n费用：人均1500元/晚\n\n你的体验：\n- 你住了一个「帐篷版五星酒店」\n- 你拍了300张照片\n- 你发了朋友圈：「回归自然🌿」\n\n你的评论：\n- 「好美啊！」\n- 「在哪里？多少钱？」\n- 「这不是露营——这是住酒店换了个皮肤」\n\n你开始理解：精致露营——不是「露营」——是「把酒店搬到了野外」。\n\n你不是在「体验自然」——你是在「用1500元买一张自然背景的照片」。\n\n真正的露营者在生火——你在喝营地的红酒。\n\n「精致露营：你不是在露营——你是在让露营变得「不露营」。」',
+      cond: g => g.age >= 20 && !g.flags.glampingLuxury && g.money >= 1500,
+      choices:[
+        { label:'成了精致露营常客', hint:'-💰 +😊 +✨', fn: g => { g.flags.glampingLuxury=true; g.flags.glampingRegular=true; g.money -= 10000; return{mood:8,charm:5}; }},
+        { label:'体验了一次挺特别的', hint:'-💰 +😊', fn: g => { g.flags.glampingLuxury=true; g.money -= 1500; return{mood:5}; }},
+        { label:'觉得不值这个价，不如住酒店', hint:'-💰 -😊', fn: g => { g.flags.glampingLuxury=true; g.money -= 1500; return{mood:-3,intel:3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -15304,6 +15385,14 @@ const ACHIEVEMENTS = [
     { id:'subscription_minimalist_ach', icon:'📋', name:'订阅极简', desc:'清理了所有不常用的订阅', check: g => g.flags.subscriptionMinimalist },
     { id:'budget_tracker_ach', icon:'📊', name:'记账达人', desc:'开始记账控制每一笔支出', check: g => g.flags.budgetTracker },
     { id:'smart_spender_ach', icon:'🏙️', name:'精明消费者', desc:'调整消费结构减少不必要支出', check: g => g.flags.smartSpender },
+    // v27.7: 户外文化成就
+    { id:'city_walk_regular_ach', icon:'🚶', name:'城市漫步者', desc:'爱上了City Walk每周都走', check: g => g.flags.cityWalkRegular },
+    { id:'camping_enthusiast_ach', icon:'⛺', name:'露营达人', desc:'成了露营爱好者每月都去', check: g => g.flags.campingEnthusiast },
+    { id:'cycling_regular_ach', icon:'🚴', name:'骑行侠', desc:'坚持骑行身体变好了很多', check: g => g.flags.cyclingRegular },
+    { id:'frisbee_regular_ach', icon:'🥏', name:'飞盘社交家', desc:'成了飞盘常客交了很多朋友', check: g => g.flags.frisbeeRegular },
+    { id:'urban_farmer_ach', icon:'🌱', name:'都市农夫', desc:'在郊区租地种菜成了都市农夫', check: g => g.flags.urbanFarmer },
+    { id:'scientific_runner_ach', icon:'🏃', name:'科学跑者', desc:'坚持科学跑步身体越来越好', check: g => g.flags.scientificRunner },
+    { id:'hiking_enthusiast_ach', icon:'⛰️', name:'徒步爱好者', desc:'爱上徒步开始挑战更高的山', check: g => g.flags.hikingEnthusiast },
 ];
 
 // === ENDINGS === (order matters: first match wins)
