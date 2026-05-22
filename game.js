@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v16.3
+// 都市浮生记 - Game Engine v17.0
 // ============================================
 
 // === GAME STATE ===
@@ -8187,7 +8187,7 @@ const EVENTS = [
         { label:'也找个偶像', hint:'+😊 +✨', fn: g => { g.flags.fanCulture=true; g.flags.newFan=true; return{mood:10,charm:5}; }},
         { label:'觉得没必要', hint:'+🧠 -👥', fn: g => { g.flags.fanCulture=true; return{intel:5,social:-3}; }},
       ]},
-    { id:'standup_comedy', icon:'🎤', title:'脱口秀',
+    { id:'standup_comedy_v2', icon:'🎤', title:'脱口秀',
       body:'你去看了一场线下脱口秀。\n\n演员讲了1小时，你笑了59分钟。他说：「大城市打工人最辛苦的事是——笑着加班。」全场鼓掌。\n\n他说：「你以为你在追求梦想——其实你在追求不用加班的梦想。」你又鼓掌了。\n\n散场后你在路上想：他说的每一句话都是你的生活。原来把痛苦变成笑话——就是一种疗愈。\n\n你发了条朋友圈：「今晚笑到肚子疼。」配图是脱口秀门票。你的评论里全是：「在哪？下次带我！」\n\n"脱口秀：不是在讲笑话——是在用幽默化解生活的荒诞。"',
       cond: g => g.age >= 20 && !g.flags.standupComedy,
       choices:[
@@ -8203,7 +8203,7 @@ const EVENTS = [
         { label:'卸载游戏', hint:'+🧠 +💪 +💰', fn: g => { g.flags.mobileGameAddiction=true; g.flags.gameDeleted=true; return{intel:8,health:8,money:500}; }},
         { label:'继续冲分', hint:'+😊 -💪 -🧠', fn: g => { g.flags.mobileGameAddiction=true; return{mood:8,health:-8,intel:-5}; }},
       ]},
-    { id:'escape_room', icon:'🚪', title:'密室逃脱',
+    { id:'escape_room_v3', icon:'🚪', title:'密室逃脱',
       body:'你和朋友们去玩了密室逃脱。\n\n你们选了「恐怖主题」。进去之后你就后悔了——黑漆漆的房间、突然弹出的NPC、诡异的音乐。\n\n你的朋友吓得抱住了你。你其实也怕——但你装作不怕。你们花了90分钟终于逃出来了。\n\n你在出口看到阳光的那一刻，觉得——外面的世界真好。\n\n你的一个朋友说：「下次还来吗？」你说：「来——但换个不那么吓人的主题。」\n\n"密室逃脱：不是在逃——是在恐惧中找到勇气。当然，有朋友在身边会更有勇气。"',
       cond: g => g.age >= 18 && !g.flags.escapeRoom,
       choices:[
@@ -8235,13 +8235,175 @@ const EVENTS = [
         { label:'学一门乐器', hint:'+🧠 +✨ +💪', fn: g => { g.flags.musicFestival=true; g.flags.instrumentLearner=true; return{intel:12,charm:10,health:3}; }},
         { label:'线上看直播就好', hint:'+😊 +🧠', fn: g => { g.flags.musicFestival=true; return{mood:8,intel:5}; }},
       ]},
-    { id:'book_club', icon:'📚', title:'读书会',
+    { id:'book_club_v3', icon:'📚', title:'读书会',
       body:'你加入了一个读书会。\n\n每个月读一本书、线下讨论一次。这个月的书目是《百年孤独》。你读了3遍——第一遍没看懂、第二遍看了一半睡着了、第三遍终于看完了。\n\n讨论会上，一个退休的老教授说：「这本书讲的是孤独。」一个大学生说：「讲的是家族。」一个白领说：「讲的是时间。」\n\n你说：「讲的是每一个在大城市漂泊的人。」\n\n大家沉默了几秒。然后有人说：「说得真好。」\n\n"读书会：不是在读书——是在别人的故事里，找到自己的影子。"',
       cond: g => g.age >= 22 && !g.flags.bookClub,
       choices:[
         { label:'坚持每月参加', hint:'+🧠 +👥 +😊', fn: g => { g.flags.bookClub=true; g.flags.regularReader=true; return{intel:15,social:8,mood:8}; }},
         { label:'成为领读人', hint:'+🧠 +✨ +👥', fn: g => { g.flags.bookClub=true; g.flags.bookLeader=true; return{intel:12,charm:10,social:10}; }},
         { label:'自己看书就好', hint:'+🧠 +😊', fn: g => { g.flags.bookClub=true; return{intel:10,mood:5}; }},
+      ]},
+    // === v17.0 新增事件（教育体系 + 终身学习） ===
+    { id:'gaokao_retry', icon:'📝', title:'高考复读', category:'education',
+      body:'你没考上理想的大学。你妈说："复读一年吧，明年一定能考上985。"\n\n你坐在复读班的教室里，周围全是比你小一届的同学。每天6点起床、12点睡觉，做不完的试卷、背不完的单词。\n\n你的QQ签名改成了："明年，我一定可以。"\n\n但你心里清楚：复读不是重来一次——是带着上一次的伤疤再赌一次。\n\n"高考复读：不是输不起——是不甘心。"',
+      cond: g => g.age >= 17 && g.age <= 20 && !g.flags.gaokaoRetry && g.intel < 70,
+      choices:[
+        { label:'咬牙复读一年', hint:'🎲 +🧠 -💰', fn: g => { g.flags.gaokaoRetry=true; if(g.intel>50&&Math.random()>0.4){g.intel+=20;g.flags.goodCollege=true;return{intel:15,mood:20,money:-15000}}else{return{intel:8,mood:-20,money:-15000}} }},
+        { label:'去读大专学技术', hint:'+🧠 +💪', fn: g => { g.flags.gaokaoRetry=true; g.flags.vocationalSchool=true; return{intel:10,mood:5,health:5}; }},
+        { label:'直接打工', hint:'+💰 -🧠', fn: g => { g.flags.gaokaoRetry=true; return{money:5000,mood:-10}; }},
+      ]},
+    { id:'grad_school_life', icon:'🎓', title:'研究生生活', category:'education',
+      body:'你考上了研究生。\n\n你以为读研是每天看看书、写写论文、喝喝咖啡。实际上：\n\n- 导师让你帮他带孩子\n- 实验室的经费永远不够\n- 论文被拒了3次\n- 同门师兄弟内卷严重\n- 你一个月补贴3000块，还不够交房租\n\n你妈打电话问你："什么时候毕业啊？"\n\n"读研不是象牙塔——是高级打工。只不过老板叫导师。"',
+      cond: g => g.flags.studyPassed && !g.flags.gradSchoolLife && g.age >= 22,
+      choices:[
+        { label:'努力发论文', hint:'+🧠 -💪', fn: g => { g.flags.gradSchoolLife=true; g.flags.paperPublished=true; return{intel:20,mood:-5,health:-8}; }},
+        { label:'混个毕业证就行', hint:'+😊 -🧠', fn: g => { g.flags.gradSchoolLife=true; return{mood:10,intel:5}; }},
+        { label:'退学去创业', hint:'🎲 +💰 -🧠', fn: g => { g.flags.gradSchoolLife=true; g.flags.dropout=true; g.flags.entrepreneur=true; setJob(g,'创业者',0); if(Math.random()>0.7){return{money:20000,mood:15}}else{return{money:-10000,mood:-15}} }},
+      ]},
+    { id:'study_abroad_dream_v2', icon:'✈️', title:'留学梦', category:'education',
+      body:'你一直有个留学梦。看了那么多美剧和英剧，你觉得国外的教育一定更好。\n\n你查了查费用：\n- 英国一年硕士：30-50万\n- 美国两年硕士：60-100万\n- 日本两年修士：20-30万\n- 德国免学费：生活费15-20万\n\n你看了看银行卡余额：8万。\n\n你妈说："砸锅卖铁也供你。"你爸说："别去了，回来也找不到工作。"\n\n"留学是镀金还是镀银？取决于你回来后的第一份工作。"',
+      cond: g => g.age >= 20 && g.age <= 30 && !g.flags.studyAbroad && g.money > 50000,
+      choices:[
+        { label:'去英国读一年硕', hint:'-💰💰 +🧠 +✨', fn: g => { g.flags.studyAbroad=true; g.flags.ukMaster=true; return{money:-350000,intel:25,charm:15,mood:15}; }},
+        { label:'去德国读免费大学', hint:'-💰 +🧠 +💪', fn: g => { g.flags.studyAbroad=true; g.flags.germanStudy=true; return{money:-150000,intel:30,mood:10,health:5}; }},
+        { label:'还是国内读吧', hint:'+😊 +💰', fn: g => { g.flags.studyAbroad=true; return{mood:5,money:5000}; }},
+        { label:'贷款也要去', hint:'-💰💰💰 +🧠 +✨', fn: g => { g.flags.studyAbroad=true; g.flags.studyLoan=true; return{money:-200000,intel:25,charm:15,mood:10}; }},
+      ]},
+    { id:'cert_mania', icon:'📜', title:'考证狂人', category:'education',
+      body:'你开始疯狂考证：CPA、CFA、PMP、法律职业资格、教师资格证……\n\n你的桌上堆满了教材，你的手机里全是网课App，你的周末比上班还忙。\n\n同事问你："考这么多证干嘛？"\n\n你说："艺多不压身。"\n\n但你心里知道：你不是在学东西——你是在用证书缓解焦虑。\n\n"考证是当代人的安慰剂：不是在学知识——是在买安心。"',
+      cond: g => g.age >= 22 && !g.flags.certMania && g.intel > 60,
+      choices:[
+        { label:'一口气考3个证', hint:'+🧠 -💰 -💪', fn: g => { g.flags.certMania=true; g.flags.multiCert=true; return{intel:20,money:-25000,health:-10,mood:-5}; }},
+        { label:'选一个最值钱的考', hint:'+🧠 -💰', fn: g => { g.flags.certMania=true; g.flags.keyCert=true; return{intel:15,money:-15000,mood:5}; }},
+        { label:'算了，经验比证书重要', hint:'+😊 +💰', fn: g => { g.flags.certMania=true; return{mood:10,money:5000}; }},
+      ]},
+    { id:'part_time_mba', icon:'💼', title:'在职MBA', category:'education',
+      body:'你的同事说："读个在职MBA吧，20万，两年。能认识很多人，升职也有用。"\n\n你算了一下：\n- 学费：20万\n- 每个周末上课：失去所有周末\n- 小组作业：比上班还累\n- 毕业论文：要写一篇案例分析\n\n你看了看课程表：战略管理、组织行为学、财务报表分析……每一门都像是在讲天书。\n\n"在职MBA：花20万认识一群和你一样焦虑的中产。"',
+      cond: g => g.age >= 25 && g.age <= 40 && g.jobSalary >= 8000 && !g.flags.partTimeMBA && g.money > 100000,
+      choices:[
+        { label:'报名在职MBA', hint:'-💰💰 +🧠 +👥 +✨', fn: g => { g.flags.partTimeMBA=true; g.flags.mbaNetwork=true; return{money:-200000,intel:20,social:20,charm:10}; }},
+        { label:'读个便宜点的EMBA', hint:'-💰 +🧠 +👥', fn: g => { g.flags.partTimeMBA=true; return{money:-80000,intel:12,social:10}; }},
+        { label:'自学商业知识', hint:'+🧠 +😊', fn: g => { g.flags.partTimeMBA=true; return{intel:15,mood:5,money:3000}; }},
+      ]},
+    { id:'involution_edu', icon:'🌀', title:'教育内卷', category:'education',
+      body:'你发现了一个奇怪的现象：\n\n- 小学学奥数的孩子，初中不一定成绩好\n- 初中上补习班的孩子，高中不一定能考上重点\n- 高中拼了命考985的孩子，大学毕业不一定能找到好工作\n- 读了985硕士的孩子，可能和双非本科在同一间办公室\n\n"教育就像一场军备竞赛：所有人都在加码，但没人知道终点在哪。"\n\n你开始怀疑：教育到底是在帮人——还是在淘汰人？',
+      cond: g => g.age >= 20 && !g.flags.involutionEdu,
+      choices:[
+        { label:'跟着卷，不能输', hint:'+🧠 -💪 -💰', fn: g => { g.flags.involutionEdu=true; g.flags.joinInvolution=true; return{intel:12,health:-10,mood:-8,money:-10000}; }},
+        { label:'躺平，按自己节奏来', hint:'+😊 +💪', fn: g => { g.flags.involutionEdu=true; g.flags.antiInvolution=true; return{mood:15,health:8}; }},
+        { label:'换个赛道，不走寻常路', hint:'🎲 +✨', fn: g => { g.flags.involutionEdu=true; g.flags.altPath=true; return{charm:10,mood:5}; }},
+      ]},
+    { id:'tiger_parent', icon:'🐯', title:'鸡娃家长', category:'education',
+      body:'你有了孩子，你也成了"鸡娃"家长。\n\n周末行程安排：\n- 周六上午：英语外教（200元/小时）\n- 周六下午：钢琴课（150元/小时）\n- 周日上午：奥数班（180元/小时）\n- 周日下午：编程课（160元/小时）\n\n你一年在孩子的教育上花了15万。\n\n你的孩子说："妈妈/爸爸，我好累。"\n\n你说："别人家的孩子都在学，你不学就落后了。"\n\n"鸡娃的本质：不是孩子需要——是家长焦虑。"',
+      cond: g => g.flags.hasChild && g.age >= 30 && !g.flags.tigerParent && g.money > 50000,
+      choices:[
+        { label:'全力鸡娃，不能输在起跑线', hint:'-💰💰 +🧠', fn: g => { g.flags.tigerParent=true; g.flags.kidOverloaded=true; return{money:-80000,mood:-10,social:-5}; }},
+        { label:'快乐教育，让孩子做自己喜欢的事', hint:'+😊 +👥', fn: g => { g.flags.tigerParent=true; g.flags.happyEducation=true; return{mood:15,social:8,money:-20000}; }},
+        { label:'适度鸡娃，平衡发展', hint:'+🧠 +😊', fn: g => { g.flags.tigerParent=true; g.flags.balancedEdu=true; return{intel:5,mood:8,money:-40000}; }},
+      ]},
+    { id:'school_district_house_v3', icon:'🏠', title:'学区房焦虑', category:'education',
+      body:'你的孩子要上小学了。你开始研究学区房。\n\n同一座城市：\n- 好学区的房价：10万/平\n- 普通学区的房价：4万/平\n\n差6万/平。50平的房子，差价300万。\n\n中介说："这个小区对口市重点，每年考上清北的比例是15%。"\n\n你算了算：300万的学区房 + 15%的清北概率 = 每个孩子2000万的清北成本。\n\n"学区房：不是在买房子——是在买一张概率彩票。"',
+      cond: g => g.flags.hasChild && g.age >= 28 && !g.flags.schoolDistrictHouse && g.money > 200000,
+      choices:[
+        { label:'咬牙买学区房', hint:'-💰💰💰 +🧠', fn: g => { g.flags.schoolDistrictHouse=true; g.flags.goodSchool=true; return{money:-500000,mood:-10,social:5}; }},
+        { label:'读私立国际学校', hint:'-💰💰 +✨', fn: g => { g.flags.schoolDistrictHouse=true; g.flags.internationalSchool=true; return{money:-300000,charm:10,mood:5}; }},
+        { label:'就近入学，家庭氛围更重要', hint:'+😊 +💪', fn: g => { g.flags.schoolDistrictHouse=true; return{mood:15,health:5,money:10000}; }},
+      ]},
+    { id:'credential_fraud', icon:'🎭', title:'学历造假风波', category:'education',
+      body:'你的同事被发现学历造假。\n\n他简历上写的是"某985大学硕士"，实际上是某野鸡大学的本科。他在公司干了3年，业绩一直不错。\n\nHR说："学历造假是原则问题，必须开除。"\n\n同事说："我做了3年的活，难道不比一张纸重要？"\n\n你在旁边看着，心想：在这个看学历的社会里，有多少人在用假面具活着？\n\n"学历造假：错不在能力——错在规则。"',
+      cond: g => g.age >= 22 && !g.flags.credentialFraud,
+      choices:[
+        { label:'同情他，帮他求情', hint:'+👥 -✨', fn: g => { g.flags.credentialFraud=true; g.flags.helpedColleague=true; return{social:10,mood:-5,charm:-5}; }},
+        { label:'规则就是规则', hint:'+✨ +🧠', fn: g => { g.flags.credentialFraud=true; return{charm:5,intel:5}; }},
+        { label:'反思学历至上的文化', hint:'+🧠 +😊', fn: g => { g.flags.credentialFraud=true; return{intel:10,mood:5}; }},
+      ]},
+    { id:'slow_employment_v2', icon:'🐌', title:'慢就业', category:'education',
+      body:'你毕业了，但你不想马上工作。\n\n你的同学都在疯狂投简历，你却想去旅行、去支教、去做志愿者、去gap一年。\n\n你妈说："别人都在找工作，你在干嘛？"\n\n你说："我在找自己。"\n\n你妈说："找自己能当饭吃吗？"\n\n"慢就业不是懒惰——是给自己一个想清楚的机会。但想清楚的代价，可能是落后于人。"',
+      cond: g => g.age >= 21 && g.age <= 26 && !g.flags.slowEmployment,
+      choices:[
+        { label:'gap一年去旅行', hint:'-💰 +😊 +✨', fn: g => { g.flags.slowEmployment=true; g.flags.gapYear=true; return{money:-30000,mood:20,charm:15,social:10}; }},
+        { label:'去做支教志愿者', hint:'-💰 +🧠 +👥', fn: g => { g.flags.slowEmployment=true; g.flags.volunteer=true; return{money:-10000,intel:15,social:15,mood:10}; }},
+        { label:'还是先找工作吧', hint:'+💰 +🧠', fn: g => { g.flags.slowEmployment=true; setJob(g,'实习生',4000); return{money:3000,intel:5}; }},
+      ]},
+    { id:'postdoc_dilemma', icon:'🔬', title:'博士后困局', category:'education',
+      body:'你博士毕业了。导师建议你做博士后："再做两年，发几篇顶刊，就能留校当老师了。"\n\n你看了看数据：\n- 博士后月薪：8000-15000\n- 博士后年限：2-4年\n- 留校概率：不到10%\n- 你的同学：已经年薪30万\n\n你35岁了，还在拿着一万出头的工资。你的同龄人已经买房买车结婚生子。\n\n"博士后：科研的尽头不是诺贝尔奖——是编制。"',
+      cond: g => g.age >= 28 && g.flags.gradSchoolLife && g.intel > 85 && !g.flags.postdocDilemma,
+      choices:[
+        { label:'做博士后，赌一把留校', hint:'🎲 +🧠 -💰', fn: g => { g.flags.postdocDilemma=true; if(g.intel>90&&Math.random()>0.7){g.flags.universityTeacher=true;setJob(g,'大学讲师',12000);return{intel:20,mood:25}}else{return{intel:15,mood:-15,money:-20000}} }},
+        { label:'去企业做研发', hint:'+💰 +🧠', fn: g => { g.flags.postdocDilemma=true; setJob(g,'研发工程师',25000); return{money:20000,intel:10,mood:10}; }},
+        { label:'转行做科普博主', hint:'🎲 +✨ +👥', fn: g => { g.flags.postdocDilemma=true; g.flags.scienceBlogger=true; setJob(g,'自媒体人',0); if(Math.random()>0.5){return{charm:20,social:15,money:10000}}else{return{charm:5,mood:-10}} }},
+      ]},
+    { id:'gap_year_v2', icon:'🌍', title:'间隔年', category:'education',
+      body:'你辞了职，决定给自己一年的间隔年。\n\n你的计划：\n- 3个月：东南亚背包旅行\n- 3个月：去大理/丽江住一段时间\n- 3个月：学一门新技能（编程/设计/写作）\n- 3个月：回国找工作\n\n你妈说："你这是逃避现实。"\n\n你说："我这是面对现实——只是换一种方式。"\n\n"间隔年：不是逃离生活——是找回生活。"',
+      cond: g => g.age >= 22 && g.age <= 35 && g.money > 50000 && !g.flags.gapYear && g.job !== '待业中',
+      choices:[
+        { label:'去东南亚背包3个月', hint:'-💰 +😊 +✨ +👥', fn: g => { g.flags.gapYear=true; g.flags.backpacking=true; setJob(g,'待业中',0); return{money:-40000,mood:25,charm:15,social:15,health:5}; }},
+        { label:'去大理隐居半年', hint:'-💰 +😊 +💪', fn: g => { g.flags.gapYear=true; g.flags.daliRetreat=true; setJob(g,'待业中',0); return{money:-30000,mood:20,health:15,intel:5}; }},
+        { label:'算了，还是继续上班吧', hint:'+💰 +🧠', fn: g => { g.flags.gapYear=true; return{money:5000,intel:5}; }},
+      ]},
+    { id:'vocational_edu', icon:'🔧', title:'职业教育', category:'education',
+      body:'你去参观了一所职业技术学院。\n\n你惊讶地发现：\n- 汽修专业的毕业生，月薪8000-15000\n- 电工专业的毕业生，时薪200-300\n- 烹饪专业的毕业生，很多人开了自己的店\n- 护理专业的毕业生，供不应求\n\n而你的985同学，很多人月薪6000，还在内卷。\n\n"职业教育不是低人一等——是换一条赛道。在这个赛道上，手艺比学历值钱。"',
+      cond: g => g.age >= 18 && !g.flags.vocationalEdu,
+      choices:[
+        { label:'学一门技术（汽修/电工/烹饪）', hint:'+🧠 +💪 +💰', fn: g => { g.flags.vocationalEdu=true; g.flags.craftSkill=true; return{intel:10,health:5,mood:5}; }},
+        { label:'还是继续走学历路线', hint:'+🧠 -💪', fn: g => { g.flags.vocationalEdu=true; return{intel:12,mood:-5}; }},
+        { label:'技术和学历两手抓', hint:'+🧠 +💪 -💰', fn: g => { g.flags.vocationalEdu=true; g.flags.dualTrack=true; return{intel:15,health:3,money:-15000}; }},
+      ]},
+    { id:'academic_misconduct', icon:'⚖️', title:'学术不端', category:'education',
+      body:'你发现你的同事/同学论文抄袭了。\n\n他用了别人的数据、改了几个字、换了个图表——然后发表在了核心期刊上。\n\n你举报还是不举报？\n\n举报：他会被撤稿、处分，甚至开除。但你也可能得罪他的导师/领导。\n不举报：你心里过不去，但你也不想惹麻烦。\n\n"学术不端：不是一个人的错——是整个评价体系在逼人造假。"',
+      cond: g => g.age >= 22 && !g.flags.academicMisconduct && g.intel > 65,
+      choices:[
+        { label:'实名举报', hint:'+✨ -👥', fn: g => { g.flags.academicMisconduct=true; g.flags.whistleblower=true; return{charm:15,social:-10,mood:5}; }},
+        { label:'匿名举报', hint:'+✨ +🧠', fn: g => { g.flags.academicMisconduct=true; g.flags.anonReport=true; return{charm:8,intel:5,mood:3}; }},
+        { label:'多一事不如少一事', hint:'+👥 -✨', fn: g => { g.flags.academicMisconduct=true; return{social:5,mood:-10,charm:-5}; }},
+      ]},
+    { id:'adult_self_exam', icon:'📖', title:'成人自考', category:'education',
+      body:'你决定参加成人自考，拿一个本科学历。\n\n你白天上班，晚上看书。你的同事不知道你在自考，你的家人以为你在加班。\n\n你报名了4门课，第一次考试过了3门。你高兴得像个孩子。\n\n你知道：这个学历在很多人眼里不算什么。但对你来说，它是你对自己的一种证明。\n\n"成人自考：不是为了别人——是为了那个曾经没考好的自己。"',
+      cond: g => g.age >= 20 && !g.flags.adultSelfExam && g.intel < 70,
+      choices:[
+        { label:'坚持自考，一年拿证', hint:'+🧠 -💪 -💰', fn: g => { g.flags.adultSelfExam=true; g.flags.selfStudyDegree=true; return{intel:20,health:-8,mood:15,money:-8000}; }},
+        { label:'报个网络教育', hint:'+🧠 -💰', fn: g => { g.flags.adultSelfExam=true; g.flags.onlineDegree=true; return{intel:12,money:-15000,mood:8}; }},
+        { label:'算了，能力比学历重要', hint:'+😊 +💰', fn: g => { g.flags.adultSelfExam=true; return{mood:10,money:3000}; }},
+      ]},
+    { id:'online_course_scam', icon:'💻', title:'网课骗局', category:'education',
+      body:'你在网上看到一个广告："3个月学会Python，月薪2万不是梦！"\n\n你花了9980块报了名。课程质量很差，老师照着PPT念，作业是抄代码。\n\n3个月后，你发现：你学会了print("Hello World")，但找不到工作。\n\n你想退款，客服说："你已经看了50%的课程，不能退。"\n\n"网课骗局：不是教你知识——是教你交智商税。"',
+      cond: g => g.age >= 18 && g.age <= 40 && !g.flags.onlineCourseScam,
+      choices:[
+        { label:'维权退款', hint:'🎲 +💰 -😊', fn: g => { g.flags.onlineCourseScam=true; if(Math.random()>0.5){return{money:8000,mood:-5}}else{return{money:-2000,mood:-15}} }},
+        { label:'算了，当交学费了', hint:'+🧠 +😊', fn: g => { g.flags.onlineCourseScam=true; return{intel:5,mood:-5,money:-1000}; }},
+        { label:'自学才是正道（B站免费课）', hint:'+🧠 +😊', fn: g => { g.flags.onlineCourseScam=true; g.flags.selfTaughtCoder=true; return{intel:15,mood:8}; }},
+      ]},
+    { id:'declining_enrollment', icon:'📉', title:'考研人数下降', category:'education',
+      body:'新闻说：今年考研报名人数比去年减少了50万。\n\n评论区：\n"读了3年研究生，出来发现工资还没本科同学高。"\n"考研不是唯一的出路——只是最贵的弯路。"\n"与其花3年读研，不如花3年积累经验。"\n\n但也有人说："研究生不只是学知识——是换一个圈子、换一种视野。"\n\n"考研降温：不是学历不值钱了——是大家算清楚了性价比。"',
+      cond: g => g.age >= 20 && !g.flags.decliningEnrollment,
+      choices:[
+        { label:'还是决定考研', hint:'+🧠 -💰 -💪', fn: g => { g.flags.decliningEnrollment=true; g.flags.stillPursuing=true; return{intel:15,money:-10000,health:-5}; }},
+        { label:'直接就业更务实', hint:'+💰 +😊', fn: g => { g.flags.decliningEnrollment=true; return{money:8000,mood:10}; }},
+        { label:'边工作边考', hint:'+🧠 -💪 +💰', fn: g => { g.flags.decliningEnrollment=true; g.flags.workAndStudy=true; return{intel:10,health:-8,money:5000}; }},
+      ]},
+    { id:'phd_mental_health', icon:'🧠', title:'读博心理健康', category:'education',
+      body:'你读博的第3年。\n\n你的状态：\n- 论文被拒了5次\n- 导师对你越来越不满意\n- 同门已经有人退学了\n- 你每天在实验室待12小时，但效率越来越低\n- 你开始失眠、焦虑、怀疑人生\n\n你在深夜刷到一条帖子："读博第4年，我差点没扛过去。"\n\n评论区有人说："你不是一个人。"\n\n"读博最难的不是学术——是心理。每一个博士生都在和自己的精神内耗作斗争。"',
+      cond: g => g.flags.gradSchoolLife && g.age >= 25 && !g.flags.phdMentalHealth,
+      choices:[
+        { label:'寻求心理咨询帮助', hint:'+😊 +💪 +👥', fn: g => { g.flags.phdMentalHealth=true; g.flags.soughtHelp=true; return{mood:15,health:10,social:8}; }},
+        { label:'咬牙坚持，再苦两年', hint:'+🧠 -💪 -😊', fn: g => { g.flags.phdMentalHealth=true; g.flags.grimPersevere=true; return{intel:10,health:-15,mood:-15}; }},
+        { label:'退学，生命比学位重要', hint:'+😊 +💪 -🧠', fn: g => { g.flags.phdMentalHealth=true; g.flags.phdQuit=true; return{mood:20,health:15,intel:-5}; }},
+      ]},
+    { id:'lifelong_learning', icon:'🌱', title:'终身学习', category:'education',
+      body:'你40岁了，但你还在学。\n\n你最近学了：\n- 用ChatGPT辅助工作\n- 用Midjourney做设计\n- 用Python自动化日常任务\n- 看Coursera上的AI课程\n\n你的同事说："你都40了，还折腾什么？"\n\n你说："不学就会被淘汰。不是和年轻人竞争——是和时代竞争。"\n\n"终身学习：不是因为好奇——是因为恐惧。恐惧被甩下、恐惧过时、恐惧变成自己曾经嘲笑的那种人。"',
+      cond: g => g.age >= 35 && !g.flags.lifelongLearning && g.intel > 60,
+      choices:[
+        { label:'全面拥抱新技术', hint:'+🧠 +✨ +💪', fn: g => { g.flags.lifelongLearning=true; g.flags.techAdopter=true; return{intel:20,charm:10,health:5,mood:10}; }},
+        { label:'学一门新语言', hint:'+🧠 +✨', fn: g => { g.flags.lifelongLearning=true; g.flags.newLanguage=true; return{intel:18,charm:12}; }},
+        { label:'算了，经验够用了', hint:'+😊 -🧠', fn: g => { g.flags.lifelongLearning=true; return{mood:8,intel:-5}; }},
+      ]},
+    { id:'education_return', icon:'💰', title:'教育投资回报', category:'education',
+      body:'你做了一次教育投资回报分析：\n\n- 本科4年花费：20万，毕业起薪6000/月\n- 硕士+2年花费：30万，毕业起薪10000/月\n- 博士+4年花费：50万，毕业起薪12000/月\n- 留学+1年花费：40万，毕业起薪12000/月\n\n你算了一下：硕士的投资回报期是5年，博士是10年，留学是8年。\n\n但你没算的是：青春、机会成本、心理压力。\n\n"教育投资回报率：用金钱算得出来——但用人生算不出来。"',
+      cond: g => g.age >= 25 && !g.flags.educationReturn,
+      choices:[
+        { label:'继续投资自己（进修）', hint:'-💰 +🧠', fn: g => { g.flags.educationReturn=true; return{money:-30000,intel:15,mood:5}; }},
+        { label:'赚钱比学历重要', hint:'+💰 +😊', fn: g => { g.flags.educationReturn=true; return{money:10000,mood:10}; }},
+        { label:'平衡发展，两手都要抓', hint:'+🧠 +💰', fn: g => { g.flags.educationReturn=true; return{intel:8,money:5000,mood:5}; }},
       ]},
 ];
 
@@ -9025,6 +9187,23 @@ const ACHIEVEMENTS = [
     { id:'cinephile_ach', icon:'🎬', name:'影迷', desc:'享受了一个人的电影', check: g => g.flags.movieNight },
     { id:'festival_goer_ach', icon:'🎵', name:'音乐节达人', desc:'参加了音乐节', check: g => g.flags.musicFestival },
     { id:'bookworm_ach_v2', icon:'📚', name:'读书会成员', desc:'加入了读书会', check: g => g.flags.bookClub },
+    // === v17.0 新增成就（教育体系 + 终身学习） ===
+    { id:'gaokao_retry_ach', icon:'📝', name:'不屈的复读生', desc:'经历了高考复读', check: g => g.flags.gaokaoRetry },
+    { id:'grad_student_ach', icon:'🎓', name:'研究生', desc:'体验了研究生生活', check: g => g.flags.gradSchoolLife },
+    { id:'overseas_scholar_ach', icon:'✈️', name:'海归', desc:'出国留学', check: g => g.flags.studyAbroad },
+    { id:'cert_collector_ach', icon:'📜', name:'证书收集者', desc:'疯狂考证', check: g => g.flags.certMania },
+    { id:'mba_graduate_ach', icon:'💼', name:'MBA毕业生', desc:'完成了在职MBA', check: g => g.flags.partTimeMBA },
+    { id:'involution_survivor_ach', icon:'🌀', name:'内卷幸存者', desc:'经历了教育内卷', check: g => g.flags.involutionEdu },
+    { id:'tiger_parent_ach_v2', icon:'🐯', name:'鸡娃家长', desc:'成为了鸡娃家长', check: g => g.flags.tigerParent },
+    { id:'school_house_ach', icon:'🏠', name:'学区房业主', desc:'买了学区房', check: g => g.flags.schoolDistrictHouse },
+    { id:'slow_living_ach', icon:'🐌', name:'慢就业青年', desc:'选择了慢就业', check: g => g.flags.slowEmployment },
+    { id:'gap_year_ach', icon:'🌍', name:'间隔年旅行者', desc:'给自己放了一个间隔年', check: g => g.flags.gapYear },
+    { id:'craftsman_ach', icon:'🔧', name:'手艺人', desc:'学了职业技术', check: g => g.flags.vocationalEdu },
+    { id:'whistleblower_ach', icon:'⚖️', name:'学术正义者', desc:'举报了学术不端', check: g => g.flags.whistleblower },
+    { id:'self_study_ach', icon:'📖', name:'自考勇士', desc:'通过成人自考提升学历', check: g => g.flags.adultSelfExam },
+    { id:'self_taught_ach', icon:'💻', name:'自学成才', desc:'通过B站自学编程', check: g => g.flags.selfTaughtCoder },
+    { id:'lifelong_learner_ach', icon:'🌱', name:'终身学习者', desc:'40岁仍在学习新技能', check: g => g.flags.lifelongLearning },
+    { id:'phd_survivor_ach', icon:'🔬', name:'博士幸存者', desc:'熬过了博士心理健康危机', check: g => g.flags.phdMentalHealth },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -9286,6 +9465,12 @@ const ENDINGS = [
     // --- v16.3 NEW ENDINGS (文化娱乐) ---
     { id:'cultural_life_end', badge:'🎭', title:'文艺生活家', desc:'你把大城市的文化生活过成了日常。\n\n你是剧本杀常客、脱口秀爱好者、读书会领读人、音乐节参与者。你的周末永远排满了文化活动。\n\n你的朋友圈不是美食就是演出。有人说你「活得像个文化人」。你说：「我只是活得像个好奇的人。」\n\n你的书架上有200本书、你的电影票根有100多张、你的剧本杀角色有30多个。每一个都是一段不同的体验。\n\n"文艺生活：不是在消费文化——是在用文化丰富自己的人生。"', cond: g => g.flags.bookClub && g.flags.standupComedy && g.flags.musicFestival && g.flags.scriptMurder && g.intel >= 65 && g.mood >= 65 && g.age >= 25 },
     { id:'social_entertainer_end', badge:'🎉', title:'社交组织者', desc:'你成了朋友圈里的社交灵魂。\n\n你组织了无数次桌游之夜、密室逃脱、剧本杀、KTV。你的朋友们说：「没有你的局不叫局。」\n\n你的微信群有500个人，每周至少组一次局。你认识的人比你记得的名字还多。\n\n你的一个朋友说：「你怎么认识这么多人？」你说：「不是我认识的人多——是我珍惜每一次遇见。」\n\n"社交组织者：不是爱热闹——是害怕朋友们变得疏远。每一次聚会，都是在缝合人与人之间的距离。"', cond: g => g.flags.gameOrganizer && g.flags.scriptMurder && g.flags.escapeRoom && g.social >= 80 && g.age >= 25 },
+    // --- v17.0 教育结局 ---
+    { id:'education_master_end', badge:'🎓', title:'学术大牛', desc:'你从本科一路读到博士，发了10篇顶刊，成了某领域的专家。\n\n你的论文被引用了500次，你的学生叫你"老板"。你在国际会议上用流利的英语做报告，台下的人认真记笔记。\n\n你妈终于可以在亲戚面前抬起头了："我儿子/女儿是大学教授。"\n\n你站在讲台上，看着台下20岁的学生们。你想起了当年那个迷茫的自己。\n\n"学术的路很孤独，但每一步都是向着真理前进。"', cond: g => g.flags.gradSchoolLife && g.flags.paperPublished && g.intel >= 90 && g.age >= 32 },
+    { id:'lifelong_learner_end_v2', badge:'🌱', title:'终身学习者', desc:'你没有高学历，但你从未停止学习。\n\n你考了5个专业证书、学了2门外语、读了500本书、上了20门在线课程。你的书房堆满了教材，你的Kindle里还有30本未读完的书。\n\n你的同事说："你怎么什么都会？"你说："不是我都会——是我一直在学。"\n\n40岁的你，比25岁的自己更有价值。因为你从未停止成长。\n\n"终身学习：不是为了超越别人——是为了超越昨天的自己。"', cond: g => g.flags.lifelongLearning && g.flags.certMania && g.intel >= 85 && g.age >= 38 },
+    { id:'vocational_master_end', badge:'🔧', title:'大国工匠', desc:'你没有走学历路线，而是选择了手艺。\n\n你从学徒做到了师傅，从师傅做到了行业标杆。你的技术在这个城市无人能敌。别人搞不定的问题，你一看就知道毛病在哪。\n\n你的月薪从3000涨到了3万。那些当年嘲笑你"不读书"的同学，现在来找你修车/修水管/装修房子。\n\n你说："读书是一种出路，手艺也是一种出路。路不同，但都能到达终点。"\n\n"手艺人：用双手创造生活，用技术赢得尊重。"', cond: g => g.flags.vocationalEdu && g.flags.craftSkill && g.money >= 100000 && g.age >= 30 },
+    { id:'study_returnee_end', badge:'✈️', title:'海归精英', desc:'你出国留学后回国了。\n\n你进了一家外企/大厂，年薪50万。你的英语流利、视野开阔、做事方式和国际接轨。\n\n但你也发现：国内的工作节奏和国外完全不同。你的同事觉得你"太洋气"，你的老板觉得你"不够接地气"。\n\n你在两种文化之间找到了平衡点。你用国际化的方式解决了本地化的问题。\n\n"海归：不是回来镀金——是回来做事。"', cond: g => g.flags.studyAbroad && g.money >= 200000 && g.intel >= 80 && g.age >= 28 },
+    { id:'education_reformer_end', badge:'📚', title:'教育革新者', desc:'你经历了教育的内卷，也见证了教育的困境。\n\n你决定做一些改变：你办了一所创新学校/做了一个教育公众号/写了一本教育畅销书。你的理念是"让教育回归本质——培养人，而不是筛选人"。\n\n你的学生/读者/粉丝说："是你改变了我对教育的看法。"\n\n你没有改变整个体制，但你改变了一些人的命运。\n\n"教育改革：不是推翻一切——是在废墟上种花。"', cond: g => g.flags.involutionEdu && g.flags.antiInvolution && g.intel >= 75 && g.social >= 60 && g.age >= 32 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
@@ -9663,6 +9848,7 @@ function applySeasonEffects(season) {
 
 function pickEvent() {
     // v8.0: 事件冷却去重 - 最近15个事件不会重复出现
+    // v17.0: 事件类别多样性 - 优先选择最近较少触发的类别
     const cityEvents = CITIES[G.city]?.events || [];
     const allEvents = [...EVENTS, ...cityEvents];
     const recentSet = new Set(G.recentEventIds || []);
@@ -9675,13 +9861,27 @@ function pickEvent() {
         (!e.cond || e.cond(G)) && (!e.minAge || G.age>=e.minAge) && (!e.maxAge || G.age<=e.maxAge)
     );
     if (!pool.length) return null;
+    // v17.0: 类别权重优化 - 有category标签的事件，如果该类别最近触发过，降低权重
+    if (!G.recentCategories) G.recentCategories = [];
     const weighted = [];
-    pool.forEach(e => { for(let i=0;i<(e.weight||1);i++) weighted.push(e); });
+    pool.forEach(e => {
+        let w = e.weight || 1;
+        // v17.0: 如果事件有类别且该类别最近触发过，权重减半
+        if (e.category && G.recentCategories.includes(e.category)) {
+            w = Math.max(1, Math.floor(w * 0.5));
+        }
+        for(let i=0;i<w;i++) weighted.push(e);
+    });
     const picked = weighted[Math.floor(Math.random()*weighted.length)];
     // v8.0: 记录已见事件（保留最近15个）
     if (!G.recentEventIds) G.recentEventIds = [];
     G.recentEventIds.push(picked.id);
     if (G.recentEventIds.length > 15) G.recentEventIds.shift();
+    // v17.0: 记录事件类别（保留最近8个）
+    if (picked.category) {
+        G.recentCategories.push(picked.category);
+        if (G.recentCategories.length > 8) G.recentCategories.shift();
+    }
     return picked;
 }
 
