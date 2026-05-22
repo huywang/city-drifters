@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v6.8
+// 都市浮生记 - Game Engine v6.9
 // ============================================
 
 // === GAME STATE ===
@@ -3378,6 +3378,34 @@ const EVENTS = [
         { label:'组织主题露营', hint:'+👥 +✨', fn: g => { g.flags.outdoorCommunity=true; g.flags.eventOrganizer=true; return{social:12,charm:10,mood:12}; }},
         { label:'只参加活动', hint:'+👥 +😊', fn: g => { g.flags.outdoorCommunity=true; return{social:8,mood:10}; }},
       ]},
+    // === v6.9 EVENTS - 考研热降温与断亲 ===
+    { id:'graduate_exam', icon:'🎓', title:'考研还是就业',
+      body:'你站在人生的十字路口：考研还是就业？\n\n看了看数据：2025年考研报名388万人，较2023年高点减少86万，连续两年下降。\n\n"考研热降温——从'盲目跟风'到'理性回归'。"\n\n你的成本计算：\n- 时间成本：备考6-12个月，读研3年\n- 经济成本：专硕学费2-8万/年，生活费\n- 机会成本：本科应届生起薪5862元，读研3年少赚21万\n\n"研究生学历=高薪"的关联正在弱化。一线城市互联网、金融行业的"研究生溢价"从35%降至18%。\n\n"考研不是必经之路，而是需要认真计算的投资。"\n\n但你也在思考：学历贬值是泡沫破灭，还是价值回归？',
+      cond: g => !g.flags.graduateExam && g.age>=21 && g.age<=25 && g.intel>=50,
+      choices:[
+        { label:'全力考研', hint:'-💰 +🧠', fn: g => { g.flags.graduateExam=true; if(Math.random()>0.7){g.flags.graduateStudent=true; return{money:-15000,intel:15,mood:20}}else{return{money:-15000,intel:8,mood:-15}} }},
+        { label:'边工作边考', hint:'+💰 +🧠 -😊', fn: g => { g.flags.graduateExam=true; if(Math.random()>0.8){g.flags.graduateStudent=true; return{money:5000,intel:10,mood:15}}else{return{money:5000,intel:5,mood:-10,health:-5}} }},
+        { label:'直接就业', hint:'+💰 +🧠', fn: g => { g.flags.graduateExam=true; g.flags.directEmployment=true; return{money:8000,intel:5,mood:5}; }},
+        { label:'考公务员', hint:'+🧠', fn: g => { g.flags.graduateExam=true; if(Math.random()>0.85){g.flags.civilServant=true; return{intel:10,mood:25}}else{return{intel:5,mood:-8}} }},
+      ]},
+    { id:'cut_family_ties', icon:'🔪', title:'断亲',
+      body:'春节回家，你发现：你不想走亲戚了。\n\n"断亲——年轻人主动切断与部分亲戚的联系，拒绝无效社交。"\n\n你的理由：\n- 亲戚问工资、问对象、问买房，让你压力山大\n- 一年见一次，没有共同话题，只有尴尬的寒暄\n- 红包、礼物、人情往来，经济负担重\n- 价值观差异大，聊天容易吵架\n\n"断亲不是不孝，而是选择性地维护亲密关系。"\n\n你开始：\n- 不去远房亲戚家拜年\n- 不参加家族聚会\n- 只和父母、核心家庭成员保持联系\n- 用"忙"作为借口\n\n"年轻人不是不想社交，而是不想在无效社交上浪费时间。"\n\n但你也看到了问题：父母不理解、亲戚说你"冷漠"、家族关系疏远。',
+      cond: g => !g.flags.cutFamilyTies && g.age>=22 && g.age<=35,
+      choices:[
+        { label:'彻底断亲', hint:'+😊 +💰', fn: g => { g.flags.cutFamilyTies=true; g.flags.fullCut=true; return{mood:12,money:3000,social:-8}; }},
+        { label:'选择性断亲', hint:'+😊 +👥', fn: g => { g.flags.cutFamilyTies=true; g.flags.selectiveCut=true; return{mood:10,social:5}; }},
+        { label:'表面应付', hint:'+👥', fn: g => { g.flags.cutFamilyTies=true; g.flags.surfaceOnly=true; return{social:3,mood:-5}; }},
+        { label:'坚持走亲戚', hint:'+👥 +😊', fn: g => { g.flags.cutFamilyTies=true; g.flags.traditional=true; return{social:10,mood:5,money:-2000}; }},
+      ]},
+    { id:'temple_economy', icon:'🏯', title:'烧香拜佛',
+      body:'你去了趟寺庙：雍和宫、灵隐寺、法喜寺。\n\n"寺庙经济——年轻人不追星了，改追'佛祖'。"\n\n你买了：\n- 门票：20-50元\n- 香：10-100元\n- 手串：200-500元（开光版）\n- 祈福牌：50-200元\n\n"在上班和上进之间，选择了上香；在求人和求己之间，选择了求佛。"\n\n2025年，寺庙游客中，90后、00后占比超过60%。\n\n"年轻人不是迷信，而是在不确定的时代，寻找一点心理安慰。"\n\n你在祈福牌上写下：事业顺利、身体健康、脱单。\n\n但你也在思考：如果佛祖真的灵验，为什么还有这么多人焦虑？',
+      cond: g => !g.flags.templeEconomy && g.age>=20 && g.age<=35 && g.mood<70,
+      choices:[
+        { label:'深度体验', hint:'-💰 +😊 +🧠', fn: g => { g.flags.templeEconomy=true; g.flags.templeFan=true; return{money:-500,mood:18,intel:5}; }},
+        { label:'买手串转运', hint:'-💰 +😊 +✨', fn: g => { g.flags.templeEconomy=true; g.flags.braceletCollector=true; return{money:-300,mood:12,charm:5}; }},
+        { label:'写祈福牌', hint:'-💰 +😊', fn: g => { g.flags.templeEconomy=true; return{money:-100,mood:10}; }},
+        { label:'不信这个', hint:'+🧠', fn: g => { g.flags.templeEconomy=true; return{intel:3,mood:-3}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3669,6 +3697,11 @@ const ACHIEVEMENTS = [
     { id:'outdoor_enthusiast', icon:'⛰️', name:'户外爱好者', desc:'参与户外运动', check: g => g.flags.outdoorSports },
     { id:'hiker_pro', icon:'🥾', name:'徒步达人', desc:'开始徒步', check: g => g.flags.hiker },
     { id:'community_leader', icon:'👥', name:'社群领袖', desc:'成为户外社群主理人', check: g => g.flags.communityLeader },
+    // v6.9 achievements
+    { id:'graduate_student', icon:'🎓', name:'研究生', desc:'考上研究生', check: g => g.flags.graduateStudent },
+    { id:'rational_choice', icon:'🧠', name:'理性选择者', desc:'理性看待考研', check: g => g.flags.graduateExam },
+    { id:'family_cutter', icon:'🔪', name:'断亲青年', desc:'选择断亲', check: g => g.flags.cutFamilyTies },
+    { id:'temple_visitor', icon:'🏯', name:'寺庙常客', desc:'体验烧香拜佛', check: g => g.flags.templeEconomy },
 ];
 
 // === ENDINGS === (order matters: first match wins)
