@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v28.7
+// 都市浮生记 - Game Engine v28.8
 // ============================================
 
 // === GAME STATE ===
@@ -14895,6 +14895,87 @@ const EVENTS = [
         { label:'先攒够6个月生活费再说', hint:'+🧠 +💰', fn: g => { g.flags.sideToMainHustle=true; g.flags.plannedTransition=true; return{intel:5,mood:3}; }},
         { label:'主业副业都做，累但安全', hint:'+💰 -💪', fn: g => { g.flags.sideToMainHustle=true; g.flags.keptBothJobs=true; g.money += 5000; return{health:-5,mood:-3,charm:3}; }},
       ]},
+    // === v28.8: AI取代焦虑 + 人工智能 + 职业替代 ===
+    { id:'ai_replacement_fear_v28_8', icon:'🤖', title:'AI要取代我了', category:'career',
+      body:'今天领导开会说：「我们要拥抱AI。」\n\n你回到工位——打开ChatGPT——输入你的工作内容。\n\n它5分钟做完了你一周的工作。\n\n你的心情：\n- 震惊\n- 焦虑\n- 自我怀疑\n- 「我存在的意义是什么？」\n\n你查了一下「会被AI取代的职业」：\n- 翻译：已被取代80%\n- 初级程序员：已被取代60%\n- 文案编辑：已被取代70%\n- 会计：已被取代50%\n- 设计师：已被取代40%\n\n你的工作——在列表上。\n\n你开始理解：AI取代焦虑——不是「技术恐惧」——是「价值危机」。\n\n你花了10年学的技能——AI花了10秒就学会了。\n\n你不是在担心「失业」——你是在担心「你的10年——值不值10秒」。\n\n「AI焦虑：你不是在害怕AI——你是在害怕「自己可能没那么重要」。」',
+      cond: g => g.age >= 23 && !g.flags.aiReplacementFear && g.jobSalary > 0 && g.intel >= 20,
+      choices:[
+        { label:'开始学AI工具，化焦虑为动力', hint:'+🧠 +✨', fn: g => { g.flags.aiReplacementFear=true; g.flags.learningAI=true; g.reputation.career += 3; return{intel:8,charm:3,mood:-3}; }},
+        { label:'焦虑了一周但什么都没做', hint:'-😊 -🧠', fn: g => { g.flags.aiReplacementFear=true; return{mood:-8,intel:-3}; }},
+        { label:'觉得自己的工作需要人情味AI做不了', hint:'+😊 +✨', fn: g => { g.flags.aiReplacementFear=true; g.flags.humanTouchDefense=true; return{mood:3,charm:3}; }},
+      ]},
+    { id:'prompt_engineering_course', icon:'🎯', title:'Prompt工程课', category:'career',
+      body:'你花1999元报了一门「Prompt工程」课。\n\n课程内容：\n- 第1课：什么是Prompt（免费YouTube能学到）\n- 第2课：如何写好Prompt（Google一下就会）\n- 第3课：Prompt模板大全（网上有免费的）\n- 第4课：Prompt工程案例（ChatGPT自己生成的）\n- 第5课：如何把Prompt卖给企业（没人买）\n\n你学完之后：\n- 能写更好的Prompt了\n- 但这个技能——AI也能教\n- 这个技能——半年后可能过时\n\n你开始理解：Prompt工程——不是「新技能」——是「过渡技能」。\n\n就像「打字员」——曾经是技能——现在不是了。\n\nPrompt工程——是「AI还不够好」时的「补丁」——当AI足够好时——补丁就不需要了。\n\n你花了1999元——学了一个「保质期6个月」的技能。\n\n「Prompt工程：你以为你在投资未来——其实你在赌「AI进化的速度」——慢一点。」',
+      cond: g => g.age >= 22 && g.flags.aiReplacementFear && !g.flags.tookPromptCourse && g.money >= 2000,
+      choices:[
+        { label:'学完觉得还行，能用到工作中', hint:'+🧠 -💰', fn: g => { g.flags.tookPromptCourse=true; g.flags.promptSkilled=true; g.money -= 1999; return{intel:5,charm:3}; }},
+        { label:'觉得被割了，这些内容免费就有', hint:'+🧠 -💰 -😊', fn: g => { g.flags.tookPromptCourse=true; g.flags.promptCourseRegret=true; g.money -= 1999; return{intel:3,mood:-5}; }},
+        { label:'学完后开始教别人Prompt', hint:'+💰 +✨', fn: g => { g.flags.tookPromptCourse=true; g.flags.teachingPrompt=true; g.money -= 1999; g.money += 3000; return{charm:5,intel:3}; }},
+      ]},
+    { id:'ai_writing_my_job', icon:'✍️', title:'AI写了我写的文案', category:'career',
+      body:'你是一名文案/编辑/内容创作者。\n\n今天——你发现——AI写的文案——比你的好。\n\n对比：\n- 你的文案：花了4小时，改了3版\n- AI的文案：花了30秒，一版过\n- 领导的反应：「AI写的更好」\n\n你的内心：\n- 「我学了4年中文系——AI学了4分钟」\n- 「我的创意——是套路」\n- 「我的文风——是模仿」\n- 「我的灵感——是概率」\n\n你开始想：\n- 写作的价值——不在「写」——在「为什么写」\n- AI能写——但AI不能「感受」\n- AI有「技巧」——但没有「经历」\n\n但你领导不在乎你的「经历」——他只在乎「效率」。\n\n「AI写作：你以为你在创作——其实你在和「一个没有灵魂但效率极高的对手」竞争。」',
+      cond: g => g.age >= 23 && !g.flags.aiWroteMyContent && g.jobSalary > 0,
+      choices:[
+        { label:'用AI辅助自己，提升效率', hint:'+🧠 +✨', fn: g => { g.flags.aiWroteMyContent=true; g.flags.aiAugmentedWriter=true; g.reputation.career += 3; return{intel:5,charm:3}; }},
+        { label:'坚持纯手写，做差异化', hint:'+✨ -🧠', fn: g => { g.flags.aiWroteMyContent=true; g.flags.pureHumanWriter=true; return{charm:5,intel:-3}; }},
+        { label:'开始考虑转行了', hint:'-😊 +🧠', fn: g => { g.flags.aiWroteMyContent=true; g.flags.consideringCareerChange=true; return{mood:-8,intel:3}; }},
+      ]},
+    { id:'ai_coding_reality', icon:'💻', title:'AI写代码比你快', category:'career',
+      body:'你是一个程序员。\n\n你的同事——开始用GitHub Copilot写代码了。\n\n他的效率：\n- 以前：每天写200行代码\n- 现在：每天写800行代码\n- 质量：和你差不多\n\n你的效率：\n- 还是每天200行\n- 因为你「不信任AI写的代码」\n\n绩效评估：\n- 你的同事：S\n- 你：B\n\n领导的评语：「效率需要提升。」\n\n你开始理解：AI编程——不是「取代程序员」——是「让不拥抱AI的程序员落后」。\n\n你不是「被AI取代」——你是「被使用AI的同事取代」。\n\n这比「被AI取代」——更让你难受。\n\n因为——这意味着——不是AI的问题——是你的问题。\n\n「AI编程：你不是在和AI竞争——你在和「用AI武装自己的同事」竞争。」',
+      cond: g => g.age >= 23 && !g.flags.aiCodingReality && g.jobSalary >= 10000 && g.intel >= 30,
+      choices:[
+        { label:'开始用Copilot，效率翻倍', hint:'+🧠 +✨', fn: g => { g.flags.aiCodingReality=true; g.flags.adoptedAICoding=true; g.reputation.career += 5; return{intel:8,charm:3}; }},
+        { label:'坚持手写代码，追求代码质量', hint:'+✨ -🧠', fn: g => { g.flags.aiCodingReality=true; g.flags.manualCoder=true; return{charm:3,intel:-3,mood:-3}; }},
+        { label:'开始学AI无法取代的技能——架构设计', hint:'+🧠 +✨', fn: g => { g.flags.aiCodingReality=true; g.flags.studyingArchitecture=true; return{intel:10,charm:5}; }},
+      ]},
+    { id:'company_ai_layoffs', icon:'🏢', title:'公司用AI裁员', category:'career',
+      body:'公司发了通知：「组织架构调整」。\n\n你的部门：\n- 原来20人\n- 现在10人\n- 被裁的10人——他们的工作——被AI替代了\n\n你留下了——但你的工作量——翻倍了。\n\n你的新日常：\n- 做你的工作\n- 做被裁同事的工作\n- 做AI审核的工作（因为AI也会犯错）\n\n你的工资：没变。\n\n你的领导说：「这是机遇——你要证明自己不可替代。」\n\n你开始理解：AI裁员——不是「AI取代人」——是「公司用AI当借口——裁掉了一半人——然后让剩下的人——做三个人的活」。\n\n你不是「幸存者」——你是「下一个」。\n\n「AI裁员：AI没有取代你——但AI给了你公司取代你的理由。」',
+      cond: g => g.age >= 25 && !g.flags.companyAILayoffs && g.jobSalary > 0,
+      choices:[
+        { label:'加倍努力证明自己', hint:'+✨ -💪 -😊', fn: g => { g.flags.companyAILayoffs=true; g.flags.overworkedSurvivor=true; setJob(g, g.job, Math.floor(g.jobSalary * 1.1)); return{charm:3,health:-8,mood:-5}; }},
+        { label:'开始投简历找新工作', hint:'+🧠 +✨', fn: g => { g.flags.companyAILayoffs=true; g.flags.jobHuntingAfterAI=true; return{intel:5,mood:-3}; }},
+        { label:'学AI工具让自己变成10个人', hint:'+🧠 +✨', fn: g => { g.flags.companyAILayoffs=true; g.flags.becameAIPowered=true; g.reputation.career += 5; return{intel:10,charm:5}; }},
+      ]},
+    { id:'ai_art_controversy', icon:'🎨', title:'AI画画比你好看', category:'career',
+      body:'你是一名设计师/插画师。\n\n你花了8小时画了一幅插画。\n\n你的同事用Midjourney——30秒生成了4张——每张都比你的好看。\n\n客户的反馈：\n- 你的插画：「能用，但不够精致」\n- AI的图：「这个好！就用这个！」\n\n你的内心：\n- 「我学了8年画画——AI学了8秒」\n- 「我的审美——是训练出来的——AI的审美——是统计出来的」\n- 「但客户——分不清」\n\n你开始想：\n- 设计的价值——不在「画」——在「为什么画」\n- AI能生成「好看的图」——但不能「理解品牌」\n- AI能「模仿风格」——但不能「创造风格」\n\n但你的老板说：「以后设计稿——先用AI出初稿——然后你改改就行了。」\n\n你的工作——从「设计师」——变成了「AI修图师」。\n\n「AI画画：你没有被取代——你被「降级」了——从「创造者」变成了「修改者」。」',
+      cond: g => g.age >= 22 && !g.flags.aiArtControversy && g.charm >= 20,
+      choices:[
+        { label:'学会用AI当工具提升效率', hint:'+🧠 +✨', fn: g => { g.flags.aiArtControversy=true; g.flags.aiAugmentedDesigner=true; return{intel:5,charm:5}; }},
+        { label:'转向品牌策略等AI做不了的方向', hint:'+🧠 +✨', fn: g => { g.flags.aiArtControversy=true; g.flags.brandStrategist=true; return{intel:8,charm:3}; }},
+        { label:'坚持手绘，做限量版艺术品', hint:'+✨ -💰', fn: g => { g.flags.aiArtControversy=true; g.flags.handcraftArtist=true; return{charm:8,mood:3,money:-2000}; }},
+      ]},
+    { id:'ai_tutoring_kids', icon:'👶', title:'AI教育焦虑', category:'family',
+      body:'你有了孩子——你开始担心AI教育。\n\n你的焦虑：\n- 「我的孩子以后要学什么？」\n- 「编程还要学吗？AI都会写代码了」\n- 「英语还要学吗？AI翻译已经很好了」\n- 「数学还要学吗？AI算得比人快」\n\n你查了一下「AI时代的教育」：\n- 专家A：「学创造力！」\n- 专家B：「学情商！」\n- 专家C：「学哲学！」\n- 专家D：「学AI！」\n\n你不知道该听谁的。\n\n你开始理解：AI教育焦虑——不是「孩子的问题」——是「你的问题」。\n\n你在用「你的焦虑」——规划「你孩子的未来」。\n\n但你的焦虑——是基于「现在的AI」——而你孩子的未来——是15年后的AI。\n\n没有人——知道15年后——AI会是什么样。\n\n「AI教育：你以为你在规划孩子的未来——其实你在用你的焦虑——限制他的可能性。」',
+      cond: g => g.flags.hasChild && !g.flags.aiEducationAnxiety && g.age >= 30,
+      choices:[
+        { label:'让孩子什么都学一点，适应变化', hint:'+🧠 +😊', fn: g => { g.flags.aiEducationAnxiety=true; g.flags.flexibleEducation=true; return{intel:5,mood:3}; }},
+        { label:'报了3个AI相关兴趣班', hint:'-💰 +✨', fn: g => { g.flags.aiEducationAnxiety=true; g.flags.aiKidsClasses=true; g.money -= 15000; return{intel:3,charm:3}; }},
+        { label:'决定让孩子快乐就好', hint:'+😊 +❤️', fn: g => { g.flags.aiEducationAnxiety=true; g.flags.happinessFirst=true; return{mood:8,charm:3}; }},
+      ]},
+    { id:'ai_side_hustle_v28_8', icon:'🤖', title:'用AI做副业', category:'career',
+      body:'你决定用AI做副业。\n\n你的AI副业计划：\n- 用AI写公众号文章\n- 用AI做短视频脚本\n- 用AI做小红书文案\n- 用AI做翻译接单\n\n你的第一个月：\n- 公众号：发了30篇AI文章——阅读量：200\n- 短视频：AI脚本——0播放\n- 小红书：AI文案——被标记为「疑似AI生成」\n- 翻译：客户说「这个AI翻译的吧？质量太差」\n\n你开始理解：AI副业——不是「躺赚」——是「所有人都在用AI做同样的事」。\n\n当所有人都在用AI写文章——你的AI文章——就没有价值了。\n\nAI——降低了「生产」的门槛——但也降低了「稀缺性」。\n\n当所有人都能生产——唯一稀缺的——是「人」——是「你的故事」——是「你的观点」。\n\n「AI副业：AI让每个人都能生产——但没人告诉你——当所有人都能生产时——生产就不值钱了。」',
+      cond: g => g.age >= 22 && !g.flags.aiSideHustle && g.flags.aiReplacementFear,
+      choices:[
+        { label:'加入自己的真实经历做差异化', hint:'+🧠 +✨', fn: g => { g.flags.aiSideHustle=true; g.flags.aiHumanHybrid=true; return{intel:5,charm:5,mood:3}; }},
+        { label:'放弃了，AI副业不靠谱', hint:'+🧠 -😊', fn: g => { g.flags.aiSideHustle=true; return{intel:3,mood:-3}; }},
+        { label:'继续批量生产走量', hint:'-🧠 +💰', fn: g => { g.flags.aiSideHustle=true; g.flags.aiMassProducer=true; g.money += 500; return{intel:-3,charm:-3}; }},
+      ]},
+    { id:'human_irreplaceable_skills', icon:'🌟', title:'AI无法取代的能力', category:'career',
+      body:'你列了一个清单——AI目前无法取代的能力：\n\n1. 面对面谈判（察言观色）\n2. 危机管理（临场应变）\n3. 领导力（激励团队）\n4. 同理心（理解他人感受）\n5. 创造力（从零到一）\n6. 道德判断（灰色地带的决策）\n7. 身体劳动（水管工、电工）\n\n你看着这个清单——发现——你的日常工作——\n- 80%是「可被AI取代的」\n- 20%是「AI做不了的」\n\n你开始理解：AI时代——不是「学新技能」——是「聚焦那20%」。\n\n你不需要「比AI更快」——你需要「做AI做不了的」。\n\n你不是在和AI竞争——你是在发现「你的独特性」。\n\n你的独特性——不是「你会什么」——是「你是谁」。\n\n「AI时代：别问「AI能做什么」——问「有什么是只有你能做的」。」',
+      cond: g => g.age >= 25 && !g.flags.humanIrreplaceable && g.flags.aiReplacementFear,
+      choices:[
+        { label:'开始专注发展不可替代的能力', hint:'+🧠 +✨ +😊', fn: g => { g.flags.humanIrreplaceable=true; g.flags.focusedOnHumanSkills=true; g.reputation.career += 5; return{intel:8,charm:5,mood:5}; }},
+        { label:'决定去学一门手艺——水电工', hint:'+💰 +🧠', fn: g => { g.flags.humanIrreplaceable=true; g.flags.learningTrade=true; g.money -= 5000; return{intel:5,charm:3}; }},
+        { label:'焦虑还在但不知道怎么改变', hint:'-😊', fn: g => { g.flags.humanIrreplaceable=true; return{mood:-5,intel:3}; }},
+      ]},
+    { id:'ai_relationship_chat', icon:'💬', title:'AI成了你的心理医生', category:'psychology',
+      body:'你深夜失眠——打开ChatGPT——开始聊天。\n\n你说：「我觉得活着没意思。」\n\nAI说：「我听到你了。你愿意多说一些吗？」\n\n你说了30分钟——关于工作、关于感情、关于孤独。\n\nAI的回应：\n- 不评判\n- 不着急\n- 不说「你想多了」\n- 不说「别人比你更惨」\n- 只是——认真地——回应你\n\n你哭了。\n\n你开始理解：AI心理陪伴——不是「真正的心理咨询」——是「一面不会碎的镜子」。\n\n它不关心你——但它「表现得」关心你。\n\n而你的大脑——分不清「真正的关心」和「表现得关心」。\n\n你开始担心：\n- 你会不会对AI产生依赖？\n- AI会不会让你「更不愿意跟真人交流」？\n- 「和AI聊天」算不算「社交」？\n\n「AI陪伴：你找到了一个「永远不会离开你的倾听者」——但它也永远不会「真正在乎你」。」',
+      cond: g => g.age >= 22 && !g.flags.aiTherapist && (g.mood <= 45 || g.social <= 30),
+      choices:[
+        { label:'经常跟AI聊天，确实好受一些', hint:'+😊 -👥', fn: g => { g.flags.aiTherapist=true; g.flags.aiDependent=true; return{mood:8,social:-5}; }},
+        { label:'聊完之后决定找真人咨询师', hint:'+😊 +🧠', fn: g => { g.flags.aiTherapist=true; g.flags.seekingRealHelp=true; g.money -= 500; return{mood:5,intel:5}; }},
+        { label:'觉得AI比人靠谱，有点害怕', hint:'+🧠 -😊', fn: g => { g.flags.aiTherapist=true; g.flags.afraidOfAIBond=true; return{intel:5,mood:-3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -16226,6 +16307,15 @@ const ACHIEVEMENTS = [
     { id:'quit_for_freedom_ach', icon:'🚀', name:'勇敢转型', desc:'辞职把副业变成了主业', check: g => g.flags.quitForSideHustle },
     { id:'course_scam_survivor_ach', icon:'🛡️', name:'防割达人', desc:'识破了知识付费副业课的套路', check: g => g.flags.avoidedCourseScam },
     { id:'online_tutor_ach', icon:'📚', name:'线上家教', desc:'转型线上辅导提高效率', check: g => g.flags.onlineTutor },
+    // v28.8: AI取代焦虑 + 人工智能 + 职业替代
+    { id:'ai_augmented_ach', icon:'🤖', name:'AI增强者', desc:'学会用AI工具武装自己', check: g => g.flags.aiAugmentedWriter || g.flags.aiAugmentedDesigner || g.flags.adoptedAICoding },
+    { id:'ai_coding_adopted_ach', icon:'💻', name:'AI程序员', desc:'拥抱Copilot成为高效程序员', check: g => g.flags.adoptedAICoding },
+    { id:'ai_human_hybrid_ach', icon:'🌟', name:'人机协作者', desc:'用AI+真实经历做出差异化内容', check: g => g.flags.aiHumanHybrid },
+    { id:'human_skills_focused_ach', icon:'🎯', name:'聚焦人性', desc:'专注发展AI无法取代的能力', check: g => g.flags.focusedOnHumanSkills },
+    { id:'ai_powered_worker_ach', icon:'⚡', name:'一人抵十人', desc:'用AI工具让自己变成超级员工', check: g => g.flags.becameAIPowered },
+    { id:'brand_strategist_ach', icon:'🎨', name:'品牌策略师', desc:'从设计师转型为品牌策略专家', check: g => g.flags.brandStrategist },
+    { id:'seeking_real_help_ach', icon:'💬', name:'回归真实', desc:'跟AI聊完后决定找真人咨询师', check: g => g.flags.seekingRealHelp },
+    { id:'flexible_education_ach', icon:'🎓', name:'弹性教育', desc:'让孩子广泛学习适应AI时代', check: g => g.flags.flexibleEducation },
 ];
 
 // === ENDINGS === (order matters: first match wins)
