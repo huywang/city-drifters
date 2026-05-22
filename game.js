@@ -1460,6 +1460,87 @@ const EVENTS = [
         }},
         { label:'找个借口不去', hint:'+💰 -👥', fn: g => { g.relationships.friends = clamp((g.relationships.friends||40)-5, 0, 100); return{mood:-3,social:-5}; }},
       ]},
+    // === v2.18 MORE EVENTS ===
+    { id:'side_project', icon:'💡', title:'副业想法',
+      body:'你看到一个帖子："程序员下班后靠副业月入3万"。\n\n你心动了：做独立开发？写技术博客？还是做做自媒体？\n\n但你也知道：副业听起来很美，做起来很难。\n\n"副业的真相：用8小时换来的钱，可能还不如加班费。"',
+      cond: g => g.job!=='待业中' && g.intel>55 && g.age>=24 && g.age<=40 && !g.flags.sideHustle,
+      choices:[
+        { label:'开始做副业', hint:'🎲 -❤️ +💰', fn: g => { g.flags.sideHustle=true; if(Math.random()>0.4){return{money:8000,mood:10,health:-5}}else{return{money:-3000,mood:-10,health:-8}} }},
+        { label:'先学习再说', hint:'+🧠', fn: g => ({intel:8,mood:3}) },
+        { label:'算了，太累了', hint:'+❤️', fn: g => ({health:5,mood:-3}) },
+      ]},
+    { id:'work_burnout_warning', icon:'⚠️', title:'身体警报',
+      body:'你在工位上突然感到一阵眩晕。心跳加速，眼前发黑。\n\n你赶紧坐下来休息，过了几分钟才缓过来。\n\n同事关心地问："你没事吧？要不要去医院？"\n\n"身体发出的警报，比任何KPI都重要。"',
+      cond: g => g.health<40 && g.job!=='待业中' && g.consecutiveOvertime>6,
+      choices:[
+        { label:'去医院检查', hint:'-💰 +❤️', fn: g => ({money:-2000,health:15,mood:5}) },
+        { label:'请假休息几天', hint:'+❤️ -💰', fn: g => ({health:20,mood:10,money:-3000}) },
+        { label:'撑一撑就过去了', hint:'-❤️ -❤️', fn: g => ({health:-15,mood:-10}) },
+      ]},
+    { id:'investment_opportunity', icon:'📈', title:'投资机会',
+      body:'朋友给你推荐了一个投资项目：年化收益15%，说是稳赚不赔。\n\n你有点心动，但也有点怀疑：真有这种好事？\n\n"投资有风险，入市需谨慎。但最大的风险是——什么都不投。"\n\n（或者最大的风险是——什么都投。）',
+      cond: g => g.money>30000 && g.intel>45 && !g.flags.invested,
+      choices:[
+        { label:'投10万试试', hint:'🎲 -💰', fn: g => { g.flags.invested=true; if(Math.random()>0.5){return{money:15000,mood:20,intel:5}}else{return{money:-10000,mood:-20}} }},
+        { label:'先学习理财知识', hint:'+🧠', fn: g => ({intel:10,mood:5}) },
+        { label:'不投，太危险了', hint:'+😊', fn: g => ({mood:5}) },
+      ]},
+    { id:'family_pressure', icon:'📞', title:'催婚电话',
+      body:'你妈又来电话了："你都XX岁了，怎么还不找对象？"\n\n"隔壁老李家的儿子都生二胎了。"\n\n"你是不是有什么问题？要不要回来相亲？"\n\n你深吸一口气，默默把手机调成静音。\n\n"催婚是中国家长的必修课——但孩子永远不想上这门课。"',
+      cond: g => g.age>=26 && g.age<=38 && !g.flags.married && !g.flags.hasPartner,
+      choices:[
+        { label:'答应去相亲', hint:'🎲 +👨‍👩‍👧', fn: g => { g.relationships.family = clamp((g.relationships.family||60)+8, 0, 100); if(Math.random()>0.5 && g.charm>40){g.flags.hasPartner=true;g.relationships.partner=40;return{mood:15,social:5}}else{return{mood:-5,money:-200}} }},
+        { label:'解释自己的计划', hint:'+🧠 +👨‍👩‍👧', fn: g => { g.relationships.family = clamp((g.relationships.family||60)+5, 0, 100); return{intel:3,mood:5}; }},
+        { label:'敷衍过去', hint:'-👨‍👩‍👧', fn: g => { g.relationships.family = clamp((g.relationships.family||60)-5, 0, 100); return{mood:-3}; }},
+      ]},
+    { id:'moving_day', icon:'📦', title:'搬家日',
+      body:'你又搬家了。这已经是大城市生活的第N次搬家。\n\n打包行李的时候，你翻出了很多"回忆"：第一份工作的工牌、前女友/男友送的礼物、大学时的笔记……\n\n每一样东西都是一段故事，但你没有空间留下它们全部。\n\n"大城市教会你的第一件事：断舍离。"',
+      cond: g => !g.flags.hasHouse && g.months>12 && g.months%18===0,
+      choices:[
+        { label:'扔掉不需要的东西', hint:'+😊 +🧠', fn: g => ({mood:10,intel:5,health:3}) },
+        { label:'都留着，都是回忆', hint:'-😊', fn: g => ({mood:-5}) },
+        { label:'搬到更好的房子', hint:'-💰 +😊', fn: g => ({money:-5000,mood:15,health:5}) },
+      ]},
+    { id:'weekend_trip', icon:'🏖️', title:'周末短途旅行',
+      body:'你看到朋友圈有人去周边城市玩了：苏州的园林、杭州的西湖、南京的夫子庙……\n\n你心动了：要不要周末也出去玩一趟？\n\n但算了算：高铁票+酒店+吃喝，至少1000块。\n\n"旅行的意义不是去哪里，而是离开这里。"',
+      cond: g => g.job!=='待业中' && g.mood<60 && g.money>5000,
+      choices:[
+        { label:'去！生活需要调剂', hint:'-💰 +😊 +❤️', fn: g => ({money:-1500,mood:20,health:8,charm:3}) },
+        { label:'周边公园走走就好', hint:'+😊 +❤️', fn: g => ({mood:10,health:5}) },
+        { label:'算了，省钱要紧', hint:'+💰 -😊', fn: g => ({money:500,mood:-5}) },
+      ]},
+    { id:'work_anniversary', icon:'🎂', title:'工作周年',
+      body:'今天是你在这家公司工作满X周年的日子。\n\nHR发了一封全员邮件："感谢大家的辛勤付出！"\n\n你的"奖励"是：又老了一岁，又多了几根白发。\n\n"工作的意义是什么？——大概是为了发这条朋友圈。"',
+      cond: g => g.job!=='待业中' && g.months>12 && g.months%12===0,
+      choices:[
+        { label:'发个朋友圈纪念一下', hint:'+✨ +😊', fn: g => ({charm:5,mood:8}) },
+        { label:'请同事们喝奶茶', hint:'-💰 +👥', fn: g => { g.relationships.colleagues = clamp((g.relationships.colleagues||30)+10, 0, 100); return{money:-500,social:8,mood:5}; }},
+        { label:'什么也不做', hint:'', fn: g => ({mood:3}) },
+      ]},
+    { id:'midnight_thoughts', icon:'🌙', title:'深夜思考',
+      body:'凌晨2点，你睡不着。\n\n你开始想：我来大城市到底是为了什么？是为了钱？为了梦想？还是为了证明自己？\n\n你看了看天花板，又看了看手机里的余额。\n\n"深夜的思考最真实，也最没用——因为明天你还是要上班。"',
+      cond: g => g.mood<50 && g.age>=25,
+      choices:[
+        { label:'写日记记录心情', hint:'+🧠 +😊', fn: g => ({intel:5,mood:10}) },
+        { label:'给朋友打电话倾诉', hint:'+👥 +😊', fn: g => { g.relationships.friends = clamp((g.relationships.friends||40)+8, 0, 100); return{social:8,mood:12}; }},
+        { label:'算了，继续刷手机', hint:'-❤️', fn: g => ({health:-5,mood:-3}) },
+      ]},
+    { id:'salary_negotiation', icon:'💰', title:'谈涨薪',
+      body:'你已经在这家公司干了快两年了，但工资只涨了10%。\n\n你决定找老板谈谈涨薪。\n\n老板说："公司现在很困难，等明年再说吧。"\n\n你知道这话你已经听了两遍了。\n\n"涨薪不是求来的，是跳出来的。"',
+      cond: g => g.job!=='待业中' && g.months>18 && g.jobSalary<20000,
+      choices:[
+        { label:'坚持要求涨薪', hint:'🎲', fn: g => { if(Math.random()>0.5){const raise=Math.floor(g.jobSalary*0.2);g.jobSalary+=raise;return{money:raise*3,mood:15}}else{return{mood:-15,social:-5}} }},
+        { label:'准备跳槽', hint:'+💰 +🧠', fn: g => ({intel:5,mood:5,social:3}) },
+        { label:'算了，先这样吧', hint:'-😊', fn: g => ({mood:-10}) },
+      ]},
+    { id:'health_app', icon:'⌚', title:'健康追踪',
+      body:'你买了一个智能手表，开始追踪健康数据。\n\n步数：3000步（目标是10000）\n睡眠：5小时（目标是8小时）\n心率：静息75（偏高）\n\n你看着数据，叹了口气：原来自己活得这么不健康。\n\n"数据不会说谎——但看了数据的人会选择忽视。"',
+      cond: g => g.age>=24 && g.health<70 && g.money>3000,
+      choices:[
+        { label:'开始健康生活', hint:'+❤️ +😊 -💰', fn: g => { g.flags.healthyLifestyle=true; return{health:15,mood:10,money:-1500}; }},
+        { label:'买更多健康设备', hint:'-💰 +❤️', fn: g => ({money:-2000,health:5,mood:3}) },
+        { label:'算了，眼不见心不烦', hint:'-❤️', fn: g => ({health:-5,mood:-3}) },
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -1509,6 +1590,11 @@ const ACHIEVEMENTS = [
     { id:'team_player', icon:'👥', name:'团队之星', desc:'同事关系达到90+', check: g => g.relationships && g.relationships.colleagues>=90 },
     { id:'kaogong_prepper', icon:'📚', name:'考公预备役', desc:'开始备考公务员', check: g => g.flags.kaogongPrep },
     { id:'digital_detox', icon:'📵', name:'数字排毒', desc:'完成数字戒断', check: g => g.flags.digitalDetox },
+    // v2.18 achievements
+    { id:'healthy_life', icon:'🥗', name:'健康生活', desc:'开始健康生活方式', check: g => g.flags.healthyLifestyle },
+    { id:'side_hustle', icon:'💡', name:'斜杠青年', desc:'开始做副业', check: g => g.flags.sideHustle },
+    { id:'long_timer', icon:'📅', name:'老员工', desc:'在同一家公司工作超过3年', check: g => g.job!=='待业中' && g.months>36 },
+    { id:'challenge_master', icon:'🎯', name:'挑战达人', desc:'完成10个每日挑战', check: g => { const c = JSON.parse(localStorage.getItem('cityDrifters_challenges')||'[]'); return c.length>=10; }},
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -2124,7 +2210,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.17' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.18' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
