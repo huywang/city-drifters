@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v23.3
+// 都市浮生记 - Game Engine v23.4
 // ============================================
 
 // === GAME STATE ===
@@ -11509,6 +11509,87 @@ const EVENTS = [
         { label:'完成了一些一直想做的事', hint:'+😊 +🧠', fn: g => { g.flags.finalChapter=true; g.flags.bucketList=true; return{mood:18,intel:8}; }},
         { label:'和家人度过了温暖的时光', hint:'+😊 +🤝', fn: g => { g.flags.finalChapter=true; g.flags.warmFamily=true; return{mood:20,social:10}; }},
       ]},
+    // === v23.4 新增事件（新型住房 + 共享居住 + 蜗居生活） ===
+    { id:'tiny_apartment', icon:'🏠', title:'蜗居生活', category:'city',
+      body:'你搬进了一个15平米的隔断间。\n\n这是你在大城市的第一个家——如果这也能叫家的话。\n\n你的房间：\n- 一张单人床（占据了房间的一半）\n- 一张折叠桌（吃饭/办公/化妆三用）\n- 一个衣柜（放不下你所有的衣服）\n- 一扇窗户（对着隔壁楼的墙）\n\n月租：2800元。这已经是你工资的35%。\n\n你的邻居们：\n- 隔壁：一对情侣，每天吵架\n- 对面：一个程序员，每天加班到凌晨\n- 楼上：一个带孩子的妈妈，孩子每晚哭\n\n公用卫生间要排队。公用厨房永远有人在用。\n\n但你不抱怨——因为你知道，这是大城市的入场券。\n\n你在墙上贴了一张海报，上面写着：「总有一天，我会有自己的房子。」\n\n「蜗居是大城市给年轻人的第一课：梦想很大，空间很小。」',
+      cond: g => g.age >= 22 && g.age <= 30 && !g.flags.tinyApartment && !g.flags.hasHouse && g.money < 50000,
+      choices:[
+        { label:'把小房间布置得很温馨', hint:'+😊', fn: g => { g.flags.tinyApartment=true; g.flags.cozySpace=true; return{mood:8,charm:3}; }},
+        { label:'拼命加班赚钱，想早点搬出去', hint:'+💰 -💪', fn: g => { g.flags.tinyApartment=true; return{money:3000,health:-5,mood:-5}; }},
+        { label:'接受了现实，把精力放在提升自己上', hint:'+🧠 +😊', fn: g => { g.flags.tinyApartment=true; return{intel:8,mood:5}; }},
+      ]},
+    { id:'co_living_space', icon:'🏢', title:'共享居住', category:'social',
+      body:'你搬进了一个Co-living空间——一种新型的共享居住模式。\n\n你的私人空间：一个20平米的studio（带独立卫浴）。\n公共空间：共享厨房、客厅、健身房、图书室、联合办公区。\n\n月租：4500元。比传统租房贵，但包含了水电网和公共空间。\n\n你的室友（们）：\n- 总共住了30个人，年龄从22到35\n- 有程序员、设计师、创业者、自由职业者\n- 每周有一次社区晚餐（AA制）\n- 每月有一次主题分享会\n\n你在这里认识了一个做独立游戏的人，你们成了好朋友。\n\n你发现：Co-living的好处不只是住的地方——是一个现成的社交圈。\n\n但问题也有：\n- 隐私有限——隔音很差\n- 社区规则多——需要维护公共空间\n- 人来人往——刚认识的人可能就搬走了\n\n「共享居住：用隐私换社交，用空间换归属。」',
+      cond: g => g.age >= 22 && g.age <= 35 && !g.flags.coLivingSpace && !g.flags.hasHouse && g.money >= 5000,
+      choices:[
+        { label:'喜欢上了社区氛围，住了两年', hint:'+🤝 +😊', fn: g => { g.flags.coLivingSpace=true; g.flags.coLivingLong=true; return{social:15,mood:10,money:-9000}; }},
+        { label:'认识了一些有趣的人，但一年后搬走了', hint:'+🤝 +🧠', fn: g => { g.flags.coLivingSpace=true; return{social:8,mood:5,money:-4500}; }},
+        { label:'觉得太吵了，还是一个人住好', hint:'+😊', fn: g => { g.flags.coLivingSpace=true; return{mood:5,money:-4500}; }},
+      ]},
+    { id:'long_rent_apartment', icon:'🔑', title:'长租公寓', category:'city',
+      body:'你搬进了一个品牌长租公寓。\n\n相比普通租房，长租公寓有很多优点：\n- 统一装修，干净现代\n- 配套家具家电\n- 有管家服务\n- 可以月付\n\n但也有坑：\n- 租金比市场价高20%\n- 「租金贷」——你签了一年的合同，但公寓方让你通过贷款一次性付清\n- 如果公寓跑路，你还要继续还贷\n\n你签了合同。月租3800，押一付三。\n\n搬进去的第一天，你很开心——终于有了自己的小窝。\n\n三个月后，你听说隔壁的长租公寓品牌爆雷了。租客们被赶出去，但贷款还要继续还。\n\n你开始担心自己的公寓会不会也出事。\n\n「长租公寓：当你的家变成了一个金融产品，你就不再是租客——是赌徒。」',
+      cond: g => g.age >= 22 && g.age <= 35 && !g.flags.longRentApt && !g.flags.hasHouse,
+      choices:[
+        { label:'住了两年，一切顺利', hint:'+😊 -💰', fn: g => { g.flags.longRentApt=true; return{mood:8,money:-7600}; }},
+        { label:'遇到了公寓爆雷，被迫搬走', hint:'-😊 -💰', fn: g => { g.flags.longRentApt=true; g.flags.rentCrisis=true; return{mood:-15,money:-5000}; }},
+        { label:'谨慎选择了一个靠谱品牌', hint:'+🧠', fn: g => { g.flags.longRentApt=true; return{intel:5,mood:5,money:-7600}; }},
+      ]},
+    { id:'roommate_conflict_v23_4', icon:'😤', title:'合租矛盾', category:'social',
+      body:'你和室友发生了矛盾。\n\n起因很小：他没洗碗。然后是：他在客厅打游戏到凌晨3点。然后是：他带朋友回家没提前说。\n\n你忍了三次，第四次爆发了。\n\n你们吵了一架。他说：「你太挑剔了。」你说：「你太自私了。」\n\n冷静下来后，你们坐下来谈了谈：\n- 制定了室友公约\n- 约定了公共区域的清洁排班\n- 约定了安静时间（23:00后不大声）\n- 约定了访客提前通知\n\n关系缓和了。但你开始思考：为什么在大城市，找一个好的室友比找一个好的伴侣还难？\n\n答案也许是：因为室友关系没有爱情的滤镜——只有赤裸裸的生活习惯碰撞。\n\n「合租是成年人的修行：在最小的空间里，学会最大的包容。」',
+      cond: g => (g.flags.tinyApartment || g.flags.longRentApt) && !g.flags.roommateConflict,
+      choices:[
+        { label:'制定了室友公约，关系改善了', hint:'+🤝 +🧠', fn: g => { g.flags.roommateConflict=true; g.flags.roommateHarmony=true; return{social:5,intel:5,mood:5}; }},
+        { label:'搬走了，一个人住', hint:'+😊 -💰', fn: g => { g.flags.roommateConflict=true; g.flags.liveAlone=true; return{mood:10,money:-3000}; }},
+        { label:'忍了，但内心越来越不舒服', hint:'-😊', fn: g => { g.flags.roommateConflict=true; return{mood:-8,health:-3}; }},
+      ]},
+    { id:'house_hunting', icon:'🏡', title:'看房之路', category:'finance',
+      body:'你决定买房了。\n\n你开始了漫长的看房之路：\n\n**预算：**首付30万，月供不超过8000\n**目标：**两居室，地铁沿线，学区不要太差\n\n你看了30套房子：\n- 市中心老破小：地段好，但太旧\n- 郊区新房：环境好，但通勤2小时\n- 学区房：价格翻倍，但你还没结婚\n- 商住两用：便宜但没有学位\n\n你开始理解一个残酷的现实：\n- 你买得起的地方，你不想住\n- 你想住的地方，你买不起\n\n你的中介说：「买房是妥协的艺术——100分的房子不存在。」\n\n你的父母说：「先买一个小的，以后换大的。」\n\n你开始怀疑：买房到底是投资——还是被绑住了？\n\n「买房：大城市的终极考题。答案不是房子——是你想要什么样的人生。」',
+      cond: g => g.age >= 26 && g.age <= 40 && !g.flags.houseHunting && !g.flags.hasHouse && g.money >= 50000,
+      choices:[
+        { label:'买了一个小的，先上车再说', hint:'-💰💰 +😊', fn: g => { g.flags.houseHunting=true; g.flags.hasHouse=true; g.flags.smallHouse=true; return{mood:15,money:-30000}; }},
+        { label:'继续看房，等一个合适的机会', hint:'+🧠', fn: g => { g.flags.houseHunting=true; return{intel:8,mood:-3}; }},
+        { label:'决定不买房了，租房也挺好', hint:'+😊 +🧠', fn: g => { g.flags.houseHunting=true; g.flags.rentForever=true; return{mood:10,intel:5}; }},
+      ]},
+    { id:'moving_nightmare', icon:'📦', title:'搬家噩梦', category:'city',
+      body:'你又搬家了。\n\n这是你来大城市后的第5次搬家。\n\n每次搬家都是一种折磨：\n- 打包所有东西（为什么你有这么多东西？）\n- 找搬家公司（被坑了300块）\n- 拆装家具（你的腰在抗议）\n- 适应新环境（新邻居、新路线、新外卖）\n\n你看着满屋的箱子，问自己：为什么总是搬家？\n\n答案很简单：\n- 房东涨租了\n- 室友不靠谱\n- 公司换了地方\n- 你想离地铁近一点\n\n你开始羡慕有房子的人。不是因为房子本身——是因为他们不用搬家。\n\n你在朋友圈发了一条：「又搬家了。大城市漂泊者的宿命。」\n\n一个朋友评论：「什么时候买房？」\n\n你没回复。\n\n「搬家是大城市漂泊者最直观的痛苦——每一次搬家，都在提醒你：这里不是你的家。」',
+      cond: g => g.age >= 22 && g.age <= 35 && !g.flags.movingNightmare && (g.flags.tinyApartment || g.flags.longRentApt) && !g.flags.hasHouse,
+      choices:[
+        { label:'下定决心一定要买房', hint:'+💪 +🧠', fn: g => { g.flags.movingNightmare=true; g.flags.buyHouseResolve=true; return{intel:5,mood:-5,charm:3}; }},
+        { label:'开始极简生活，减少搬家的痛苦', hint:'+😊 +🧠', fn: g => { g.flags.movingNightmare=true; g.flags.minimalist=true; return{mood:8,intel:8}; }},
+        { label:'认命了，漂泊就漂泊吧', hint:'+😊', fn: g => { g.flags.movingNightmare=true; return{mood:5}; }},
+      ]},
+    { id:'urban_village_v23_4', icon:'🏘️', title:'城中村', category:'city',
+      body:'你住进了城中村。\n\n这是大城市最魔幻的存在：高楼大厦的缝隙里，藏着一片片低矮的自建房。\n\n你的房间：\n- 月租1200元（在大城市简直是白菜价）\n- 20平米，有独立卫生间\n- 窗外是密密麻麻的电线和空调外机\n\n城中村的生态：\n- 楼下就是小吃街——10块钱能吃饱\n- 隔壁是理发店——15块钱剪个头\n- 对面是快递驿站——每天都有人取快递\n\n你在这里看到了大城市最真实的一面：\n- 外卖小哥住在隔壁\n- 工厂女工住在楼上\n- 刚毕业的大学生住在对面\n- 退休老人坐在巷口下棋\n\n城中村是大城市的良心——它让收入不高的人也能在这座城市有一个落脚的地方。\n\n但你也听说了：城中村要拆迁了。拆迁后，这里会变成商业综合体。\n\n「城中村：大城市的灰色地带——也是最有烟火气的地方。」',
+      cond: g => g.age >= 22 && g.age <= 30 && !g.flags.urbanVillage && !g.flags.hasHouse && g.money < 30000,
+      choices:[
+        { label:'在城中村住了两年，体验了最真实的大城市', hint:'+😊 +🧠', fn: g => { g.flags.urbanVillage=true; return{mood:8,intel:8,social:5}; }},
+        { label:'攒了一些钱就搬走了', hint:'+💰', fn: g => { g.flags.urbanVillage=true; return{money:5000,mood:3}; }},
+        { label:'觉得环境太差了，住了几个月就走了', hint:'', fn: g => { g.flags.urbanVillage=true; return{mood:-3,health:-3}; }},
+      ]},
+    { id:'home_renovation_v23_4', icon:'🔨', title:'装修那些事', category:'hobby',
+      body:'你买了房子（或者租了一个可以装修的），现在要装修了。\n\n你发现：装修是一个比买房更复杂的过程。\n\n你需要做的决定：\n1. 风格：北欧风？日式？新中式？极简？\n2. 预算：10万？20万？50万？\n3. 施工队：全包？半包？自己找工人？\n4. 材料：地板用什么？墙面刷什么？\n\n你的装修预算：15万。\n最终花费：22万。（超支47%）\n\n你的装修教训：\n- 不要相信任何报价——实际费用至少翻倍\n- 不要听装修公司的建议——他们只想让你多花钱\n- 不要在网上看装修案例——现实和照片差距巨大\n- 一定要请监理——不然你会被工人糊弄\n\n三个月后，你搬进了新家。\n\n虽然有很多不满意的地方，但你觉得——这是你的地方。你的每一个决定，好的和坏的，都留在了这里。\n\n「装修是每个成年人的必修课：在理想和预算之间找到平衡。」',
+      cond: g => g.flags.hasHouse && !g.flags.homeRenovation,
+      choices:[
+        { label:'精心装修，把家变成了自己想要的样子', hint:'-💰 +😊', fn: g => { g.flags.homeRenovation=true; g.flags.beautifulHome=true; return{mood:15,charm:5,money:-20000}; }},
+        { label:'简单装修，够用就好', hint:'-💰 +🧠', fn: g => { g.flags.homeRenovation=true; return{mood:8,money:-8000}; }},
+        { label:'装修超支严重，但效果不错', hint:'-💰💰 +😊', fn: g => { g.flags.homeRenovation=true; g.flags.overBudget=true; return{mood:12,money:-25000,charm:3}; }},
+      ]},
+    { id:'housing_anxiety', icon:'😰', title:'住房焦虑', category:'psychology',
+      body:'你失眠了。\n\n不是因为工作——是因为房子。\n\n你算了一笔账：\n- 如果买房：首付需要50万（你只有20万）\n- 如果贷款：月供8000（你月薪12000）\n- 如果继续租房：每月房租4000（永远在帮房东还贷）\n\n你看着房价走势图：\n- 市中心：均价8万/平米\n- 郊区：均价4万/平米\n- 你的老家：均价8000/平米\n\n你开始理解一个残酷的数学：\n- 不吃不喝攒50年，才能买一套市中心的房子\n- 如果房价继续涨，你可能一辈子都买不起\n\n你的一个朋友说：「房子是大城市最大的焦虑来源——比工作、比感情、比健康都焦虑。」\n\n另一个朋友说：「但你知道吗？焦虑也没用。要么买，要么租，要么离开。」\n\n你选了哪一个？\n\n「住房焦虑：当一座城市的价格超过了大多数人的承受能力，焦虑就不再是个人问题——是社会问题。」',
+      cond: g => g.age >= 25 && g.age <= 40 && !g.flags.housingAnxiety && !g.flags.hasHouse,
+      choices:[
+        { label:'接受了焦虑，继续存钱', hint:'+💰 +🧠', fn: g => { g.flags.housingAnxiety=true; return{money:5000,intel:5,mood:-5}; }},
+        { label:'开始考虑离开大城市', hint:'+🧠 +😊', fn: g => { g.flags.housingAnxiety=true; g.flags.considerLeaving=true; return{intel:8,mood:3}; }},
+        { label:'想通了：房子不等于家', hint:'+😊 +🧠', fn: g => { g.flags.housingAnxiety=true; g.flags.houseNotHome=true; return{mood:12,intel:10}; }},
+      ]},
+    { id:'community_building', icon:'🏘️', title:'社区建设', category:'social',
+      body:'你开始参与社区建设。\n\n不是政府号召的——是你自发做的。\n\n你做了这些事：\n- 组织了一次社区跳蚤市场\n- 建了一个邻里互助群\n- 在小区里发起了垃圾分类倡议\n- 帮独居老人买菜、取快递\n\n你的邻居们开始认识你了：\n- 「你就是那个组织活动的小伙子/姑娘吧？」\n- 「上次你帮我搬东西，我一直想谢谢你。」\n- 「社区有你这样的人，真好。」\n\n你发现：大城市的冷漠不是必然的——只是缺少主动打破它的人。\n\n你的一个邻居——一个独居的老人——对你说：「谢谢你。我住在这里10年了，从来没和邻居说过这么多话。」\n\n你的眼眶湿了。\n\n「社区建设：不是政府的事——是每个住在这里的人的事。当你的邻居不再是陌生人，城市就不再是冰冷的。」',
+      cond: g => g.age >= 25 && !g.flags.communityBuilding && g.social >= 30,
+      choices:[
+        { label:'成了社区的核心志愿者', hint:'+🤝 +😊', fn: g => { g.flags.communityBuilding=true; g.flags.communityLeader=true; return{social:15,mood:15,charm:8}; }},
+        { label:'参与了一些社区活动，认识了一些邻居', hint:'+🤝 +😊', fn: g => { g.flags.communityBuilding=true; return{social:10,mood:8}; }},
+        { label:'做了一些但没坚持', hint:'+🧠', fn: g => { g.flags.communityBuilding=true; return{social:5,intel:3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -12558,6 +12639,12 @@ const ACHIEVEMENTS = [
     { id:'aging_grace_ach', icon:'🌿', name:'优雅老去', desc:'学会了优雅地面对衰老', check: g => g.flags.agingGrace },
     { id:'family_reconcile_ach', icon:'👨‍👩‍👧‍👦', name:'代际和解', desc:'和家人达成了深层的理解与和解', check: g => g.flags.familyReconcile },
     { id:'legacy_builder_ach_v23_3', icon:'📜', name:'人生传承', desc:'整理了自己的人生记录留给后人', check: g => g.flags.legacyComplete },
+    // === v23.4 新增成就（住房与居住） ===
+    { id:'cozy_home_ach', icon:'🏠', name:'温馨小窝', desc:'把小空间变成了温暖的家', check: g => g.flags.beautifulHome || g.flags.cozySpace },
+    { id:'community_leader_ach', icon:'🏘️', name:'社区达人', desc:'成了社区建设的核心志愿者', check: g => g.flags.communityLeader },
+    { id:'minimalist_ach_v23_4', icon:'🧹', name:'极简主义者', desc:'开始了极简生活', check: g => g.flags.minimalist },
+    { id:'house_not_home_ach', icon:'🧠', name:'房子不等于家', desc:'想通了住房与幸福的关系', check: g => g.flags.houseNotHome },
+    { id:'roommate_harmony_ach', icon:'🤝', name:'好室友', desc:'学会了和室友和谐相处', check: g => g.flags.roommateHarmony },
 ];
 
 // === ENDINGS === (order matters: first match wins)
