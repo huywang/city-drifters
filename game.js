@@ -1064,6 +1064,80 @@ const EVENTS = [
         { label:'寄钱回去', hint:'-💰 -😊', fn: g => { g.flags.familyEmergency=true; return{money:-10000,mood:-10}; }},
         { label:'视频慰问', hint:'-😊', fn: g => { g.flags.familyEmergency=true; return{mood:-20,social:-5}; }},
       ]},
+    // ===== v2.8: MORE LIFE PATHS =====
+    { id:'freelance_offer', icon:'💻', title:'自由职业机会',
+      body:'有个客户找到你："我们想请你做这个项目，按项目制收费，一个项目3-5万。"\n\n你算了算：一年接6-8个项目，收入比上班还高，而且自由。\n\n但你又担心：没有五险一金，没有稳定收入，生病了怎么办？\n\n"自由职业的本质是：用不安全感换自由。你愿意吗？"',
+      cond: g => g.age>=26 && g.age<=40 && g.intel>60 && !g.flags.freelancer && g.job!=='待业中',
+      choices:[
+        { label:'辞职做自由职业', hint:'🎲 +💰 +😊', fn: g => { g.flags.freelancer=true; g.flags.sideHustle='freelance'; setJob(g,'自由职业者',0); if(Math.random()>0.4){return{money:20000,mood:20,intel:10}}else{return{money:-5000,mood:-10}} }},
+        { label:'兼职接私活', hint:'+💰 -❤️', fn: g => { g.flags.sideHustle='freelance'; return{money:15000,health:-5,mood:5}; }},
+        { label:'算了，稳定重要', hint:'+😊', fn: g => ({mood:5}) },
+      ]},
+    { id:'travel_dream', icon:'✈️', title:'环游世界',
+      body:'你在网上看到一个数字游民的故事：一边旅行一边工作，一年去了12个国家。\n\n你心动了：也许生活不应该只有KPI和房贷。\n\n你算了算：存款够你旅行半年，但回来之后呢？\n\n"旅行不是逃避，是寻找。但你得想清楚，你在找什么。"',
+      cond: g => g.age>=25 && g.age<=35 && g.money>=50000 && !g.flags.worldTravel && g.mood<60,
+      choices:[
+        { label:'辞职去旅行', hint:'-💰💰 +😊 +✨', fn: g => { g.flags.worldTravel=true; g.flags.lyingFlat=true; setJob(g,'待业中',0); return{money:-40000,mood:30,charm:20,health:10,social:10}; }},
+        { label:'先gap year半年', hint:'-💰 +😊 +✨', fn: g => { g.flags.worldTravel=true; setJob(g,'待业中',0); return{money:-25000,mood:25,charm:15,health:8}; }},
+        { label:'算了，还是工作重要', hint:'+💰 -😊', fn: g => ({money:3000,mood:-8}) },
+      ]},
+    { id:'teaching_opportunity', icon:'👨‍🏫', title:'教育培训机会',
+      body:'有个培训机构找你："我们想请你做兼职讲师，周末上课，一天2000。"\n\n你觉得挺有意思的：把你的专业知识教给别人，还能赚钱。\n\n但你又担心：你够格吗？你能讲好吗？\n\n"教是最好的学。当你教会别人的时候，你自己也成长了。"',
+      cond: g => g.age>=27 && g.intel>65 && !g.flags.teacher && g.job!=='待业中',
+      choices:[
+        { label:'接受，做兼职讲师', hint:'+💰 +🧠 +✨', fn: g => { g.flags.teacher=true; return{money:8000,intel:10,charm:8,mood:10}; }},
+        { label:'全职转型培训师', hint:'🎲 +🧠', fn: g => { g.flags.teacher=true; setJob(g,'培训师',15000); if(Math.random()>0.4){return{mood:15,intel:15,charm:10}}else{return{mood:-10}} }},
+        { label:'算了，我不够格', hint:'-😊', fn: g => ({mood:-5}) },
+      ]},
+    { id:'small_shop', icon:'🏪', title:'开小店梦想',
+      body:'你路过一家转让的咖啡店，老板说："位置好，租金低，转让费10万。"\n\n你心动了：开一家自己的小店，是多少人的梦想？\n\n但你又算了算：装修5万，设备3万，流动资金5万——总共23万。\n\n而且，你知道：90%的咖啡店活不过3年。\n\n"开咖啡店不是梦想，是赌博。但你愿意赌吗？"',
+      cond: g => g.age>=28 && g.age<=45 && g.money>=150000 && !g.flags.smallShop && !g.flags.entrepreneur,
+      choices:[
+        { label:'盘下来开店', hint:'🎲 -💰💰', fn: g => { g.flags.smallShop=true; g.flags.entrepreneur=true; setJob(g,'小店老板',0); if(Math.random()>0.5){return{money:-230000,mood:25,social:15,charm:10}}else{return{money:-230000,mood:-15}} }},
+        { label:'先观察市场', hint:'+🧠', fn: g => ({intel:8,mood:5}) },
+        { label:'算了，风险太大', hint:'+😊', fn: g => ({mood:5}) },
+      ]},
+    { id:'volunteer_work', icon:'🤝', title:'志愿者活动',
+      body:'你在朋友圈看到一个公益组织在招志愿者：去山区支教/去养老院陪伴老人/去流浪动物基地帮忙。\n\n你心动了：也许做点有意义的事，会让生活不一样。\n\n但你又犹豫：周末本来可以休息/加班赚钱，去做志愿者值吗？\n\n"人生的意义不在于你得到了什么，而在于你给予了什么。"',
+      cond: g => g.age>=25 && !g.flags.volunteer,
+      choices:[
+        { label:'参加支教', hint:'+😊 +👥 +🧠', fn: g => { g.flags.volunteer=true; return{mood:20,social:15,intel:8,charm:10,money:-500}; }},
+        { label:'去养老院', hint:'+😊 +👥', fn: g => { g.flags.volunteer=true; return{mood:18,social:12,charm:8,money:-300}; }},
+        { label:'救助流浪动物', hint:'+😊 +❤️', fn: g => { g.flags.volunteer=true; return{mood:15,health:5,charm:10,money:-500}; }},
+        { label:'算了，没时间', hint:'-😊', fn: g => ({mood:-5}) },
+      ]},
+    { id:'health_scare', icon:'🏥', title:'体检异常',
+      body:'你做了年度体检，报告显示：某项指标异常，建议复查。\n\n你慌了：上网一查，这个指标可能是小问题，也可能是大问题。\n\n你去医院复查，医生说："暂时没事，但要注意生活方式。"\n\n你松了一口气，但你知道：身体在给你发警告了。\n\n"健康就像银行：年轻时透支，老了要还。"',
+      cond: g => g.age>=30 && g.health<60 && !g.flags.healthScare,
+      choices:[
+        { label:'认真改变生活方式', hint:'+❤️ +🧠', fn: g => { g.flags.healthScare=true; return{health:15,intel:8,mood:10}; }},
+        { label:'买保健品', hint:'-💰 +❤️', fn: g => { g.flags.healthScare=true; return{money:-5000,health:8,mood:5}; }},
+        { label:'算了，年轻人哪有不熬夜的', hint:'-❤️', fn: g => { g.flags.healthScare=true; return{health:-10,mood:-5}; }},
+      ]},
+    { id:'networking_event', icon:'🎯', title:'行业会议',
+      body:'你参加了一个行业会议，现场都是大佬和同行。\n\n你鼓起勇气跟几个大牛换了名片，还加了几个微信群。\n\n你发现：原来人脉不是认识多少人，而是多少人认可你。\n\n"社交的本质是价值交换。你得先有价值，才能交换。"',
+      cond: g => g.age>=25 && g.job!=='待业中' && g.social<60,
+      choices:[
+        { label:'积极社交', hint:'+👥 +✨ -💰', fn: g => ({social:15,charm:8,money:-1000,mood:8}) },
+        { label:'只听不说话', hint:'+🧠', fn: g => ({intel:10,social:3}) },
+        { label:'找机会跳槽', hint:'🎲 +💰', fn: g => { if(Math.random()>0.5){const s=Math.floor(g.jobSalary*1.4);setJob(g,getTitle(g,'senior'),s);return{money:5000,mood:15}}else{return{mood:-5}} }},
+      ]},
+    { id:'personal_brand', icon:'🌟', title:'打造个人品牌',
+      body:'你在知乎/小红书上开始写专业文章，粉丝慢慢涨起来了。\n\n有人私信你："能付费咨询吗？"有人找你合作，有人请你做分享。\n\n你发现：个人品牌是最好的名片，也是最稳定的副业。\n\n"在这个时代，影响力就是资产。"',
+      cond: g => g.age>=26 && g.intel>60 && g.charm>50 && !g.flags.personalBrand,
+      choices:[
+        { label:'持续输出，建立品牌', hint:'+💰 +✨ +🧠', fn: g => { g.flags.personalBrand=true; g.flags.influencer=true; return{money:10000,charm:15,intel:10,social:8,mood:12}; }},
+        { label:'偶尔写写', hint:'+✨ +🧠', fn: g => ({charm:8,intel:5,mood:5}) },
+        { label:'算了，没时间', hint:'-😊', fn: g => ({mood:-3}) },
+      ]},
+    { id:'financial_freedom_plan', icon:'🎯', title:'FIRE计划',
+      body:'你看到一个概念：FIRE（Financial Independence, Retire Early）——财务自由，提前退休。\n\n核心思想：攒够25倍年支出的钱，然后靠4%的年化收益生活。\n\n你算了算：你一年花15万，需要攒375万才能FIRE。\n\n你现在有多少？不敢算。\n\n"FIRE不是梦，是数学题。但前提是——你得先有钱。"',
+      cond: g => g.age>=28 && g.age<=38 && g.intel>65 && g.money>50000 && !g.flags.firePlan,
+      choices:[
+        { label:'开始执行FIRE计划', hint:'+💰 +🧠', fn: g => { g.flags.firePlan=true; return{money:30000,intel:10,mood:15}; }},
+        { label:'先提高收入再说', hint:'+💰', fn: g => ({money:10000,intel:5}) },
+        { label:'FIRE太遥远，过好当下', hint:'+😊', fn: g => ({mood:10}) },
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -1099,6 +1173,13 @@ const ACHIEVEMENTS = [
     { id:'musician', icon:'🎸', name:'音乐人', desc:'学了乐器', check: g => g.flags.musicSkill },
     { id:'photographer', icon:'📷', name:'摄影师', desc:'爱上摄影', check: g => g.flags.photographyHobby },
     { id:'viral_star', icon:'🌟', name:'网红初体验', desc:'意外走红', check: g => g.flags.viralMoment },
+    { id:'freelancer', icon:'💻', name:'自由职业者', desc:'成为自由职业者', check: g => g.flags.freelancer },
+    { id:'world_traveler', icon:'✈️', name:'环游世界', desc:'去旅行了', check: g => g.flags.worldTravel },
+    { id:'teacher', icon:'👨‍🏫', name:'为人师表', desc:'做了培训师', check: g => g.flags.teacher },
+    { id:'shop_owner', icon:'🏪', name:'小店老板', desc:'开了小店', check: g => g.flags.smallShop },
+    { id:'volunteer', icon:'🤝', name:'志愿者', desc:'参加过志愿者活动', check: g => g.flags.volunteer },
+    { id:'personal_brand', icon:'🌟', name:'个人品牌', desc:'建立个人品牌', check: g => g.flags.personalBrand },
+    { id:'fire_planner', icon:'🎯', name:'FIRE计划', desc:'开始FIRE计划', check: g => g.flags.firePlan },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -1128,6 +1209,11 @@ const ENDINGS = [
     { id:'investment_guru', badge:'📈', title:'投资达人', desc:'你从韭菜变成了投资达人。股票、基金、房产——你都有了。\n\n但你知道，运气占了80%。剩下的20%，是你用无数个失眠的夜晚换来的。\n\n"投资有风险，入市需谨慎。但你已经入局了。"', cond: g => g.flags.invested && g.money>=200000 && g.intel>=70 },
     { id:'lying_flat_end', badge:'🛋️', title:'躺平人生', desc:'你选择了躺平。不卷了，不拼了，不争了。\n\n你在郊区租了个小房子，种花养猫，偶尔打零工。\n\n有人说你是loser，有人说你是智者。你不在乎。\n\n"人生不是赛道，是旷野。你选择了自己的路。"', cond: g => g.flags.lyingFlat && g.mood>=65 && g.health>=60 && g.age>=30 },
     { id:'divorced_life', badge:'💔', title:'围城之外', desc:'你离婚了。不是失败，是选择。\n\n你重新开始一个人的生活。周末约朋友，工作日加班，偶尔相亲。\n\n你发现：离婚不是终点，是另一种开始。\n\n"婚姻不是人生的必选项。幸福才是。"', cond: g => g.flags.divorced && g.mood>=50 && g.age>=35 },
+    { id:'digital_nomad', badge:'🌍', title:'数字游民', desc:'你成了数字游民。一边旅行一边工作，今天在清迈，下个月在巴厘岛。\n\n你的办公室是咖啡厅，你的同事是WiFi。\n\n"不是逃离，是选择另一种活法。"\n\n你在朋友圈发了张海边的照片，配文："这才是生活。"\n\n虽然你偶尔也会想念大城市的便利和熟悉。', cond: g => g.flags.lyingFlat && g.money>=80000 && g.intel>=65 && g.charm>=55 && g.age>=28 && g.age<=40 },
+    { id:'freelancer_end', badge:'💻', title:'自由职业者', desc:'你成了自由职业者。没有老板，没有打卡，没有固定收入。\n\n有时候一个月赚5万，有时候三个月没单子。\n\n但你享受这种自由：想接就接，想休息就休息。\n\n"自由职业不是不工作，是为自己工作。"', cond: g => g.flags.sideHustle && g.intel>=60 && g.money>=50000 && g.age>=30 },
+    { id:'teacher_end', badge:'👨‍🏫', title:'教育培训师', desc:'你转型做了教育培训师。教孩子编程，教成人英语，教职场新人沟通技巧。\n\n虽然收入不如大厂，但你觉得有意义。\n\n"教育的本质是一棵树摇动另一棵树，一朵云推动另一朵云。"', cond: g => g.intel>=75 && g.social>=50 && g.mood>=55 && g.age>=30 },
+    { id:'small_business', badge:'🏪', title:'小店老板', desc:'你开了家小店——也许是咖啡厅，也许是花店，也许是书店。\n\n没有996，但有7×24。你既是老板也是员工。\n\n但你享受这种踏实感：每天开门营业，看到熟客微笑。\n\n"开一家小店，是很多人的梦想。你把它变成了现实。"', cond: g => g.flags.entrepreneur && g.money>=30000 && g.mood>=50 && g.age>=32 },
+    { id:'retire_abroad', badge:'🌴', title:'海外养老', desc:'你在东南亚买了套小房子，开始了海外养老生活。\n\n泰国的物价是中国的1/3，空气好，人友善。\n\n你用国内的退休金，过着当地中产的生活。\n\n"此心安处是吾乡——前提是签证不给你找麻烦。"', cond: g => g.money>=400000 && g.age>=50 && g.health>=50 && g.charm>=50 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
@@ -1515,7 +1601,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.7' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.8' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
