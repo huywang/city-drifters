@@ -2249,7 +2249,7 @@ const EVENTS = [
         { label:'买一堆保健品', hint:'-💰', fn: g => { g.flags.healthScare=true; return{money:-5000,health:3,mood:3}; }},
         { label:'预约专家门诊', hint:'-💰 +❤️', fn: g => { g.flags.healthScare=true; return{money:-2000,health:8,mood:5}; }},
       ]},
-    { id:'rent_increase', icon:'📈', title:'房东涨价',
+    { id:'rent_increase_v2', icon:'📈', title:'房东涨价',
       body:'房东发来消息："下个月开始，房租涨500。"\n\n你算了算：这已经是你来这个城市后第3次涨房租了。\n\n每次涨房租，你都会想：是不是该买房了？然后你看了看房价——算了，还是继续租吧。\n\n"房租是大城市的月租税，交的是你在这里呼吸的权利。"',
       cond: g => !g.flags.hasHouse && g.months>=12 && !g.flags.rentIncrease && Math.random()>0.6,
       choices:[
@@ -2257,6 +2257,56 @@ const EVENTS = [
         { label:'搬家找便宜的', hint:'-💰 -😊 +❤️', fn: g => { g.flags.rentIncrease=true; g.flags.movedHouse=true; return{money:-3000,mood:-10,health:-5}; }},
         { label:'找室友分摊', hint:'-😊 +👥', fn: g => { g.flags.rentIncrease=true; return{mood:-5,social:5}; }},
         { label:'和房东谈判', hint:'🎲', fn: g => { g.flags.rentIncrease=true; if(g.charm>=60&&Math.random()>0.5){return{mood:5,charm:3}}else{return{mood:-10}} }},
+      ]},
+    // === v2.36 EVENTS ===
+    { id:'blind_box', icon:'🎁', title:'盲盒经济',
+      body:'你路过一家泡泡玛特，橱窗里的限量款公仔闪闪发光。\n\n"只要59元一个，说不定能抽到隐藏款！"\n\n你已经买了5个了，花了300块，还没抽到你想要的那个。你开始理解为什么有人说这是"合法赌博"。\n\n"盲盒的魅力不是里面的东西，是拆盒那一刻的期待感。"',
+      cond: g => !g.flags.blindBox && g.age<=35 && g.money>3000 && Math.random()>0.6,
+      choices:[
+        { label:'再买10个！', hint:'-💰💰 +😊', fn: g => { g.flags.blindBox=true; return{money:-590,mood:15,charm:3}; }},
+        { label:'只买一个尝尝鲜', hint:'-💰 +😊', fn: g => { g.flags.blindBox=true; return{money:-59,mood:5}; }},
+        { label:'理智战胜冲动', hint:'+🧠', fn: g => { g.flags.blindBox=true; return{intel:3,mood:-3}; }},
+      ]},
+    { id:'short_video_addiction', icon:'📱', title:'短视频成瘾',
+      body:'你本来只想刷5分钟抖音。\n\n抬头一看，已经凌晨2点了。\n\n你看了看手机使用时间：今天已使用6小时23分。\n\n你开始思考：是你在使用手机，还是手机在使用你？\n\n"短视频时代，你的注意力才是最值钱的商品。"',
+      cond: g => !g.flags.shortVideoAddiction && g.age<=40 && Math.random()>0.5,
+      choices:[
+        { label:'设置使用时间限制', hint:'+🧠 +❤️', fn: g => { g.flags.shortVideoAddiction=true; return{intel:5,health:3,mood:5}; }},
+        { label:'继续刷，明天再说', hint:'-❤️ -😊', fn: g => { g.flags.shortVideoAddiction=true; return{health:-8,mood:-5,intel:-3}; }},
+        { label:'卸载所有短视频App', hint:'+🧠 +😊 +❤️', fn: g => { g.flags.shortVideoAddiction=true; g.flags.digitalDetox=true; return{intel:8,mood:10,health:5}; }},
+        { label:'开始做短视频', hint:'+✨ +👥', fn: g => { g.flags.shortVideoAddiction=true; g.flags.contentCreator=true; return{charm:8,social:5,mood:5}; }},
+      ]},
+    { id:'new_neighbor', icon:'🏘️', title:'新邻居',
+      body:'你的邻居搬走了，来了一个新邻居。\n\nta很年轻，看起来也是"漂"在大城市的人。你们在电梯里碰面，尴尬地笑了笑。\n\n"在大城市，你和邻居的关系通常是：知道ta的存在，但不知道ta的名字。"',
+      cond: g => !g.flags.hasNewNeighbor && !g.flags.hasHouse && g.months>=6 && Math.random()>0.7,
+      choices:[
+        { label:'主动打招呼', hint:'+👥 +😊', fn: g => { g.flags.hasNewNeighbor=true; g.flags.goodNeighbor=true; return{social:8,mood:5}; }},
+        { label:'礼貌地点头', hint:'+👥', fn: g => { g.flags.hasNewNeighbor=true; return{social:3}; }},
+        { label:'假装看手机', hint:'-😊', fn: g => { g.flags.hasNewNeighbor=true; return{mood:-3}; }},
+      ]},
+    { id:'marathon_challenge', icon:'🏃', title:'马拉松挑战',
+      body:'你的朋友圈被刷屏了：同事/朋友完成了半程马拉松。\n\n你看了看自己日渐圆润的肚子，又看了看那双买了3个月还没穿过的跑鞋。\n\n"每个跑马拉松的人都说：最难的不是跑步，是起床。"',
+      cond: g => g.flags.fitnessJourney && !g.flags.marathonChallenge && g.health>=60 && Math.random()>0.5,
+      choices:[
+        { label:'报名半马！', hint:'+❤️ +😊 -💰', fn: g => { g.flags.marathonChallenge=true; if(g.health>=75){return{health:15,mood:20,money:-500}}else{return{health:-10,mood:-5,money:-500}} }},
+        { label:'先跑5公里试试', hint:'+❤️ +😊', fn: g => { g.flags.marathonChallenge=true; return{health:8,mood:10}; }},
+        { label:'还是算了吧', hint:'-😊', fn: g => { g.flags.marathonChallenge=true; return{mood:-5}; }},
+      ]},
+    { id:'side_project', icon:'💻', title:'副业项目',
+      body:'一个朋友找你合作一个副业项目：\n\n- 需要投入3个月周末时间\n- 成功后预计收入5万\n- 失败了就是白干\n\n你看了看你的周末安排：刷手机、睡觉、刷手机。\n\n"副业不是第二份工作，是第二种人生可能性。"',
+      cond: g => !g.flags.sideProject && g.intel>=60 && g.job!=='待业中' && g.age>=25 && Math.random()>0.6,
+      choices:[
+        { label:'全力以赴', hint:'-❤️ +💰💰', fn: g => { g.flags.sideProject=true; if(g.intel>=70&&Math.random()>0.4){return{money:50000,health:-10,mood:15,intel:5}}else{return{health:-15,mood:-10,intel:3}} }},
+        { label:'适度参与', hint:'+💰 +🧠', fn: g => { g.flags.sideProject=true; if(Math.random()>0.5){return{money:20000,intel:5}}else{return{intel:3,mood:-3}} }},
+        { label:'婉拒', hint:'+😊', fn: g => { g.flags.sideProject=true; return{mood:5}; }},
+      ]},
+    { id:'hometown_visit', icon:'🚄', title:'回家看看',
+      body:'你已经大半年没回家了。你妈在电话里说："有空回来看看吧。"\n\n你打开购票软件：高铁3小时，二等座200块。\n\n你算了算：请假3天，来回路费400，给爸妈买礼物2000。\n\n"回家的成本从来不是车票，是面对他们眼中的期待和你的愧疚。"',
+      cond: g => !g.flags.hometownVisit && g.months>=18 && g.money>5000 && Math.random()>0.6,
+      choices:[
+        { label:'请假回家', hint:'-💰 +😊 +👥', fn: g => { g.flags.hometownVisit=true; g.relationships.family = clamp((g.relationships.family||50)+20,0,100); return{money:-3000,mood:20,social:10}; }},
+        { label:'视频通话代替', hint:'+👥', fn: g => { g.flags.hometownVisit=true; g.relationships.family = clamp((g.relationships.family||50)+5,0,100); return{social:3,mood:5}; }},
+        { label:'下次再说', hint:'-😊 -👥', fn: g => { g.flags.hometownVisit=true; g.relationships.family = clamp((g.relationships.family||50)-10,0,100); return{mood:-8,social:-5}; }},
       ]},
 ];
 
@@ -2381,6 +2431,13 @@ const ACHIEVEMENTS = [
     { id:'health_awakening', icon:'🏥', name:'健康觉醒', desc:'从体检报告中醒悟', check: g => g.flags.healthScare && g.flags.fitnessJourney },
     { id:'classmate_brave', icon:'🍻', name:'坦然面对', desc:'勇敢参加了同学聚会', check: g => g.flags.classmateReunion && g.social>=60 },
     { id:'smart_renter', icon:'🏠', name:'租房达人', desc:'和房东成功谈判', check: g => g.flags.rentIncrease && g.charm>=65 },
+    // v2.36 achievements
+    { id:'blind_box_fan', icon:'🎁', name:'盲盒玩家', desc:'体验了盲盒经济', check: g => g.flags.blindBox },
+    { id:'digital_detox', icon:'📵', name:'数字断联', desc:'成功戒掉短视频', check: g => g.flags.digitalDetox },
+    { id:'good_neighbor', icon:'🏘️', name:'好邻居', desc:'和新邻居成为朋友', check: g => g.flags.goodNeighbor },
+    { id:'marathon_runner', icon:'🏃', name:'马拉松跑者', desc:'完成了一次马拉松挑战', check: g => g.flags.marathonChallenge && g.health>=70 },
+    { id:'side_project_done', icon:'💻', name:'副业起步', desc:'开始了自己的副业项目', check: g => g.flags.sideProject },
+    { id:'homecoming', icon:'🚄', name:'常回家看看', desc:'回家看望了父母', check: g => g.flags.hometownVisit },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -2453,6 +2510,10 @@ const ENDINGS = [
     { id:'health_warrior', badge:'💪', title:'健康觉醒者', desc:'你曾经是一个标准的"亚健康打工人"：熬夜、外卖、久坐、焦虑。\n\n直到那张体检报告把你惊醒。你开始跑步、做饭、早睡、冥想。\n\n你花了两年时间，把自己从悬崖边拉了回来。\n\n"健康不是目标，是一切目标的前提。"', cond: g => g.flags.healthScare && g.flags.fitnessJourney && g.health>=85 && g.mood>=70 && g.age>=30 },
     { id:'slow_life_master', badge:'☕', title:'慢生活实践者', desc:'你没有成为有钱人，也没有成为名人。\n\n但你找到了一种让自己舒服的生活方式：在咖啡馆看书、在公园散步、和朋友聊天。\n\n你不再追求"高效"和"成功"，你追求的是——心安。\n\n"慢下来不是放弃，是终于学会了和自己和解。"', cond: g => g.flags.cafeOffice && g.flags.minimalist && g.mood>=75 && g.intel>=70 && !g.flags.entrepreneur && g.age>=30 },
     { id:'weather_survivor', badge:'⛈️', title:'风雨同路人', desc:'你在大城市经历了很多"坏天气"：台风、暴雨、高温、寒冬。\n\n每一次极端天气，都是一次考验。你没有退缩，你挺过来了。\n\n你发现：那些打不倒你的，真的会让你更强大。\n\n"人生如天气，无法预测，只能适应。"', cond: g => (g.flags.typhoonDay || g.flags.rainySeason) && g.flags.healthScare && g.health>=70 && g.mood>=60 && g.months>=48 && g.age>=28 },
+    // --- v2.36 ENDINGS ---
+    { id:'content_king', badge:'📱', title:'自媒体达人', desc:'你从一个刷短视频成瘾的人，变成了一个做短视频的人。\n\n你的账号有了10万粉丝，你开始理解：内容创作的本质，是把你的时间卖给更多人。\n\n你没有成为大V，但你找到了表达的方式。\n\n"每个人都是自己生活的导演——只是有些人的观众更多而已。"', cond: g => g.flags.contentCreator && g.charm>=70 && g.social>=60 && g.money>=30000 && g.age>=28 },
+    { id:'balanced_life', badge:'⚖️', title:'平衡大师', desc:'你学会了生活的艺术：工作、健康、家庭、社交、兴趣——你每一项都照顾到了。\n\n你没有特别突出的成就，但你有一个充实而平衡的人生。\n\n"成功不是某一方面的极致，是各个方面的和谐。"', cond: g => g.health>=70 && g.mood>=70 && g.intel>=60 && g.social>=60 && g.charm>=60 && (g.relationships && g.relationships.family>=60) && g.age>=35 },
+    { id:'side_hustle_success', badge:'💼', title:'副业转正', desc:'你的副业终于做起来了。\n\n收入虽然不算多，但你知道：这是你自己的事业，不是给别人打工。\n\n你开始思考：要不要辞职全职做？\n\n"副业最好的结果是：你有选择的自由。"', cond: g => g.flags.sideProject && g.flags.sideHustle && g.money>=100000 && g.intel>=70 && g.age>=30 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
@@ -3087,7 +3148,7 @@ function getEndingRarity(endingId) {
     // Rare (hard to achieve)
     const rare = ['settled', 'startup_end', 'influencer_end', 'digital_nomad', 'karoshi', 'jail', 'social_butterfly_end', 'health_guru', 'side_hustle_king', 'kaogong_success', 'mentor_end', 'community_builder', 'career_pivot', 'anti_fraud_hero', 'relationship_guru', 'comeback_kid', 'health_warrior'];
     // Uncommon (moderately difficult)
-    const uncommon = ['hometown_hero', 'go_home', 'civil_end', 'ordinary', 'single', 'investment_guru', 'lying_flat_end', 'lonely_death', 'estranged', 'pet_parent', 'mortgage_default_end', 'kong_yiji_end', 'full_time_child_end', 'minimalist_life', 'slow_life', 'scam_victim', 'sandwich_generation', 'lonely_achiever', 'wanderer', 'slow_life_master', 'weather_survivor'];
+    const uncommon = ['hometown_hero', 'go_home', 'civil_end', 'ordinary', 'single', 'investment_guru', 'lying_flat_end', 'lonely_death', 'estranged', 'pet_parent', 'mortgage_default_end', 'kong_yiji_end', 'full_time_child_end', 'minimalist_life', 'slow_life', 'scam_victim', 'sandwich_generation', 'lonely_achiever', 'wanderer', 'slow_life_master', 'weather_survivor', 'content_king', 'balanced_life', 'side_hustle_success'];
 
     if (legendary.includes(endingId)) return 'legendary';
     if (rare.includes(endingId)) return 'rare';
@@ -3271,7 +3332,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.35' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.36' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
