@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v21.1
+// 都市浮生记 - Game Engine v21.2
 // ============================================
 
 // === GAME STATE ===
@@ -9930,6 +9930,87 @@ const EVENTS = [
         { label:'决定再坚持一下，不走了', hint:'+😊 +❤️', fn: g => { g.flags.cityFarewell=true; g.flags.stayDecision=true; return{mood:8,social:5}; }},
         { label:'说走就走，不回头', hint:'+🧠', fn: g => { g.flags.cityFarewell=true; return{intel:3}; }},
       ]},
+    // === v21.2 新增事件（健康养生 + 身心平衡 + 中医文化） ===
+    { id:'tcm_wellness_v3', icon:'🏺', title:'中医养生', category:'health',
+      body:'你的一个朋友带你去了一家中医馆。\n\n老中医给你把了脉，看了看你的舌头，说：「你肝火旺、脾虚、湿气重。典型的都市白领体质。」\n\n你问：「怎么调理？」\n\n他说：「三件事：早睡早起、少吃冷饮、每周来拔一次罐。」\n\n你半信半疑地试了一个月：拔罐、艾灸、推拿。你发现：拔完罐之后确实舒服了很多，睡眠质量也好了。\n\n你的同事说：「你这是交智商税。」\n你的另一个同事说：「中医不是治病的——是治人的。它让你重新关注自己的身体。」\n\n你开始理解：中医养生的精髓不在于药方——在于「治未病」。在你还没生病的时候，就开始关注身体发出的信号。\n\n「中医养生：不是老了才养生——是趁年轻就开始养生。」',
+      cond: g => !g.flags.tcmWellness && g.age >= 25,
+      choices:[
+        { label:'开始定期做中医调理', hint:'+❤️ +😊 -💰', fn: g => { g.flags.tcmWellness=true; g.flags.tcmRegular=true; return{health:12,mood:5,money:-3000}; }},
+        { label:'体验了几次，感觉有帮助', hint:'+❤️ +😊', fn: g => { g.flags.tcmWellness=true; return{health:8,mood:5}; }},
+        { label:'不太信这个', hint:'', fn: g => { g.flags.tcmWellness=true; return{mood:2}; }},
+      ]},
+    { id:'marathon_goal', icon:'🏃', title:'跑一场马拉松', category:'health',
+      body:'你给自己定了一个目标：跑一场半程马拉松。\n\n你从没跑过超过5公里。你的同事说：「你疯了吧？」\n\n你开始训练：第一周，跑了3公里，膝盖疼了三天。第二周，5公里，气喘吁吁。第三周，8公里，你开始享受跑步的节奏。\n\n三个月后，你站在了半程马拉松的起点。21.0975公里。\n\n跑到15公里的时候，你的腿已经不是你的了。但你听到了路边的加油声、看到了其他跑者的微笑。你想：我已经在路上了——不能停。\n\n当你跑过终点线的时候，你哭了。不是因为累——是因为你做到了你曾经认为不可能的事。\n\n你的奖牌挂在了墙上。你看着它，想：人生就像马拉松——重要的不是速度，是坚持。\n\n「马拉松：不是跑得快——是不放弃。当你的脚步停不下来的时候，你就赢了。」',
+      cond: g => !g.flags.marathonGoal && g.age >= 22 && g.age <= 50 && g.health >= 50,
+      choices:[
+        { label:'完成了半程马拉松，开始准备全马', hint:'+❤️ +😊 +🧠', fn: g => { g.flags.marathonGoal=true; g.flags.marathonRunner=true; return{health:15,mood:15,intel:3}; }},
+        { label:'完成了半马，但不再跑更远了', hint:'+❤️ +😊', fn: g => { g.flags.marathonGoal=true; g.flags.halfMarathon=true; return{health:12,mood:12}; }},
+        { label:'训练到一半放弃了', hint:'+❤️', fn: g => { g.flags.marathonGoal=true; return{health:5,mood:-3}; }},
+      ]},
+    { id:'sleep_economy', icon:'😴', title:'睡眠经济', category:'health',
+      body:'你已经有半年没有睡好觉了。\n\n你开始尝试各种「助眠」产品：乳胶枕头2000块、助眠香薰500块、白噪音App会员99块/年、褪黑素300块/月。\n\n你的同事说：「你这是在用金钱换睡眠。」\n\n你查了数据：中国有3亿人存在睡眠障碍。围绕「睡眠」的产业已经超过4000亿——从床垫到安眠药，从冥想课到睡眠门诊。\n\n你发现：睡眠问题的根源不是枕头不好——是你太焦虑了。工作焦虑、房贷焦虑、未来焦虑……你的大脑不肯关机。\n\n你的一个朋友说：「最好的安眠药不是褪黑素——是心安。」\n\n你开始每天睡前做10分钟冥想。一个月后，你的睡眠确实好了很多。\n\n「睡眠经济：卖的不是产品——是你对失眠的恐惧。但真正能治好失眠的，只有你自己。」',
+      cond: g => !g.flags.sleepEconomy && g.age >= 22 && g.health <= 60,
+      choices:[
+        { label:'开始冥想+规律作息，改善睡眠', hint:'+❤️ +😊 +🧠', fn: g => { g.flags.sleepEconomy=true; g.flags.sleepImproved=true; return{health:10,mood:8,intel:3}; }},
+        { label:'买了一堆助眠产品', hint:'+❤️ -💰', fn: g => { g.flags.sleepEconomy=true; return{health:5,mood:3,money:-3000}; }},
+        { label:'习惯了晚睡，改不了', hint:'-❤️', fn: g => { g.flags.sleepEconomy=true; return{health:-3,mood:-2}; }},
+      ]},
+    { id:'baduanjin', icon:'🧘', title:'八段锦', category:'health',
+      body:'你的一个同事每天早上在办公室做八段锦。\n\n你以为这是老年人的运动。但他说：「你别小看八段锦——这是中国传统的健身功法，有800年历史了。比跑步温和，比瑜伽简单，效果却很好。」\n\n你跟着做了两周。你发现：八段锦的8个动作分别锻炼了不同的身体部位——拉伸脊柱、活动关节、调节呼吸。做完之后，整个人都松快了。\n\n你的另一个同事也加入了。你们每天早上9点在办公室的空地上做八段锦。路过的同事说：「你们这是集体养生啊。」\n\n你查了资料：国家体育总局推荐八段锦作为全民健身项目。它不需要器材、不需要场地、不需要基础——随时随地可以做。\n\n「八段锦：800年的智慧——用最简单的动作，调理最复杂的身体。」',
+      cond: g => !g.flags.baduanjin && g.age >= 22,
+      choices:[
+        { label:'坚持每天做八段锦', hint:'+❤️ +😊', fn: g => { g.flags.baduanjin=true; g.flags.baduanjinRegular=true; return{health:12,mood:8}; }},
+        { label:'偶尔做做，当放松', hint:'+❤️', fn: g => { g.flags.baduanjin=true; return{health:5,mood:5}; }},
+        { label:'太慢了，不适合我', hint:'', fn: g => { g.flags.baduanjin=true; return{mood:2}; }},
+      ]},
+    { id:'fasting_practice', icon:'🍽️', title:'轻断食', category:'health',
+      body:'你的一个朋友开始做「16:8轻断食」——每天只在8小时内吃东西，其余16小时不吃。\n\n她说：「我瘦了10斤，精力也好了。关键是——不用节食，只是调整了吃饭的时间窗口。」\n\n你试了一下：早上10点到下午6点可以吃饭，其余时间只喝水。\n\n第一周：饿得发慌，半夜做梦都在吃火锅。\n第二周：开始适应了，上午精神反而更好了。\n第三周：你的体重下降了3斤，你的体检指标好了。\n\n你的医生说：「轻断食有一定科学依据——它可以促进细胞自噬、改善胰岛素敏感性。但不是每个人都适合——有胃病的人要小心。」\n\n你发现：养生不是吃更多的好东西——有时候是少吃一点。\n\n「轻断食：不是饿自己——是给身体一个休息的机会。」',
+      cond: g => !g.flags.fastingPractice && g.age >= 22 && g.age <= 50,
+      choices:[
+        { label:'坚持轻断食，身体指标明显改善', hint:'+❤️ +😊 +🧠', fn: g => { g.flags.fastingPractice=true; g.flags.fastingSuccess=true; return{health:12,mood:5,intel:3}; }},
+        { label:'试了一段时间，效果一般', hint:'+❤️', fn: g => { g.flags.fastingPractice=true; return{health:5,mood:2}; }},
+        { label:'太饿了，坚持不了', hint:'', fn: g => { g.flags.fastingPractice=true; return{mood:-2}; }},
+      ]},
+    { id:'mindful_eating', icon:'🥗', title:'正念饮食', category:'health',
+      body:'你参加了公司组织的「正念饮食」工作坊。\n\n老师给了你一颗葡萄干，说：「请用5分钟吃这颗葡萄干。」\n\n你觉得疯了。一颗葡萄干不是1秒就能吃掉吗？\n\n但老师教你：先看它的颜色、再闻它的气味、再感受它在嘴里的触感、最后慢慢咀嚼——感受它的甜味、酸味、水分。\n\n5分钟后，你觉得这颗葡萄干是你吃过的最好吃的东西。\n\n老师说：「你平时吃饭是不是边看手机边吃？你是不是从来没有真正「品尝」过你的食物？」\n\n你开始每顿饭放下手机，认真咀嚼每一口。你发现：当你真正品尝食物的时候，你吃得更少了——因为你更容易感到满足。\n\n「正念饮食：不是吃更少——是感受更多。当你真正品尝食物的时候，你也在品尝生活。」',
+      cond: g => !g.flags.mindfulEating && g.age >= 22,
+      choices:[
+        { label:'开始践行正念饮食', hint:'+❤️ +😊 +🧠', fn: g => { g.flags.mindfulEating=true; g.flags.mindfulEater=true; return{health:8,mood:8,intel:5}; }},
+        { label:'偶尔实践，有帮助', hint:'+❤️ +😊', fn: g => { g.flags.mindfulEating=true; return{health:5,mood:5}; }},
+        { label:'太慢了，不适合我', hint:'', fn: g => { g.flags.mindfulEating=true; return{mood:2}; }},
+      ]},
+    { id:'mental_health_day', icon:'🧠', title:'心理健康日', category:'health',
+      body:'你的公司推出了一个新政策：每个月有一天「心理健康日」——不用请假、不用说明理由，直接休息。\n\nHR说：「我们意识到，心理健康和身体健康一样重要。如果你今天不想上班——那就不上。」\n\n你的第一个心理健康日，你什么都没做。你睡到自然醒、看了部电影、在公园里坐了一下午。\n\n你发现：有时候你不需要做什么——你只是需要「被允许什么都不做」。\n\n你的同事说：「以前觉得请假是偷懒。现在觉得——允许自己休息，是一种能力。」\n\n你开始每个月用一天来「充电」。不是去旅行、不是去学习——就是让自己彻底放空。\n\n「心理健康日：不是让你不上班——是让你知道，你的感受比工作重要。」',
+      cond: g => !g.flags.mentalHealthDay && g.age >= 22 && g.age <= 45 && g.job !== '待业中',
+      choices:[
+        { label:'定期使用心理健康日，认真休息', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.mentalHealthDay=true; g.flags.mentalHealthAware=true; return{mood:12,health:5,intel:3}; }},
+        { label:'用了几次，感觉有帮助', hint:'+😊 +❤️', fn: g => { g.flags.mentalHealthDay=true; return{mood:8,health:3}; }},
+        { label:'不敢用，怕影响工作', hint:'-😊', fn: g => { g.flags.mentalHealthDay=true; return{mood:-3}; }},
+      ]},
+    { id:'sub_health', icon:'😰', title:'亚健康警告', category:'health',
+      body:'你的体检报告出来了：\n\n血脂偏高 ⚠️\n尿酸偏高 ⚠️\n轻度脂肪肝 ⚠️\n颈椎退行性变 ⚠️\n\n医生说：「你没有生病——但你也不健康。你处于「亚健康」状态。如果不改变生活方式，5年内大概率会发展成慢性病。」\n\n你看着报告，有点慌。你才30岁，体检报告比你的简历还「丰富」。\n\n你的一个同事说：「你的报告算好的了。我的报告有12个箭头，医生说我已经不算亚健康了——算亚疾病。」\n\n你开始反思：每天外卖、久坐、熬夜、不运动——你的身体在用体检报告给你发「警告信」。\n\n你做了一个决定：从明天开始，改变。\n\n「亚健康：不是病——但它是病的前奏。当你的身体开始发出警告，不要等到它变成求救信号。」',
+      cond: g => !g.flags.subHealth && g.age >= 25 && g.health <= 60,
+      choices:[
+        { label:'认真改变生活方式', hint:'+❤️ +😊 +🧠', fn: g => { g.flags.subHealth=true; g.flags.lifestyleChange=true; return{health:10,mood:5,intel:3}; }},
+        { label:'注意了一下，但没有大改', hint:'+❤️', fn: g => { g.flags.subHealth=true; return{health:3,mood:-3}; }},
+        { label:'焦虑了几天又忘了', hint:'', fn: g => { g.flags.subHealth=true; return{mood:-5}; }},
+      ]},
+    { id:'tai_chi_park', icon:'🥋', title:'公园太极', category:'health',
+      body:'你每天早上路过公园，都会看到一群老人在打太极。\n\n有一天你停下了脚步，站在旁边看。一个白发老爷爷看到你，说：「小伙子/小姑娘，来一起练？」\n\n你加入了。动作很慢、很柔——但你出了一身汗。\n\n老爷爷说：「太极不是慢动作——是慢思考。每一个动作都有它的含义：云手是在化解力量、白鹤亮翅是在展示平衡。」\n\n你开始每天早起去公园打太极。你发现：你的身体变柔了、你的心态变稳了、你的睡眠变好了。\n\n你的同事说：「你这是提前进入老年生活了。」\n\n你说：「不是老年生活——是中国人的生活智慧。」\n\n「太极：用最慢的动作，练最稳的心。」',
+      cond: g => !g.flags.taiChiPark && g.age >= 25,
+      choices:[
+        { label:'成了公园太极的常客', hint:'+❤️ +😊 +🧠', fn: g => { g.flags.taiChiPark=true; g.flags.taiChiRegular=true; return{health:12,mood:10,intel:3}; }},
+        { label:'学了一段时间，偶尔练习', hint:'+❤️ +😊', fn: g => { g.flags.taiChiPark=true; return{health:8,mood:5}; }},
+        { label:'体验了一下，不太适合我', hint:'', fn: g => { g.flags.taiChiPark=true; return{mood:3}; }},
+      ]},
+    { id:'herbal_tea_culture', icon:'🍵', title:'养生壶与养生茶', category:'health',
+      body:'你的同事送了你一个养生壶。\n\n「这是红枣枸杞茶、这是菊花决明子茶、这是陈皮普洱、这是玫瑰花茶。」她说：「每种茶有不同的功效，根据体质选择。」\n\n你开始在办公室泡养生茶。你的同事路过都会问：「你今天泡的什么？」\n\n你发现：养生茶的功效不在于茶本身——在于「仪式感」。当你认真地选茶、泡茶、品茶的时候，你在给自己一个「暂停」的信号。\n\n你的一个朋友是中医，她说：「养生茶不能治病——但它能让你开始关注自己的身体。当你知道自己「湿气重」要喝薏米水、「上火」要喝菊花茶的时候，你已经在自我调理了。」\n\n你的办公桌上现在有三个壶：一个泡茶、一个煮粥、一个炖银耳。你的同事叫你「养生达人」。\n\n「养生壶：不是在喝茶——是在提醒自己，慢一点、好一点。」',
+      cond: g => !g.flags.herbalTeaCulture && g.age >= 24,
+      choices:[
+        { label:'成了养生茶爱好者', hint:'+❤️ +😊 -💰', fn: g => { g.flags.herbalTeaCulture=true; g.flags.teaWellness=true; return{health:8,mood:8,money:-500}; }},
+        { label:'偶尔泡泡，感觉不错', hint:'+❤️ +😊', fn: g => { g.flags.herbalTeaCulture=true; return{health:5,mood:5}; }},
+        { label:'还是喝咖啡吧', hint:'', fn: g => { g.flags.herbalTeaCulture=true; return{mood:2}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -10859,6 +10940,12 @@ const ACHIEVEMENTS = [
     { id:'sound_collector_ach', icon:'🔊', name:'城市声音收藏家', desc:'开始记录城市的声音', check: g => g.flags.soundCollector },
     { id:'reading_regular_ach', icon:'📚', name:'城市书房常客', desc:'在城市书房找到了阅读的乐趣', check: g => g.flags.readingRegular },
     { id:'night_market_fan_ach', icon:'🌃', name:'夜市达人', desc:'爱上了城市的烟火气', check: g => g.flags.nightMarketFan },
+    // === v21.2 新增成就（健康养生） ===
+    { id:'tcm_regular_ach', icon:'🏺', name:'中医养生达人', desc:'开始定期做中医调理', check: g => g.flags.tcmRegular },
+    { id:'marathon_ach', icon:'🏃', name:'马拉松跑者', desc:'完成了一场半程马拉松', check: g => g.flags.marathonRunner || g.flags.halfMarathon },
+    { id:'baduanjin_ach', icon:'🧘', name:'八段锦练习者', desc:'坚持每天做八段锦', check: g => g.flags.baduanjinRegular },
+    { id:'mindful_eater_ach', icon:'🥗', name:'正念饮食者', desc:'开始践行正念饮食', check: g => g.flags.mindfulEater },
+    { id:'lifestyle_change_ach', icon:'🔄', name:'生活方式改变者', desc:'因亚健康警告而认真改变了生活方式', check: g => g.flags.lifestyleChange },
 ];
 
 // === ENDINGS === (order matters: first match wins)
