@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v29.1
+// 都市浮生记 - Game Engine v29.2
 // ============================================
 
 // === GAME STATE ===
@@ -15227,6 +15227,87 @@ const EVENTS = [
         { label:'觉得错过了太多机会回去了', hint:'+✨ -💰', fn: g => { g.flags.geoArbitrage=true; g.flags.missedOpportunities=true; return{charm:3,mood:-3}; }},
         { label:'在三线城市找到了新的商业机会', hint:'+💰 +✨', fn: g => { g.flags.geoArbitrage=true; g.flags.localOpportunity=true; g.money += 20000; return{charm:5,intel:5}; }},
       ]},
+    // === v29.2: 银发经济 + 养老焦虑 + 代际照护 ===
+    { id:'nursing_home_visit', icon:'🏥', title:'考察养老院', category:'family',
+      body:'你开始考察养老院了——为了你爸妈。\n\n你看了3家：\n\nA：社区养老院\n- 月费：4000元\n- 条件：4人间，共用卫生间\n- 距离：开车20分钟\n\nB：中高端养老院\n- 月费：8000元\n- 条件：2人间，独立卫生间\n- 距离：开车40分钟\n\nC：高端养老社区\n- 月费：15000元\n- 条件：单人间，配套齐全\n- 距离：开车1小时\n\n你妈说：「我不去养老院，我在家里等死就行了。」\n\n你开始理解：养老院——不是「安置父母的地方」——是「你在「自己的生活和父母的需求」之间做的选择」。\n\n你选贵的——你的生活质量下降。\n你选便宜的——你的内疚感上升。\n\n「养老院：你不是在选养老院——你是在选「你能承受多少内疚」。」',
+      cond: g => g.age >= 38 && !g.flags.nursingHomeVisit && g.parentsGettingOld,
+      choices:[
+        { label:'选了中高端的，尽力了', hint:'-💰 +❤️', fn: g => { g.flags.nursingHomeVisit=true; g.flags.choseMidRangeHome=true; g.money -= 8000; return{mood:3,charm:3}; }},
+        { label:'说服父母先在家，请保姆照顾', hint:'-💰 +❤️', fn: g => { g.flags.nursingHomeVisit=true; g.flags.hiredHomeCare=true; g.money -= 5000; return{mood:5,social:3}; }},
+        { label:'太贵了，暂时还是父母自己照顾自己', hint:'+💰 -❤️', fn: g => { g.flags.nursingHomeVisit=true; return{mood:-8,intel:3}; }},
+      ]},
+    { id:'pension_anxiety_v29_2', icon:'💰', title:'养老金焦虑', category:'finance',
+      body:'你查了一下你的养老金账户。\n\n你的养老金预估：\n- 缴费年限：25年\n- 个人账户余额：12万\n- 预估月养老金：3200元\n\n你所在城市：\n- 最低生活标准：2500元\n- 你的养老金：3200元\n- 盈余：700元\n\n你的担忧：\n- 通胀每年3-5%\n- 医疗费随年龄指数增长\n- 3200元/月——够吃饭——但不够看病\n\n你开始理解：养老金焦虑——不是「钱不够」——是「不确定性太大」。\n\n你不知道——你会活多久——你会生什么病——你需要多少护理费。\n\n你的养老金——够「活着」——但不够「活得有尊严」。\n\n「养老金焦虑：你不是在担心「钱不够花」——你是在担心「老了之后——成为一个负担」。」',
+      cond: g => g.age >= 40 && !g.flags.pensionAnxiety && g.jobSalary > 0,
+      choices:[
+        { label:'开始额外存养老基金', hint:'+💰 +🧠', fn: g => { g.flags.pensionAnxiety=true; g.flags.extraPensionSaving=true; g.money -= 10000; return{intel:5,mood:3}; }},
+        { label:'买了商业养老保险', hint:'-💰 +🧠', fn: g => { g.flags.pensionAnxiety=true; g.flags.commercialPension=true; g.money -= 20000; return{intel:5,charm:3}; }},
+        { label:'焦虑了但觉得想了也没用', hint:'-😊', fn: g => { g.flags.pensionAnxiety=true; return{mood:-5}; }},
+      ]},
+    { id:'parent_digital_divide', icon:'📱', title:'教父母用手机', category:'family',
+      body:'你教你妈用智能手机。\n\n第1次：教她用微信\n- 「妈，点这里发消息」\n- 「哪个点？」\n- 「绿色的那个」\n- 「我点了怎么没反应？」\n- （过了30分钟终于发了一条）\n\n第2次：教她用支付宝\n- 「妈，扫码付款」\n- 「怎么扫？」\n- 「对准二维码」\n- 「扫了，然后呢？」\n- （你崩溃了）\n\n第3次：教她挂号\n- 「妈，先选医院」\n- 「然后选科室」\n- 「然后选医生」\n- 「然后选时间」\n- （4步操作——教了2小时）\n\n你开始理解：数字鸿沟——不是「老年人不会用」——是「这个系统不是为老年人设计的」。\n\n你用了10年学会的东西——他们可能永远学不会。\n\n不是因为「笨」——是因为「没有人为他们设计」。\n\n「数字鸿沟：你不是在教父母用手机——你是在「为整个社会的数字排斥」做补丁」。」',
+      cond: g => g.age >= 30 && !g.flags.parentDigitalDivide,
+      choices:[
+        { label:'耐心教了一个月，教会了基本操作', hint:'+❤️ +🧠 -😊', fn: g => { g.flags.parentDigitalDivide=true; g.flags.taughtParentsTech=true; return{social:5,intel:3,mood:-3}; }},
+        { label:'给他们买了最简单的老年手机', hint:'+❤️ -💰', fn: g => { g.flags.parentDigitalDivide=true; g.money -= 500; return{mood:3,charm:3}; }},
+        { label:'每次打电话远程指导', hint:'+❤️ +😊', fn: g => { g.flags.parentDigitalDivide=true; return{social:3,mood:2}; }},
+      ]},
+    { id:'alzheimer_fear', icon:'🧠', title:'父母开始忘事了', category:'family',
+      body:'你妈打电话来说：「你爸最近老忘事。」\n\n症状：\n- 忘了刚说过的话\n- 出门忘了带钥匙\n- 把盐放成了糖\n- 有时候忘了你的名字\n\n你带他去检查：\n- 轻度认知障碍\n- 不一定是阿尔茨海默\n- 但需要观察\n\n你的内心：\n- 如果他真的得了阿尔茨海默怎么办？\n- 谁来照顾他？\n- 我请得起护工吗？\n- 我能辞职照顾他吗？\n\n你开始理解：阿尔茨海默——不是「一种病」——是「一场漫长的告别」。\n\n你的父亲——会慢慢地——忘记一切——包括你。\n\n而你——什么都做不了——只能「在他还记得你的时候——多陪陪他」。\n\n「阿尔茨海默：你害怕的不是「他忘了你」——是「你还没来得及让他知道你爱他」。」',
+      cond: g => g.age >= 40 && !g.flags.alzheimerFear && g.parentsGettingOld,
+      choices:[
+        { label:'每周回家陪父母', hint:'+❤️ +😊 -💰', fn: g => { g.flags.alzheimerFear=true; g.flags.weeklyVisits=true; g.money -= 2000; return{mood:5,social:5}; }},
+        { label:'请了专业护工定期照顾', hint:'-💰 +❤️', fn: g => { g.flags.alzheimerFear=true; g.flags.professionalCare=true; g.money -= 6000; return{mood:3,intel:3}; }},
+        { label:'开始研究阿尔茨海默的预防方法', hint:'+🧠 +❤️', fn: g => { g.flags.alzheimerFear=true; g.flags.researchingPrevention=true; return{intel:8,mood:-3}; }},
+      ]},
+    { id:'elderly_parent_social', icon:'👴', title:'父母的社交', category:'social',
+      body:'你发现——你的父母——很孤独。\n\n他们的日常：\n- 早上：去菜市场买菜\n- 上午：在家看电视\n- 中午：两个人吃饭\n- 下午：在小区里坐着\n- 晚上：看新闻联播\n- 每天说的话：不超过100句\n\n他们的朋友：\n- 老张：去年搬走了\n- 老李：生病住院了\n- 老王：去世了\n\n你妈说：「我们没什么事，你忙你的。」\n\n但你知道——他们「没什么事」——是因为「他们已经习惯了孤独」。\n\n你开始理解：老年社交——不是「老年人的需求」——是「老年人的生命线」。\n\n孤独——对老年人来说——比「疾病」更致命。\n\n「父母社交：你以为他们需要「钱」——其实他们需要「有人说话」。」',
+      cond: g => g.age >= 35 && !g.flags.elderlyParentSocial && g.parentsGettingOld,
+      choices:[
+        { label:'帮父母报了老年大学', hint:'-💰 +❤️', fn: g => { g.flags.elderlyParentSocial=true; g.flags.parentsInSeniorCollege=true; g.money -= 3000; return{mood:5,social:3}; }},
+        { label:'每天视频电话聊10分钟', hint:'+❤️ +😊', fn: g => { g.flags.elderlyParentSocial=true; g.flags.dailyVideoCall=true; return{mood:5,social:5}; }},
+        { label:'鼓励父母参加社区活动', hint:'+❤️ +🧠', fn: g => { g.flags.elderlyParentSocial=true; return{social:3,mood:3}; }},
+      ]},
+    { id:'home_care_vs_nursing', icon:'🏠', title:'居家养老还是养老院', category:'family',
+      body:'你在纠结——父母是「居家养老」还是「去养老院」。\n\n居家养老：\n- 优点：父母熟悉的环境\n- 缺点：需要请保姆（5000-8000元/月）\n- 风险：保姆不靠谱\n\n养老院：\n- 优点：专业照护，有社交\n- 缺点：父母不愿意去\n- 风险：虐待老人新闻\n\n你妈说：「我在家等死就行了，别花那个钱。」\n你爸说：「听你妈的。」\n\n你开始理解：居家vs养老院——不是「选择题」——是「两难困境」。\n\n居家——你担心「照顾不好」。\n养老院——你担心「他们不开心」。\n\n不管选哪个——你都会「内疚」。\n\n「居家vs养老院：你不是在选择「哪种方式更好」——你是在选择「哪种内疚你能承受」。」',
+      cond: g => g.age >= 40 && g.flags.nursingHomeVisit && !g.flags.homeCareVsNursing,
+      choices:[
+        { label:'尊重父母意愿居家养老', hint:'+❤️ -💰', fn: g => { g.flags.homeCareVsNursing=true; g.flags.choseHomeCare=true; g.money -= 5000; return{mood:3,charm:3}; }},
+        { label:'半居家半日间照料中心', hint:'+🧠 -💰', fn: g => { g.flags.homeCareVsNursing=true; g.flags.hybridCare=true; g.money -= 4000; return{intel:5,mood:3}; }},
+        { label:'还是说服父母去了养老院', hint:'-❤️ +🧠', fn: g => { g.flags.homeCareVsNursing=true; g.flags.choseNursingHome=true; g.money -= 8000; return{mood:-5,intel:3}; }},
+      ]},
+    { id:'retirement_purpose', icon:'🌅', title:'退休后找事做', category:'psychology',
+      body:'你退休了。\n\n你终于可以：\n- 睡到自然醒\n- 不用上班\n- 想做什么做什么\n\n但你发现：\n- 第1天：好爽！\n- 第7天：有点无聊\n- 第30天：不知道干什么\n- 第90天：觉得人生没意义了\n\n你开始找事做：\n- 跳广场舞：不喜欢\n- 学书法：没耐心\n- 带孙子：太累\n- 旅游：钱不够\n\n你开始理解：退休——不是「自由」——是「失去了被需要的感觉」。\n\n工作——虽然辛苦——但它给了你「存在感」。\n\n退休之后——你需要「自己给自己找存在感」——而这——比工作还难。\n\n「退休找事做：你以为你在「享受退休」——其实你在「重新学习如何活着」。」',
+      cond: g => g.age >= 55 && !g.flags.retirementPurpose && g.jobSalary > 0,
+      choices:[
+        { label:'开始当志愿者找到了新的人生意义', hint:'+❤️ +😊', fn: g => { g.flags.retirementPurpose=true; g.flags.volunteerRetiree=true; g.reputation.social += 5; return{mood:10,charm:5}; }},
+        { label:'开始写回忆录', hint:'+🧠 +😊', fn: g => { g.flags.retirementPurpose=true; g.flags.writingMemoir=true; return{intel:8,mood:5}; }},
+        { label:'觉得退休生活很空虚', hint:'-😊 -🧠', fn: g => { g.flags.retirementPurpose=true; return{mood:-8,intel:-3}; }},
+      ]},
+    { id:'estate_planning', icon:'📋', title:'遗产规划', category:'finance',
+      body:'你开始考虑遗产规划了。\n\n你的资产：\n- 房子：市值300万（还有50万贷款）\n- 存款：40万\n- 保险：寿险50万\n\n你想留给孩子的：\n- 房子\n- 存款\n- 一笔「起步资金」\n\n但你想到了：\n- 遗产税：中国目前没有\n- 房产继承：手续复杂\n- 分配问题：如果有多个孩子怎么分？\n- 万一孩子不争气败光了怎么办？\n\n你开始理解：遗产规划——不是「分钱」——是「如何在不在的时候——还能保护你爱的人」。\n\n你不是在「安排财产」——你是在「安排你离开后他们的生活」。\n\n这让你「难受」——但也让你「认真」。\n\n「遗产规划：你不是在「分配财产」——你是在「写一封不会寄出的信——告诉孩子你有多爱他们」。」',
+      cond: g => g.age >= 50 && !g.flags.estatePlanning && g.money >= 100000,
+      choices:[
+        { label:'做了完整的遗嘱和保险规划', hint:'+🧠 +❤️ -💰', fn: g => { g.flags.estatePlanning=true; g.flags.completeEstatePlan=true; g.money -= 5000; return{intel:8,mood:3}; }},
+        { label:'把房子提前过户给孩子', hint:'-💰 +❤️', fn: g => { g.flags.estatePlanning=true; g.flags.earlyTransfer=true; g.money -= 10000; return{mood:5,charm:3}; }},
+        { label:'觉得还早不着急', hint:'+😊 -🧠', fn: g => { g.flags.estatePlanning=true; return{mood:3}; }},
+      ]},
+    { id:'caregiver_burnout', icon:'😩', title:'照护倦怠', category:'psychology',
+      body:'你照顾了父母3年——你累了。\n\n你的日常：\n- 白天：上班\n- 下班后：赶回家做饭\n- 晚上：陪父母看病\n- 周末：处理各种手续\n- 半夜：接到电话（又出事了）\n\n你的身体：\n- 头痛：每周\n- 失眠：经常\n- 体重：下降了5kg\n- 情绪：暴躁\n\n你的工作：\n- 请了12天假（领导不高兴）\n- 出了2个错（被客户投诉）\n- 绩效评估：B-\n\n你开始理解：照护倦怠——不是「你不孝顺」——是「一个人的承受力是有限的」。\n\n你不是「不爱父母」——你是「同时爱父母和工作——但你的时间不够爱两个」。\n\n「照护倦怠：你不是在「照顾父母」——你是在「用你的健康——换他们的健康」——而你的健康——也在崩溃」。」',
+      cond: g => g.age >= 38 && (g.flags.hiredHomeCare || g.flags.choseHomeCare || g.flags.weeklyVisits) && g.health <= 50,
+      choices:[
+        { label:'请了更多帮手分担照护', hint:'-💰 +💪 +❤️', fn: g => { g.flags.caregiverBurnout=true; g.flags.hiredMoreHelp=true; g.money -= 5000; return{health:5,mood:5}; }},
+        { label:'和父母认真谈了需要专业照护', hint:'+🧠 +❤️', fn: g => { g.flags.caregiverBurnout=true; g.flags.professionalCareTalk=true; return{intel:5,mood:3,social:3}; }},
+        { label:'继续硬撑觉得不能放弃', hint:'-💪 -😊 +❤️', fn: g => { g.flags.caregiverBurnout=true; g.flags.ignoredCaregiverBurnout=true; return{health:-10,mood:-8,charm:3}; }},
+      ]},
+    { id:'living_will', icon:'📝', title:'生前预嘱', category:'psychology',
+      body:'你在网上看到一篇文章：「你希望临终时被怎样对待？」\n\n问题：\n- 如果心跳停止——你要不要心肺复苏？\n- 如果无法呼吸——你要不要上呼吸机？\n- 如果无法进食——你要不要插管？\n- 如果无法治愈——你要不要放弃治疗？\n\n你开始思考：\n- 「我不想被插满管子活着」\n- 「但我的家人——可能不会同意放弃」\n- 「如果我没有提前说——他们会怎么选？」\n\n你开始理解：生前预嘱——不是「放弃生命」——是「尊重生命的质量」。\n\n你不是在「选择死亡」——你是在「选择如何告别」。\n\n「生前预嘱：你不是在「安排死亡」——你是在「给爱你的人——一个不用做艰难决定的礼物」。」',
+      cond: g => g.age >= 45 && !g.flags.livingWill && g.intel >= 25,
+      choices:[
+        { label:'签了生前预嘱并告知家人', hint:'+🧠 +😊', fn: g => { g.flags.livingWill=true; g.flags.signedLivingWill=true; return{intel:8,mood:5,charm:3}; }},
+        { label:'和家人认真讨论了这个话题', hint:'+❤️ +🧠', fn: g => { g.flags.livingWill=true; g.flags.discussedEndOfLife=true; return{social:5,intel:5}; }},
+        { label:'觉得太早了以后再说', hint:'+😊 -🧠', fn: g => { g.flags.livingWill=true; return{mood:2}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -16596,6 +16677,15 @@ const ACHIEVEMENTS = [
     { id:'scam_avoided_ach', icon:'🛡️', name:'火眼金睛', desc:'识破了远程工作骗局', check: g => g.flags.avoidedScam },
     { id:'geo_arbitrage_ach', icon:'🗺️', name:'地理套利', desc:'通过地理套利存下了一大笔钱', check: g => g.flags.geoArbitrage },
     { id:'local_opportunity_ach', icon:'🌱', name:'小城大梦', desc:'在三线城市发现了新的商业机会', check: g => g.flags.localOpportunity },
+    // v29.2: 银发经济 + 养老焦虑 + 代际照护
+    { id:'taught_tech_ach', icon:'📱', name:'耐心教学', desc:'教会了父母使用智能手机', check: g => g.flags.taughtParentsTech },
+    { id:'weekly_visits_ach', icon:'🏠', name:'每周回家', desc:'坚持每周回家陪父母', check: g => g.flags.weeklyVisits },
+    { id:'daily_video_ach', icon:'📹', name:'视频达人', desc:'每天和父母视频电话', check: g => g.flags.dailyVideoCall },
+    { id:'volunteer_retiree_ach', icon:'🤝', name:'银发志愿者', desc:'退休后当志愿者找到了人生意义', check: g => g.flags.volunteerRetiree },
+    { id:'estate_plan_ach', icon:'📋', name:'未雨绸缪', desc:'做了完整的遗产规划', check: g => g.flags.completeEstatePlan },
+    { id:'living_will_ach', icon:'📝', name:'生前预嘱', desc:'签了生前预嘱给家人减轻负担', check: g => g.flags.signedLivingWill },
+    { id:'hybrid_care_ach', icon:'🏥', name:'混合照护', desc:'选择了半居家半日间照料的折中方案', check: g => g.flags.hybridCare },
+    { id:'writing_memoir_ach', icon:'📖', name:'人生记录者', desc:'退休后开始写回忆录', check: g => g.flags.writingMemoir },
 ];
 
 // === ENDINGS === (order matters: first match wins)
