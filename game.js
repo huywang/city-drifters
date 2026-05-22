@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v32.9
+// 都市浮生记 - Game Engine v33.0
 // ============================================
 
 // === GAME STATE ===
@@ -18338,6 +18338,97 @@ const EVENTS = [
         { label:'决定继续留在这个城市', hint:'+🧠 +😊', fn: g => { g.flags.yearRound=true; g.flags.stayCity=true; return{intel:5,mood:8}; }},
         { label:'给爸妈寄了一些当地特产', hint:'-💰 +👥 +😊', fn: g => { g.flags.yearRound=true; g.money-=200; return{social:5,mood:8}; }},
       ]},
+
+    // === v33.0 大版本：城市新移民 ===
+    { id:'first_day_city_v33', icon:'🚄', title:'第一天到这座城市', category:'immigrant',
+      body:'你拎着两个行李箱走出了火车站。\n\n空气里有不一样的味道——是汽车尾气和不知道哪家餐厅飘来的油烟混合的味道。\n\n你打开手机导航，找到了你提前订的青年旅馆。一个床位，五十块一晚。\n\n放下行李后你出了门，站在街头看了看。高楼大厦、川流不息的车辆、行色匆匆的路人。每个人都好像知道自己要去哪里。\n\n只有你站在那里，拎着手机，不知道该往哪个方向走。\n\n你深吸了一口气，对自己说：「就从这里开始吧。」',
+      cond: g => g.months <= 1 && g.age >= 18,
+      choices:[
+        { label:'兴奋地四处逛了一圈', hint:'+😊 +💪', fn: g => { g.flags.firstDayCity=true; return{mood:8,health:2}; }},
+        { label:'紧张地回了旅馆研究地图', hint:'+🧠', fn: g => { g.flags.firstDayCity=true; return{intel:5}; }},
+        { label:'给爸妈打了个电话报平安', hint:'+👥 +😊', fn: g => { g.flags.firstDayCity=true; g.flags.calledHome=true; return{social:3,mood:5}; }},
+      ]},
+
+    { id:'residence_permit_v33', icon:'📋', title:'办居住证', category:'immigrant',
+      body:'你需要办居住证，不然很多事情都做不了。\n\n你去了社区服务中心，排了两个小时的队。终于到你了，工作人员说：「你的租房合同不行，要让房东带房产证来。」\n\n你回去找房东，房东说：「我可以给你复印件，但你要多交一百块手续费。」\n\n你又跑了一趟社区中心。这次换了一个窗口，工作人员说：「还缺一张一寸照片。」\n\n你在附近的照相馆花了三十块拍了一张。第三次去的时候，终于办好了。\n\n你拿着那张居住证，觉得这张小小的卡片，比你的毕业证还珍贵——因为它代表着你在这座城市有了「身份」。',
+      cond: g => g.months >= 1 && !g.flags.hasHukou,
+      choices:[
+        { label:'跑了好几趟终于办好了', hint:'+🧠 +😊', fn: g => { g.flags.residencePermit=true; return{intel:3,mood:5}; }},
+        { label:'吐槽了一下办事效率', hint:'+✨', fn: g => { g.flags.residencePermit=true; return{charm:3,mood:-2}; }},
+        { label:'觉得有了居住证就是半个本地人了', hint:'+👥 +😊', fn: g => { g.flags.residencePermit=true; return{social:3,mood:8}; }},
+      ]},
+
+    { id:'first_subway_v33', icon:'🚇', title:'第一次坐地铁', category:'immigrant',
+      body:'你第一次在这个城市坐地铁。\n\n你站在自动售票机前研究了半天，不知道该买哪一站的票。后面的人开始催你了：「你到底坐哪站？」\n\n你慌忙说了个站名，对方帮你按了按钮。\n\n你拿着票进了站，等地铁来了。门一开，你被人流推着挤了进去。\n\n地铁里人贴人，你抓着扶手，感觉自己像沙丁鱼罐头里的一条鱼。\n\n你数着站数，生怕坐过了站。到了你要下的那一站，你使出全身力气挤到了门口。\n\n门开了，你冲了出去。回头一看——地铁已经开走了。你大口大口地呼吸着站台的空气，觉得你征服了这个城市的第一关。',
+      cond: g => g.months <= 2 && g.age >= 18,
+      choices:[
+        { label:'回去研究了一下地铁线路图', hint:'+🧠', fn: g => { g.flags.firstSubway=true; return{intel:5}; }},
+        { label:'下载了地铁APP，以后不会坐错了', hint:'+🧠 +💪', fn: g => { g.flags.firstSubway=true; return{intel:3,health:2}; }},
+        { label:'觉得这个城市的地铁太复杂了', hint:'-😊', fn: g => { g.flags.firstSubway=true; return{mood:-3}; }},
+      ]},
+
+    { id:'getting_lost_v33', icon:'🗺️', title:'迷路了', category:'immigrant',
+      body:'你去找面试的公司，结果在一个写字楼群里迷了路。\n\nA栋、B栋、C栋……你转了三圈也没找到D栋在哪里。你看了看时间，面试还有十分钟就开始了。\n\n你急得满头大汗，问了一个保安大叔。大叔说：「D栋啊，你从这个门出去，左拐，过一个天桥就到了。」\n\n你一路小跑，终于找到了D栋。但电梯在22楼，你在3楼。\n\n你爬了19层楼梯。到面试的公司门口的时候，你气喘吁吁、满头大汗。\n\n前台看了看你说：「你是来面试的吧？没关系，还有一分钟。」\n\n你喘着气走进了面试间。你觉得，这是你在这个城市的第一次「极限挑战」。',
+      cond: g => g.months <= 3 && g.age >= 18,
+      choices:[
+        { label:'爬了19层楼梯赶到了面试', hint:'+💪 +🧠', fn: g => { g.flags.gettingLost2=true; return{health:3,intel:3}; }},
+        { label:'迟到了，但面试官没怪你', hint:'+😊', fn: g => { g.flags.gettingLost2=true; return{mood:3}; }},
+        { label:'以后提前查好了路线再出门', hint:'+🧠', fn: g => { g.flags.gettingLost2=true; g.flags.planRoute=true; return{intel:5}; }},
+      ]},
+
+    { id:'first_paycheck_v33', icon:'💰', title:'第一次发工资', category:'immigrant',
+      body:'手机震了一下——工资到账了。\n\n你打开银行APP看了看数字。扣完五险一金和个税，到手的比你想象的少了一些。但这是你在这个城市赚到的第一笔钱。\n\n你先转了两千块给妈妈。妈妈回消息：「你自己留着花，妈不缺钱。」\n\n你回：「拿着吧，我够花的。」\n\n然后你去超市买了一些日用品，又吃了一顿好的。你算了一下剩下的钱——房租、水电、交通、吃饭……刚好够用。\n\n你坐在出租屋里，看着银行卡余额。虽然不多，但你觉得这是你独立的开始。\n\n你在这个城市，终于可以靠自己活下去了。',
+      cond: g => g.months >= 1 && g.jobSalary > 0 && !g.flags.firstPaycheckFlag,
+      choices:[
+        { label:'给爸妈转了钱，自己省着花', hint:'+👥 +😊', fn: g => { g.flags.firstPaycheckV33=true; g.flags.firstPaycheckFlag=true; g.money-=2000; return{social:5,mood:10}; }},
+        { label:'犒劳自己吃了一顿大餐', hint:'-💰 +😊', fn: g => { g.flags.firstPaycheckV33=true; g.flags.firstPaycheckFlag=true; g.money-=300; return{mood:8}; }},
+        { label:'存了起来，一分钱都没乱花', hint:'+💰 +🧠', fn: g => { g.flags.firstPaycheckV33=true; g.flags.firstPaycheckFlag=true; return{money:500,intel:3}; }},
+      ]},
+
+    { id:'homesick_night_v33', icon:'🌙', title:'想家的夜晚', category:'immigrant',
+      body:'凌晨两点，你躺在床上，突然很想家。\n\n你想念妈妈的菜、想念爸爸的唠叨、想念家里那张虽然硬但特别舒服的床。\n\n你翻了翻手机相册，看到了出发前全家在火车站的合影。妈妈笑着，但眼圈红了。爸爸帮你拎行李，一句话都没说。\n\n你打开微信，想给妈妈发条消息，但看了看时间——太晚了，别吵醒他们。\n\n你在备忘录里写了一句话：「今天想家了，但我不会放弃。」\n\n你把手机放到枕头旁边，闭上眼睛。你听到了窗外偶尔驶过的车声。这个城市还在运转，而你也是它的一部分了。\n\n明天还要早起上班。你深深地吸了一口气，慢慢睡着了。',
+      cond: g => g.months >= 1 && !g.flags.hasHukou && g.mood < 60,
+      choices:[
+        { label:'在备忘录里写下了心情', hint:'+🧠 +😊', fn: g => { g.flags.homesickNight=true; return{intel:5,mood:3}; }},
+        { label:'第二天一早就给妈妈打了电话', hint:'+👥 +😊', fn: g => { g.flags.homesickNight=true; g.flags.calledMom3=true; return{social:5,mood:8}; }},
+        { label:'告诉自己要坚强', hint:'+💪', fn: g => { g.flags.homesickNight=true; return{health:3,mood:3}; }},
+      ]},
+
+    { id:'first_friend_v33', icon:'🤝', title:'交到第一个朋友', category:'immigrant',
+      body:'你在这个城市还没有什么朋友。\n\n有一天在公司茶水间，你遇到了一个跟你一样是外地来的同事。她叫小林，比你早来半年。\n\n你们聊了起来：「你是哪里人？」「来了多久了？」「住在哪里？」「习不习惯？」\n\n发现你们住的地铁站只差两站。她问你：「周末有没有空？我知道一家特别好吃的火锅店。」\n\n周末你们去吃了火锅。她给你推荐了哪里买菜便宜、哪条路上班最快、哪个公园适合跑步。\n\n你觉得在这个城市，交到第一个朋友比找到第一份工作还重要。因为有了朋友，你就不再是一个人了。',
+      cond: g => g.months >= 1 && g.social < 40 && g.jobSalary > 0,
+      choices:[
+        { label:'成了无话不谈的好朋友', hint:'+👥 +😊', fn: g => { g.flags.firstFriend=true; return{social:10,mood:10}; }},
+        { label:'偶尔一起吃饭逛街', hint:'+👥', fn: g => { g.flags.firstFriend=true; return{social:5,mood:5}; }},
+        { label:'加了微信但不常联系', hint:'+👥', fn: g => { g.flags.firstFriend=true; return{social:3}; }},
+      ]},
+
+    { id:'learn_dialect_v33', icon:'🗣️', title:'学会了一句方言', category:'immigrant',
+      body:'你来这个城市已经半年了。\n\n有一天你去菜市场买菜，老板娘说了一句话你完全没听懂。你尴尬地笑了笑，旁边的阿姨帮你翻译了：「她说这个菜今天不新鲜了，给你算便宜点。」\n\n你开始留意身边的人怎么说话。你学会了几个词：「侬好」（你好）、「巴适」（舒服）、「靓仔」（帅哥）——取决于你在哪个城市。\n\n有一天你去早餐店，试着用方言说了一句点餐的话。老板娘笑了：「哟，会说了嘛！」\n\n你发现，学会一句方言比学会一门外语还让你开心——因为这意味着你开始属于这个地方了。',
+      cond: g => g.months >= 6,
+      choices:[
+        { label:'开始主动学更多方言', hint:'+🧠 +👥', fn: g => { g.flags.learnDialect=true; return{intel:5,social:5}; }},
+        { label:'用手机录了下来发给爸妈', hint:'+👥 +😊', fn: g => { g.flags.learnDialect=true; return{social:3,mood:5}; }},
+        { label:'觉得语言是融入一个城市最好的方式', hint:'+🧠 +😊', fn: g => { g.flags.learnDialect=true; return{intel:5,mood:3}; }},
+      ]},
+
+    { id:'alone_newyear_v33', icon:'🧧', title:'第一次独自过年', category:'immigrant',
+      body:'今年你没有回家过年。\n\n不是因为不想回，是因为加班有三倍工资，而且春运的票太难抢了。\n\n大年三十晚上，你一个人在出租屋里煮了一碗速冻饺子。你打开了电视，看了春晚。\n\n你给爸妈打了视频电话。妈妈看到你一个人吃饺子，哭了。你说：「没事，我挺好的，饺子也很好吃。」\n\n挂了电话后，你看了看窗外——外面有人在放烟花。你站在窗前看了很久。\n\n你发了一条朋友圈：「第一次一个人过年，但我知道，明年会更好。」\n\n零点的时候，你收到了二十多条新年祝福。你突然觉得，你不是一个人。',
+      cond: g => g.months >= 6 && !g.flags.hasHukou,
+      choices:[
+        { label:'一个人吃了饺子看了春晚', hint:'+🧠 +😊', fn: g => { g.flags.aloneNewyear=true; return{intel:3,mood:3}; }},
+        { label:'约了同样没回家的朋友一起过', hint:'+👥 +😊', fn: g => { g.flags.aloneNewyear=true; return{social:8,mood:8}; }},
+        { label:'加班赚了三倍工资', hint:'+💰', fn: g => { g.flags.aloneNewyear=true; g.money+=3000; return{mood:-3}; }},
+      ]},
+
+    { id:'decide_stay_v33', icon:'🏙️', title:'决定留下来', category:'immigrant',
+      body:'你来这个城市已经一年了。\n\n你坐在窗前，看着远处的灯火，想了很多。\n\n这一年你经历了很多：迷路、搬家、加班、孤独、生病……但你也有了新的朋友、新的技能、新的自己。\n\n你算了一笔账：留在这里，机会多但压力大；回老家，舒服但可能一辈子就这样了。\n\n你想起了第一天到达这座城市时说的话：「就从这里开始吧。」\n\n你打开手机，给妈妈发了条消息：「妈，我决定留在这里。」\n\n妈妈回：「你开心就好，但记得常回来看看。」\n\n你看着这条消息，眼眶有点湿。你知道，留下来不意味着不回家，而是把这里也变成你的家。',
+      cond: g => g.months >= 12 && !g.flags.hasHukou,
+      choices:[
+        { label:'坚定地选择留下', hint:'+🧠 +😊', fn: g => { g.flags.decideStay=true; return{intel:5,mood:10}; }},
+        { label:'还在犹豫，再想想', hint:'+🧠', fn: g => { g.flags.decideStay=true; g.flags.stillThinking=true; return{intel:5}; }},
+        { label:'跟朋友说了这个决定', hint:'+👥 +😊', fn: g => { g.flags.decideStay=true; return{social:5,mood:8}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -20087,6 +20178,18 @@ const ACHIEVEMENTS = [
     { id:'winter_snow_ach', icon:'❄️', name:'初雪', desc:'在城市里迎接了第一场雪', check: g => g.flags.winterSnow },
     { id:'seasonal_cold_ach', icon:'🤧', name:'换季感冒', desc:'在换季时感冒了并想家了', check: g => g.flags.seasonalCold },
     { id:'year_round_ach', icon:'🗓️', name:'一年四季', desc:'在这个城市度过了完整的一年', check: g => g.flags.yearRound },
+
+    // --- v33.0 城市新移民成就 ---
+    { id:'first_day_ach', icon:'🚄', name:'新的开始', desc:'来到了一个全新的城市', check: g => g.flags.firstDayCity },
+    { id:'residence_permit_ach', icon:'📋', name:'有了身份', desc:'办好了居住证', check: g => g.flags.residencePermit },
+    { id:'first_subway_ach', icon:'🚇', name:'地铁新手', desc:'在这个城市第一次坐了地铁', check: g => g.flags.firstSubway },
+    { id:'getting_lost_ach', icon:'🗺️', name:'迷路勇士', desc:'在这个城市迷了路但没有放弃', check: g => g.flags.gettingLost2 },
+    { id:'first_paycheck_ach', icon:'💰', name:'第一桶金', desc:'拿到了在这个城市的第一份工资', check: g => g.flags.firstPaycheckV33 },
+    { id:'homesick_ach', icon:'🌙', name:'想家的人', desc:'在深夜想念了家乡', check: g => g.flags.homesickNight },
+    { id:'first_friend_ach', icon:'🤝', name:'第一个朋友', desc:'在新城市交到了第一个朋友', check: g => g.flags.firstFriend },
+    { id:'dialect_ach', icon:'🗣️', name:'方言入门', desc:'学会了当地的方言', check: g => g.flags.learnDialect },
+    { id:'alone_newyear_ach', icon:'🧧', name:'独自过年', desc:'第一次一个人在异乡过了年', check: g => g.flags.aloneNewyear },
+    { id:'decide_stay_ach', icon:'🏙️', name:'选择留下', desc:'决定留在这座城市继续奋斗', check: g => g.flags.decideStay },
 ];
 
 // === ENDINGS === (order matters: first match wins)
