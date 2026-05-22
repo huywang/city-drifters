@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v11.4
+// 都市浮生记 - Game Engine v11.5
 // ============================================
 
 // === GAME STATE ===
@@ -5469,6 +5469,63 @@ const EVENTS = [
         { label:'无所谓', hint:'+😊', fn: g => { return{mood:3}; }},
         { label:'减少刷手机', hint:'+💪 +🧠', fn: g => { return{intel:5,health:3,mood:5}; }},
       ]},
+    // === v11.5 事件链/人生转折/生活智慧 ===
+    { id:'midlife_crossroads', icon:'🔀', title:'人生十字路口',
+      body:'你30岁了。你坐在深夜的出租屋里，问自己三个问题：\n\n1. 这份工作还有意义吗？\n2. 这座城市还适合我吗？\n3. 这是我想要的人生吗？\n\n你没有答案。但你知道：不做选择，也是一种选择。\n\n"30岁是人生的中场休息——上半场忙着生存，下半场思考生活。"',
+      cond: g => g.age >= 29 && g.age <= 33 && g.months > 48,
+      choices:[
+        { label:'换城市', hint:'🎲 +🧠', fn: g => { g.flags.crossroadsCity=true; return{intel:5,mood:5}; }},
+        { label:'换行业', hint:'🎲 +🧠', fn: g => { g.flags.crossroadsCareer=true; return{intel:5,mood:3}; }},
+        { label:'继续现状', hint:'+😊', fn: g => { return{mood:-5}; }},
+      ]},
+    { id:'moving_chain', icon:'📦', title:'搬家',
+      body:'你又搬家了。这是你来这座城市后第N次搬家。\n\n打包的时候你发现：你的东西越来越多，但真正需要的越来越少。\n\n搬家公司收了800块。你站在新家门口，心想：这也许是最后一次搬家了。也许。\n\n"搬家是大城市漂泊者的成年礼——每搬一次，你就更清楚自己想要什么样的生活。"',
+      cond: g => !g.flags.hasHouse && g.months > 18 && g.money > 1000,
+      choices:[
+        { label:'租更好的', hint:'-💰 +😊', fn: g => { g.flags.movedUp=true; return{money:-3000,mood:10,health:3}; }},
+        { label:'省钱合租', hint:'-💰 +👥', fn: g => { return{money:-1000,social:5}; }},
+        { label:'搬到郊区', hint:'-💰 +💪', fn: g => { g.flags.movedSuburb=true; return{money:-500,health:5,mood:3}; }},
+      ]},
+    { id:'hometown_visit', icon:'🚄', title:'回趟老家',
+      body:'你回了一趟老家。\n\n你发现：街角的小卖部变成了奶茶店，你家楼下的路修了三次还是坑坑洼洼，你的高中同学已经结婚生了两个孩子。\n\n你妈做了你最爱吃的菜。你爸喝了两杯酒后说："在外面累了就回来。"\n\n"故乡是一个你离开后才会想念的地方——但回去了你会发现，你已经不属于这里了。"',
+      cond: g => g.months > 24 && g.money > 2000,
+      choices:[
+        { label:'多待几天', hint:'-💰 +👥 +😊', fn: g => { if(g.relationships) g.relationships.family=clamp((g.relationships.family||60)+15,0,100); return{money:-2000,mood:12,social:5}; }},
+        { label:'当天往返', hint:'-💰 +😊', fn: g => { if(g.relationships) g.relationships.family=clamp((g.relationships.family||60)+5,0,100); return{money:-500,mood:5}; }},
+        { label:'考虑回来发展', hint:'+🧠', fn: g => { g.flags.considerReturn=true; return{intel:5,mood:3}; }},
+      ]},
+    { id:'life_insurance_chain', icon:'🛡️', title:'保险意识',
+      body:'你的朋友出了车祸，住院两周，花了3万块。\n\nTA有医保，报销了60%。剩下的1.2万让TA心疼了很久。\n\n你开始认真思考：如果同样的事发生在我身上呢？\n\n"保险是你不希望用到的东西——但用到的时候，你会庆幸自己买了。"',
+      cond: g => g.age >= 24 && g.months > 18 && !g.flags.hasCommercialInsurance,
+      choices:[
+        { label:'买医疗险', hint:'-💰 🛡️', fn: g => { g.flags.hasCommercialInsurance=true; return{money:-600,mood:5}; }},
+        { label:'买意外险', hint:'-💰 🛡️', fn: g => { g.flags.hasCommercialInsurance=true; return{money:-200,mood:3}; }},
+        { label:'觉得自己运气好', hint:'+🧠', fn: g => { return{intel:2}; }},
+      ]},
+    { id:'retirement_thought', icon:'👴', title:'养老焦虑',
+      body:'你算了一笔账：按照目前的存款速度，你大概需要工作到70岁才能"退休"。\n\n你看了看你的社保缴纳记录：已经交了5年了。\n\n你在网上搜索"年轻人如何规划养老"，看到了一个回答："先活到退休再说。"\n\n"养老焦虑的本质：你在用20多岁的收入，规划60岁以后的生活。这本身就是一种奢侈。"',
+      cond: g => g.age >= 28 && g.months > 36,
+      choices:[
+        { label:'开始存养老钱', hint:'-💰 +🧠', fn: g => { return{money:-5000,intel:5,mood:3}; }},
+        { label:'投资养老基金', hint:'-💰 🎲', fn: g => { if(g.investments) g.investments.fund = (g.investments.fund||0)+10000; return{money:-10000,intel:3}; }},
+        { label:'活在当下', hint:'+😊', fn: g => { return{mood:10}; }},
+      ]},
+    { id:'learn_instrument', icon:'🎸', title:'学一门乐器',
+      body:'你买了一把吉他/尤克里里/口琴。你想：如果我会弹一首歌就好了。\n\n你跟着B站教程学了两周。你的手指磨出了茧，但你终于能弹一首《小星星》了。\n\n你发了条朋友圈，收到了50个赞。有人说："来一首！"\n\n"学乐器是成年人最低成本的自我投资——你花500块就能获得终身的快乐。"',
+      cond: g => g.age >= 20 && g.age <= 40 && g.money > 300,
+      choices:[
+        { label:'坚持练习', hint:'+🧠 +✨', fn: g => { g.flags.instrumentPlayer=true; return{intel:5,charm:5,mood:8}; }},
+        { label:'学了两个月放弃', hint:'+😊', fn: g => { return{mood:3}; }},
+        { label:'报班学习', hint:'-💰 +🧠', fn: g => { g.flags.instrumentPlayer=true; return{money:-3000,intel:8,charm:5,mood:10}; }},
+      ]},
+    { id:'volunteer_work', icon:'❤️', title:'志愿者',
+      body:'你报名了一个周末志愿者活动：去养老院陪老人聊天/去动物收容所帮忙/去社区教小朋友画画。\n\n你发现：帮助别人带来的快乐，比消费带来的快乐更持久。\n\n一个老人拉着你的手说："谢谢你来看我，好久没人陪我说话了。"\n\n"做志愿者不是为了简历，是为了提醒自己：你拥有的比你以为的多。"',
+      cond: g => g.age >= 20 && g.months > 6 && g.social >= 25,
+      choices:[
+        { label:'定期参加', hint:'+👥 +😊', fn: g => { g.flags.regularVolunteer=true; return{social:10,mood:12,charm:5}; }},
+        { label:'偶尔参加', hint:'+😊 +👥', fn: g => { return{social:5,mood:8}; }},
+        { label:'不太适合', hint:'', fn: g => { return{mood:-2}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'first_job', icon:'💼', name:'职场新人', desc:'找到第一份工作', check: g => g.flags.gotFirstJob },
@@ -5937,6 +5994,11 @@ const ACHIEVEMENTS = [
     { id:'ethical_creator', icon:'💖', name:'良心博主', desc:'只推荐好东西', check: g => g.flags.ethicalCreator },
     { id:'livestream_seller', icon:'📺', name:'带货主播', desc:'尝试了直播带货', check: g => g.flags.livestreamSeller },
     { id:'digital_clean', icon:'🧹', name:'数字清洁工', desc:'清理了社交媒体', check: g => g.flags.cleanedDigital },
+    // === v11.5 新增成就 ===
+    { id:'instrument_player', icon:'🎸', name:'乐器新手', desc:'学会了一门乐器', check: g => g.flags.instrumentPlayer },
+    { id:'volunteer_regular', icon:'❤️', name:'常驻志愿者', desc:'定期参加志愿活动', check: g => g.flags.regularVolunteer },
+    { id:'moved_up', icon:'📦', name:'消费升级', desc:'搬到了更好的房子', check: g => g.flags.movedUp },
+    { id:'retirement_planner', icon:'👴', name:'养老规划师', desc:'开始规划退休生活', check: g => g.investments && g.investments.fund >= 10000 },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -6083,6 +6145,8 @@ const ENDINGS = [
     { id:'foodie_end', badge:'🍜', title:'城市美食家', desc:'你吃遍了这座城市的每一个角落。\n\n从路边摊到米其林，从早餐铺到深夜食堂。你知道哪条巷子有最好的小面，哪个小区藏着最正宗的川菜。\n\n你在小红书上有了1万粉丝，他们叫你"城市胃王"。\n\n"美食是城市最好的名片——你用味蕾读完了这座城市的每一页。"', cond: g => g.flags.foodExplorer && g.flags.foodBlogger && g.charm >= 50 && g.mood >= 60 },
     // --- v11.4 NEW ENDINGS ---
     { id:'influencer_end', badge:'📱', title:'网红人生', desc:'你成了一个小网红。\n\n粉丝不多不少，刚好够养活自己。你接广告、做直播、写测评。你把自己的生活变成了一种"内容"。\n\n有人说你"活得很累"，因为你要时刻维护人设。但你觉得：能把喜欢的事变成工作，已经很幸运了。\n\n"网红的真相：你展示的是精心编排的人生，但观众需要的是真实。"', cond: g => g.flags.contentCreator && g.charm >= 55 && g.money >= 30000 && g.age >= 25 },
+    // --- v11.5 NEW ENDINGS ---
+    { id:'volunteer_heart_end', badge:'❤️', title:'温暖的人', desc:'你成了社区里最受欢迎的人。\n\n每个周末你都会去养老院、收容所、社区中心做志愿者。你认识了很多朋友——有些比你大50岁，有些比你小20岁。\n\n有人说："你做的事情没有一分钱收入。"\n\n你笑着说："但收获的快乐，千金不换。"\n\n"生命的意义不在于你拥有多少，在于你给予了多少。"', cond: g => g.flags.regularVolunteer && g.social >= 60 && g.mood >= 65 && g.age >= 27 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
