@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v24.0
+// 都市浮生记 - Game Engine v24.1
 // ============================================
 
 // === GAME STATE ===
@@ -11752,6 +11752,87 @@ const EVENTS = [
         { label:'学了数字修复技术，想参与文物保护', hint:'+🧠 +💰', fn: g => { g.flags.digitalHeritage=true; g.flags.heritageTech=true; return{intel:12,money:2000}; }},
         { label:'很感动，发了条朋友圈', hint:'+🤝', fn: g => { g.flags.digitalHeritage=true; return{social:5,mood:5}; }},
       ]},
+    // === v24.1: 新消费趋势 + 社会热点 ===
+    { id:'emotional_spending', icon:'💝', title:'情绪价值消费', category:'society',
+      body:'你发现了一种新的消费方式：花钱买「情绪价值」。\n\n朋友推荐的服务：\n- 「陪聊师」：30元/小时，专业倾听你的烦恼\n- 「夸夸群」：10元进群，所有人都会夸你\n- 「叫醒服务」：每天有人温柔叫你起床\n- 「晚安服务」：每晚有人跟你说晚安\n- 「虚拟恋人」：50元/天，假装是你的对象\n\n你试了一次陪聊师——对方温柔地听你吐槽了老板一个小时。\n\n你哭了。不是因为难过——是因为好久没有人认真听你说话了。\n\n你在想：当孤独可以明码标价——是商业的进步，还是人际的退步？\n\n「情绪消费：花钱买的不是服务——是被看见的感觉。」',
+      cond: g => g.age >= 18 && !g.flags.emotionalSpending && g.mood <= 50,
+      choices:[
+        { label:'办了月卡，每周跟陪聊师聊一次', hint:'-💰 +😊 +🤝', fn: g => { g.flags.emotionalSpending=true; g.flags.regularListener=true; g.money -= 3000; return{mood:12,social:8}; }},
+        { label:'试了一次觉得挺好，偶尔用用', hint:'-💰 +😊', fn: g => { g.flags.emotionalSpending=true; g.money -= 500; return{mood:8}; }},
+        { label:'觉得花钱买安慰太可悲了', hint:'-😊', fn: g => { g.flags.emotionalSpending=true; return{mood:-5,intel:3}; }},
+      ]},
+    { id:'deepfake_crisis', icon:'🎭', title:'AI换脸风波', category:'tech',
+      body:'你的同事小李崩溃了。\n\n一段用她脸做的不雅视频在群里传播。\n\n是AI换脸——deepfake。有人用她朋友圈的照片，生成了假视频。\n\n小李报了警，但事情很复杂：\n- 视频传播速度太快，删不干净\n- 即使证明是假的，看过的人也不会忘\n- 同事看她的眼神变了\n- 她开始不敢发照片，不敢出门\n\n你看着小李，突然意识到：在一个AI可以伪造一切的时代——「眼见为实」已经死了。\n\n任何人都可能成为受害者。任何人。\n\n「深度伪造：AI最可怕的地方——不是它会犯错，是它不会犯错。」',
+      cond: g => g.age >= 18 && !g.flags.deepfakeCrisis,
+      choices:[
+        { label:'帮小李维权，一起找律师和报警', hint:'+🤝 +😊 -💰', fn: g => { g.flags.deepfakeCrisis=true; g.flags.deepfakeAdvocate=true; g.money -= 2000; return{social:12,mood:5,charm:5}; }},
+        { label:'开始清理自己的网上照片和信息', hint:'+🧠 -😊', fn: g => { g.flags.deepfakeCrisis=true; g.flags.digitalCleaner=true; return{intel:8,mood:-5}; }},
+        { label:'很同情但觉得离自己很远', hint:'', fn: g => { g.flags.deepfakeCrisis=true; return{mood:-3}; }},
+      ]},
+    { id:'tcm_wellness_v24_1', icon:'🍵', title:'新中式养生', category:'health',
+      body:'你被同事带进了「新中式养生」的坑。\n\n不是老中医那种苦药汤——而是很潮的养生方式：\n- 人参拿铁：在咖啡里加人参提取物\n- 枸杞气泡水：泡枸杞但用气泡水\n- 艾灸贴：贴上去就能艾灸，不用点火\n- 八段锦App：跟着AI教练打八段锦\n- 中药香薰：用中药材做的精油\n\n你觉得这些都是智商税。\n\n但坚持了两个月后——你发现睡眠确实好了，精力也充沛了。\n\n也许老祖宗的智慧——加上现代科技——真的有道理？\n\n「新中式养生：用最潮的方式——做最老的事。」',
+      cond: g => g.age >= 22 && !g.flags.tcmWellness && g.health <= 65,
+      choices:[
+        { label:'全套入坑，每天坚持养生routine', hint:'+❤️ +😊 -💰', fn: g => { g.flags.tcmWellness=true; g.flags.tcmRoutine=true; g.money -= 2000; return{health:12,mood:8}; }},
+        { label:'选了几个简单的坚持做', hint:'+❤️', fn: g => { g.flags.tcmWellness=true; return{health:8,mood:3}; }},
+        { label:'觉得就是智商税，不信', hint:'', fn: g => { g.flags.tcmWellness=true; return{intel:2}; }},
+      ]},
+    { id:'pet_funeral_v24_1', icon:'🐾', title:'宠物告别', category:'psychology',
+      body:'你的猫——陪伴了你8年的那只橘猫——走了。\n\n你没想到自己会这么难过。\n\n朋友推荐了宠物殡葬服务：\n- 遗体美容：让宠物走得体面\n- 单独火化：保证骨灰不混\n- 骨灰钻石：把骨灰做成钻石永远陪伴\n- 宠物墓园：有专人打理的安息地\n- 纪念视频：把和宠物的照片做成视频\n\n一套服务下来，要8000-30000元。\n\n有人说：「为一只猫花这么多钱？疯了吧。」\n\n但你心里知道：它不是一只猫。它是你在这座城市里——最忠实的家人。\n\n「宠物告别：有些告别——比告别一个人还难。」',
+      cond: g => g.age >= 22 && !g.flags.petFuneral && g.flags.hasPet,
+      choices:[
+        { label:'选最好的服务，给它最后的体面', hint:'-💰 +😊 +✨', fn: g => { g.flags.petFuneral=true; g.flags.petGoodbye=true; g.money -= 20000; return{mood:10,charm:5}; }},
+        { label:'简单办，把骨灰带回家陪着', hint:'-💰 +😊', fn: g => { g.flags.petFuneral=true; g.money -= 5000; return{mood:8}; }},
+        { label:'不买服务，自己在家默默纪念', hint:'+😊', fn: g => { g.flags.petFuneral=true; return{mood:5,intel:3}; }},
+      ]},
+    { id:'city_walk_2', icon:'🚶', title:'City Walk 2.0', category:'hobby',
+      body:'City Walk已经升级了。\n\n现在流行的是「深度城市探索」：\n- 跟着建筑师走读城市建筑史\n- 跟着历史学家走百年老街\n- 跟着植物学家认路边的花草\n- 跟着美食家吃遍小巷里的苍蝇馆子\n- 跟着摄影师拍城市的隐秘角落\n\n一次走读活动50-200元，通常2-3小时。\n\n你参加了一次「百年弄堂走读」——\n\n走了30年的路，你第一次知道了每栋楼的故事。原来你家楼下那个破旧的弄堂，曾是民国时期最著名的书店街。\n\n你开始用不同的眼光看这座城市：它不只是你打工的地方——它是一本你还没翻开的书。\n\n「City Walk 2.0：走过的路——可以重新认识。」',
+      cond: g => g.age >= 18 && !g.flags.cityWalk2,
+      choices:[
+        { label:'成了深度走读爱好者，每月参加', hint:'-💰 +😊 +🧠 +🤝', fn: g => { g.flags.cityWalk2=true; g.flags.cityExplorer=true; g.money -= 1500; return{mood:10,intel:8,social:8}; }},
+        { label:'参加了几次，拍了很多照片', hint:'-💰 +😊', fn: g => { g.flags.cityWalk2=true; return{mood:8,charm:3}; }},
+        { label:'觉得不如自己随便走走', hint:'+😊', fn: g => { g.flags.cityWalk2=true; return{mood:3}; }},
+      ]},
+    { id:'prefab_moments', icon:'📱', title:'预制朋友圈', category:'social',
+      body:'你发现了一个新产业：「预制朋友圈」。\n\n花200块，有人帮你拍好一个月的朋友圈素材：\n- 10张精修的咖啡馆照片\n- 5张旅行风景照（其实是在本地公园拍的）\n- 3张健身照（其实是在影棚拍的）\n- 配文都写好了，高级又有品味\n\n你的同事小赵就买了一套——她的朋友圈看起来像月入5万的精致白领。\n\n实际上她月薪6000，住在城中村。\n\n你问她：「为什么要这样？」\n\n她说：「因为朋友圈就是我的简历。别人怎么看我——决定了我能拿到什么机会。」\n\n你沉默了。她说的——好像也不全是错的。\n\n「预制朋友圈：真实不值钱——但「看起来很好」很值钱。」',
+      cond: g => g.age >= 18 && g.age <= 35 && !g.flags.prefabMoments,
+      choices:[
+        { label:'也买了一套，开始经营人设', hint:'-💰 +✨ +🤝', fn: g => { g.flags.prefabMoments=true; g.flags.personaCurator=true; g.money -= 2000; return{charm:10,social:8,mood:-3}; }},
+        { label:'觉得挺好笑的，但尊重别人的选择', hint:'+😊', fn: g => { g.flags.prefabMoments=true; return{mood:3,intel:2}; }},
+        { label:'觉得太虚假了，发了条素颜自拍', hint:'+😊 +✨', fn: g => { g.flags.prefabMoments=true; g.flags.authenticSelf=true; return{mood:8,charm:5}; }},
+      ]},
+    { id:'digital_yuan', icon:'💴', title:'数字人民币', category:'finance',
+      body:'公司通知：从下个月起，工资用数字人民币发放。\n\n你下载了数字人民币App：\n- 支付跟微信支付宝差不多\n- 但有个「智能合约」功能很有意思\n- 可以设定钱只能用于特定用途（比如房租、学费）\n- 还「可控匿名」——小额匿名，大额可追溯\n\n但你也听到了一些担忧：\n- 每一笔消费政府都能看到\n- 如果社会信用体系跟它挂钩……\n- 以后是不是花钱不「合规」都不行了？\n\n你看着手机里的三个支付App，觉得：支付方式变了——但被监控的感觉没变。\n\n「数字人民币：钱是数字的——但花钱的自由呢？」',
+      cond: g => g.age >= 18 && !g.flags.digitalYuan && g.salary,
+      choices:[
+        { label:'全面转向数字人民币，享受便利', hint:'+💰 +🧠', fn: g => { g.flags.digitalYuan=true; g.flags.digitalYuanAdopter=true; return{money:500,intel:5}; }},
+        { label:'只用来收工资，日常还是用微信', hint:'+💰', fn: g => { g.flags.digitalYuan=true; return{money:200}; }},
+        { label:'有点担忧，尽量少用', hint:'+🧠', fn: g => { g.flags.digitalYuan=true; g.flags.digitalYuanSkeptic=true; return{intel:5,mood:-2}; }},
+      ]},
+    { id:'elder_community', icon:'🏘️', title:'养老社区考察', category:'society',
+      body:'你爸妈打来电话：「我们去看了一家养老社区，挺好的。」\n\n你以为是普通养老院——结果是一个高端养老社区：\n- 独立公寓，60平米\n- 24小时医疗护理\n- 健身房、游泳池、电影院\n- 老年大学：学书法、学钢琴、学编程\n- 社区农场：可以自己种菜\n- 月费：8000元/人\n\n你妈说：「这里的老人都很开朗，比在家开心多了。」\n\n你心里五味杂陈：\n- 每月8000——两个老人就是16000\n- 你的房贷+生活费已经很紧了\n- 但如果他们真的开心……\n\n「养老社区：让父母住得好——是子女最大的孝心，也是最重的负担。」',
+      cond: g => g.age >= 30 && !g.flags.elderCommunity && g.salary,
+      choices:[
+        { label:'咬牙给爸妈报了名，让他们过好', hint:'-💰 +😊 +🤝', fn: g => { g.flags.elderCommunity=true; g.flags.elderCare=true; g.money -= 5000; return{mood:10,social:8,charm:5}; }},
+        { label:'先让他们试住一个月看看', hint:'-💰 +😊', fn: g => { g.flags.elderCommunity=true; g.money -= 16000; return{mood:5}; }},
+        { label:'经济压力太大，暂时不考虑', hint:'-😊', fn: g => { g.flags.elderCommunity=true; return{mood:-8}; }},
+      ]},
+    { id:'cross_border_ecom', icon:'📦', title:'跨境电商出海', category:'career',
+      body:'你的前同事老陈辞职做跨境电商了。\n\n他在TikTok Shop和Temu上卖东西给外国人：\n- 中国制造的日用品，成本5块，卖5美元\n- 用AI生成多语言产品描述\n- 从义乌直发全球\n- 月销售额已经突破50万\n\n他兴奋地给你看后台数据：「兄弟，这才是风口！中国供应链+全球消费=印钞机。」\n\n他邀请你合伙：你负责运营，他负责供应链。\n\n你心动了——但也看到了风险：\n- 平台政策随时可能变\n- 物流和退换货很复杂\n- 需要压一批货款\n\n「跨境电商：把中国的东西卖给全世界——听起来很美，做起来很累。」',
+      cond: g => g.age >= 22 && g.age <= 45 && !g.flags.crossBorderEcom && g.money >= 20000,
+      choices:[
+        { label:'投2万入伙，一起做出海生意', hint:'-💰 ±💰 +🧠', fn: g => { g.flags.crossBorderEcom=true; g.flags.ecomPartner=true; g.money -= 20000; return{intel:10,charm:5,social:5}; }},
+        { label:'不投钱，帮他做运营赚外快', hint:'+💰 +🧠', fn: g => { g.flags.crossBorderEcom=true; g.flags.ecomOperator=true; return{money:3000,intel:8}; }},
+        { label:'觉得不靠谱，婉拒了', hint:'', fn: g => { return{mood:2}; }},
+      ]},
+    { id:'ev_charging', icon:'🔌', title:'充电桩生意', category:'finance',
+      body:'你注意到小区门口新装了一排充电桩。\n\n一个朋友在充电桩公司工作，给你算了一笔账：\n- 一个快充桩成本约5万\n- 每度电赚0.5元服务费\n- 每天充100度电，月入1500元/桩\n- 5年回本，之后纯赚\n- 政府还有补贴\n\n他建议你投几个桩：「这是被动收入，躺着赚钱。」\n\n但你也看到了问题：\n- 充电桩公司跑路的新闻不少\n- 选址很重要，偏僻地方没人充\n- 电池技术迭代快，现在的桩可能很快过时\n\n「充电桩投资：躺赚？还是躺着被割韭菜？」',
+      cond: g => g.age >= 25 && !g.flags.evCharging && g.money >= 50000,
+      choices:[
+        { label:'投5万装一个桩试试水', hint:'-💰 ±💰', fn: g => { g.flags.evCharging=true; g.flags.chargingInvestor=true; g.money -= 50000; return{intel:5}; }},
+        { label:'研究了一下，决定买充电桩股票', hint:'±💰 +🧠', fn: g => { g.flags.evCharging=true; g.flags.chargingStock=true; return{intel:5}; }},
+        { label:'觉得风险太大，算了', hint:'', fn: g => { return{mood:2}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -12819,6 +12900,12 @@ const ACHIEVEMENTS = [
     { id:'bci_pioneer_ach', icon:'🧠', name:'脑机先锋', desc:'深度参与脑机接口测试', check: g => g.flags.bciPioneer },
     { id:'digital_will_ach', icon:'💾', name:'数字遗嘱', desc:'整理了数字资产并立下遗嘱', check: g => g.flags.digitalWill },
     { id:'life_recorder_ach', icon:'🏛️', name:'人生记录者', desc:'开始系统记录自己的人生故事', check: g => g.flags.lifeRecorder },
+    // v24.1: 新消费趋势成就
+    { id:'city_explorer_ach_v24_1', icon:'🚶', name:'城市探索者', desc:'成了深度城市走读爱好者', check: g => g.flags.cityExplorer },
+    { id:'authentic_self_ach', icon:'📸', name:'真实自我', desc:'拒绝预制朋友圈，坚持真实的自己', check: g => g.flags.authenticSelf },
+    { id:'deepfake_advocate_ach', icon:'⚖️', name:'数字维权者', desc:'帮助他人对抗AI换脸侵害', check: g => g.flags.deepfakeAdvocate },
+    { id:'tcm_routine_ach', icon:'🍵', name:'养生达人', desc:'坚持新中式养生routine', check: g => g.flags.tcmRoutine },
+    { id:'ecom_partner_ach', icon:'📦', name:'出海合伙人', desc:'参与跨境电商创业', check: g => g.flags.ecomPartner },
 ];
 
 // === ENDINGS === (order matters: first match wins)
