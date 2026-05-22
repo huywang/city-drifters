@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v20.2
+// 都市浮生记 - Game Engine v20.3
 // ============================================
 
 // === GAME STATE ===
@@ -9671,6 +9671,87 @@ const EVENTS = [
         { label:'还在努力找工作', hint:'+🧠', fn: g => { g.flags.returnToWork=true; return{intel:3,mood:-3}; }},
         { label:'决定继续在家陪孩子', hint:'+❤️ +😊', fn: g => { g.flags.returnToWork=true; g.flags.stayHomeParent=true; return{mood:5,social:-5}; }},
       ]},
+    // === v20.3 新增事件（家庭代际 + 亲密关系 + 生活百态） ===
+    { id:'stay_home_dad', icon:'👨‍👶', title:'全职爸爸', category:'social',
+      body:'你做了一个决定：辞职在家带孩子，让老婆去上班。\n\n你的同事们不理解：「男人怎么能在家带孩子？」\n你的父母不理解：「你读了这么多书，就为了在家看孩子？」\n你的岳母倒是开心：「终于有人带孩子了我可以打麻将了。」\n\n你发现：全职爸爸比上班累多了。白天喂奶、换尿布、哄睡、做辅食。晚上还要被老婆嫌弃：「你怎么又让孩子哭了？」\n\n但你也发现了一些美好的东西：孩子第一次叫「爸爸」、第一次走路、第一次对你笑——这些瞬间，是任何升职加薪都比不了的。\n\n你的一个全职爸爸朋友说：「带孩子是最难的工作——但也是最有意义的工作。」\n\n「全职爸爸：不是退步——是用另一种方式撑起一个家。」',
+      cond: g => !g.flags.stayHomeDad && g.age >= 26 && g.age <= 40 && g.flags.hasChild && g.job !== '待业中',
+      choices:[
+        { label:'成为全职爸爸，享受亲子时光', hint:'+❤️ +😊 -💰', fn: g => { g.flags.stayHomeDad=true; setJob(g,'待业中',0); return{mood:10,social:-5,health:5}; }},
+        { label:'请了育儿假，但最终还是回去上班了', hint:'+😊 -💰', fn: g => { g.flags.stayHomeDad=true; g.flags.paternityLeave=true; return{mood:5,money:-3000}; }},
+        { label:'还是让老婆带孩子吧', hint:'', fn: g => { g.flags.stayHomeDad=true; return{mood:-3}; }},
+      ]},
+    { id:'only_child_eldercare', icon:'👴', title:'独生子女的养老难题', category:'social',
+      body:'你是独生子女。你的父母60岁了。\n\n你算了一笔账：两个独生子女，要养四个老人——你爸、你妈、你岳父、你岳母。如果有孩子，就是「421」结构：四个老人、两个大人、一个孩子。\n\n你的一个朋友说：「我爸住院了，我一个人白天上班、晚上陪护。我老婆的妈也在住院。我们两个人，要照顾四个老人。」\n\n另一个朋友说：「我给我爸妈买了养老保险、医疗保险、重疾险。但真到了需要照顾的时候，钱解决不了问题——他们需要的是人。」\n\n你开始做养老规划：养老院、居家养老、请保姆、跟父母住一起……每一个选择都有代价。\n\n「独生子女的养老：是一代人的宿命——也是最需要被看见的困境。」',
+      cond: g => !g.flags.onlyChildEldercare && g.age >= 28 && g.age <= 45,
+      choices:[
+        { label:'认真做养老规划，开始存钱', hint:'+🧠 +💰', fn: g => { g.flags.onlyChildEldercare=true; g.flags.elderCarePlan=true; g.flags.retirementPlanning=true; return{intel:5,mood:-3}; }},
+        { label:'把父母接到身边照顾', hint:'+❤️ +😊 -💰', fn: g => { g.flags.onlyChildEldercare=true; g.flags.parentsNearby=true; return{mood:5,social:5,money:-5000}; }},
+        { label:'走一步看一步吧', hint:'', fn: g => { g.flags.onlyChildEldercare=true; return{mood:-2}; }},
+      ]},
+    { id:'parents_divorce', icon:'💔', title:'父母离婚了', category:'social',
+      body:'你妈给你打了个电话：「我和你爸决定离婚了。」\n\n你已经30岁了，但听到这个消息的时候，还是觉得天塌了。\n\n你妈说：「我们吵了30年了。你小时候是为了你才没离。现在你长大了，我们想为自己活一次。」\n\n你的第一反应是愤怒：「你们早干什么去了？」\n第二反应是理解：「也许他们真的不幸福。」\n第三反应是释然：「至少他们终于不用再互相折磨了。」\n\n你的一个朋友也是成年后经历父母离婚：「我以为我已经长大了，但听到这个消息的时候，我还是变成了那个8岁的小孩。」\n\n你发现：不管多大年纪，父母的离婚都会触动你内心最柔软的地方。\n\n「父母离婚：不是你的错——不管你是8岁还是38岁。」',
+      cond: g => !g.flags.parentsDivorce && g.age >= 25 && g.age <= 45,
+      choices:[
+        { label:'接受并支持他们的决定', hint:'+🧠 +❤️', fn: g => { g.flags.parentsDivorce=true; g.flags.supportParentsChoice=true; return{intel:5,mood:-5}; }},
+        { label:'需要时间消化，先不表态', hint:'+🧠', fn: g => { g.flags.parentsDivorce=true; return{intel:3,mood:-8}; }},
+        { label:'很生气，觉得他们太自私了', hint:'-😊', fn: g => { g.flags.parentsDivorce=true; return{mood:-12}; }},
+      ]},
+    { id:'far_from_home', icon:'🚂', title:'远方漂泊', category:'social',
+      body:'你接到了你姐的电话：「妈想你了，你什么时候回来？」\n\n你看了看日历：已经8个月没回过老家了。\n\n你算了算：从你的城市回老家，高铁6小时、飞机2小时+转机1小时、自驾10小时。一年最多回2次——春节一次、国庆一次。每次待5天。\n\n一年365天，你只能陪父母10天。如果你父母还能活20年——你只能再陪他们200天。不到7个月。\n\n你的一个朋友辞职回了老家：「我不想等到子欲养而亲不待。」\n另一个朋友说：「我每个月给家里转5000块。虽然人不在，但钱在。」\n\n你看着手机里的全家福，想：什么才是真正的陪伴？\n\n「远方漂泊：是每个游子的痛——你在远方拼搏，父母在老家等你。但等待是有期限的。」',
+      cond: g => !g.flags.farFromHome && g.age >= 24 && g.months >= 24,
+      choices:[
+        { label:'增加回家频率，多陪父母', hint:'+❤️ +😊 -💰', fn: g => { g.flags.farFromHome=true; g.flags.frequentVisits=true; return{mood:8,social:5,money:-3000}; }},
+        { label:'给父母转钱，虽然人不在但心在', hint:'+❤️ -💰', fn: g => { g.flags.farFromHome=true; g.flags.monthlyTransfer=true; return{mood:3,money:-2000}; }},
+        { label:'先拼事业，以后再说', hint:'+💰 -😊', fn: g => { g.flags.farFromHome=true; return{money:2000,mood:-5}; }},
+      ]},
+    { id:'pet_as_child', icon:'🐾', title:'毛孩子就是我娃', category:'hobby',
+      body:'你的猫/狗已经3岁了。你给它过生日——买了蛋糕、吹了气球、发了朋友圈。\n\n你的同事说：「你对你的宠物比对你自己都上心。」\n\n你说：「它就是我的孩子啊——虽然它不会说话，但它会在我哭的时候蹭我、在我回来的时候摇尾巴、在我加班的时候等我回家。」\n\n你给它买了宠物保险、定期做体检、请了宠物行为训练师。你的一个朋友说：「你养宠物的钱够养一个小孩了。」\n\n你说：「养小孩要操心教育、升学、就业、婚恋。养宠物只需要操心：它今天吃了吗？拉了吗？开心吗？」\n\n你发现：在这个不确定的时代，宠物的爱是最确定的东西。\n\n「毛孩子：不会说话，但永远在你需要的时候出现。这就是最好的陪伴。」',
+      cond: g => !g.flags.petAsChild && g.age >= 22 && g.age <= 40 && g.flags.hasPet,
+      choices:[
+        { label:'把宠物当孩子养，给它最好的', hint:'+😊 +❤️ -💰', fn: g => { g.flags.petAsChild=true; g.flags.petParent=true; return{mood:12,social:3,money:-5000}; }},
+        { label:'适度宠爱，理性养宠', hint:'+😊 +🧠', fn: g => { g.flags.petAsChild=true; return{mood:8,intel:3}; }},
+        { label:'它只是一只动物', hint:'', fn: g => { g.flags.petAsChild=true; return{mood:2}; }},
+      ]},
+    { id:'family_reconciliation', icon:'🤝', title:'与原生家庭和解', category:'psychology',
+      body:'你做了一个决定：主动跟父母谈一谈过去的事。\n\n你约你爸喝了一顿酒。你说了很多小时候的事：他打你、不让你哭、不让你表达情绪。你爸听了很久，沉默了很久。\n\n最后他说了一句你从没听过的话：「对不起。我不知道怎么做一个好爸爸——因为我爸也不知道。」\n\n你突然理解了：你的父亲也是一个受伤的孩子。他的暴躁、他的沉默、他的不会表达爱——不是因为他不爱你，而是因为他从来就没被教过怎么爱。\n\n你哭了。你爸也哭了。这是你第一次看到你爸哭。\n\n你发现：和解不是原谅——是理解。当你理解了他们的局限，你就不再被过去困住了。\n\n「原生家庭和解：不是忘记伤痛——是带着伤痛继续前行。」',
+      cond: g => !g.flags.familyReconciliation && g.age >= 28 && g.flags.familyOrigin,
+      choices:[
+        { label:'深入沟通，跟父母达成了和解', hint:'+❤️ +😊 +🧠', fn: g => { g.flags.familyReconciliation=true; g.flags.healedFamily=true; return{mood:15,social:8,intel:5}; }},
+        { label:'尝试了但没完全成功，至少迈出了第一步', hint:'+🧠 +❤️', fn: g => { g.flags.familyReconciliation=true; return{intel:5,mood:5,social:3}; }},
+        { label:'还没准备好面对', hint:'', fn: g => { g.flags.familyReconciliation=true; return{mood:-3}; }},
+      ]},
+    { id:'adult_friendship_parents', icon:'👨‍👩‍👦', title:'跟父母做朋友', category:'social',
+      body:'你发现：你跟父母的关系变了。\n\n以前他们问你「吃了吗」你会烦。现在你主动给他们发消息：「今天吃了什么好吃的？」\n以前他们催你结婚你会吵。现在你平静地说：「我在考虑了，不着急。」\n以前你觉得他们什么都不懂。现在你发现：他们的很多人生经验，其实是对的。\n\n你开始把父母当「朋友」而不是「父母」：你们一起看剧、一起散步、一起吐槽新闻。你爸开始跟你聊他的工作压力，你妈开始跟你聊她的追剧心得。\n\n你的一个朋友说：「我跟父母关系最好的时候，就是我不再把他们当父母——而是把他们当两个普通人。」\n\n你突然觉得：也许这就是成长——不是变得比父母强，而是终于看到他们也是普通人。\n\n「成年后的亲子关系：当你不再需要他们的时候，你才真正开始爱他们。」',
+      cond: g => !g.flags.adultFriendshipParents && g.age >= 28 && g.age <= 50,
+      choices:[
+        { label:'主动改善与父母的关系', hint:'+❤️ +😊', fn: g => { g.flags.adultFriendshipParents=true; g.flags.closeToParents=true; return{mood:10,social:8}; }},
+        { label:'保持现状，关系慢慢变好', hint:'+❤️', fn: g => { g.flags.adultFriendshipParents=true; return{mood:5,social:3}; }},
+        { label:'还是保持距离比较好', hint:'', fn: g => { g.flags.adultFriendshipParents=true; return{mood:2}; }},
+      ]},
+    { id:'hometown_wedding', icon:'💒', title:'回老家参加婚礼', category:'social',
+      body:'你收到了发小的婚礼请帖。\n\n你坐高铁回了老家。一下车，空气里都是熟悉的味道。你发现：小城变了很多——新建了商场、拓宽了马路、老房子拆了。\n\n婚礼上，你见到了很多小时候的玩伴。有的胖了、有的秃了、有的成了老板、有的成了公务员。你们聊起小时候的事，笑得前仰后合。\n\n你的发小说：「你走了这么多年，我还是最想念咱们小时候一起爬树、抓鱼、偷西瓜的日子。」\n\n你说：「我也是。」\n\n你突然觉得：大城市给了你机会，但小城给了你根。不管你走多远，这些记忆都是你的锚。\n\n「回老家参加婚礼：不是怀旧——是提醒自己，你从哪里来。」',
+      cond: g => !g.flags.hometownWedding && g.age >= 24 && g.months >= 24,
+      choices:[
+        { label:'多待几天，跟老朋友们聚一聚', hint:'+😊 +❤️ -💰', fn: g => { g.flags.hometownWedding=true; g.flags.reconnected=true; return{mood:12,social:8,money:-2000}; }},
+        { label:'参加完婚礼就回去了', hint:'+😊', fn: g => { g.flags.hometownWedding=true; return{mood:5,social:3}; }},
+        { label:'没时间去', hint:'', fn: g => { g.flags.hometownWedding=true; return{mood:-2}; }},
+      ]},
+    { id:'roommate_friendship', icon:'🏠', title:'神仙室友', category:'social',
+      body:'你的室友是一个特别好的人。\n\n你加班到11点回来，发现他给你留了饭。你感冒了，他帮你买了药。你的快递到了，他帮你收了。\n\n周末你们一起做饭、一起看剧、一起打游戏。你的室友说：「在大城市最幸运的事，不是找到好工作——是找到好室友。」\n\n你的一个朋友说：「我的室友半夜3点打游戏，声音大到我在隔壁都听得见。」\n另一个朋友说：「我的室友从来不洗碗，厨房已经变成战场了。」\n\n你看着你的室友，觉得自己真的很幸运。你们不是家人，但胜似家人。\n\n你发了一条朋友圈：「在大城市最好的关系，就是遇到一个跟你一样珍惜这段关系的室友。」\n\n「神仙室友：是陌生城市里最温暖的陪伴——你们没有血缘，但选择了彼此。」',
+      cond: g => !g.flags.roommateFriendship && g.age >= 20 && g.age <= 35 && !g.flags.hasHouse,
+      choices:[
+        { label:'珍惜这段友情，成了最好的朋友', hint:'+❤️ +😊 +👥', fn: g => { g.flags.roommateFriendship=true; g.flags.bestRoommate=true; return{mood:12,social:10}; }},
+        { label:'关系不错，互相照顾', hint:'+😊 +👥', fn: g => { g.flags.roommateFriendship=true; return{mood:8,social:5}; }},
+        { label:'只是普通的合租关系', hint:'', fn: g => { g.flags.roommateFriendship=true; return{mood:3,social:2}; }},
+      ]},
+    { id:'single_happy', icon:'🙋', title:'一个人的精彩', category:'social',
+      body:'你已经单身三年了。\n\n你的朋友们都在秀恩爱、秀婚礼、秀孩子。你秀的是：周末睡到自然醒、一个人去吃火锅、一个人去看电影、一个人去旅行。\n\n你的一个朋友说：「你不孤独吗？」\n\n你说：「孤独？我连自己的时间都不够用。我要看书、健身、学吉他、旅行、做义工。哪有时间孤独？」\n\n你的另一个已婚朋友说：「有时候我挺羡慕你的。我已经忘了上一次一个人待着是什么时候了。」\n\n你发现：单身不是一种缺陷——是一种选择。有些人找到了另一半，有些人找到了自己。\n\n你在朋友圈写：「单身不是等待被选择——是主动选择等待对的人。如果等不到，一个人也很好。」\n\n「一个人的精彩：不是没有人爱——是在等对的人的同时，先学会爱自己。」',
+      cond: g => !g.flags.singleHappy && g.age >= 25 && g.age <= 40 && !g.flags.married,
+      choices:[
+        { label:'享受单身生活，活出自己的精彩', hint:'+😊 +🧠 +❤️', fn: g => { g.flags.singleHappy=true; g.flags.happySingle=true; return{mood:12,intel:5,health:5}; }},
+        { label:'单身也挺好的，但不排斥遇到对的人', hint:'+😊', fn: g => { g.flags.singleHappy=true; return{mood:8}; }},
+        { label:'其实还是有点想谈恋爱', hint:'-😊', fn: g => { g.flags.singleHappy=true; return{mood:-3}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -10579,6 +10660,12 @@ const ACHIEVEMENTS = [
     { id:'gen_z_ally_ach', icon:'✊', name:'职场觉醒者', desc:'支持年轻人为权益发声', check: g => g.flags.rightsAdvocate },
     { id:'career_transition_ach', icon:'🎯', name:'华丽转身', desc:'通过职业转型找到了热爱的工作', check: g => g.flags.careerTransition },
     { id:'workplace_mentor_ach', icon:'🧓', name:'薪火相传', desc:'成为了别人的职场导师', check: g => g.flags.workplaceMentor && g.flags.managementPath },
+    // === v20.3 新增成就（家庭代际 + 生活百态） ===
+    { id:'stay_home_dad_ach', icon:'👨‍👶', name:'超级奶爸', desc:'成为全职爸爸，享受亲子时光', check: g => g.flags.stayHomeDad },
+    { id:'elder_care_planner_ach', icon:'👴', name:'养老规划师', desc:'为父母的养老做了充分准备', check: g => g.flags.elderCarePlan || g.flags.parentsNearby },
+    { id:'family_healer_ach', icon:'🤝', name:'家庭和解者', desc:'与原生家庭达成了和解', check: g => g.flags.healedFamily },
+    { id:'happy_single_ach_v2', icon:'🙋', name:'单身贵族', desc:'在单身生活中活出了精彩', check: g => g.flags.happySingle },
+    { id:'best_roommate_ach', icon:'🏠', name:'神仙室友', desc:'在大城市遇到了最好的室友', check: g => g.flags.bestRoommate },
 ];
 
 // === ENDINGS === (order matters: first match wins)
