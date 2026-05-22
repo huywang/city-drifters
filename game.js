@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v32.3
+// 都市浮生记 - Game Engine v32.4
 // ============================================
 
 // === GAME STATE ===
@@ -17792,6 +17792,97 @@ const EVENTS = [
         { label:'干了几天就不想干了，太累', hint:'-💪', fn: g => { g.flags.deliveryStation=true; return{health:-3,money:200}; }},
         { label:'写了一篇体验日记发在网上', hint:'+✨ +🧠', fn: g => { g.flags.deliveryStation=true; g.flags.wroteDiary=true; return{charm:5,intel:3}; }},
       ]},
+
+    // === v32.4 城市里的动物 ===
+    { id:'stray_cat_v32_4', icon:'🐱', title:'流浪猫', category:'animals',
+      body:'下班回家的路上，你听到垃圾桶旁边有微弱的叫声。\n\n你走过去一看，是一只小橘猫，瘦得皮包骨，眼睛糊了一层分泌物。\n\n它看到你，缩了一下，然后又叫了一声。那声音又细又尖，像是在求你。\n\n你蹲下来，伸出手。它犹豫了一下，慢慢走过来，蹭了蹭你的手指。\n\n你没有养过猫。你不确定自己能不能养好。但你知道，如果你现在走了，你可能再也看不到它了。\n\n你脱下外套，把它裹起来，去了最近的宠物医院。',
+      cond: g => g.age >= 18 && g.money > 1000,
+      choices:[
+        { label:'收养了它，给它取了个名字', hint:'-💰 +😊 +👥', fn: g => { g.flags.strayCat=true; g.flags.adoptedCat=true; g.money-=800; return{mood:10,social:3}; }},
+        { label:'带到宠物医院治好了放回去', hint:'-💰 +😊', fn: g => { g.flags.strayCat=true; g.money-=500; return{mood:5}; }},
+        { label:'在网上发了求助帖找人领养', hint:'+👥 +✨', fn: g => { g.flags.strayCat=true; g.flags.postedHelp=true; return{social:5,charm:3}; }},
+      ]},
+
+    { id:'dog_walking_v32_4', icon:'🐕', title:'遛狗社交', category:'animals',
+      body:'你在小区里散步，一只金毛突然冲过来蹭你的腿。\n\n主人是个三十多岁的女生，她笑着说：「它太喜欢人了，对不起啊。」\n\n你们聊了起来。她是个程序员，平时加班到很晚，只有遛狗的时候才出来透口气。\n\n「其实养狗之后我社交多了很多，小区里遛狗的人都认识。」\n\n你看到远处有个大叔牵着一只泰迪，一个阿姨牵着一只柯基，他们正在聊天。\n\n你觉得在这个城市里，狗可能是最好的社交媒介。',
+      cond: g => g.age >= 20 && g.social < 60,
+      choices:[
+        { label:'考虑自己也养一只狗', hint:'+👥 +😊', fn: g => { g.flags.dogWalking=true; g.flags.considerDog=true; return{social:5,mood:5}; }},
+        { label:'加了她的微信，约下次一起遛', hint:'+👥', fn: g => { g.flags.dogWalking=true; g.flags.madeFriend=true; return{social:8}; }},
+        { label:'摸了摸金毛就走了', hint:'+😊', fn: g => { g.flags.dogWalking=true; return{mood:5}; }},
+      ]},
+
+    { id:'city_birds_v32_4', icon:'🐦', title:'城市里的鸟', category:'animals',
+      body:'有一天早上，你被窗外的鸟叫声吵醒了。\n\n你打开窗户，看到电线上停了一排麻雀，叽叽喳喳地叫着。阳光照在它们的羽毛上，泛着温暖的光。\n\n你突然意识到，你已经很久没有注意过鸟了。在这个城市里，你每天看的是手机、电脑、地铁、高楼——但你从来没有抬头看过天。\n\n你查了一下，发现这个城市里居然有一百多种鸟。白头鹎、珠颈斑鸠、乌鸫……它们一直在你身边，只是你从来没注意过。\n\n你站在窗前听了十分钟。这十分钟，比刷一小时手机让你感觉更好。',
+      cond: g => g.mood < 60,
+      choices:[
+        { label:'开始每天早起听鸟叫', hint:'+💪 +😊', fn: g => { g.flags.cityBirds=true; g.flags.morningBirds=true; return{health:5,mood:8}; }},
+        { label:'买了个望远镜开始观鸟', hint:'-💰 +🧠 +😊', fn: g => { g.flags.cityBirds=true; g.flags.birdwatching=true; g.money-=300; return{intel:5,mood:5}; }},
+        { label:'拍了几张照片发到网上', hint:'+✨', fn: g => { g.flags.cityBirds=true; return{charm:3,mood:3}; }},
+      ]},
+
+    { id:'abandoned_pet_v32_4', icon:'📦', title:'被遗弃的宠物', category:'animals',
+      body:'你刷到一条新闻：有人在小区门口发现了一笼被遗弃的仓鼠，旁边放着一袋没吃完的饲料。\n\n笼子上贴着一张纸条：「养不了了，请好心人收养。」\n\n你在评论区看到很多人在骂，也有人说愿意领养。\n\n你想起你刚来这个城市的时候，也差点养了一只仓鼠。后来你想了想：你自己都还没站稳，怎么照顾好另一个生命？\n\n有些人在养宠物之前没有想清楚，想清楚的时候又选择了放弃。但被放弃的那个生命，它不知道自己做错了什么。',
+      cond: g => g.age >= 20,
+      choices:[
+        { label:'联系了发布者去领养了一只', hint:'-💰 +😊', fn: g => { g.flags.abandonedPet=true; g.money-=200; return{mood:8}; }},
+        { label:'转发了帖子帮它们找领养', hint:'+👥', fn: g => { g.flags.abandonedPet=true; return{social:3,mood:3}; }},
+        { label:'捐了点钱给流浪动物救助站', hint:'-💰 +😊', fn: g => { g.flags.abandonedPet=true; g.flags.donatedShelter=true; g.money-=100; return{mood:5}; }},
+      ]},
+
+    { id:'park_squirrel_v32_4', icon:'🐿️', title:'公园里的松鼠', category:'animals',
+      body:'周末你去公园散步，看到一棵大树下面有几只松鼠在捡食物。\n\n它们动作很快，前爪捧着坚果，小嘴快速地啃。看到人走近也不害怕，好像已经习惯了。\n\n一个老爷爷坐在旁边的长椅上，手里拿着一袋花生。他告诉你，他每天都来喂它们，已经喂了三年了。\n\n「我老伴走了之后，就是它们陪着我。」\n\n你看着松鼠们争抢花生的样子，觉得生命真的很顽强。在这个钢筋水泥的城市里，它们找到了自己的生存方式。\n\n你也在旁边坐了下来，安静地看着。',
+      cond: g => g.age >= 18,
+      choices:[
+        { label:'陪老爷爷坐了很久，听他讲故事', hint:'+👥 +😊', fn: g => { g.flags.parkSquirrel=true; g.flags.listenedStory=true; return{social:5,mood:8}; }},
+        { label:'也去买了一袋坚果喂松鼠', hint:'-💰 +😊', fn: g => { g.flags.parkSquirrel=true; g.money-=20; return{mood:8}; }},
+        { label:'拍了一段视频发了抖音', hint:'+✨', fn: g => { g.flags.parkSquirrel=true; return{charm:5}; }},
+      ]},
+
+    { id:'cat_cafe_v32_4', icon:'☕', title:'猫咖打工', category:'animals',
+      body:'你在猫咖找了一份周末兼职。\n\n店里有十二只猫，每只都有名字和性格。大橘最懒，英短最高冷，布偶最黏人。\n\n你的工作是喂猫、铲屎、擦桌子、接待客人。听起来简单，但十二只猫的屎量是惊人的。\n\n有个小女孩来店里，抱着一只猫不撒手。她妈妈说：「家里不让养，她只能来这里。」\n\n你看到小女孩把脸埋进猫的毛里，笑得很开心。你想，这个城市里有很多人需要猫，但不是每个人都有条件养。\n\n猫咖的意义也许就在这里——让想养而不能养的人，有一个可以撸猫的地方。',
+      cond: g => g.age >= 18 && g.age <= 35,
+      choices:[
+        { label:'坚持做了三个月兼职', hint:'+💰 +😊', fn: g => { g.flags.catCafe=true; g.flags.persisted=true; return{money:1500,mood:5}; }},
+        { label:'做了一个月就不做了，猫屎太臭', hint:'-😊', fn: g => { g.flags.catCafe=true; return{money:500,mood:-3}; }},
+        { label:'跟老板建议办一个领养日活动', hint:'+🧠 +👥', fn: g => { g.flags.catCafe=true; g.flags.suggestedEvent=true; return{intel:5,social:5}; }},
+      ]},
+
+    { id:'hedgehog_v32_4', icon:'🦔', title:'小区里的刺猬', category:'animals',
+      body:'晚上十一点，你下楼扔垃圾，看到草丛里有个小东西在动。\n\n你打开手机手电筒一照——是一只刺猬！它被你吓到了，缩成了一个球。\n\n你从来不知道小区里居然有刺猬。你上网查了一下，原来城市里的刺猬越来越多，因为绿化带够多、食物够丰富。\n\n你拍了张照片发到业主群里，大家都兴奋了：「真的有吗？」「在哪看到的？」「我从来没见过！」\n\n物业回复说：「请大家不要打扰它，让它自然生活。」\n\n你觉得这个城市比你以为的更有生命力。',
+      cond: g => g.age >= 18,
+      choices:[
+        { label:'开始每天晚上去观察它', hint:'+🧠 +😊', fn: g => { g.flags.hedgehog=true; g.flags.nightlyWatch=true; return{intel:5,mood:5}; }},
+        { label:'在小区里做了个「刺猬出没」的告示', hint:'+👥 +✨', fn: g => { g.flags.hedgehog=true; g.flags.madeSign=true; return{social:5,charm:3}; }},
+        { label:'发了朋友圈，感叹城市也有野生动物', hint:'+✨ +🧠', fn: g => { g.flags.hedgehog=true; return{charm:3,intel:3}; }},
+      ]},
+
+    { id:'fish_keeping_v32_4', icon:'🐟', title:'养鱼治愈', category:'animals',
+      body:'你在水族市场买了个小鱼缸和几条孔雀鱼。\n\n老板说：「孔雀鱼最好养，温度不用太高，饲料放一点点就行。」\n\n你把鱼缸放在书桌上。晚上加班的时候，抬头看看鱼在水里游来游去，你的心情莫名地平静下来。\n\n你开始研究水草、过滤系统、灯光。你的鱼缸从一个小玻璃缸变成了一个小型生态系统。\n\n有天早上你发现鱼缸里多了几条小鱼——孔雀鱼生宝宝了！你激动地拍了视频。\n\n你觉得养鱼是这个城市里最容易获得的治愈方式。看着它们在水中无忧无虑地游着，你觉得一切烦恼都变轻了。',
+      cond: g => g.age >= 20 && g.mood < 70,
+      choices:[
+        { label:'越来越投入，开始养更多品种', hint:'-💰 +🧠 +😊', fn: g => { g.flags.fishKeeping=true; g.flags.expanded=true; g.money-=500; return{intel:5,mood:8}; }},
+        { label:'把养鱼的过程写成了博客', hint:'+✨ +🧠', fn: g => { g.flags.fishKeeping=true; g.flags.fishBlog=true; return{charm:5,intel:3}; }},
+        { label:'送了几条小鱼给同事', hint:'+👥', fn: g => { g.flags.fishKeeping=true; return{social:5,mood:3}; }},
+      ]},
+
+    { id:'storm_animals_v32_4', icon:'🌧️', title:'暴雨中的流浪动物', category:'animals',
+      body:'今天下了一场暴雨，你从窗户看到楼下的流浪猫躲在空调外机下面，浑身湿透了。\n\n你拿了一把伞下楼，用纸箱做了个简易的遮雨棚。那只猫看了你一眼，没跑。\n\n你回去又拿了一碗水和一点剩饭放过去。\n\n第二天你看到业主群里有人在讨论：「暴雨天流浪动物太可怜了，我们能不能在楼下搭个棚子？」\n\n有人说好，有人说影响美观。讨论了一晚上也没有结论。\n\n但有几个业主自发地在楼下放了一些猫粮和水。你觉得这个城市里还是有很多善良的人。',
+      cond: g => g.age >= 18,
+      choices:[
+        { label:'跟几个业主一起搭了一个猫棚', hint:'+👥 +😊', fn: g => { g.flags.stormAnimals=true; g.flags.builtShelter=true; return{social:8,mood:8}; }},
+        { label:'给流浪动物救助组织捐了款', hint:'-💰 +😊', fn: g => { g.flags.stormAnimals=true; g.money-=200; return{mood:5}; }},
+        { label:'写了一篇呼吁关注流浪动物的文章', hint:'+✨ +🧠', fn: g => { g.flags.stormAnimals=true; return{charm:5,intel:3}; }},
+      ]},
+
+    { id:'urban_birdwatch_v32_4', icon:'🔭', title:'城市观鸟', category:'animals',
+      body:'你加入了一个城市观鸟群。\n\n周末早上六点，你跟着几个观鸟爱好者去了湿地公园。你借了一副望远镜，开始寻找鸟的踪迹。\n\n一个大哥指着远处说：「看，那只白鹭！」你顺着他的方向看去——一只白色的大鸟站在水边，优雅得像一幅画。\n\n你又看到了翠鸟、夜鹭、黑水鸡……原来这个城市里有这么多鸟，只是你从来没注意过。\n\n大哥说：「观鸟会上瘾的。你会发现城市比你以为的大得多。」\n\n你放下望远镜，深吸了一口气。空气里有草和水的味道。你觉得这个周末比睡懒觉有意义多了。',
+      cond: g => g.age >= 18 && g.intel > 40,
+      choices:[
+        { label:'成了观鸟群的活跃成员', hint:'+👥 +🧠', fn: g => { g.flags.urbanBirdwatch=true; g.flags.activeMember=true; return{social:5,intel:5}; }},
+        { label:'买了一本鸟类图鉴开始学习', hint:'-💰 +🧠', fn: g => { g.flags.urbanBirdwatch=true; g.flags.boughtGuide=true; g.money-=80; return{intel:8}; }},
+        { label:'记录了一年的观鸟日记', hint:'+🧠 +✨', fn: g => { g.flags.urbanBirdwatch=true; g.flags.birdDiary=true; return{intel:8,charm:5}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -19469,6 +19560,18 @@ const ACHIEVEMENTS = [
     { id:'meal_stand_ach', icon:'🍱', name:'工地盒饭', desc:'在工地旁的盒饭摊吃了一顿饱饭', check: g => g.flags.mealStand },
     { id:'scavenger_ach', icon:'🚮', name:'拾荒者', desc:'从拾荒者身上学到了珍惜', check: g => g.flags.urbanScavenger },
     { id:'delivery_station_ach', icon:'📦', name:'快递背后', desc:'亲身体验了快递分拣的辛苦', check: g => g.flags.deliveryStation },
+
+    // --- v32.4 城市里的动物成就 ---
+    { id:'stray_cat_ach', icon:'🐱', name:'猫奴觉醒', desc:'救助了一只流浪猫', check: g => g.flags.strayCat },
+    { id:'dog_walking_ach', icon:'🐕', name:'遛狗社交', desc:'通过遛狗认识了新朋友', check: g => g.flags.dogWalking },
+    { id:'city_birds_ach', icon:'🐦', name:'抬头看天', desc:'开始注意城市里的鸟', check: g => g.flags.cityBirds },
+    { id:'abandoned_pet_ach', icon:'📦', name:'不离不弃', desc:'关注了被遗弃的宠物问题', check: g => g.flags.abandonedPet },
+    { id:'park_squirrel_ach', icon:'🐿️', name:'松鼠朋友', desc:'在公园里观察了松鼠', check: g => g.flags.parkSquirrel },
+    { id:'cat_cafe_ach', icon:'☕', name:'猫咖兼职', desc:'在猫咖体验了打工生活', check: g => g.flags.catCafe },
+    { id:'hedgehog_ach', icon:'🦔', name:'刺猬邻居', desc:'在小区里发现了刺猬', check: g => g.flags.hedgehog },
+    { id:'fish_keeping_ach', icon:'🐟', name:'养鱼治愈', desc:'从养鱼中获得了平静', check: g => g.flags.fishKeeping },
+    { id:'storm_animals_ach', icon:'🌧️', name:'暴雨守护', desc:'在暴雨中帮助了流浪动物', check: g => g.flags.stormAnimals },
+    { id:'urban_birdwatch_ach', icon:'🔭', name:'城市观鸟人', desc:'加入了城市观鸟的行列', check: g => g.flags.urbanBirdwatch },
 ];
 
 // === ENDINGS === (order matters: first match wins)
