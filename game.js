@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v33.1
+// 都市浮生记 - Game Engine v33.2
 // ============================================
 
 // === GAME STATE ===
@@ -18520,6 +18520,97 @@ const EVENTS = [
         { label:'给爸妈发了条消息说爱他们', hint:'+👥 +😊', fn: g => { g.flags.cantGoBack=true; return{social:5,mood:5}; }},
         { label:'擦干眼泪，准备迎接新的生活', hint:'+💪 +😊', fn: g => { g.flags.cantGoBack=true; return{health:3,mood:5}; }},
       ]},
+
+    // === v33.2 城市里的性别 ===
+    { id:'woman_taxi_v33_2', icon:'🚕', title:'深夜打车', category:'gender',
+      body:'你加完班，凌晨一点打车回家。\n\n上车后你习惯性地把车牌号发给了朋友，又打开了实时定位分享。\n\n司机是个中年男人，一直不说话。你坐在后排右侧，手放在门把手旁边。\n\n你的手机电量只有15%了。你不敢听音乐，因为要保持警觉。\n\n终于到了小区门口。你下了车，快步走进楼道。你回头看了一眼——出租车已经开走了。\n\n你站在电梯里，松了一口气。你发了一条消息：「到了。」\n\n你觉得，深夜打车对女性来说永远不是一件轻松的事。',
+      cond: g => g.age >= 18 && g.jobSalary > 0,
+      choices:[
+        { label:'到家后跟朋友报了平安', hint:'+👥 +😊', fn: g => { g.flags.womanTaxi=true; return{social:3,mood:3}; }},
+        { label:'决定以后尽量早回家', hint:'+🧠 +💪', fn: g => { g.flags.womanTaxi=true; return{intel:3,health:2}; }},
+        { label:'在朋友圈写了关于女性安全的文章', hint:'+✨ +🧠', fn: g => { g.flags.womanTaxi=true; g.flags.wroteSafety=true; return{charm:5,intel:3}; }},
+      ]},
+
+    { id:'man_childcare_v33_2', icon:'👨‍👧', title:'爸爸带娃', category:'gender',
+      body:'你看到一个爸爸在公园里独自带两个孩子。\n\n他一手抱着小的，一手牵着大的。大的要上厕所，小的在哭。他手忙脚乱地换尿布，旁边几个妈妈看着他，窃窃私语。\n\n一个大妈说：「这个爸爸真厉害。」另一个说：「妈妈去哪了？」\n\n你走过去帮他递了一张纸巾。他感激地看了你一眼：「谢谢，一个人带两个真的太累了。」\n\n你说：「你老婆呢？」他说：「她出差了。其实平时也是我带得多，但别人总觉得男人带不好孩子。」\n\n你觉得，社会对「好爸爸」的定义，比对「好妈妈」的要求低太多了。',
+      cond: g => g.age >= 20,
+      choices:[
+        { label:'帮他看了一会儿孩子', hint:'+👥 +😊', fn: g => { g.flags.manChildcare=true; return{social:5,mood:5}; }},
+        { label:'跟他聊了很久关于育儿的事', hint:'+🧠 +👥', fn: g => { g.flags.manChildcare=true; return{intel:5,social:3}; }},
+        { label:'觉得带娃真的不容易', hint:'+🧠 +😊', fn: g => { g.flags.manChildcare=true; return{intel:3,mood:3}; }},
+      ]},
+
+    { id:'gender_discrimination_v33_2', icon:'⚖️', title:'职场性别歧视', category:'gender',
+      body:'你的同事小王被领导叫去谈话了。\n\n她回来后脸色很差。你问她怎么了，她说：「领导问我打算什么时候要孩子。我说暂时不考虑，他说：『那你考虑好了再说，我们这个项目需要长期投入。』」\n\n你很气愤。这明明就是变相的性别歧视。\n\n小王说：「我已经不是第一次遇到这种事了。上一家公司更过分，面试的时候直接问我有没有男朋友。」\n\n你想帮她出头，但她拦住了你：「算了，闹大了对我也不好。这个行业圈子小。」\n\n你觉得，职场上的性别歧视不会因为你一个人就消失，但至少你可以做一个清醒的旁观者。',
+      cond: g => g.age >= 22 && g.jobSalary > 0,
+      choices:[
+        { label:'帮她查了劳动法相关条款', hint:'+🧠 +👥', fn: g => { g.flags.genderDiscrimination=true; return{intel:5,social:5}; }},
+        { label:'在公司群里匿名提了这个问题', hint:'+👥 +✨', fn: g => { g.flags.genderDiscrimination=true; g.flags.anonPost=true; return{social:3,charm:3}; }},
+        { label:'决定以后面试时也注意这些', hint:'+🧠', fn: g => { g.flags.genderDiscrimination=true; return{intel:5}; }},
+      ]},
+
+    { id:'dating_market_v33_2', icon:'📊', title:'相亲市场的差异', category:'gender',
+      body:'你陪朋友去了一个相亲角。\n\n大爷大妈们把子女的「简历」挂在绳子上：身高、学历、收入、房产、户籍。\n\n你发现一个有意思的现象：男方的简历上写的是「月薪两万、有房有车」，女方的简历上写的是「肤白貌美、温柔贤惠」。\n\n一个大妈跟你说：「男孩要有房有车，女孩要年轻漂亮。这是市场规律。」\n\n你看了看那些简历，觉得这不是相亲市场，是人才市场。每个人的价值都被明码标价了。\n\n你朋友叹了口气：「在这里，你不是一个人，你是一张简历。」\n\n你觉得，不管是男性还是女性，被这样衡量都是一种悲哀。',
+      cond: g => g.age >= 25 && !g.flags.married,
+      choices:[
+        { label:'跟朋友吐槽了半天', hint:'+👥 +😊', fn: g => { g.flags.datingMarket=true; return{social:5,mood:3}; }},
+        { label:'写了一篇关于相亲市场的观察', hint:'+✨ +🧠', fn: g => { g.flags.datingMarket=true; g.flags.wroteObservation=true; return{charm:5,intel:5}; }},
+        { label:'觉得每个人都有权选择自己的标准', hint:'+🧠', fn: g => { g.flags.datingMarket=true; return{intel:5}; }},
+      ]},
+
+    { id:'housework_split_v33_2', icon:'🧹', title:'家务分配', category:'gender',
+      body:'你和另一半因为家务吵架了。\n\n你觉得你已经做了很多——倒垃圾、修灯泡、偶尔做饭。但对方说：「你知道谁每天洗碗、擦桌子、洗衣服、打扫卫生吗？」\n\n你想了想，好像确实都是对方在做。\n\n你上网查了一下数据：中国女性平均每天做家务2小时6分钟，男性只有45分钟。\n\n你决定开始主动分担更多家务。你列了一张清单，一人一半。\n\n执行了一周后你发现：做家务真的很累。你以前觉得「没什么大不了」的事，做起来才知道有多辛苦。\n\n你跟对方说了声：「对不起，以前是我不够体贴。」',
+      cond: g => g.age >= 22 && (g.flags.married || g.social > 50),
+      choices:[
+        { label:'列了家务清单一人一半', hint:'+👥 +😊', fn: g => { g.flags.houseworkSplit=true; g.flags.madeList=true; return{social:8,mood:5}; }},
+        { label:'道了歉并开始主动做家务', hint:'+👥 +💪', fn: g => { g.flags.houseworkSplit=true; return{social:5,health:3}; }},
+        { label:'花钱请了钟点工', hint:'-💰 +👥', fn: g => { g.flags.houseworkSplit=true; g.money-=500; return{social:3}; }},
+      ]},
+
+    { id:'woman_safety_v33_2', icon:'🔒', title:'女性独居安全', category:'gender',
+      body:'你是一个独居女性。\n\n你在网上看到一篇文章：《女性独居安全指南》。你认真看了每一条：\n\n1. 门口放一双男士拖鞋\n2. 阳台上挂几件男士衣服\n3. 外卖和快递写男士名字\n4. 不要在社交媒体上暴露住址\n5. 出门前检查门锁\n\n你照着做了。你把外卖名改成了「王先生」，在门口放了一双42码的拖鞋。\n\n你有时候觉得荒诞——你只是一个人住，却要假装家里有男人。\n\n但你更觉得愤怒——为什么一个女性连独自生活的安全感都需要自己来创造？\n\n你把这篇文章转发给了所有你认识的独居女性朋友。',
+      cond: g => g.age >= 20 && !g.flags.hasHouse,
+      choices:[
+        { label:'按照指南做了所有安全措施', hint:'+🧠 +💪', fn: g => { g.flags.womanSafety=true; return{intel:5,health:3}; }},
+        { label:'把指南分享给了朋友', hint:'+👥 +✨', fn: g => { g.flags.womanSafety=true; return{social:5,charm:3}; }},
+        { label:'觉得社会应该做得更好', hint:'+🧠', fn: g => { g.flags.womanSafety=true; return{intel:5}; }},
+      ]},
+
+    { id:'men_emotions_v33_2', icon:'💭', title:'男人的眼泪', category:'gender',
+      body:'你的男性朋友失恋了，约你出来喝酒。\n\n他喝了很多，眼眶红了。他说：「我不敢在别人面前哭。别人会说我不像个男人。」\n\n你说：「在我面前你可以哭。」\n\n他沉默了很久，然后眼泪掉下来了。他哭得像个孩子。\n\n等他哭完了，他擦了擦脸，不好意思地笑了笑：「谢谢你。我已经很久没有这样释放过了。」\n\n你想起你自己也有很多次想哭但忍住了的时候。你觉得「男人不能哭」可能是这个社会对男性最大的伤害之一。\n\n你们喝完酒，走在夜风里。你觉得，能有一个让你哭的朋友，是一件很幸运的事。',
+      cond: g => g.age >= 20 && g.social > 30,
+      choices:[
+        { label:'陪他哭了一场', hint:'+👥 +😊', fn: g => { g.flags.menEmotions=true; return{social:8,mood:5}; }},
+        { label:'认真地听他说了心里话', hint:'+👥 +🧠', fn: g => { g.flags.menEmotions=true; return{social:5,intel:3}; }},
+        { label:'觉得男性也需要被允许脆弱', hint:'+🧠 +😊', fn: g => { g.flags.menEmotions=true; return{intel:5,mood:3}; }},
+      ]},
+
+    { id:'period_pain_v33_2', icon:'🩸', title:'月经假', category:'gender',
+      body:'你的女同事今天请假了，说是「身体不舒服」。\n\n但你知道她其实是痛经。她每个月有那么一两天都疼得脸色发白。\n\n你查了一下，有些公司开始实行「月经假」——女性每个月可以请一天带薪假。但争议很大：有人说这是进步，有人说这是「特殊对待」。\n\n你的一个男同事说：「凭什么女生有月经假？那我们是不是也可以有『不想上班假』？」\n\n你觉得这个争论本身就很荒谬。月经假不是福利，是基本的健康保障。就像你不能要求一个骨折的人「忍着」一样。\n\n你在公司的意见箱里投了一个建议：希望公司能考虑实行月经假。',
+      cond: g => g.age >= 20 && g.jobSalary > 0,
+      choices:[
+        { label:'向公司建议实行月经假', hint:'+🧠 +👥', fn: g => { g.flags.periodPain=true; g.flags.suggestedLeave=true; return{intel:5,social:3}; }},
+        { label:'在网上写了关于月经假的讨论', hint:'+✨ +🧠', fn: g => { g.flags.periodPain=true; return{charm:5,intel:3}; }},
+        { label:'给痛经的同事送了红糖姜茶', hint:'+👥 +😊', fn: g => { g.flags.periodPain=true; g.flags.sentTea=true; return{social:5,mood:5}; }},
+      ]},
+
+    { id:'stay_home_dad_v33_2', icon:'👶', title:'全职爸爸', category:'gender',
+      body:'你在小区里认识了一个全职爸爸。\n\n他原来是IT公司的项目经理，年薪三十万。老婆生了孩子后，他们商量了一下，决定他辞职在家带孩子。\n\n「我老婆工资比我高，而且她更喜欢工作。我虽然也喜欢工作，但孩子总得有人带。」\n\n他每天的生活是：做饭、喂奶、换尿布、陪玩、哄睡。他说比上班累多了，「因为上班有下班时间，带孩子是24小时无休」。\n\n小区里有些大妈看他的眼神很奇怪：「一个大男人不出去挣钱，在家带孩子？」\n\n他说：「我不在意。我做的是最重要的工作——培养一个人。」\n\n你觉得，他比你认识的大多数人都勇敢。',
+      cond: g => g.age >= 25,
+      choices:[
+        { label:'很佩服他的勇气', hint:'+🧠 +😊', fn: g => { g.flags.stayHomeDad=true; return{intel:5,mood:5}; }},
+        { label:'跟他成了朋友，经常交流育儿', hint:'+👥 +🧠', fn: g => { g.flags.stayHomeDad=true; g.flags.dadFriend=true; return{social:5,intel:3}; }},
+        { label:'觉得家庭分工应该灵活', hint:'+🧠', fn: g => { g.flags.stayHomeDad=true; return{intel:5}; }},
+      ]},
+
+    { id:'gender_stereotype_v33_2', icon:'🏷️', title:'性别刻板印象', category:'gender',
+      body:'你在超市看到一个场景：一个小男孩拿起一个粉色的玩具娃娃，他妈妈立刻说：「放下，那个是女孩子玩的。你玩那个恐龙。」\n\n小男孩不情愿地放下了娃娃，拿起了恐龙。但他一直回头看那个娃娃。\n\n你想：从什么时候开始，颜色、玩具、职业、性格都有了性别标签？\n\n粉色是女孩的、蓝色是男孩的。护士是女的、工程师是男的。温柔是女的、坚强是男的。\n\n你觉得这些标签限制了每一个人——不只是女性，也包括男性。\n\n你发了一条朋友圈：「别让性别标签决定你的人生。喜欢粉色就喜欢粉色，想哭就哭，想做护士就做护士。」\n\n收到了很多赞，也有一些杠精评论。但你不在乎。',
+      cond: g => g.age >= 18 && g.intel > 40,
+      choices:[
+        { label:'发了一条反刻板印象的朋友圈', hint:'+✨ +🧠', fn: g => { g.flags.genderStereotype=true; return{charm:5,intel:3}; }},
+        { label:'跟朋友讨论了很久这个话题', hint:'+🧠 +👥', fn: g => { g.flags.genderStereotype=true; return{intel:5,social:3}; }},
+        { label:'决定不给自己的孩子贴性别标签', hint:'+🧠 +😊', fn: g => { g.flags.genderStereotype=true; g.flags.noLabels=true; return{intel:5,mood:5}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -20293,6 +20384,18 @@ const ACHIEVEMENTS = [
     { id:'small_medical_ach', icon:'🏥', name:'小城医疗', desc:'感受了小城市医疗的不便', check: g => g.flags.smallCityMedical },
     { id:'county_date_ach', icon:'💑', name:'县城相亲', desc:'在老家经历了一次相亲', check: g => g.flags.countyBlinddate },
     { id:'cant_go_back_ach', icon:'🚂', name:'回不去的故乡', desc:'明白了故乡是一个只能离开的地方', check: g => g.flags.cantGoBack },
+
+    // --- v33.2 城市里的性别成就 ---
+    { id:'woman_taxi_ach', icon:'🚕', name:'深夜到家', desc:'深夜打车安全到家', check: g => g.flags.womanTaxi },
+    { id:'man_childcare_ach', icon:'👨‍👧', name:'超级奶爸', desc:'见证了爸爸带娃的不易', check: g => g.flags.manChildcare },
+    { id:'gender_discrimination_ach', icon:'⚖️', name:'职场平等', desc:'直面了职场中的性别歧视', check: g => g.flags.genderDiscrimination },
+    { id:'dating_market_ach', icon:'📊', name:'明码标价', desc:'看透了相亲市场的荒诞', check: g => g.flags.datingMarket },
+    { id:'housework_split_ach', icon:'🧹', name:'家务革命', desc:'开始了公平的家务分配', check: g => g.flags.houseworkSplit },
+    { id:'woman_safety_ach', icon:'🔒', name:'独居安全', desc:'为独居安全做了充分准备', check: g => g.flags.womanSafety },
+    { id:'men_emotions_ach', icon:'💭', name:'男人也哭', desc:'允许自己和他人表达脆弱', check: g => g.flags.menEmotions },
+    { id:'period_pain_ach', icon:'🩸', name:'月经假倡议', desc:'为女性健康权益发声', check: g => g.flags.periodPain },
+    { id:'stay_home_dad_v33_2_ach', icon:'👶', name:'全职爸爸', desc:'认识了勇敢的全职爸爸', check: g => g.flags.stayHomeDad },
+    { id:'gender_stereotype_ach', icon:'🏷️', name:'撕掉标签', desc:'拒绝被性别刻板印象定义', check: g => g.flags.genderStereotype },
 ];
 
 // === ENDINGS === (order matters: first match wins)
