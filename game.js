@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v3.2
+// 都市浮生记 - Game Engine v3.3
 // ============================================
 
 // === GAME STATE ===
@@ -2712,6 +2712,41 @@ const EVENTS = [
         { label:'觉得太理想化', hint:'+🧠', fn: g => { g.flags.zeroBridePrice=true; return{intel:5}; }},
         { label:'传播这个理念', hint:'+👥 +✨', fn: g => { g.flags.zeroBridePrice=true; return{social:8,charm:5}; }},
       ]},
+    // === v3.3 EVENTS - FIRE运动与数字游民 ===
+    { id:'fire_movement', icon:'🔥', title:'FIRE运动',
+      body:'你在豆瓣看到一个小组："FIRE生活"，8万成员。\n\nFIRE = Financial Independence, Retire Early（财务独立，提前退休）\n\n规则：攒够年开支的25倍，靠4%的理财收益生活，然后提前退休。\n\n你算了算：\n- 年开支：6万\n- 目标：150万\n- 当前存款：15万\n- 还差：135万\n\n你陷入了沉思：要攒多少年？能坚持吗？退休后干嘛？\n\n"FIRE不是逃避，是给自己一个选择。"',
+      cond: g => !g.flags.fireMovement && g.money>20000 && g.age>=25 && g.intel>=60,
+      choices:[
+        { label:'开始FIRE计划', hint:'+💰 +🧠 -😊', fn: g => { g.flags.fireMovement=true; return{money:5000,intel:10,mood:-5}; }},
+        { label:'穷FIRE，极简生活', hint:'+💰 -😊', fn: g => { g.flags.fireMovement=true; g.flags.minimalist=true; return{money:8000,mood:-8}; }},
+        { label:'咖啡师FIRE，半退休', hint:'+😊 +💰', fn: g => { g.flags.fireMovement=true; g.flags.coffeeFIRE=true; return{mood:10,money:3000}; }},
+        { label:'算了，太遥远了', hint:'+😊', fn: g => { g.flags.fireMovement=true; return{mood:5}; }},
+      ]},
+    { id:'fire_reality', icon:'💼', title:'FIRE后又回来上班了',
+      body:'你认识的一个FIRE前辈，提前退休三年后又回来上班了。\n\n他说："退休后的第一年很爽，第二年有点无聊，第三年开始焦虑。"\n\n你问："为什么？"\n\n他说："没有目标，没有社交，没有成就感。钱是够了，但人活着不只是为了钱。"\n\n"FIRE的终点不是退休，是找到真正想做的事。"',
+      cond: g => g.flags.fireMovement && !g.flags.fireReality && g.age>=30,
+      choices:[
+        { label:'重新审视FIRE目标', hint:'+🧠 +😊', fn: g => { g.flags.fireReality=true; return{intel:10,mood:12}; }},
+        { label:'继续坚持', hint:'+💰 -😊', fn: g => { g.flags.fireReality=true; return{money:5000,mood:-8}; }},
+        { label:'边FIRE边找热爱', hint:'+😊 +✨', fn: g => { g.flags.fireReality=true; return{mood:15,charm:8}; }},
+      ]},
+    { id:'digital_nomad', icon:'🌍', title:'数字游民生活',
+      body:'你辞职了，成为数字游民。\n\n你的收入来源：\n- 自由职业开发：月入8000-15000\n- 技术博客广告：月入500-2000\n- 在线课程：月入1000-3000\n\n你的足迹：\n- 大理（2个月）- 程序员天堂\n- 清迈（3个月）- 数字游民聚集地\n- 巴厘岛（1个月）- 网络一般但环境好\n- 厦门（2个月）- 国内最宜居\n- 成都（4个月）- 美食太多\n\n"数字游民不是逃避，是重新定义工作与生活的边界。"',
+      cond: g => !g.flags.digitalNomad && g.intel>=70 && g.money>30000 && g.age>=25 && g.age<=40,
+      choices:[
+        { label:'辞职，去大理', hint:'+😊 +❤️ -💰', fn: g => { g.flags.digitalNomad=true; setJob(g,'数字游民',0); return{mood:25,health:10,money:-5000}; }},
+        { label:'边工作边准备', hint:'+💰 +🧠', fn: g => { g.flags.digitalNomad=true; return{money:5000,intel:8}; }},
+        { label:'太冒险了，算了', hint:'+😊', fn: g => { g.flags.digitalNomad=true; return{mood:5}; }},
+      ]},
+    { id:'nomad_challenges', icon:'😔', title:'数字游民的困境',
+      body:'你做了半年数字游民，发现了三个问题：\n\n1. **孤独感**：没有同事，没有固定社交圈\n2. **自律难**：没有人监督，容易摸鱼\n3. **时区问题**：接海外客户需要半夜开会\n\n你开始怀疑：这是自由，还是另一种形式的流浪？\n\n"数字游民的光鲜背后，是常人看不到的孤独与自律。"',
+      cond: g => g.flags.digitalNomad && !g.flags.nomadChallenges && g.months>=6,
+      choices:[
+        { label:'加入Coworking空间', hint:'+👥 +😊', fn: g => { g.flags.nomadChallenges=true; return{social:15,mood:12}; }},
+        { label:'固定工作时间', hint:'+🧠 +😊', fn: g => { g.flags.nomadChallenges=true; return{intel:8,mood:8}; }},
+        { label:'回去上班', hint:'+💰 -😊', fn: g => { g.flags.nomadChallenges=true; setJob(g,'程序员',12000); return{money:5000,mood:-10}; }},
+        { label:'继续坚持', hint:'+✨ +😊', fn: g => { g.flags.nomadChallenges=true; return{charm:8,mood:10}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -2769,6 +2804,10 @@ const ACHIEVEMENTS = [
     { id:'bride_price_warrior', icon:'💰', name:'彩礼战士', desc:'面对天价彩礼', check: g => g.flags.bridePrice },
     { id:'delay_marriage_expert', icon:'💍', name:'延迟结婚专家', desc:'选择晚婚', check: g => g.flags.delayMarriage },
     { id:'zero_price_supporter', icon:'💚', name:'零彩礼支持者', desc:'支持婚俗改革', check: g => g.flags.zeroBridePrice },
+    { id:'fire_practitioner', icon:'🔥', name:'FIRE实践者', desc:'开始FIRE计划', check: g => g.flags.fireMovement },
+    { id:'fire_veteran', icon:'💼', name:'FIRE归来者', desc:'FIRE后又回来上班', check: g => g.flags.fireReality },
+    { id:'digital_nomad_life', icon:'🌍', name:'数字游民', desc:'成为数字游民', check: g => g.flags.digitalNomad },
+    { id:'nomad_survivor', icon:'😔', name:'游民幸存者', desc:'度过数字游民困境', check: g => g.flags.nomadChallenges },
     { id:'photographer', icon:'📷', name:'摄影师', desc:'爱上摄影', check: g => g.flags.photographyHobby },
     { id:'viral_star', icon:'🌟', name:'网红初体验', desc:'意外走红', check: g => g.flags.viralMoment },
     { id:'freelancer', icon:'💻', name:'自由职业者', desc:'成为自由职业者', check: g => g.flags.freelancer },
