@@ -30,6 +30,9 @@
                 <button class="btn btn-ghost" onclick="showScreen('screen-about')">
                     <span class="btn-icon">📖</span> 关于游戏
                 </button>
+                <button class="btn btn-ghost" onclick="openSettings()">
+                    <span class="btn-icon">⚙️</span> 设置
+                </button>
             </div>
             <div class="title-footer">
                 <span>v2.0</span> · <span>献给每一个在大城市奋斗的你</span>
@@ -331,6 +334,44 @@
             <h2>📜 人生轨迹</h2>
             <div class="timeline-scroll" id="timeline-scroll"></div>
             <button class="btn btn-secondary" onclick="closeModal('modal-timeline')">关闭</button>
+        </div>
+    </div>
+
+    <!-- ===== 设置弹窗 ===== -->
+    <div class="modal" id="modal-settings">
+        <div class="modal-overlay" onclick="closeModal('modal-settings')"></div>
+        <div class="modal-content">
+            <h2>⚙️ 设置</h2>
+            <div class="settings-group">
+                <h3>🔤 字体大小</h3>
+                <div class="settings-options">
+                    <button class="settings-btn" onclick="setFontSize('small')">小</button>
+                    <button class="settings-btn active" onclick="setFontSize('medium')" id="font-medium">中</button>
+                    <button class="settings-btn" onclick="setFontSize('large')">大</button>
+                </div>
+            </div>
+            <div class="settings-group">
+                <h3>🎨 显示模式</h3>
+                <div class="settings-options">
+                    <label class="settings-toggle">
+                        <input type="checkbox" id="toggle-contrast" onchange="toggleHighContrast()">
+                        <span>高对比度</span>
+                    </label>
+                    <label class="settings-toggle">
+                        <input type="checkbox" id="toggle-motion" onchange="toggleReduceMotion()">
+                        <span>减少动画</span>
+                    </label>
+                </div>
+            </div>
+            <div class="settings-group">
+                <h3>💾 数据管理</h3>
+                <div class="settings-options">
+                    <button class="settings-btn" onclick="exportSave()">导出存档</button>
+                    <button class="settings-btn" onclick="importSave()">导入存档</button>
+                    <button class="settings-btn danger" onclick="clearSave()">清除存档</button>
+                </div>
+            </div>
+            <button class="btn btn-secondary" onclick="closeModal('modal-settings')">关闭</button>
         </div>
     </div>
 

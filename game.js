@@ -1139,8 +1139,103 @@ function initParticles() {
     (function animate() { ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach(p=>{p.update();p.draw()}); requestAnimationFrame(animate); })();
 }
 
+// === SETTINGS ===
+function openSettings() {
+    document.getElementById('modal-settings').classList.add('open');
+    loadSettingsUI();
+}
+
+function setFontSize(size) {
+    const sizes = { small: '14px', medium: '16px', large: '18px' };
+    document.documentElement.style.fontSize = sizes[size];
+    localStorage.setItem('gameSettings_fontSize', size);
+    document.querySelectorAll('.settings-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+}
+
+function toggleHighContrast() {
+    const enabled = document.getElementById('toggle-contrast').checked;
+    document.body.classList.toggle('high-contrast', enabled);
+    localStorage.setItem('gameSettings_highContrast', enabled);
+}
+
+function toggleReduceMotion() {
+    const enabled = document.getElementById('toggle-motion').checked;
+    document.body.classList.toggle('reduce-motion', enabled);
+    localStorage.setItem('gameSettings_reduceMotion', enabled);
+}
+
+function exportSave() {
+    const save = localStorage.getItem('cityDrifters_save');
+    if (!save) { notify('没有存档可导出'); return; }
+    const blob = new Blob([save], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `都市浮生记_存档_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    notify('📤 存档已导出！');
+}
+
+function importSave() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const data = JSON.parse(event.target.result);
+                localStorage.setItem('cityDrifters_save', JSON.stringify(data));
+                notify('💾 存档已导入！刷新页面生效');
+                setTimeout(() => location.reload(), 1500);
+            } catch (err) {
+                notify('❌ 存档文件格式错误');
+            }
+        };
+        reader.readAsText(file);
+    };
+    input.click();
+}
+
+function clearSave() {
+    if (!confirm('确定要清除存档吗？此操作不可恢复！')) return;
+    localStorage.removeItem('cityDrifters_save');
+    notify('🗑️ 存档已清除');
+}
+
+function loadSettingsUI() {
+    const fontSize = localStorage.getItem('gameSettings_fontSize') || 'medium';
+    const highContrast = localStorage.getItem('gameSettings_highContrast') === 'true';
+    const reduceMotion = localStorage.getItem('gameSettings_reduceMotion') === 'true';
+
+    document.querySelectorAll('.settings-btn').forEach(btn => {
+        if (btn.textContent.includes(fontSize === 'small' ? '小' : fontSize === 'large' ? '大' : '中')) {
+            btn.classList.add('active');
+        }
+    });
+    document.getElementById('toggle-contrast').checked = highContrast;
+    document.getElementById('toggle-motion').checked = reduceMotion;
+}
+
+function loadSettings() {
+    const fontSize = localStorage.getItem('gameSettings_fontSize') || 'medium';
+    const highContrast = localStorage.getItem('gameSettings_highContrast') === 'true';
+    const reduceMotion = localStorage.getItem('gameSettings_reduceMotion') === 'true';
+
+    const sizes = { small: '14px', medium: '16px', large: '18px' };
+    document.documentElement.style.fontSize = sizes[fontSize];
+
+    if (highContrast) document.body.classList.add('high-contrast');
+    if (reduceMotion) document.body.classList.add('reduce-motion');
+}
+
 // === INIT ===
 document.addEventListener('DOMContentLoaded', () => {
+    loadSettings();
     initParticles();
     if (!localStorage.getItem('cityDrifters_save')) document.getElementById('btn-continue').style.opacity = '0.4';
 });
