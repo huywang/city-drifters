@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v10.5
+// 都市浮生记 - Game Engine v10.6
 // ============================================
 
 // === GAME STATE ===
@@ -4959,6 +4959,87 @@ const EVENTS = [
         { label:'明确拒绝', hint:'+🧠', fn: g => { g.flags.blindDateDone=true; return{intel:3,mood:2}; }},
         { label:'当朋友吧', hint:'+👥 +😊', fn: g => { g.flags.blindDateDone=true; return{social:5,mood:5}; }},
       ]},
+    // === v10.6 副业经济/文化消费 ===
+    { id:'xianyu_sell', icon:'🐟', title:'闲鱼卖闲置',
+      body:'你打开闲鱼，发现自己有一堆没用的东西：买了没穿的衣服、用了两次就闲置的厨房电器、冲动消费的数码产品。\n\n你拍了照片、写了描述、标了价格。三天后，第一单成交了！\n\n你突然觉得：原来"断舍离"还能赚钱。\n\n"闲鱼是中国人的后悔药——别人用过的东西，可能是你的新开始。"',
+      cond: g => g.months > 6 && g.money < 20000,
+      choices:[
+        { label:'大甩卖', hint:'+💰', fn: g => { g.flags.xianyuSeller=true; return{money:800,mood:5}; }},
+        { label:'精挑细选卖', hint:'+💰 +🧠', fn: g => { g.flags.xianyuSeller=true; return{money:2000,intel:2,mood:3}; }},
+        { label:'算了舍不得', hint:'+😊', fn: g => { return{mood:-2}; }},
+      ]},
+    { id:'paid_knowledge', icon:'📚', title:'知识付费',
+      body:'你在朋友圈看到一门课："30天从零到月入过万"，售价299元。\n\n你犹豫了一下，想起了那句"投资自己永远是最好的投资"。\n\n你买了。30天后你发现：课是真的，但"月入过万"是假的。\n\n"知识付费的真相：卖课的人赚得比学课的人多。"',
+      cond: g => g.intel >= 40 && g.money > 500 && !g.flags.boughtCourse,
+      choices:[
+        { label:'认真学完', hint:'+🧠', fn: g => { g.flags.boughtCourse=true; return{money:-299,intel:8,mood:3}; }},
+        { label:'买了不看', hint:'-💰', fn: g => { g.flags.boughtCourse=true; return{money:-299,mood:-3}; }},
+        { label:'不买，自学', hint:'+🧠', fn: g => { return{intel:5}; }},
+      ]},
+    { id:'concert_event', icon:'🎵', title:'演唱会',
+      body:'你喜欢的歌手来你的城市开演唱会了。门票从480到2880，黄牛票翻了三倍。\n\n你咬咬牙买了最贵的——毕竟，这可能是TA最后一次巡演了。\n\n现场几万人一起合唱的时候，你哭了。不是因为感动，是因为你觉得：这一刻，所有的加班、焦虑、孤独，都值了。\n\n"演唱会是成年人的精神充电——两个小时的呐喊，够用一年。"',
+      cond: g => g.months > 6 && g.money > 2000,
+      choices:[
+        { label:'买VIP票', hint:'-💰 +😊', fn: g => { g.flags.wentConcert=true; return{money:-3000,mood:20,charm:3}; }},
+        { label:'买普通票', hint:'-💰 +😊', fn: g => { g.flags.wentConcert=true; return{money:-500,mood:15}; }},
+        { label:'看直播', hint:'+😊', fn: g => { return{mood:5}; }},
+      ]},
+    { id:'art_exhibition', icon:'🎨', title:'看展',
+      body:'周末你去了一个当代艺术展。门票88元。\n\n你站在一堆看不懂的装置艺术前面，假装很懂地拍了照片。\n\n你在朋友圈写道："艺术是灵魂的镜子。"\n\n你妈评论："这有什么好看的？浪费钱。"\n\n"看展是一种仪式：你不一定看懂了，但你觉得自己的灵魂被洗礼了。"',
+      cond: g => g.charm >= 30 && g.months > 6 && g.money > 200,
+      choices:[
+        { label:'认真研究', hint:'+🧠 +✨', fn: g => { g.flags.wentExhibition=true; return{intel:5,charm:5,mood:5}; }},
+        { label:'拍照打卡', hint:'+✨', fn: g => { g.flags.wentExhibition=true; return{charm:8,mood:3}; }},
+        { label:'看不懂走了', hint:'', fn: g => { return{mood:-2}; }},
+      ]},
+    { id:'spontaneous_trip', icon:'✈️', title:'说走就走的旅行',
+      body:'你在某个加班到凌晨的晚上，打开携程，订了一张去大理/丽江/厦门的机票。\n\n你没有做攻略，没有订酒店，甚至没有告诉任何人。\n\n你在洱海边发呆，在古城里闲逛，在路边小店吃一碗米线。你觉得自己终于活过来了。\n\n"旅行不是逃避，是给自己一个喘息的机会。"',
+      cond: g => g.mood < 50 && g.money > 3000 && g.months > 12,
+      choices:[
+        { label:'玩一周', hint:'-💰 +😊', fn: g => { g.flags.spontaneousTrip=true; return{money:-5000,mood:25,health:5}; }},
+        { label:'玩三天', hint:'-💰 +😊', fn: g => { g.flags.spontaneousTrip=true; return{money:-2000,mood:15,health:3}; }},
+        { label:'算了没钱', hint:'+😊', fn: g => { return{mood:-5}; }},
+      ]},
+    { id:'street_vendor', icon:'🏪', title:'摆摊',
+      body:'你在夜市租了个摊位，卖起了柠檬茶/手工饰品/二手书。\n\n一晚上赚了200块。虽然比你加班费少，但你第一次觉得：这是为自己工作。\n\n你拍了张照片发朋友圈："白天打工，晚上摆摊，这就是我的人生。"\n\n收获了300个赞。\n\n"摆摊不是为了赚钱，是为了证明自己还有另一种可能。"',
+      cond: g => g.age >= 20 && g.age <= 35 && g.months > 6 && g.money > 500,
+      choices:[
+        { label:'坚持摆摊', hint:'+💰 +✨', fn: g => { g.flags.streetVendor=true; return{money:1500,charm:5,social:5,mood:8}; }},
+        { label:'试试一周', hint:'+💰', fn: g => { g.flags.streetVendor=true; return{money:500,mood:5}; }},
+        { label:'太累了放弃', hint:'', fn: g => { return{mood:-3}; }},
+      ]},
+    { id:'web_novel', icon:'✍️', title:'写网文',
+      body:'你决定写一部网络小说。你想了很久题材：穿越？修仙？都市？系统文？\n\n你最终写了一部关于"大城市漂泊"的现实主义小说。前三章没什么人看，但你写得很开心。\n\n直到有一天，一个读者评论说："你写的就是我的生活。谢谢你让我觉得不是只有我一个人这样。"\n\n"写作的意义不是被多少人看到，而是让一个人觉得被理解了。"',
+      cond: g => g.intel >= 50 && g.months > 12 && !g.flags.webNovelist,
+      choices:[
+        { label:'日更3000字', hint:'+🧠 +✨', fn: g => { g.flags.webNovelist=true; return{intel:5,charm:3,mood:5}; }},
+        { label:'佛系更新', hint:'+🧠', fn: g => { g.flags.webNovelist=true; return{intel:3,mood:3}; }},
+        { label:'投给出版社', hint:'+✨', fn: g => { g.flags.webNovelist=true; return{charm:5,mood:8}; }},
+      ]},
+    { id:'livestream_try', icon:'📹', title:'试水直播',
+      body:'你鼓起勇气开了人生第一次直播。\n\n观众：3个人。其中一个是你的小号，一个是你妈，一个是误入的路人。\n\n你尴尬地聊了半小时，路人走的时候说了一句："主播加油。"\n\n你觉得这是你听过最温暖的鼓励。\n\n"每个大主播都从0个观众开始——区别是有些人放弃了，有些人没有。"',
+      cond: g => g.charm >= 30 && g.months > 6 && !g.flags.triedLivestream,
+      choices:[
+        { label:'坚持直播', hint:'+✨ +👥', fn: g => { g.flags.triedLivestream=true; return{charm:8,social:5,mood:5}; }},
+        { label:'当练口才', hint:'+✨', fn: g => { g.flags.triedLivestream=true; return{charm:5,mood:3}; }},
+        { label:'太尴尬了', hint:'', fn: g => { g.flags.triedLivestream=true; return{mood:-5}; }},
+      ]},
+    { id:'drivers_license', icon:'🚗', title:'考驾照',
+      body:'你终于决定考驾照了。驾校报名费4000块。\n\n科目一：刷题一周，过了。\n科目二：倒车入库把你逼疯了，你挂了一次。\n科目三：上路的时候你紧张得手心出汗。\n科目四：又刷题，过了。\n\n拿到驾照的那一刻，你觉得自己终于是一个"完整"的成年人了。\n\n"驾照是成年人的第二张身份证——虽然你可能永远买不起车。"',
+      cond: g => g.age >= 18 && g.age <= 40 && g.money > 3000 && !g.flags.hasDriversLicense,
+      choices:[
+        { label:'一次过', hint:'-💰 +🧠', fn: g => { g.flags.hasDriversLicense=true; return{money:-4000,intel:3,mood:10}; }},
+        { label:'挂了两次', hint:'-💰', fn: g => { g.flags.hasDriversLicense=true; return{money:-5500,mood:5}; }},
+        { label:'不考了', hint:'', fn: g => { return{mood:-3}; }},
+      ]},
+    { id:'side_hustle_online', icon:'💻', title:'线上副业',
+      body:'你在网上找了一份副业：帮人写文案/做PPT/翻译/设计Logo。\n\n第一个月赚了3000块。虽然不多，但这是你用"下班后的时间"赚的。\n\n你发了一条朋友圈："打工人也有第二收入了！"\n\n"副业是打工人的Plan B——你不确定能不能成功，但你知道不能只有一个Plan A。"',
+      cond: g => g.intel >= 40 && g.months > 12 && g.jobSalary >= 5000 && !g.flags.hasSideHustle,
+      choices:[
+        { label:'大力发展', hint:'+💰 +🧠', fn: g => { g.flags.hasSideHustle=true; return{money:3000,intel:5,mood:8}; }},
+        { label:'偶尔接单', hint:'+💰', fn: g => { g.flags.hasSideHustle=true; return{money:1000,mood:3}; }},
+        { label:'影响主业放弃', hint:'+😊', fn: g => { return{mood:-3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'first_job', icon:'💼', name:'职场新人', desc:'找到第一份工作', check: g => g.flags.gotFirstJob },
@@ -5382,6 +5463,15 @@ const ACHIEVEMENTS = [
     { id:'brave_dater', icon:'💑', name:'勇敢相亲', desc:'去了一次相亲', check: g => g.flags.wentBlindDate },
     { id:'relative_cutter', icon:'✂️', name:'断亲勇士', desc:'选择了断亲', check: g => g.flags.cutRelatives },
     { id:'filial_v2', icon:'🏥', name:'孝心体检', desc:'带父母做体检', check: g => g.flags.parentHealthDone },
+    // === v10.6 新增成就 ===
+    { id:'xianyu_seller', icon:'🐟', name:'闲鱼达人', desc:'在闲鱼卖了闲置', check: g => g.flags.xianyuSeller },
+    { id:'side_hustler', icon:'💻', name:'斜杠青年', desc:'开始做副业', check: g => g.flags.hasSideHustle },
+    { id:'web_novelist_ach', icon:'✍️', name:'网文作者', desc:'开始写网络小说', check: g => g.flags.webNovelist },
+    { id:'concert_goer', icon:'🎵', name:'演唱会狂热', desc:'去了一场演唱会', check: g => g.flags.wentConcert },
+    { id:'art_lover', icon:'🎨', name:'文艺青年', desc:'去看了艺术展', check: g => g.flags.wentExhibition },
+    { id:'street_vendor_ach', icon:'🏪', name:'摆摊达人', desc:'尝试了夜市摆摊', check: g => g.flags.streetVendor },
+    { id:'driver_ach', icon:'🚗', name:'持证上路', desc:'拿到了驾照', check: g => g.flags.hasDriversLicense },
+    { id:'livestreamer_ach', icon:'📹', name:'直播新人', desc:'尝试了直播', check: g => g.flags.triedLivestream },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -5507,6 +5597,10 @@ const ENDINGS = [
     { id:'health_conscious_end', badge:'🍵', title:'养生大师', desc:'你从一个熬夜冠军变成了一个养生达人。\n\n早睡早起、规律饮食、定期体检、枸杞泡水。你的体检报告从一片箭头变成了全部正常。\n\n你在知乎写了一篇《从脂肪肝到六块腹肌的逆袭》，获得了10万+阅读。\n\n"养生不是怕死，是学会了好好活着。"', cond: g => g.flags.wellnessMode && g.health >= 75 && g.age >= 28 },
     { id:'cut_relatives_end', badge:'✂️', title:'断亲自由', desc:'你切断了那些让你不舒服的亲戚关系。\n\n没有了对比，没有了催婚，没有了灵魂拷问。你终于可以在过年的时候做自己想做的事。\n\n有人说你冷漠，但你知道：血缘是缘分，不是枷锁。\n\n"断亲不是不孝，是把爱留给值得的人。"', cond: g => g.flags.cutRelatives && g.mood >= 60 && g.age >= 26 },
     { id:'wellness_punk_end', badge:'🎸', title:'朋克养生家', desc:'你活成了一种矛盾的美。\n\n凌晨2点还在加班，但桌上放着燕窝和枸杞。\n\n周末去蹦迪到凌晨4点，但周一早上准时去健身房。\n\n你不是不养生，你是用最朋克的方式养生。\n\n"朋克养生是一种态度：我知道这样不好，但我选择快乐。"', cond: g => g.health >= 50 && g.mood >= 60 && g.age >= 25 && g.age <= 35 },
+    // --- v10.6 NEW ENDINGS ---
+    { id:'side_hustle_end', badge:'💻', title:'斜杠人生', desc:'你不只有一份工作。\n\n白天你是打工人，晚上你是自由职业者。你写文案、做PPT、翻译、设计。\n\n你的副业收入慢慢追上了主业。你在考虑：要不要辞职，全职做自由职业？\n\n"斜杠不是贪婪，是不想被一个标签定义。"', cond: g => g.flags.hasSideHustle && g.money >= 30000 && g.intel >= 60 && g.age >= 26 },
+    { id:'novelist_end', badge:'✍️', title:'网文作家', desc:'你写的小说终于有人看了。\n\n从0个读者到100个，从100个到10000个。你的故事被更多人看到。\n\n有人说你写得好，有人说你写得烂。但你知道：重要的不是评价，是你一直在写。\n\n"每个作家都是从无人问津开始的——区别是你有没有坚持下去。"', cond: g => g.flags.webNovelist && g.charm >= 50 && g.intel >= 60 && g.months > 36 },
+    { id:'traveler_end', badge:'✈️', title:'行走的风景', desc:'你走遍了大半个中国。\n\n从大理到丽江，从厦门到成都，从西安到拉萨。\n\n你在每个城市都留下了照片和故事。你的朋友圈是一本旅行日记。\n\n"旅行不会改变世界，但会改变看世界的你。"', cond: g => g.flags.spontaneousTrip && g.charm >= 45 && g.mood >= 60 && g.age >= 28 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
