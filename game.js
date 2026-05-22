@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v28.8
+// 都市浮生记 - Game Engine v28.9
 // ============================================
 
 // === GAME STATE ===
@@ -14976,6 +14976,87 @@ const EVENTS = [
         { label:'聊完之后决定找真人咨询师', hint:'+😊 +🧠', fn: g => { g.flags.aiTherapist=true; g.flags.seekingRealHelp=true; g.money -= 500; return{mood:5,intel:5}; }},
         { label:'觉得AI比人靠谱，有点害怕', hint:'+🧠 -😊', fn: g => { g.flags.aiTherapist=true; g.flags.afraidOfAIBond=true; return{intel:5,mood:-3}; }},
       ]},
+    // === v28.9: 消费降级 + 平替文化 + 穷精致 ===
+    { id:'pingti_lifestyle', icon:'💡', title:'平替人生', category:'finance',
+      body:'你开始研究「平替」了。\n\n你的平替清单：\n- 戴森吹风机（2999元）→ 小米吹风机（199元）\n- SK-II神仙水（1590元）→ 国货精华水（89元）\n- 星巴克（38元）→ 瑞幸（9.9元）\n- 优衣库（199元）→ 1688同款（39元）\n- 健身房年卡（3000元）→ 公园跑步（0元）\n\n你的月度消费：\n- 平替前：8000元\n- 平替后：4500元\n- 月省：3500元\n- 年省：42000元\n\n但你的「体验」：\n- 吹风机：差不多\n- 护肤品：差了一点\n- 咖啡：差了很多\n- 衣服：线头有点多\n- 健身：没人监督确实懒了\n\n你开始理解：平替——不是「降低生活质量」——是「发现哪些质量是你不需要付费的」。\n\n你不是在「省钱」——你是在「重新定义什么是值得花的钱」。\n\n「平替：你以为你在消费降级——其实你在「消费觉醒」。」',
+      cond: g => g.age >= 22 && !g.flags.pingtiLifestyle && g.money >= 0,
+      choices:[
+        { label:'全面平替，年省4万', hint:'+💰 +🧠', fn: g => { g.flags.pingtiLifestyle=true; g.flags.fullPingti=true; g.money += 5000; return{intel:5,mood:3}; }},
+        { label:'选择性平替，咖啡必须喝好的', hint:'+💰 +😊', fn: g => { g.flags.pingtiLifestyle=true; g.flags.selectivePingti=true; g.money += 2000; return{intel:3,mood:5}; }},
+        { label:'试了一个月觉得生活质量下降了', hint:'-🧠 +😊', fn: g => { g.flags.pingtiLifestyle=true; return{mood:-3,intel:3}; }},
+      ]},
+    { id:'pinduoduo_addiction', icon:'📱', title:'拼多多真香', category:'finance',
+      body:'你下载了拼多多。\n\n你的购物记录：\n- 垃圾袋：100个3.9元（淘宝15元）\n- 手机壳：2个5.9元（京东29元）\n- 数据线：3条9.9元（Apple原装149元）\n- 袜子：10双12.9元（品牌店89元）\n- 零食大礼包：19.9元（超市69元）\n\n你开始疯狂分享：\n- 「帮我砍一刀！」\n- 「这个真的便宜你看看！」\n- 「拼多多太香了！」\n\n你的朋友：\n- 删了你的微信（因为天天发链接）\n- 屏蔽了你的朋友圈\n- 「你能不能别发了」\n\n你开始理解：拼多多——不是「省钱」——是「用你的社交关系——换几块钱的折扣」。\n\n你省了500块——但你丢了3个朋友。\n\n每个朋友——值多少钱？\n\n「拼多多：你以为你在省钱——其实你在「透支你的社交信用」。」',
+      cond: g => g.age >= 20 && !g.flags.pinduoduoAddiction && g.money >= 0,
+      choices:[
+        { label:'继续买，但不再分享链接了', hint:'+💰 +🧠', fn: g => { g.flags.pinduoduoAddiction=true; g.flags.silentPDDUser=true; g.money += 500; return{intel:3,mood:2}; }},
+        { label:'疯狂拉人砍价省了2000', hint:'+💰 -👥', fn: g => { g.flags.pinduoduoAddiction=true; g.flags.pddAggressive=true; g.money += 2000; return{social:-8,charm:-3}; }},
+        { label:'觉得太low了删了APP', hint:'+✨ -💰', fn: g => { g.flags.pinduoduoAddiction=true; return{charm:3,mood:2}; }},
+      ]},
+    { id:'coupon_hunter', icon:'🎫', title:'薅羊毛大师', category:'finance',
+      body:'你成了「薅羊毛」专家。\n\n你的技能树：\n- 各大平台新人券：每个号用一遍\n- 外卖红包群：加了20个\n- 信用卡积分兑换：研究透了\n- 双11/618凑单公式：比高考数学还认真\n- 临期食品超市：每周必去\n\n你的战果：\n- 这个月省了：1200元\n- 花在研究优惠的时间：30小时\n- 你的时薪：40元/小时\n\n你的代价：\n- 冰箱里堆满了「便宜但用不上」的东西\n- 你买了一年份的洗衣液（你用不完）\n- 你囤了3箱零食（过期了2箱）\n\n你开始理解：薅羊毛——不是「免费」——是「用时间和空间——换看似便宜的消费」。\n\n你省了1200——但你「被迫消费」了3000。\n\n「薅羊毛：你以为你在省钱——其实你在「为省钱而花钱」。」',
+      cond: g => g.age >= 20 && !g.flags.couponHunter && g.intel >= 15,
+      choices:[
+        { label:'学会了理性薅，只买需要的', hint:'+🧠 +💰', fn: g => { g.flags.couponHunter=true; g.flags.rationalCoupon=true; g.money += 3000; return{intel:5,mood:3}; }},
+        { label:'囤了一屋子东西用不完', hint:'-💰 +😊', fn: g => { g.flags.couponHunter=true; g.flags.overStocked=true; g.money -= 1500; return{mood:3,intel:-3}; }},
+        { label:'把这个技能变成了副业——帮人代买', hint:'+💰 +✨', fn: g => { g.flags.couponHunter=true; g.flags.couponSideHustle=true; g.money += 2000; return{charm:5,intel:3}; }},
+      ]},
+    { id:'expired_food_store', icon:'🏪', title:'临期食品超市', category:'lifestyle',
+      body:'你发现了临期食品超市。\n\n价格对比：\n- 进口巧克力：原价89元 → 临期价19.9元\n- 进口麦片：原价69元 → 临期价15.9元\n- 进口牛奶：原价59元 → 临期价12.9元\n- 进口零食大礼包：原价199元 → 临期价49.9元\n\n你的购物车：\n- 总原价：800元\n- 你实际付了：180元\n- 你「省了」：620元\n\n但你发现了问题：\n- 你开始「为了便宜而买」\n- 你买了一堆「平时不会买」的东西\n- 有些真的过期了——你没来得及吃\n\n你开始理解：临期食品——不是「浪费的救赎」——是「另一种浪费」。\n\n你以为你在「拯救食物」——其实你在「被低价诱导消费」。\n\n「临期食品：你以为你在占便宜——其实便宜在占你。」',
+      cond: g => g.age >= 20 && !g.flags.expiredFoodStore && g.money >= 0,
+      choices:[
+        { label:'只买自己会吃的，确实省了不少', hint:'+💰 +🧠', fn: g => { g.flags.expiredFoodStore=true; g.flags.smartExpiredShopping=true; g.money += 800; return{intel:5,mood:3}; }},
+        { label:'买了一堆吃不完又过期了', hint:'-💰 -🧠', fn: g => { g.flags.expiredFoodStore=true; g.money -= 200; return{intel:-3,mood:-3}; }},
+        { label:'觉得这就是穷人的体面', hint:'+😊 +🧠', fn: g => { g.flags.expiredFoodStore=true; g.flags.acceptedFrugalLife=true; return{mood:5,intel:3}; }},
+      ]},
+    { id:'consumption_downgrade_social', icon:'🍺', title:'消费降级后的社交', category:'social',
+      body:'你消费降级了——但你的社交没有。\n\n你的困境：\n- 朋友约火锅：人均150元\n- 朋友约KTV：人均200元\n- 朋友约密室逃脱：人均180元\n- 朋友约剧本杀：人均120元\n\n你一个月被约了8次——总计1300元。\n\n你的选择：\n- 全去：-1300元\n- 全不去：失去朋友\n- 选择性去：得罪一半人\n\n你开始发明「穷鬼社交」：\n- 「去我家吃火锅吧，超市买的食材才80块」\n- 「去公园野餐吧，我带了自制三明治」\n- 「来我家看电影吧，有投影仪」\n\n朋友的反应：\n- A：「也行啊，省钱了」\n- B：「你是不是没钱了？」\n- C：「下次还是出去吃吧」\n\n你开始理解：消费降级——最难的不是「物质」——是「社交」。\n\n你的社交——建立在「消费」之上——当消费降级——社交也降级了。\n\n「消费降级社交：你以为你在省钱——其实你在测试「哪些朋友是真的朋友」。」',
+      cond: g => g.age >= 22 && !g.flags.downgradeSocial && (g.flags.pingtiLifestyle || g.money <= 3000),
+      choices:[
+        { label:'推行穷鬼社交，留下了真朋友', hint:'+❤️ +🧠', fn: g => { g.flags.downgradeSocial=true; g.flags.realFriendsRemained=true; return{social:5,mood:5,intel:3}; }},
+        { label:'硬撑着装有钱继续赴约', hint:'-💰 -😊 +👥', fn: g => { g.flags.downgradeSocial=true; g.flags.fakeRichSocial=true; g.money -= 3000; return{social:5,mood:-8}; }},
+        { label:'减少了社交频率，专注自己', hint:'+🧠 -👥', fn: g => { g.flags.downgradeSocial=true; g.flags.reducedSocialLife=true; return{intel:5,social:-5,mood:2}; }},
+      ]},
+    { id:'diy_everything', icon:'🔧', title:'万物皆可DIY', category:'lifestyle',
+      body:'你开始DIY一切。\n\n你的DIY清单：\n- 理发：自己买推子剪（省50元/次）\n- 做饭：从不点外卖了（省1500元/月）\n- 咖啡：自己买豆子手冲（省30元/杯）\n- 健身：B站跟练（省200元/月）\n- 美甲/美容：自己学（省300元/次）\n\n你的成果：\n- 理发：第一次剪歪了，戴了3天帽子\n- 做饭：从难吃到能吃，用了2个月\n- 咖啡：比瑞幸好喝，比星巴克差\n- 健身：没人监督，坚持了3周\n\n你的时间投入：\n- 做饭：每天多花1小时\n- 咖啡：每天多花15分钟\n- 理发：每月省30分钟\n- 总计：每天多花1.5小时\n\n你开始理解：DIY——不是「免费」——是「用钱换时间——还是用时间换钱」的选择题。\n\n你的时间——值多少钱？\n\n如果你的时薪是50元——你花1.5小时DIY省了30元——你亏了。\n\n「DIY：你以为你在省钱——其实你在「用最贵的方式——消耗你最宝贵的资源——时间」。」',
+      cond: g => g.age >= 22 && !g.flags.diyEverything && g.money >= 0,
+      choices:[
+        { label:'坚持DIY，厨艺大涨', hint:'+🧠 +😊 +💰', fn: g => { g.flags.diyEverything=true; g.flags.masteredCooking=true; g.money += 2000; return{intel:5,mood:5,health:3}; }},
+        { label:'只DIY做饭和咖啡，其他还是花钱', hint:'+💰 +😊', fn: g => { g.flags.diyEverything=true; g.flags.selectiveDIY=true; g.money += 1000; return{intel:3,mood:3}; }},
+        { label:'试了一个月放弃了，太累了', hint:'+😊 -💰', fn: g => { g.flags.diyEverything=true; return{mood:3,intel:3}; }},
+      ]},
+    { id:'anti_consumerism_awakening', icon:'🧘', title:'消费主义觉醒', category:'psychology',
+      body:'你开始质疑消费主义了。\n\n你的「觉醒时刻」：\n- 你打开衣柜——发现有20件衣服——只穿了3件\n- 你打开鞋柜——有8双鞋——常穿的只有2双\n- 你打开手机——有40个APP——常用的只有5个\n- 你打开抽屉——有各种「打折囤的」——全过期了\n\n你开始算账：\n- 过去5年——你花了多少「不必要的钱」？\n- 衣服：约5万\n- 电子产品：约3万\n- 护肤品：约2万\n- 零食饮料：约1.5万\n- 总计：11.5万\n\n这些钱——如果存下来——够首付了。\n\n你开始理解：消费主义——不是「你需要」——是「它让你觉得你需要」。\n\n你不是在「消费」——你是在「被消费」。\n\n你的欲望——不是你的——是「广告给你植入的」。\n\n「消费觉醒：你不是没钱——你是「把钱花在了不需要的东西上」——然后「抱怨自己穷」。」',
+      cond: g => g.age >= 24 && !g.flags.consumerAwakening && g.money >= 0,
+      choices:[
+        { label:'开始极简生活，卖掉闲置', hint:'+💰 +🧠 +😊', fn: g => { g.flags.consumerAwakening=true; g.flags.minimalistLife=true; g.money += 8000; return{intel:8,mood:8}; }},
+        { label:'给自己设了消费限额：每月不超过3000', hint:'+💰 +🧠', fn: g => { g.flags.consumerAwakening=true; g.flags.budgetCap=true; g.money += 3000; return{intel:5,mood:3}; }},
+        { label:'想想就好，该买还是买', hint:'+😊 -💰', fn: g => { g.flags.consumerAwakening=true; return{mood:3,intel:2}; }},
+      ]},
+    { id:'poor_meal_plan', icon:'🍜', title:'穷鬼套餐', category:'lifestyle',
+      body:'你发现了一个新世界：「穷鬼套餐」。\n\n你的穷鬼美食地图：\n- 麦当劳1+1：13.9元\n- 肯德基疯狂星期四：9.9元\n- 瑞幸9.9：每天一杯\n- 蜜雪冰城：4元柠檬水\n- 沙县小吃：拌面+扁肉=12元\n- 兰州拉面：牛肉面15元\n\n你的月度餐饮开销：\n- 之前：2500元（外卖+堂食）\n- 现在：1200元（穷鬼套餐+自己做饭）\n- 月省：1300元\n\n你的身体变化：\n- 体重：+2kg（穷鬼套餐碳水太多）\n- 蔬菜摄入：严重不足\n- 蛋白质：不够\n- 钠含量：超标\n\n你开始理解：穷鬼套餐——不是「健康饮食」——是「最便宜的热量」。\n\n你省了1300元——但你的身体——在用「健康」买单。\n\n「穷鬼套餐：你以为你在省钱——其实你在「用未来的医疗费——换今天的饭钱」。」',
+      cond: g => g.age >= 20 && !g.flags.poorMealPlan && g.money >= 0,
+      choices:[
+        { label:'学会了在穷鬼套餐里加蔬菜', hint:'+🧠 +💪', fn: g => { g.flags.poorMealPlan=true; g.flags.balancedFrugal=true; g.money += 1300; return{intel:5,health:3}; }},
+        { label:'天天穷鬼套餐省了钱但胖了', hint:'+💰 -💪', fn: g => { g.flags.poorMealPlan=true; g.money += 1300; return{health:-5,mood:3}; }},
+        { label:'觉得吃得开心最重要', hint:'+😊 -💰', fn: g => { g.flags.poorMealPlan=true; return{mood:5,intel:2}; }},
+      ]},
+    { id:'secondhand_clothes', icon:'👕', title:'二手衣服', category:'lifestyle',
+      body:'你开始在闲鱼买二手衣服了。\n\n你的「二手战利品」：\n- 优衣库羽绒服：原价599 → 闲鱼89元\n- Nike跑鞋：原价899 → 闲鱼199元\n- ZARA大衣：原价799 → 闲鱼129元\n\n你省了：1880元。\n\n你的心理变化：\n- 第1次穿：「这是别人穿过的……」\n- 第2次穿：「其实也看不出来」\n- 第3次穿：「谁在乎啊」\n- 第10次穿：「这衣服就是我的」\n\n你开始理解：二手衣服——不是「穿别人的旧衣服」——是「让衣服活第二次」。\n\n一件衣服的平均穿着次数：7次就被扔掉。\n\n你——在拯救一件「被浪费的衣服」。\n\n你不是「穷」——你是「环保先锋」。\n\n「二手衣服：你以为你在消费降级——其实你在「对抗快时尚的浪费」。」',
+      cond: g => g.age >= 20 && !g.flags.secondhandClothes && g.money >= 0,
+      choices:[
+        { label:'成了二手衣服达人，还卖攻略', hint:'+💰 +✨ +🧠', fn: g => { g.flags.secondhandClothes=true; g.flags.thriftExpert=true; g.money += 1500; return{intel:5,charm:5}; }},
+        { label:'只买基本款二手的，其他还是买新的', hint:'+💰 +😊', fn: g => { g.flags.secondhandClothes=true; g.money += 800; return{mood:3,intel:3}; }},
+        { label:'实在接受不了穿别人的衣服', hint:'+✨ -💰', fn: g => { g.flags.secondhandClothes=true; return{charm:3,mood:2}; }},
+      ]},
+    { id:'social_spending_cut', icon:'✂️', title:'砍掉无效社交', category:'social',
+      body:'你决定——砍掉「无效社交」。\n\n你的「社交审计」：\n- 同事聚餐（每月4次）：800元 → 砍到1次\n- 同学聚会（每季度1次）：500元 → 不去\n- 微信群红包（每月）：300元 → 不发\n- 生日礼物（每月2-3份）：600元 → 只送最好的朋友\n- 请客吃饭（每月2次）：400元 → 改成AA\n\n你每月省了：1800元。\n\n但你的「社交损失」：\n- 同事不再叫你吃饭了\n- 同学觉得你「混好了就不理人了」\n- 有人说你「抠」\n\n你开始理解：砍掉无效社交——不是「省钱」——是「重新定义什么是有效社交」。\n\n你的社交——有多少是「真的想去的」？\n有多少是「不好意思不去的」？\n\n你砍掉的是「不好意思不去的」——留下的是「真的想去的」。\n\n「砍掉无效社交：你不是在省钱——你是在「用金钱筛选你的社交圈」。」',
+      cond: g => g.age >= 24 && !g.flags.socialSpendingCut && g.social >= 30,
+      choices:[
+        { label:'成功精简社交，时间多了很多', hint:'+💰 +🧠 +😊', fn: g => { g.flags.socialSpendingCut=true; g.flags.streamlinedSocial=true; g.money += 2000; return{intel:5,mood:5,social:-3}; }},
+        { label:'省了钱但觉得有点孤独', hint:'+💰 -😊', fn: g => { g.flags.socialSpendingCut=true; g.money += 2000; return{mood:-5,social:-5}; }},
+        { label:'还是算了，社交很重要', hint:'+👥 -💰', fn: g => { g.flags.socialSpendingCut=true; return{social:5,mood:3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -16316,6 +16397,15 @@ const ACHIEVEMENTS = [
     { id:'brand_strategist_ach', icon:'🎨', name:'品牌策略师', desc:'从设计师转型为品牌策略专家', check: g => g.flags.brandStrategist },
     { id:'seeking_real_help_ach', icon:'💬', name:'回归真实', desc:'跟AI聊完后决定找真人咨询师', check: g => g.flags.seekingRealHelp },
     { id:'flexible_education_ach', icon:'🎓', name:'弹性教育', desc:'让孩子广泛学习适应AI时代', check: g => g.flags.flexibleEducation },
+    // v28.9: 消费降级 + 平替文化 + 穷精致
+    { id:'full_pingti_ach', icon:'💡', name:'平替大师', desc:'全面消费降级年省4万', check: g => g.flags.fullPingti },
+    { id:'rational_coupon_ach', icon:'🎫', name:'理性薅羊毛', desc:'只买需要的东西合理省钱', check: g => g.flags.rationalCoupon },
+    { id:'mastered_cooking_ach', icon:'🍳', name:'厨艺大师', desc:'坚持DIY做饭厨艺大涨', check: g => g.flags.masteredCooking },
+    { id:'minimalist_life_ach', icon:'🧘', name:'极简主义者', desc:'卖掉闲置拥抱极简生活', check: g => g.flags.minimalistLife },
+    { id:'balanced_frugal_ach', icon:'🥗', name:'穷而健康', desc:'在省钱的同时保持营养均衡', check: g => g.flags.balancedFrugal },
+    { id:'thrift_expert_ach', icon:'👕', name:'二手达人', desc:'成为二手衣服消费专家', check: g => g.flags.thriftExpert },
+    { id:'streamlined_social_ach', icon:'✂️', name:'社交精简', desc:'砍掉无效社交留下真朋友', check: g => g.flags.streamlinedSocial },
+    { id:'real_friends_ach', icon:'❤️', name:'真朋友', desc:'用穷鬼社交筛选出了真朋友', check: g => g.flags.realFriendsRemained },
 ];
 
 // === ENDINGS === (order matters: first match wins)
