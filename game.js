@@ -1875,6 +1875,56 @@ const EVENTS = [
         { label:'要求更多薪资', hint:'+💰 🎲', fn: g => { g.flags.careerMilestone=true; if(Math.random()>0.5){const raise=Math.floor(g.jobSalary*0.4);g.jobSalary+=raise;return{money:raise*6,mood:20}}else{return{mood:-15}} }},
         { label:'拒绝，专注技术', hint:'+🧠 +😊', fn: g => { g.flags.careerMilestone=true; return{intel:15,mood:10}; }},
       ]},
+    // ===== v2.27: LIFE VARIETY & BALANCE =====
+    { id:'travel_experience', icon:'✈️', title:'独自旅行',
+      body:'你决定一个人去旅行。目的地：云南/西藏/新疆/青海湖。\n\n你在路上遇到了很多有趣的人：背包客、摄影师、流浪歌手。\n\n你拍了好多照片，发了好多朋友圈。\n\n"旅行的意义不是看风景，是看自己。"',
+      cond: g => g.money>8000 && g.age>=24 && g.age<=40 && !g.flags.soloTravel,
+      choices:[
+        { label:'深度游，住青旅', hint:'-💰 +👥 +✨', fn: g => { g.flags.soloTravel=true; return{money:-5000,social:12,charm:8,mood:20}; }},
+        { label:'穷游，搭车露营', hint:'-💰 +❤️ +🧠', fn: g => { g.flags.soloTravel=true; return{money:-2000,health:8,intel:10,mood:15}; }},
+        { label:'豪华游，住五星', hint:'-💰💰 +😊 +✨', fn: g => { g.flags.soloTravel=true; return{money:-15000,mood:25,charm:10}; }},
+        { label:'算了，没时间', hint:'-😊', fn: g => ({mood:-5}) },
+      ]},
+    { id:'learn_instrument', icon:'🎸', title:'学乐器',
+      body:'你突然想学一门乐器：吉他、钢琴、尤克里里、口琴。\n\n你买了一把吉他，花了2000块。你看了10个教学视频，学了3个和弦。\n\n你的室友说："你弹得像杀鸡。"\n\n但你不在乎：你在享受学习的过程。\n\n"音乐是灵魂的出口——即使你弹得很烂。"',
+      cond: g => g.money>3000 && g.age>=22 && g.age<=45 && !g.flags.musicSkill,
+      choices:[
+        { label:'坚持练习', hint:'+🧠 +😊 -❤️', fn: g => { g.flags.musicSkill=true; return{intel:10,mood:12,health:-3,money:-2000}; }},
+        { label:'报班学习', hint:'-💰 +🧠 +👥', fn: g => { g.flags.musicSkill=true; return{money:-5000,intel:12,social:8,mood:10}; }},
+        { label:'放弃，太难了', hint:'-😊', fn: g => ({mood:-8,money:-2000}) },
+      ]},
+    { id:'cooking_skill', icon:'🍳', title:'学做饭',
+      body:'你受够了外卖，决定学做饭。\n\n你买了锅碗瓢盆，看了B站教程，做了一顿"黑暗料理"。\n\n你发朋友圈："第一次做饭，求赞。"\n\n朋友评论："看起来像案发现场。"\n\n但你吃了一口，觉得：嗯，还挺好吃的。\n\n"做饭是生活的基本技能——也是爱的表达方式。"',
+      cond: g => g.money>1000 && g.age>=22 && !g.flags.cookingSkill,
+      choices:[
+        { label:'坚持做饭', hint:'+❤️ +😊 +🧠', fn: g => { g.flags.cookingSkill=true; return{health:15,mood:12,intel:8,money:-1000}; }},
+        { label:'偶尔做做', hint:'+❤️ +😊', fn: g => { g.flags.cookingSkill=true; return{health:8,mood:8,money:-500}; }},
+        { label:'算了，还是外卖', hint:'-❤️ -💰', fn: g => ({health:-5,mood:-5}) },
+      ]},
+    { id:'volunteer_work', icon:'🤝', title:'志愿者活动',
+      body:'你报名参加了志愿者活动：去养老院陪伴老人/去山区支教/去动物收容所帮忙。\n\n你遇到了很多志同道合的人，也看到了很多需要帮助的人。\n\n你突然觉得：原来自己拥有的已经很多了。\n\n"帮助别人，是帮助自己的最好方式。"',
+      cond: g => g.age>=23 && g.mood>40 && !g.flags.volunteer,
+      choices:[
+        { label:'定期参加', hint:'+👥 +😊 +✨', fn: g => { g.flags.volunteer=true; g.relationships.friends = clamp((g.relationships.friends||40)+12, 0, 100); return{social:12,mood:18,charm:10}; }},
+        { label:'偶尔参加', hint:'+👥 +😊', fn: g => { g.flags.volunteer=true; return{social:8,mood:12,charm:5}; }},
+        { label:'捐款支持', hint:'-💰 +😊', fn: g => { g.flags.volunteer=true; return{money:-2000,mood:15,charm:8}; }},
+      ]},
+    { id:'fitness_journey', icon:'🏋️', title:'健身之旅',
+      body:'你办了一张健身卡，花了3000块。你发誓：这次一定要坚持！\n\n第一天：跑了5公里，感觉要死了。\n第二天：浑身酸痛，下不了楼。\n第三天：不想去了……\n\n但你还是去了。一个月后，你瘦了5斤，精力也变好了。\n\n"健身不是为了好看，是为了活得更好。"',
+      cond: g => g.money>4000 && g.health<70 && g.age>=23 && g.age<=45 && !g.flags.gymMember,
+      choices:[
+        { label:'坚持健身', hint:'+❤️ +😊 +✨ -💰', fn: g => { g.flags.gymMember=true; return{health:20,mood:15,charm:10,money:-3000}; }},
+        { label:'请私教', hint:'+❤️ +🧠 -💰💰', fn: g => { g.flags.gymMember=true; return{health:25,intel:5,mood:12,money:-8000}; }},
+        { label:'办卡后就不去了', hint:'-💰 -❤️', fn: g => { g.flags.gymMember=true; return{money:-3000,health:-5,mood:-10}; }},
+      ]},
+    { id:'reading_habit', icon:'📚', title:'养成阅读习惯',
+      body:'你决定每个月读2本书。你买了Kindle，下载了10本书。\n\n第一周：读了50页，觉得好充实。\n第二周：刷手机忘了读书。\n第三周：Kindle没电了，懒得充。\n第四周：Kindle找不到了……\n\n"阅读是最好的投资——但也是最容易被放弃的投资。"',
+      cond: g => g.intel>50 && g.age>=22 && !g.flags.readingHabit,
+      choices:[
+        { label:'坚持阅读', hint:'+🧠 +😊', fn: g => { g.flags.readingHabit=true; return{intel:15,mood:10,money:-500}; }},
+        { label:'听书，碎片时间', hint:'+🧠', fn: g => { g.flags.readingHabit=true; return{intel:10,mood:5,money:-300}; }},
+        { label:'算了，没时间', hint:'-🧠', fn: g => ({intel:-3,mood:-5}) },
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -2612,7 +2662,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.26' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.27' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
