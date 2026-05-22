@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v15.2
+// 都市浮生记 - Game Engine v15.3
 // ============================================
 
 // === GAME STATE ===
@@ -7854,6 +7854,87 @@ const EVENTS = [
         { label:'努力提升自己', hint:'+🧠 +💪 -💰', fn: g => { g.flags.faceCulture=true; g.flags.selfImprovement=true; return{intel:10,health:3,money:-2000}; }},
         { label:'减少这类聚会', hint:'+😊 +🧠', fn: g => { g.flags.faceCulture=true; g.flags.selectiveSocializing=true; return{mood:8,intel:5}; }},
       ]},
+    // === v15.3 消费文化 + 极简主义 + 国潮热 ===
+    { id:'double_eleven_v3', icon:'🛍️', title:'双十一狂欢',
+      body:'双十一来了。你提前一周就开始加购物车。\n\n11月11日零点，你的手指以百米冲刺的速度点击「立即购买」。你买了：一件羽绒服（原价1200，折后680）、一套护肤品（买一送一）、一台扫地机器人（限时特价）。\n\n总消费：4200元。你觉得省了3000元——实际上你多花了4200元。\n\n快递到了之后，你发现：羽绒服太大了、护肤品和你现有的重复了、扫地机器人被你的地毯卡住了。\n\n你的购物车清空了，但你的钱包也清空了。\n\n"双十一：不是在省钱——是在用「省了多少」来合理化「花了多少」。"',
+      cond: g => g.age >= 20 && !g.flags.doubleEleven,
+      choices:[
+        { label:'列好清单，理性购买', hint:'+🧠 +💰', fn: g => { g.flags.doubleEleven=true; g.flags.rationalBuyer=true; return{intel:10,money:1000}; }},
+        { label:'只买最需要的1件', hint:'+🧠 +😊', fn: g => { g.flags.doubleEleven=true; g.flags.minimalBuyer=true; return{intel:8,mood:5}; }},
+        { label:'冲冲冲，清空购物车', hint:'-💰 +😊', fn: g => { g.flags.doubleEleven=true; g.flags.impulseBuyer=true; return{money:-4200,mood:10}; }},
+      ]},
+    { id:'minimalism_journey', icon:'🧹', title:'极简主义',
+      body:'你看了一个日本极简主义的视频，决定断舍离。\n\n你花了整个周末整理房间：扔了3袋衣服、2箱书、50个快递盒（你一直「留着以后用」的）。\n\n你的房间从「仓库」变成了「住所」。你发现：你拥有的东西比你需要的多3倍。\n\n你的室友看着空荡荡的客厅说：「你把沙发也扔了？」你说：「坐地上也挺好的。」他看着你，不确定你是在认真还是在发疯。\n\n一个月后，你发现：东西少了，心也轻了。\n\n"极简主义：不是什么都没有——是留下的都是重要的。"',
+      cond: g => g.age >= 22 && !g.flags.minimalismJourney,
+      choices:[
+        { label:'坚持极简生活', hint:'+😊 +💪 +🧠', fn: g => { g.flags.minimalismJourney=true; g.flags.minimalist=true; return{mood:12,health:5,intel:10}; }},
+        { label:'适度就好', hint:'+😊 +🧠', fn: g => { g.flags.minimalismJourney=true; g.flags.moderateMinimalist=true; return{mood:8,intel:8}; }},
+        { label:'三天后又买回来了', hint:'-🧠 +😊', fn: g => { g.flags.minimalismJourney=true; return{intel:-3,mood:5}; }},
+      ]},
+    { id:'guochao_trend', icon:'🐉', title:'国潮热',
+      body:'你买了一双李宁的球鞋——不是因为便宜，是因为真的好看。\n\n你发现：国产设计终于不再是「便宜替代品」了。李宁、安踏、鸿星尔克、花西子、完美日记——国货正在重新定义「时尚」。\n\n你穿着李宁去了同学聚会。一个穿Nike的同学问：「你这是李宁？」你说：「中国李宁。」他看了看你的鞋，说：「确实好看。」\n\n你觉得：支持国货不是为了爱国——是因为它们真的做得好了。\n\n"国潮：不是爱国情怀——是中国设计终于有了自己的语言。"',
+      cond: g => g.age >= 18 && !g.flags.guochaoTrend,
+      choices:[
+        { label:'成为国货爱好者', hint:'+😊 +✨ +💰', fn: g => { g.flags.guochaoTrend=true; g.flags.domesticBrandFan=true; return{mood:8,charm:5,money:-500}; }},
+        { label:'理性对比，选最好的', hint:'+🧠 +💰', fn: g => { g.flags.guochaoTrend=true; g.flags.rationalConsumer=true; return{intel:8,money:200}; }},
+        { label:'还是喜欢国际品牌', hint:'+✨ -💰', fn: g => { g.flags.guochaoTrend=true; return{charm:3,money:-800}; }},
+      ]},
+    { id:'subscription_fatigue_v2', icon:'💳', title:'订阅疲劳',
+      body:'你查了一下每月的自动扣费。\n\n视频会员3个（爱奇艺、腾讯、B站）、音乐会员2个（网易云、QQ音乐）、云存储2个（百度网盘、iCloud）、健身App、记账App、冥想App……\n\n总计：每月287元。你算了一下年费：3444元。你实际使用的：大概只有2个。\n\n你取消了8个订阅。你觉得自己像是给互联网打工的——每个月自动上交保护费。\n\n你的一个朋友说：「我什么都不订阅。」你说：「那你用什么？」他说：「借别人的。」你：「……」\n\n"订阅经济：看起来每个月只要几块钱——但加起来就是你工资的5%。"',
+      cond: g => g.age >= 20 && !g.flags.subscriptionFatigueV2,
+      choices:[
+        { label:'精简到只留必需的', hint:'+💰 +🧠', fn: g => { g.flags.subscriptionFatigueV2=true; g.flags.subscriptionOptimizer=true; return{money:2000,intel:5}; }},
+        { label:'和朋友共享账号', hint:'+💰 +👥', fn: g => { g.flags.subscriptionFatigueV2=true; g.flags.accountSharer=true; return{money:1500,social:5}; }},
+        { label:'算了，都留着吧', hint:'-💰 +😊', fn: g => { g.flags.subscriptionFatigueV2=true; return{money:-2000,mood:3}; }},
+      ]},
+    { id:'second_hand_market', icon:'♻️', title:'二手经济',
+      body:'你在闲鱼上卖了一台旧手机。\n\n你发现：二手市场比你想的大得多。有人卖旧衣服、旧书、旧电子产品、甚至还有「半瓶香水」和「用过一次的跑步机」。\n\n你也开始在闲鱼上买东西：一本绝版书（15元）、一台二手Switch（800元）、一个九成新的小米空气净化器（200元）。\n\n你算了一下：你在闲鱼上省了5000块，也赚了2000块。\n\n你的室友说：「你变了。」你说：「我没变——只是不想为不需要的溢价买单了。」\n\n"二手经济：不是穷——是聪明。好东西值得被第二次珍惜。"',
+      cond: g => g.age >= 20 && !g.flags.secondHandMarket,
+      choices:[
+        { label:'买卖都用二手', hint:'+💰 +🧠 +😊', fn: g => { g.flags.secondHandMarket=true; g.flags.secondHandExpert=true; return{money:3000,intel:8,mood:5}; }},
+        { label:'只卖不买', hint:'+💰 +🧠', fn: g => { g.flags.secondHandMarket=true; return{money:2000,intel:5}; }},
+        { label:'还是喜欢新的', hint:'+😊 -💰', fn: g => { g.flags.secondHandMarket=true; return{mood:3,money:-500}; }},
+      ]},
+    { id:'brand_worship', icon:'👜', title:'品牌崇拜',
+      body:'你攒了3个月的工资，买了一个LV的包。\n\n你背着它去了公司。一个同事注意到了：「哟，LV啊。」你觉得自己的身价好像涨了。\n\n但你心里知道：你的银行卡余额从8000变成了500。你下个月要吃泡面了。\n\n你的一个朋友问你：「你觉得这个包值这个价吗？」你说：「值不值不重要——背着它我觉得自信了。」\n\n他笑了笑：「自信不应该来自一个包。」你想了想——也许他说得对。\n\n"品牌崇拜：不是买了一个品牌——是买了一个你以为的自己。"',
+      cond: g => g.age >= 22 && !g.flags.brandWorship,
+      choices:[
+        { label:'反思消费观', hint:'+🧠 +😊', fn: g => { g.flags.brandWorship=true; g.flags.consumerReflection=true; return{intel:12,mood:8}; }},
+        { label:'继续努力赚钱买更多', hint:'-💰 +✨', fn: g => { g.flags.brandWorship=true; return{money:-5000,charm:8}; }},
+        { label:'退掉包包', hint:'+💰 +🧠', fn: g => { g.flags.brandWorship=true; g.flags.returnBuyer=true; return{money:12000,intel:5}; }},
+      ]},
+    { id:'consumption_upgrade', icon:'📈', title:'消费升级',
+      body:'你决定「对自己好一点」——开始消费升级。\n\n你把手磨咖啡从速溶换成了现磨、把外卖从15块的盒饭换成了30块的轻食、把出租屋的灯泡换成了智能灯。\n\n你的生活品质确实提高了。但你的月支出也从3000变成了6000。你的工资没变。\n\n你的理财顾问（一个App）说：「你的消费增速超过了收入增速。」你说：「我知道。」\n\n你陷入了一个两难：降低消费觉得委屈自己，维持消费觉得钱包委屈。\n\n"消费升级：不是生活变好了——是你对「好」的标准变高了。问题在于：标准只会越来越高。"',
+      cond: g => g.age >= 22 && !g.flags.consumptionUpgrade,
+      choices:[
+        { label:'找到平衡点', hint:'+🧠 +😊 +💰', fn: g => { g.flags.consumptionUpgrade=true; g.flags.balancedConsumer=true; return{intel:10,mood:8,money:1000}; }},
+        { label:'继续升级', hint:'+😊 -💰', fn: g => { g.flags.consumptionUpgrade=true; return{mood:10,money:-3000}; }},
+        { label:'降回原来的水平', hint:'+💰 -😊', fn: g => { g.flags.consumptionUpgrade=true; g.flags.consumptionDowngrade=true; return{money:2000,mood:-5}; }},
+      ]},
+    { id:'experience_economy', icon:'🎪', title:'体验经济',
+      body:'你决定把钱花在「体验」上，而不是「物品」上。\n\n你花500块看了一场演唱会、花800块体验了一次密室逃脱、花1200块学了3节冲浪课。\n\n你的存款没有增加，但你的回忆增加了很多。你有了一起尖叫的演唱会记忆、一起解谜的朋友、以及在海里被浪打翻的糗事。\n\n你的一个朋友说：「你花这些钱不心疼吗？」你说：「买一个包，三年后就旧了。但这些回忆，三十年后还在。」\n\n"体验经济：不是不花钱——是把钱花在了会增值的东西上：记忆。"',
+      cond: g => g.age >= 20 && !g.flags.experienceEconomy,
+      choices:[
+        { label:'持续投资体验', hint:'+😊 +👥 +✨', fn: g => { g.flags.experienceEconomy=true; g.flags.experienceInvestor=true; return{mood:15,social:10,charm:8}; }},
+        { label:'平衡体验和储蓄', hint:'+🧠 +😊', fn: g => { g.flags.experienceEconomy=true; g.flags.balancedSpending=true; return{intel:8,mood:10}; }},
+        { label:'体验一次就好', hint:'+😊 +🧠', fn: g => { g.flags.experienceEconomy=true; return{mood:8,intel:5}; }},
+      ]},
+    { id:'financial_anxiety', icon:'📊', title:'理财焦虑',
+      body:'你的同事说他今年基金赚了30%。\n\n你打开你的理财App：亏损2.7%。你看着绿色的数字，觉得自己的钱在慢慢消失。\n\n你开始研究各种理财产品：基金、股票、黄金、加密货币、国债。你每天看三次行情。你的情绪随着K线上下波动。\n\n你的一个朋友说：「你不理财，财不理你。」另一个朋友说：「你越理财，财越离你远。」\n\n你不知道该信谁。但你知道：不学习理财，你永远会焦虑。\n\n"理财焦虑：不是钱的问题——是你对未来的不确定感。而学习，是消除不确定感最好的方式。"',
+      cond: g => g.age >= 22 && !g.flags.financialAnxiety,
+      choices:[
+        { label:'系统学习理财', hint:'+🧠 +💰', fn: g => { g.flags.financialAnxiety=true; g.flags.financialLearner=true; return{intel:15,money:2000}; }},
+        { label:'定投指数基金', hint:'+🧠 +💰', fn: g => { g.flags.financialAnxiety=true; g.flags.indexInvestor=true; return{intel:8,money:1000}; }},
+        { label:'不碰理财，存银行', hint:'+😊 -🧠', fn: g => { g.flags.financialAnxiety=true; return{mood:5,intel:-3}; }},
+      ]},
+    { id:'local_brand_discovery', icon:'🏪', title:'宝藏小店',
+      body:'你在一条小巷子里发现了一家宝藏咖啡馆。\n\n老板是一个从上海回来的年轻人。他说：「我不想在大城市卷了，想开一家自己喜欢的店。」\n\n他的咖啡很好喝，蛋糕是他妈妈做的。店里只有6张桌子，每张桌子上都有一本书——是他推荐你看的。\n\n你在这里坐了一个下午。你看了半本书、喝了两杯咖啡、和老板聊了一小时。\n\n你觉得：这才是消费升级——不是买更贵的东西，而是找到更好的体验。\n\n"宝藏小店：不是在消费——是在支持另一种生活方式。"',
+      cond: g => g.age >= 22 && !g.flags.localBrandDiscovery,
+      choices:[
+        { label:'成为常客', hint:'+😊 +👥 +🧠', fn: g => { g.flags.localBrandDiscovery=true; g.flags.localSupporter=true; return{mood:12,social:8,intel:5}; }},
+        { label:'帮老板宣传', hint:'+👥 +✨', fn: g => { g.flags.localBrandDiscovery=true; g.flags.localPromoter=true; return{social:10,charm:8}; }},
+        { label:'下次再来', hint:'+😊', fn: g => { g.flags.localBrandDiscovery=true; return{mood:8}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -8593,6 +8674,16 @@ const ACHIEVEMENTS = [
     { id:'neighbor_peace_ach', icon:'🏘️', name:'邻里和平使者', desc:'处理了邻里纠纷', check: g => g.flags.neighborDispute },
     { id:'favor_master_ach', icon:'🤝', name:'人情练达', desc:'面对了人情债', check: g => g.flags.favorExchange },
     { id:'face_free_ach', icon:'🎭', name:'面子自由', desc:'不再被面子绑架', check: g => g.flags.faceCulture },
+    // === v15.3 新增成就（消费文化） ===
+    { id:'double11_ach', icon:'🛍️', name:'双十一战士', desc:'经历了双十一', check: g => g.flags.doubleEleven },
+    { id:'minimalist_ach', icon:'🧹', name:'极简主义者', desc:'开始了极简生活', check: g => g.flags.minimalismJourney },
+    { id:'guochao_fan_ach', icon:'🐉', name:'国潮爱好者', desc:'拥抱了国潮', check: g => g.flags.guochaoTrend },
+    { id:'subscription_optimizer_ach', icon:'💳', name:'订阅优化师', desc:'优化了订阅服务', check: g => g.flags.subscriptionFatigueV2 },
+    { id:'second_hand_expert_ach', icon:'♻️', name:'二手达人', desc:'进入了二手市场', check: g => g.flags.secondHandMarket },
+    { id:'smart_consumer_ach', icon:'📈', name:'精明消费者', desc:'学会了消费升级', check: g => g.flags.consumptionUpgrade },
+    { id:'experience_investor_ach', icon:'🎪', name:'体验投资者', desc:'投资了体验而非物品', check: g => g.flags.experienceEconomy },
+    { id:'financial_learner_ach', icon:'📊', name:'理财学徒', desc:'开始学习理财', check: g => g.flags.financialAnxiety },
+    { id:'local_supporter_ach', icon:'🏪', name:'宝藏猎人', desc:'发现了宝藏小店', check: g => g.flags.localBrandDiscovery },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -8837,6 +8928,10 @@ const ENDINGS = [
     { id:'social_master_end', badge:'🎭', title:'社交大师', desc:'你成了一个真正懂社交的人。\n\n你学会了饭局礼仪、送礼技巧、邻里相处、人情往来。你在公司里人缘极好，在小区里人人夸赞。\n\n但最让你骄傲的不是这些——是你学会了什么时候该社交、什么时候该独处。你不再为了合群而合群，不再为了面子而勉强自己。\n\n你的朋友说：「和你相处特别舒服。」你说：「因为我终于不装了。」\n\n"社交大师：不是认识多少人——是让认识的人都觉得值得。"', cond: g => g.flags.socialSavvy && g.flags.giftMaster && g.flags.conflictResolver && g.social >= 75 && g.age >= 30 },
     { id:'free_thinker_end', badge:'🧠', title:'独立思考者', desc:'你在信息洪流中保持了清醒。\n\n你不再被算法推荐左右、不再被网络舆论裹挟、不再为了面子而活。你学会了看多方信息、学会了质疑、学会了沉默。\n\n你的同事说：「你怎么什么都不表态？」你说：「不是不表态——是在表态之前先想想。」\n\n你订阅了5个不同立场的媒体。你的朋友圈里不转任何未经核实的消息。你成了朋友眼中的「靠谱信息源」。\n\n"独立思考：不是反对一切——是在相信之前，先问为什么。"', cond: g => g.flags.criticalThinker && g.flags.informationBubble && g.flags.innerConfidence && g.intel >= 75 && g.age >= 28 },
     { id:'anti_involution_champion_end', badge:'⚡', title:'反卷之王', desc:'你在内卷的洪流中找到了自己的节奏。\n\n你不再和同事比加班、不再和朋友圈比收入、不再和社会比标准。你用自己的方式工作、用自己的方式休息、用自己的方式活着。\n\n你的领导说：「你很特别。」你说：「我只是不想活成别人的模板。」\n\n你准点下班、周末不加班、年假全部休完。你的绩效不是最好的——但你的生活是你想要的。\n\n"反卷：不是不努力——是不用别人的尺子量自己的人生。"', cond: g => g.flags.efficiencyKing && g.flags.faceCulture && g.flags.innerConfidence && g.mood >= 65 && g.age >= 28 },
+    // --- v15.3 NEW ENDINGS (消费文化) ---
+    { id:'wise_consumer_end', badge:'💎', title:'智慧消费者', desc:'你从一个冲动消费者，变成了一个真正懂消费的人。\n\n你学会了理性购物、极简生活、二手交易、体验投资。你不再被广告忽悠、不再被双十一绑架、不再为了面子而消费。\n\n你的月支出从8000降到了4000，但生活质量反而提高了。因为你把钱花在了真正重要的地方：体验、健康、和爱的人在一起的时间。\n\n你的朋友问你：「你怎么做到这么省的？」你说：「我不是省——我只是知道什么值得。」\n\n"智慧消费：不是花得少——是每一分钱都花在了让自己更好的地方。"', cond: g => g.flags.minimalist && g.flags.rationalBuyer && g.flags.secondHandExpert && g.money >= 30000 && g.age >= 28 },
+    { id:'experience_rich_end', badge:'🌟', title:'体验富翁', desc:'你的存款不多，但你的回忆很多。\n\n你去过很多城市、看过很多演唱会、学过冲浪和攀岩、在小巷子里发现过宝藏咖啡馆。\n\n你的朋友们最喜欢和你在一起——因为你总有故事可以讲。你的相册里没有名牌包和豪车，但有很多笑容和风景。\n\n你的一个孩子问你：「爸/妈，你年轻的时候最开心的事是什么？」你说：「去了很多地方，见了很多人，做了很多现在想起来还会笑的事。」\n\n"体验富翁：不是拥有最多的人——是经历最多的人。"', cond: g => g.flags.experienceEconomy && g.flags.localBrandDiscovery && g.flags.experienceInvestor && g.mood >= 70 && g.age >= 30 },
+    { id:'financial_freedom_path_end', badge:'📈', title:'财务自由之路', desc:'你找到了属于自己的财务自由之路。\n\n你从一个理财小白，变成了一个有系统的投资者。你不再追涨杀跌、不再被K线绑架情绪。你有自己的投资策略，有自己的风险控制，有自己的长期规划。\n\n你的投资收益从亏损变成了稳定增长。你的被动收入开始覆盖基本生活开支。\n\n你的同事问你：「你财务自由了吗？」你说：「自由不是一个数字——是一种心态。我现在不焦虑了——这就是自由。」\n\n"财务自由：不是有很多钱——是不再为钱焦虑。"', cond: g => g.flags.financialLearner && g.flags.indexInvestor && g.flags.balancedConsumer && g.money >= 100000 && g.intel >= 65 && g.age >= 32 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
