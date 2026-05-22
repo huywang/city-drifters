@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v24.1
+// 都市浮生记 - Game Engine v24.2
 // ============================================
 
 // === GAME STATE ===
@@ -11833,6 +11833,87 @@ const EVENTS = [
         { label:'研究了一下，决定买充电桩股票', hint:'±💰 +🧠', fn: g => { g.flags.evCharging=true; g.flags.chargingStock=true; return{intel:5}; }},
         { label:'觉得风险太大，算了', hint:'', fn: g => { return{mood:2}; }},
       ]},
+    // === v24.2: 职场新生态 + 教育变革 ===
+    { id:'ai_interviewer', icon:'🎯', title:'AI面试官', category:'career',
+      body:'你投了一份心仪的工作，收到了面试通知。\n\n但面试你的——不是人，是AI。\n\n一个屏幕上的人脸，用合成的声音问你问题：\n- 「请描述一次你解决冲突的经历」\n- 「你最大的缺点是什么？」\n- 「你为什么想来我们公司？」\n\nAI在分析你的：\n- 微表情：你是否紧张、是否在说谎\n- 语速和语调：你是否自信\n- 用词和逻辑：你的思维能力\n\n你表现得很自然——但你心里在想：一个机器，凭什么决定我的人生？\n\n而且你永远不知道——它因为什么拒绝了你。\n\n「AI面试：公平还是更不公平——取决于算法是谁写的。」',
+      cond: g => g.age >= 20 && g.age <= 40 && !g.flags.aiInterview,
+      choices:[
+        { label:'专门学了AI面试技巧，成功通过', hint:'+🧠 +💰', fn: g => { g.flags.aiInterview=true; g.flags.aiInterviewPro=true; return{intel:10,charm:5,money:3000}; }},
+        { label:'尽力表现，但感觉被机器评判很别扭', hint:'+🧠 -😊', fn: g => { g.flags.aiInterview=true; return{intel:5,mood:-5}; }},
+        { label:'拒绝参加，去找有真人面试的公司', hint:'+😊 -💰', fn: g => { g.flags.aiInterview=true; g.flags.aiInterviewRefused=true; return{mood:5}; }},
+      ]},
+    { id:'side_hustle_2', icon:'💼', title:'副业内卷', category:'career',
+      body:'你的同事都有副业：\n\n- 小王：下班后做自媒体，月入8000\n- 小李：周末做婚庆摄影，月入5000\n- 小赵：晚上做代驾，月入3000\n- 小陈：帮人写简历，一单200\n\n你成了唯一一个没有副业的人。\n\n你感到了一种新的焦虑：只靠一份工资——在这个时代，是不是太天真了？\n\n但你也看到：\n- 小王因为副业影响了本职工作\n- 小李已经两年没休过周末\n- 小赵开车开到凌晨三点\n- 小陈的客户越来越难伺候\n\n「副业：多一份收入——少一份生活。」',
+      cond: g => g.age >= 22 && g.age <= 40 && !g.flags.sideHustle2 && g.salary,
+      choices:[
+        { label:'开始做副业，利用下班时间接单', hint:'+💰 -😊 -❤️', fn: g => { g.flags.sideHustle2=true; g.flags.sideHustler=true; return{money:5000,mood:-5,health:-5}; }},
+        { label:'投资自己，用业余时间学新技能', hint:'+🧠 -💰', fn: g => { g.flags.sideHustle2=true; g.flags.skillInvestor=true; g.money -= 3000; return{intel:12}; }},
+        { label:'坚持只做主业，把本职工作做到极致', hint:'+💰 +😊', fn: g => { g.flags.sideHustle2=true; g.flags.mainJobFocus=true; return{money:2000,mood:5}; }},
+      ]},
+    { id:'metaverse_office', icon:'🥽', title:'元宇宙办公', category:'tech',
+      body:'公司宣布试行「元宇宙办公」。\n\n你戴上VR头盔，进入一个虚拟办公室：\n- 你的数字分身坐在工位上\n- 同事们的分身在旁边聊天\n- 会议室是一个3D虚拟空间\n- 白板可以多人同时书写\n\n第一天很新鲜：\n- 不用通勤了\n- 可以穿睡衣上班（反正别人看到的是虚拟形象）\n- 开会时可以偷偷做别的（只要分身在看屏幕）\n\n但一周后你发现了问题：\n- 戴头盔太久头痛\n- 分不清上班和下班\n- 同事关系变得更淡了\n- 总觉得有人在「监控」你的在线状态\n\n「元宇宙办公：你到了办公室——但你的灵魂还在床上。」',
+      cond: g => g.age >= 20 && g.age <= 45 && !g.flags.metaverseOffice && g.salary,
+      choices:[
+        { label:'积极适应，成了虚拟办公达人', hint:'+🧠 +💰', fn: g => { g.flags.metaverseOffice=true; g.flags.vrOfficePro=true; return{intel:8,money:2000}; }},
+        { label:'觉得还行，但更喜欢线下办公', hint:'+🤝', fn: g => { g.flags.metaverseOffice=true; return{social:5,mood:3}; }},
+        { label:'强烈反对，申请回到线下办公', hint:'+😊 -🤝', fn: g => { g.flags.metaverseOffice=true; g.flags.vrOfficeRefused=true; return{mood:5,social:-3}; }},
+      ]},
+    { id:'gig_worker_transition', icon:'🛵', title:'骑手转型', category:'career',
+      body:'你认识的一个外卖骑手小刘，决定转型了。\n\n他送了三年外卖，身体越来越差：\n- 膝盖疼，上下楼梯困难\n- 颈椎病，脖子转不动\n- 胃病，三餐不规律\n\n他花了两万块学了一门手艺——宠物美容。\n\n现在他在一家宠物店工作：\n- 月薪6000（比送外卖少）\n- 但有空调、有社保、有休息日\n- 最重要的是：不用再跟系统抢时间了\n\n他对你说：「以前我跑一单5块钱，系统倒计时40分钟。现在给狗洗澡一只30块——但不用玩命。」\n\n你想了想：什么叫进步？也许就是——从「快」变成「稳」。\n\n「骑手转型：慢下来——不是退步，是活明白了。」',
+      cond: g => g.age >= 22 && !g.flags.gigTransition,
+      choices:[
+        { label:'帮小刘介绍更多转型资源', hint:'+🤝 +😊', fn: g => { g.flags.gigTransition=true; g.flags.gigHelper=true; return{social:10,mood:8,charm:5}; }},
+        { label:'反思自己的工作方式，开始注意健康', hint:'+❤️ +😊', fn: g => { g.flags.gigTransition=true; return{health:8,mood:5}; }},
+        { label:'觉得每个人有自己的路，没多想', hint:'', fn: g => { g.flags.gigTransition=true; return{intel:3}; }},
+      ]},
+    { id:'certificate_mania', icon:'📜', title:'考证内卷', category:'education',
+      body:'你刷到了一个新词：「证书焦虑症」。\n\n看看你的朋友圈：\n- 同事A考了PMP、CFA、CPA\n- 同事B考了心理咨询师、营养师、健康管理师\n- 同事C考了雅思8分、日语N1、法语B2\n- 同事D考了无人机驾照、潜水证、咖啡师证\n\n你看了看自己——好像什么证都没有。\n\n一种焦虑涌上来：我是不是太不思进取了？\n\n但你也看到了现实：\n- 同事A考了那么多证，工资没涨过\n- 同事B的证花了15万，一个也没用上\n- 同事C的外语能力在工作中完全用不到\n- 同事D的证都在吃灰\n\n「考证：知识就是力量——但证书不是知识。」',
+      cond: g => g.age >= 22 && g.age <= 40 && !g.flags.certificateMania && g.intel >= 20,
+      choices:[
+        { label:'报了3个证的培训班，全面提升', hint:'-💰 +🧠 -❤️', fn: g => { g.flags.certificateMania=true; g.flags.certCollector=true; g.money -= 15000; return{intel:15,health:-5,mood:-3}; }},
+        { label:'只考了一个跟工作相关的证', hint:'-💰 +🧠', fn: g => { g.flags.certificateMania=true; g.money -= 3000; return{intel:8,money:2000}; }},
+        { label:'想通了，不考了，把时间用来生活', hint:'+😊 +❤️', fn: g => { g.flags.certificateMania=true; g.flags.antiCert=true; return{mood:10,health:5}; }},
+      ]},
+    { id:'digital_management', icon:'📊', title:'数字化管理', category:'career',
+      body:'公司上了一套「数字化管理系统」。\n\n听起来很高大上——实际上就是：\n\n- 每天打卡要人脸识别+GPS定位\n- 上厕所超过10分钟系统自动提醒\n- 鼠标键盘活动低于阈值算「摸鱼」\n- 每天自动生成员工效率报告\n- 你的每一个操作都被记录和分析\n\nHR说这是「数据驱动管理」。\n\n员工说这是「电子镣铐」。\n\n你看着屏幕上自己的效率评分——85分，排名中等偏上。\n\n但你心里清楚：这个系统衡量的——只是你「看起来有多忙」。\n\n「数字化管理：管理的是数据——丢失的是信任。」',
+      cond: g => g.age >= 20 && g.age <= 50 && !g.flags.digitalManagement && g.salary,
+      choices:[
+        { label:'适应系统，用数据证明自己的价值', hint:'+🧠 +💰 -😊', fn: g => { g.flags.digitalManagement=true; g.flags.dataDriven=true; return{intel:5,money:2000,mood:-5}; }},
+        { label:'学会了「看起来在忙」的技巧', hint:'+🧠 -😊', fn: g => { g.flags.digitalManagement=true; g.flags.systemGamer=true; return{intel:5,mood:-2}; }},
+        { label:'觉得被监控太窒息，开始考虑跳槽', hint:'-😊 +🧠', fn: g => { g.flags.digitalManagement=true; g.flags.lookingForNewJob=true; return{mood:-8,intel:3}; }},
+      ]},
+    { id:'ai_coding', icon:'💻', title:'AI写代码', category:'tech',
+      body:'你的程序员朋友老张，最近工作轻松了很多。\n\n因为他开始用AI写代码了。\n\n他演示给你看：\n- 用自然语言描述需求，AI自动生成代码\n- 写了一半的代码，AI自动补全剩下的\n- 有bug？AI自动定位和修复\n- 要重构？AI一键优化\n\n他的效率提升了3倍。\n\n但他说了一句让你震惊的话：「我现在觉得——我不太需要学新东西了。因为AI什么都会。」\n\n然后他又说：「但我也在想——如果AI什么都会，那我存在的意义是什么？」\n\n你答不上来。因为这个问题——不只是程序员的。\n\n「AI编程：代码是AI写的——但bug是人生的。」',
+      cond: g => g.age >= 20 && g.age <= 45 && !g.flags.aiCoding && g.intel >= 25,
+      choices:[
+        { label:'也开始学用AI工具提升自己的工作效率', hint:'+🧠 +💰', fn: g => { g.flags.aiCoding=true; g.flags.aiToolUser=true; return{intel:12,money:2000}; }},
+        { label:'觉得AI会取代很多人，开始焦虑', hint:'-😊 +🧠', fn: g => { g.flags.aiCoding=true; g.flags.aiAnxious=true; return{mood:-8,intel:5}; }},
+        { label:'觉得这是好事，人类可以做更有意义的事', hint:'+😊 +🧠', fn: g => { g.flags.aiCoding=true; g.flags.aiOptimist=true; return{mood:5,intel:8}; }},
+      ]},
+    { id:'online_degree', icon:'🎓', title:'在线学历', category:'education',
+      body:'你看到一条新闻：某985大学开设了完全在线的本科学历。\n\n学费3万，学制2年，国家承认学历。\n\n你心动了。你一直觉得学历是你职业发展的瓶颈。\n\n但你也看到了争议：\n- HR圈公开说「在线学历含金量低」\n- 很多公司的学历筛选还是只看全日制\n- 在线学习的自律性要求很高\n- 没有校园社交，人脉价值有限\n\n你的一个同事去年报了一个在线MBA：「说实话，学到的东西不多。但简历上多了一行——这就够了。」\n\n「在线学历：知识可以在线学——但学历的偏见还在线下。」',
+      cond: g => g.age >= 22 && g.age <= 40 && !g.flags.onlineDegree && g.money >= 30000,
+      choices:[
+        { label:'花3万报了在线本科/MBA', hint:'-💰 +🧠 +✨', fn: g => { g.flags.onlineDegree=true; g.flags.onlineStudent=true; g.money -= 30000; return{intel:12,charm:5}; }},
+        { label:'选了更便宜的在线课程，不拿学位', hint:'-💰 +🧠', fn: g => { g.flags.onlineDegree=true; g.money -= 5000; return{intel:8}; }},
+        { label:'觉得不值得，不如在工作中学习', hint:'+💰 +🧠', fn: g => { g.flags.onlineDegree=true; g.flags.practicalLearner=true; return{intel:5,money:1000}; }},
+      ]},
+    { id:'freelance_platform', icon:'🌐', title:'自由职业平台', category:'career',
+      body:'你在自由职业平台上注册了账号。\n\n上面有各种各样的工作机会：\n- 翻译一篇文档：500元\n- 设计一个Logo：800元\n- 写一个小程序：3000元\n- 做一个PPT：200元\n- 拍一组产品照：1500元\n\n你试着接了几单——发现：\n- 自由是自由了，但收入不稳定\n- 要跟全国甚至全世界的人竞争\n- 客户的期望总是很高，预算总是很低\n- 没有社保、没有带薪假、没有年终奖\n\n但你也很享受：没有老板、没有通勤、没有无意义的会议。\n\n自由职业——自由的代价，就是什么都要自己扛。\n\n「自由职业：没人管你——也没人帮你。」',
+      cond: g => g.age >= 22 && g.age <= 45 && !g.flags.freelancePlatform && g.intel >= 20,
+      choices:[
+        { label:'全职做自由职业，辞掉了工作', hint:'±💰 +😊 -🤝', fn: g => { g.flags.freelancePlatform=true; g.flags.fullTimeFreelancer=true; g.salary = 0; return{mood:10,social:-5}; }},
+        { label:'用业余时间接一些单子', hint:'+💰 -❤️', fn: g => { g.flags.freelancePlatform=true; g.flags.partTimeFreelancer=true; return{money:5000,health:-3}; }},
+        { label:'试了几单觉得不适合自己', hint:'+🧠', fn: g => { g.flags.freelancePlatform=true; return{intel:5,mood:-2}; }},
+      ]},
+    { id:'skills_subscription', icon:'📚', title:'知识付费陷阱', category:'education',
+      body:'你算了一笔账：你在知识付费上花了多少钱？\n\n- 得到App年费：365元\n- 知乎盐选会员：228元\n- 网易云课堂：买了12门课，看了2门\n- 混沌学园：年费1999元\n- 各种9.9元训练营：累计花了800元\n- 私教课（一对一辅导）：花了5000元\n\n总计：超过1万元。\n\n你真正学到的东西？可能值500块。\n\n你意识到：你买的不是知识——是「我在学习」的幻觉。\n\n那些课——大多数你买了就再也没打开过。\n\n但每次看到新课上线，你还是忍不住点「立即购买」。\n\n因为「万一下次真的会看呢？」\n\n「知识付费：你付费了——知识不一定到付。」',
+      cond: g => g.age >= 20 && !g.flags.skillsSubscription && g.money >= 5000,
+      choices:[
+        { label:'痛定思痛，退订所有未看的课程', hint:'+💰 +😊 +🧠', fn: g => { g.flags.skillsSubscription=true; g.flags.knowledgeDetox=true; g.money += 2000; return{mood:8,intel:5}; }},
+        { label:'开始认真学已经买的课程', hint:'+🧠 +😊', fn: g => { g.flags.skillsSubscription=true; g.flags.seriousLearner=true; return{intel:12,mood:5}; }},
+        { label:'……然后又买了一门新课', hint:'-💰', fn: g => { g.flags.skillsSubscription=true; g.money -= 1000; return{mood:-3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -12906,6 +12987,12 @@ const ACHIEVEMENTS = [
     { id:'deepfake_advocate_ach', icon:'⚖️', name:'数字维权者', desc:'帮助他人对抗AI换脸侵害', check: g => g.flags.deepfakeAdvocate },
     { id:'tcm_routine_ach', icon:'🍵', name:'养生达人', desc:'坚持新中式养生routine', check: g => g.flags.tcmRoutine },
     { id:'ecom_partner_ach', icon:'📦', name:'出海合伙人', desc:'参与跨境电商创业', check: g => g.flags.ecomPartner },
+    // v24.2: 职场新生态成就
+    { id:'ai_interview_pro_ach', icon:'🎯', name:'AI面试达人', desc:'掌握了AI面试技巧', check: g => g.flags.aiInterviewPro },
+    { id:'skill_investor_ach', icon:'📚', name:'技能投资者', desc:'用业余时间投资自己的技能', check: g => g.flags.skillInvestor },
+    { id:'knowledge_detox_ach', icon:'🧹', name:'知识断舍离', desc:'退订所有未看的付费课程', check: g => g.flags.knowledgeDetox },
+    { id:'anti_cert_ach', icon:'📜', name:'反内卷先锋', desc:'拒绝考证焦虑，选择生活', check: g => g.flags.antiCert },
+    { id:'ai_tool_user_ach', icon:'💻', name:'AI工具达人', desc:'熟练使用AI工具提升效率', check: g => g.flags.aiToolUser },
 ];
 
 // === ENDINGS === (order matters: first match wins)
