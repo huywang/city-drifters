@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v10.8
+// 都市浮生记 - Game Engine v11.0
 // ============================================
 
 // === GAME STATE ===
@@ -412,6 +412,43 @@ const SURPRISE_EVENTS = [
     { id:'surprise_nap', icon:'😴', title:'午休', weight:3,
       body:'中午你趴在工位上睡了20分钟。醒来发现口水流到了键盘上。\n\n你偷偷擦了擦，假装什么都没发生。\n\n"工位午睡是打工人的小确幸——前提是别流口水。"',
       fn: g => ({health: 3, mood: 5}) },
+    // === v11.0 新增突发事件 ===
+    { id:'surprise_wechat_pay_bug', icon:'💳', title:'支付故障', weight:3,
+      body:'你在便利店买了瓶水，微信支付扣了两次。你找店员理论，店员说："找微信客服。"\n\n你打了客服电话，等了40分钟。最终退了回来，但你的时薪已经超过了这瓶水的价格。\n\n"移动支付很方便，直到它不方便。"',
+      fn: g => ({money: -10, mood: -8}) },
+    { id:'surprise_delivery_delay', icon:'📦', title:'快递延误', weight:3,
+      body:'你等了三天的快递，物流信息停在"已发货"一动不动。\n\n你催了客服，客服说："亲，耐心等待哦~"\n\n又等了两天，快递到了——你买的是夏天的衣服，现在已经是秋天了。\n\n"快递的速度，取决于快递小哥的心情。"',
+      fn: g => ({mood: -5}) },
+    { id:'surprise_shared_bike', icon:'🚲', title:'共享单车', weight:3,
+      body:'你扫了一辆共享单车，骑了5分钟发现链条掉了。\n\n你想还车，但App显示"不在停车区"。你推了20分钟找到停车区，已经迟到了。\n\n"共享单车：共享的是车，独享的是倒霉。"',
+      fn: g => ({mood: -8, health: -2, charm: -1}) },
+    { id:'surprise_internet_outage', icon:'📡', title:'断网了', weight:2,
+      body:'你正在开视频会议，突然断网了。你用手机热点，结果信号也只有一格。\n\n领导在群里说："你怎么掉了？"\n\n你心想：我也想掉线，但我不敢。\n\n"断网是打工人唯一合法的「消失」理由。"',
+      fn: g => ({mood: -10, intel: -1}) },
+    { id:'surprise_lucky_draw', icon:'🎰', title:'抽奖', weight:2,
+      body:'公司年会抽奖。一等奖iPhone，二等奖AirPods，三等奖保温杯。\n\n你抽到了——"参与奖"：一张公司logo的贴纸。\n\n你看了看手里的贴纸，又看了看一等奖得主——老板的儿子。\n\n"抽奖是概率游戏，但有些人的概率比你高。"',
+      fn: g => { if (Math.random() > 0.85) return {money: 2000, mood: 20}; return {mood: -5, charm: -1}; } },
+    { id:'surprise_food_delivery_coupon', icon:'🎫', title:'外卖红包', weight:3,
+      body:'你花10分钟找了一张外卖红包：满30减3。\n\n你觉得自己赚了3块。但你花了10分钟，你的时薪远超3块。\n\n"省3块钱的快感，和赚300块一样大。这就是打工人的快乐阈值。"',
+      fn: g => ({money: 3, mood: 3, intel: -1}) },
+    { id:'surprise_parking_ticket', icon:'🅿️', title:'违停罚单', weight:2,
+      body:'你在路边停了5分钟买杯咖啡，出来车上多了一张罚单：200元。\n\n你这杯咖啡38块，加上罚单238块。\n\n"这是你喝过最贵的咖啡。"',
+      fn: g => ({money: -200, mood: -10}) },
+    { id:'surprise_reunion_group', icon:'👥', title:'同学群复活', weight:2,
+      body:'沉寂三年的大学同学群突然活跃了——有人在卖保险，有人在拉投票，有人在发拼多多链接。\n\n你默默设了免打扰。\n\n"同学群的复活节，永远是有人在卖东西的时候。"',
+      fn: g => ({mood: -3, social: 2}) },
+    { id:'surprise_typhoon', icon:'🌀', title:'台风天上班', weight:2,
+      body:'台风预警，全市停工停课——除了你的公司。\n\n领导说："大家注意安全，能来尽量来。"\n\n你顶着12级大风，走了40分钟到公司。发现只来了3个人。\n\n"台风天上班的人，不是勇敢，是穷。"',
+      fn: g => ({health: -8, mood: -12}) },
+    { id:'surprise_random_kindness', icon:'💝', title:'陌生人的善意', weight:1,
+      body:'你在地铁上打了个喷嚏，旁边的人递给你一张纸巾。\n\n你说了声谢谢，TA笑了笑说："没事，我包里有的是。"\n\n就这么一瞬间，你觉得这座城市没那么冷了。\n\n"大城市的温暖，往往来自最陌生的人。"',
+      fn: g => ({mood: 12, social: 3, health: 2}) },
+    { id:'surprise_salary_delay', icon:'💸', title:'工资延迟发放', weight:2,
+      body:'HR发来通知："本月工资延迟至月底发放。"\n\n你看了看信用卡还款日——15号。\n\n你开始认真思考：要不要去找老板借点钱？\n\n"延迟发工资的公司，和延迟发货的卖家一样——让人想给差评。"',
+      fn: g => ({money: -1000, mood: -12}) },
+    { id:'surprise_found_cat', icon:'🐱', title:'猫咪碰瓷', weight:2,
+      body:'你蹲在路边等外卖，一只猫走过来，直接躺在你脚边翻肚皮。\n\n你摸了它10分钟，外卖到了，但它不让你走。\n\n最终你花了20分钟才脱身。\n\n"猫咪碰瓷是世界上最可爱的犯罪。"',
+      fn: g => ({mood: 10, charm: 3}) },
 ];
 
 // === EVENTS (100+) ===
@@ -7191,6 +7228,13 @@ function showStatChange(stat, value, icon, display) {
 }
 
 function addEventCard(data, addToLog) {
+    // 事件收集追踪
+    if (data.id) {
+        if (!G.flags._seenEvents) G.flags._seenEvents = [];
+        if (!G.flags._seenEvents.includes(data.id)) {
+            G.flags._seenEvents.push(data.id);
+        }
+    }
     const log = document.getElementById('event-log');
     const card = document.createElement('div');
     card.className = `event-card ${data.type?'event-'+data.type:''}`;
@@ -7880,6 +7924,18 @@ function shareEnding() {
     if (G.health > 80) tags.push('❤️ 健康达人');
     if (G.mood < 20) tags.push('😔 疲惫打工人');
     if (G.flags.regretCount > 10) tags.push('🫠 算了大王');
+    if (G.flags.hasChild) tags.push('👶 奶爸/奶妈');
+    if (G.flags.dink) tags.push('🍷 丁克族');
+    if (G.flags.hasDazi) tags.push('🤝 搭子达人');
+    if (G.flags.hasMBTI) tags.push('🧩 MBTI信徒');
+    if (G.flags.nightCycling) tags.push('🚴 夜骑侠');
+    if (G.flags.webNovelist) tags.push('✍️ 网文作者');
+    if (G.flags.wasLaidOff) tags.push('📦 被裁老兵');
+    if (G.flags.digitalDetox) tags.push('📵 数字极简');
+    if (G.flags.sawTherapist) tags.push('🧠 心理勇者');
+    if (G.flags.cutRelatives) tags.push('✂️ 断亲勇士');
+    if (G.flags.promoted) tags.push('📈 管理层');
+    if (G.flags.workLifeBalance) tags.push('⚖️ 生活平衡师');
     if (tags.length === 0) tags.push('🏙️ 普通打工人');
 
     const tagLine = tags.slice(0, 4).join(' ');
@@ -7908,6 +7964,7 @@ ${rarityEmoji} 「${t}」[${rarityLabel}]
 🎯 做出选择：${G.choices}次
 🏆 解锁成就：${achievementCount}个
 📈 最强属性：${topStat}
+📖 经历事件：${(G.flags._seenEvents||[]).length}个
 
 🏷️ 人生标签：${tagLine}
 

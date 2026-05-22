@@ -1,0 +1,98 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## 项目概述
+
+都市浮生记（City Drifters）—— 一款中国大城市漂泊者人生模拟网页游戏。纯前端单文件架构，无构建工具、无框架依赖。
+
+## 开发与运行
+
+```bash
+# 本地运行（任意静态服务器）
+python -m http.server 8080
+# 或
+npx serve .
+```
+
+无需构建、无需安装依赖。直接浏览器打开 `index.html` 即可。
+
+部署目标：GitHub Pages（master 分支根目录）。
+
+## 架构
+
+整个游戏由 3 个文件组成：
+
+| 文件 | 行数 | 职责 |
+|------|------|------|
+| `index.html` | ~60行 | 页面结构、屏幕容器、无障碍标记 |
+| `style.css` | ~1450行 | 主题（深色/浅色）、响应式、动画、无障碍样式 |
+| `game.js` | ~8200行 | 全部游戏逻辑，单文件 |
+
+### game.js 内部结构（按代码顺序）
+
+1. **全局状态 `G`** — 单一可变对象，包含所有运行时状态（属性、标志、事件日志、投资等）
+2. **数据定义区**（占代码量 ~70%）：
+   - `BACKGROUNDS` — 出身背景定义（含隐藏出身）
+   - `CITIES` — 6个城市及其专属事件（北京/上海/深圳/杭州/广州/成都）
+   - `SURPRISE_EVENTS` — 52个突发事件
+   - `EVENTS` — 556个生活事件数组
+   - `ACHIEVEMENTS` — 372个成就
+   - `ENDINGS` — 108种结局（顺序有优先级，first match wins）
+   - `TRADE_GOODS` — 8种倒卖商品
+   - `RUMOR_POOL` — 24条情报/谣言
+   - `DAILY_MODIFIERS` — 10种每日运势修正
+   - `INVEST_OPTIONS` — 5种投资选项（余额宝/A股/基金/比特币/房产）
+3. **引擎层**：
+   - 屏幕切换（`showScreen`）
+   - 月度循环（`nextMonth` → 活动选择 → 事件触发 → 属性衰减 → 结局检测）
+   - 季节系统、事件链系统、危机事件系统
+   - 倒卖交易系统（城市价差、价格波动、10%手续费）
+   - 投资理财系统（月度结算、风险波动）
+   - 信息/谣言系统（社交触发、后续事件链）
+   - 延迟后果系统（N月后触发效果）
+   - 连续活动系统（6月连续同一活动触发质变）
+   - 每日运势系统（基于日期的固定修正）
+   - 城市移动系统（5000元搬家费、失去工作）
+   - 关系/技能子系统
+4. **Meta 系统**：传承点数、难度选择、每日挑战、跨局统计
+5. **UI/持久化**：存档（localStorage，3 槽位）、音效、粒子动画、键盘/触控
+
+### 核心数据流
+
+```
+玩家选择活动 → nextMonth() → 属性变化 → 触发事件(cond匹配) → 玩家选择 → fn()修改G → 检查结局/成就 → 更新HUD
+```
+
+### 关键约定
+
+- 事件的 `fn` 返回属性增量对象 `{money, health, mood, intel, social, charm}`，由引擎统一 apply
+- 事件条件 `cond: g => ...` 接收游戏状态，返回布尔值
+- `setJob(g, name, salary)` 是修改工作的唯一入口
+- 结局匹配顺序即优先级，新增结局要注意插入位置
+- `flags` 对象用于跨事件状态追踪（事件链、一次性触发等）
+
+## 内容扩展模式
+
+新增事件的标准模板：
+```javascript
+{ id:'unique_id', icon:'emoji', title:'标题',
+  body:'叙述文本',
+  cond: g => /* 触发条件 */,
+  choices:[
+    { label:'选项文本', hint:'属性提示', fn: g => ({/* 属性变化 */}) },
+  ]
+}
+```
+
+新增成就：在 `ACHIEVEMENTS` 数组追加 `{id, icon, title, desc, check: g => ...}`
+
+新增结局：在 `ENDINGS` 数组的合适优先级位置插入 `{id, title, rarity, cond, desc}`
+
+## 注意事项
+
+- 所有代码和注释使用中文
+- 无任何包管理器或构建步骤
+- localStorage key 前缀为 `cityDrifters_` 或 `gameSettings_`
+- 游戏使用 Web Audio API 生成音效（无外部音频文件）
+- 版本号在 game.js 文件头注释中维护
