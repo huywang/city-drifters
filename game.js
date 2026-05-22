@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v30.9
+// 都市浮生记 - Game Engine v31.0
 // ============================================
 
 // === GAME STATE ===
@@ -18555,6 +18555,31 @@ const ENDINGS = [
     { id:'enlightened_end', badge:'🌈', title:'通透人生', desc:'你成了一个通透的人。\n\n你学会了接受、学会了放下、学会了活在当下。你不再跟现实较劲，不再为别人的标准活着。\n\n你的房间很简朴，但每一件东西都有故事。你的朋友不多，但每一个都是经过时间考验的。你的钱不算多，但你不再焦虑。\n\n有人问你：「你怎么活得这么通透？」\n\n你笑了笑说：「没什么秘诀。只是终于想明白了一件事——人生不是比赛。」\n\n你的书架上有一封信——10年前写给自己的。你打开看了看，觉得那个年轻的自己，真的很可爱。\n\n「通透：不是看破红尘——是看破自己。」', cond: g => g.flags.gracefulAcceptance && g.flags.mindfulLiving && g.flags.legacyLetter && g.mood >= 60 && g.intel >= 50 },
     { id:'giver_end', badge:'💝', title:'给予者', desc:'你把人生献给了他人。\n\n从社区志愿者到帮助陌生人，从倾听朋友到陪伴老人——你的存在，让很多人的世界温暖了一点。\n\n你没有赚很多钱，没有很高的社会地位。但你走在街上，总有人跟你打招呼。\n\n一个曾经受你帮助的人，后来也成了一个志愿者。他给你发了一条消息：「因为你，我开始帮助别人。现在我已经帮助了100个人。」\n\n你看着这条消息，觉得——这是你这辈子收到过的最好的回报。\n\n「给予：你给出去的爱——永远会以另一种方式存在。」', cond: g => g.flags.longTermVolunteer && g.social >= 60 && g.flags.familyPriority && g.achievements.length >= 15 },
     { id:'explorer_end', badge:'🌍', title:'人生探索者', desc:'你成了一个永不停歇的探索者。\n\n从独自旅行到体验不同文化，从尝试新事物到挑战舒适区——你的人生不是一条直线，是一张地图。\n\n你去过很多地方，见过很多人，听过很多故事。你的朋友圈就是一本「人间观察日记」。\n\n有人问你：「你探索了这么多，找到了什么？」\n\n你说：「找到了一个事实——没有终点。探索本身就是意义。」\n\n你的墙上挂着一张世界地图，上面标满了你去过的地方和你想去的地方。想去的地方——永远比去过的多。\n\n「探索：世界那么大——一辈子都不够。」', cond: g => g.flags.soloTraveler && (g.flags.cityExplorer || g.flags.nomadLife) && g.charm >= 40 && g.intel >= 40 },
+    // --- v31.0 理财投资与韭菜文化结局 ---
+    { id:'financial_freedom_end_v31', badge:'💰', title:'财务自由（理性版）', desc:'你通过理性投资实现了财务自由。\n\n不是靠运气——是靠学习。你读了100本理财书，经历了3次市场波动，坚持了10年定投。\n\n你的投资组合跑赢了通胀，你的被动收入覆盖了生活开支。\n\n你终于可以不为钱工作了。但你没有躺平——你开始做真正想做的事。\n\n「财务自由的本质：不是不用工作——是可以选择工作。」', cond: g => g.flags.longTermInvestor && g.flags.financialLiteracy && g.money >= 500000 && g.intel >= 60 && g.age >= 40 },
+    { id:'investment_lesson_end', badge:'📉', title:'韭菜的觉醒', desc:'你曾经是韭菜——被割了一茬又一茬。\n\n股票追涨杀跌、基金买了就跌、P2P暴雷、加密货币腰斩。你亏了50万。\n\n但你学到了：投资不是赌博，理财不是暴富。\n\n你开始系统学习，开始理性投资。虽然钱还没赚回来，但你的心不再焦虑了。\n\n「韭菜的觉醒：不是不再被割——是学会了不被割。」', cond: g => g.flags.learnedInvesting && g.money < 50000 && g.intel >= 50 && g.age >= 30 },
+    // --- v31.0 职场性别与生育困境结局 ---
+    { id:'balanced_parent_end', badge:'⚖️', title:'平衡大师', desc:'你在职场和家庭之间找到了平衡。\n\n你没有成为CEO，也没有成为全职妈妈。你成了一个「足够好」的妈妈和「足够好」的员工。\n\n你学会了说不、学会了求助、学会了放过自己。\n\n你的孩子说：「妈妈/爸爸，你是我见过最厉害的人。」\n\n你说：「不是厉害——是学会了接受不完美。」\n\n「平衡：不是完美——是取舍。」', cond: g => g.flags.negotiateBalance && g.flags.married && g.flags.hasChild && g.mood >= 60 && g.age >= 35 },
+    { id:'dink_happy_end', badge:'💑', title:'丁克人生', desc:'你选择了丁克——不要孩子，只要彼此。\n\n你的朋友们忙着鸡娃，你们忙着旅行。你的同事们攒学区房，你们攒退休金。\n\n有人说你们自私，有人说你们勇敢。你不在乎。\n\n你和伴侣手牵手走过40年，你们说：「这辈子最正确的决定，就是选择了彼此。」\n\n「丁克：不是不想要——是选择了另一种想要。」', cond: g => g.flags.enjoyDink && g.flags.married && !g.flags.hasChild && g.mood >= 70 && g.age >= 45 },
+    // --- v31.0 网红经济与直播文化结局 ---
+    { id:'authentic_influencer_end', badge:'🎭', title:'真实网红', desc:'你成了网红——但你保持了真实。\n\n你没有为了流量制造焦虑，没有为了广告虚假宣传。你只做真实的内容，只推荐真正喜欢的东西。\n\n你的粉丝不多，但每一个都是真的。你的收入不高，但每一分都是干净的。\n\n一个粉丝给你发消息：「谢谢你。你的内容让我觉得，我可以做自己。」\n\n你哭了。这才是你做内容的初衷。\n\n「真实的代价：可能不够红——但足够安心。」', cond: g => g.flags.stayAuthentic && g.flags.demandedHonesty && g.flags.influencer && g.mood >= 65 && g.age >= 28 },
+    { id:'influencer_burnout_end', badge:'😵', title:'流量倦怠', desc:'你成了网红，然后倦怠了。\n\n日更的压力、数据的焦虑、算法的变化——你累了。\n\n你停更了3个月。你的粉丝掉了一半，但你的心回来了。\n\n你重新开始——但这次不是为了流量，是为了自己。\n\n「流量是毒品——尝过一次，就再也回不去了。但你可以选择戒掉。」', cond: g => g.flags.contentBurnout && g.flags.influencer && g.mood >= 50 && g.age >= 30 },
+    // --- v31.0 心理健康与自我成长结局 ---
+    { id:'mental_health_warrior_end', badge:'🛋️', title:'心理健康战士', desc:'你从心理困境中走了出来。\n\n你经历了情绪崩溃、做了心理咨询、学了正念冥想、疗愈了内在小孩。你不再害怕脆弱，不再逃避情绪。\n\n你成了一个心理健康倡导者。你在朋友圈分享你的经历，你说：「心理问题和感冒一样正常。」\n\n一个朋友私信你：「谢谢你。如果不是你的分享，我可能不会去寻求帮助。」\n\n「心理健康：不是永远开心——是学会了和不开心的自己相处。」', cond: g => g.flags.therapyGrowth && g.flags.dailyMindfulness && g.flags.deepHealing && g.mood >= 70 && g.intel >= 60 && g.age >= 30 },
+    { id:'self_compassion_end', badge:'💕', title:'自我关怀大师', desc:'你学会了自我关怀。\n\n你不再苛责自己、不再和别人比较、不再为了完美牺牲健康。\n\n你每天对自己说一句鼓励的话，你允许自己休息，你接纳自己的不完美。\n\n你的朋友说：「你变了。你以前很焦虑，现在很温和。」\n\n你说：「不是温和——是学会了爱自己。」\n\n「自我关怀：不是自私——是可持续的爱。」', cond: g => g.flags.stopCompare && g.flags.allowRest && g.flags.selfCompassion && g.mood >= 70 && g.age >= 30 },
+    // --- v31.0 中年危机与第二人生结局 ---
+    { id:'second_life_end', badge:'🎬', title:'第二人生', desc:'你在中年找到了第二人生。\n\n你没有辞职，没有离婚，没有推翻一切。你在现有的生活中，找到了新的可能。\n\n你开始学画画、写小说、做志愿者。你的生活不再只有工作和家庭——还有热爱。\n\n你的孩子说：「爸爸/妈妈，你最近好开心。」\n\n你说：「因为我找到了自己。」\n\n「第二人生：不是重新开始——是重新发现。」', cond: g => g.flags.commitSecondAct && g.flags.midlifeHobby && g.mood >= 70 && g.age >= 40 },
+    { id:'midlife_wisdom_end_v31', badge:'🦉', title:'中年智者', desc:'你在中年获得了智慧。\n\n你不再焦虑于年龄，不再恐惧于衰老。你接纳了自己，接纳了生活，接纳了不完美。\n\n你开始把智慧传递给年轻人。你成了导师，成了朋友们的倾听者。\n\n一个年轻人问你：「中年可怕吗？」\n\n你说：「不可怕。可怕的是永远年轻却永远焦虑。」\n\n「中年智慧：不是老了——是懂了。」', cond: g => g.flags.acceptAndEnjoy && g.flags.passWisdom && g.mood >= 70 && g.intel >= 60 && g.age >= 45 },
+    // --- v31.0 消费主义反思与极简生活结局 ---
+    { id:'minimalist_life_end_v31', badge:'📦', title:'极简主义者', desc:'你成了极简主义者。\n\n你扔掉了80%的东西，留下了20%真正需要的。你的家空了，但你的心满了。\n\n你不再购物、不再囤货、不再为了拥有而焦虑。你的钱花在体验上而不是物品上。\n\n你的朋友说：「你的家好空。」\n\n你说：「不是空——是留白。」\n\n「极简：不是拥有更少——是需要更少。」', cond: g => g.flags.completeDeclutter && g.flags.persistMinimal && g.flags.experienceOverThings && g.mood >= 70 && g.age >= 30 },
+    { id:'anti_consumerism_end', badge:'✊', title:'反消费主义先锋', desc:'你彻底摆脱了消费主义。\n\n你不再被广告洗脑，不再为了虚荣购物，不再用消费定义自己。\n\n你买二手、用极简、过可持续生活。你的碳足迹比平均水平低60%。\n\n你成了一个环保倡导者。你说：「消费主义是21世纪最大的骗局。」\n\n「反消费主义：不是不消费——是有意识地消费。」', cond: g => g.flags.persistAntiConsumer && g.flags.fullSecondhand && g.flags.sustainabilityChoice && g.mood >= 65 && g.intel >= 60 && g.age >= 30 },
+    // --- v31.0 代际差异与价值观碰撞结局 ---
+    { id:'bridge_generations_end', badge:'🌉', title:'代际桥梁', desc:'你成功跨越了代际鸿沟。\n\n你和父母建立了更好的关系。你们不再争吵，开始理解。你们不再控制，开始尊重。\n\n你的父母说：「我们以前不理解你，但我们现在为你骄傲。」\n\n你说：「不是因为我成功了——是因为我做了自己。」\n\n「代际桥梁：不是改变对方——是理解彼此。」', cond: g => g.flags.betterRelation && g.flags.understandParents && g.flags.ownFilial && g.mood >= 65 && g.social >= 60 && g.age >= 30 },
+    { id:'new_tradition_end', badge:'🏮', title:'新传统创造者', desc:'你创造了属于自己的新传统。\n\n你没有完全抛弃传统，也没有完全拥抱现代。你找到了平衡。\n\n你保留了有意义的传统（年夜饭、祭祖），改变了形式主义的（磕头、催生），创造了新的（家庭旅行、年度家庭会议）。\n\n你的孩子说：「我喜欢我们家的传统。」\n\n你说：「这些传统是为我们服务的——不是我们为了传统服务。」\n\n「新传统：不是抛弃过去——是为未来创造。」', cond: g => g.flags.createNewTradition && g.flags.findBalance && g.flags.balancedParenting && g.mood >= 65 && g.age >= 35 },
+    // --- v31.0 移民与海外生活结局 ---
+    { id:'global_citizen_end', badge:'🌏', title:'世界公民', desc:'你成了世界公民。\n\n你在海外生活多年，学会了多种语言，交到了来自世界各地的朋友。你的视野是全球的，你的心是开放的。\n\n你不再属于某一个国家——你属于世界。\n\n有人问你：「你的家在哪里？」\n\n你说：「心安处即是家。」\n\n「世界公民：不是没有根——是根在世界各地。」', cond: g => g.flags.embraceGlobal && g.flags.activeAdapt && g.flags.acceptMultiIdentity && g.mood >= 70 && g.intel >= 65 && g.age >= 35 },
+    { id:'returnee_success_end', badge:'🇨🇳', title:'海归成功', desc:'你回国后成功了。\n\n你利用了海外经验，找到了好工作，做出了成绩。你成了公司的国际化人才。\n\n你的同事们说：「你的视野很开阔。」\n\n你说：「不是我开阔——是我见过不同的世界。」\n\n你把海外经验和本土实践结合，做出了独特的贡献。\n\n「海归：不是镀金——是历练。」', cond: g => g.flags.activeReturn && g.flags.leverageReturnee && g.money >= 200000 && g.mood >= 65 && g.age >= 32 },
+    { id:'immigration_regret_end', badge:'💭', title:'移民的代价', desc:'你移民了，但你后悔了。\n\n你得到了更好的环境、更高的收入、更完善的福利。但你失去了父母的陪伴、朋友的温暖、文化的归属。\n\n你在异国他乡，过着体面但孤独的生活。\n\n你妈在视频里说：「你什么时候回来？」\n\n你说：「快了。」但你知道，你回不去了。\n\n「移民的代价：你得到了一些——也失去了一些。没有完美的选择。」', cond: g => g.flags.deepRegret && g.flags.startImmigration && g.mood < 50 && g.age >= 35 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
