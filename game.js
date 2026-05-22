@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v7.4
+// 都市浮生记 - Game Engine v7.5
 // ============================================
 
 // === GAME STATE ===
@@ -3490,6 +3490,37 @@ const EVENTS = [
         { label:'做文化传播', hint:'+💰 +✨ +🧠', fn: g => { g.flags.culturalHeritage=true; g.flags.culturePromoter=true; return{money:5000,charm:12,intel:10}; }},
         { label:'不感兴趣', hint:'+🧠', fn: g => { g.flags.culturalHeritage=true; return{intel:3}; }},
       ]},
+    // === v7.5 EVENTS - 职场PUA与电子榨菜 ===
+    { id:'workplace_pua', icon:'😰', title:'职场PUA',
+      body:'你的领导又在"为你好"：\n\n"我批评你是因为你还有救，别人我都不说。"\n"你这个年龄，能进我们公司是你的福气。"\n"加班是自愿的，但不加班的人我们都记在心里。"\n"你看看其他人，怎么就你做不到？"\n\n"职场PUA——用'为你好'的名义，摧毁你的自信心和判断力。"\n\n你开始怀疑自己：\n- 是不是我真的能力不行？\n- 是不是我太矫情了？\n- 离开这里我还能去哪？\n- 也许领导说得对，我应该感恩\n\n"职场PUA的本质：上司利用话语权和利益决策权，对下属进行精神控制，目的是让你产生自我怀疑，从而被迫服从。"\n\n你的选择：\n\n"员工不是机械的执行者，企业价值的盲从者，而是扮演着创造者的角色。当企业丢掉了主责主业，员工只是服从却没有真正认同，这样的企业自然留不住人心。"',
+      cond: g => !g.flags.workplacePUA && g.age>=22 && g.age<=35 && g.job!=='待业中' && g.mood<=50,
+      choices:[
+        { label:'记录证据，准备维权', hint:'+🧠 +💪', fn: g => { g.flags.workplacePUA=true; g.flags.recordEvidence=true; return{intel:10,health:5}; }},
+        { label:'正面回应，拒绝服从', hint:'+💪 +😊', fn: g => { g.flags.workplacePUA=true; g.flags.standUp=true; return{health:10,mood:15}; }},
+        { label:'寻求心理帮助', hint:'-💰 +💭', fn: g => { g.flags.workplacePUA=true; g.flags.seekCounseling=true; return{money:-2000,mood:10,health:8}; }},
+        { label:'辞职离开', hint:'-💰 +😊', fn: g => { g.flags.workplacePUA=true; g.flags.quit=true; return{money:-5000,mood:20,health:15}; }},
+        { label:'默默忍受', hint:'-😊 -💪', fn: g => { g.flags.workplacePUA=true; return{mood:-20,health:-15,intel:-5}; }},
+      ]},
+    { id:'digital_addiction', icon:'📱', title:'电子榨菜成瘾',
+      body:'你吃饭时必须看视频，否则觉得饭不香。\n\n你的"电子榨菜"清单：\n- 影视解说：5分钟看完一部电影\n- 综艺切片：只看最搞笑的片段\n- 短视频：15秒一个爽点\n- 直播切片：只看精华部分\n\n"电子榨菜——碎片化时代的佐料，还是慢性毒药？"\n\n你的症状：\n- 文章超过1000字就没耐心看\n- 视频超过1分钟就想快进\n- 吃饭不看手机就觉得空虚\n- 睡前刷短视频到凌晨2点\n- 第二天上班精神恍惚\n\n"63.3%的受访者会随时随地刷短视频，50.3%的人感觉思考能力下降。"\n\n你开始反思：\n- "我是不是被算法控制了？"\n- "我还能深度阅读吗？"\n- "我的注意力是不是被碎片化了？"\n\n"电子榨菜虽然满足了人们的诸多需求，却也使当代人不知不觉地陷入了难以挣脱的困局——减少线下人际交往，让大脑在用餐时间持续兴奋，压缩休息时间，长此以往将导致过度疲劳、消化不良。"',
+      cond: g => !g.flags.digitalAddiction && g.age>=18 && g.age<=35 && g.mood<=60,
+      choices:[
+        { label:'物理隔离，睡前不带手机进卧室', hint:'+😊 +💭', fn: g => { g.flags.digitalAddiction=true; g.flags.digitalDetox=true; return{mood:10,health:8,intel:5}; }},
+        { label:'卸载短视频App', hint:'+🧠 +😊', fn: g => { g.flags.digitalAddiction=true; g.flags.uninstallApps=true; return{intel:12,mood:8}; }},
+        { label:'培养深度阅读习惯', hint:'+🧠 +💪', fn: g => { g.flags.digitalAddiction=true; g.flags.deepReading=true; return{intel:15,health:5}; }},
+        { label:'参加线下活动', hint:'+👥 +😊', fn: g => { g.flags.digitalAddiction=true; g.flags.offlineActivities=true; return{social:10,mood:12,health:8}; }},
+        { label:'继续刷，停不下来', hint:'-😊 -💭', fn: g => { g.flags.digitalAddiction=true; return{mood:-15,health:-10,intel:-8}; }},
+      ]},
+    { id:'pretend_to_work', icon:'🎭', title:'假装上班',
+      body:'你失业3个月了，但每天早上还是背着电脑出门。\n\n你去了"假装上班有限公司"——一个专门为失业者提供工位的地方。\n\n"假装上班——在经济转型、就业市场低迷的情况下，年轻人对职场环境的最新抵抗和探索。"\n\n你每天的生活：\n- 早上9点到"公司"打卡\n- 坐在工位上投简历、写网文、学习AI工具\n- 中午和同事（其他失业者）聊天\n- 下午继续找工作或发展副业\n- 晚上回家告诉父母"今天工作挺忙的"\n\n"假装上班的意义：不是欺骗，而是在失业期间保持生活节奏，避免社交孤立。"\n\n你的心态：\n- "不是不想工作，是投了80份简历都石沉大海。"\n- "躺平？我这是在等下一次冲刺的起跑线。"\n- "城市容不下肉身，农村放不下灵魂？现在我觉得农村挺有奔头。"\n\n"允许人生有中场休息，才是社会进步的标志。当社会能包容不同的生活选择，躺平才能真正成为调整期，而非终点站。"',
+      cond: g => !g.flags.pretendToWork && g.age>=22 && g.age<=30 && g.job==='待业中' && g.money<10000,
+      choices:[
+        { label:'每天去'公司'投简历', hint:'+🧠 +💪', fn: g => { g.flags.pretendToWork=true; g.flags.keepRoutine=true; return{intel:8,health:5,mood:10}; }},
+        { label:'发展副业，写网文', hint:'+💰 +😊', fn: g => { g.flags.pretendToWork=true; g.flags.sideHustleWriting=true; return{money:3000,mood:12}; }},
+        { label:'学习AI工具', hint:'+🧠 +💰', fn: g => { g.flags.pretendToWork=true; g.flags.learnAI=true; return{intel:15,money:2000}; }},
+        { label:'回老家创业', hint:'+💰 +👥', fn: g => { g.flags.pretendToWork=true; g.flags.returnHometown=true; return{money:5000,social:10,mood:8}; }},
+        { label:'彻底躺平', hint:'-😊 -💪', fn: g => { g.flags.pretendToWork=true; g.flags.fullLyingFlat=true; return{mood:-20,health:-10}; }},
+      ]},
     // === v7.4 EVENTS - 延迟退休与养老焦虑 ===
     { id:'delayed_retirement', icon:'👴', title:'延迟退休',
       body:'2025年1月1日，《实施弹性退休制度暂行办法》正式生效。\n\n你看着新闻：男职工退休年龄逐步延至63岁，女职工分档延至55岁和58岁。\n\n"90后大概率要工作到65岁才能退休。"\n\n你算了一笔账：你现在25岁，还有40年才能退休。40年，足够你经历多少次"中年危机"？\n\n"延迟退休——年轻人眼中的'压力'，还是'新机'？"\n\n你的焦虑：\n- "刚上班就要面对延迟退休，这辈子要工作到60多岁？"\n- "能否健康工作到65岁？"\n- "老员工延迟退休，会不会挤压我的晋升空间？"\n- "上有老下有小，延迟退休让经济压力陡增"\n\n但你也在思考：职业生涯被拉长，"35岁危机"的时间节点可能随之延后。\n\n"与其被动焦虑，不如主动规划——'终身成长'才能对抗年龄焦虑。"',
@@ -3865,6 +3896,11 @@ const ACHIEVEMENTS = [
     { id:'mental_health_warrior', icon:'💭', name:'心理健康战士', desc:'寻求心理帮助', check: g => g.flags.seekHelp },
     { id:'age_35_survivor', icon:'🎂', name:'35岁幸存者', desc:'度过35岁危机', check: g => g.flags.age35Crisis },
     { id:'career_transformer', icon:'💪', name:'职业转型者', desc:'35岁后成功转型', check: g => g.flags.careerTransition },
+    // v7.5 achievements
+    { id:'pua_resister', icon:'😰', name:'PUA反抗者', desc:'拒绝职场PUA', check: g => g.flags.standUp },
+    { id:'digital_detox_pro', icon:'📱', name:'数字排毒达人', desc:'戒除电子榨菜成瘾', check: g => g.flags.digitalDetox },
+    { id:'pretend_worker', icon:'🎭', name:'假装上班族', desc:'体验假装上班', check: g => g.flags.pretendToWork },
+    { id:'routine_keeper', icon:'💪', name:'生活节奏保持者', desc:'失业期间保持规律生活', check: g => g.flags.keepRoutine },
 ];
 
 // === ENDINGS === (order matters: first match wins)
