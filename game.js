@@ -1925,6 +1925,49 @@ const EVENTS = [
         { label:'听书，碎片时间', hint:'+🧠', fn: g => { g.flags.readingHabit=true; return{intel:10,mood:5,money:-300}; }},
         { label:'算了，没时间', hint:'-🧠', fn: g => ({intel:-3,mood:-5}) },
       ]},
+    // ===== v2.28: RARE EVENTS & DEPTH =====
+    { id:'unexpected_inheritance', icon:'💰', title:'意外遗产',
+      body:'你接到了一个陌生律师的电话："你的远房亲戚去世了，留给你一笔遗产。"\n\n你以为是诈骗，但对方提供了完整的文件。\n\n原来是你爷爷的兄弟，一辈子没结婚，把遗产留给了你。\n\n金额：50万。\n\n"有时候，生活会给你意想不到的礼物——但礼物背后往往是遗憾。"',
+      cond: g => g.age>=30 && !g.flags.inheritance && Math.random()>0.8,
+      choices:[
+        { label:'接受遗产', hint:'+💰💰 +😊', fn: g => { g.flags.inheritance=true; return{money:500000,mood:20,social:5}; }},
+        { label:'捐出一部分', hint:'+💰 +✨ +😊', fn: g => { g.flags.inheritance=true; g.flags.volunteer=true; return{money:300000,mood:25,charm:15,social:10}; }},
+        { label:'全部捐出', hint:'+✨ +😊 -💰', fn: g => { g.flags.inheritance=true; g.flags.volunteer=true; return{money:50000,mood:30,charm:25,social:15}; }},
+      ]},
+    { id:'life_mentor', icon:'🧓', title:'人生导师',
+      body:'你在咖啡厅遇到了一位70岁的老人。他看起来很有气质，你们聊了起来。\n\n他说他曾经是大学教授，退休后环游世界。他分享了很多人生智慧：\n\n"年轻人，人生没有标准答案。你不需要活成别人期望的样子。"\n\n"做让你老了不后悔的事，而不是让你老了后悔没做的事。"\n\n你加了老人的微信，他说随时可以找他聊天。\n\n"有些话，年轻人听不进去——直到遇见对的人。"',
+      cond: g => g.age>=25 && g.age<=35 && g.intel>55 && !g.flags.lifeMentor && Math.random()>0.7,
+      choices:[
+        { label:'定期请教', hint:'+🧠 +😊 +👥', fn: g => { g.flags.lifeMentor=true; return{intel:15,mood:18,social:10}; }},
+        { label:'请老人吃饭', hint:'-💰 +🧠 +👥', fn: g => { g.flags.lifeMentor=true; return{money:-500,intel:12,mood:15,social:12}; }},
+        { label:'只是客套', hint:'+😊', fn: g => ({mood:8}) },
+      ]},
+    { id:'moral_dilemma', icon:'⚖️', title:'道德困境',
+      body:'你在公司发现了一个问题：你的领导在做假账，挪用公司资金。\n\n你知道如果举报，领导会被开除，但你也会被报复。\n\n如果你不举报，公司可能会因此倒闭，很多同事会失业。\n\n"道德和利益之间，往往只隔着一个选择的距离。"',
+      cond: g => g.job!=='待业中' && g.months>12 && g.intel>50 && !g.flags.moralDilemma && Math.random()>0.7,
+      choices:[
+        { label:'举报，坚持正义', hint:'+✨ +🧠 -👥 -💰', fn: g => { g.flags.moralDilemma=true; g.relationships.colleagues = clamp((g.relationships.colleagues||30)-20, 0, 100); return{charm:20,intel:10,mood:-15,social:-15,money:-10000}; }},
+        { label:'匿名举报', hint:'+🧠 +✨', fn: g => { g.flags.moralDilemma=true; return{intel:8,charm:10,mood:5}; }},
+        { label:'假装没看到', hint:'-✨ -🧠 +👥', fn: g => { g.flags.moralDilemma=true; g.relationships.colleagues = clamp((g.relationships.colleagues||30)+5, 0, 100); return{charm:-15,intel:-8,social:5,mood:-10}; }},
+        { label:'私下提醒领导', hint:'🎲', fn: g => { g.flags.moralDilemma=true; if(Math.random()>0.5){g.relationships.colleagues = clamp((g.relationships.colleagues||30)+10, 0, 100);return{mood:10,social:8}}else{return{mood:-20,social:-15,money:-15000}} }},
+      ]},
+    { id:'identity_crisis', icon:'🎭', title:'身份认同',
+      body:'你在大城市生活了5年，但你依然觉得：自己不属于这里。\n\n你的口音、习惯、价值观，都和"本地人"不一样。\n\n你回老家的时候，亲戚说你"变了"。\n\n你在大城市的时候，同事说你是"外地人"。\n\n你开始怀疑：我到底是谁？我属于哪里？\n\n"身份认同是漂泊者的永恒命题——你既不属于故乡，也不属于他乡。"',
+      cond: g => g.months>=60 && g.age>=27 && !g.flags.identityCrisis,
+      choices:[
+        { label:'接受自己的多重身份', hint:'+🧠 +😊', fn: g => { g.flags.identityCrisis=true; return{intel:12,mood:15,charm:5}; }},
+        { label:'努力融入大城市', hint:'+👥 +✨ -💰', fn: g => { g.flags.identityCrisis=true; g.relationships.colleagues = clamp((g.relationships.colleagues||30)+10, 0, 100); return{social:10,charm:8,mood:8,money:-5000}; }},
+        { label:'考虑回老家', hint:'+👨‍👩‍👧 -😊', fn: g => { g.flags.identityCrisis=true; g.relationships.family = clamp((g.relationships.family||60)+15, 0, 100); return{mood:-5,social:5}; }},
+      ]},
+    { id:'creative_breakthrough', icon:'💡', title:'创意突破',
+      body:'你突然有了一个创意：\n\n- 一个App的想法\n- 一本书的构思\n- 一个商业计划\n- 一个艺术项目\n\n你觉得这个想法可以改变你的人生。你兴奋得睡不着觉。\n\n"创意是廉价的，执行才是无价的。"\n\n问题是：你敢不敢去执行？',
+      cond: g => g.intel>60 && g.age>=24 && g.age<=40 && !g.flags.creativeBreakthrough && Math.random()>0.6,
+      choices:[
+        { label:'辞职创业', hint:'🎲🎲 -💰 +🧠', fn: g => { g.flags.creativeBreakthrough=true; g.flags.entrepreneur=true; setJob(g,'创业者',0); if(Math.random()>0.5){return{money:-30000,intel:20,mood:25,social:15}}else{return{money:-50000,mood:-20,health:-10}} }},
+        { label:'业余时间做', hint:'+🧠 +😊 -❤️', fn: g => { g.flags.creativeBreakthrough=true; g.flags.sideHustle=true; return{intel:15,mood:18,health:-8}; }},
+        { label:'写下来，以后再说', hint:'+🧠', fn: g => { g.flags.creativeBreakthrough=true; return{intel:10,mood:8}; }},
+        { label:'算了，只是想想', hint:'-😊', fn: g => ({mood:-10}) },
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -2662,7 +2705,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.27' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.28' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
