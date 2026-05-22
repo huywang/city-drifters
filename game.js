@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v21.3
+// 都市浮生记 - Game Engine v21.4
 // ============================================
 
 // === GAME STATE ===
@@ -10092,6 +10092,87 @@ const EVENTS = [
         { label:'学了很多，开始调整', hint:'+🧠 +💰', fn: g => { g.flags.assetAllocation=true; return{intel:5,money:3000}; }},
         { label:'太复杂了，还是存银行吧', hint:'', fn: g => { g.flags.assetAllocation=true; return{intel:2}; }},
       ]},
+    // === v21.4 新增事件（宠物经济） ===
+    { id:'adopt_cat', icon:'🐱', title:'领养了一只猫', category:'hobby',
+      body:'你路过小区门口，看到一只流浪橘猫蹲在纸箱旁边。它看着你，你也看着它。\n\n你蹲下来，它蹭了蹭你的手。就这一下——你知道你的钱包要遭殃了。\n\n你发了条朋友圈：「从今天起，我是猫奴。」\n\n评论区清一色：「恭喜入坑。」\n\n从此你的人生多了一个身份：铲屎官。猫粮、猫砂、猫玩具、猫窝、猫爬架……你发现：养猫比养自己贵。\n\n但每天晚上，它蜷在你腿边打呼噜的时候——你觉得，这钱花得值。\n\n「猫不是宠物——是室友。一个不用交房租、还天天嫌弃你的室友。」',
+      cond: g => !g.flags.hasPet && !g.flags.adoptedCat && g.money >= 2000 && g.age >= 23,
+      choices:[
+        { label:'领养了它，从此有了毛茸茸的家人', hint:'+😊 +💰-', fn: g => { g.flags.hasPet=true; g.flags.adoptedCat=true; g.flags.catOwner=true; return{mood:15,money:-1500,charm:3}; }},
+        { label:'犹豫了，先拍个照发朋友圈', hint:'+😊', fn: g => { g.flags.catLover=true; return{mood:5}; }},
+        { label:'算了，自己都养不活', hint:'', fn: g => { return{mood:-3}; }},
+      ]},
+    { id:'adopt_dog', icon:'🐕', title:'领养了一只狗', category:'hobby',
+      body:'你在朋友圈看到有人送养小狗——一只混血柴犬，眼睛圆圆的，笑得特别治愈。\n\n你去看了它。它一见到你就疯狂摇尾巴，扑上来舔你的手。\n\n你心想：这就是缘分吧。\n\n从那天起，你每天早上6点被它舔醒——不是因为闹钟，是因为它要拉屎。\n\n你开始每天遛狗两次，风雨无阻。你的微信步数从3000变成了15000。\n\n你邻居说：「你这狗真乖。」你说：「它乖？它在家咬了我三双拖鞋。」\n\n「养狗之后才知道：原来每天最开心的事——是回家时有人在门口等你。」',
+      cond: g => !g.flags.hasPet && !g.flags.adoptedDog && g.money >= 3000 && g.age >= 23,
+      choices:[
+        { label:'领养了它，开始了遛狗人生', hint:'+😊 +❤️ +💰-', fn: g => { g.flags.hasPet=true; g.flags.adoptedDog=true; g.flags.dogOwner=true; return{mood:15,health:5,money:-2000,charm:3}; }},
+        { label:'想养但怕没时间遛', hint:'+❤️', fn: g => { g.flags.dogLover=true; return{mood:3}; }},
+        { label:'算了，养狗责任太重', hint:'', fn: g => { return{mood:-2}; }},
+      ]},
+    { id:'pet_medical_v2_x2', icon:'🏥', title:'宠物看病', category:'health',
+      body:'你的宠物突然不吃东西了。你带它去了宠物医院。\n\n医生检查后说：「是肠胃炎，需要输液。」\n\n你看了一眼账单——2800元。你倒吸一口凉气。这比你自己的体检还贵。\n\n你在知乎上看到一句话：「宠物看病的价格，是在考验你对它的爱有多深。」\n\n你咬咬牙，刷卡了。你看着它在输液架上乖乖躺着，偶尔看你一眼——你觉得这钱花得值。\n\n回家的路上，你默默下载了宠物保险APP。\n\n「养宠物的人都有一个共同的恐惧：不是怕它拆家——是怕它生病。」',
+      cond: g => g.flags.hasPet && g.money >= 1000 && !g.flags.petMedical,
+      choices:[
+        { label:'毫不犹豫，最好的治疗', hint:'+😊 -💰💰', fn: g => { g.flags.petMedical=true; g.flags.petDevoted=true; return{mood:8,money:-2800}; }},
+        { label:'选了普通方案，够用就好', hint:'-💰', fn: g => { g.flags.petMedical=true; return{mood:3,money:-1200}; }},
+        { label:'问了能不能吃药代替', hint:'-💰', fn: g => { g.flags.petMedical=true; return{mood:-2,money:-500}; }},
+      ]},
+    { id:'pet_social', icon:'🐾', title:'宠物社交', category:'social',
+      body:'你带宠物去公园遛弯，遇到了另一个铲屎官。\n\n你们的宠物互相闻了闻，你们互相加了微信。\n\n从此你加入了一个「毛孩子家长群」。群里每天的话题：\n- 谁家猫又吐毛球了\n- 哪个牌子的猫粮性价比高\n- 宠物医院避雷\n- 谁家狗又拆家了（附视频）\n\n你发现：养宠物的人，比不养宠物的人多了一个社交维度。你们聊宠物比聊工作还认真。\n\n你的一个群友说：「我社交恐惧，但带狗出门就不怕了——因为话题永远是狗。」\n\n「宠物是最好的社交货币。你不需要找话题——它们自己就是话题。」',
+      cond: g => g.flags.hasPet && !g.flags.petSocial,
+      choices:[
+        { label:'融入了宠物社交圈，认识了很多同好', hint:'+👥 +😊', fn: g => { g.flags.petSocial=true; return{social:8,mood:5}; }},
+        { label:'加了群但很少说话，默默看晒猫晒狗', hint:'+👥', fn: g => { g.flags.petSocial=true; return{social:3,mood:3}; }},
+        { label:'社交？我家宠物就是我的社交', hint:'', fn: g => { g.flags.petSocial=true; return{mood:2}; }},
+      ]},
+    { id:'pet_economy_v2_x2', icon:'💰', title:'宠物经济觉醒', category:'finance',
+      body:'你算了一笔账：养宠物一年花了多少钱。\n\n猫粮/狗粮：3000元\n猫砂/尿垫：800元\n玩具/零食：600元\n医疗/疫苗：2000元\n美容/洗澡：1200元\n\n总计：7600元/年。十年就是76000元。\n\n你沉默了。然后你打开了另一个思路——宠物经济是个巨大的市场。\n\n你开始关注宠物行业：宠物食品、宠物医疗、宠物殡葬、宠物保险、宠物直播……\n\n你发现：中国宠物市场已经超过3000亿元。而且还在增长。\n\n一个做宠物用品的朋友说：「现在最赚钱的不是养宠物——是给养宠物的人卖东西。」\n\n「你以为你在养宠物？其实你在养活一整条产业链。」',
+      cond: g => g.flags.hasPet && !g.flags.petEconomy && g.intel >= 40,
+      choices:[
+        { label:'看到了商机，考虑做宠物相关副业', hint:'+🧠 +💰', fn: g => { g.flags.petEconomy=true; g.flags.petBusiness=true; return{intel:5,money:3000}; }},
+        { label:'研究了宠物行业，做了相关投资', hint:'+🧠 +💰', fn: g => { g.flags.petEconomy=true; return{intel:8,money:2000}; }},
+        { label:'算完账决定继续养——因为它是家人不是开销', hint:'+😊', fn: g => { g.flags.petEconomy=true; return{mood:8}; }},
+      ]},
+    { id:'pet_photo', icon:'📸', title:'宠物博主之路', category:'career',
+      body:'你给宠物拍了一张照片，发到了小红书。\n\n第二天醒来——5000个赞。\n\n评论区：「太可爱了！」「求教程！」「这是天使吧！」\n\n你开始认真给宠物拍照。买了补光灯、小道具、甚至给宠物做了一套表情包。\n\n你的粉丝从100涨到了1000，然后是10000。\n\n有品牌来找你合作：「能帮我们推广猫粮吗？免费寄一箱+500元推广费。」\n\n你发现：你的宠物不仅给你带来了陪伴——还带来了一条全新的收入渠道。\n\n你的一个粉丝留言：「看了你家猫，我也想养一只。」你回复：「养吧——但请做好钱包和心理的双重准备。」\n\n「在自媒体时代，你的猫可能比你更值钱。」',
+      cond: g => g.flags.hasPet && g.flags.petSocial && !g.flags.petBlogger && g.charm >= 40,
+      choices:[
+        { label:'认真做宠物博主，接到了广告合作', hint:'+💰 +✨ +😊', fn: g => { g.flags.petBlogger=true; g.flags.influencer=true; return{money:5000,charm:8,mood:10}; }},
+        { label:'偶尔发发，当个爱好', hint:'+✨ +😊', fn: g => { g.flags.petBlogger=true; return{charm:5,mood:5}; }},
+        { label:'不想让宠物成为赚钱工具', hint:'+😊', fn: g => { g.flags.petBlogger=true; return{mood:5}; }},
+      ]},
+    { id:'pet_loss_v2_x2', icon:'💔', title:'宠物走失', category:'psychology',
+      body:'你回家发现门没关好——宠物不见了。\n\n你疯了一样在小区里找。打印了寻宠启事，贴满了电线杆和公告栏。\n\n你在业主群里发了消息，附上照片。邻居们纷纷转发。\n\n第一天没找到。第二天没找到。第三天——\n\n凌晨3点，你听到门外有挠门的声音。你打开门，它蹲在那里，脏兮兮的，但活着。\n\n你抱住了它，哭了。你从没想过，一只猫/狗能让你这么崩溃。\n\n你发了条朋友圈：「找到了。以后出门一定检查门窗。求求所有养宠人注意。」\n\n评论区全是安慰：「回来就好。」\n\n「你以为你在照顾它——其实是它在治愈你。失去它的恐惧，让你明白了这一点。」',
+      cond: g => g.flags.hasPet && !g.flags.petLost && g.age >= 24,
+      choices:[
+        { label:'失而复得，从此更加珍惜', hint:'+😊', fn: g => { g.flags.petLost=true; g.flags.petDevoted=true; return{mood:5,social:3}; }},
+        { label:'在邻居帮助下找回了它', hint:'+👥 +😊', fn: g => { g.flags.petLost=true; return{mood:3,social:5}; }},
+        { label:'它再也没回来……', hint:'-😊', fn: g => { g.flags.petLost=true; g.flags.petGone=true; g.flags.hasPet=false; return{mood:-15}; }},
+      ]},
+    { id:'pet_insurance', icon:'🛡️', title:'宠物保险', category:'finance',
+      body:'上次宠物看病的账单让你心有余悸。你开始研究宠物保险。\n\n对比了市面上几款产品：\n- A款：年费600，报销70%门诊\n- B款：年费1200，报销90%+住院\n- C款：年费300，只保大病\n\n你算了一笔账：如果宠物一年生病两次，B款最划算。如果健康，A款够用。\n\n你最终选了一个方案。虽然花了钱——但你心里踏实了。\n\n你发了条微博：「给毛孩子买了保险，比自己买得还认真。」\n\n「宠物保险的本质：用确定的小钱，对冲不确定的大钱。这和人生一样。」',
+      cond: g => g.flags.hasPet && g.flags.petMedical && !g.flags.petInsurance,
+      choices:[
+        { label:'买了全面的宠物保险', hint:'-💰 +😊', fn: g => { g.flags.petInsurance=true; return{money:-1200,mood:5,intel:3}; }},
+        { label:'选了基础款，够用就好', hint:'-💰 +😊', fn: g => { g.flags.petInsurance=true; return{money:-600,mood:3,intel:2}; }},
+        { label:'觉得不划算，不如自己存钱', hint:'', fn: g => { g.flags.petInsurance=true; return{intel:2}; }},
+      ]},
+    { id:'pet_therapy', icon:'🧠', title:'宠物治愈力', category:'psychology',
+      body:'你加班到凌晨回家，身心俱疲。\n\n推开门——你的宠物跑过来迎接你。它不在乎你几点回来，不在乎你赚多少钱。\n\n它只是想见到你。\n\n你坐在沙发上，它蜷在你腿边。你摸着它的毛，听着它的呼噜声——你的焦虑慢慢消散了。\n\n你打开知乎，看到一个心理学研究：「养宠物可以降低皮质醇水平，减少焦虑和抑郁症状。」\n\n你不需要研究——你已经感受到了。\n\n你发了条朋友圈：「有些治愈不需要药物——只需要一只毛茸茸的小东西。」\n\n「在这个充满不确定性的世界里，宠物给你的是唯一确定的东西：无条件的爱。」',
+      cond: g => g.flags.hasPet && (g.mood <= 50 || g.flags.hadAnxiety) && !g.flags.petTherapy,
+      choices:[
+        { label:'开始把宠物当作精神支柱', hint:'+😊 +❤️', fn: g => { g.flags.petTherapy=true; g.flags.petDevoted=true; return{mood:12,health:3}; }},
+        { label:'确实感受到了治愈的力量', hint:'+😊', fn: g => { g.flags.petTherapy=true; return{mood:8}; }},
+        { label:' appreciated它的陪伴，但不想过度依赖', hint:'+🧠', fn: g => { g.flags.petTherapy=true; return{mood:5,intel:3}; }},
+      ]},
+    { id:'pet_travel_v2', icon:'✈️', title:'带宠物出行', category:'hobby',
+      body:'你想出去旅行，但没人帮你照看宠物。\n\n你查了一圈：\n- 宠物寄养店：80元/天\n- 宠物酒店：150元/天（带摄像头）\n- 朋友帮忙：欠人情\n- 带它一起：托运/自驾\n\n你最终决定自驾——带它一起去。\n\n你给它买了车载安全座椅，准备了水和零食。它在后座好奇地看着窗外。\n\n到了目的地，你带它去了海边/山间。它第一次看到大海/草地——疯狂奔跑的样子让你笑了。\n\n你拍了很多照片。每一张里，它都笑得比你开心。\n\n「旅行的意义不是去远方——是带着重要的人（和毛孩子）一起去。」',
+      cond: g => g.flags.hasPet && !g.flags.petTravel && g.money >= 3000,
+      choices:[
+        { label:'自驾游带宠物出行，收获了难忘回忆', hint:'+😊 +💰-', fn: g => { g.flags.petTravel=true; return{mood:15,money:-2000,charm:3}; }},
+        { label:'选了宠物酒店，自己去旅行', hint:'+😊 -💰', fn: g => { g.flags.petTravel=true; return{mood:8,money:-1000}; }},
+        { label:'为了它，取消了旅行计划', hint:'+😊', fn: g => { g.flags.petTravel=true; return{mood:3}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -11036,6 +11117,12 @@ const ACHIEVEMENTS = [
     { id:'allocator_ach', icon:'🥧', name:'资产配置师', desc:'完成了科学的资产配置', check: g => g.flags.assetAllocation },
     { id:'fire_pursuer_ach', icon:'🔥', name:'FIRE追求者', desc:'开始践行财务自由、提前退休', check: g => g.flags.financialIndependence },
     { id:'insurance_planner_ach', icon:'🛡️', name:'风险管理者', desc:'合理规划了保险保障', check: g => g.flags.insurancePlanning },
+    // === v21.4 新增成就（宠物经济） ===
+    { id:'cat_owner_ach', icon:'🐱', name:'猫奴', desc:'领养了一只猫，正式成为铲屎官', check: g => g.flags.catOwner },
+    { id:'dog_owner_ach', icon:'🐕', name:'铲屎官', desc:'领养了一只狗，开始了遛狗人生', check: g => g.flags.dogOwner },
+    { id:'pet_blogger_ach', icon:'📸', name:'宠物博主', desc:'通过宠物内容走上了自媒体之路', check: g => g.flags.petBlogger },
+    { id:'pet_devoted_ach', icon:'💕', name:'宠物至亲', desc:'对宠物倾注了全部的爱', check: g => g.flags.petDevoted && g.flags.petTherapy },
+    { id:'pet_business_ach_v2', icon:'🐾', name:'宠物经济弄潮儿', desc:'在宠物行业中发现了商机', check: g => g.flags.petBusiness },
 ];
 
 // === ENDINGS === (order matters: first match wins)
