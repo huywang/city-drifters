@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v25.6
+// 都市浮生记 - Game Engine v26.0
 // ============================================
 
 // === GAME STATE ===
@@ -52,6 +52,45 @@ const BACKGROUNDS = {
         unlockCond: '达成"财务自由"结局后可用',
         intro: '你买彩票中了500万。税后400万，你选了50万给爸妈，剩下的带着去了大城市。\n\n你妈说："别告诉任何人。"你爸说："省着点花。"你说："我知道。"\n\n但中了彩票的人，90%在5年内破产。你知道这个统计数字。\n\n"钱不是万能的，但没有钱是万万不能的。至于多了会怎样——你准备亲自试试。"' },
 };
+
+// === v26.0: LIFE MOTTOS 人生座右铭系统 ===
+const LIFE_MOTTOS = [
+    { id:'ambition',    icon:'🚀', text:'我要出人头地',   attrs:'💰✨', bonus:{intel:3,charm:2,money:500} },
+    { id:'contentment', icon:'☮️', text:'知足常乐',       attrs:'❤️😊', bonus:{mood:5,health:3} },
+    { id:'freedom',     icon:'🕊️', text:'自由最重要',     attrs:'😊✨', bonus:{mood:3,charm:3} },
+    { id:'money_first', icon:'💰', text:'搞钱要紧',       attrs:'💰🧠', bonus:{money:1000,intel:2} },
+    { id:'hedonism',    icon:'🎉', text:'及时行乐',       attrs:'😊✨', bonus:{mood:5,charm:2} },
+    { id:'knowledge',   icon:'📚', text:'知识改变命运',   attrs:'🧠✨', bonus:{intel:5,charm:2} },
+    { id:'relationships',icon:'🤝',text:'人脉就是钱脉',   attrs:'🤝✨', bonus:{social:5,charm:2} },
+    { id:'health_first',icon:'❤️', text:'健康第一',       attrs:'❤️😊', bonus:{health:5,mood:2} },
+    { id:'stoic',       icon:'🗿', text:'尽人事听天命',   attrs:'🧠❤️', bonus:{intel:3,health:3} },
+    { id:'rebel',       icon:'🔥', text:'不走寻常路',     attrs:'✨😊', bonus:{charm:5,mood:2} },
+];
+let selectedMotto = null;
+function renderMottoGrid() {
+    const el = document.getElementById('motto-grid');
+    if (!el) return;
+    el.innerHTML = LIFE_MOTTOS.map(m => `
+        <div class="motto-card" data-motto="${m.id}" onclick="selectMotto('${m.id}')" style="padding:10px;border:2px solid rgba(255,255,255,0.15);border-radius:10px;cursor:pointer;background:rgba(255,255,255,0.05);transition:all 0.2s;text-align:center">
+            <div style="font-size:1.5em">${m.icon}</div>
+            <div style="font-weight:bold;margin:4px 0;font-size:0.95em">${m.text}</div>
+            <div style="font-size:0.75em;opacity:0.6">${m.attrs}</div>
+        </div>
+    `).join('');
+}
+function selectMotto(id) {
+    selectedMotto = id;
+    document.querySelectorAll('.motto-card').forEach(c => {
+        c.style.borderColor = 'rgba(255,255,255,0.15)';
+        c.style.background = 'rgba(255,255,255,0.05)';
+    });
+    const sel = document.querySelector(`.motto-card[data-motto="${id}"]`);
+    if (sel) {
+        sel.style.borderColor = '#a78bfa';
+        sel.style.background = 'linear-gradient(135deg,rgba(167,139,250,0.25),rgba(118,75,162,0.25))';
+    }
+}
+
 
 // === CITIES ===
 const CITIES = {
@@ -14248,6 +14287,8 @@ function selectCity(city) {
     document.querySelector(`.city-card[data-city="${city}"]`).classList.add('selected');
     document.getElementById('create-step2').classList.add('hidden');
     document.getElementById('create-step3').classList.remove('hidden');
+    // v26.0: 渲染座右铭选择器
+    renderMottoGrid();
 }
 function setName(name) { document.getElementById('player-name').value = name; }
 
@@ -14290,7 +14331,22 @@ function startGame() {
         _consecutiveActivity: { type: null, count: 0 },
         // v9.2: 投资理财系统初始化
         investments: {},
+        // v26.0: 人生座右铭
+        motto: selectedMotto,
     });
+
+    // v26.0: 应用座右铭初始加成
+    if (selectedMotto) {
+        const mottoData = LIFE_MOTTOS.find(m => m.id === selectedMotto);
+        if (mottoData && mottoData.bonus) {
+            if (mottoData.bonus.intel) G.intel = clamp(G.intel + mottoData.bonus.intel, 0, 100);
+            if (mottoData.bonus.charm) G.charm = clamp(G.charm + mottoData.bonus.charm, 0, 100);
+            if (mottoData.bonus.mood) G.mood = clamp(G.mood + mottoData.bonus.mood, 0, 100);
+            if (mottoData.bonus.health) G.health = clamp(G.health + mottoData.bonus.health, 0, 100);
+            if (mottoData.bonus.social) G.social = clamp(G.social + mottoData.bonus.social, 0, 100);
+            if (mottoData.bonus.money) G.money += mottoData.bonus.money;
+        }
+    }
 
     showScreen('screen-game');
     updateHUD();
@@ -14300,8 +14356,9 @@ function startGame() {
     log.innerHTML = '';
 
     const diffEmoji = diff.emoji;
+    const mottoText = selectedMotto ? LIFE_MOTTOS.find(m => m.id === selectedMotto)?.text : '';
     addEventCard({ icon: '🚀', title: `${bg.name} · 来到${city.name}`, body: bg.intro + `\n\n<div class="meme-quote">${city.meme}</div>`, type: 'milestone' }, false);
-    addEventCard({ icon: '📍', title: `新起点 ${diffEmoji} ${diff.label}`, body: `你来到了${city.name}——"${city.trait}"。\n\n房租：${fmtMoney(city.rent)}/月\n生活成本：${city.cost>1.1?'较高':city.cost>1.0?'适中':'还行'}\n难度：${diff.label}${legacy.points>0?`\n传承加成：+${legacyBonus}点`:''}\n\n每个伟大的故事都从一间出租屋开始。`, type: 'special' }, false);
+    addEventCard({ icon: '📍', title: `新起点 ${diffEmoji} ${diff.label}`, body: `你来到了${city.name}——"${city.trait}"。\n\n房租：${fmtMoney(city.rent)}/月\n生活成本：${city.cost>1.1?'较高':city.cost>1.0?'适中':'还行'}\n难度：${diff.label}${legacy.points>0?`\n传承加成：+${legacyBonus}点`:''}${mottoText?`\n座右铭：「${mottoText}」`:''}\n\n每个伟大的故事都从一间出租屋开始。`, type: 'special' }, false);
 
     document.getElementById('current-event').innerHTML = '';
     document.getElementById('btn-advance').disabled = false;
@@ -15888,6 +15945,96 @@ function getLifeTimeline() {
     return timeline.slice(0, 15); // 最多显示15个关键事件
 }
 
+// v26.0: 人生一句话总结
+function generateLifeSummary() {
+    const g = G;
+    const parts = [];
+
+    // 判断主人生主题
+    const themes = [];
+    if (g.money >= 500000) themes.push('wealth');
+    else if (g.money >= 100000) themes.push('stable');
+    else if (g.money <= -50000) themes.push('debt');
+
+    if (g.mood >= 70) themes.push('happy');
+    else if (g.mood <= 30) themes.push('sad');
+
+    if (g.health >= 70) themes.push('healthy');
+    else if (g.health <= 30) themes.push('sick');
+
+    if (g.intel >= 60) themes.push('wise');
+    if (g.social >= 60) themes.push('social');
+    if (g.charm >= 60) themes.push('charming');
+
+    if (g.flags.married) themes.push('married');
+    if (g.flags.hasChild) themes.push('parent');
+    if (g.flags.entrepreneur) themes.push('entrepreneur');
+    if (g.flags.hasHouse) themes.push('homeowner');
+    if (g.achievements && g.achievements.length >= 20) themes.push('achiever');
+
+    // 开头：人生定义
+    let opening = '';
+    if (themes.includes('wealth') && themes.includes('happy')) opening = '你活成了人生赢家';
+    else if (themes.includes('wealth') && themes.includes('sad')) opening = '你拥有了财富，却失去了快乐';
+    else if (themes.includes('debt') && themes.includes('sad')) opening = '你的人生是一场漫长的下坠';
+    else if (themes.includes('debt') && themes.includes('happy')) opening = '你一无所有，却活得很快乐';
+    else if (themes.includes('happy') && themes.includes('stable')) opening = '你过了平凡但幸福的一生';
+    else if (themes.includes('wise')) opening = '你成了一个通透的人';
+    else if (themes.includes('entrepreneur')) opening = '你选择了冒险的人生';
+    else if (themes.includes('social')) opening = '你活在人群里';
+    else if (themes.includes('charming')) opening = '你活成了别人眼中的光';
+    else if (themes.includes('healthy') && themes.includes('happy')) opening = '你活出了健康与快乐';
+    else if (themes.includes('sick')) opening = '你的身体早早发出了警报';
+    else if (themes.includes('achiever')) opening = '你的人生收获满满';
+    else opening = '你过了平凡的一生';
+
+    // 中段：关键转折
+    let middle = '';
+    const keyMoments = [];
+    if (g.flags.married) keyMoments.push('找到了相伴一生的人');
+    if (g.flags.hasChild) keyMoments.push('成为了父母');
+    if (g.flags.entrepreneur) keyMoments.push('赌上了一切去创业');
+    if (g.flags.hasHouse) keyMoments.push('在大城市安了家');
+    if (g.flags.retired) keyMoments.push('终于退出了职场');
+    if (g.flags.movedCities) keyMoments.push('换过城市重新开始');
+
+    if (keyMoments.length > 0) {
+        middle = '——' + keyMoments.slice(0, 3).join('，') + '。';
+    } else {
+        middle = '。';
+    }
+
+    // 结尾：座右铭呼应或反思
+    let ending = '';
+    const mottoData = g.motto ? LIFE_MOTTOS.find(m => m.id === g.motto) : null;
+    if (mottoData) {
+        // 根据实际人生和座右铭的契合度生成
+        const mottoText = mottoData.text;
+        if (mottoText === '我要出人头地' && themes.includes('wealth')) ending = `你兑现了当初的座右铭：「${mottoText}」。`;
+        else if (mottoText === '我要出人头地' && !themes.includes('wealth')) ending = `你没能兑现座右铭：「${mottoText}」——但你学到了更多。`;
+        else if (mottoText === '知足常乐' && themes.includes('happy')) ending = `你活成了座右铭：「${mottoText}」。`;
+        else if (mottoText === '搞钱要紧' && themes.includes('wealth')) ending = `座右铭「${mottoText}」——你真的做到了。`;
+        else if (mottoText === '自由最重要' && themes.includes('happy')) ending = `你用一生践行了：「${mottoText}」。`;
+        else if (mottoText === '及时行乐' && themes.includes('sad')) ending = `你奉行「${mottoText}」——但快乐没有持续到最后。`;
+        else if (mottoText === '知识改变命运' && themes.includes('wise')) ending = `「${mottoText}」——你真的被知识改变了。`;
+        else if (mottoText === '健康第一' && themes.includes('healthy')) ending = `「${mottoText}」——你守护住了最重要的东西。`;
+        else if (mottoText === '不走寻常路' && themes.includes('entrepreneur')) ending = `「${mottoText}」——你真的走了一条没人走过的路。`;
+        else ending = `你的座右铭是：「${mottoText}」——你努力活出了它的样子。`;
+    } else {
+        const reflections = [
+            '回头看——每一步都算数。',
+            '你不确定这是不是最好的人生——但它是你的。',
+            '有些遗憾，但也有些骄傲。',
+            '你终于明白了：人生没有标准答案。',
+            '大城市没有给你答案——但给了你寻找的机会。',
+            '你带着故事离开——这就够了。',
+        ];
+        ending = reflections[Math.floor(Math.random() * reflections.length)];
+    }
+
+    return opening + middle + ending;
+}
+
 // v25.0: 人生阶段系统 - 根据年龄定义不同人生阶段
 const LIFE_STAGES = [
     { id:'youth', name:'青年期', ageMin:18, ageMax:24, desc:'探索与迷茫', modifiers:{mood:-2,social:3,charm:2}, color:'#4ade80' },
@@ -16055,6 +16202,19 @@ function triggerEnding() {
         const timelineEl = document.getElementById('life-timeline-v24');
         if (timelineEl) {
             timelineEl.innerHTML = `<h3>📅 人生大事记</h3><div class="timeline-v24" style="max-height:300px;overflow-y:auto;padding:10px">${timeline.map(t => `<div style="display:flex;gap:10px;margin-bottom:8px;border-left:3px solid #764ba2;padding-left:12px"><span style="color:#764ba2;font-weight:bold;min-width:40px">${t.age}岁</span><span style="color:#ccc">${t.text}</span></div>`).join('')}</div>`;
+        }
+    }
+
+    // v26.0: 人生一句话总结
+    const lifeSummary = generateLifeSummary();
+    if (lifeSummary) {
+        const summaryEl = document.getElementById('life-summary-v26');
+        if (summaryEl) {
+            summaryEl.innerHTML = `
+                <div style="margin:20px 0;padding:20px;border-radius:16px;background:linear-gradient(135deg,rgba(167,139,250,0.2),rgba(118,75,162,0.15));border:1px solid rgba(167,139,250,0.4);text-align:center">
+                    <h3 style="margin:0 0 12px 0;color:#a78bfa">💭 人生一句话</h3>
+                    <p style="margin:0;font-size:1.1em;line-height:1.6;font-style:italic;color:#eee">${lifeSummary}</p>
+                </div>`;
         }
     }
 
