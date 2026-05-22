@@ -913,6 +913,60 @@ const EVENTS = [
         { label:'靠孩子养老', hint:'+😊 -💰', fn: g => { g.flags.retirementPlanning=true; if(g.flags.hasChild){return{mood:10}}else{return{mood:-10}} }},
         { label:'走一步看一步', hint:'+😊', fn: g => ({mood:5}) },
       ]},
+    // ===== v2.5: SEASONAL EVENTS =====
+    { id:'spring_festival', icon:'🧧', title:'春节回家',
+      body:'春节到了，你抢到了回家的火车票（虽然是无座的）。\n\n回到家，你妈的第一句话是："有对象了吗？"\n\n七大姑八大姨轮番上阵：工资多少？买房了吗？什么时候结婚？\n\n你发了条朋友圈："家和万事兴。"配了张全家福，屏蔽了所有同事。\n\n"春节是中国人的信仰：回家，吃饭，被问，微笑，忍住。"',
+      cond: g => g.month === 2 && !g.flags.springFestivalThisYear,
+      choices:[
+        { label:'老实回答所有问题', hint:'-😊 +👥', fn: g => { g.flags.springFestivalThisYear=true; return{mood:-15,social:10,money:-3000}; }},
+        { label:'装傻充楞', hint:'+😊', fn: g => { g.flags.springFestivalThisYear=true; return{mood:5,money:-2000}; }},
+        { label:'不回家，旅游过年', hint:'+😊 -👥', fn: g => { g.flags.springFestivalThisYear=true; return{mood:20,money:-5000,social:-5}; }},
+        { label:'不回家，加班赚钱', hint:'+💰 -😊', fn: g => { g.flags.springFestivalThisYear=true; return{money:8000,mood:-10,health:-5}; }},
+      ]},
+    { id:'summer_heat', icon:'🔥', title:'高温预警',
+      body:'气温40度，你走在上班的路上，感觉自己是一块正在融化的冰淇淋。\n\n办公室的空调坏了，老板说："心静自然凉。"\n\n你看了看外卖App：一杯冰美式要30块，但你觉得这是救命钱。\n\n"大城市的夏天，不是热，是蒸。你不是在上班，是在蒸桑拿。"',
+      cond: g => g.month >= 7 && g.month <= 8,
+      choices:[
+        { label:'买冰美式续命', hint:'-💰 +😊', fn: g => ({money:-30,mood:8,health:-2}) },
+        { label:'自带水壶', hint:'+💰', fn: g => ({money:10,health:3}) },
+        { label:'请高温假', hint:'🎲', fn: g => { if(Math.random()>0.6){return{mood:15,health:5,money:-1000}}else{return{mood:-10}} }},
+      ]},
+    { id:'mid_autumn', icon:'🥮', title:'中秋月饼',
+      body:'中秋节到了，你收到了公司发的月饼礼盒。\n\n你打开一看：五仁月饼。你看了看朋友圈，别人晒的都是流心月饼、冰皮月饼。\n\n你妈打电话来："月饼收到了吗？好吃吗？"\n\n你说："好吃。"其实你只咬了一口就扔了。\n\n"月饼的意义不在于吃，在于发朋友圈。"',
+      cond: g => g.month === 9,
+      choices:[
+        { label:'发朋友圈晒月饼', hint:'+✨ +👥', fn: g => ({charm:5,social:5,mood:5}) },
+        { label:'寄回家给父母', hint:'+😊 +👥', fn: g => ({mood:10,social:8,money:-50}) },
+        { label:'自己吃掉', hint:'+😊', fn: g => ({mood:8,health:-2}) },
+        { label:'不吃，减肥', hint:'+❤️', fn: g => ({health:3,mood:-3}) },
+      ]},
+    { id:'winter_loneliness', icon:'❄️', title:'冬至孤独',
+      body:'冬至了，你一个人在出租屋里吃速冻饺子。\n\n窗外下着雪，你看着朋友圈：有人在晒火锅，有人在晒滑雪，有人在晒男朋友/女朋友。\n\n你发了条："一个人也要好好过节。"配图是你和速冻饺子的合影。\n\n"大城市的冬天，冷的是天气，孤独的是心。"',
+      cond: g => g.month === 12 && g.social < 40,
+      choices:[
+        { label:'约朋友吃火锅', hint:'+👥 +😊', fn: g => ({social:10,mood:15,money:-200}) },
+        { label:'给父母打电话', hint:'+😊 +👥', fn: g => ({mood:10,social:5}) },
+        { label:'一个人也挺好', hint:'+🧠', fn: g => ({intel:5,mood:5}) },
+        { label:'下载交友App', hint:'🎲 +✨', fn: g => { if(Math.random()>0.6){g.flags.inRelationship=true;return{mood:20,charm:8,social:10}}else{return{mood:-10}} }},
+      ]},
+    { id:'double_11', icon:'🛒', title:'双十一购物狂欢',
+      body:'双十一到了，你的购物车里塞了50件商品，总价2万。\n\n你的理智说："这些都是消费主义陷阱。"\n你的手指说："但真的便宜啊！"\n\n凌晨1点，你开始抢单。1点01分，你抢到了。1点02分，你后悔了。\n\n"双十一的本质是：用省钱的借口，花更多的钱。"',
+      cond: g => g.month === 11,
+      choices:[
+        { label:'清空购物车！', hint:'-💰💰 +😊', fn: g => ({money:-15000,mood:25,charm:8}) },
+        { label:'只买必需品', hint:'-💰 +🧠', fn: g => ({money:-2000,mood:10,intel:5}) },
+        { label:'什么都不买', hint:'+💰 +🧠', fn: g => ({money:500,intel:8,mood:-5}) },
+        { label:'买完再退货', hint:'🎲', fn: g => { if(Math.random()>0.5){return{mood:15,money:-3000}}else{return{mood:-10,money:-8000}} }},
+      ]},
+    { id:'new_year_resolution', icon:'🎯', title:'新年flag',
+      body:'新年第一天，你立了一堆flag：\n\n1. 减肥20斤\n2. 存够10万\n3. 学会一项新技能\n4. 找到对象\n5. 早睡早起\n\n你看了看去年的flag：一条都没完成。\n\n"新年flag的意义不在于实现，在于给自己一个开始的仪式感。"',
+      cond: g => g.month === 1,
+      choices:[
+        { label:'认真执行', hint:'+🧠 +❤️', fn: g => ({intel:10,health:8,mood:10}) },
+        { label:'选一个重点做', hint:'+🧠', fn: g => ({intel:8,mood:5}) },
+        { label:'算了，年年都一样', hint:'-😊', fn: g => ({mood:-5}) },
+        { label:'发朋友圈立flag', hint:'+✨', fn: g => ({charm:5,mood:8}) },
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -1047,7 +1101,11 @@ function startGame() {
 function advanceMonth() {
     if (G.isEnded) return;
     G.months++; G.month++;
-    if (G.month > 12) { G.month = 1; G.age++; G.year++; }
+    if (G.month > 12) { G.month = 1; G.age++; G.year++; G.flags.springFestivalThisYear = false; }
+
+    // 季节效果
+    const season = getSeason(G.month);
+    applySeasonEffects(season);
 
     const city = CITIES[G.city];
     G.money -= city.rent + Math.floor(3000 * city.cost);
@@ -1091,6 +1149,42 @@ function advanceMonth() {
     if (event) { showEvent(event); } else { showMonthlySummary(); }
 
     if (G.months % 12 === 0) G.eventLog.push({ age: G.age, text: `在大城市又活过了一年` });
+}
+
+// === SEASON SYSTEM ===
+function getSeason(month) {
+    if (month >= 3 && month <= 5) return 'spring';
+    if (month >= 6 && month <= 8) return 'summer';
+    if (month >= 9 && month <= 11) return 'autumn';
+    return 'winter';
+}
+
+function getSeasonName(season) {
+    return { spring: '春季', summer: '夏季', autumn: '秋季', winter: '冬季' }[season] || '';
+}
+
+function getSeasonIcon(season) {
+    return { spring: '🌸', summer: '☀️', autumn: '🍂', winter: '❄️' }[season] || '';
+}
+
+function applySeasonEffects(season) {
+    switch (season) {
+        case 'spring':
+            G.mood = clamp(G.mood + 2, 0, 100); // 春天心情好
+            break;
+        case 'summer':
+            G.health = clamp(G.health - 1, 0, 100); // 夏天热，健康略降
+            G.mood = clamp(G.mood + 1, 0, 100);
+            break;
+        case 'autumn':
+            G.mood = clamp(G.mood - 1, 0, 100); // 秋天容易伤感
+            G.intel = clamp(G.intel + 1, 0, 100); // 秋天适合学习
+            break;
+        case 'winter':
+            G.health = clamp(G.health - 2, 0, 100); // 冬天容易生病
+            G.mood = clamp(G.mood - 2, 0, 100); // 冬天容易抑郁
+            break;
+    }
 }
 
 function pickEvent() {
@@ -1180,7 +1274,7 @@ function updateHUD() {
     document.getElementById('hud-age').textContent = `${G.age}岁`;
     document.getElementById('hud-city').textContent = G.cityName;
     document.getElementById('hud-job').textContent = G.job!=='待业中' ? `${G.job} · ${fmtMoney(G.jobSalary)}/月` : '待业中';
-    document.getElementById('hud-date').textContent = `${G.year}年${G.month}月`;
+    document.getElementById('hud-date').textContent = `${G.year}年${G.month}月 ${getSeasonIcon(getSeason(G.month))}`;
 
     updBar('bar-money','val-money', G.money>=0 ? Math.min(G.money/500000*100,100) : 0, fmtMoney(G.money));
     updBar('bar-health','val-health', G.health, G.health);
@@ -1273,7 +1367,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.4' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.5' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
