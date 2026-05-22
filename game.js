@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v30.3
+// 都市浮生记 - Game Engine v30.4
 // ============================================
 
 // === GAME STATE ===
@@ -16223,6 +16223,87 @@ const EVENTS = [
         { label:'寻求社会支持和互助群体', hint:'+👥 +🧠', fn: g => { g.flags.singleParentStruggle=true; g.flags.seekSupport=true; return{social:5,intel:3}; }},
         { label:'允许自己脆弱也允许自己求助', hint:'+😊', fn: g => { g.flags.singleParentStruggle=true; g.flags.allowVulnerable=true; return{mood:5,health:3}; }},
       ]},
+    // v30.4 事件 - 网红经济与直播文化
+    { id:'livestream_dream_v30_4', icon:'📱', title:'直播梦', category:'influencer',
+      body:'你决定试试「直播带货」——因为听说「月入十万不是梦」。\n\n你的准备：\n- 买了补光灯（300元）、手机支架（50元）、声卡（500元）\n- 看了100个直播教程视频\n- 准备了50个产品的话术\n- 发了朋友圈宣传\n\n你的第一场直播：\n- 在线人数：最高7人（其中3个是你朋友）\n- 时长：2小时\n- 成交额：0\n- 感受：「尴尬到脚趾扣地」\n\n你学到了：\n- 「直播」不是「说话」——是「表演+销售+运营」\n- 「网红」不是「轻松赚钱」——是「创业」\n- 「月入十万」是「幸存者偏差」——90%的主播月入不到3000\n\n「每一个「光鲜的网红」背后——都有100个「没人看的直播间」。」',
+      cond: g => g.age >= 20 && g.age <= 40 && g.money >= 1000 && !g.flags.livestreamDream,
+      choices:[
+        { label:'坚持播三个月看看效果', hint:'+💪 -😊', fn: g => { g.flags.livestreamDream=true; g.flags.persistStream=true; return{intel:5,mood:-3}; }},
+        { label:'这不适合我换个方向', hint:'+🧠', fn: g => { g.flags.livestreamDream=true; g.flags.quitStream=true; return{intel:3,mood:2}; }},
+        { label:'先做短视频积累粉丝', hint:'+🧠', fn: g => { g.flags.livestreamDream=true; g.flags.startShortVideo=true; return{intel:5,charm:3}; }},
+      ]},
+    { id:'mcn_contract', icon:'📝', title:'MCN签约', category:'influencer',
+      body:'你的账号有了一点粉丝——一家MCN机构找上门了。\n\n他们的条件：\n- 「签约」后帮你「运营」「推广」「接广告」\n- 「分成比例」：你30%，他们70%\n- 「违约金」：100万\n- 「独家」：只能在他们平台发内容\n- 「时长」：3年\n\n你的调查：\n- 网上说「MCN坑很多」——「签约容易解约难」\n- 有的博主「被雪藏」——公司不给资源但也不让你走\n- 有的博主「被分成剥削」——你赚10万他们拿7万\n- 但也有「成功案例」——有人靠MCN从小号变成大号\n\n你的分析：\n- 「签约」的好处：「有团队」「有资源」「省心」\n- 「签约」的坏处：「失去自由」「分成低」「风险大」\n- 「不签约」的好处：「自由」「全拿」\n- 「不签约」的坏处：「没资源」「自己扛」\n\n「MCN合同不是「机会」——是「赌注」。赌的是你的「未来3年」。',
+      cond: g => g.flags.influencer && !g.flags.mcnContract,
+      choices:[
+        { label:'签约试试有人带总比单打独斗好', hint:'+💰 -🧠', fn: g => { g.flags.mcnContract=true; g.flags.signedMcn=true; return{money:5000,intel:-3}; }},
+        { label:'拒绝签约自己做更自由', hint:'+🧠', fn: g => { g.flags.mcnContract=true; g.flags.stayIndependent=true; return{intel:5,charm:3}; }},
+        { label:'找律师看合同谈更好的条件', hint:'+🧠 -💰', fn: g => { g.flags.mcnContract=true; g.flags.negotiatedMcn=true; return{intel:5,money:-1000}; }},
+      ]},
+    { id:'viral_content_v30_4', icon:'🔥', title:'爆款视频', category:'influencer',
+      body:'你的一条视频突然「爆了」——播放量破百万！\n\n数据：\n- 播放量：150万\n- 点赞：8.7万\n- 评论：3200\n- 新增粉丝：2.3万\n\n你的心情：\n- 兴奋：「我终于火了！」\n- 焦虑：「下一条怎么办？」\n- 困惑：「这条为什么会火？我之前的为什么不火？」\n\n评论区的声音：\n- 「博主好有才！」\n- 「能不能多出这种内容？」\n- 「这不就是抄XXX的吗？」\n- 「广告！取关了！」\n\n你的思考：\n- 「爆款」是「运气」还是「方法论」？\n- 「复制爆款」是「策略」还是「自我重复」？\n- 「粉丝」要的是「你想要的」还是「他们想要的」？\n\n「流量是「毒品」——一旦尝过，你就再也回不去了。',
+      cond: g => g.flags.influencer && !g.flags.viralContent,
+      choices:[
+        { label:'趁热度赶紧接广告变现', hint:'+💰 +💰', fn: g => { g.flags.viralContent=true; g.flags.monetizeViral=true; return{money:8000,charm:5}; }},
+        { label:'认真分析爆款原因复制方法论', hint:'+🧠', fn: g => { g.flags.viralContent=true; g.flags.analyzeViral=true; return{intel:8}; }},
+        { label:'不管数据继续做自己想做的', hint:'+😊', fn: g => { g.flags.viralContent=true; g.flags.stayAuthentic=true; return{mood:5,charm:3}; }},
+      ]},
+    { id:'brand_collab', icon:'💼', title:'品牌合作', category:'influencer',
+      body:'有品牌找你「合作推广」了！\n\n合作内容：\n- 产品：某「减肥茶」（你没用过）\n- 报酬：5000元 + 产品赠送\n- 要求：发一条「真实体验」的推广视频\n- 话术：「我喝了一个月瘦了10斤」（你根本没喝过）\n\n你的纠结：\n- 「5000块」不是小数目——够你两个月房租\n- 「虚假宣传」会不会「翻车」？\n- 「粉丝信任」值多少钱？\n- 「恰饭」和「骗人」的界限在哪里？\n\n你的选择：\n- 接——「赚钱嘛，不寒碜」\n- 不接——「我不能骗粉丝」\n- 改条件——「我要先试用，真的有效才推」\n\n「广告法规定：代言人不得为其未使用过的商品作推荐。但「软广」不是「代言」？」\n\n（你的「信誉」是你最值钱的「资产」。）',
+      cond: g => g.flags.influencer && g.flags.viralContent && !g.flags.brandCollab,
+      choices:[
+        { label:'接了赚钱要紧', hint:'+💰💰 -🧠', fn: g => { g.flags.brandCollab=true; g.flags.acceptedBadDeal=true; return{money:5000,intel:-3,charm:-3}; }},
+        { label:'拒绝这种虚假推广', hint:'+😊 +👥', fn: g => { g.flags.brandCollab=true; g.flags.refusedFakeAd=true; return{mood:5,social:3}; }},
+        { label:'要求先试用再决定是否推荐', hint:'+🧠 +👥', fn: g => { g.flags.brandCollab=true; g.flags.demandedHonesty=true; return{intel:5,social:5}; }},
+      ]},
+    { id:'content_burnout_v30_4', icon:'😵', title:'创作倦怠', category:'influencer',
+      body:'你做了几个月的自媒体——你「倦怠」了。\n\n你的症状：\n- 每天想选题想到头疼\n- 看到数据下降就焦虑\n- 看到同行爆款就嫉妒\n- 看到恶评就想退出\n- 不想拍不想剪不想发\n\n你的困境：\n- 「停更」就「掉粉」——算法不等你\n- 「日更」就「透支」——创意有极限\n- 「做自己」就「没流量」——市场不买单\n- 「迎合市场」就「迷失」——不知道在做谁\n\n你的反思：\n- 「自媒体」是「自由职业」还是「自我奴役」？\n- 「内容创业」是「梦想」还是「内卷」？\n- 「网红」是「职业」还是「消耗品」？\n\n「创作」需要「灵感」——但「日更」需要「产能」。「灵感」和「产能」是「矛盾的」。',
+      cond: g => g.flags.influencer && g.age >= 22 && !g.flags.contentBurnout,
+      choices:[
+        { label:'降低频率给自己放个假', hint:'+💪 +😊', fn: g => { g.flags.contentBurnout=true; g.flags.takeBreak=true; return{health:5,mood:5}; }},
+        { label:'找人帮忙分担制作', hint:'+🧠 -💰', fn: g => { g.flags.contentBurnout=true; g.flags.delegate=true; return{intel:3,money:-2000}; }},
+        { label:'考虑转型做其他事情', hint:'+🧠', fn: g => { g.flags.contentBurnout=true; g.flags.considerPivot=true; return{intel:5,mood:-2}; }},
+      ]},
+    { id:'cancel_culture_v30_4', icon:'💣', title:'网络翻车', category:'influencer',
+      body:'你「翻车」了——因为一条旧视频被挖出来了。\n\n起因：\n- 你3年前发过一条「不太恰当」的评论\n- 有人截图发到网上说「XXX竟然说过这种话」\n- 热搜上了，评论区炸了\n\n你的感受：\n- 恐惧：「我的职业生涯完了」\n- 愤怒：「3年前的话为什么要翻出来？」\n- 委屈：「我已经不是那时候的我了」\n- 后悔：「我当时为什么要说那种话？」\n\n你的应对策略：\n- 道歉——「我当时的言论确实不当，我道歉」\n- 沉默——「等热度过去」\n- 反击——「这是「网络暴力」」\n- 删除——「假装没发生过」\n\n「互联网是有记忆的」——但「人」是可以「成长」的。\n\n问题是：「公众」愿意「给你时间」吗？',
+      cond: g => g.flags.influencer && g.flags.viralContent && !g.flags.cancelCulture,
+      choices:[
+        { label:'真诚道歉承认过去的错误', hint:'+😊 +👥', fn: g => { g.flags.cancelCulture=true; g.flags.sincereApology=true; return{mood:3,social:3,charm:-3}; }},
+        { label:'保持沉默等热度过去', hint:'-😊', fn: g => { g.flags.cancelCulture=true; g.flags.staySilent=true; return{mood:-5}; }},
+        { label:'反击这是网络暴力', hint:'+💪 -👥', fn: g => { g.flags.cancelCulture=true; g.flags.fightBack=true; return{mood:-3,social:-5}; }},
+      ]},
+    { id:'influencer_lifestyle', icon:'✨', title:'网红生活', category:'influencer',
+      body:'你终于成为了「有一定影响力」的网红——你的生活发生了很多变化。\n\n变化的「好」：\n- 「免费」的东西多了——餐厅请你「试吃」，酒店请你「试住」\n- 「社交圈」变了——你认识了很多「大V」「品牌方」「同行」\n- 「收入」上来了——广告费从500涨到5000\n- 「自信」来了——你发现「有人听你说话」\n\n变化的「坏」：\n- 「隐私」没了——你去哪里都有人认出你\n- 「人设」困住了你——你不能「说错话」「做错事」\n- 「生活」变成了「内容」——你吃饭拍照、旅行拍视频、难过写文案\n- 「真实」和「表演」的界限模糊了\n\n你的感悟：\n- 「网红」不是「职业」——是「生活方式」\n- 「影响力」不是「权力」——是「责任」\n- 「被看见」不是「被理解」——是「被消费」\n\n「每一个「网红」都是「一个人」——不是「一个账号」。',
+      cond: g => g.flags.influencer && g.flags.viralContent && !g.flags.influencerLifestyle,
+      choices:[
+        { label:'享受这种生活这是你的梦想', hint:'+😊 +💰', fn: g => { g.flags.influencerLifestyle=true; g.flags.enjoyFame=true; return{mood:5,money:3000,charm:3}; }},
+        { label:'保持清醒不被流量冲昏头', hint:'+🧠', fn: g => { g.flags.influencerLifestyle=true; g.flags.stayGrounded=true; return{intel:5,mood:3}; }},
+        { label:'开始规划转型不能一直靠流量', hint:'+🧠 +💰', fn: g => { g.flags.influencerLifestyle=true; g.flags.planTransition=true; return{intel:5,money:2000}; }},
+      ]},
+    { id:'knowledge_payment_v30_4', icon:'📚', title:'知识付费', category:'influencer',
+      body:'你决定做「知识付费」——把你的经验变成「课程」。\n\n你的课程：\n- 标题：「从零到万粉：自媒体实战指南」\n- 价格：199元\n- 内容：10节视频课 + 社群答疑\n- 平台：知识星球 / 小鹅通\n\n你的纠结：\n- 「我够格教别人吗？」——「你不需要成为「专家」，你只需要「比学员多走一步」」\n- 「会不会被骂「割韭菜」？」——「只要「真有用」就不是「割」」\n- 「定价多少合适？」——「太低「没价值」，太高「卖不出」」\n\n你的策略：\n- 做「免费试听」——让「效果说话」\n- 做「不满意退款」——降低「决策风险」\n- 做「真实案例」——不是「理论」是「实操」\n\n「知识付费」不是「卖课」——是「卖「解决方案」」。\n\n（中国知识付费市场规模：2023年约1000亿。但「90%的课程」销量「不到100份」。）',
+      cond: g => g.flags.influencer && g.intel >= 30 && !g.flags.knowledgePayment,
+      choices:[
+        { label:'认真做一套有价值的课程', hint:'+💰 +🧠', fn: g => { g.flags.knowledgePayment=true; g.flags.qualityCourse=true; return{money:5000,intel:5}; }},
+        { label:'先做免费内容积累口碑', hint:'+👥 +🧠', fn: g => { g.flags.knowledgePayment=true; g.flags.freeFirst=true; return{social:5,intel:3}; }},
+        { label:'知识付费太卷了不适合我', hint:'+😊', fn: g => { g.flags.knowledgePayment=true; g.flags.skipKnowledge=true; return{mood:3}; }},
+      ]},
+    { id:'algorithm_slave', icon:'🤖', title:'算法奴隶', category:'influencer',
+      body:'你发现——你变成了「算法的奴隶」。\n\n你的「被控制」：\n- 「选题」被「热搜」控制——什么火做什么\n- 「发布时间」被「算法」控制——什么时候流量高什么时候发\n- 「内容形式」被「平台」控制——短视频火就做短视频，直播火就直播\n- 「情绪」被「数据」控制——播放高就开心，播放低就焦虑\n\n你的反思：\n- 「创作者」还是「数据工」？\n- 「表达自我」还是「迎合算法」？\n- 「我在「用」平台」还是「平台在「用」我」？\n\n你的觉醒：\n- 「算法」是「工具」——不是「老板」\n- 「数据」是「参考」——不是「标准」\n- 「流量」是「手段」——不是「目的」\n\n「每一个「内容创作者」都面临一个问题：你是「为自己创作」还是「为算法创作」？」\n\n（当你的「创作」被「数据」驱动——你就不再是「创作者」，是「数据工人」。）',
+      cond: g => g.flags.influencer && g.flags.viralContent && !g.flags.algorithmSlave,
+      choices:[
+        { label:'接受现实这就是游戏规则', hint:'+💰 -😊', fn: g => { g.flags.algorithmSlave=true; g.flags.acceptAlgorithm=true; return{money:2000,mood:-3}; }},
+        { label:'重新定义自己的创作标准', hint:'+😊 +🧠', fn: g => { g.flags.algorithmSlave=true; g.flags.redefineCreative=true; return{mood:5,intel:5}; }},
+        { label:'考虑退出平台回归普通生活', hint:'+😊 -👥', fn: g => { g.flags.algorithmSlave=true; g.flags.considerQuit=true; return{mood:3,social:-3}; }},
+      ]},
+    { id:'fan_economy_v30_4', icon:'👥', title:'粉丝经济', category:'influencer',
+      body:'你开始理解「粉丝经济」的本质——「信任变现」。\n\n你的「粉丝」画像：\n- 年龄：18-35岁\n- 性别：女性60%，男性40%\n- 地域：一二线城市\n- 消费力：月均消费500-2000\n\n你的「变现」方式：\n- 广告：品牌方付费推广（单次1000-10000）\n- 带货：直播卖货分成（月均5000-50000）\n- 课程：知识付费（总收入20000）\n- 周边：卖自己的产品（T恤/杯子/笔记本）\n- 私域：付费社群（月费99，100人=9900/月）\n\n你的思考：\n- 「粉丝」不是「数字」——是「人」\n- 「信任」不是「资源」——是「关系」\n- 「变现」不是「割韭菜」——是「价值交换」\n\n你的底线：\n- 「不推荐自己没用的东西」\n- 「不为了赚钱伤害粉丝」\n- 「不为了数据制造焦虑」\n\n「粉丝经济的本质——是「信任」的「储蓄」和「提取」。你「存」得越多，「取」得越多——但「透支」了就「破产」。',
+      cond: g => g.flags.influencer && g.flags.viralContent && !g.flags.fanEconomy,
+      choices:[
+        { label:'建立健康的粉丝经济模式', hint:'+💰 +👥', fn: g => { g.flags.fanEconomy=true; g.flags.healthyFanEco=true; return{money:5000,social:5}; }},
+        { label:'把粉丝转化为私域社群', hint:'+💰 +🧠', fn: g => { g.flags.fanEconomy=true; g.flags.buildCommunity=true; return{money:3000,intel:5}; }},
+        { label:'不想变现只想纯粹创作', hint:'+😊 -💰', fn: g => { g.flags.fanEconomy=true; g.flags.pureCreator=true; return{mood:5,money:-1000}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -17700,6 +17781,15 @@ const ACHIEVEMENTS = [
     { id:'set_deadline_ach', icon:'📅', name:'重新出发', desc:'给自己设定了重返职场的期限', check: g => g.flags.setDeadline },
     { id:'enjoy_dink_ach', icon:'💑', name:'丁克生活', desc:'选择了二人世界并享受当下', check: g => g.flags.enjoyDink },
     { id:'allow_vulnerable_ach', icon:'💕', name:'允许脆弱', desc:'学会了允许自己脆弱也允许自己求助', check: g => g.flags.allowVulnerable },
+    // v30.4 achievements - 网红经济与直播文化
+    { id:'stay_independent_ach', icon:'🗽', name:'独立创作者', desc:'拒绝了MCN签约保持了创作自由', check: g => g.flags.stayIndependent },
+    { id:'analyze_viral_ach', icon:'🔬', name:'方法论达人', desc:'认真分析了爆款原因形成了自己的方法论', check: g => g.flags.analyzeViral },
+    { id:'demanded_honesty_ach', icon:'✊', name:'真实推荐', desc:'坚持只推荐自己用过的产品', check: g => g.flags.demandedHonesty },
+    { id:'stay_authentic_ach', icon:'🎭', name:'保持真实', desc:'不管数据坚持做自己想做的内容', check: g => g.flags.stayAuthentic },
+    { id:'stay_grounded_ach', icon:'🌳', name:'不被流量冲昏头', desc:'在网红生活中保持了清醒', check: g => g.flags.stayGrounded },
+    { id:'quality_course_ach', icon:'📖', name:'良心课程', desc:'认真做了一套有价值的知识付费课程', check: g => g.flags.qualityCourse },
+    { id:'redefine_creative_ach', icon:'🎨', name:'重新定义创作', desc:'重新定义了自己的创作标准不再被算法控制', check: g => g.flags.redefineCreative },
+    { id:'healthy_fan_eco_ach', icon:'🤝', name:'健康粉丝经济', desc:'建立了健康的粉丝经济变现模式', check: g => g.flags.healthyFanEco },
 ];
 
 // === ENDINGS === (order matters: first match wins)
