@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v9.2
+// 都市浮生记 - Game Engine v9.3
 // ============================================
 
 // === GAME STATE ===
@@ -371,6 +371,25 @@ const SURPRISE_EVENTS = [
     { id:'surprise_power_cut', icon:'💡', title:'停电了', weight:2,
       body:'加班到一半，整栋楼停电了。\n\n你保存文件了吗？没有。\n\n你在黑暗中静坐了5分钟，突然觉得：这5分钟是你今天最平静的时刻。\n\n"停电是大城市唯一的黑暗浪漫。"',
       fn: g => ({mood: 5, health: 3}) },
+    // === v9.3 新增突发事件 ===
+    { id:'surprise_boss_dinner', icon:'🍻', title:'老板请吃饭', weight:2,
+      body:'老板突然说："今晚请大家吃饭！"\n\n你去了才知道：这不是聚餐，是团建。老板要你们每个人表演节目。\n\n你唱了首《光辉岁月》，跑调了。老板说："有勇气！加500块绩效。"',
+      fn: g => { if (g.job !== '待业中') return {mood: 5, money: 500, social: 5, charm: -2}; return {mood: -3}; } },
+    { id:'surprise_health_code', icon:'🟢', title:'健康码变黄', weight:2,
+      body:'你的健康码突然变黄了。你哪也没去，什么也没做。\n\n你打了12345投诉，排了2小时队做核酸。三天后自动变绿。\n\n"在大城市，你的命运由一个二维码决定。"',
+      fn: g => ({mood: -10, health: -3}) },
+    { id:'surprise_upgrade', icon:'💻', title:'电脑死机', weight:3,
+      body:'你的工作电脑蓝屏了。硬盘里三个月的工作文件全没了。\n\nIT说："你没备份？"\n\n你心想：备份？我连觉都没时间睡，还备份。',
+      fn: g => { if (g.job !== '待业中') return {mood: -15, intel: -2}; return {mood: -5}; } },
+    { id:'surprise_street_food', icon:'🍢', title:'路边摊', weight:3,
+      body:'加班到深夜，你在路边摊吃了碗热干面。老板多给你加了个蛋。\n\n"看你天天加班，怪辛苦的。"\n\n这碗面5块钱，但你觉得它值500。',
+      fn: g => ({mood: 12, health: 3, money: -5}) },
+    { id:'surprise_promotion_rumor', icon:'📢', title:'升职传言', weight:2,
+      body:'公司里传开了：下个月要提拔一个主管。你觉得自己有戏。\n\n然后你看到名单：是老板的小舅子。\n\n"职场升迁靠能力——如果你老板不认识你的话。"',
+      fn: g => { if (g.job !== '待业中') return {mood: -10, social: -3}; return {mood: -3}; } },
+    { id:'surprise_lost_item', icon:'🔑', title:'丢钥匙', weight:2,
+      body:'你把家门钥匙丢了。开锁师傅收了你300块。\n\n你站在门口看着他30秒打开锁，突然觉得自己的安全感也很脆弱。\n\n"一把钥匙300块，安全感的价格另算。"',
+      fn: g => ({money: -300, mood: -8}) },
 ];
 
 // === EVENTS (100+) ===
@@ -4381,9 +4400,92 @@ const EVENTS = [
         { label:'请假在家吹空调', hint:'+😊 -💰', fn: g => { return{mood:10,health:3,money:-500}; }},
         { label:'继续上班', hint:'+💰 -❤️', fn: g => { return{money:500,health:-5,mood:-8}; }},
       ]},
+    // === v9.3 城市特色深化 ===
+    { id:'beijing_hutong', icon:'🏘️', title:'胡同漫步',
+      body:'周末你在北京胡同里溜达，看到大爷们在下棋，大妈们在跳广场舞。\n\n一个胡同口的小饭馆写着："本店经营30年，比你的工龄都长。"\n\n你点了一碗炸酱面，坐在门口吃。那一刻你觉得：北京也有温柔的一面。',
+      cond: g => g.city === 'beijing' && g.mood < 60,
+      choices:[
+        { label:'跟大爷下棋', hint:'+👥 +🧠', fn: g => { return{social:8,intel:3,mood:10}; }},
+        { label:'拍vlog发抖音', hint:'+✨', fn: g => { return{charm:8,mood:5,social:3}; }},
+        { label:'吃完就走', hint:'+😊', fn: g => { return{mood:8,health:3}; }},
+      ]},
+    { id:'beijing_haidian', icon:'📚', title:'海淀鸡娃',
+      body:'你住海淀，楼下邻居的孩子3岁学英语，5岁学编程，7岁已经参加奥数竞赛。\n\n你妈打电话来："你看看人家孩子！"\n\n你看了看自己——连微积分都还给老师了。',
+      cond: g => g.city === 'beijing' && g.age >= 30,
+      choices:[
+        { label:'压力山大', hint:'-😊', fn: g => { return{mood:-10,intel:3}; }},
+        { label:'我还年轻不管这些', hint:'+😊', fn: g => { return{mood:5}; }},
+        { label:'开始学习提升自己', hint:'+🧠', fn: g => { return{intel:8,mood:-3,money:-1000}; }},
+      ]},
+    { id:'chengdu_teahouse', icon:'🍵', title:'成都茶馆',
+      body:'你在成都人民公园的鹤鸣茶社喝了一下午茶。\n\n周围全是打麻将的大爷和摆龙门阵的阿姨。时间好像在这里慢了下来。\n\n你突然理解了为什么成都人总说："急啥子嘛，巴适得板。"',
+      cond: g => g.city === 'chengdu' && g.health < 70,
+      choices:[
+        { label:'学会慢生活', hint:'+❤️ +😊', fn: g => { return{health:8,mood:15,charm:3}; }},
+        { label:'学打麻将', hint:'+👥 +🧠', fn: g => { return{social:10,intel:3,mood:8}; }},
+        { label:'觉得浪费时间', hint:'-😊', fn: g => { return{mood:-5,intel:2}; }},
+      ]},
+    { id:'chengdu_panda', icon:'🐼', title:'熊猫基地',
+      body:'你去了成都大熊猫基地，看到了刚出生的小熊猫。\n\n它们圆滚滚的，在草地上打滚。你看了一个小时，完全忘了工作。\n\n"大熊猫教会你一个道理：只要够可爱，就不用努力。"',
+      cond: g => g.city === 'chengdu' && g.mood < 50,
+      choices:[
+        { label:'拍100张照片', hint:'+✨ +😊', fn: g => { return{charm:5,mood:20}; }},
+        { label:'买个熊猫玩偶', hint:'-💰 +😊', fn: g => { return{money:-100,mood:12}; }},
+        { label:'思考人生', hint:'+🧠', fn: g => { return{intel:5,mood:8}; }},
+      ]},
+    { id:'shenzhen_speed', icon:'⚡', title:'深圳速度',
+      body:'你在深圳点了一份外卖，15分钟就到了。你问骑手怎么这么快，他说："在深圳，什么都要快。"\n\n你想起刚来深圳时，HR跟你说："这里没有慢生活，只有快淘汰。"\n\n"深圳速度，是用无数人的青春换来的。"',
+      cond: g => g.city === 'shenzhen' && g.months > 6,
+      choices:[
+        { label:'跟上节奏', hint:'+💰 -❤️', fn: g => { return{money:3000,health:-5,mood:-5,intel:5}; }},
+        { label:'找自己的节奏', hint:'+😊 +❤️', fn: g => { return{mood:10,health:5}; }},
+      ]},
+    { id:'hangzhou_alibaba', icon:'🏢', title:'阿里味',
+      body:'你在杭州工作，发现身边一半的人都在阿里或者从阿里出来的。\n\n你的朋友圈里全是"赋能"、"抓手"、"闭环"这种词。\n\n你开始怀疑：你是不是也说"赋能"了？',
+      cond: g => g.city === 'hangzhou' && g.job !== '待业中',
+      choices:[
+        { label:'学互联网黑话', hint:'+🧠 +✨', fn: g => { return{intel:5,charm:3,mood:-3}; }},
+        { label:'保持自己的表达', hint:'+😊', fn: g => { return{mood:5,intel:2}; }},
+      ]},
+    { id:'shanghai_bund_night', icon:'🌃', title:'外滩跑步',
+      body:'你加入了外滩跑团，每周三晚上沿着黄浦江跑步。\n\n左边是陆家嘴的高楼大厦，右边是外滩的百年建筑。你在这条路上跑过无数次。\n\n"上海的魔幻在于：你一边跑步一边觉得自己像在电影里。"',
+      cond: g => g.city === 'shanghai' && g.health < 70,
+      choices:[
+        { label:'坚持跑步', hint:'+❤️ +👥', fn: g => { return{health:10,social:8,mood:8}; }},
+        { label:'跑完去吃宵夜', hint:'+😊 -❤️', fn: g => { return{mood:12,health:-3,money:-200}; }},
+      ]},
+    // === v9.3 社交系统深化事件 ===
+    { id:'old_friend_visit', icon:'🤝', title:'老友来访',
+      body:'大学室友突然来你的城市出差，约你吃饭。\n\n见面后你们聊了三个小时：从校园回忆到工作压力，从感情八卦到人生困惑。\n\n你发现：有些人，即使很久没见，还是一见如故。',
+      cond: g => g.social > 20 && g.months > 12,
+      choices:[
+        { label:'请他吃大餐', hint:'-💰 +👥', fn: g => { if(g.relationships) g.relationships.friends=clamp((g.relationships.friends||40)+15,0,100); return{money:-500,mood:15,social:10}; }},
+        { label:'AA制', hint:'+👥', fn: g => { if(g.relationships) g.relationships.friends=clamp((g.relationships.friends||40)+8,0,100); return{mood:10,social:5}; }},
+      ]},
+    { id:'colleague_conflict', icon:'😤', title:'职场冲突',
+      body:'你的同事在背后说你坏话，被另一个同事告诉你了。\n\n你纠结了一整天：要不要找他当面对质？\n\n你想起职场前辈说过的话："在公司里，没有永远的朋友，只有永远的利益。"',
+      cond: g => g.job !== '待业中' && g.months > 6,
+      choices:[
+        { label:'当面对质', hint:'🎲', fn: g => { if(Math.random()>0.5){return{mood:10,social:5,charm:3}}else{return{mood:-10,social:-8}} }},
+        { label:'默默记住，以后防备', hint:'+🧠', fn: g => { return{intel:5,mood:-5}; }},
+        { label:'找领导投诉', hint:'🎲', fn: g => { if(Math.random()>0.6){return{mood:8,social:-3}}else{return{mood:-15,social:-10}} }},
+      ]},
+    { id:'mentor_found', icon:'🧓', title:'遇到贵人',
+      body:'你在一个行业活动上遇到了一位前辈。他跟你聊了一个小时，给了你很多建议。\n\n最后他说："年轻人，最重要的不是赚多少钱，是想清楚自己要什么。"\n\n你回去后想了很久——你到底要什么？',
+      cond: g => g.intel > 50 && g.age < 30 && g.months > 6,
+      choices:[
+        { label:'定期请教', hint:'+🧠 +👥', fn: g => { g.flags.hasMentor=true; return{intel:10,social:8,mood:8}; }},
+        { label:'加了微信就没联系了', hint:'+😊', fn: g => { return{intel:3}; }},
+      ]},
+    { id:'roommate_conflict', icon:'🏠', title:'室友矛盾',
+      body:'你的室友又半夜带人回来，还把厨房搞得一团糟。\n\n你发了条微信："能不能注意点？"\n\n他回了个"好的"，然后继续我行我素。\n\n"合租是大城市最残酷的社交实验：你被迫跟一个陌生人共享生活。"',
+      cond: g => g.money < 30000 && g.months > 3 && !g.flags.hasHouse,
+      choices:[
+        { label:'忍了', hint:'+😊', fn: g => { return{mood:-10,health:-3}; }},
+        { label:'好好谈谈', hint:'+👥', fn: g => { if(Math.random()>0.4){return{mood:8,social:3}}else{return{mood:-5,social:-5}} }},
+        { label:'搬家', hint:'-💰', fn: g => { return{money:-3000,mood:10}; }},
+      ]},
 ];
-
-// === ACHIEVEMENTS ===
 const ACHIEVEMENTS = [
     { id:'first_job', icon:'💼', name:'职场新人', desc:'找到第一份工作', check: g => g.flags.gotFirstJob },
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -4765,6 +4867,9 @@ const ACHIEVEMENTS = [
     { id:'crisis35_survivor', icon:'⚡', name:'35岁突围', desc:'经历过35岁危机', check: g => g.flags.crisis35seen },
     { id:'spring_festival_ach', icon:'🧧', name:'春节回家', desc:'度过了一个春节', check: g => g.months > 12 && g.month % 12 === 1 },
     { id:'double11_survivor', icon:'🛒', name:'双十一战士', desc:'经历了双十一', check: g => g.flags.double11spent },
+    // === v9.3 新增成就 ===
+    { id:'mentor_found_ach', icon:'🧓', name:'良师益友', desc:'遇到了一位人生导师', check: g => g.flags.hasMentor },
+    { id:'city_explorer', icon:'🏙️', name:'城市探索者', desc:'体验过至少3个城市的特色事件', check: g => { let c=0; if(g.flags.beijingExplored)c++; if(g.flags.shanghaiExplored)c++; if(g.flags.chengduExplored)c++; return c>=3; } },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -6552,7 +6657,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '9.2' };
+    const saveData = { ...G, savedAt: Date.now(), version: '9.3' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
