@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v10.1
+// 都市浮生记 - Game Engine v10.2
 // ============================================
 
 // === GAME STATE ===
@@ -390,6 +390,28 @@ const SURPRISE_EVENTS = [
     { id:'surprise_lost_item', icon:'🔑', title:'丢钥匙', weight:2,
       body:'你把家门钥匙丢了。开锁师傅收了你300块。\n\n你站在门口看着他30秒打开锁，突然觉得自己的安全感也很脆弱。\n\n"一把钥匙300块，安全感的价格另算。"',
       fn: g => ({money: -300, mood: -8}) },
+    // === v10.2 新增突发事件 ===
+    { id:'surprise_birthday', icon:'🎂', title:'生日', weight:2,
+      body:'今天是你生日。你发了一条朋友圈，收到了87个赞。\n\n其中50个是不太熟的人，30个是同事，只有7个是你真正的朋友。\n\n"成年人的生日，是朋友圈的狂欢，一个人的孤独。"',
+      fn: g => ({mood: 5, social: 3, charm: 2}) },
+    { id:'surprise_upgrade_app', icon:'📱', title:'APP更新', weight:3,
+      body:'你最常用的App更新了——界面全变了，你常用的功能被移到了三级菜单。\n\n你骂了10分钟产品经理，然后默默学会了新操作。\n\n"每一次App更新，都是对用户耐心的测试。"',
+      fn: g => ({mood: -5, intel: 1}) },
+    { id:'surprise_free_trial', icon:'🎁', title:'免费试用', weight:2,
+      body:'你注册了一个"免费试用7天"的会员服务。\n\n7天后你忘了取消，被扣了298块。\n\n"免费试用是这个时代最成功的商业模式——利用你的健忘。"',
+      fn: g => ({money: -298, mood: -8}) },
+    { id:'surprise_old_classmate', icon:'👋', title:'偶遇老同学', weight:2,
+      body:'你在商场排队的时候，遇到了高中同学。\n\n他开了辆宝马，你说你在挤地铁。\n\n你们互相加了微信，但你心里清楚：以后不会再联系了。\n\n"老同学是大城市最熟悉的陌生人。"',
+      fn: g => { const r = Math.random(); if (r > 0.7) return {social: 5, mood: -5}; return {mood: -8, social: -2}; } },
+    { id:'surprise_aircon', icon:'❄️', title:'空调坏了', weight:2,
+      body:'你的出租屋空调坏了。房东说维修要等一周。\n\n你买了个电风扇，但40度的风吹过来也是热的。\n\n你开始认真考虑：要不要住公司？至少公司有中央空调。\n\n"出租屋的空调，和出租屋的爱情一样——随时可能坏掉。"',
+      fn: g => ({health: -5, mood: -10, money: -200}) },
+    { id:'surprise_salary_compare', icon:'💰', title:'工资对比', weight:2,
+      body:'你在网上看到一个帖子：《2024年各行业平均薪资》。\n\n你的行业平均月薪2万，你的月薪1万2。\n\n你安慰自己：平均数都是被大佬拉高的。你是那个"被平均"的人。\n\n"平均工资就像平均身高——姚明来了，所有人都"长高"了。"',
+      fn: g => { if (g.jobSalary > 0 && g.jobSalary < 20000) return {mood: -12, intel: 2}; return {mood: -3}; } },
+    { id:'surprise_nap', icon:'😴', title:'午休', weight:3,
+      body:'中午你趴在工位上睡了20分钟。醒来发现口水流到了键盘上。\n\n你偷偷擦了擦，假装什么都没发生。\n\n"工位午睡是打工人的小确幸——前提是别流口水。"',
+      fn: g => ({health: 3, mood: 5}) },
 ];
 
 // === EVENTS (100+) ===
@@ -5239,6 +5261,10 @@ const ENDINGS = [
     { id:'homeowner_end', badge:'🏠', title:'有房一族', desc:'你在大城市买了房。\n\n从租10平米的隔断间，到拥有自己的两室一厅。你用了整整十年。\n\n站在阳台上看着城市的夜景，你想起刚来这座城市时的自己。\n\n"房子不是家，但有了房子，才敢把这里叫做家。"', cond: g => g.flags.hasHouse && g.money >= 0 && g.age >= 30 },
     { id:'civil_servant_end', badge:'📋', title:'体制内人生', desc:'你考上了公务员，成了"体制内"的人。\n\n工资不高不低，朝九晚五，稳定得让人安心。\n\n你妈终于不再催你找工作了。你的朋友圈从"加班打卡"变成了"养生茶推荐"。\n\n"体制内不是围城，是避风港。"', cond: g => g.flags.civilServant && g.mood >= 60 && g.age >= 28 },
     { id:'educated_end', badge:'🎓', title:'终身学习者', desc:'你从未停止学习。\n\n从考证到读研，从线上课程到线下沙龙。你的简历越来越长，你的视野越来越宽。\n\n你不确定学习能不能改变命运，但你知道：不学习一定不能。\n\n"学无止境——这不是鸡汤，是生存策略。"', cond: g => g.flags.hasMBA && g.flags.hasCertificate && g.intel >= 85 },
+    // --- v10.2 NEW ENDINGS ---
+    { id:'burnout_recovery', badge:'🌱', title:'浴火重生', desc:'你经历了职业倦怠，但你挺过来了。\n\n你看心理咨询师、学冥想、换工作、重新找到生活的节奏。\n\n你比以前更懂得照顾自己，也更懂得拒绝不合理的要求。\n\n"不是所有的跌倒都叫失败，有些叫成长。"', cond: g => g.flags.sawTherapist && g.mood >= 65 && g.health >= 60 && g.age >= 30 },
+    { id:'simple_life_end', badge:'🌿', title:'简单生活', desc:'你没有成为有钱人，也没有成为名人。\n\n但你学会了做饭、养花、散步、看书。你有一个小圈子的好朋友，有一只猫，有一份还行的工作。\n\n你终于明白：幸福不在于拥有多少，而在于享受当下。\n\n"简单生活不是平庸，是选择。"', cond: g => g.flags.cookingSkill && g.flags.hasPet && g.mood >= 60 && g.health >= 55 && g.age >= 32 },
+    { id:'hometown_return', badge:'🏡', title:'回乡发展', desc:'你终于回到了老家。\n\n没有了大城市的繁华，也没有了大城市的压力。你在老家找了份工作，买了个小房子。\n\n你妈高兴得合不拢嘴。你爸偷偷在邻居面前炫耀："我孩子回来了。"\n\n"回家不是认输，是另一种勇敢。"', cond: g => g.flags.midlifeChange && g.money >= 20000 && g.age >= 33 && g.social >= 40 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
@@ -6966,7 +6992,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '10.1' };
+    const saveData = { ...G, savedAt: Date.now(), version: '10.2' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
