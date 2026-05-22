@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v28.6
+// 都市浮生记 - Game Engine v28.7
 // ============================================
 
 // === GAME STATE ===
@@ -14814,6 +14814,87 @@ const EVENTS = [
         { label:'只去关系最好的', hint:'+🧠 -✨', fn: g => { g.flags.weddingGiftHell=true; g.flags.selectiveWeddings=true; g.money -= 3000; return{intel:3,social:-3}; }},
         { label:'决定以后不结婚把份子钱赚回来是不可能的', hint:'+🧠 +😊', fn: g => { g.flags.weddingGiftHell=true; g.flags.acceptedGiftLoss=true; return{intel:5,mood:2}; }},
       ]},
+    // === v28.7: 副业经济 + 斜杠青年 + 财务自由梦 ===
+    { id:'street_vendor_start', icon:'🏮', title:'下班后摆摊', category:'career',
+      body:'你决定下班后去摆摊。\n\n你的「创业计划」：\n- 卖什么：煎饼果子（成本3元，卖10元）\n- 地点：地铁站出口\n- 时间：18:00-22:00\n- 设备投资：小推车2000元+食材500元\n\n第一天：\n- 卖了15个煎饼 = 150元\n- 城管来了 = 跑了\n- 食材浪费 = 50元\n- 净利润 = 50元\n\n第一周：\n- 总收入 = 700元\n- 总成本 = 350元\n- 被城管追了3次\n- 你的本职工作 = 因为太困出了bug\n\n你开始理解：摆摊——不是「副业」——是「第二份全职」。\n\n你的「时薪」：\n- 摆摊4小时 = 50元/天\n- 时薪 = 12.5元\n- 低于当地最低工资标准\n\n你不是在「创业」——你是在「用健康换零花钱」。\n\n「摆摊：你以为你在做副业——其实你在做「时薪12.5元的第二份工作」。」',
+      cond: g => g.age >= 22 && !g.flags.triedStreetVendor && g.jobSalary > 0,
+      choices:[
+        { label:'坚持了3个月，攒了4000元', hint:'+💰 -😊 +💪', fn: g => { g.flags.triedStreetVendor=true; g.flags.streetVendorPersisted=true; g.money += 4000; return{health:-5,mood:-3,charm:5}; }},
+        { label:'干了一周就放弃了', hint:'-💰 +🧠', fn: g => { g.flags.triedStreetVendor=true; g.money -= 2000; return{intel:3,mood:-3}; }},
+        { label:'越做越好，考虑全职摆摊', hint:'+💰 +✨', fn: g => { g.flags.triedStreetVendor=true; g.flags.streetVendorGrowing=true; g.money += 2000; return{charm:5,mood:5}; }},
+      ]},
+    { id:'self_media_side_hustle', icon:'📹', title:'自媒体副业', category:'career',
+      body:'你决定做自媒体当副业。\n\n你的赛道选择：\n- A：职场干货（受众广，竞争激烈）\n- B：城市生活（你擅长，变现难）\n- C：理财知识（你有经验，门槛高）\n- D：搞笑段子（流量大，你没天赋）\n\n你的投入：\n- 买了一个补光灯：200元\n- 买了一个麦克风：300元\n- 学了剪辑软件：2周\n- 每天下班后剪视频：2小时\n\n3个月后：\n- 发了60条视频\n- 总播放量：12000\n- 粉丝：380\n- 收入：0元\n- 你的精力：-100%\n\n你开始理解：自媒体副业——不是「下班后赚外快」——是「下班后免费打工」。\n\n那些成功的博主——不是「副业成功」——是「全职投入了3年」。\n\n你不是在做副业——你是在「买彩票」——用时间和精力买。\n\n「自媒体副业：你以为你在投资未来——其实你在免费给平台打工。」',
+      cond: g => g.age >= 22 && !g.flags.triedSelfMedia && g.jobSalary > 0,
+      choices:[
+        { label:'坚持更新，相信长期主义', hint:'+✨ -😊', fn: g => { g.flags.triedSelfMedia=true; g.flags.selfMediaPersisted=true; g.money -= 500; return{charm:5,intel:3,mood:-3}; }},
+        { label:'换个赛道重新来', hint:'+🧠 -💰', fn: g => { g.flags.triedSelfMedia=true; g.flags.selfMediaPivoted=true; return{intel:5,mood:-2}; }},
+        { label:'认清现实，不适合每个人', hint:'+🧠 +😊', fn: g => { g.flags.triedSelfMedia=true; return{intel:5,mood:3}; }},
+      ]},
+    { id:'xianyu_reselling', icon:'🔄', title:'闲鱼倒爷', category:'finance',
+      body:'你发现了闲鱼的「商机」。\n\n你的商业模式：\n- 在1688低价进货\n- 在闲鱼加价卖\n- 差价就是利润\n\n你的第一单：\n- 进价：15元（手机壳）\n- 卖价：35元\n- 快递费：5元\n- 平台费：2元\n- 利润：13元\n\n你的月报表：\n- 进货：50单 × 15元 = 750元\n- 卖出：35单 × 35元 = 1225元\n- 退货：8单（你亏了运费）\n- 库存积压：15单\n- 净利润：200元\n\n你的时间投入：\n- 选品：每天1小时\n- 拍照修图：每天30分钟\n- 发货：每天30分钟\n- 售后：每天30分钟\n- 总计：每天3小时\n\n你的时薪：200元 / 90小时 = 2.2元/小时\n\n你开始理解：闲鱼倒爷——不是「躺赚」——是「用最长的时间赚最少的钱」。\n\n「闲鱼倒爷：你以为你在做生意——其实你在做「时薪2.2元的体力劳动」。」',
+      cond: g => g.age >= 20 && !g.flags.triedXianyuReselling && g.money >= 500,
+      choices:[
+        { label:'优化选品，做高客单价', hint:'+🧠 +💰', fn: g => { g.flags.triedXianyuReselling=true; g.flags.xianyuOptimized=true; g.money += 500; return{intel:5,charm:3}; }},
+        { label:'清完库存就不做了', hint:'+🧠 -💰', fn: g => { g.flags.triedXianyuReselling=true; g.money -= 200; return{intel:5,mood:2}; }},
+        { label:'扩大规模多进货', hint:'+💰 -🧠', fn: g => { g.flags.triedXianyuReselling=true; g.flags.xianyuScaled=true; g.money -= 2000; return{intel:-3,charm:3}; }},
+      ]},
+    { id:'freelance_coding', icon:'💻', title:'接私活', category:'career',
+      body:'你在程序员社区接了一个私活。\n\n项目信息：\n- 类型：小程序开发\n- 预算：8000元\n- 工期：2周\n- 客户：一个传统行业老板\n\n你的现实：\n- 白天上班8小时\n- 晚上写代码4小时\n- 周末写代码8小时\n- 2周总投入：约100小时\n\n你的时薪：8000 / 100 = 80元/小时\n\n听起来不错？\n\n但客户的需求变了5次：\n- 「加个功能」——免费\n- 「改个设计」——免费\n- 「再优化一下」——免费\n- 「上线后有点问题」——免费\n- 「能不能帮我看看服务器」——免费\n\n最终：\n- 实际工期：5周\n- 实际投入：200小时\n- 实际时薪：40元/小时\n- 你的本职工作：因为熬夜出了2个线上bug\n\n你开始理解：接私活——不是「高价副业」——是「没有PM的全栈打工」。\n\n「接私活：你以为你在接项目——其实你在「免费给甲方当乙方」。」',
+      cond: g => g.age >= 23 && !g.flags.triedFreelanceCoding && g.jobSalary >= 8000 && g.intel >= 30,
+      choices:[
+        { label:'完成了，但再也不接了', hint:'+💰 -😊', fn: g => { g.flags.triedFreelanceCoding=true; g.money += 8000; return{mood:-5,health:-5,intel:5}; }},
+        { label:'跟客户谈了加价', hint:'+💰 +🧠', fn: g => { g.flags.triedFreelanceCoding=true; g.flags.negotiatedRate=true; g.money += 12000; return{intel:5,charm:3}; }},
+        { label:'中途放弃了，退了定金', hint:'-💰 +😊', fn: g => { g.flags.triedFreelanceCoding=true; g.money -= 2000; return{mood:3,intel:3}; }},
+      ]},
+    { id:'ride_sharing_side', icon:'🚗', title:'下班跑滴滴', category:'career',
+      body:'你注册了滴滴司机——下班后跑3小时。\n\n你的数据：\n- 每天19:00-22:00\n- 日均接单：6单\n- 日均流水：120元\n- 油费：40元/天\n- 日均净收入：80元\n\n一个月后：\n- 总收入：2400元\n- 违章停车：200元\n- 小事故修车：800元\n- 实际收入：1400元\n\n你的「隐性成本」：\n- 车 depreciation（折旧）：约500元/月\n- 保险上涨：约200元/年\n- 你的睡眠：每天少了3小时\n- 你的社交：基本没了\n\n你开始理解：跑滴滴——不是「灵活副业」——是「用你的车和你的命——换1400块」。\n\n你的身体——是你唯一的「资产」——你在用折旧的方式使用它。\n\n「跑滴滴：你以为你在赚外快——其实你在「提前消费你的健康」。」',
+      cond: g => g.age >= 23 && !g.flags.triedRideSharing && g.jobSalary > 0 && g.money >= 5000,
+      choices:[
+        { label:'坚持跑了半年攒了1万', hint:'+💰 -💪 -😊', fn: g => { g.flags.triedRideSharing=true; g.flags.ridesharePersisted=true; g.money += 10000; return{health:-8,mood:-5}; }},
+        { label:'跑了一个月觉得不值', hint:'+🧠 +😊', fn: g => { g.flags.triedRideSharing=true; g.money += 1400; return{intel:5,mood:2}; }},
+        { label:'转做周末代驾', hint:'+💰 +🧠', fn: g => { g.flags.triedRideSharing=true; g.flags.switchedToDesignatedDriver=true; g.money += 3000; return{intel:3,mood:2}; }},
+      ]},
+    { id:'paid_knowledge_scam', icon:'🎓', title:'知识付费副业课', category:'finance',
+      body:'你刷到一条广告：「月入3万的副业秘密——限时特价2999元」\n\n课程内容：\n- 第1课：「打造个人IP」（废话2小时）\n- 第2课：「流量密码」（抄别人的内容）\n- 第3课：「变现路径」（卖课）\n- 第4课：「如何让你的学员也卖课」（？？？）\n\n你交了2999元——学完之后发现：\n- 老师赚钱的方式——就是卖课给你\n- 你赚钱的方式——就是卖课给下一个人\n- 这就是——「知识付费版传销」\n\n你的损失：\n- 课程费：2999元\n- 时间：30小时\n- 自尊：无价\n\n你开始理解：知识付费——不是「投资自己」——是「为焦虑买单」。\n\n那些「副业月入3万」的人——他们唯一的副业——就是「教你做副业」。\n\n「知识付费：你以为你在买知识——其实你在买「我在学习」的错觉。」',
+      cond: g => g.age >= 22 && !g.flags.boughtSideHustleCourse && g.money >= 3000,
+      choices:[
+        { label:'被割了韭菜', hint:'-💰 -🧠', fn: g => { g.flags.boughtSideHustleCourse=true; g.flags.gotScammedByCourse=true; g.money -= 2999; return{intel:-3,mood:-5}; }},
+        { label:'看了免费试听就识破了', hint:'+🧠 +😊', fn: g => { g.flags.boughtSideHustleCourse=true; g.flags.avoidedCourseScam=true; return{intel:5,mood:3}; }},
+        { label:'学了点东西但没回本', hint:'-💰 +🧠', fn: g => { g.flags.boughtSideHustleCourse=true; g.money -= 2999; return{intel:3,mood:-3}; }},
+      ]},
+    { id:'dropshipping_dream', icon:'📦', title:'无货源电商', category:'career',
+      body:'你朋友拉你做「无货源电商」。\n\n模式：\n- 你不需要进货\n- 客户下单后你从1688下单直接发给客户\n- 你赚差价\n\n你的投入：\n- 开店费：0元\n- 保证金：1000元\n- 推广费：500元/月\n\n你的第一个月：\n- 上架了200个商品\n- 咨询：30人\n- 下单：8人\n- 退货：3人（质量太差）\n- 差评：2个\n- 收入：280元\n- 利润：-720元\n\n你开始理解：无货源电商——不是「零成本创业」——是「用你的信誉卖劣质商品」。\n\n你没有「供应链优势」——你只是「中间商」——而且是「没有品控的中间商」。\n\n「无货源电商：你以为你在做电商——其实你在做「不需要负责的倒爷」。」',
+      cond: g => g.age >= 22 && !g.flags.triedDropshipping && g.money >= 1500,
+      choices:[
+        { label:'优化选品做精品路线', hint:'+🧠 +💰', fn: g => { g.flags.triedDropshipping=true; g.flags.dropshippingRefined=true; g.money -= 500; return{intel:5,charm:3}; }},
+        { label:'关了店铺及时止损', hint:'+🧠 -💰', fn: g => { g.flags.triedDropshipping=true; g.money -= 1500; return{intel:5,mood:3}; }},
+        { label:'加大推广力度', hint:'-💰 -🧠', fn: g => { g.flags.triedDropshipping=true; g.flags.dropshippingScaled=true; g.money -= 3000; return{intel:-3,mood:-5}; }},
+      ]},
+    { id:'tutoring_side_job', icon:'📚', title:'周末当家教', category:'career',
+      body:'你通过朋友介绍——周末给一个初中生补数学。\n\n你的收入：\n- 时薪：150元/小时\n- 每周2次 × 2小时 = 4小时\n- 月收入：150 × 4 × 4 = 2400元\n\n听起来不错？但现实是：\n- 备课：每次1小时（无偿）\n- 家长沟通：每周30分钟（无偿）\n- 批改作业：每周30分钟（无偿）\n- 实际时薪：150 × 4 / 7 = 85元/小时\n\n更麻烦的是：\n- 家长：「老师，成绩怎么还没提高？」\n- 孩子：「老师，我不想学。」\n- 你：「你不想学我也没办法……」\n\n3个月后——孩子成绩提高了5分。\n\n家长说：「才5分？花了7200块啊。」\n\n你开始理解：家教——不是「高时薪副业」——是「替别人的教育焦虑买单」。\n\n「家教：你以为你在传授知识——其实你在做「家长焦虑的缓冲器」。」',
+      cond: g => g.age >= 22 && !g.flags.triedTutoring && g.intel >= 30 && g.jobSalary > 0,
+      choices:[
+        { label:'坚持教了一学期，有成就感', hint:'+💰 +😊 +✨', fn: g => { g.flags.triedTutoring=true; g.flags.tutoringPersisted=true; g.money += 7200; return{intel:5,mood:3,charm:3}; }},
+        { label:'教了2个月受不了家长', hint:'+💰 -😊', fn: g => { g.flags.triedTutoring=true; g.money += 4800; return{mood:-3,intel:3}; }},
+        { label:'改成线上辅导节省通勤', hint:'+💰 +🧠', fn: g => { g.flags.triedTutoring=true; g.flags.onlineTutor=true; g.money += 6000; return{intel:5,mood:2}; }},
+      ]},
+    { id:'side_hustle_burnout', icon:'🔥', title:'副业倦怠', category:'psychology',
+      body:'你同时做了3个副业：\n- 白天上班：8小时\n- 晚上接私活：3小时\n- 周末摆摊：8小时\n- 每天睡眠：5小时\n\n你的身体开始抗议：\n- 头痛：每周3次\n- 失眠：每晚\n- 胃疼：经常\n- 情绪：暴躁\n\n你的工作效率：\n- 本职工作：出了2个线上事故\n- 领导：「你最近状态很差」\n- 副业：质量下降，客户投诉\n\n你的收入：\n- 主业：10000元\n- 副业：5000元\n- 医疗费：2000元\n- 净利润：13000元\n\n但你的「健康余额」：已透支。\n\n你开始理解：副业倦怠——不是「你不够努力」——是「人的精力是有限的」。\n\n你在用「健康」换「钱」——但健康——是唯一一个——你不能「赚回来」的资产。\n\n「副业倦怠：你以为你在「拼命赚钱」——其实你在「分期付款式地消耗生命」。」',
+      cond: g => g.age >= 24 && (g.flags.triedStreetVendor || g.flags.triedFreelanceCoding || g.flags.triedRideSharing) && g.health <= 50,
+      choices:[
+        { label:'全部停掉，先休息', hint:'+💪 +😊 -💰', fn: g => { g.flags.sideHustleBurnout=true; g.flags.choseRestOverMoney=true; return{health:10,mood:8,money:-2000}; }},
+        { label:'只保留最赚钱的一个', hint:'+💰 +🧠', fn: g => { g.flags.sideHustleBurnout=true; g.flags.focusedOnOneHustle=true; return{intel:5,mood:3}; }},
+        { label:'继续硬撑，不敢停', hint:'-💪 -😊 +💰', fn: g => { g.flags.sideHustleBurnout=true; g.flags.ignoredBurnout=true; return{health:-10,mood:-8,money:2000}; }},
+      ]},
+    { id:'side_to_main_hustle', icon:'🚀', title:'副业转主业', category:'career',
+      body:'你的副业收入——终于超过了主业。\n\n你的数据：\n- 主业月薪：12000元\n- 副业月收入：15000元\n- 副业增长率：每月+10%\n\n你的纠结：\n- 辞职做副业？\n- 副业不稳定怎么办？\n- 社保断了怎么办？\n- 万一副业失败了？\n\n你算了一笔账：\n- 辞职后的月支出：8000元\n- 副业月收入：15000元\n- 盈余：7000元\n- 但——副业没有「五险一金」\n- 你需要自己交：约3000元/月\n- 实际盈余：4000元\n\n你开始理解：副业转主业——不是「自由」——是「另一种不稳定」。\n\n打工人的安全感——来自「每月到账的工资」。\n\n自由职业的安全感——来自「你自己」——而你——是你最大的风险。\n\n「副业转主业：你以为你在追求自由——其实你在用「稳定」换「自由」——而自由的代价——是「焦虑」。」',
+      cond: g => g.age >= 25 && !g.flags.sideToMainHustle && g.jobSalary >= 8000 && (g.flags.streetVendorGrowing || g.flags.selfMediaPersisted || g.flags.negotiatedRate),
+      choices:[
+        { label:'辞职了！全力以赴', hint:'+💰 +😊 -🧠', fn: g => { g.flags.sideToMainHustle=true; g.flags.quitForSideHustle=true; setJob(g, '自由职业者', 15000); return{mood:8,charm:5,intel:-3}; }},
+        { label:'先攒够6个月生活费再说', hint:'+🧠 +💰', fn: g => { g.flags.sideToMainHustle=true; g.flags.plannedTransition=true; return{intel:5,mood:3}; }},
+        { label:'主业副业都做，累但安全', hint:'+💰 -💪', fn: g => { g.flags.sideToMainHustle=true; g.flags.keptBothJobs=true; g.money += 5000; return{health:-5,mood:-3,charm:3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -16136,6 +16217,15 @@ const ACHIEVEMENTS = [
     { id:'solo_date_ach', icon:'🍜', name:'一个人也很好', desc:'被放鸽子后享受了一人食', check: g => g.flags.enjoyedSoloDate },
     { id:'selective_weddings_ach', icon:'🧧', name:'理性随礼', desc:'只参加最重要的婚礼', check: g => g.flags.selectiveWeddings },
     { id:'values_freedom_ach', icon:'🕊️', name:'自由无价', desc:'觉得单身的自由值得这个价', check: g => g.flags.valuesFreedom },
+    // v28.7: 副业经济 + 斜杠青年 + 财务自由梦
+    { id:'street_vendor_ach_v28_7', icon:'🏮', name:'摆摊达人', desc:'坚持摆摊3个月攒到了钱', check: g => g.flags.streetVendorPersisted },
+    { id:'self_media_persist_ach', icon:'📹', name:'长期主义者', desc:'坚持更新自媒体相信厚积薄发', check: g => g.flags.selfMediaPersisted },
+    { id:'xianyu_pro_ach_v28_7', icon:'🔄', name:'闲鱼达人', desc:'优化选品把闲鱼做成了副业', check: g => g.flags.xianyuOptimized },
+    { id:'negotiated_rate_ach', icon:'💰', name:'谈价高手', desc:'跟客户成功谈了加价', check: g => g.flags.negotiatedRate },
+    { id:'chose_rest_ach', icon:'🧘', name:'学会休息', desc:'倦怠后选择休息而不是硬撑', check: g => g.flags.choseRestOverMoney },
+    { id:'quit_for_freedom_ach', icon:'🚀', name:'勇敢转型', desc:'辞职把副业变成了主业', check: g => g.flags.quitForSideHustle },
+    { id:'course_scam_survivor_ach', icon:'🛡️', name:'防割达人', desc:'识破了知识付费副业课的套路', check: g => g.flags.avoidedCourseScam },
+    { id:'online_tutor_ach', icon:'📚', name:'线上家教', desc:'转型线上辅导提高效率', check: g => g.flags.onlineTutor },
 ];
 
 // === ENDINGS === (order matters: first match wins)
