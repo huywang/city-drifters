@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v7.1
+// 都市浮生记 - Game Engine v7.2
 // ============================================
 
 // === GAME STATE ===
@@ -3462,6 +3462,34 @@ const EVENTS = [
         { label:'做IP运营', hint:'+💰 +🧠', fn: g => { g.flags.ipCollaboration=true; g.flags.ipOperator=true; return{money:8000,intel:12,charm:5}; }},
         { label:'不买，智商税', hint:'+💰 +🧠', fn: g => { g.flags.ipCollaboration=true; return{money:500,intel:3,mood:-5}; }},
       ]},
+    // === v7.2 EVENTS - 国潮与新中式 ===
+    { id:'guochao', icon:'🏮', title:'国潮崛起',
+      body:'你走进了国潮店：汉服、新中式服装、国风饰品、文创产品。\n\n"国潮——不是复古，而是用现代方式重新诠释传统文化。"\n\n你看了看数据：\n- 2025年，中国汉服市场规模达191.1亿元\n- 2019-2022年，购买国货国潮的消费者数量增长74%，成交金额增长355%\n- "新中式"服饰市场规模达10亿元级别，近三年增速超100%\n\n"Z世代把传统文化符号融入日常，让国潮文化有了新的模样。"\n\n你开始：\n- 穿新中式服装上班\n- 打卡文博场馆、古城古镇\n- 体验汉服妆造、国风摄影\n- 购买国货美妆、文创产品\n\n"国潮的背后，是文化自信与日俱增——年轻人不再盲目追崇西方，而是回归本土。"\n\n但你也在思考：国潮是真正的文化复兴，还是商业营销的噱头？',
+      cond: g => !g.flags.guochao && g.age>=18 && g.age<=35,
+      choices:[
+        { label:'汉服爱好者', hint:'-💰 +✨ +🧠', fn: g => { g.flags.guochao=true; g.flags.hanfuFan=true; return{money:-2000,charm:15,intel:8}; }},
+        { label:'新中式穿搭', hint:'-💰 +✨', fn: g => { g.flags.guochao=true; g.flags.newChineseStyle=true; return{money:-800,charm:10,mood:8}; }},
+        { label:'国风摄影', hint:'-💰 +✨ +😊', fn: g => { g.flags.guochao=true; g.flags.guofengPhotographer=true; return{money:-500,charm:12,mood:15}; }},
+        { label:'不感兴趣', hint:'+🧠', fn: g => { g.flags.guochao=true; return{intel:3}; }},
+      ]},
+    { id:'hanfu_wedding', icon:'💒', title:'汉服婚礼',
+      body:'你参加了一场汉服婚礼：新郎新娘穿着明制婚服，行三拜九叩之礼。\n\n"汉服婚礼——不是复古，而是用传统礼仪见证爱情。"\n\n你看了看流程：\n- 纳采、问名、纳吉、纳征、请期、亲迎（六礼）\n- 沃盥、对席、同牢、合卺、解缨、结发（正婚礼）\n- 执手、拜见父母（婚后礼）\n\n"传统汉服婚礼需要符合服装本身的礼仪规范，而不需要多么有设计感。"\n\n你被感动了：这不是表演，而是对传统文化的尊重。\n\n但你也在思考：传统婚礼的繁文缛节，真的适合现代人吗？还是只是一种形式？\n\n"汉服婚礼的意义：不是回到过去，而是让传统活在当下。"',
+      cond: g => !g.flags.hanfuWedding && g.age>=22 && g.age<=35 && g.flags.guochao,
+      choices:[
+        { label:'办汉服婚礼', hint:'-💰💰 +✨ +😊', fn: g => { g.flags.hanfuWedding=true; g.flags.traditionalWedding=true; return{money:-30000,charm:20,mood:25}; }},
+        { label:'参加汉服婚礼', hint:'+😊 +🧠', fn: g => { g.flags.hanfuWedding=true; return{mood:15,intel:8}; }},
+        { label:'做汉服婚礼策划', hint:'+💰 +✨', fn: g => { g.flags.hanfuWedding=true; g.flags.weddingPlanner=true; return{money:10000,charm:12}; }},
+        { label:'太麻烦，不办', hint:'+💰', fn: g => { g.flags.hanfuWedding=true; return{money:5000,mood:-5}; }},
+      ]},
+    { id:'cultural_heritage', icon:'🏛️', title:'文化传承',
+      body:'你开始关注传统文化：书法、国画、茶道、香道、古琴。\n\n"文化传承——不是复古，而是让古老的智慧活在现代生活中。"\n\n你参加了：\n- 书法班：每周练习楷书、行书\n- 茶道体验：学习泡茶、品茶、茶礼\n- 古琴课：学习《高山流水》《梅花三弄》\n- 国学讲座：读《论语》《道德经》《庄子》\n\n"年轻人对传统文化的兴趣，不是怀旧，而是寻找精神寄托。"\n\n你在朋友圈发了一张书法作品的照片，配文："心正则笔正。"\n\n但你也在思考：传统文化真的能解决现代人的焦虑吗？还是只是一种装饰？\n\n"传统文化的真正价值：不是回到过去，而是理解现在。"',
+      cond: g => !g.flags.culturalHeritage && g.age>=20 && g.age<=40 && g.intel>=60,
+      choices:[
+        { label:'深度学习', hint:'+🧠 +😊', fn: g => { g.flags.culturalHeritage=true; g.flags.cultureScholar=true; return{intel:15,mood:12}; }},
+        { label:'体验为主', hint:'+😊 +✨', fn: g => { g.flags.culturalHeritage=true; g.flags.cultureExplorer=true; return{mood:15,charm:8}; }},
+        { label:'做文化传播', hint:'+💰 +✨ +🧠', fn: g => { g.flags.culturalHeritage=true; g.flags.culturePromoter=true; return{money:5000,charm:12,intel:10}; }},
+        { label:'不感兴趣', hint:'+🧠', fn: g => { g.flags.culturalHeritage=true; return{intel:3}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3767,6 +3795,11 @@ const ACHIEVEMENTS = [
     { id:'guzi_collector', icon:'🎌', name:'谷子收藏家', desc:'入坑谷子经济', check: g => g.flags.goodsEconomy2 },
     { id:'cosplayer_pro', icon:'🎭', name:'Coser', desc:'玩Cosplay', check: g => g.flags.cosplay },
     { id:'ip_enthusiast', icon:'🤝', name:'IP联名爱好者', desc:'购买联名产品', check: g => g.flags.ipCollaboration },
+    // v7.2 achievements
+    { id:'guochao_fan', icon:'🏮', name:'国潮青年', desc:'拥抱国潮文化', check: g => g.flags.guochao },
+    { id:'hanfu_lover', icon:'👘', name:'汉服爱好者', desc:'穿汉服', check: g => g.flags.hanfuFan },
+    { id:'traditional_wedding', icon:'💒', name:'汉服婚礼', desc:'举办汉服婚礼', check: g => g.flags.hanfuWedding },
+    { id:'culture_inheritor', icon:'🏛️', name:'文化传承者', desc:'学习传统文化', check: g => g.flags.culturalHeritage },
 ];
 
 // === ENDINGS === (order matters: first match wins)
