@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v22.1
+// 都市浮生记 - Game Engine v22.2
 // ============================================
 
 // === GAME STATE ===
@@ -10537,6 +10537,87 @@ const EVENTS = [
         { label:'了解了体制运作，但确定不适合自己', hint:'+🧠 +😊', fn: g => { g.flags.internshipGov=true; return{intel:10,mood:3}; }},
         { label:'觉得太无聊了，还是喜欢有挑战的', hint:'+😊', fn: g => { g.flags.internshipGov=true; return{mood:3}; }},
       ]},
+    // === v22.2 新增事件（夜经济） ===
+    { id:'late_night_food', icon:'🍜', title:'深夜食堂', category:'food',
+      body:'加班到晚上10点，你饿着肚子走出公司。\n\n路边有一家兰州拉面还亮着灯。你走进去，点了一碗牛肉面。\n\n店里还有几个人：一个外卖小哥在吃炒饭，一个代驾司机在喝汤，一对情侣在分一碗面。\n\n老板是个甘肃人，在这里开了十年了。他说：「我们这条街上的店，都是靠你们这些加班的人活着的。」\n\n你吃着面，突然觉得：这碗面比任何一家网红餐厅的东西都好吃。也许是因为饿——也许是因为温暖。\n\n你发了条朋友圈：「深夜的一碗面，比白天的一顿大餐更治愈。」\n\n「深夜食堂卖的不是食物——是深夜里的一点点温暖。」',
+      cond: g => !g.flags.lateNightFood && g.age >= 22 && g.jobSalary >= 5000,
+      choices:[
+        { label:'成了这家店的常客', hint:'+😊 +💰-', fn: g => { g.flags.lateNightFood=true; return{mood:10,money:-500}; }},
+        { label:'吃完回家，觉得加班没那么苦了', hint:'+😊', fn: g => { g.flags.lateNightFood=true; return{mood:5}; }},
+        { label:'吃完更饿了，又去买了烧烤', hint:'+😊 +💰-', fn: g => { g.flags.lateNightFood=true; return{mood:8,money:-200,health:-2}; }},
+      ]},
+    { id:'night_market_v3', icon:'🏮', title:'夜市摆摊', category:'career',
+      body:'你路过夜市，看到一个空摊位。你突然有个想法：为什么不来摆摊？\n\n你研究了一下：摊位费一晚200元，卖小吃或者小商品。\n\n你决定试试。你批发了一些手机壳和小饰品，花了800元进货。\n\n第一个晚上——你紧张地站在摊位后面。路过的人看一眼就走。\n\n你开始主动招呼：「来看看啊！手机壳10块3个！」\n\n到收摊时，你卖了1500元。减去成本——你赚了500元。\n\n你很兴奋。不是因为钱——是因为你第一次靠自己的双手在街头赚到了钱。\n\n你的一个朋友说：「摆摊是最古老的创业方式——也是最真实的。」\n\n「夜市教会你的不是生意——是和陌生人打交道的勇气。」',
+      cond: g => !g.flags.nightMarketV3 && g.age >= 22 && g.money >= 1000,
+      choices:[
+        { label:'坚持摆摊一个月，赚了不少', hint:'+💰 +✨ +😊', fn: g => { g.flags.nightMarketV3=true; g.flags.streetVendor=true; return{money:5000,charm:5,mood:8}; }},
+        { label:'摆了几天就放弃了，太累了', hint:'+💰 +😊', fn: g => { g.flags.nightMarketV3=true; return{money:1000,mood:3}; }},
+        { label:'体验了摆摊，理解了小商贩的不易', hint:'+🧠 +😊', fn: g => { g.flags.nightMarketV3=true; return{intel:5,mood:5,money:500}; }},
+      ]},
+    { id:'night_walk', icon:'🌙', title:'深夜散步', category:'psychology',
+      body:'你失眠了。凌晨2点，你穿上外套出门散步。\n\n城市的夜晚和白天的两个世界。没有汽车的喧嚣，只有偶尔经过的出租车。\n\n你走过白天经过过无数次的街道。在夜晚，你看到了白天看不到的东西：\n- 24小时便利店里一个打瞌睡的店员\n- 路边长椅上一个醉酒的中年人\n- 天桥上一个独自弹吉他的年轻人\n- 环卫工人在清扫街道\n\n你突然觉得：这座城市从来没有真正睡过。总有人在深夜里努力活着。\n\n你走了一圈回来，困了。你终于睡着了。\n\n「深夜散步的意义不是看风景——是看到那些被白天掩盖的故事。」',
+      cond: g => !g.flags.nightWalk && g.age >= 23 && g.mood <= 50,
+      choices:[
+        { label:'感受到了城市的另一面', hint:'+🧠 +😊', fn: g => { g.flags.nightWalk=true; return{intel:5,mood:8}; }},
+        { label:'觉得有点孤独，但也很平静', hint:'+😊', fn: g => { g.flags.nightWalk=true; return{mood:5}; }},
+        { label:'走了一圈更失眠了', hint:'', fn: g => { g.flags.nightWalk=true; return{mood:-3}; }},
+      ]},
+    { id:'karaoke_night', icon:'🎤', title:'KTV通宵', category:'social',
+      body:'朋友生日，你们去了KTV。\n\n你们从晚上8点唱到凌晨2点。从周杰伦唱到陈奕迅，从《晴天》唱到《孤勇者》。\n\n你发现：你平时不好意思唱的歌，在KTV里都能放开嗓子吼。\n\n凌晨1点，你们开始唱歌了——不是唱得好不好，而是谁最投入。\n\n你的朋友喝多了，抱着麦克风唱《朋友》，唱着唱着哭了。\n\n你说：「你没事吧？」他擦了擦眼泪：「没事。就是想起来了以前的事。」\n\n你们在KTV门口告别。凌晨的城市很安静，你们的笑声很吵。\n\n你发了条朋友圈：「最好的歌不是唱得最好听的——是和最好的人一起唱的。」\n\n「KTV卖的不是唱歌——是一群人在一个密闭空间里释放情绪。」',
+      cond: g => !g.flags.karaokeNight && g.age >= 22 && g.social >= 30,
+      choices:[
+        { label:'唱得很开心，友谊更深了', hint:'+👥 +😊', fn: g => { g.flags.karaokeNight=true; return{social:8,mood:12,money:-300}; }},
+        { label:'开心了一晚，第二天嗓子哑了', hint:'+😊', fn: g => { g.flags.karaokeNight=true; return{mood:8,health:-3,money:-300}; }},
+        { label:'不太适应这种社交方式', hint:'', fn: g => { g.flags.karaokeNight=true; return{mood:2,money:-300}; }},
+      ]},
+    { id:'night_shift', icon:'🌃', title:'夜班人生', category:'career',
+      body:'你的公司开始要求上夜班。从晚上10点到早上6点。\n\n你第一次上夜班：整栋楼只有你一个人。空调嗡嗡响，日光灯刺眼。\n\n你开始理解那些做夜班的人：护士、保安、外卖骑手、工厂工人。\n\n你的身体开始抗议：白天睡不着，晚上困得要命。你的生物钟完全乱了。\n\n你开始研究「夜班生存指南」：\n- 白天睡觉要用遮光窗帘\n- 夜班前要吃高蛋白食物\n- 凌晨3-4点是最困的时候，要起来活动\n\n一个月后你回到了白班。你发了一条朋友圈：「上完夜班才知道——朝九晚五是福气。」\n\n「夜班让你理解了：你习以为常的作息——对很多人来说是奢侈品。」',
+      cond: g => !g.flags.nightShift && g.age >= 22 && g.jobSalary >= 4000,
+      choices:[
+        { label:'熬过了夜班，更珍惜正常作息', hint:'+🧠 +😊', fn: g => { g.flags.nightShift=true; return{intel:5,mood:5,money:3000}; }},
+        { label:'赚了夜班补贴但身体吃不消', hint:'+💰 -❤️', fn: g => { g.flags.nightShift=true; return{money:5000,health:-8,mood:-3}; }},
+        { label:'拒绝上夜班，和领导吵了一架', hint:'+😊', fn: g => { g.flags.nightShift=true; return{mood:5,social:-5}; }},
+      ]},
+    { id:'24h_bookstore', icon:'📚', title:'24小时书店', category:'city',
+      body:'你发现了城市里的一家24小时书店。\n\n凌晨1点，你走进去。里面有：\n- 一个在写论文的研究生\n- 一个在角落睡着的外卖员\n- 一对在安静看书的情侣\n- 一个头发花白的老人在看报纸\n\n你选了一本书，坐在窗边看了起来。\n\n你发现：深夜读书和白天的感觉完全不同。世界安静了，只有你和书。\n\n书里有一句话打动你：「城市的光不应该只属于白天。夜晚也应该有属于思考的地方。」\n\n你在留言簿上写了一句话：「谢谢你，让我在深夜有了归处。」\n\n你走出书店时已经凌晨4点了。天边开始泛白。你深吸一口气——新的一天开始了。\n\n「24小时书店是城市最后的浪漫——它相信：总有人在深夜需要一本书。」',
+      cond: g => !g.flags.bookstore24h && g.age >= 22 && g.intel >= 35,
+      choices:[
+        { label:'成了24小时书店的常客', hint:'+🧠 +😊', fn: g => { g.flags.bookstore24h=true; return{intel:10,mood:8}; }},
+        { label:'体验了一次深夜阅读，很特别', hint:'+🧠 +😊', fn: g => { g.flags.bookstore24h=true; return{intel:5,mood:5}; }},
+        { label:'太困了，没看多久就回家了', hint:'', fn: g => { g.flags.bookstore24h=true; return{mood:2}; }},
+      ]},
+    { id:'night_running', icon:'🏃', title:'夜跑', category:'health',
+      body:'你开始夜跑。\n\n晚上8点，你穿上跑鞋出门。公园里有跑步的人、遛狗的人、跳广场舞的阿姨。\n\n你跑了3公里。气喘吁吁，但出了一身汗后感觉很好。\n\n你下载了Keep，开始记录每次跑步的数据。你的配速从8分钟/公里慢慢变成了6分钟/公里。\n\n一个月后，你能跑10公里了。你参加了线上10公里挑战赛。\n\n你发现：夜跑的好处是——你不需要早起。白天上班已经够累了，晚上跑完正好释放压力。\n\n你的一个跑友说：「跑步治百病——尤其是心病。」\n\n「夜跑的好处不只是锻炼——是把一天的疲惫和焦虑都跑掉了。」',
+      cond: g => !g.flags.nightRunning && g.age >= 22 && g.health >= 40,
+      choices:[
+        { label:'坚持夜跑三个月，身体和精神都变好了', hint:'+❤️ +😊', fn: g => { g.flags.nightRunning=true; return{health:12,mood:10,charm:3}; }},
+        { label:'跑了几次觉得不错，偶尔跑跑', hint:'+❤️ +😊', fn: g => { g.flags.nightRunning=true; return{health:5,mood:5}; }},
+        { label:'晚上太累了，跑不动', hint:'', fn: g => { g.flags.nightRunning=true; return{mood:-2}; }},
+      ]},
+    { id:'midnight_convenience', icon:'🏪', title:'便利店文化', category:'city',
+      body:'你加班到凌晨，走进了全家便利店。\n\n你买了一盒饭团、一杯咖啡、一根关东煮。你坐在窗边的吧台吃起来。\n\n你发现：凌晨的便利店是城市的「深夜客厅」。\n\n这里有：\n- 刚下班的打工人\n- 等代驾的醉鬼\n- 深夜约会的年轻人\n- 刚考完试的学生\n\n你和店员聊了几句。他是个大学生，在这里做兼职。他说：「夜班其实挺好的——安静，能看书。」\n\n你吃完东西，走出便利店。你在玻璃上看到了自己的倒影——和整个城市的倒影。\n\n「便利店是城市给深夜的人最后的温柔：24小时亮着灯，永远欢迎你。」',
+      cond: g => !g.flags.midnightConvenience && g.age >= 22,
+      choices:[
+        { label:'成了深夜便利店的常客', hint:'+😊', fn: g => { g.flags.midnightConvenience=true; return{mood:5,money:-200}; }},
+        { label:'感受到了城市深夜的温度', hint:'+😊 +🧠', fn: g => { g.flags.midnightConvenience=true; return{mood:8,intel:3}; }},
+        { label:'吃完就走了，没什么特别的', hint:'', fn: g => { g.flags.midnightConvenience=true; return{mood:2}; }},
+      ]},
+    { id:'night_economy_job', icon:'💼', title:'夜经济创业', category:'career',
+      body:'你注意到了一个趋势：城市的夜经济越来越火。\n\n政府鼓励夜间消费：延长地铁运营时间、开放夜市摊位、发放夜间消费券。\n\n你开始思考：夜经济有什么机会？\n\n你调研了一圈：\n- 深夜食堂/烧烤摊\n- 24小时自习室\n- 夜间健身房\n- 夜间代驾\n- 深夜播客/直播\n\n你决定试试。你选了一个方向，投入了5000元启动资金。\n\n第一个月——收入不稳定。第二个月——开始有了回头客。第三个月——开始盈利了。\n\n你发现：夜经济的本质是——为那些深夜不睡觉的人提供服务。而深夜不睡觉的人，越来越多。\n\n「夜经济是城市活力的另一面——白天的经济是给理性的人的，夜晚的经济是给感性的人的。」',
+      cond: g => !g.flags.nightEconomyJob && g.age >= 24 && g.money >= 8000,
+      choices:[
+        { label:'夜经济创业成功，月入过万', hint:'+💰 +😊 +✨', fn: g => { g.flags.nightEconomyJob=true; g.flags.entrepreneur=true; return{money:15000,mood:10,charm:5}; }},
+        { label:'尝试了但没做起来，交了学费', hint:'+🧠 +💰-', fn: g => { g.flags.nightEconomyJob=true; return{intel:8,money:-5000,mood:3}; }},
+        { label:'研究了一番，觉得风险太大没做', hint:'+🧠', fn: g => { g.flags.nightEconomyJob=true; return{intel:5}; }},
+      ]},
+    { id:'stargazing', icon:'🌟', title:'天台看星星', category:'hobby',
+      body:'你在小红书上看到一个帖子：「在城市里也能看到银河——只需要找到一个没有光污染的天台。」\n\n你找到了你小区顶楼的天台。凌晨12点，你带着毯子上去了。\n\n你躺下来，看着天空。虽然看不到银河——但你看到了北斗七星、猎户座、还有几颗你叫不出名字的星星。\n\n城市的灯光让你平时看不到这些。但只要抬头——它们一直都在。\n\n你想起了小时候在老家：满天的星星，爷爷指着天上告诉你哪颗是牛郎星、哪颗是织女星。\n\n你给妈妈发了条消息：「妈，我在天台看星星。想你了。」\n\n她回：「早点睡，别感冒了。」\n\n你笑了。\n\n「星星一直在天上——只是你忘了抬头看。生活中很多美好的东西也是这样。」',
+      cond: g => !g.flags.stargazing && g.age >= 22 && g.mood <= 55,
+      choices:[
+        { label:'爱上了观星，买了一个天文望远镜', hint:'+😊 +💰-', fn: g => { g.flags.stargazing=true; g.flags.starGazer=true; return{mood:12,money:-1500,intel:5}; }},
+        { label:'看了一会儿，觉得很治愈', hint:'+😊', fn: g => { g.flags.stargazing=true; return{mood:10}; }},
+        { label:'蚊子太多了，没看多久就下来了', hint:'', fn: g => { g.flags.stargazing=true; return{mood:3}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -11516,6 +11597,12 @@ const ACHIEVEMENTS = [
     { id:'iron_bowl_ach', icon:'🏛️', name:'铁饭碗体验者', desc:'在体制内工作过', check: g => g.flags.civilServantLife },
     { id:'resign_gov_ach', icon:'🚪', name:'辞掉铁饭碗', desc:'有勇气离开了体制', check: g => g.flags.resignedFromGov && g.flags.careerTransition },
     { id:'exam_anxiety_ach', icon:'😰', name:'考试焦虑幸存者', desc:'学会了和考试焦虑共处', check: g => g.flags.examAnxiety },
+    // === v22.2 新增成就（夜经济） ===
+    { id:'night_foodie_ach', icon:'🍜', name:'深夜食堂常客', desc:'在深夜找到了食物的温暖', check: g => g.flags.lateNightFood },
+    { id:'night_runner_ach', icon:'🏃', name:'夜跑达人', desc:'坚持夜跑锻炼了身体', check: g => g.flags.nightRunning },
+    { id:'star_gazer_ach', icon:'🌟', name:'观星者', desc:'在城市里仰望星空', check: g => g.flags.starGazer },
+    { id:'night_entrepreneur_ach', icon:'💼', name:'夜经济创业者', desc:'在夜间经济中找到了商机', check: g => g.flags.nightEconomyJob && g.flags.entrepreneur },
+    { id:'night_walker_ach_v22_2', icon:'🌙', name:'深夜漫步者', desc:'在深夜的街道找到了平静', check: g => g.flags.nightWalk },
 ];
 
 // === ENDINGS === (order matters: first match wins)
