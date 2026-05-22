@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v6.2
+// 都市浮生记 - Game Engine v6.3
 // ============================================
 
 // === GAME STATE ===
@@ -3210,6 +3210,34 @@ const EVENTS = [
         { label:'二刷三刷', hint:'-💰💰 +😊', fn: g => { g.flags.immersiveTheater=true; g.flags.theaterFan=true; return{money:-1500,mood:30}; }},
         { label:'太贵了，看评价就好', hint:'+🧠', fn: g => { g.flags.immersiveTheater=true; return{intel:3,mood:5}; }},
       ]},
+    // === v6.3 EVENTS - 直播带货与新能源汽车 ===
+    { id:'livestream_shopping', icon:'📱', title:'直播带货',
+      body:'你刷到一个直播间：某网红正在带货一款"原价1999，直播间只要299"的美容仪。\n\n弹幕："家人们，最后100单！"\n\n你犹豫了。然后你看到新闻：某头部主播带货翻车，假燕窝、假牛肉、虚假宣传，面临26.9亿赔偿。\n\n"直播带货——从'家人们'到'韭菜们'，只需要一场翻车。"\n\n2025年，直播电商人均年消费7968元，但增速从118%跌至6%。\n\n数据造假、虚假宣传、售后维权难——直播间里的"繁荣"，背后是无数消费者的血泪。\n\n"你以为你是家人，其实你是数据；你以为你在捡便宜，其实你在交智商税。"',
+      cond: g => !g.flags.livestreamShopping && g.age>=18 && g.age<=40,
+      choices:[
+        { label:'冲动下单', hint:'-💰 +😊', fn: g => { g.flags.livestreamShopping=true; g.flags.impulseBuyer=true; return{money:-500,mood:10}; }},
+        { label:'做功课再买', hint:'+🧠 -💰', fn: g => { g.flags.livestreamShopping=true; g.flags.smartConsumer=true; return{intel:8,money:-300,mood:5}; }},
+        { label:'自己开直播', hint:'-💰 +✨ +💰', fn: g => { g.flags.livestreamShopping=true; g.flags.streamer=true; if(Math.random()>0.6){return{money:5000,charm:15,social:10}}else{return{money:-2000,mood:-10}} }},
+        { label:'坚决不买', hint:'+🧠 +💰', fn: g => { g.flags.livestreamShopping=true; return{intel:5,money:200,mood:-3}; }},
+      ]},
+    { id:'new_energy_car', icon:'🚗', title:'新能源汽车',
+      body:'你考虑买车：燃油车还是新能源？\n\n同事说："现在谁还买油车？新能源渗透率都突破50%了！"\n\n你看了看数据：2025年中国新能源车销量1578万辆，26-45岁年轻人占65%。\n\n小米SU7、比亚迪、特斯拉、理想——每个品牌都有自己的粉丝。\n\n"新能源汽车不只是交通工具，更是'移动的智能终端'——能聊天、能看剧、能自动驾驶。"\n\n但你也看到了问题：续航焦虑、充电桩不足、电池衰减、二手车贬值。\n\n"买新能源是'真香'还是'真坑'？取决于你的通勤距离和钱包厚度。"\n\nZ世代的态度：70%认为400-500公里续航够用，30%愿为智能驾驶多付1万元。',
+      cond: g => !g.flags.newEnergyCar && g.age>=22 && g.age<=40 && g.money>=30000,
+      choices:[
+        { label:'买入门级（5-10万）', hint:'-💰💰 +😊 +✨', fn: g => { g.flags.newEnergyCar=true; g.flags.budgetEV=true; return{money:-80000,mood:20,charm:8}; }},
+        { label:'买中端（15-25万）', hint:'-💰💰💰 +😊 +✨', fn: g => { g.flags.newEnergyCar=true; g.flags.midRangeEV=true; return{money:-200000,mood:25,charm:12}; }},
+        { label:'买高端（30万+）', hint:'-💰💰💰💰 +😊 +✨', fn: g => { g.flags.newEnergyCar=true; g.flags.luxuryEV=true; return{money:-350000,mood:30,charm:18}; }},
+        { label:'继续坐地铁', hint:'+💰 +🧠', fn: g => { g.flags.newEnergyCar=true; g.flags.publicTransit=true; return{money:5000,intel:3,mood:-5}; }},
+      ]},
+    { id:'smart_driving', icon:'🤖', title:'智能驾驶',
+      body:'你试驾了一辆搭载城市NOA（自动辅助导航驾驶）的新能源车。\n\n车自己变道、超车、识别红绿灯、避让行人。你的手放在方向盘上，但心已经飞了。\n\n"智能驾驶——让开车从'技能'变成'监督'，人类司机正在成为'安全员'。"\n\n销售说："我们的L2+级智驾，10万块的车也能用！"\n\n你看了看新闻：某品牌智驾系统识别不了白色货车，发生碰撞。某车主过度依赖智驾，睡着了。\n\n"技术很美好，但生命不能'辅助'——方向盘后面，永远是责任。"\n\n2025年，L2级辅助驾驶渗透率突破50%，但事故责任认定仍是灰色地带。',
+      cond: g => !g.flags.smartDriving && g.age>=22 && g.age<=45 && g.flags.newEnergyCar,
+      choices:[
+        { label:'深度体验智驾', hint:'+🧠 +😊', fn: g => { g.flags.smartDriving=true; g.flags.techEnthusiast=true; return{intel:12,mood:18}; }},
+        { label:'谨慎使用', hint:'+🧠', fn: g => { g.flags.smartDriving=true; g.flags.safeDriver=true; return{intel:8,mood:5}; }},
+        { label:'研究技术原理', hint:'+🧠 +✨', fn: g => { g.flags.smartDriving=true; g.flags.aiResearcher=true; return{intel:15,charm:8}; }},
+        { label:'不敢用', hint:'+🧠', fn: g => { g.flags.smartDriving=true; return{intel:3,mood:-5}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3468,6 +3496,11 @@ const ACHIEVEMENTS = [
     { id:'escape_master', icon:'🔐', name:'密室逃脱者', desc:'体验密室逃脱', check: g => g.flags.escapeRoom },
     { id:'puzzle_master', icon:'🧩', name:'解谜高手', desc:'完成解谜主题密室', check: g => g.flags.puzzleMaster },
     { id:'immersive_fan', icon:'🎪', name:'沉浸式体验家', desc:'观看沉浸式演出', check: g => g.flags.immersiveTheater },
+    // v6.3 achievements
+    { id:'livestream_shopper', icon:'📱', name:'直播间常客', desc:'体验直播带货', check: g => g.flags.livestreamShopping },
+    { id:'smart_consumer', icon:'🧠', name:'理性消费者', desc:'做功课再下单', check: g => g.flags.smartConsumer },
+    { id:'ev_owner', icon:'🚗', name:'新能源车主', desc:'购买新能源汽车', check: g => g.flags.newEnergyCar },
+    { id:'tech_enthusiast', icon:'🤖', name:'科技发烧友', desc:'体验智能驾驶', check: g => g.flags.techEnthusiast },
 ];
 
 // === ENDINGS === (order matters: first match wins)
