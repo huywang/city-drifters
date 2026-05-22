@@ -1345,3 +1345,87 @@ html[style*="font-size: 18px"] .modal-content {
     color: var(--text-muted);
     font-variant-numeric: tabular-nums;
 }
+
+/* === v9.0 城市移动系统 === */
+.btn-city-switch {
+    background: linear-gradient(135deg, #06b6d4, #0891b2);
+    font-size: 0.75rem;
+}
+.city-switch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+.city-switch-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: all 0.2s;
+}
+.city-switch-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.city-switch-card.current {
+    border-color: #06b6d4;
+    background: rgba(6,182,212,0.08);
+}
+.city-switch-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.city-switch-name {
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+.city-current-badge {
+    font-size: 0.75rem;
+    background: #06b6d4;
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+.city-switch-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+.city-switch-trait {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+.btn-move {
+    margin-top: auto;
+    background: linear-gradient(135deg, #06b6d4, #0891b2);
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+}
+.btn-move:hover:not(:disabled) {
+    transform: scale(1.02);
+    box-shadow: 0 2px 8px rgba(6,182,212,0.4);
+}
+.btn-move:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+@media (max-width: 600px) {
+    .city-switch-grid {
+        grid-template-columns: 1fr;
+    }
+}

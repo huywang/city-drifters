@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v8.3
+// 都市浮生记 - Game Engine v9.0
 // ============================================
 
 // === GAME STATE ===
@@ -4508,6 +4508,8 @@ const ACHIEVEMENTS = [
     { id:'delayed_consequence_survivor', icon:'⏰', name:'因果循环', desc:'经历了至少一个延迟后果', check: g => (g.flags.loanSharkUrgent||g.flags.writer||false) },
     { id:'consecutive_exerciser', icon:'🏃', name:'健身狂魔', desc:'连续6个月锻炼', check: g => g._consecutiveActivity && g._consecutiveActivity.type === 'exercise' && g._consecutiveActivity.count >= 6 },
     { id:'career_crossroad_survivor', icon:'🔀', name:'职业抉择', desc:'站在职业十字路口做出选择', check: g => g.flags.careerCrossroad },
+    // === v9.0 新增成就 ===
+    { id:'city_hopper_ach', icon:'🗺️', name:'城市候鸟', desc:'搬过一次城市', check: g => g.flags.citySwitch },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -5269,6 +5271,102 @@ function triggerQuarterlyEvent() {
     }
 }
 
+// === v9.0 城市移动系统 ===
+function openCitySwitch() {
+    const modal = document.getElementById('modal-city') || createCityModal();
+    const content = modal.querySelector('.city-switch-content');
+    if (!content) return;
+
+    let html = '<p style="color:var(--text-muted);font-size:13px;margin-bottom:12px">💡 换城市需要搬家费（5000元），且会失去当前工作。不同城市有不同的机会和代价。</p>';
+    html += '<div class="city-switch-grid">';
+
+    for (const [key, city] of Object.entries(CITIES)) {
+        const isCurrent = G.city === key;
+        const moveCost = 5000;
+        const canMove = !isCurrent && G.money >= moveCost;
+        html += `
+            <div class="city-switch-card ${isCurrent ? 'current' : ''}">
+                <div class="city-switch-header">
+                    <span class="city-switch-name">${city.name}</span>
+                    ${isCurrent ? '<span class="city-current-badge">📍 当前</span>' : ''}
+                </div>
+                <div class="city-switch-info">
+                    <span>🏠 房租: ¥${city.rent}/月</span>
+                    <span>💸 物价: ${(city.cost * 100).toFixed(0)}%</span>
+                    <span>🏘️ 房价: ${fmtMoney(city.house)}/㎡</span>
+                </div>
+                <div class="city-switch-trait">${city.meme}</div>
+                ${isCurrent ? '' : `<button class="btn-small btn-move" ${canMove?'':'disabled'} onclick="switchCity('${key}')">搬去${city.name}（-${fmtMoney(moveCost)}）</button>`}
+            </div>`;
+    }
+    html += '</div>';
+    content.innerHTML = html;
+    modal.classList.add('open');
+}
+
+function createCityModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.id = 'modal-city';
+    modal.innerHTML = `
+        <div class="modal-overlay" onclick="closeModal('modal-city')"></div>
+        <div class="modal-content modal-large">
+            <button class="modal-close" onclick="closeModal('modal-city')" aria-label="关闭">×</button>
+            <h2>🗺️ 换城市</h2>
+            <div class="city-switch-content"></div>
+        </div>`;
+    document.body.appendChild(modal);
+    return modal;
+}
+
+function switchCity(cityId) {
+    const city = CITIES[cityId];
+    if (!city || G.city === cityId) return;
+    if (G.money < 5000) { notify('❌ 搬家费不足！'); return; }
+
+    const oldCity = CITIES[G.city].name;
+    G.money -= 5000;
+    G.city = cityId;
+    G.cityName = city.name;
+    G.flags.citySwitch = true;
+
+    // 换城市失去当前工作（除非是远程工作）
+    if (G.job !== '待业中' && !G.flags.remoteWorker && !G.flags.freelancer) {
+        setJob(G, '待业中', 0);
+        addEventCard({
+            icon: '🗺️',
+            title: `搬到了${city.name}`,
+            body: `你从${oldCity}搬到了${city.name}。\n\n搬家花了不少钱，工作也没了——你需要重新找工作。\n\n但你告诉自己：新的城市，新的开始。\n\n${city.meme}\n\n<div class="meme-quote" style="color:var(--accent)">— 重新开始 —</div>`,
+            type: 'neutral'
+        }, true);
+    } else {
+        addEventCard({
+            icon: '🗺️',
+            title: `搬到了${city.name}`,
+            body: `你从${oldCity}搬到了${city.name}。\n\n${city.meme}\n\n<div class="meme-quote" style="color:var(--accent)">— 换个地方继续漂 —</div>`,
+            type: 'neutral'
+        }, true);
+    }
+
+    // 换城市对属性的影响
+    G.mood = clamp(G.mood + 5, 0, 100); // 新鲜感
+    G.social = clamp(G.social - 10, 0, 100); // 失去本地人脉
+
+    // 清空背包中不能带走的货物（保留2件）
+    const invKeys = Object.keys(G.inventory).filter(k => G.inventory[k] > 0);
+    if (invKeys.length > 2) {
+        const toRemove = invKeys.slice(2);
+        toRemove.forEach(k => delete G.inventory[k]);
+        notify('📦 搬家时丢弃了多余的货物');
+    }
+
+    updateTradePrices();
+    updateHUD();
+    closeModal('modal-city');
+    notify(`✅ 已搬到${city.name}！`);
+    playSound('chain');
+}
+
 // === v8.0 倒卖交易系统 ===
 function openTradeMarket() {
     if (!tradePrices || Object.keys(tradePrices).length === 0) updateTradePrices();
@@ -5845,7 +5943,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '8.3' };
+    const saveData = { ...G, savedAt: Date.now(), version: '9.0' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
@@ -6022,6 +6120,11 @@ function initKeyboardShortcuts() {
             case 'T':
                 e.preventDefault();
                 openTradeMarket();
+                break;
+            case 'c':
+            case 'C':
+                e.preventDefault();
+                openCitySwitch();
                 break;
             case 's':
             case 'S':
