@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v32.1
+// 都市浮生记 - Game Engine v32.2
 // ============================================
 
 // === GAME STATE ===
@@ -17610,6 +17610,97 @@ const EVENTS = [
         { label:'找了一家早餐店替代', hint:'+😊', fn: g => { g.flags.breakfastGone=true; return{mood:-2}; }},
         { label:'写了一篇关于早餐摊的文章', hint:'+✨ +🧠', fn: g => { g.flags.breakfastGone=true; g.flags.wroteAboutFood=true; return{charm:5,intel:3}; }},
       ]},
+
+    // === v32.2 父母的第二人生 ===
+    { id:'mom_moments_v32_2', icon:'📱', title:'妈妈的朋友圈', category:'parents',
+      body:'你无意中刷到了妈妈的朋友圈。\n\n你以为她只会发养生文章，结果你看到了：她和姐妹们去爬山了、她学做了一道新菜、她参加了一个摄影比赛还得了奖。\n\n你翻了好几页，发现妈妈的生活比你想的丰富多了。\n\n有一条朋友圈写着：「孩子们都忙，我们也得有自己的日子过。」底下有二十几个赞，全是她的朋友。\n\n你突然意识到，妈妈不只是「你的妈妈」，她也是她自己。',
+      cond: g => g.age >= 22 && !g.flags.hasHukou,
+      choices:[
+        { label:'给妈妈点了赞，评论了一句', hint:'+👥 +😊', fn: g => { g.flags.momMoments=true; return{social:3,mood:5}; }},
+        { label:'打了个电话问她最近怎么样', hint:'+👥 +😊', fn: g => { g.flags.momMoments=true; g.flags.callMom=true; return{social:5,mood:8}; }},
+        { label:'默默地看了很久，没说什么', hint:'+🧠', fn: g => { g.flags.momMoments=true; g.flags.silentReflection=true; return{intel:5,mood:3}; }},
+      ]},
+
+    { id:'dad_retirement_v32_2', icon:'🎣', title:'爸爸退休了', category:'parents',
+      body:'爸爸退休了。\n\n你打电话回去，他说：「没啥事，就在家待着。」但你知道他不是「在家待着」的那种人。\n\n过了一个月，妈妈偷偷告诉你：爸爸迷上了钓鱼，每天早上五点就出门，比上班还积极。\n\n又过了两个月，爸爸发来一张照片——他钓了一条五斤重的大鲤鱼，笑得像个孩子。\n\n你从来没见过爸爸笑得这么开心。他在工厂里干了三十年，从来没有这样笑过。\n\n你突然觉得，也许退休不是结束，是另一个开始。',
+      cond: g => g.age >= 25,
+      choices:[
+        { label:'给爸爸买了一套好的钓具', hint:'-💰 +👥', fn: g => { g.flags.dadRetirement=true; g.money-=800; return{social:5,mood:5}; }},
+        { label:'跟爸爸说自己也想去钓鱼', hint:'+👥 +😊', fn: g => { g.flags.dadRetirement=true; g.flags.fishingWithDad=true; return{social:5,mood:8}; }},
+        { label:'鼓励爸爸开个钓鱼短视频号', hint:'+🧠 +✨', fn: g => { g.flags.dadRetirement=true; g.flags.dadVlogger=true; return{intel:3,charm:3}; }},
+      ]},
+
+    { id:'teach_phone_v32_2', icon:'📲', title:'教爸妈用手机', category:'parents',
+      body:'过年回家，你发现自己已经教了第八遍了：怎么用微信发语音、怎么扫码支付、怎么看抖音。\n\n妈妈每次都认真做笔记，但下次还是忘了。她有点不好意思地说：「妈是不是太笨了？」\n\n你说：「不是的，是我没教好。」\n\n你花了一整个下午，把每一步都截了图，做了一份「手机使用手册」存在她手机里。\n\n走之前，妈妈终于学会了视频通话。你回到大城市后的第一个晚上，她就打过来了。\n\n屏幕上她笑得很大声：「你看你看！妈学会了！」',
+      cond: g => g.age >= 20,
+      choices:[
+        { label:'做了一本纸质版手册寄回去', hint:'+🧠 +👥', fn: g => { g.flags.teachPhone=true; g.flags.madeManual=true; return{intel:3,social:5}; }},
+        { label:'以后每周视频教她一个新功能', hint:'+👥 +😊', fn: g => { g.flags.teachPhone=true; g.flags.weeklyVideo=true; return{social:8,mood:5}; }},
+        { label:'觉得太烦了，让妈妈找邻居学', hint:'-👥 -😊', fn: g => { g.flags.teachPhone=true; return{social:-3,mood:-5}; }},
+      ]},
+
+    { id:'parents_checkup_v32_2', icon:'🏥', title:'爸妈的体检报告', category:'parents',
+      body:'妈妈发来一张体检报告的照片，问你：「这个箭头是什么意思？」\n\n你仔细看了看——血糖偏高、血脂偏高、颈椎有问题。你上网查了查，发现这些指标都不太好。\n\n你打了电话过去，妈妈说：「没事没事，医生说了注意点就行。」\n\n但你知道「注意点」是什么——少吃盐、多运动、按时吃药。这些话说起来容易，做起来难。\n\n你给妈妈买了一台血压计寄回去，又帮她挂了个专家号。\n\n你突然明白了一件事：你在外面打拼，而他们在老家，慢慢变老。',
+      cond: g => g.age >= 25 && g.money > 2000,
+      choices:[
+        { label:'请了假回去陪他们看病', hint:'-💰 +👥 +😊', fn: g => { g.flags.parentsCheckup=true; g.flags.wentHome=true; g.money-=2000; return{social:8,mood:5}; }},
+        { label:'远程帮他们预约了体检套餐', hint:'-💰 +👥', fn: g => { g.flags.parentsCheckup=true; g.money-=1500; return{social:5,mood:3}; }},
+        { label:'叮嘱了几句就挂了电话', hint:'-😊', fn: g => { g.flags.parentsCheckup=true; return{mood:-5}; }},
+      ]},
+
+    { id:'parents_visit_v32_2', icon:'🧳', title:'爸妈来城里看你', category:'parents',
+      body:'爸妈坐了八个小时的火车来看你。\n\n他们带了一大袋家乡的土特产，把你的出租屋塞得满满的。妈妈一进厨房就说：「你这灶台怎么这么脏？」\n\n爸爸站在窗前看了看外面，说：「这楼真高啊。」\n\n你带他们去了几个景点，但他们对什么都不太感兴趣。妈妈只关心你吃得好不好、睡得够不够。\n\n晚上你听到他们在隔壁房间小声聊天：「孩子瘦了……」「在这边肯定很辛苦……」「别跟他说这些……」\n\n第二天一早，妈妈就做了你最小时候爱吃的粥。',
+      cond: g => g.age >= 20 && !g.flags.hasHukou,
+      choices:[
+        { label:'请了年假陪他们逛了一周', hint:'-💰 +👥 +😊', fn: g => { g.flags.parentsVisit=true; g.money-=1000; return{social:8,mood:10}; }},
+        { label:'周末陪了他们，平时还要上班', hint:'+👥', fn: g => { g.flags.parentsVisit=true; return{social:5,mood:3}; }},
+        { label:'他们住不惯，三天就回去了', hint:'-😊', fn: g => { g.flags.parentsVisit=true; return{mood:-5}; }},
+      ]},
+
+    { id:'mom_dance_v32_2', icon:'💃', title:'妈妈的广场舞', category:'parents',
+      body:'妈妈开始跳广场舞了。\n\n每天晚上七点，她准时出门，去小区广场上跟一群阿姨跳舞。她从最基础的动作学起，现在已经站在了第一排。\n\n她发了个视频给你：一群大妈穿着统一的红色T恤，在广场上跳《最炫民族风》。妈妈的动作虽然不太标准，但笑得很开心。\n\n你还注意到，妈妈换了新发型，还买了几件新衣服。\n\n你问：「妈你是不是谈恋爱了？」她笑着说：「去去去，就是交了几个好朋友。」\n\n你觉得妈妈年轻了好多岁。',
+      cond: g => g.age >= 22,
+      choices:[
+        { label:'给妈妈买了双好的运动鞋', hint:'-💰 +👥 +😊', fn: g => { g.flags.momDance=true; g.money-=300; return{social:5,mood:5}; }},
+        { label:'回家的时候跟她学了几步', hint:'+👥 +😊', fn: g => { g.flags.momDance=true; g.flags.learnedDance=true; return{social:5,mood:8}; }},
+        { label:'担心妈妈太晚回家不安全', hint:'+🧠', fn: g => { g.flags.momDance=true; g.flags.worrySafety=true; return{intel:3,mood:-2}; }},
+      ]},
+
+    { id:'dad_silence_v32_2', icon:'🚬', title:'爸爸的沉默', category:'parents',
+      body:'你发现爸爸越来越沉默了。\n\n以前打电话，他还会说几句——工作怎么样、钱够不够花。现在他只说：「你妈说两句。」然后就把电话递给妈妈。\n\n过年回家，你看到爸爸一个人坐在阳台上抽烟，看着远处的山。\n\n你走过去坐在他旁边，也不知道说什么。过了很久，他说了一句：「你小时候，我抱你坐在这里看火车，你特别高兴。」\n\n你不记得了。但他记得。\n\n你突然觉得，你和爸爸之间，隔了太多没说出口的话。',
+      cond: g => g.age >= 22,
+      choices:[
+        { label:'陪爸爸坐了很久，没说话', hint:'+👥 +😊', fn: g => { g.flags.dadSilence=true; g.flags.silentCompany=true; return{social:3,mood:8}; }},
+        { label:'问爸爸最近身体怎么样', hint:'+👥', fn: g => { g.flags.dadSilence=true; return{social:5,mood:3}; }},
+        { label:'跟妈妈说要多关心爸爸', hint:'+🧠 +👥', fn: g => { g.flags.dadSilence=true; g.flags.tellMom=true; return{intel:3,social:3}; }},
+      ]},
+
+    { id:'parents_plan_v32_2', icon:'🏠', title:'爸妈的养老计划', category:'parents',
+      body:'过年回家吃饭的时候，爸爸突然说了一句：「我们想把老房子翻新一下，以后就在家养老了。」\n\n妈妈接着说：「隔壁李阿姨去了养老院，说条件还不错，一个月三千块……」\n\n你心里一沉。你知道他们在想什么——他们不想给你添负担。\n\n爸爸说：「你别管这些，你自己过好就行。」\n\n你想说点什么，但话到嘴边又咽回去了。你算了一下自己的存款、房贷、生活开销……你觉得好像什么都给不了他们。\n\n但你知道，他们需要的也许不是钱，是你在。',
+      cond: g => g.age >= 28 && g.money > 5000,
+      choices:[
+        { label:'拿出一笔钱帮他们翻新房子', hint:'-💰 +👥 +😊', fn: g => { g.flags.parentsPlan=true; g.flags.fundedRenovation=true; g.money-=10000; return{social:8,mood:8}; }},
+        { label:'认真地跟他们讨论了养老方案', hint:'+🧠 +👥', fn: g => { g.flags.parentsPlan=true; return{intel:5,social:5}; }},
+        { label:'说以后一定接他们来城里住', hint:'+👥', fn: g => { g.flags.parentsPlan=true; g.flags.promiseCity=true; return{social:3,mood:3}; }},
+      ]},
+
+    { id:'old_photos_v32_2', icon:'📷', title:'老照片', category:'parents',
+      body:'整理家里的时候，你翻出了一个旧相册。\n\n里面全是老照片：爸爸妈妈年轻时候的样子、你小时候骑在爸爸脖子上、一家三口在公园的合影。\n\n你发现妈妈年轻时真的很漂亮，爸爸年轻时头发浓密、笑容灿烂。他们看起来比你现在还年轻。\n\n有一张照片背面写着：「1995年春，第一次带孩子去公园。」\n\n你把照片拿给妈妈看，她笑了：「那时候你爸追我追了好久呢。」爸爸在旁边假装没听见，但耳朵红了。\n\n你把几张老照片拍了照存在手机里。有些记忆，要好好保存。',
+      cond: g => g.age >= 20,
+      choices:[
+        { label:'把老照片扫描了做成电子相册', hint:'+🧠 +😊', fn: g => { g.flags.oldPhotos=true; g.flags.digitalAlbum=true; return{intel:5,mood:8}; }},
+        { label:'跟爸妈聊了很久以前的事', hint:'+👥 +😊', fn: g => { g.flags.oldPhotos=true; g.flags.familyStories=true; return{social:8,mood:10}; }},
+        { label:'默默地把照片放了回去', hint:'+🧠', fn: g => { g.flags.oldPhotos=true; return{intel:3,mood:3}; }},
+      ]},
+
+    { id:'new_year_home_v32_2', icon:'🧧', title:'回家过年', category:'parents',
+      body:'你终于回家过年了。\n\n火车站挤满了人，你拖着行李箱走了很远。出站的时候，远远看到了爸爸——他好像又老了一些，头发白了不少。\n\n他接过你的行李箱，什么都没说，走在前面。\n\n回到家，妈妈已经做了一桌子菜。都是你小时候爱吃的：红烧肉、糖醋排骨、西红柿鸡蛋汤。\n\n妈妈说：「多吃点，瘦了。」爸爸说：「回来就好。」\n\n你坐在饭桌前，闻着饭菜的香味，听着他们唠叨家长里短。你觉得这是世界上最好闻的味道、最好听的声音。\n\n过年，就是回家。',
+      cond: g => g.age >= 18 && !g.flags.hasHukou,
+      choices:[
+        { label:'在家里待了整整两周', hint:'+👥 +😊', fn: g => { g.flags.newYearHome=true; g.flags.longStay=true; return{social:8,mood:12}; }},
+        { label:'给爸妈各买了一件新衣服', hint:'-💰 +👥 +😊', fn: g => { g.flags.newYearHome=true; g.money-=1000; return{social:5,mood:8}; }},
+        { label:'待了三天就回去了，假期太短', hint:'-😊', fn: g => { g.flags.newYearHome=true; return{mood:-5}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -19263,6 +19354,18 @@ const ACHIEVEMENTS = [
     { id:'fly_restaurant_ach', icon:'🪰', name:'苍蝇馆子探店', desc:'找到了隐藏的苍蝇馆子宝藏', check: g => g.flags.flyRestaurant },
     { id:'cook_for_one_ach', icon:'🍳', name:'一人食大师', desc:'开始享受给自己做饭', check: g => g.flags.cookForOne },
     { id:'breakfast_gone_ach', icon:'🥟', name:'消失的早餐摊', desc:'记住了一个消失的早餐摊', check: g => g.flags.breakfastGone },
+
+    // --- v32.2 父母的第二人生成就 ---
+    { id:'mom_moments_ach', icon:'📱', name:'认识妈妈', desc:'发现妈妈有自己的精彩生活', check: g => g.flags.momMoments },
+    { id:'dad_retirement_ach', icon:'🎣', name:'爸爸的新生活', desc:'看到爸爸退休后找到了新的快乐', check: g => g.flags.dadRetirement },
+    { id:'teach_phone_ach', icon:'📲', name:'数字桥梁', desc:'耐心地教会了爸妈使用智能手机', check: g => g.flags.teachPhone },
+    { id:'parents_checkup_ach', icon:'🏥', name:'关心健康', desc:'关注了爸妈的体检报告', check: g => g.flags.parentsCheckup },
+    { id:'parents_visit_ach', icon:'🧳', name:'爸妈来看我', desc:'爸妈来城里看望了你', check: g => g.flags.parentsVisit },
+    { id:'mom_dance_ach', icon:'💃', name:'妈妈的舞台', desc:'看到妈妈在广场舞中找到了快乐', check: g => g.flags.momDance },
+    { id:'dad_silence_ach', icon:'🚬', name:'沉默的爱', desc:'在爸爸的沉默中感受到了父爱', check: g => g.flags.dadSilence },
+    { id:'parents_plan_ach', icon:'🏠', name:'养老规划', desc:'跟爸妈讨论了养老计划', check: g => g.flags.parentsPlan },
+    { id:'old_photos_ach', icon:'📷', name:'时光相册', desc:'翻看了家里的老照片', check: g => g.flags.oldPhotos },
+    { id:'new_year_home_ach', icon:'🧧', name:'回家过年', desc:'回家过了一个温暖的年', check: g => g.flags.newYearHome },
 ];
 
 // === ENDINGS === (order matters: first match wins)
