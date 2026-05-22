@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v9.0
+// 都市浮生记 - Game Engine v9.1
 // ============================================
 
 // === GAME STATE ===
@@ -344,6 +344,31 @@ const SURPRISE_EVENTS = [
     { id:'surprise_good_review', icon:'⭐', title:'好评返现', weight:2,
       body:'"亲，五星好评返现2元~"\n\n你看了看一星的外卖，想了想2块钱。打了五星。\n\n"好评返现是这个时代最诚实的交易。"',
       fn: g => ({money: 2, mood: -2}) },
+    // === v9.1 新增突发事件 ===
+    { id:'surprise_ai_email', icon:'🤖', title:'AI写的邮件', weight:3,
+      body:'你用AI写了一封工作邮件，领导回了一句："写得不错，以后都这么写。"\n\n你心想：他不知道这是AI写的，但他觉得我变聪明了。\n\n"AI时代的职场秘诀：让AI替你努力。"',
+      fn: g => ({intel: 3, mood: 5, charm: 2}) },
+    { id:'surprise_digital_detox', icon:'📵', title:'手机掉马桶', weight:2,
+      body:'你的手机掉进了马桶。捞出来已经开不了机了。\n\n你去修手机，师傅说："进水了，换主板，800。"\n\n没有手机的24小时，你发现：原来生活可以这么安静。\n\n然后你焦虑了。',
+      fn: g => ({money: -800, mood: -15, health: 5, intel: 3}) },
+    { id:'surprise_pinduoduo', icon:'🛍️', title:'拼多多陷阱', weight:4,
+      body:'你妈发来一个拼多多链接："帮我砍一刀。"\n\n你砍了。然后她又发来三个链接。\n\n你帮她砍了47刀，她的空气炸锅省了3块钱。\n\n"亲情在拼多多面前，不值一提。"',
+      fn: g => ({mood: -5, social: 3}) },
+    { id:'surprise_didi', icon:'🚗', title:'网约车加价', weight:3,
+      body:'暴雨天叫车，加价2.5倍。你看了看500米外的地铁站——决定走路。\n\n走了100米你就后悔了。但你已经湿透了，回头也没意义。\n\n"暴雨天的打车软件，比股票还刺激。"',
+      fn: g => ({health: -5, mood: -8, money: -50}) },
+    { id:'surprise_colleague_secret', icon:'🤫', title:'同事的秘密', weight:2,
+      body:'你无意中发现：坐你对面的同事，工资比你高50%。\n\n你们干的活一模一样，他比你晚来半年。\n\n你安慰自己：也许他有关系吧。也许他能力强吧。\n\n也许，这就是命。',
+      fn: g => { if (g.job !== '待业中') { return {mood: -15, intel: 2}; } return {mood: -5}; } },
+    { id:'surprise_xianyu', icon:'📱', title:'闲鱼奇遇', weight:2,
+      body:'你在闲鱼上卖二手货，买家约在地铁站交易。\n\n见面一看：是你前同事。他也在卖东西。\n\n你们互相看了看对方的窘境，然后假装不认识。\n\n"闲鱼是大城市打工人的跳蚤市场——卖掉过去，凑合现在。"',
+      fn: g => { const gain = Math.floor(Math.random() * 300) + 100; return {money: gain, mood: 5, social: 3}; } },
+    { id:'surprise_covid_test', icon:'🧪', title:'社区通知', weight:2,
+      body:'社区群发了条通知：明天早上6点核酸。\n\n你设了5:30的闹钟，结果到了发现队伍已经排了200人。\n\n你排队的时候认识了一个大爷，他教你怎么薅社区福利。\n\n"在中国，排队是国民运动。"',
+      fn: g => ({health: 2, mood: -5, social: 3}) },
+    { id:'surprise_power_cut', icon:'💡', title:'停电了', weight:2,
+      body:'加班到一半，整栋楼停电了。\n\n你保存文件了吗？没有。\n\n你在黑暗中静坐了5分钟，突然觉得：这5分钟是你今天最平静的时刻。\n\n"停电是大城市唯一的黑暗浪漫。"',
+      fn: g => ({mood: 5, health: 3}) },
 ];
 
 // === EVENTS (100+) ===
@@ -4142,6 +4167,120 @@ const EVENTS = [
         { label:'跳槽去创业公司', hint:'🎲', fn: g => { g.flags.careerCrossroad=true; g.flags.careerChange=true; if(Math.random()>0.4){setJob(g,'高级'+g.job.replace('初级',''),Math.floor(g.jobSalary*1.3)); addDelayedEffect(8, function(g2){if(Math.random()>0.5){g2.flags.entrepreneur=true; return {money:50000,mood:20}}else{return {money:-20000,mood:-15}};}, '你跳槽的那家创业公司：要么上市了，要么倒闭了。无论哪种，你都学到了很多。'); return{mood:15,charm:5}}else{setJob(g,'待业中',0); return{mood:-20,money:-5000}} }},
         { label:'都拒绝，做现在的事', hint:'+😊', fn: g => { g.flags.careerCrossroad=true; addDelayedEffect(12, {mood:8, intel:5}, '一年过去了。你没升职也没跳槽。但你在现在的岗位上越来越熟练，越来越从容。\n\n有时候，不选择也是一种选择。'); return{mood:5,intel:3}; }},
       ]},
+    // === v9.1 谣言触发事件 ===
+    { id:'rumor_followup_job', icon:'💼', title:'内推消息来了',
+      body:'上次聚会上朋友提到的那个内推机会，今天他发微信来了：岗位JD和薪资范围都发过来了。\n\n薪资确实比你现在高30%，但要求也高不少。\n\n"你考虑好了告诉我，名额有限。"',
+      cond: g => g.flags.rumorJobTip && g.job !== '待业中' && g.months > 6,
+      choices:[
+        { label:'投简历试试', hint:'🎲', fn: g => { g.flags.rumorJobTip=false; if(g.intel>65&&Math.random()>0.4){ setJob(g, '高级'+g.job.replace('初级','').replace('高级',''), Math.floor(g.jobSalary*1.3)); return{money:5000,mood:15,social:5}; }else{ return{mood:-10,money:-500}; } }},
+        { label:'现在的工作还行', hint:'+😊', fn: g => { g.flags.rumorJobTip=false; return{mood:5}; }},
+      ]},
+    { id:'rumor_followup_rent', icon:'🏠', title:'公租房消息',
+      body:'你之前听到的公租房消息是真的！街道办开始接受申请了。\n\n但排队的人很多，你的条件刚好够格——前提是你要准备一堆材料。',
+      cond: g => g.flags.rumorRentTip,
+      choices:[
+        { label:'赶紧去排队申请', hint:'+😊 -💰', fn: g => { g.flags.rumorRentTip=false; if(Math.random()>0.3){ G.flags.cheapRent=true; return{mood:20,money:-2000}; }else{ return{mood:-10,money:-500}; } }},
+        { label:'太麻烦了，算了', hint:'+😊', fn: g => { g.flags.rumorRentTip=false; return{mood:3}; }},
+      ]},
+    { id:'rumor_followup_gym', icon:'💪', title:'健身年卡',
+      body:'你之前听说的那个健身房周年庆促销，今天路过发现真的在搞活动。\n\n年卡原价3999，现在只要1199。\n\n前台小姐姐笑容满面："帅哥/美女，办一张吗？"',
+      cond: g => g.flags.rumorGymDeal,
+      choices:[
+        { label:'办！投资健康', hint:'-💰 +❤️', fn: g => { g.flags.rumorGymDeal=false; g.flags.hasGymCard=true; return{money:-1199,health:10,mood:8,charm:5}; }},
+        { label:'算了，我在家做keep', hint:'+😊', fn: g => { g.flags.rumorGymDeal=false; return{mood:3}; }},
+      ]},
+    { id:'rumor_followup_policy', icon:'📋', title:'人才补贴',
+      body:'好消息！你之前听说的人才补贴政策真的出了！\n\n租房补贴每月1500，连续发3年。你赶紧去网上查了查——你居然符合条件！',
+      cond: g => g.flags.rumorPolicyTip && g.months > 3,
+      choices:[
+        { label:'立即申请', hint:'+💰', fn: g => { g.flags.rumorPolicyTip=false; g.flags.hasSubsidy=true; G.money += 5000; return{money:5000,mood:15}; }},
+        { label:'再研究研究', hint:'+🧠', fn: g => { g.flags.rumorPolicyTip=false; addDelayedEffect(2, {mood:-8}, '你犹豫太久，补贴政策名额满了……'); return{intel:2}; }},
+      ]},
+    { id:'rumor_followup_crypto', icon:'🪙', title:'币圈诱惑',
+      body:'上次聚会那个吹币圈暴富的人又发朋友圈了——这次晒了张保时捷的照片。\n\n你看着自己的工资条，陷入了沉思。\n\n"要不上车试试？就投一点点？"',
+      cond: g => g.flags.rumorCrypto && g.money > 5000,
+      choices:[
+        { label:'投5000试试水', hint:'🎲', fn: g => { g.flags.rumorCrypto=false; if(Math.random()>0.7){ return{money:15000,mood:20}; }else{ return{money:-5000,mood:-15}; } }},
+        { label:'忍住，这是韭菜收割机', hint:'+🧠', fn: g => { g.flags.rumorCrypto=false; addDelayedEffect(4, {mood:-5}, '那个币圈大佬后来发朋友圈说亏了一套房。你庆幸自己没上车。'); return{intel:5,mood:5}; }},
+      ]},
+    { id:'rumor_followup_elevator', icon:'🏢', title:'电梯费',
+      body:'物业真的发了通知：装电梯每户要出5万，不交钱就取消你家的使用权。\n\n楼下大爷说的没错，你被"少数服从多数"了。',
+      cond: g => g.flags.rumorElevator && g.money > 0,
+      choices:[
+        { label:'交钱吧', hint:'-💰', fn: g => { g.flags.rumorElevator=false; return{money:-5000,mood:-10}; }},
+        { label:'跟物业理论', hint:'🎲', fn: g => { g.flags.rumorElevator=false; if(Math.random()>0.7){ return{mood:10,social:5}; }else{ return{money:-5000,mood:-20,social:-5}; } }},
+        { label:'考虑搬家', hint:'🎲', fn: g => { g.flags.rumorElevator=false; return{mood:-8}; }},
+      ]},
+    { id:'rumor_followup_scam', icon:'🛡️', title:'防诈骗',
+      body:'你果然接到了"社保局"的电话，说你社保异常需要补缴。\n\n好在你之前听朋友提过这个骗局，一秒识破。\n\n"骗子：先生您的社保……"\n"你：你猜我信不信？"',
+      cond: g => g.flags.rumorScamAlert,
+      choices:[
+        { label:'挂掉电话', hint:'+🧠', fn: g => { g.flags.rumorScamAlert=false; return{mood:8,intel:3}; }},
+        { label:'逗骗子玩一会儿', hint:'+😊', fn: g => { g.flags.rumorScamAlert=false; return{mood:15,charm:2}; }},
+      ]},
+    { id:'rumor_followup_blind_date', icon:'💕', title:'相亲',
+      body:'朋友妈妈介绍的对象终于约出来了。\n\n见面才发现：对方确实"条件很好"，但你们之间完全没有话题。\n\n全程都在聊房子车子和年薪。',
+      cond: g => g.flags.rumorBlindDate && !g.relationships?.partner,
+      choices:[
+        { label:'再给一次机会', hint:'🎲', fn: g => { g.flags.rumorBlindDate=false; if(Math.random()>0.5){ G.relationships.partner=25; return{social:5,mood:8}; }else{ return{mood:-5,money:-200}; } }},
+        { label:'算了，不是我的菜', hint:'+😊', fn: g => { g.flags.rumorBlindDate=false; return{mood:3}; }},
+      ]},
+    // === v9.1 新增社会热点事件 ===
+    { id:'ai_interview', icon:'🤖', title:'AI面试官',
+      body:'你投了一家大公司，结果第一轮面试是AI面试官。\n\n一个屏幕上的虚拟人问你：「请描述你最大的优点。」\n\n你心想：我的优点就是不会在AI面前紧张……才怪。',
+      cond: g => g.intel > 50 && g.job === '待业中' && g.months > 3,
+      choices:[
+        { label:'认真回答', hint:'+🧠', fn: g => { if(g.intel>70&&Math.random()>0.4){ setJob(g,'大厂员工',18000); return{mood:20,money:5000}; }else{ return{mood:-10,intel:3}; } }},
+        { label:'随便应付', hint:'+😊', fn: g => { return{mood:5}; }},
+      ]},
+    { id:'rent_increase', icon:'📈', title:'房东涨价',
+      body:'房东发来微信：下个月房租涨500。\n\n"不涨不行啊，我也要生活。"\n\n你看了看合同，确实没写不能涨。',
+      cond: g => g.money > 0 && g.months > 6 && !g.flags.cheapRent && Math.random() > 0.7,
+      choices:[
+        { label:'接受涨价', hint:'-💰', fn: g => { G.flags.rentIncreased = true; return{money:-500,mood:-8}; }},
+        { label:'跟房东砍价', hint:'🎲', fn: g => { if(Math.random()>0.5){ return{mood:10,charm:3}; }else{ return{money:-300,mood:-5}; } }},
+        { label:'准备搬家', hint:'-💰 +😊', fn: g => { return{money:-2000,mood:5}; }},
+      ]},
+    { id:'wechat_group_drama', icon:'💬', title:'群聊风波',
+      body:'你的微信群里突然吵起来了——有人在群里发了一条"震惊体"文章，另一个人说是假的。\n\n然后话题从养生转到了国际政治，从国际政治转到了谁在群里潜水不说话。\n\n最后有人说："要不咱们建个新群？"',
+      cond: g => g.social > 30 && g.months > 2,
+      choices:[
+        { label:'加入新群', hint:'+👥', fn: g => { return{social:5,mood:3}; }},
+        { label:'默默退群', hint:'+😊', fn: g => { return{mood:5,social:-3}; }},
+        { label:'发个红包和稀泥', hint:'-💰 +👥', fn: g => { return{money:-50,social:8,mood:5}; }},
+      ]},
+    { id:'food_delivery_guilt', icon:'🍜', title:'外卖罪恶感',
+      body:'你这个月的外卖消费记录出来了：3800块。\n\n平均每天127块。你算了算，如果自己做饭能省一半。\n\n但你看着厨房——连锅都没有。',
+      cond: g => g.money > 5000 && g.months > 3,
+      choices:[
+        { label:'买个锅学做饭', hint:'-💰 +❤️', fn: g => { return{money:-500,health:8,mood:5,intel:3}; }},
+        { label:'算了吧，时间就是金钱', hint:'+😊', fn: g => { return{mood:3}; }},
+        { label:'下个月一定控制', hint:'+😊', fn: g => { return{mood:-3}; }},
+      ]},
+    { id:'midnight_emo', icon:'🌙', title:'深夜emo',
+      body:'凌晨两点，你躺在床上翻来覆去睡不着。\n\n你打开手机，刷了一圈朋友圈：同学升职了，朋友结婚了，前同事创业融资了。\n\n你默默发了条朋友圈，又删掉了。又发了一条，又删掉了。\n\n"成年人的崩溃，是悄无声息的。"',
+      cond: g => g.mood < 40 && g.months > 6,
+      choices:[
+        { label:'听白噪音入睡', hint:'+❤️', fn: g => { return{health:3,mood:5}; }},
+        { label:'打开购物软件', hint:'-💰 +😊', fn: g => { return{money:-500,mood:8,health:-3}; }},
+        { label:'写日记', hint:'+🧠', fn: g => { return{intel:5,mood:8}; }},
+        { label:'打开招聘APP', hint:'+💰 +😊', fn: g => { if(Math.random()>0.6){ return{mood:10,money:2000}; }else{ return{mood:-5}; } }},
+      ]},
+    { id:'health_check_report', icon:'🏥', title:'体检报告',
+      body:'公司组织的年度体检报告出来了。\n\n你打开一看：脂肪肝、颈椎病、近视加深、体重超标……\n\n"20多岁的身体，50岁的零件。"',
+      cond: g => g.health < 50 && g.job !== '待业中' && g.months > 6,
+      choices:[
+        { label:'开始养生', hint:'+❤️ +😊', fn: g => { return{health:10,mood:5,money:-500}; }},
+        { label:'吃顿好的压压惊', hint:'+😊 -❤️', fn: g => { return{mood:10,health:-5,money:-200}; }},
+        { label:'算了，年轻人的常态', hint:'+😊', fn: g => { addDelayedEffect(6, {health:-15}, '半年后你再次体检，指标更差了……'); return{mood:3}; }},
+      ]},
+    { id:'pet_adoption', icon:'🐱', title:'撸猫诱惑',
+      body:'你路过一家猫咖，一只橘猫一直蹭你的手。\n\n店员说："这只猫特别亲人，要不领养吧？"\n\n你看了看自己的出租屋——10平米，放不下一张双人床。\n\n但那只猫看着你，你也看着它。',
+      cond: g => g.mood < 60 && g.money > 3000 && g.months > 3,
+      choices:[
+        { label:'领养！', hint:'-💰 +😊', fn: g => { g.flags.hasPet=true; return{money:-2000,mood:20,health:5}; }},
+        { label:'下次吧', hint:'+😊', fn: g => { return{mood:5}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -4510,6 +4649,15 @@ const ACHIEVEMENTS = [
     { id:'career_crossroad_survivor', icon:'🔀', name:'职业抉择', desc:'站在职业十字路口做出选择', check: g => g.flags.careerCrossroad },
     // === v9.0 新增成就 ===
     { id:'city_hopper_ach', icon:'🗺️', name:'城市候鸟', desc:'搬过一次城市', check: g => g.flags.citySwitch },
+    // === v9.1 新增成就 ===
+    { id:'social_intel', icon:'🗣️', name:'社交达人', desc:'通过社交获得过情报', check: g => g.flags._rumorCooldown && g.flags._rumorCooldown.length >= 3 },
+    { id:'rumor_victim', icon:'🪤', name:'交了学费', desc:'被谣言坑过一次', check: g => g.flags.rumorCrypto && g.money < 0 },
+    { id:'rumor_savvy', icon:'🧠', name:'消息灵通', desc:'累计获得5条以上情报', check: g => g.flags._rumorCooldown && g.flags._rumorCooldown.length >= 5 },
+    { id:'pet_owner', icon:'🐱', name:'铲屎官', desc:'领养了一只宠物', check: g => g.flags.hasPet },
+    { id:'subsidy_winner', icon:'📋', name:'薅到羊毛', desc:'成功申请到人才补贴', check: g => g.flags.hasSubsidy },
+    { id:'gym_member', icon:'💪', name:'健身会员', desc:'办了健身年卡', check: g => g.flags.hasGymCard },
+    { id:'cheap_rent_ach', icon:'🏠', name:'租房达人', desc:'成功申请到公租房', check: g => g.flags.cheapRent },
+    { id:'emo_night', icon:'🌙', name:'深夜emo', desc:'经历过一次深夜情绪低落', check: g => g.mood < 30 && g.months > 12 },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -4605,6 +4753,10 @@ const ENDINGS = [
     // --- v8.1 NEW ENDINGS (策划团队建议) ---
     { id:'trade_king_end', badge:'🏪', title:'倒爷之王', desc:'你成了地下交易市场的传奇。\n\n从华强北到中关村，从黄牛票到限量球鞋，没有你没倒过的东西。你的商业嗅觉比华尔街的分析师还灵敏。\n\n有人说你"投机倒把"，你说这叫"资源配置优化"。\n\n"市场经济的本质就是信息差——你只是比别人更懂这个道理。"\n\n你的仓库堆满了货，你的微信好友5000人，你的账上有六位数。\n\n虽然你妈至今不知道你具体做什么工作。', cond: g => g.flags.tradeProfit && g.money>=200000 && g.intel>=65 && g.age>=28 },
     { id:'loan_shark_end', badge:'🦈', title:'网贷深渊', desc:'你借了网贷。然后以贷养贷。然后利滚利。\n\n从借5000变成了欠50万。催收电话打给了你所有的通讯录好友，你的同事、领导、父母都收到了短信。\n\n你不敢接陌生电话，不敢看微信消息，不敢出门。\n\n"你以为借的是钱，其实借的是命。"\n\n你终于鼓起勇气，给家里打了电话。你妈在电话那头哭了。\n\n（如果你或身边的人遭遇网贷困扰，请拨打法律援助热线：12348）', cond: g => g.flags.loanSharkOwed && g.money<=-50000 && g.mood<=25 },
+    // --- v9.1 NEW ENDINGS ---
+    { id:'info_broker_end', badge:'🕸️', title:'消息灵通人士', desc:'你成了圈子里的"消息灵通人士"。\n\n谁家要卖房、哪家公司要招人、哪个领导要被调走——你比他们的HR还先知道。\n\n你用这些信息换了无数人情，也在不知不觉中编织了一张无形的关系网。\n\n有人说你"八面玲珑"，你说你只是"比较爱聊天"。\n\n"信息就是权力——即使你只是一个爱八卦的打工人。"', cond: g => g.flags._rumorCooldown && g.flags._rumorCooldown.length >= 8 && g.social >= 70 && g.intel >= 60 },
+    { id:'pet_companion_end', badge:'🐱', title:'猫奴人生', desc:'你领养了那只橘猫。从此你的生活多了一个室友。\n\n它会在你加班时趴在键盘上，会在你emo时蹭你的手，会在你睡着时偷看你的手机。\n\n你给它取名"房租"——因为它比你更会占地方。\n\n"养猫之后你才明白：被需要，也是一种幸福。"', cond: g => g.flags.hasPet && g.mood >= 60 && g.age >= 30 },
+    { id:'city_nomad_end', badge:'🗺️', title:'城市游牧民', desc:'你搬了三次以上的城市，每次都是重新开始。\n\n你在北京挤过地铁，在上海喝过咖啡，在深圳加过班，在成都吃过火锅。\n\n你见过不同的城市，也见过同样的自己——一个永远在寻找更好生活的漂泊者。\n\n"也许没有最好的城市，只有最适合自己的节奏。"', cond: g => g.flags.citySwitch && g.age >= 35 && g.social >= 50 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
@@ -4777,6 +4929,8 @@ function applyActivity() {
         if (selectedActivity === 'socialize') {
             G.relationships.friends = clamp((G.relationships.friends||40) + 8, 0, 100);
             G.relationships.colleagues = clamp((G.relationships.colleagues||30) + 3, 0, 100);
+            // v9.1: 信息/谣言系统 - 社交时获得有用的情报
+            generateRumor();
         }
         if (selectedActivity === 'rest') {
             G.relationships.partner = clamp((G.relationships.partner||0) + 3, 0, 100);
@@ -4805,6 +4959,9 @@ function advanceMonth() {
 
     // v8.2: 延迟后果系统 - 检查是否有到期的延迟效果
     processDelayedEffects();
+
+    // v9.1: 信息谣言后续效果
+    processRumorEffects();
 
     // v8.2: 连续活动惩罚/奖励 - 连续选同一活动会有额外后果
     processConsecutiveActivity();
@@ -5268,6 +5425,230 @@ function triggerQuarterlyEvent() {
             body: milestone.body + `\n\n<div class="meme-quote" style="color:var(--accent)">— 时光荏苒 —</div>`,
             type: 'neutral'
         }, true);
+    }
+}
+
+// === v9.1 信息/谣言系统 ===
+// 社交时随机获得情报：有些有用，有些是坑
+const RUMOR_POOL = [
+    // —— 真实有用的情报 ——
+    { id:'rumor_job_opening', icon:'💼', title:'饭局上的消息', body:'朋友悄悄告诉你：他公司下周有个内部推荐名额，薪资比外面高30%。\n\n"你先把简历发我，我帮你递进去。"',
+      type:'good', effect: g => { g.flags.rumorJobTip = true; return {mood:8}; },
+      followUp:'你记下了这个内推机会。' },
+    { id:'rumor_rent_drop', icon:'🏠', title:'租房内幕', body:'酒桌上有人透露：你那个片区下个月有一批公租房要放出来，租金只有市场价的一半。\n\n"消息还没公开，你赶紧去街道办问问。"',
+      type:'good', effect: g => { g.flags.rumorRentTip = true; return {mood:5,intel:3}; },
+      followUp:'你默默记下了这个消息。' },
+    { id:'rumor_stock_tip', icon:'📈', title:'财富密码', body:'一个做金融的朋友喝多了，拉着你说了半天"内幕消息"：某只股票下周要涨。\n\n"这个你别乱说啊，我就跟你说一声。"',
+      type:'risky', effect: g => {
+          g.flags.rumorStockTip = true;
+          // 50%概率真涨，50%概率是割韭菜
+          if (Math.random() > 0.5) { g.flags.rumorStockReal = true; }
+          return {mood:5};
+      }, followUp:'你心里盘算着要不要试试。' },
+    { id:'rumor_trade_hot', icon:'🔥', title:'行情情报', body:'有人告诉你最近某种货很抢手，价格马上要涨。\n\n"我也是听说的，你看着办。"',
+      type:'good', effect: g => {
+          // 随机让一种商品下月涨价
+          const goods = Object.keys(TRADE_GOODS);
+          const hotGood = goods[Math.floor(Math.random()*goods.length)];
+          g.flags.rumorHotGood = hotGood;
+          g.flags.rumorTradeTip = true;
+          return {mood:3};
+      }, followUp:'你记下了这个商品的行情。' },
+    { id:'rumor_company_layoff', icon:'⚠️', title:'裁员风声', body:'隔壁部门的人偷偷跟你说：公司可能要裁员了。\n\n"我劝你提前投简历，别等HR找你谈话。"',
+      type:'good', effect: g => { g.flags.rumorLayoff = true; return {mood:-5,intel:3}; },
+      followUp:'你开始偷偷更新简历。' },
+    { id:'rumor_gym_deal', icon:'💪', title:'健身卡折扣', body:'你朋友说他健身房要搞周年庆促销，年卡打三折。\n\n"要办赶紧办，就这周末，过了就恢复原价了。"',
+      type:'good', effect: g => { g.flags.rumorGymDeal = true; return {mood:5}; },
+      followUp:'你打算周末去看看。' },
+    { id:'rumor_freelance', icon:'💻', title:'私活机会', body:'聚会上认识了一个人，说他们有个外包项目缺人，问你有没有兴趣。\n\n"活不多，但给钱爽快。你考虑一下？"',
+      type:'good', effect: g => {
+          g.flags.rumorFreelance = true;
+          if (Math.random() > 0.4) {
+              return {money:8000,mood:10,social:5};
+          } else {
+              return {money:3000,mood:5};
+          }
+      }, followUp:'你留了他的微信。' },
+    { id:'rumor_housing_policy', icon:'📋', title:'政策风向', body:'一个在政府上班的朋友说：这个城市马上要出台新的人才补贴政策，租房和买房都有补贴。\n\n"消息还没公开，你提前准备材料。"',
+      type:'good', effect: g => { g.flags.rumorPolicyTip = true; return {intel:5,mood:5}; },
+      followUp:'你默默开始准备申请材料。' },
+    { id:'rumor_side_hustle', icon:'🛵', title:'副业门路', body:'有人说现在跑外卖特别赚钱，尤其是周末和节假日。\n\n"一个月多赚个五六千不成问题，就看你愿不愿意辛苦。"',
+      type:'neutral', effect: g => {
+          if (Math.random() > 0.5) { return {money:4000,health:-5,mood:-3}; }
+          else { return {money:2000,health:-8,mood:-5}; }
+      }, followUp:'你下载了外卖骑手APP。' },
+    // —— 坑人的假消息 ——
+    { id:'rumor_crypto', icon:'🪙', title:'币圈暴富神话', body:'酒桌上有人吹嘘自己炒币赚了一套房，怂恿你也入坑。\n\n"现在上车还来得及！下一个百倍币！"',
+      type:'bad', effect: g => {
+          g.flags.rumorCrypto = true;
+          return {mood:5};
+      }, followUp:'你心动了，但理智告诉你……' },
+    { id:'rumor_pyramid', icon:'🔺', title:'"创业项目"', body:'一个老同学突然约你吃饭，热情地介绍他的"创业项目"：只需要投入5000块，月回报30%。\n\n"我们团队已经有200人了！"',
+      type:'bad', effect: g => {
+          if (g.intel > 60) {
+              return {mood:3,intel:2}; // 聪明人一眼识破
+          } else {
+              g.money -= 5000;
+              addDelayedEffect(3, {mood:-20,money:-3000}, '那个「创业项目」果然是传销，你的钱打了水漂');
+              return {mood:5,money:-5000};
+          }
+      }, followUp: g => g.intel > 60 ? '你婉拒了，总觉得不太对。' : '你投了5000块试试水。' },
+    { id:'rumor_scam_call', icon:'📞', title:'电信诈骗情报', body:'有人跟你说最近有种新型诈骗：冒充社保局打电话让你补交费用。\n\n"我已经中招了，你小心点。"',
+      type:'good', effect: g => { g.flags.rumorScamAlert = true; return {intel:3}; },
+      followUp:'你记住了这个套路。' },
+    { id:'rumor_mlm', icon:'🧴', title:'微商邀请', body:'你朋友圈突然被一个人刷屏了——她以前是你的同事，现在在做微商。\n\n她私信你："姐/哥，来跟我一起做吧，月入十万不是梦！"',
+      type:'bad', effect: g => {
+          return {mood:-3,social:-2};
+      }, followUp:'你默默屏蔽了她的朋友圈。' },
+    // —— 城市特色八卦 ——
+    { id:'rumor_beijing_hukou', icon:'📋', title:'户口消息', body:'有人听说北京要放宽落户政策了，积分落户分数线可能下降。\n\n"不过这消息传了好几年了，每次都是假的。"',
+      type:'city', cond: g => g.city === 'beijing',
+      effect: g => { g.flags.rumorHukou = true; return {mood:3}; },
+      followUp:'你半信半疑。' },
+    { id:'rumor_shanghai_disney', icon:'🏰', title:'迪士尼年卡', body:'朋友说上海迪士尼内部员工可以搞到半价年卡。\n\n"你信吗？反正我是不太信。"',
+      type:'city', cond: g => g.city === 'shanghai',
+      effect: g => {
+          if (Math.random() > 0.6) {
+              return {money:-500,mood:15,charm:5}; // 真的搞到了
+          } else {
+              return {money:-200,mood:-5}; // 被骗了200定金
+          }
+      }, followUp:'你决定碰碰运气。' },
+    { id:'rumor_shenzhen_factory', icon:'🏭', title:'工厂搬迁', body:'有人说深圳又有一批工厂要搬到东南亚了，周围的房租可能会降。\n\n"城中村都要拆了改公寓。"',
+      type:'city', cond: g => g.city === 'shenzhen',
+      effect: g => { g.flags.rumorFactoryMove = true; return {intel:3}; },
+      followUp:'你开始关注附近租房信息。' },
+    { id:'rumor_hangzhou_taobao', icon:'🛒', title:'淘宝新规', body:'做电商的朋友说淘宝要改算法了，小卖家可能会被限流。\n\n"赶紧囤货，趁现在还卖得动。"',
+      type:'city', cond: g => g.city === 'hangzhou',
+      effect: g => {
+          if (g.flags.ecommerce || g.flags.influencer) {
+              return {mood:-8,intel:3};
+          }
+          return {intel:2};
+      }, followUp:'电商圈又焦虑了起来。' },
+    { id:'rumor_chengdu_food', icon:'🌶️', title:'美食情报', body:'有人告诉你成都新开了一家苍蝇馆子，味道绝了，但只有本地人才知道。\n\n"老板脾气很差，去晚了就关门。"',
+      type:'city', cond: g => g.city === 'chengdu',
+      effect: g => { return {mood:10,health:3}; },
+      followUp:'你找时间去了，果然名不虚传。' },
+    { id:'rumor_guangzhou_wholesale', icon:'📦', title:'批发市场', body:'有人说广州白马服装城最近在清仓甩卖，衣服按斤卖。\n\n"你去进一批货，挂闲鱼卖，至少翻三倍。"',
+      type:'city', cond: g => g.city === 'guangzhou',
+      effect: g => { g.flags.rumorWholesale = true; return {mood:5}; },
+      followUp:'你盘算着要不要去进货。' },
+    // —— 生活八卦/黑色幽默 ——
+    { id:'rumor_office_gossip', icon:'🗣️', title:'办公室八卦', body:'同事悄悄告诉你：你们领导要被调走了，新领导是个"卷王"。\n\n"听说他以前那个部门，没有一个人能准时下班。"',
+      type:'neutral', effect: g => {
+          if (g.job !== '待业中') {
+              g.flags.rumorNewBoss = true;
+              return {mood:-8};
+          }
+          return {mood:3};
+      }, followUp:'你开始为未来担忧。' },
+    { id:'rumor_marriage_market', icon:'💒', title:'相亲市场', body:'朋友的妈妈跟你说：她手上有个"条件很好"的对象要介绍给你。\n\n"有房有车，就是比你大10岁。你要不要见见？"',
+      type:'neutral', effect: g => {
+          if (g.relationships && (g.relationships.partner||0) < 30) {
+              g.flags.rumorBlindDate = true;
+              return {mood:5,social:3};
+          }
+          return {mood:-5};
+      }, followUp:'你犹豫了一下。' },
+    { id:'rumor_neighbor', icon:'👀', title:'邻居的忠告', body:'楼下大爷跟你说：你这栋楼可能要装电梯了，要每家出5万。\n\n"不同意也得同意，少数服从多数。"',
+      type:'bad', effect: g => {
+          g.flags.rumorElevator = true;
+          return {mood:-5,money:-5000};
+      }, followUp:'你看着银行卡余额叹了口气。' },
+    { id:'rumor_ai_job', icon:'🤖', title:'AI替代论', body:'聚会上一个做AI的人说：你们这个岗位三年内就会被AI替代。\n\n"不是吓你，我已经在做了。"',
+      type:'neutral', effect: g => {
+          if (g.intel > 70) {
+              return {intel:5,mood:3}; // 聪明人觉得是学习机会
+          }
+          return {mood:-10};
+      }, followUp:'你开始思考职业转型。' },
+    { id:'rumor_lottery', icon:'🎰', title:'彩票玄学', body:'有人说他算出了双色球规律，推荐你买他选的号码。\n\n"我跟你说，这次一定中！"',
+      type:'bad', effect: g => {
+          if (Math.random() > 0.95) {
+              return {money:50000,mood:30}; // 万一中了呢
+          }
+          return {money:-100,mood:-3};
+      }, followUp:'你花了100块买了彩票，然后……' },
+];
+
+function generateRumor() {
+    // 从谣言池中随机选一条（有冷却机制）
+    if (!G.flags._rumorCooldown) G.flags._rumorCooldown = [];
+
+    // 过滤：城市限制 + 冷却
+    const available = RUMOR_POOL.filter(r => {
+        if (r.cond && !r.cond(G)) return false;
+        if (G.flags._rumorCooldown.includes(r.id)) return false;
+        return true;
+    });
+
+    if (available.length === 0) {
+        // 冷却池清空一半，让玩家能再次获得之前的谣言
+        G.flags._rumorCooldown = G.flags._rumorCooldown.slice(0, Math.floor(G.flags._rumorCooldown.length / 2));
+        return;
+    }
+
+    const rumor = available[Math.floor(Math.random() * available.length)];
+
+    // 加入冷却
+    G.flags._rumorCooldown.push(rumor.id);
+    if (G.flags._rumorCooldown.length > 10) {
+        G.flags._rumorCooldown = G.flags._rumorCooldown.slice(-8);
+    }
+
+    // 执行效果
+    const delta = rumor.effect(G);
+
+    // 处理 followUp 文本
+    const followUp = typeof rumor.followUp === 'function' ? rumor.followUp(G) : rumor.followUp;
+
+    // 构建事件卡片
+    const typeMap = { good:'good', bad:'bad', risky:'neutral', neutral:'neutral', city:'neutral' };
+    const typeLabel = { good:'💡 靠谱情报', bad:'⚠️ 来路不明', risky:'🎲 风险情报', neutral:'📢 道听途说', city:'🏙️ 本地消息' };
+
+    addEventCard({
+        icon: rumor.icon,
+        title: rumor.title,
+        body: rumor.body + '\n\n<div style="color:var(--text-muted);font-size:12px;margin-top:8px">[' + (typeLabel[rumor.type]||'📢 消息') + '] ' + followUp + '</div>',
+        type: typeMap[rumor.type] || 'neutral'
+    }, true);
+}
+
+// 处理谣言后续效果（在 advanceMonth 中调用）
+function processRumorEffects() {
+    // 股票情报兑现
+    if (G.flags.rumorStockTip) {
+        G.flags.rumorStockTip = false;
+        if (G.flags.rumorStockReal) {
+            G.flags.rumorStockReal = false;
+            const gain = Math.floor(Math.random() * 8000) + 2000;
+            G.money += gain;
+            addEventCard({ icon:'📈', title:'股票涨了', body:`你听从了朋友的「内幕消息」，小赚了一笔。\n\n<div class="meme-quote" style="color:var(--accent)">— 韭菜也有翻身的一天 —</div>`, type:'good' }, true);
+            return {money:gain, mood:10};
+        } else {
+            const loss = Math.floor(Math.random() * 5000) + 3000;
+            G.money -= loss;
+            addEventCard({ icon:'📉', title:'割了韭菜', body:`你信了那个「内幕消息」，结果被套了。\n\n<div class="meme-quote" style="color:var(--accent)">— 金融市场的学费，从不便宜 —</div>`, type:'bad' }, true);
+            return {money:-loss, mood:-15};
+        }
+    }
+
+    // 交易情报：让指定商品涨价
+    if (G.flags.rumorTradeTip && G.flags.rumorHotGood && tradePrices[G.flags.rumorHotGood]) {
+        const good = G.flags.rumorHotGood;
+        tradePrices[good] = Math.floor(tradePrices[good] * 1.4); // 涨40%
+        G.flags.rumorTradeTip = false;
+        G.flags.rumorHotGood = null;
+        // 不通知玩家，让他们自己发现价格变化
+    }
+
+    // 裁员预警：如果真的有裁员事件触发
+    if (G.flags.rumorLayoff && G.job !== '待业中' && Math.random() > 0.7) {
+        G.flags.rumorLayoff = false;
+        G.flags.wasLaidOff = true;
+        addEventCard({ icon:'💔', title:'裁员来了', body:`幸好你提前知道了消息，已经更新了简历。\n\nHR找你谈话的时候，你比同事淡定得多。\n\n<div class="meme-quote" style="color:var(--accent)">— 知道坏消息要来了，反而没那么慌 —</div>`, type:'neutral' }, true);
+        return {mood:-5, intel:3};
     }
 }
 
@@ -5943,7 +6324,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '9.0' };
+    const saveData = { ...G, savedAt: Date.now(), version: '9.1' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
@@ -6280,11 +6661,67 @@ function notify(text) {
 // === SHARE ===
 function shareEnding() {
     const t = document.getElementById('ending-title').textContent.replace(/\s*\[.*?\]\s*/g, '');
-    const rarity = getEndingRarity(ENDINGS.find(e => e.title.includes(t))?.id || 'default');
+    const ending = ENDINGS.find(e => e.title.includes(t));
+    const rarity = getEndingRarity(ending?.id || 'default');
     const rarityEmoji = { common: '⚪', uncommon: '🟢', rare: '🔵', legendary: '🟡' }[rarity];
+    const rarityLabel = { common: '普通', uncommon: '罕见', rare: '稀有', legendary: '传说' }[rarity];
     const topStat = getTopStat();
     const achievementCount = G.achievements.length;
-    const text = `🏙️ 都市浮生记 · 人生结局\n\n${rarityEmoji} ${t}\n\n👤 ${G.name}，${G.age}岁\n📍 ${G.cityName}\n⏱️ 漂泊了${Math.floor(G.months/12)}年${G.months%12}个月\n💰 最终资产：${fmtMoney(G.money)}\n🎯 做出选择：${G.choices}次\n🏆 解锁成就：${achievementCount}个\n📊 最强属性：${topStat}\n\n#都市浮生记 #人生模拟器`;
+
+    // 生成人生标签
+    const tags = [];
+    if (G.flags.hasPet) tags.push('🐱 铲屎官');
+    if (G.flags.hasGymCard) tags.push('💪 健身达人');
+    if (G.flags.citySwitch) tags.push('🗺️ 城市候鸟');
+    if (G.flags.entrepreneur) tags.push('🚀 创业者');
+    if (G.flags.influencer) tags.push('📱 博主');
+    if (G.flags.hasSubsidy) tags.push('📋 薅羊毛专家');
+    if (G.flags.cheapRent) tags.push('🏠 公租房住户');
+    if (G.flags.remoteWorker) tags.push('💻 远程工作者');
+    if (G.money > 1000000) tags.push('💰 百万富翁');
+    if (G.money < -50000) tags.push('💸 负债累累');
+    if (G.intel > 80) tags.push('🧠 知识分子');
+    if (G.charm > 80) tags.push('✨ 万人迷');
+    if (G.health > 80) tags.push('❤️ 健康达人');
+    if (G.mood < 20) tags.push('😔 疲惫打工人');
+    if (G.flags.regretCount > 10) tags.push('🫠 算了大王');
+    if (tags.length === 0) tags.push('🏙️ 普通打工人');
+
+    const tagLine = tags.slice(0, 4).join(' ');
+
+    // 生成人生金句
+    const quotes = [
+        '生活不是等待暴风雨过去，而是学会在雨中跳舞。',
+        '在大城市里，活着本身就是一种胜利。',
+        '每一个漂泊的人，都是自己故事的主角。',
+        '你的人生，没有标准答案。',
+        '大城市容不下肉身，小城市放不下灵魂。',
+        '所谓成功，就是用自己喜欢的方式过一生。',
+    ];
+    const quote = quotes[Math.floor(Math.random() * quotes.length)];
+
+    const text = `🏙️ 都市浮生记 · 人生结局
+
+${rarityEmoji} 「${t}」[${rarityLabel}]
+
+👤 ${G.name}，${G.age}岁
+📍 ${G.cityName}
+⏱️ 漂泊了${Math.floor(G.months/12)}年${G.months%12}个月
+
+📊 人生数据
+💰 最终资产：${fmtMoney(G.money)}
+🎯 做出选择：${G.choices}次
+🏆 解锁成就：${achievementCount}个
+📈 最强属性：${topStat}
+
+🏷️ 人生标签：${tagLine}
+
+💬 "${quote}"
+
+——
+来试试你能打出什么结局？
+#都市浮生记 #人生模拟器`;
+
     if (navigator.share) { navigator.share({title:'都市浮生记',text}); }
     else { navigator.clipboard.writeText(text).then(() => notify('📤 已复制到剪贴板！')); }
 }
