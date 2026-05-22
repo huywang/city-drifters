@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v24.4
+// 都市浮生记 - Game Engine v24.5
 // ============================================
 
 // === GAME STATE ===
@@ -12076,6 +12076,87 @@ const EVENTS = [
         { label:'这次聊开了，以后看情况', hint:'+🤝 +😊', fn: g => { g.flags.familyMeeting=true; return{social:8,mood:8}; }},
         { label:'觉得太formal了，不太适合中国人', hint:'', fn: g => { g.flags.familyMeeting=true; return{social:3}; }},
       ]},
+    // === v24.5: 文化娱乐 + 生活方式 ===
+    { id:'script_kill', icon:'🎭', title:'剧本杀', category:'hobby',
+      body:'朋友拉你去玩了一场剧本杀。\n\n你们7个人，扮演7个角色，在一个虚构的故事里推理凶手。\n\n4个小时里：\n- 你扮演了一个富商的私生子\n- 你需要隐藏自己的秘密\n- 你要通过对话找出其他人的谎言\n- 最后投票选出你认为的凶手\n\n游戏结束后你发现：\n- 你跟6个陌生人成了朋友\n- 你体验了另一种人生（虽然是虚构的）\n- 你的推理能力还不错——居然猜对了\n- 最重要的是：4个小时里你完全忘了工作和烦恼\n\n你在想：也许沉浸在一个故事里——就是现代人最好的休息方式。\n\n「剧本杀：你不是在玩游戏——你是在活另一种人生。」',
+      cond: g => g.age >= 18 && g.age <= 38 && !g.flags.scriptKill,
+      choices:[
+        { label:'成了剧本杀常客，每周玩一次', hint:'-💰 +😊 +🤝 +🧠', fn: g => { g.flags.scriptKill=true; g.flags.scriptKillFan=true; g.money -= 2000; return{mood:12,social:10,intel:5}; }},
+        { label:'偶尔玩玩，更喜欢推理类的', hint:'-💰 +😊 +🧠', fn: g => { g.flags.scriptKill=true; g.money -= 500; return{mood:8,intel:5}; }},
+        { label:'不太喜欢，觉得太费时间了', hint:'', fn: g => { g.flags.scriptKill=true; return{mood:-2}; }},
+      ]},
+    { id:'game_addiction_2', icon:'🎮', title:'游戏人生', category:'hobby',
+      body:'你又开始打游戏了。\n\n不是小时候那种玩——是沉迷。\n\n每天下班后：\n- 打开电脑就开始玩\n- 一玩就到了凌晨2点\n- 第二天上班精神恍惚\n- 周末12小时不下线\n\n你在游戏里是个英雄——\n- 你有一支强大的公会\n- 大家都尊重你\n- 你的装备全服排名前100\n\n但在现实中——\n- 你的工作越来越敷衍\n- 你的朋友越来越少\n- 你的身体越来越差\n\n你在想：游戏里的成就感——能替代现实吗？\n\n如果可以——你还需要现实吗？\n\n「游戏：你赢了全世界——但输了自己。」',
+      cond: g => g.age >= 18 && g.age <= 40 && !g.flags.gameAddiction2 && g.mood <= 50,
+      choices:[
+        { label:'设了闹钟限制游戏时间，开始平衡', hint:'+😊 +🧠', fn: g => { g.flags.gameAddiction2=true; g.flags.gameBalanced=true; return{mood:5,intel:5,health:3}; }},
+        { label:'彻底戒了，删掉了游戏', hint:'+❤️ +😊 -🤝', fn: g => { g.flags.gameAddiction2=true; g.flags.gameDetox=true; return{health:8,mood:8,social:-3}; }},
+        { label:'继续玩，反正现实也没什么好过的', hint:'-❤️ -😊', fn: g => { g.flags.gameAddiction2=true; g.flags.gameEscapist=true; return{health:-10,mood:-5}; }},
+      ]},
+    { id:'fan_economy_v24_5', icon:'⭐', title:'饭圈经济', category:'social',
+      body:'你的同事小陈是个追星族。\n\n她每月工资6000，但花在偶像身上的就有3000：\n- 演唱会门票：1500元\n- 周边产品：500元/月\n- 打榜投票：500元/月\n- 应援集资：500元/月\n\n她说：「他是我生活中唯一的光。」\n\n你看了看她的出租屋——\n- 墙上贴满了偶像的海报\n- 柜子里全是偶像的周边\n- 手机壁纸、电脑壁纸、社交头像——全是偶像\n\n她自己呢？\n- 吃泡面省钱买周边\n- 熬夜打榜第二天上班迟到\n- 因为偶像跟朋友吵架（「你居然不喜欢他？！」）\n\n你想：追星——是把光借给别人，还是把自己燃烧殆尽？\n\n「饭圈：你以为你在追星——其实你在追一个理想中的自己。」',
+      cond: g => g.age >= 16 && g.age <= 30 && !g.flags.fanEconomy,
+      choices:[
+        { label:'也被安利了，开始追一个偶像', hint:'-💰 +😊 -🧠', fn: g => { g.flags.fanEconomy=true; g.flags.idolFollower=true; g.money -= 3000; return{mood:10,intel:-3}; }},
+        { label:'劝小陈理性消费，帮她算了一笔账', hint:'+🤝 +🧠', fn: g => { g.flags.fanEconomy=true; g.flags.rationalHelper=true; return{social:8,intel:5}; }},
+        { label:'不理解但尊重，毕竟每个人有爱好', hint:'+🧠', fn: g => { g.flags.fanEconomy=true; return{intel:3,mood:2}; }},
+      ]},
+    { id:'camping_lifestyle', icon:'⛺', title:'露营热', category:'hobby',
+      body:'你被朋友拉去露营了。\n\n不是那种背包客的硬核露营——而是「精致露营」：\n- 帐篷是北欧风的\n- 桌椅是实木折叠的\n- 炊具是铸铁锅+卡式炉\n- 灯光是氛围感串灯\n- 音箱在放轻音乐\n\n你在星空下喝着精酿啤酒，觉得：这才是生活。\n\n但你算了一下装备费用：\n- 帐篷：3000元\n- 睡袋+垫子：800元\n- 桌椅：600元\n- 炊具+灯具：1000元\n- 总计：5400元（而且一年用不了几次）\n\n你发了条朋友圈——点赞200+。\n\n你开始怀疑：你到底是喜欢露营——还是喜欢「发露营朋友圈」？\n\n「精致露营：你逃离了城市——但带了城市的所有装备。」',
+      cond: g => g.age >= 20 && g.age <= 40 && !g.flags.campingLifestyle && g.money >= 5000,
+      choices:[
+        { label:'入坑了，买全套装备成了露营达人', hint:'-💰 +😊 +✨', fn: g => { g.flags.campingLifestyle=true; g.flags.campingPro=true; g.money -= 8000; return{mood:12,charm:5,health:5}; }},
+        { label:'偶尔去，享受自然就好不用太装备', hint:'+😊 +❤️', fn: g => { g.flags.campingLifestyle=true; g.flags.natureLover=true; return{mood:8,health:5}; }},
+        { label:'觉得就是中产阶级的消费陷阱', hint:'+🧠', fn: g => { g.flags.campingLifestyle=true; return{intel:5,mood:2}; }},
+      ]},
+    { id:'short_video_creator', icon:'📹', title:'短视频创作', category:'career',
+      body:'你决定不再只是刷短视频——而是开始拍。\n\n你选了一个你擅长的领域：做饭。\n\n第一条视频：你在出租屋里做了一碗葱油拌面。\n\n播放量：300。\n\n你没有放弃。你开始研究：\n- 什么样的标题吸引人\n- 怎样的剪辑节奏让人看不停\n- 什么时间发布效果最好\n- 怎么在评论区跟观众互动\n\n第20条视频——爆了。播放量50万。\n\n你收到了第一条广告邀请：一个酱油品牌，报价2000元。\n\n你激动了：也许——你真的可以靠这个赚钱？\n\n但你也看到了数据：99%的短视频创作者——月收入不到100元。\n\n「短视频：每个人都可以拍——但不是每个人都能活。」',
+      cond: g => g.age >= 18 && g.age <= 40 && !g.flags.shortVideoCreator,
+      choices:[
+        { label:'全力投入短视频创作，当成事业来做', hint:'+💰 +😊 -❤️', fn: g => { g.flags.shortVideoCreator=true; g.flags.fullTimeCreator=true; return{money:3000,mood:10,health:-3}; }},
+        { label:'当副业做，利用业余时间拍', hint:'+💰 +🧠', fn: g => { g.flags.shortVideoCreator=true; g.flags.sideCreator=true; return{money:1500,intel:5}; }},
+        { label:'拍着玩玩，不追求变现', hint:'+😊 +✨', fn: g => { g.flags.shortVideoCreator=true; return{mood:8,charm:3}; }},
+      ]},
+    { id:'pet_social_v24_5', icon:'🐕', title:'宠物社交', category:'social',
+      body:'你带猫去了猫咖。\n\n你以为猫咖是给人喝咖啡的——其实是给猫社交的。\n\n你发现了一个现象：\n- 养猫的人有「猫友群」\n- 养狗的人有「狗友群」\n- 每天在群里晒宠物照片\n- 周末约着一起遛狗/带猫聚会\n- 宠物生日一起庆祝\n- 宠物生病一起出主意\n\n你加了猫友群后——\n- 认识了30个同样养猫的朋友\n- 通过猫友找到了一个很好的工作机会\n- 有人帮你免费照看猫（你出差时）\n- 你的社交圈——因为一只猫——扩大了3倍\n\n你看着你的猫：「你知道你帮我认识了多少人吗？」\n\n猫：「……喵。」\n\n「宠物社交：你以为你在养宠物——其实宠物在养你的社交。」',
+      cond: g => g.age >= 20 && !g.flags.petSocial && g.flags.hasPet,
+      choices:[
+        { label:'成了猫友群活跃分子，组织聚会', hint:'+🤝 +😊', fn: g => { g.flags.petSocial=true; g.flags.petCommunityLeader=true; return{social:15,mood:10,charm:5}; }},
+        { label:'加了群偶尔聊聊，挺好', hint:'+🤝 +😊', fn: g => { g.flags.petSocial=true; return{social:8,mood:5}; }},
+        { label:'不太社交，还是自己跟猫待着舒服', hint:'+😊', fn: g => { g.flags.petSocial=true; return{mood:3}; }},
+      ]},
+    { id:'nostalgia_consumption', icon:'📼', title:'复古怀旧', category:'hobby',
+      body:'你路过了一家「复古商店」。\n\n里面全是80-90年代的东西：\n- 黑胶唱片机\n- 胶片相机\n- 老式收音机\n- 磁带和CD\n- 红白机（任天堂FC）\n- 铁皮青蛙\n- 大大泡泡糖\n\n你花了200块买了一台红白机。\n\n回家连上电视——超级玛丽、魂斗罗、双截龙——全都能玩！\n\n你突然被打回了10岁。\n\n你想起那时候的快乐：\n- 不用加班\n- 不用还房贷\n- 最大的烦恼是作业\n- 最快乐的事是一根冰棍\n\n你哭了。不是难过——是怀念。\n\n「复古：你买的不是旧东西——是回不去的旧时光。」',
+      cond: g => g.age >= 25 && !g.flags.nostalgiaConsumption,
+      choices:[
+        { label:'成了复古收藏爱好者，经常淘旧货', hint:'-💰 +😊 +✨', fn: g => { g.flags.nostalgiaConsumption=true; g.flags.vintageCollector=true; g.money -= 5000; return{mood:12,charm:5}; }},
+        { label:'买了几件怀旧一下就好', hint:'-💰 +😊', fn: g => { g.flags.nostalgiaConsumption=true; g.money -= 500; return{mood:8}; }},
+        { label:'觉得旧的不去新的不来，没买', hint:'+🧠', fn: g => { g.flags.nostalgiaConsumption=true; return{intel:3}; }},
+      ]},
+    { id:'indie_bookstore', icon:'📚', title:'独立书店', category:'hobby',
+      body:'你发现了一家独立书店。\n\n它藏在一条小巷子里，没有招牌。\n\n推开门——\n- 满墙的书架\n- 一只猫趴在柜台上\n- 咖啡的香味\n- 轻柔的爵士乐\n- 几个安静看书的人\n\n老板说：「我们靠咖啡养活书店。」\n\n你在角落里坐了一下午，看完了一本一直想看的书。\n\n你发现——这是你这一年里最平静的一下午。\n\n没有手机、没有通知、没有KPI——只有你和一本书。\n\n你成了这里的常客。\n\n在这个什么都快的时代——有一个地方——允许你慢下来。\n\n「独立书店：城市最后的慢空间——也是最后的庇护所。」',
+      cond: g => g.age >= 20 && !g.flags.indieBookstore && g.intel >= 20,
+      choices:[
+        { label:'成了书店的常客和志愿者', hint:'+😊 +🧠 +🤝', fn: g => { g.flags.indieBookstore=true; g.flags.bookstoreRegular=true; return{mood:12,intel:10,social:5}; }},
+        { label:'偶尔去坐坐，享受安静', hint:'+😊 +🧠', fn: g => { g.flags.indieBookstore=true; return{mood:8,intel:5}; }},
+        { label:'去了一次觉得不错，但还是喜欢电子书', hint:'+🧠', fn: g => { g.flags.indieBookstore=true; return{intel:3}; }},
+      ]},
+    { id:'community_group_buy_v24_5', icon:'🛒', title:'社区团购', category:'finance',
+      body:'你被邻居拉进了社区团购群。\n\n群里有200多个人，每天都有人发：\n- 「今天车厘子29.9/斤，要的扣1」\n- 「有机蔬菜套餐39.9，明早送到」\n- 「东北大米10斤装28元」\n- 「新疆阿克苏苹果5斤25元」\n\n你买了几次——确实比超市便宜30%。\n\n但你也发现了问题：\n- 有时候质量不稳定\n- 退款很麻烦\n- 团长（群主）有时候跑路\n- 你开始买很多不需要的东西\n\n你算了一下：因为「便宜」——你每月多花了800元。\n\n你想起了那句话：「便宜的东西——其实最贵。」\n\n「社区团购：省钱是真的——花更多钱也是真的。」',
+      cond: g => g.age >= 22 && !g.flags.communityGroupBuy,
+      choices:[
+        { label:'成了团长，赚佣金+省钱', hint:'+💰 +🤝', fn: g => { g.flags.communityGroupBuy=true; g.flags.groupBuyLeader=true; return{money:3000,social:10}; }},
+        { label:'只买需要的，理性消费', hint:'+💰 +🧠', fn: g => { g.flags.communityGroupBuy=true; g.flags.smartShopper=true; return{money:1000,intel:3}; }},
+        { label:'控制不住手，退了群保平安', hint:'+😊 +💰', fn: g => { g.flags.communityGroupBuy=true; g.flags.shoppingDetox=true; return{mood:5,money:500}; }},
+      ]},
+    { id:'podcast_listener_v24_5', icon:'🎧', title:'播客时代', category:'education',
+      body:'你开始听播客了。\n\n通勤的1小时——不再只是刷短视频了。\n\n你喜欢的播客：\n- 《商业就是这样》：用通俗语言讲商业逻辑\n- 《随机波动》：三个女生聊社会议题\n- 《忽左忽右》：深度历史访谈\n- 《声东击西》：科技与人文\n\n你发现：\n- 1小时的播客比100条短视频更有深度\n- 你开始思考更多「大问题」\n- 你跟同事聊天时能引用更多观点\n- 你的思维变得更开阔了\n\n但也有副作用：\n- 你开始觉得自己「什么都知道一点」\n- 实际上——你只是听了，没有做\n\n「播客：听见了——不等于听到了。听到了——不等于做到了。」',
+      cond: g => g.age >= 20 && !g.flags.podcastListener && g.intel >= 15,
+      choices:[
+        { label:'成了重度播客听众，每天听2小时', hint:'+🧠 +😊', fn: g => { g.flags.podcastListener=true; g.flags.podcastAddict=true; return{intel:12,mood:5}; }},
+        { label:'选了几个精品播客，通勤时听', hint:'+🧠', fn: g => { g.flags.podcastListener=true; return{intel:8}; }},
+        { label:'更喜欢看书，播客太慢了', hint:'+🧠', fn: g => { g.flags.podcastListener=true; return{intel:5}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -13167,6 +13248,12 @@ const ACHIEVEMENTS = [
     { id:'family_priority_ach', icon:'👴', name:'陪伴为先', desc:'增加回家频率优先陪伴父母', check: g => g.flags.familyPriority },
     { id:'family_communicator_ach', icon:'🗣️', name:'家庭沟通师', desc:'定期召开家庭会议建立沟通', check: g => g.flags.familyCommunicator },
     { id:'free_parenting_ach', icon:'🐯', name:'自由教育', desc:'拒绝鸡娃给孩子自由成长空间', check: g => g.flags.freeParenting },
+    // v24.5: 文化娱乐成就
+    { id:'script_kill_fan_ach', icon:'🎭', name:'剧本杀达人', desc:'成了剧本杀常客', check: g => g.flags.scriptKillFan },
+    { id:'game_balanced_ach', icon:'🎮', name:'游戏平衡', desc:'学会平衡游戏与现实生活', check: g => g.flags.gameBalanced },
+    { id:'camping_pro_ach', icon:'⛺', name:'露营达人', desc:'入坑精致露营生活', check: g => g.flags.campingPro },
+    { id:'bookstore_regular_ach', icon:'📚', name:'书店常客', desc:'成了独立书店的常客和志愿者', check: g => g.flags.bookstoreRegular },
+    { id:'podcast_addict_ach', icon:'🎧', name:'播客重度用户', desc:'每天听播客开阔思维', check: g => g.flags.podcastAddict },
 ];
 
 // === ENDINGS === (order matters: first match wins)
