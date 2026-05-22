@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v22.9
+// 都市浮生记 - Game Engine v23.0
 // ============================================
 
 // === GAME STATE ===
@@ -11185,6 +11185,87 @@ const EVENTS = [
         { label:'选择了一个城市扎根', hint:'+😊 +🤝', fn: g => { g.flags.homeOrRoad=true; g.flags.rootedCity=true; return{mood:15,social:10}; }},
         { label:'还在寻找中，但接受了这种不确定', hint:'+🧠 +😊', fn: g => { g.flags.homeOrRoad=true; return{intel:10,mood:8}; }},
       ]},
+    // === v23.0 新增事件（性格特质系统 + 人生复盘 + 引擎优化） ===
+    { id:'trait_adventurer_event', icon:'🧭', title:'冒险者的选择', category:'career',
+      body:'你被一家创业公司邀请加入——他们正在做一件很酷的事：用AI改变教育。\n\n创始人说：「我们不需要稳定的人，我们需要敢赌的人。」\n\n薪资比你现在的低30%，但有期权。如果公司上市，你的期权可能值几百万。\n\n如果失败了——你浪费了两三年。\n\n你的理性告诉你：风险太高。\n你的直觉告诉你：这才是你应该做的事。\n\n你的冒险者直觉在燃烧。\n\n「冒险者的悖论：最大的风险是不冒任何风险——因为你永远不知道自己能走多远。」',
+      cond: g => g.traits && g.traits.adventurer && !g.flags.adventurerChoice && g.age >= 25,
+      choices:[
+        { label:'加入了创业公司，赌一把未来', hint:'+💰 高风险高回报', fn: g => { g.flags.adventurerChoice=true; if(Math.random()<0.45){g.flags.startupSuccess=true; return{money:50000,mood:20,intel:10};}else{return{money:-10000,mood:-5,intel:8};} }},
+        { label:'婉拒了，继续现在的路', hint:'+😊', fn: g => { g.flags.adventurerChoice=true; return{mood:5}; }},
+        { label:'提出了兼职合作的方式', hint:'+🧠 +💰', fn: g => { g.flags.adventurerChoice=true; g.flags.partTimeStartup=true; return{intel:8,money:3000,mood:8}; }},
+      ]},
+    { id:'trait_rational_event', icon:'📊', title:'数据驱动的人生', category:'finance',
+      body:'你做了一件以前从未做的事：用Excel分析了你过去5年的财务数据。\n\n结果让你震惊：\n- 月均收入：9,800元\n- 月均支出：7,200元\n- 储蓄率：26.5%\n- 最大支出类别：房租（35%）\n- 第二大支出：餐饮（22%）\n- 冲动消费占比：18%\n\n你发现：如果减少冲动消费，5年后你可以攒够首付。\n\n你开始建立财务模型：\n- 每月定投3000元到基金\n- 减少外卖，自己做饭\n- 取消不必要的订阅\n\n一年下来，你的存款比之前多了40%。\n\n你的理性派特质让你看到了数字背后的真相。\n\n「数据不会骗人——但人会骗自己。」',
+      cond: g => g.traits && g.traits.rational && !g.flags.dataDrivenLife,
+      choices:[
+        { label:'严格执行了财务计划', hint:'+💰💰 +🧠', fn: g => { g.flags.dataDrivenLife=true; return{money:8000,intel:10,mood:5}; }},
+        { label:'做了计划，但执行得一般', hint:'+💰 +🧠', fn: g => { g.flags.dataDrivenLife=true; return{money:3000,intel:5}; }},
+        { label:'分析完之后反而焦虑了', hint:'+🧠 -😊', fn: g => { g.flags.dataDrivenLife=true; return{intel:8,mood:-5}; }},
+      ]},
+    { id:'trait_emotional_event', icon:'🎨', title:'感性的一天', category:'hobby',
+      body:'今天，你做了一件「没用」的事。\n\n你在公园坐了一整个下午，画了一幅水彩画。\n\n画得不好——天空歪了，树也歪了，但你觉得很开心。\n\n你的同事问：「画这个有什么用？」\n\n你说：「没有用。但我喜欢。」\n\n你的感性让你看到了理性看不到的东西：\n- 一朵花的颜色变化\n- 一阵风带来的花香\n- 一只猫的慵懒姿态\n- 一首歌里隐藏的悲伤\n\n你的感性不是弱点——是天赋。\n\n它让你在这个功利的世界里，依然能感受到美。\n\n你决定每周给自己一个「无用」的下午——做那些没有产出、没有收益、但让你快乐的事。\n\n「在一个崇尚效率的世界里，做无用的事是最勇敢的反抗。」',
+      cond: g => g.traits && g.traits.emotional && !g.flags.uselessAfternoon,
+      choices:[
+        { label:'坚持了每周「无用下午」，生活更有色彩', hint:'+😊 +😊', fn: g => { g.flags.uselessAfternoon=true; return{mood:18,health:5,charm:5}; }},
+        { label:'画了一段时间，开始在网上卖画', hint:'+💰 +😊', fn: g => { g.flags.uselessAfternoon=true; g.flags.sellArt=true; return{mood:12,money:2000,charm:8}; }},
+        { label:'试了几次，觉得自己确实没有天赋', hint:'+🧠', fn: g => { g.flags.uselessAfternoon=true; return{intel:5,mood:-3}; }},
+      ]},
+    { id:'trait_socialite_event', icon:'🎉', title:'社交达人组局', category:'social',
+      body:'你组织了一次大聚会——把你认识的各路朋友都叫到了一起。\n\n来了15个人：\n- 你的饭搭子小王\n- 你的健身搭子阿强\n- 你的前同事\n- 你在共享办公认识的朋友\n- 还有他们各自带来的朋友\n\n聚会很成功。大家吃火锅、玩游戏、聊八卦。\n\n你在人群中穿梭，照顾每个人的情绪，把互相不认识的人介绍给对方。\n\n聚会结束后，你在群里收到了一堆消息：\n- 「今天太开心了！」\n- 「下次还来！」\n- 「你是我们的灵魂组局人！」\n\n你觉得：这可能就是你最大的天赋——把不同的人连接在一起。\n\n「社交达人的价值不在于认识多少人——在于能让多少人因为你的连接而受益。」',
+      cond: g => g.traits && g.traits.socialite && !g.flags.masterGathering,
+      choices:[
+        { label:'开始定期组局，成了朋友圈的核心', hint:'+🤝 +😊', fn: g => { g.flags.masterGathering=true; return{social:15,mood:12,charm:8}; }},
+        { label:'从中发现了商机，开始做社交活动创业', hint:'+💰 +🧠', fn: g => { g.flags.masterGathering=true; g.flags.socialBiz=true; return{money:5000,intel:10,social:10}; }},
+        { label:'开心了一晚上，但第二天觉得有点累', hint:'+😊', fn: g => { g.flags.masterGathering=true; return{mood:8,social:5}; }},
+      ]},
+    { id:'trait_loner_event', icon:'🐺', title:'独行侠的自白', category:'psychology',
+      body:'你一个人去了一个没有信号的山里，待了三天。\n\n没有手机、没有社交媒体、没有工作邮件。只有你、山、和星星。\n\n第一天：焦虑。你不停地想拿手机看消息。\n第二天：平静。你开始听到自己的心跳。\n第三天：顿悟。\n\n你想明白了很多事：\n- 你不需要别人的认可来定义自己\n- 独处不是逃避——是充电\n- 你最大的竞争对手不是别人——是昨天的自己\n\n回到城市后，你的朋友问你：「你不觉得孤独吗？」\n\n你说：「一个人不等于孤独。很多人在一起也不一定不孤独。」\n\n你的独行侠特质不是社交障碍——是你知道，最好的陪伴是自己的陪伴。\n\n「独行侠不是没有朋友——是他学会了在独处中找到力量。」',
+      cond: g => g.traits && g.traits.loner && !g.flags.lonerRetreat,
+      choices:[
+        { label:'把独处变成了习惯，每月一次「断联日」', hint:'+😊 +💪', fn: g => { g.flags.lonerRetreat=true; return{mood:15,health:8,intel:8}; }},
+        { label:'在山里写了一篇长文，发在了公众号上', hint:'+😊 +🤝', fn: g => { g.flags.lonerRetreat=true; g.flags.lonerWriter=true; return{mood:12,intel:10,social:5,charm:5}; }},
+        { label:'想通了一些事，回来后生活照旧', hint:'+🧠', fn: g => { g.flags.lonerRetreat=true; return{intel:8,mood:5}; }},
+      ]},
+    { id:'trait_pragmatist_event', icon:'🏗️', title:'务实者的计划', category:'finance',
+      body:'你做了一件很「无聊」但很重要的事：制定了一个5年计划。\n\n你的计划包括：\n1. 财务目标：5年内存款达到50万\n2. 职业目标：在行业内建立专业口碑\n3. 健康目标：保持体脂率25%以下\n4. 学习目标：每年考一个证书\n5. 关系目标：维护5个核心关系\n\n你把计划打印出来，贴在了墙上。\n\n你的朋友看了说：「这也太无趣了吧？」\n\n你笑了笑。你知道：\n- 大城市的竞争不是靠激情赢的——是靠持续性\n- 每天进步1%，一年后你会进步37倍\n- 复利是世界第八大奇迹\n\n一年后，你的计划完成率：72%。不完美，但比没有计划好太多了。\n\n「务实主义者不追风口——他们建房子。」',
+      cond: g => g.traits && g.traits.pragmatist && !g.flags.fiveYearPlan,
+      choices:[
+        { label:'严格执行，一年后超额完成目标', hint:'+💰💰 +🧠', fn: g => { g.flags.fiveYearPlan=true; return{money:15000,intel:12,mood:10}; }},
+        { label:'执行了大部分，小有收获', hint:'+💰 +😊', fn: g => { g.flags.fiveYearPlan=true; return{money:8000,intel:8,mood:8}; }},
+        { label:'计划赶不上变化，只完成了一半', hint:'+🧠', fn: g => { g.flags.fiveYearPlan=true; return{intel:5,mood:3}; }},
+      ]},
+    { id:'trait_idealist_event', icon:'🌈', title:'理想主义者的困境', category:'psychology',
+      body:'你陷入了一个困境：你既想追求理想，又需要面对现实。\n\n你想写一本小说。你已经构思了很久，但一直没动笔。\n\n原因是：\n- 写小说不赚钱\n- 你不确定自己写得好不好\n- 你怕浪费时间\n- 你怕被嘲笑\n\n但你的内心一直在催你：写吧。\n\n你的一个朋友说：「你先写出来，好不好让别人评判。」\n\n你的另一个朋友说：「梦想不能当饭吃。」\n\n你决定：不管了，先写了再说。最差的结果不过是浪费了一些时间。\n\n你每天下班后写2000字。三个月后，你写了18万字。\n\n你把它发在了网上。阅读量：127。\n\n但你不在乎。因为你终于做了自己一直想做的事。\n\n「理想主义者的困境不是理想不现实——是现实总在要求你放弃理想。」',
+      cond: g => g.traits && g.traits.idealist && !g.flags.idealistDilemma,
+      choices:[
+        { label:'坚持写作，慢慢积累读者', hint:'+😊 +🧠', fn: g => { g.flags.idealistDilemma=true; g.flags.novelist=true; return{mood:15,intel:12,charm:8}; }},
+        { label:'写完了第一部，开始投稿出版社', hint:'+💰 +😊', fn: g => { g.flags.idealistDilemma=true; if(Math.random()<0.3){return{money:20000,mood:20,charm:10};}else{return{mood:5,intel:8};} }},
+        { label:'写了三个月，放弃了', hint:'+🧠 -😊', fn: g => { g.flags.idealistDilemma=true; return{intel:5,mood:-8}; }},
+      ]},
+    { id:'life_chapter_review', icon:'📖', title:'人生篇章回顾', category:'psychology',
+      body:'你在整理旧照片时，看到了很多年前的自己。\n\n你决定做一次「人生篇章回顾」——把你的人生分成几个章节：\n\n**第一章：童年**\n那时的你，觉得世界是公平的，努力就有回报。\n\n**第二章：求学**\n你开始发现世界不公平——但你还相信努力。\n\n**第三章：大城市**\n你来到了大城市。你被震撼了，也被打击了。\n\n**第四章：挣扎**\n你换了几份工作，搬了几次家，失去了一些朋友。\n\n**第五章：现在的你**\n你不再天真，但也没有变得冷漠。\n你不再理想主义，但也没有完全务实。\n你不再是当初那个你——但你还是你。\n\n你看着照片笑了。你不知道第六章会是什么——但你知道，故事还没结束。\n\n「人生不是一条直线——是一系列章节。每一章都有它的意义。」',
+      cond: g => g.age >= 30 && !g.flags.chapterReview && g.intel >= 25,
+      choices:[
+        { label:'把回顾写成了一封信，给未来的自己', hint:'+😊 +🧠', fn: g => { g.flags.chapterReview=true; return{mood:15,intel:10}; }},
+        { label:'和老朋友聚了一次，聊了很多以前的事', hint:'+😊 +🤝', fn: g => { g.flags.chapterReview=true; return{mood:12,social:10}; }},
+        { label:'感慨了一番，然后继续生活', hint:'+🧠', fn: g => { g.flags.chapterReview=true; return{intel:5,mood:5}; }},
+      ]},
+    { id:'crossroad_midlife', icon:'🔀', title:'中年十字路口', category:'career',
+      body:'你40多岁了，站在一个十字路口。\n\n你的左边：\n- 继续现在的工作——稳定但无聊\n- 你知道退休前大概就是这个样子了\n\n你的右边：\n- 做一些完全不同的事——有风险但有可能更充实\n- 可能是创业、学习新领域、或者搬到另一个城市\n\n你的身后：\n- 20多年的工作经验\n- 一些人脉和积蓄\n- 一些遗憾和一些骄傲\n\n你的面前：\n- 一个选择\n\n你问自己：如果我现在不做，以后会不会后悔？\n\n你的答案已经很明显了。问题只是：你敢不敢执行。\n\n「中年不是危机——是清算。你清算自己还有多少勇气。」',
+      cond: g => g.age >= 40 && g.age <= 50 && !g.flags.midlifeCrossroad,
+      choices:[
+        { label:'做了大胆的改变——不想带着遗憾过完下半生', hint:'+😊 -💰', fn: g => { g.flags.midlifeCrossroad=true; g.flags.boldMidlife=true; return{mood:15,money:-20000,charm:10,intel:5}; }},
+        { label:'选择了安稳——把精力放在家庭和健康上', hint:'+💪 +🤝', fn: g => { g.flags.midlifeCrossroad=true; return{health:10,social:8,mood:8}; }},
+        { label:'纠结了很久，最终什么都没变', hint:'+🧠', fn: g => { g.flags.midlifeCrossroad=true; return{intel:5,mood:-5}; }},
+      ]},
+    { id:'wisdom_sharing', icon:'📝', title:'分享你的智慧', category:'social',
+      body:'你发现了一件事：你的人生经验是有价值的。\n\n一个年轻同事问你：「你是怎么在大城市活下来的？」\n\n你认真地回答了他。他听完后说：「谢谢，这些话对我很有帮助。」\n\n你开始在社交平台上分享你的经验：\n- 大城市生存指南\n- 职场避坑经验\n- 理财入门知识\n- 心态管理技巧\n\n你的文章被一个公众号转载了。阅读量：10万+。\n\n评论区里，很多人说：「谢谢你说出了我不敢说的话。」「你的经历让我觉得我不孤单。」\n\n你发现：分享你的经验不仅是帮助别人——也是给自己的人生赋予意义。\n\n「你经历过的痛苦和迷茫，如果能帮到一个人少走弯路，那就不是白费的。」',
+      cond: g => g.age >= 32 && !g.flags.wisdomSharing && g.intel >= 30,
+      choices:[
+        { label:'开始认真经营个人品牌', hint:'+💰 +🤝', fn: g => { g.flags.wisdomSharing=true; g.flags.personalBrand=true; return{money:3000,social:12,charm:10,intel:5}; }},
+        { label:'写了几篇文章，但不追求流量', hint:'+😊 +🧠', fn: g => { g.flags.wisdomSharing=true; return{mood:10,intel:8}; }},
+        { label:'觉得自己没什么值得分享的', hint:'', fn: g => { g.flags.wisdomSharing=true; return{mood:-3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -12210,6 +12291,12 @@ const ACHIEVEMENTS = [
     { id:'digital_nomad_ach_v22_9', icon:'🌍', name:'数字游民', desc:'过上了边走边工作的生活', check: g => g.flags.nomadLife },
     { id:'freelancer_ach_v22_9', icon:'🎯', name:'自由职业者', desc:'成为了一名自由职业者', check: g => g.flags.freelanceStable },
     { id:'inner_peace_ach', icon:'🕊️', name:'内心安定', desc:'找到了属于自己的家', check: g => g.flags.innerPeace },
+    // === v23.0 新增成就（性格特质系统与大版本更新） ===
+    { id:'adventurer_trait_ach', icon:'🧭', name:'冒险者觉醒', desc:'发现了自己天生的冒险精神', check: g => g.traits && g.traits.adventurer },
+    { id:'rational_trait_ach', icon:'📊', name:'理性觉醒', desc:'成为了数据驱动的理性决策者', check: g => g.traits && g.traits.rational },
+    { id:'novelist_ach', icon:'📝', name:'业余作家', desc:'完成了自己的第一部小说', check: g => g.flags.novelist },
+    { id:'personal_brand_ach', icon:'🌟', name:'个人品牌', desc:'建立了自己的个人品牌', check: g => g.flags.personalBrand },
+    { id:'life_reviewer_ach', icon:'📖', name:'人生复盘师', desc:'认真回顾了自己的人生篇章', check: g => g.flags.chapterReview },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -12515,6 +12602,12 @@ const ENDINGS = [
     // --- v21.0 人生哲学结局 ---
     { id:'philosopher_end', badge:'🌟', title:'觉醒者', desc:'你成了一个觉醒者。\n\n你经历了死亡教育、做了临终关怀志愿者、写了回忆录、找到了Ikigai、形成了自己的人生哲学。你不再焦虑于别人怎么看你，不再恐惧于未知的未来。\n\n你的朋友们说：「你变了。你以前很焦虑，现在很平静。」\n\n你说：「不是平静——是通透。我终于知道了什么是最重要的。」\n\n一个年轻人问你：「人生最重要的是什么？」\n\n你微笑着说：「活着。清醒地活着。」\n\n「觉醒：不是看透了世界——是看透了自己。当你不再跟自己较劲的时候，整个世界都变得温柔了。」', cond: g => g.flags.lifePhilosophy && g.flags.personalGrowth && (g.flags.deathAware || g.flags.lifeChanged) && (g.flags.foundIkigai || g.flags.stoic) && g.mood >= 70 && g.intel >= 70 && g.age >= 35 },
     { id:'meaningful_life_end', badge:'📖', title:'有意义的一生', desc:'你过了有意义的一生。\n\n你没有成为亿万富翁，没有改变世界，没有名垂青史。但你：认真爱过几个人、做过几件让自己骄傲的事、帮助过一些需要帮助的人、写过一些让自己感动的文字。\n\n你的回忆录里有欢笑也有泪水。你的人生清单完成了7件。你的感恩日记写了365天。\n\n你的孩子在你的书架上发现了你的回忆录。他们翻开第一页，上面写着：\n\n「给我最爱的孩子们：你们的爸爸/妈妈，这辈子最大的成就，就是有了你们。」\n\n「有意义的一生：不是活得多长——是活得多深。当你的每一天都有意义，一辈子就够了。」', cond: g => (g.flags.memoirist || g.flags.listCompleter) && g.flags.gratitude && g.mood >= 65 && g.age >= 40 && g.achievements.length >= 15 },
+    // --- v23.0 性格特质结局 ---
+    { id:'adventurer_end', badge:'🧭', title:'永远在路上', desc:'你选择了永远在路上。\n\n你创过业、旅居过好几个城市、做过数字游民、尝试过各种冒险。你的人生不是一条直线——是一张地图。\n\n你的护照上盖满了章。你的微信好友来自20个省份和10个国家。你的故事可以写一本书。\n\n有人问你：「你不累吗？」\n\n你说：「累。但停下来更累——因为我会想，我错过了什么。」\n\n你的冒险精神不是鲁莽——是你知道：人生最大的遗憾不是做了什么，是没做什么。\n\n「冒险者：不是不怕失败——是知道失败也是故事的一部分。」', cond: g => g.traits && g.traits.adventurer && (g.flags.entrepreneur || g.flags.nomadLife) && g.charm >= 50 && g.age >= 35 },
+    { id:'rational_master_end', badge:'📊', title:'理性人生', desc:'你用理性和数据规划了自己的人生。\n\n你的财务模型、五年计划、健康管理——一切都井井有条。你的存款稳步增长，你的投资组合跑赢了大盘，你的体检报告比同龄人好很多。\n\n你的朋友说：「你的人生像一台精密的机器。」\n\n你说：「不是机器——是园丁。我只是学会了什么时候播种、什么时候浇水、什么时候收获。」\n\n你的一个冲动的朋友亏了大钱，来找你求助。你帮他做了一个理性的财务计划。\n\n三个月后，他对你说：「你是我见过最冷静的人。」\n\n「理性不是没有感情——是不让感情做决定。」', cond: g => g.traits && g.traits.rational && g.money >= 200000 && g.intel >= 65 && g.health >= 55 && g.age >= 35 },
+    { id:'inner_peace_end_v23', badge:'🕊️', title:'内心安宁', desc:'你找到了内心安宁。\n\n你经历了大城市的喧嚣、职场的勾心斗角、人际关系的纷扰——但最终，你找到了属于自己的平静。\n\n你不再为别人的评价失眠，不再为得不到的东西焦虑，不再为过去的事后悔。你学会了接纳——接纳自己、接纳生活、接纳不完美。\n\n你的日记本上写着一句话：「我不需要更多的东西。我需要更少的欲望。」\n\n你的一个焦虑的朋友问你：「你怎么这么平静？」\n\n你说：「因为我终于明白了——控制能控制的，接受不能控制的。」\n\n「内心安宁：不是世界变安静了——是你不再被噪音干扰了。」', cond: g => g.flags.innerPeace && g.mood >= 65 && g.intel >= 50 && g.age >= 35 },
+    { id:'community_leader_end_v23', badge:'🌐', title:'社群领袖', desc:'你成了一个社群领袖。\n\n从饭搭子到组局达人，从共享办公到社交活动创业——你把连接人变成了你的使命。\n\n你的社群有5000+成员。每周有3场活动。有人通过你的社群找到了工作、找到了对象、找到了人生方向。\n\n一个成员给你发了一条消息：「谢谢你。如果不是你的社群，我可能早就离开这个城市了。」\n\n你哭了。你没想到，你做的这些事，对别人来说这么重要。\n\n「社群的力量：一个人走得快，一群人走得远。但需要有人把这群人聚在一起。」', cond: g => g.traits && g.traits.socialite && (g.flags.masterGathering || g.flags.socialBiz) && g.social >= 70 && g.age >= 30 },
+    { id:'wisdom_elder_end_v23', badge:'📚', title:'智慧长者', desc:'你成了一个智慧的长者。\n\n你把你的经验写成了文章、做了分享、带了一些年轻人。你的人生不是一场独角戏——是一堂传承课。\n\n你的一个学生后来成了行业大佬。他回来看你，说：「当年你跟我说的那句话，改变了我的命运。」\n\n你想了想，你甚至不记得是哪句话了。\n\n但你知道：种子撒出去了，总有一些会发芽。\n\n你的书架上有一本自己写的书。封面上写着：「给后来者的100条建议——一个普通人的不普通经验。」\n\n「传承：不是你要留下什么——是你帮别人找到他们自己的路。」', cond: g => g.flags.wisdomSharing && g.flags.personalBrand && g.intel >= 60 && g.age >= 40 && g.achievements.length >= 20 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
@@ -12780,6 +12873,55 @@ function advanceMonth() {
             const choice = tp.choices[choiceIdx];
             choice.fn(G);
             G.eventLog.push({ age: G.age, text: `你做出了选择：${choice.label}` });
+        }
+    }
+
+    // v23.0: 性格特质系统 - 根据玩家行为累积特质，影响后续事件
+    if (!G.traits) G.traits = {};
+    if (G.month === 1 && !G.flags['trait_check_'+G.age]) {
+        G.flags['trait_check_'+G.age] = true;
+        // 冒险者特质：频繁换工作/创业/旅居
+        if (!G.traits.adventurer && (G.flags.entrepreneur || G.flags.nomadLife || G.flags.boldThirty || G.flags.careerTransition)) {
+            G.traits.adventurer = true;
+            G.eventLog.push({ age: G.age, text: '【特质觉醒】你发现自己是一个天生的冒险者——你不害怕未知，你害怕的是一成不变。' });
+            G.charm = clamp(G.charm + 5, 0, 100);
+        }
+        // 理性派特质：高智力/投资理财/规划
+        if (!G.traits.rational && G.intel >= 60 && (G.flags.emotionalConsumption || G.flags.creatorEconomy || G.flags.seriousPlanning)) {
+            G.traits.rational = true;
+            G.eventLog.push({ age: G.age, text: '【特质觉醒】你成为了一个理性派——你习惯用数据和逻辑来做决定。' });
+            G.intel = clamp(G.intel + 5, 0, 100);
+        }
+        // 感性派特质：高心情/艺术爱好/情感丰富
+        if (!G.traits.emotional && (G.flags.catCafe || G.flags.collectionDisplay || G.flags.guziFan || G.flags.animeFan)) {
+            G.traits.emotional = true;
+            G.eventLog.push({ age: G.age, text: '【特质觉醒】你是一个感性的人——你用心感受世界，而不是用脑分析它。' });
+            G.mood = clamp(G.mood + 8, 0, 100);
+        }
+        // 社交达人特质：高社交/搭子/社区
+        if (!G.traits.socialite && G.social >= 55 && (G.flags.mealBuddyWang || G.flags.toyCommunity || G.flags.coWorkNetwork)) {
+            G.traits.socialite = true;
+            G.eventLog.push({ age: G.age, text: '【特质觉醒】你是一个社交达人——你在人群中如鱼得水，独处时反而不自在。' });
+            G.social = clamp(G.social + 5, 0, 100);
+        }
+        // 独行侠特质：低社交/独处/自由职业
+        if (!G.traits.loner && G.social < 40 && (G.flags.soloLifeJoy || G.flags.freelancer || G.flags.digitalDetoxV3)) {
+            G.traits.loner = true;
+            G.eventLog.push({ age: G.age, text: '【特质觉醒】你是一个独行侠——你不需要别人的认可来证明自己的价值。' });
+            G.health = clamp(G.health + 5, 0, 100);
+        }
+        // 务实主义特质：买房/存钱/考公
+        if (!G.traits.pragmatist && (G.flags.hasHouse || G.flags.civilServant || (G.money > 100000 && G.flags.seriousPlanning))) {
+            G.traits.pragmatist = true;
+            G.eventLog.push({ age: G.age, text: '【特质觉醒】你是一个务实主义者——你相信脚踏实地比空想更靠谱。' });
+            G.money += 2000;
+        }
+        // 理想主义特质：创作者/自媒体/追梦
+        if (!G.traits.idealist && (G.flags.createdShortVideo || G.flags.indieGameDev || G.flags.doujinCreate || G.flags.memoir)) {
+            G.traits.idealist = true;
+            G.eventLog.push({ age: G.age, text: '【特质觉醒】你是一个理想主义者——你相信生活不止眼前的苟且，还有诗和远方。' });
+            G.mood = clamp(G.mood + 5, 0, 100);
+            G.charm = clamp(G.charm + 5, 0, 100);
         }
     }
 
