@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v7.8
+// 都市浮生记 - Game Engine v8.1
 // ============================================
 
 // === GAME STATE ===
@@ -11,6 +11,12 @@ const G = {
     eventLog: [], achievements: [],
     money: 5000, health: 80, mood: 70, intel: 60, social: 30, charm: 50,
     flags: {}, currentEvent: null, isEnded: false,
+    // v8.0: 事件去重 - 记录最近看过的事件ID，避免重复
+    recentEventIds: [],
+    // v8.0: 倒卖系统 - 背包容量5件，不同城市价格不同
+    inventory: {},
+    // v8.0: 连续月数追踪（用于事件链深度）
+    consecutiveChoices: {},
 };
 
 // === BACKGROUNDS ===
@@ -167,6 +173,176 @@ const CITIES = {
           ]},
       ]},
 };
+
+// === v8.0 倒卖交易系统 ===
+// 借鉴《北京浮生记》核心玩法：低买高卖，价格波动，城市价差
+const TRADE_GOODS = {
+    fake_phone: { name: '华强北水货手机', icon: '📱', basePrice: 800, volatility: 0.6,
+        cityMod: { shenzhen: 0.6, beijing: 1.3, shanghai: 1.4, guangzhou: 0.9, hangzhou: 1.2, chengdu: 1.1 } },
+    luxury_fake: { name: '高仿奢侈品', icon: '👜', basePrice: 500, volatility: 0.5,
+        cityMod: { guangzhou: 0.5, shanghai: 1.5, beijing: 1.3, shenzhen: 0.8, hangzhou: 1.1, chengdu: 1.0 } },
+    concert_ticket: { name: '演唱会黄牛票', icon: '🎫', basePrice: 1200, volatility: 0.8,
+        cityMod: { beijing: 1.4, shanghai: 1.5, chengdu: 0.8, shenzhen: 0.9, guangzhou: 1.0, hangzhou: 1.1 } },
+    xianyu_stuff: { name: '闲鱼捡漏货', icon: '📦', basePrice: 300, volatility: 0.7,
+        cityMod: { beijing: 1.0, shanghai: 1.0, shenzhen: 1.0, guangzhou: 1.0, hangzhou: 1.0, chengdu: 1.0 } },
+    daigou: { name: '海外代购品', icon: '✈️', basePrice: 2000, volatility: 0.4,
+        cityMod: { shanghai: 0.7, beijing: 0.9, shenzhen: 0.8, guangzhou: 1.1, hangzhou: 1.2, chengdu: 1.3 } },
+    sneaker: { name: '限量球鞋', icon: '👟', basePrice: 1500, volatility: 0.7,
+        cityMod: { shanghai: 0.8, beijing: 1.2, shenzhen: 1.0, guangzhou: 0.9, hangzhou: 1.1, chengdu: 1.3 } },
+    blind_box: { name: '隐藏款盲盒', icon: '🎁', basePrice: 200, volatility: 0.9,
+        cityMod: { beijing: 1.0, shanghai: 1.0, shenzhen: 1.0, guangzhou: 1.0, hangzhou: 1.0, chengdu: 1.0 } },
+    medicine: { name: '网红保健品', icon: '💊', basePrice: 600, volatility: 0.5,
+        cityMod: { chengdu: 0.7, guangzhou: 0.8, beijing: 1.2, shanghai: 1.1, shenzhen: 1.0, hangzhou: 1.0 } },
+};
+const MAX_INVENTORY = 5; // v8.1: 背包从8降到5，增加策略深度
+
+// 价格波动状态（每月更新）
+let tradePrices = {};
+function updateTradePrices() {
+    const city = G.city;
+    for (const [key, good] of Object.entries(TRADE_GOODS)) {
+        const cityMul = good.cityMod[city] || 1.0;
+        const randomMul = 0.5 + Math.random() * good.volatility * 2;
+        // 偶尔出现极端价格（10%概率暴涨暴跌）
+        const extremeRoll = Math.random();
+        let extremeMul = 1;
+        if (extremeRoll < 0.05) extremeMul = 2.5 + Math.random(); // 5%暴涨
+        else if (extremeRoll < 0.10) extremeMul = 0.2 + Math.random() * 0.3; // 5%暴跌
+        tradePrices[key] = Math.floor(good.basePrice * cityMul * randomMul * extremeMul);
+    }
+}
+function getInventoryCount() {
+    let count = 0;
+    for (const v of Object.values(G.inventory)) count += (v || 0);
+    return count;
+}
+
+// === v8.0 突发事件系统 ===
+// 打破严格回合制，在月度中间随机插入意外事件
+const SURPRISE_EVENTS = [
+    { id:'surprise_pickpocket', icon:'🤏', title:'地铁小偷', weight:3,
+      body:'你在地铁上感觉口袋一轻——手机没了！\n\n你回头一看，一个戴鸭舌帽的中年男人正在往车门方向挤。但门已经关了。\n\n"大城市教会你的第一课：永远不要把手机放在外衣口袋。"',
+      fn: g => ({money: -Math.floor(g.money * 0.05) - 500, mood: -12}) },
+    { id:'surprise_find_money', icon:'💵', title:'路边捡到钱', weight:2,
+      body:'你在路边捡到一个红包，打开一看——200块！\n\n你环顾四周，没人注意你。\n\n你的良心说：交给警察。你的钱包说：今天加餐。\n\n"这200块够你吃一周外卖了。"',
+      fn: g => { const r = Math.random(); if (r > 0.7) { return { money: 200, mood: 10 }; } else { return { money: 200, mood: 5, health: -2 }; /* 吃了路边摊 */ } } },
+    { id:'surprise_landlord', icon:'🏠', title:'房东突袭', weight:3,
+      body:'你的房东突然打电话来：从下个月开始涨房租500。\n\n你："为什么？合同还没到期啊！"\n房东："不想住可以搬走，后面排队的人多着呢。"\n\n"在大城市，你不是住在房子里，你是住在别人的投资里。"',
+      fn: g => { g.flags.rentHike = true; return {money: -2000, mood: -15}; } },
+    { id:'surprise_mlm', icon:'🤝', title:'老同学约你吃饭', weight:4,
+      body:'大学同学突然约你吃饭，你以为是叙旧——结果是安利。\n\n"我现在做的这个项目，月入五万不是梦！你只需要拉三个下线……"\n\n他两眼放光，PPT比你的年终总结还精致。\n\n"你以为他请你吃饭，其实你是他的KPI。"',
+      fn: g => ({mood: -8, social: -3}) },
+    { id:'surprise_chengguan', icon:'👮', title:'城管来了！', weight:2,
+      body:'你在路边摊买煎饼的时候，突然一声"城管来了！"——整条街的小贩像多米诺骨牌一样开始跑。\n\n你拿着半个煎饼，站在原地不知所措。\n\n"这场面比奥运会开幕式还壮观。"',
+      fn: g => { if (getInventoryCount() > 0) { /* 有货可能被没收 */ const keys = Object.keys(G.inventory).filter(k => G.inventory[k] > 0); if (keys.length > 0 && Math.random() > 0.5) { const k = keys[0]; const lost = G.inventory[k]; G.inventory[k] = 0; return {mood: -20, money: -Math.floor(lost * (tradePrices[k] || 500))}; } } return {mood: -3}; } },
+    { id:'surprise_viral', icon:'📱', title:'意外走红', weight:1,
+      body:'你随手拍的一段视频在抖音上了热门——100万播放！\n\n评论区有人说你是天才，有人说你是智障。但不管怎样，你火了。\n\n虽然这种热度大概只能维持48小时。\n\n"互联网造神只需要三秒钟，毁灭也只需要三秒。"',
+      fn: g => { g.flags.wentViral = true; return {charm: 15, social: 10, mood: 20, money: Math.floor(Math.random() * 3000)}; } },
+    { id:'surprise_scam_call', icon:'📞', title:'诈骗电话', weight:5,
+      body: () => {
+        const scripts = [
+          '"你好，我是公安局的，你的银行账户涉嫌洗钱……"\n你差点信了，直到对方说了一句带口音的普通话。',
+          '"恭喜你中奖了！只需要先交2000元手续费……"\n你心想：我连彩票都没买过。',
+          '"我是你领导，明天来我办公室一趟。先转3000块到我对公账户……"\n你心想：我领导就坐我对面。',
+          '"你的快递丢了，我们双倍赔偿，请提供银行卡号……"\n你看了看快递列表——你根本没买东西。',
+        ];
+        return scripts[Math.floor(Math.random() * scripts.length)] + '\n\n"骗子的演技，比很多演员都好。"';
+      },
+      fn: g => { if (g.intel > 60 || g.flags.antiFraud) { return {intel: 3, mood: 5}; /* 识破 */ } else if (Math.random() > 0.6) { return {money: -3000, mood: -20}; /* 上当 */ } else { return {intel: 2, mood: -5}; } } },
+    { id:'surprise_rain', icon:'🌧️', title:'暴雨通勤', weight:4,
+      body:'下班的时候突然暴雨，你的伞被大风吹翻了。你淋着雨跑了三站地铁。\n\n到地铁站的时候，你看起来像刚从游泳池里爬出来。\n\n"大城市的暴雨不挑时间，只挑你没带伞的时候。"',
+      fn: g => ({health: -5, mood: -8, charm: -3}) },
+    { id:'surprise_pay_cut', icon:'✂️', title:'公司降薪', weight:2,
+      body:'全公司邮件：由于"经营调整"，全员降薪10%。\n\nCEO在邮件最后写道："让我们一起共渡难关。"\n\n你看了看他刚换的新保时捷——确实挺难的。\n\n"所谓共渡难关，就是老板的船永远不沉。"',
+      fn: g => { if (g.jobSalary > 0) { g.jobSalary = Math.floor(g.jobSalary * 0.9); return {money: -2000, mood: -15}; } return {mood: -5}; } },
+    { id:'surprise_free_food', icon:'🍜', title:'免费试吃', weight:3,
+      body:'路过商场，一家新开的餐厅在搞免费试吃。你吃了三份——不是因为好吃，是因为免费。\n\n"免费的总是最贵的。但这次是真的免费。"',
+      fn: g => ({health: 2, mood: 8, money: 0}) },
+    { id:'surprise_traffic', icon:'🚗', title:'打车被绕路', weight:3,
+      body:'你打了一辆网约车，导航显示15分钟到家。结果司机绕了40分钟。\n\n你："师傅，这不是走反了吗？"\n司机："这条路不堵。"\n你看了看手机——这条路也不通。\n\n"导航说15分钟，司机说40分钟。你永远不知道谁在说谎。"',
+      fn: g => ({money: -50, mood: -8}) },
+    { id:'surprise_insomnia', icon:'😵', title:'失眠之夜', weight:4,
+      body:'你躺在床上，脑子里全是今天开的会、明天要交的PPT、下个月的房租、去年的年终奖……\n\n你数了300只羊，结果羊也开始加班了。\n\n凌晨3点，你终于放弃了——打开了外卖App。\n\n"失眠的人不是睡不着，是脑子不肯下班。"',
+      fn: g => ({health: -4, mood: -6, money: -80}) },
+    { id:'surprise_bonus', icon:'🎉', title:'意外奖金', weight:1,
+      body:'公司突然发了一笔项目奖金——虽然不多，但完全出乎意料。\n\n你盯着银行短信看了三遍，确认没有小数点错误。\n\n"意外之财的快乐，比预期中的加薪还大。"',
+      fn: g => ({money: Math.floor(Math.random() * 5000 + 3000), mood: 15}) },
+    { id:'surprise_neighbor', icon:'🔊', title:'邻居深夜装修', weight:3,
+      body:'凌晨1点，隔壁突然传来电钻声。你的邻居在装修。\n\n你去敲门，没人应。你打了物业电话，没人接。\n\n你戴上耳塞，打开白噪音App，但电钻声穿透了一切。\n\n"大城市的隔音效果，约等于没有。"',
+      fn: g => ({health: -3, mood: -10}) },
+    { id:'surprise_delivery', icon:'📦', title:'快递到了', weight:3,
+      body: () => {
+        const items = [
+          '你忘了什么时候买的猫粮到了——但你没有猫。\n\n你在闲鱼上挂了三天，终于卖出去了，还赚了50块。',
+          '你妈从老家寄了一箱土特产：腊肉、辣椒、还有一封手写的信。\n\n信上只有六个字："在外面照顾好自己。"\n\n你读完信，吃了三碗饭。',
+          '你的快递到了，但你忘了买的是什么。\n\n拆开一看：一个你完全不记得买过的东西。\n\n你看了看订单——凌晨2点下的单。"深夜购物的你，是另一个人。"',
+          '快递小哥打电话："你的快递放门口了啊。"\n\n你开门一看——门口放了五个快递，全是你的。\n\n你不记得买了这么多东西。但拆快递的快乐让你决定不去想了。\n\n"拆快递是成年人唯一的惊喜。"',
+        ];
+        return items[Math.floor(Math.random() * items.length)];
+      },
+      fn: g => { const r = Math.random(); if (r > 0.7) return {mood: 15, money: 50}; if (r > 0.4) return {mood: 10}; return {mood: 5, money: -200}; } },
+    { id:'surprise_meeting', icon:'💼', title:'无意义的会议', weight:4,
+      body:'你被拉进了一个两小时的会议。一个小时后你发现：这个会议本该是一封邮件。\n\n你看了看周围：有人在偷偷玩手机，有人在假装记笔记，有个人已经睡着了。\n\n"开会是打工人的合法摸鱼时间。"',
+      fn: g => ({mood: -5, intel: -1}) },
+    { id:'surprise_taxi_share', icon:'🚕', title:'顺风车奇遇', weight:2,
+      body: () => {
+        const stories = [
+          '你打了一辆顺风车，拼车的是一个跟你同公司的人。你们聊了一路，发现你们做着同样的工作，拿着一样的工资，住着同一个小区。\n\n"在大城市，你以为你是独特的，其实你是可复制的。"',
+          '你打了一辆顺风车，司机是个前程序员。他去年被裁了，现在全职开网约车。\n\n"我之前也996，现在007——但至少自由了。"\n\n你下车的时候，心里五味杂陈。',
+          '顺风车上遇到一个阿姨，一路上给你介绍了三个相亲对象。你还没来得及拒绝，她已经把微信推给你了。\n\n"阿姨的热心，比算法还精准。"',
+        ];
+        return stories[Math.floor(Math.random() * stories.length)];
+      },
+      fn: g => { const r = Math.random(); if (r > 0.5) return {social: 5, mood: 5}; return {mood: -3, social: 3}; } },
+    { id:'surprise_gym_scam', icon:'🏋️', title:'健身房跑路', weight:1,
+      body:'你常去的那家健身房——跑路了。\n\n你还有8个月的会员卡没用完。你去找物业，物业说："老板已经人间蒸发了。"\n\n你的3000块会费，换来了一身教训。\n\n"健身房的倒闭速度，比你的腹肌出现速度还快。"',
+      fn: g => ({money: -3000, mood: -12, health: -3}) },
+    { id:'surprise_wander_cat', icon:'🐈', title:'流浪猫', weight:3,
+      body:'下班路上，一只橘猫蹲在你面前，用一种"你不带我回家我就死给你看"的眼神盯着你。\n\n你蹲下来摸了摸它，它立刻蹭你的腿。\n\n你看了看自己10平米的出租屋，又看了看猫。\n\n"养猫之前你是自由的，养猫之后你是铲屎的。但自由的代价是孤独。"',
+      fn: g => { if (!g.flags.hasPet) { g.flags.hasPet = true; return {mood: 15, money: -500, social: 3}; } return {mood: 5}; } },
+    { id:'surprise_overtime_msg', icon:'📩', title:'周五下午6点的消息', weight:5,
+      body:'周五下午5:59，你的微信响了。\n\n领导："这个PPT周一开会要用，你周末辛苦一下。"\n\n你看了看刚买好的电影票——《速度与激情》。\n\n你回复："好的领导。"\n\n然后你把电影票退了。\n\n"大城市没有周末，只有另一种形式的加班。"',
+      fn: g => ({mood: -12, health: -3, money: 500}) },
+    // === v8.1 新增突发事件 ===
+    { id:'surprise_wechat_group', icon:'💬', title:'公司群消息轰炸', weight:4,
+      body:'凌晨11点，公司群突然炸了。领导连发15条60秒语音。\n\n你听完发现：他只是分享钓鱼照片。\n\n"公司群存在的意义：让你下班后继续上班。"',
+      fn: g => ({mood: -8, health: -2}) },
+    { id:'surprise_food_wrong', icon:'🍔', title:'外卖送错了', weight:3,
+      body:'你点了黄焖鸡，送来酸菜鱼。小哥说："你就吃这个吧。"\n\n酸菜鱼比黄焖鸡贵20块。\n\n"外卖送错是大城市唯一免费的升级服务。"',
+      fn: g => { if (Math.random() > 0.5) return {mood: 8, health: 2}; return {mood: -5, money: -30}; } },
+    { id:'surprise_parent_call', icon:'📞', title:'你妈来电话了', weight:3,
+      body: () => {
+        const c = ['你妈问：吃饭了吗？穿秋裤了吗？有对象了吗？\n\n你说完后她说："那没事了。"\n\n你挂了电话，鼻子有点酸。',
+          '你妈说："你爸体检血压有点高。"\n你问严重吗。她说："不严重，就让你知道一下。"\n\n"让你知道一下"="我们不想让你担心"。',
+          '你妈沉默很久："没事，就想听听你的声音。"\n\n你差点没忍住。'];
+        return c[Math.floor(Math.random() * c.length)];
+      },
+      fn: g => { if (g.relationships) g.relationships.family = clamp((g.relationships.family||60) + 5, 0, 100); return {mood: 5, social: 2}; } },
+    { id:'surprise_subway_push', icon:'🚇', title:'早高峰地铁', weight:5,
+      body:'早高峰地铁，你被推进去，脸贴着陌生人的后背。\n\n你闻到他昨晚的火锅味。到站后耳机掉了一只。\n\n"早高峰地铁不是交通工具，是人体压缩机。"',
+      fn: g => ({mood: -6, health: -2, charm: -1}) },
+    { id:'surprise_social_compare', icon:'📱', title:'朋友圈暴击', weight:4,
+      body:'刷朋友圈：室友晒特斯拉，同学晒三亚，前同事晒升职，表弟晒结婚。\n\n你看了看自己的外卖和10平米出租屋。\n\n"朋友圈是别人精心编排的预告片，你却把它当正片。"',
+      fn: g => ({mood: -10, charm: -2}) },
+    { id:'surprise_late_snack', icon:'🌙', title:'深夜烧烤摊', weight:3,
+      body:'加班到11点路过烧烤摊。本想两串，结果吃了二十串加两瓶啤酒。\n\n"深夜烧烤是打工人的精神鸦片——明知有害，欲罢不能。"',
+      fn: g => ({health: -3, mood: 10, money: -120, charm: -1}) },
+    { id:'surprise_rent_due', icon:'📅', title:'月初三连击', weight:3,
+      body:'月初：房租扣款、花呗还款、信用卡账单。\n\n工资还没到，账单先到了。\n\n"月初是大城市打工人的受难日。"',
+      fn: g => ({money: -1500, mood: -8}) },
+    { id:'surprise_wedding_invite', icon:'💒', title:'红色炸弹', weight:2,
+      body:'同事发来请帖。你算了算：这个月已经出了3个份子钱了。\n\n"份子钱是中国式社交的隐形税。"',
+      fn: g => ({money: -600, mood: -5, social: 3}) },
+    { id:'surprise_found_wallet', icon:'👛', title:'捡到钱包', weight:1,
+      body:'捡到钱包，里面有身份证和800块。你交给了派出所。\n\n失主老太太拉着你的手说："好人啊！"\n\n"做好事的快乐，比消费更上瘾。"',
+      fn: g => { if (g.relationships) g.relationships.friends = clamp((g.relationships.friends||40) + 3, 0, 100); return {mood: 15, money: 200, charm: 5}; } },
+    { id:'surprise_annual_leave', icon:'✈️', title:'年假批了', weight:1,
+      body:'去年提的年假终于批了——只批3天。够去机场吃碗面的。\n\n"年假是法定权利，但在很多公司更像恩赐。"',
+      fn: g => { if (Math.random() > 0.5) return {mood: 12, health: 5, money: -2000}; return {mood: -5}; } },
+    { id:'surprise_good_review', icon:'⭐', title:'好评返现', weight:2,
+      body:'"亲，五星好评返现2元~"\n\n你看了看一星的外卖，想了想2块钱。打了五星。\n\n"好评返现是这个时代最诚实的交易。"',
+      fn: g => ({money: 2, mood: -2}) },
+];
 
 // === EVENTS (100+) ===
 const EVENTS = [
@@ -852,7 +1028,7 @@ const EVENTS = [
         { label:'算了，卸载', hint:'+😊', fn: g => { g.flags.datingApp=true; return{mood:5,intel:3}; }},
         { label:'花钱开VIP', hint:'-💰 🎲', fn: g => { g.flags.datingApp=true; g.money-=199; if(Math.random()>0.5){g.flags.inRelationship=true;return{mood:15,charm:5,social:8}}else{return{mood:-8,money:-199}} }},
       ]},
-    { id:'blind_date', icon:'👥', title:'相亲局',
+    { id:'blind_date_v2', icon:'👥', title:'相亲局',
       body:'你妈又给你安排相亲了。这次的对象是她同事的儿子/女儿：\n\n"人家有房有车，工作稳定，就缺个对象。"\n\n你坐在咖啡厅里，对方问你的第一个问题是：\n\n"你有北京户口吗？"\n\n"相亲市场比人才市场还卷：学历、户口、房产、收入，明码标价。"',
       cond: g => g.age>=26 && !g.flags.married && !g.flags.blindDateFail && g.social>30,
       choices:[
@@ -1180,7 +1356,7 @@ const EVENTS = [
         { label:'救助流浪动物', hint:'+😊 +❤️', fn: g => { g.flags.volunteer=true; return{mood:15,health:5,charm:10,money:-500}; }},
         { label:'算了，没时间', hint:'-😊', fn: g => ({mood:-5}) },
       ]},
-    { id:'health_scare', icon:'🏥', title:'体检异常',
+    { id:'health_scare_v2', icon:'🏥', title:'体检异常',
       body:'你做了年度体检，报告显示：某项指标异常，建议复查。\n\n你慌了：上网一查，这个指标可能是小问题，也可能是大问题。\n\n你去医院复查，医生说："暂时没事，但要注意生活方式。"\n\n你松了一口气，但你知道：身体在给你发警告了。\n\n"健康就像银行：年轻时透支，老了要还。"',
       cond: g => g.age>=30 && g.health<60 && !g.flags.healthScare,
       choices:[
@@ -1253,7 +1429,7 @@ const EVENTS = [
         { label:'买礼物道歉', hint:'-💰 +❤️', fn: g => { g.relationships.partner = clamp((g.relationships.partner||0)+10, 0, 100); return{money:-1500,mood:8}; }},
         { label:'算了，分手吧', hint:'💔', fn: g => { g.flags.hasPartner=false;g.relationships.partner=0;g.flags.divorced=true; return{mood:-25,social:-10}; }},
       ]},
-    { id:'parent_sick', icon:'🏥', title:'父母生病了',
+    { id:'parent_sick_v2', icon:'🏥', title:'父母生病了',
       body:'你接到电话：你爸/妈住院了。不是大病，但需要人照顾几天。\n\n你看了看手头的项目deadline，又看了看机票价格。\n\n"子欲养而亲不待——但请假扣的钱也很痛。"',
       cond: g => g.age>=28 && g.relationships.family > 30,
       choices:[
@@ -1270,7 +1446,7 @@ const EVENTS = [
         { label:'边工作边备考', hint:'-❤️ +🧠', fn: g => { g.flags.kaogongPrep=true; return{health:-10,intel:8,mood:-5}; }},
         { label:'算了，我适合打拼', hint:'+😊', fn: g => ({mood:5}) },
       ]},
-    { id:'bride_price', icon:'💍', title:'天价彩礼',
+    { id:'bride_price_v2', icon:'💍', title:'天价彩礼',
       body:'你要结婚了，但女方家要求30万彩礼+一套房。\n\n你算了算：彩礼30万+房子首付100万+装修30万+婚礼20万=180万。\n\n你的存款：20万。\n\n你妈说："要不把老家的房子卖了？"\n\n"婚姻是爱情的坟墓——但首先，你得买得起墓地。"',
       cond: g => g.flags.hasPartner && g.relationships.partner>60 && g.age>=26 && g.age<=35 && !g.flags.married && !g.flags.hasHouse,
       choices:[
@@ -1302,7 +1478,7 @@ const EVENTS = [
         { label:'发展副业Plan B', hint:'+💰 +🧠', fn: g => { g.flags.middleAgeAnxiety=true; g.flags.sideHustle=true; return{money:10000,intel:8,mood:5}; }},
         { label:'焦虑但继续996', hint:'-❤️ -😊', fn: g => { g.flags.middleAgeAnxiety=true; return{health:-10,mood:-15}; }},
       ]},
-    { id:'digital_detox', icon:'📵', title:'数字戒断',
+    { id:'digital_detox_v2', icon:'📵', title:'数字戒断',
       body:'你发现自己每天刷手机超过8小时。抖音、小红书、微博、B站——你的注意力被切割成碎片。\n\n你试着放下手机一天，结果：焦虑、手痒、幻听（总觉得手机在响）。\n\n"你以为你在玩手机，其实是手机在玩你。"',
       cond: g => g.mood<50 && g.intel>40,
       choices:[
@@ -1463,7 +1639,7 @@ const EVENTS = [
         { label:'找个借口不去', hint:'+💰 -👥', fn: g => { g.relationships.friends = clamp((g.relationships.friends||40)-5, 0, 100); return{mood:-3,social:-5}; }},
       ]},
     // === v2.18 MORE EVENTS ===
-    { id:'side_project', icon:'💡', title:'副业想法',
+    { id:'side_project_v2', icon:'💡', title:'副业想法',
       body:'你看到一个帖子："程序员下班后靠副业月入3万"。\n\n你心动了：做独立开发？写技术博客？还是做做自媒体？\n\n但你也知道：副业听起来很美，做起来很难。\n\n"副业的真相：用8小时换来的钱，可能还不如加班费。"',
       cond: g => g.job!=='待业中' && g.intel>55 && g.age>=24 && g.age<=40 && !g.flags.sideHustle,
       choices:[
@@ -1553,7 +1729,7 @@ const EVENTS = [
         { label:'断供，让银行收走', hint:'-💰 -😊', fn: g => { g.flags.mortgageDefault=true; g.flags.hasHouse=false; return{money:-50000,mood:-30,social:-10,health:-15}; }},
         { label:'借钱硬撑', hint:'-💰 -❤️', fn: g => { g.flags.mortgageDefault=true; return{money:-30000,health:-10,mood:-15}; }},
       ]},
-    { id:'unfinished_building', icon:'🏗️', title:'烂尾楼维权',
+    { id:'unfinished_building_v2', icon:'🏗️', title:'烂尾楼维权',
       body:'你买的期房烂尾了。开发商跑路，工地停工，你的100万首付打了水漂。\n\n你加入维权群，发现里面有300多人，有人已经等了3年。\n\n你们去售楼处拉横幅，被保安赶了出来。你们去政府上访，被"维稳"了。\n\n"你买的不是房子，是薛定谔的房子——在交房之前，它既存在又不存在。"',
       cond: g => g.flags.hasHouse && !g.flags.unfinishedBuilding && g.age>=28 && Math.random()>0.6,
       choices:[
@@ -1588,7 +1764,7 @@ const EVENTS = [
         { label:'继续躺平', hint:'+😊 -💰', fn: g => { g.flags.fullTimeChildHandled=true; g.flags.lyingFlat=true; return{mood:15,money:-5000,social:-10}; }},
         { label:'考公务员', hint:'+🧠 -💰', fn: g => { g.flags.fullTimeChildHandled=true; g.flags.kaogongPrep=true; return{intel:10,mood:-5,money:-3000}; }},
       ]},
-    { id:'kaogong_fever', icon:'📚', title:'考公上岸',
+    { id:'kaogong_fever_v2', icon:'📚', title:'考公上岸',
       body:'你准备了1年，终于考上了公务员。\n\n当你在公示名单上看到自己的名字时，你哭了。\n\n你妈在电话里说："终于稳定了，妈放心了。"\n\n你的同学说："恭喜你，铁饭碗。"\n\n你想说：这不是铁饭碗，是金饭碗——在这个不确定的时代。\n\n"宇宙的尽头是编制——但编制不是宇宙的终点。"',
       cond: g => g.flags.kaogongPrep && !g.flags.civilServant && g.age>=24 && g.intel>65 && Math.random()>0.4,
       choices:[
@@ -1628,7 +1804,7 @@ const EVENTS = [
         { label:'佛系养娃，快乐就好', hint:'+😊 +❤️', fn: g => { g.flags.tigerParenting=true; return{mood:15,health:5,social:5}; }},
         { label:'自己教，省钱又亲子', hint:'+🧠 +👥', fn: g => { g.flags.tigerParenting=true; g.relationships.family = clamp((g.relationships.family||60)+10, 0, 100); return{intel:8,social:8,mood:10}; }},
       ]},
-    { id:'consumption_downgrade', icon:'📉', title:'消费降级',
+    { id:'consumption_downgrade_v2', icon:'📉', title:'消费降级',
       body:'你开始消费降级了：\n\n- 咖啡：从星巴克→瑞幸→速溶→白开水\n- 外卖：从海底捞→麦当劳→沙县→自己做饭\n- 衣服：从Zara→优衣库→拼多多→旧衣服\n- 娱乐：从旅游→电影→刷短视频→睡觉\n\n你发现：省下来的钱，够你多活3个月。\n\n"消费降级不是穷，是觉醒——你终于分清了需要和想要。"',
       cond: g => g.money<30000 && !g.flags.minimalist && g.age>=25,
       choices:[
@@ -1705,7 +1881,7 @@ const EVENTS = [
         { label:'加仓抄底', hint:'🎲 -💰', fn: g => { g.flags.stockCrash=true; const bet = Math.min(20000,g.money); g.money -= bet; if(Math.random()>0.5){const gain=Math.floor(bet*1.5);g.money+=bet+gain;return{money:gain,mood:20}}else{const loss=Math.floor(bet*0.6);g.money+=bet-loss;return{money:-loss,mood:-25}} }},
         { label:'装死不动', hint:'+🧠', fn: g => { g.flags.stockCrash=true; return{intel:8,mood:-10}; }},
       ]},
-    { id:'midlife_crisis', icon:'🎭', title:'中年危机',
+    { id:'midlife_crisis_v2', icon:'🎭', title:'中年危机',
       body:'你35岁了。你开始想：\n\n- 我的事业到头了吗？\n- 我的婚姻还有激情吗？\n- 我的人生的意义是什么？\n\n你看着镜子里的自己：发际线后移了，肚子大了，眼神疲惫了。\n\n你想改变，但又不知道改变什么。\n\n"中年危机不是危机，是觉醒——你终于开始问自己：我到底想要什么？"',
       cond: g => g.age>=34 && g.age<=40 && g.mood<55 && !g.flags.midlifeCrisis,
       choices:[
@@ -1715,7 +1891,7 @@ const EVENTS = [
         { label:'接受现实，继续前行', hint:'+🧠 +😊', fn: g => { g.flags.midlifeCrisis=true; return{intel:10,mood:15}; }},
       ]},
     // ===== v2.23: MORE 2025-2026 EVENTS & BALANCE =====
-    { id:'remote_work', icon:'💻', title:'远程办公',
+    { id:'remote_work_v2', icon:'💻', title:'远程办公',
       body:'公司宣布可以远程办公了！你高兴了三秒，然后发现：\n\n- 在家办公=永远在办公\n- 视频会议比面对面还累\n- 你分不清上班和下班了\n\n你的床变成了办公桌，你的客厅变成了会议室。\n\n"远程办公不是自由，是7×24小时待命。"',
       cond: g => g.job!=='待业中' && g.intel>55 && !g.flags.remoteWork && g.age>=24 && g.age<=40,
       choices:[
@@ -1782,7 +1958,7 @@ const EVENTS = [
         { label:'拼车回家', hint:'🎲 +👥', fn: g => { g.flags.springFestivalTravel=true; if(Math.random()>0.6){return{mood:10,social:8,money:-500}}else{return{mood:-10,health:-5,money:-800}} }},
         { label:'不回去了', hint:'+💰 -👨‍👩‍👧', fn: g => { g.flags.springFestivalTravel=true; g.relationships.family = clamp((g.relationships.family||60)-15, 0, 100); return{money:3000,mood:-10}; }},
       ]},
-    { id:'summer_heat', icon:'☀️', title:'高温预警',
+    { id:'summer_heat_v2', icon:'☀️', title:'高温预警',
       body:'今天40度。你在外面走了10分钟，感觉自己要融化了。\n\n你的外卖小哥迟到了15分钟，他说："太热了，路上差点晕倒。"\n\n你给了他5星好评和10块钱小费。\n\n"高温下，有人在空调房里抱怨外卖慢，有人在烈日下送外卖。"',
       cond: g => g.month>=6 && g.month<=8 && !g.flags.summerHeat,
       choices:[
@@ -1895,7 +2071,7 @@ const EVENTS = [
         { label:'报班学习', hint:'-💰 +🧠 +👥', fn: g => { g.flags.musicSkill=true; return{money:-5000,intel:12,social:8,mood:10}; }},
         { label:'放弃，太难了', hint:'-😊', fn: g => ({mood:-8,money:-2000}) },
       ]},
-    { id:'cooking_skill', icon:'🍳', title:'学做饭',
+    { id:'cooking_skill_v2', icon:'🍳', title:'学做饭',
       body:'你受够了外卖，决定学做饭。\n\n你买了锅碗瓢盆，看了B站教程，做了一顿"黑暗料理"。\n\n你发朋友圈："第一次做饭，求赞。"\n\n朋友评论："看起来像案发现场。"\n\n但你吃了一口，觉得：嗯，还挺好吃的。\n\n"做饭是生活的基本技能——也是爱的表达方式。"',
       cond: g => g.money>1000 && g.age>=22 && !g.flags.cookingSkill,
       choices:[
@@ -1903,7 +2079,7 @@ const EVENTS = [
         { label:'偶尔做做', hint:'+❤️ +😊', fn: g => { g.flags.cookingSkill=true; return{health:8,mood:8,money:-500}; }},
         { label:'算了，还是外卖', hint:'-❤️ -💰', fn: g => ({health:-5,mood:-5}) },
       ]},
-    { id:'volunteer_work', icon:'🤝', title:'志愿者活动',
+    { id:'volunteer_work_v2', icon:'🤝', title:'志愿者活动',
       body:'你报名参加了志愿者活动：去养老院陪伴老人/去山区支教/去动物收容所帮忙。\n\n你遇到了很多志同道合的人，也看到了很多需要帮助的人。\n\n你突然觉得：原来自己拥有的已经很多了。\n\n"帮助别人，是帮助自己的最好方式。"',
       cond: g => g.age>=23 && g.mood>40 && !g.flags.volunteer,
       choices:[
@@ -1919,7 +2095,7 @@ const EVENTS = [
         { label:'请私教', hint:'+❤️ +🧠 -💰💰', fn: g => { g.flags.gymMember=true; return{health:25,intel:5,mood:12,money:-8000}; }},
         { label:'办卡后就不去了', hint:'-💰 -❤️', fn: g => { g.flags.gymMember=true; return{money:-3000,health:-5,mood:-10}; }},
       ]},
-    { id:'reading_habit', icon:'📚', title:'养成阅读习惯',
+    { id:'reading_habit_v2', icon:'📚', title:'养成阅读习惯',
       body:'你决定每个月读2本书。你买了Kindle，下载了10本书。\n\n第一周：读了50页，觉得好充实。\n第二周：刷手机忘了读书。\n第三周：Kindle没电了，懒得充。\n第四周：Kindle找不到了……\n\n"阅读是最好的投资——但也是最容易被放弃的投资。"',
       cond: g => g.intel>50 && g.age>=22 && !g.flags.readingHabit,
       choices:[
@@ -2024,7 +2200,7 @@ const EVENTS = [
         { label:'请假一周回去照顾', hint:'-💰 -💼 +👨‍👩‍👧', fn: g => { g.flags.parentIllness=true; g.relationships.family=clamp((g.relationships.family||60)+20,0,100); if(g.jobSalary>15000&&Math.random()>0.6){return{money:-90000,mood:5,jobSalary:-3000}}else{return{money:-90000,mood:10}} }},
       ]},
     // === v2.31 INTERACTIVE EVENTS ===
-    { id:'salary_negotiation', icon:'💼', title:'薪资谈判',
+    { id:'salary_negotiation_v2', icon:'💼', title:'薪资谈判',
       body:'年度绩效考核结束了。你的绩效是A，但涨薪幅度只有5%。\n\n同事悄悄告诉你：隔壁组同样绩效的人涨了15%。\n\nHR说："公司有公司的考虑。"你的leader说："我已经帮你争取了。"\n\n你知道：不争取，就没有。\n\n"薪资谈判是一场博弈——你的底牌是你的能力，你的筹码是你的勇气。"',
       cond: g => g.job!=='待业中' && g.jobSalary>=10000 && g.age>=25 && !g.flags.salaryNegotiation && Math.random()>0.6,
       choices:[
@@ -2232,7 +2408,7 @@ const EVENTS = [
         { label:'偶尔去去', hint:'+😊', fn: g => { g.flags.cafeOffice=true; return{money:-300,mood:5}; }},
         { label:'还是在家吧', hint:'+💰', fn: g => { g.flags.cafeOffice=true; return{mood:-3}; }},
       ]},
-    { id:'health_scare', icon:'🏥', title:'体检报告',
+    { id:'health_scare_v3', icon:'🏥', title:'体检报告',
       body:'公司组织了年度体检。一周后，报告出来了：\n\n- 血脂偏高 ⚠️\n- 颈椎曲度变直 ⚠️\n- 视力下降 ⚠️\n- 体重超标 ⚠️\n\n你看了看报告，又看了看桌上的外卖——突然觉得手里的炸鸡不香了。\n\n"体检报告是成年人最害怕的成绩单。"',
       cond: g => g.age>=28 && !g.flags.healthScare && g.health<70 && Math.random()>0.5,
       choices:[
@@ -2259,7 +2435,7 @@ const EVENTS = [
         { label:'只买一个尝尝鲜', hint:'-💰 +😊', fn: g => { g.flags.blindBox=true; return{money:-59,mood:5}; }},
         { label:'理智战胜冲动', hint:'+🧠', fn: g => { g.flags.blindBox=true; return{intel:3,mood:-3}; }},
       ]},
-    { id:'short_video_addiction', icon:'📱', title:'短视频成瘾',
+    { id:'short_video_addiction_v2', icon:'📱', title:'短视频成瘾',
       body:'你本来只想刷5分钟抖音。\n\n抬头一看，已经凌晨2点了。\n\n你看了看手机使用时间：今天已使用6小时23分。\n\n你开始思考：是你在使用手机，还是手机在使用你？\n\n"短视频时代，你的注意力才是最值钱的商品。"',
       cond: g => !g.flags.shortVideoAddiction && g.age<=40 && Math.random()>0.5,
       choices:[
@@ -2284,7 +2460,7 @@ const EVENTS = [
         { label:'先跑5公里试试', hint:'+❤️ +😊', fn: g => { g.flags.marathonChallenge=true; return{health:8,mood:10}; }},
         { label:'还是算了吧', hint:'-😊', fn: g => { g.flags.marathonChallenge=true; return{mood:-5}; }},
       ]},
-    { id:'side_project', icon:'💻', title:'副业项目',
+    { id:'side_project_v3', icon:'💻', title:'副业项目',
       body:'一个朋友找你合作一个副业项目：\n\n- 需要投入3个月周末时间\n- 成功后预计收入5万\n- 失败了就是白干\n\n你看了看你的周末安排：刷手机、睡觉、刷手机。\n\n"副业不是第二份工作，是第二种人生可能性。"',
       cond: g => !g.flags.sideProject && g.intel>=60 && g.job!=='待业中' && g.age>=25 && Math.random()>0.6,
       choices:[
@@ -2301,7 +2477,7 @@ const EVENTS = [
         { label:'下次再说', hint:'-😊 -👥', fn: g => { g.flags.hometownVisit=true; g.relationships.family = clamp((g.relationships.family||50)-10,0,100); return{mood:-8,social:-5}; }},
       ]},
     // === v2.37 EVENTS (Chain events) ===
-    { id:'freelance_offer', icon:'💻', title:'自由职业机会',
+    { id:'freelance_offer_v2', icon:'💻', title:'自由职业机会',
       body:'一个老客户联系你："我们有个项目，想找你外包做，预算3万。"\n\n你算了算：辞职的话，风险很大；不辞职的话，只能加班做。\n\n"自由职业听起来很美，但自由的代价是不稳定。"',
       cond: g => !g.flags.freelanceOffer && g.intel>=65 && g.job!=='待业中' && g.age>=26 && Math.random()>0.6,
       choices:[
@@ -2374,7 +2550,7 @@ const EVENTS = [
         { label:'先观望', hint:'', fn: g => { g.flags.aiReplacement=true; return{mood:-8}; }},
         { label:'躺平接受', hint:'-🧠 +😊', fn: g => { g.flags.aiReplacement=true; g.flags.lyingFlat=true; return{intel:-5,mood:3}; }},
       ]},
-    { id:'workplace_pua', icon:'😤', title:'职场PUA',
+    { id:'workplace_pua_v2', icon:'😤', title:'职场PUA',
       body:'你的领导开始"PUA"你：\n\n"你看看别人加班到12点，你怎么6点就走？"\n"公司给你机会是看得起你。"\n"你不满意可以走啊。"\n\n你开始怀疑：是我太矫情，还是ta太过分？\n\n"职场PUA的本质是：用道德绑架代替合理管理。"',
       cond: g => !g.flags.workplacePUA && g.job!=='待业中' && g.age>=24 && Math.random()>0.5,
       choices:[
@@ -2400,7 +2576,7 @@ const EVENTS = [
         { label:'搬走', hint:'-💰 +😊', fn: g => { g.flags.roommateConflict=true; g.flags.movedHouse=true; return{money:-3000,mood:8}; }},
         { label:'发微信说清楚', hint:'+🧠', fn: g => { g.flags.roommateConflict=true; return{intel:3,mood:3,social:3}; }},
       ]},
-    { id:'dating_app', icon:'💘', title:'交友软件',
+    { id:'dating_app_v2', icon:'💘', title:'交友软件',
       body:'朋友推荐你下载了一个交友App。\n\n你左滑右滑，匹配了20个人，聊了5个，见面了1个。\n\n见面后你发现：照片和真人差距有点大，聊天和现实差距更大。\n\n"交友App让选择变多了，但让心动变难了。"',
       cond: g => !g.flags.datingApp && !g.flags.married && g.age>=24 && g.age<=40 && Math.random()>0.5,
       choices:[
@@ -2446,7 +2622,7 @@ const EVENTS = [
         { label:'视频关心，寄钱回去', hint:'-💰 +👥', fn: g => { g.flags.parentHealthIssue=true; g.relationships.family = clamp((g.relationships.family||50)+10,0,100); return{money:-5000,social:5,mood:5}; }},
         { label:'告诉他们注意身体', hint:'-😊', fn: g => { g.flags.parentHealthIssue=true; g.relationships.family = clamp((g.relationships.family||50)-5,0,100); return{mood:-10}; }},
       ]},
-    { id:'weekend_trip', icon:'🏖️', title:'周末旅行',
+    { id:'weekend_trip_v2', icon:'🏖️', title:'周末旅行',
       body:'你发现了一个周末短途旅行的好去处：\n\n- 高铁2小时\n- 住宿200/晚\n- 风景不错\n\n你已经很久没有出去走走了。\n\n"旅行不是为了逃避生活，是为了让生活不再需要逃避。"',
       cond: g => !g.flags.weekendTrip && g.money>5000 && g.mood<60 && Math.random()>0.5,
       choices:[
@@ -2455,7 +2631,7 @@ const EVENTS = [
         { label:'下次再说', hint:'-😊', fn: g => { g.flags.weekendTrip=true; return{mood:-5}; }},
       ]},
     // === v2.40 EVENTS ===
-    { id:'lottery_ticket', icon:'🎫', title:'彩票梦',
+    { id:'lottery_ticket_v2', icon:'🎫', title:'彩票梦',
       body:'路过彩票站，你花了10块钱买了一张。\n\n"万一中了呢？"\n\n你知道概率是千万分之一，但你还是想试试。\n\n"彩票是穷人交的税——但你今天想逃一次税。"',
       cond: g => !g.flags.lotteryTicket && g.money>100 && Math.random()>0.6,
       choices:[
@@ -2463,7 +2639,7 @@ const EVENTS = [
         { label:'就买1张', hint:'-💰', fn: g => { g.flags.lotteryTicket=true; if(Math.random()>0.99){g.flags.lotteryWin=true;return{money:-10,money:10000,mood:20}}else{return{money:-10,mood:-2}} }},
         { label:'算了，概率太低', hint:'+🧠', fn: g => { g.flags.lotteryTicket=true; return{intel:2}; }},
       ]},
-    { id:'social_media_fame', icon:'📸', title:'意外走红',
+    { id:'social_media_fame_v2', icon:'📸', title:'意外走红',
       body:'你随手发的一条朋友圈/微博突然火了！\n\n点赞999+，评论500+，还有人私信找你合作。\n\n你体验到了"15分钟的名气"。\n\n"走红是偶然，不红是常态——享受那一刻就好。"',
       cond: g => !g.flags.socialMediaFame && g.charm>=60 && Math.random()>0.7,
       choices:[
@@ -2506,7 +2682,7 @@ const EVENTS = [
         { label:'放弃考公，接受现实', hint:'+😊 +💰', fn: g => { g.flags.examCivilWar=true; return{mood:15,money:3000}; }},
         { label:'报个培训班', hint:'-💰💰 🎲', fn: g => { g.flags.examCivilWar=true; if(Math.random()>0.5){g.flags.civilServant=true;setJob(g,'公务员',8000);return{money:-25000,mood:35}}else{return{money:-25000,mood:-15}} }},
       ]},
-    { id:'consumption_downgrade', icon:'📉', title:'消费降级',
+    { id:'consumption_downgrade_v3', icon:'📉', title:'消费降级',
       body:'你开始用拼多多买东西了。\n\n曾经你嘲笑"拼夕夕"，现在你是"拼爹爹"。你的购物车从淘宝变成了1688，从星巴克变成了瑞幸，从海底捞变成了自热火锅。\n\n你妈说："你终于懂事了。"你说："不是懂事，是没钱了。"\n\n你在豆瓣加入了"抠门女性联合会"，300万成员。你发现：原来不止你一个人在降级。\n\n"消费降级不是穷，是活明白了。"',
       cond: g => g.money<30000 && !g.flags.consumptionDowngrade && g.age>=24,
       choices:[
@@ -2592,7 +2768,7 @@ const EVENTS = [
         { label:'冥想练习', hint:'+😊 +🧠', fn: g => { g.flags.songChiGan=true; return{mood:12,intel:5}; }},
         { label:'我还是紧张点好', hint:'+🧠', fn: g => { g.flags.songChiGan=true; return{intel:3}; }},
       ]},
-    { id:'youth_unemployment', icon:'📊', title:'青年失业率',
+    { id:'youth_unemployment_v2', icon:'📊', title:'青年失业率',
       body:'新闻说：2025年16-24岁青年失业率16.9%-18.9%。\n\n你的同学群里，有人在考公，有人在考研，有人在送外卖，有人在家啃老。\n\n你发了条消息："大家都干嘛呢？"\n\n沉默了5分钟后，有人回复："活着。"\n\n"失业率是个数字，但对每个人来说，是一段人生。"',
       cond: g => !g.flags.youthUnemployment && g.age>=22 && g.age<=28 && (g.job==='待业中' || g.months<12),
       choices:[
@@ -2601,7 +2777,7 @@ const EVENTS = [
         { label:'考研提升', hint:'-💰 +🧠', fn: g => { g.flags.youthUnemployment=true; return{money:-10000,intel:15,mood:5}; }},
         { label:'接受现实', hint:'+😊', fn: g => { g.flags.youthUnemployment=true; return{mood:8}; }},
       ]},
-    { id:'remote_work', icon:'💻', title:'远程办公',
+    { id:'remote_work_v3', icon:'💻', title:'远程办公',
       body:'你的公司开始实行"混合办公"：每周2天在家，3天在公司。\n\n在家办公的第一天：\n- 早上9点起床（平时7点）\n- 穿着睡衣开会\n- 中午做了顿好的\n- 下午工作效率出奇地高\n\n你开始想：为什么要每天通勤2小时，就为了坐在办公室里发邮件？\n\n"远程办公是打工人的解放——但也是自律的考验。"',
       cond: g => !g.flags.remoteWork && g.job!=='待业中' && g.intel>=60 && g.months>=12,
       choices:[
@@ -2669,7 +2845,7 @@ const EVENTS = [
         { label:'算了，我还是配合吧', hint:'+💰 -😊', fn: g => { g.flags.antiPUA=true; return{money:1000,mood:-8}; }},
       ]},
     // === v3.2 EVENTS - 房地产与婚恋 ===
-    { id:'unfinished_building', icon:'🏚️', title:'烂尾楼噩梦',
+    { id:'unfinished_building_v3', icon:'🏚️', title:'烂尾楼噩梦',
       body:'你三年前买的期房，烂尾了。\n\n每个月还在还8000块的房贷，但房子连顶都没封。你去售楼处维权，看到一群同样遭遇的业主，有人哭了，有人骂了，有人沉默了。\n\n开发商说："资金链断了，我们也没办法。"\n银行说："房贷必须继续还。"\n政府说："保交楼，但需要时间。"\n\n你站在烂尾楼前，看着钢筋裸露的框架，想起了那句广告词："给你一个家。"\n\n"烂尾楼是购房者的噩梦——钱没了，房也没了，梦碎了。"',
       cond: g => g.flags.hasHouse && !g.flags.unfinishedBuilding && g.months>=36 && Math.random()>0.7,
       choices:[
@@ -2678,7 +2854,7 @@ const EVENTS = [
         { label:'继续等', hint:'-😊', fn: g => { g.flags.unfinishedBuilding=true; return{mood:-15}; }},
         { label:'租房住，慢慢等', hint:'-💰 -😊', fn: g => { g.flags.unfinishedBuilding=true; return{money:-3000,mood:-10}; }},
       ]},
-    { id:'bride_price', icon:'💰', title:'天价彩礼',
+    { id:'bride_price_v3', icon:'💰', title:'天价彩礼',
       body:'你要结婚了，女方家要求彩礼30万。\n\n你算了算：\n- 存款：15万\n- 父母积蓄：10万\n- 还差：5万\n\n你妈说："借点吧，娶媳妇是大事。"\n你爸说："这彩礼也太高了。"\n你对象说："这是对我父母的尊重。"\n\n你陷入了沉思：爱情真的需要用金钱来衡量吗？\n\n"彩礼是传统，但天价彩礼是绑架——绑架了爱情，也绑架了婚姻。"',
       cond: g => g.flags.hasPartner && !g.flags.married && !g.flags.bridePrice && g.age>=25 && g.money<50000,
       choices:[
@@ -2863,7 +3039,7 @@ const EVENTS = [
         { label:'找个旅游搭子', hint:'+👥 +✨', fn: g => { g.flags.daziCulture=true; g.flags.travelDazi=true; return{social:18,mood:15,money:-2000}; }},
         { label:'不需要搭子', hint:'+😊', fn: g => { g.flags.daziCulture=true; return{mood:5,social:-5}; }},
       ]},
-    { id:'age_35_crisis', icon:'⚠️', title:'35岁危机',
+    { id:'age_35_crisis_v2', icon:'⚠️', title:'35岁危机',
       body:'你看到了数据：超60%的岗位明确要求"35岁以下"，40岁以上求职者简历回复率不足20%。\n\n阿里员工从25万锐减到12万，百度员工减少21%。\n\n你已经32岁了。还有3年。\n\n同事说："35岁是职场的保质期。过了这个年龄，你就是过期的罐头。"\n\n"中年不是危机，是清醒：你开始意识到，打工不是长久之计。"',
       cond: g => !g.flags.age35Crisis && g.age>=30 && g.age<=38,
       choices:[
@@ -3026,7 +3202,7 @@ const EVENTS = [
         { label:'还是回家吧', hint:'+👥 +😊 -❤️', fn: g => { g.flags.familyDisconnect=true; return{social:10,mood:5,health:-5}; }},
       ]},
     // === v4.9 EVENTS - 精神离职与职场倦怠 ===
-    { id:'quiet_quitting', icon:'😶', title:'精神离职',
+    { id:'quiet_quitting_v2', icon:'😶', title:'精神离职',
       body:'你开始实践"精神离职"：\n\n- 上班，绝不早到\n- 下班，绝不多待\n- 只做份内之事，拒绝额外责任\n- 下班后绝不回工作消息\n\n盖洛普数据：全球59%的员工处于"安静离职"状态。\n\n你不是不努力，你只是累了。\n\n"精神离职不是躺平，而是在工作和生活之间找到平衡。"\n\n"工作不是生活的全部，没必要也不值得。"',
       cond: g => !g.flags.quietQuitting && g.age>=22 && g.age<=40 && g.job!=='待业中' && g.mood<65,
       choices:[
@@ -3123,7 +3299,7 @@ const EVENTS = [
         { label:'算了，风险太大', hint:'+💰 +🧠', fn: g => { g.flags.youngEntrepreneur=true; return{money:5000,intel:5,mood:-3}; }},
       ]},
     // === v5.6 EVENTS - 数字游民与远程工作 ===
-    { id:'digital_nomad', icon:'🌏', title:'数字游民',
+    { id:'digital_nomad_v2', icon:'🌏', title:'数字游民',
       body:'你辞职了，成为数字游民：\n\n- 大理（2个月）：程序员天堂，便宜又美\n- 清迈（3个月）：数字游民聚集地\n- 巴厘岛（1个月）：网络一般但环境好\n- 厦门（2个月）：国内最宜居的海滨城市\n- 成都（4个月）：美食太多，不想走\n\n月均收入：12000元（比上班少，但生活质量大幅提升）\n\n"数字游民——用互联网获取在线工作机会，不在固定地区工作。"\n\n"最大的挑战：孤独感、自律、时区问题。"\n\n"最棒的体验：想去哪就去哪的自由感。"',
       cond: g => !g.flags.digitalNomad && g.age>=23 && g.age<=35 && g.intel>=60 && g.money>20000,
       choices:[
@@ -3267,7 +3443,7 @@ const EVENTS = [
         { label:'太复杂，不碰', hint:'+🧠', fn: g => { g.flags.silverEconomy=true; return{intel:3}; }},
       ]},
     // === v6.5 EVENTS - 数字游民与考公热 ===
-    { id:'digital_nomad', icon:'💻', title:'数字游民',
+    { id:'digital_nomad_v3', icon:'💻', title:'数字游民',
       body:'你厌倦了朝九晚五的通勤生活，看到了一个数字游民社区：安徽黟县"黑多岛"。\n\n"工作但不上班，边休闲边挣钱。"\n\n你辞了职，搬到山水间。你的工位：咖啡馆、民宿、共享办公空间。\n\n你的工作：远程编程、自由撰稿、设计接单、新媒体运营。\n\n"数字游民——把工位搬进山水间，利用现代信息技术进行远程工作，追求自由、灵活的生活方式。"\n\n2025年，全球超过34%的员工长期处于远程办公状态。中国也涌现出安吉DNA数字游民公社、上海漕泾数字游民国际村等实体空间。\n\n但你也看到了问题：收入不稳定、社交孤立、自律要求高、没有五险一金。\n\n"数字游民不是不工作，而是换一种方式工作——自由是代价，也是收获。"',
       cond: g => !g.flags.digitalNomad && g.age>=22 && g.age<=35 && g.intel>=60,
       choices:[
@@ -3295,7 +3471,7 @@ const EVENTS = [
         { label:'考其他编制', hint:'+🧠', fn: g => { g.flags.secondCareer=true; if(Math.random()>0.75){g.flags.civilServant=true; return{intel:8,mood:20}}else{return{intel:3,mood:-5}} }},
       ]},
     // === v6.6 EVENTS - 副业经济与消费降级 ===
-    { id:'side_hustle', icon:'💼', title:'斜杠青年',
+    { id:'side_hustle_v2', icon:'💼', title:'斜杠青年',
       body:'你觉得光靠工资不够花，决定搞副业。\n\n你看了看选项：\n- 写稿：影评、剧评、文案，每月2000-3000元\n- 摆摊：校门口卖甜品、首饰，每晚18:30出摊\n- 代运营：帮人管小红书、抖音，每月3000-5000元\n- 拍照：汉服跟拍、景区跟拍，每单200-500元\n- 领队：周末组织飞盘、徒步、露营\n\n"斜杠青年——主业也好，副业也罢，只要能搞钱，都是通往自由的台阶。"\n\n2024年，全国945.4万年轻人在平台发布副业服务，其中"00后"占比40.8%。\n\n"没事早点睡，有空多搞钱——这届年轻人不爱聊八卦，爱聊副业。"\n\n但你也看到了问题：时间精力有限、副业影响主业、收入不稳定、没有五险一金。',
       cond: g => !g.flags.sideHustle && g.age>=22 && g.age<=35 && g.money<50000,
       choices:[
@@ -3304,7 +3480,7 @@ const EVENTS = [
         { label:'技能接单', hint:'+💰 +🧠', fn: g => { g.flags.sideHustle=true; g.flags.freelancer=true; return{money:3500,intel:10,mood:8}; }},
         { label:'太累了，不搞', hint:'+😊', fn: g => { g.flags.sideHustle=true; return{mood:5,health:3}; }},
       ]},
-    { id:'consumption_downgrade', icon:'📉', title:'消费降级',
+    { id:'consumption_downgrade_v4', icon:'📉', title:'消费降级',
       body:'你开始反思自己的消费习惯：\n\n- 以前：星巴克38元/杯 → 现在：瑞幸9.9元/杯\n- 以前：优衣库300元/件 → 现在：拼多多30元/件\n- 以前：海底捞150元/人 → 现在：沙县小吃15元/人\n- 以前：专柜护肤品 → 现在：平替国货\n\n"消费降级——不是买不起，而是不想被收割。"\n\n豆瓣"抠门女性联合会"小组突破300万成员，B站"极简生活"视频播放量破50亿次。\n\n2025年，57.2%的消费者更偏爱性价比更高的替代商品，"90后""00后"尤为明显。\n\n"曾经的「面子消费」转向「里子经济」，年轻人不再为品牌溢价买单。"\n\n但你也在思考：消费降级是真的穷了，还是消费观念升级了？',
       cond: g => !g.flags.consumptionDowngrade && g.age>=20 && g.age<=35,
       choices:[
@@ -3435,7 +3611,7 @@ const EVENTS = [
         { label:'不做，太累', hint:'+😊', fn: g => { g.flags.emotionalLabor=true; return{mood:5}; }},
       ]},
     // === v7.1 EVENTS - 谷子经济与二次元文化 ===
-    { id:'goods_economy', icon:'🎌', title:'谷子经济',
+    { id:'goods_economy_v2', icon:'🎌', title:'谷子经济',
       body:'你走进了谷子店：满墙的吧唧（徽章）、立牌、流麻、手办。\n\n"谷子经济——年轻人「吃谷」，把纸片人的爱带到三次元。"\n\n你看了看价格：\n- 吧唧（徽章）：20-200元/个\n- 立牌：50-500元/个\n- 手办：200-5000元/个\n- 限量款：溢价10-20倍\n\n"谷子"是英文"goods"的音译，泛指二次元周边。"吃谷"就是购买这些周边的消费行为。\n\n2024年，中国谷子经济市场规模达1689亿元，较2023年增长40.63%，预计2029年突破3000亿元。\n\n中国泛二次元用户规模达4.9亿人——几乎每3个年轻人中就有1个是二次元用户。\n\n"为兴趣买单、为认同付费、为圈层种草——谷子经济是年轻人的「情感消费」。"\n\n但你也在思考：一个99元的盲盒，二手市场能卖2300元，这是收藏还是投机？',
       cond: g => !g.flags.goodsEconomy2 && g.age>=16 && g.age<=30,
       choices:[
@@ -3511,7 +3687,7 @@ const EVENTS = [
         { label:'继续读博', hint:'-💰 +🧠', fn: g => { g.flags.educationDevaluation=true; g.flags.phdStudent=true; return{money:-10000,intel:15}; }},
       ]},
     // === v7.5 EVENTS - 职场PUA与电子榨菜 ===
-    { id:'workplace_pua', icon:'😰', title:'职场PUA',
+    { id:'workplace_pua_v3', icon:'😰', title:'职场PUA',
       body:'你的领导又在"为你好"：\n\n"我批评你是因为你还有救，别人我都不说。"\n"你这个年龄，能进我们公司是你的福气。"\n"加班是自愿的，但不加班的人我们都记在心里。"\n"你看看其他人，怎么就你做不到？"\n\n"职场PUA——用「为你好」的名义，摧毁你的自信心和判断力。"\n\n你开始怀疑自己：\n- 是不是我真的能力不行？\n- 是不是我太矫情了？\n- 离开这里我还能去哪？\n- 也许领导说得对，我应该感恩\n\n"职场PUA的本质：上司利用话语权和利益决策权，对下属进行精神控制，目的是让你产生自我怀疑，从而被迫服从。"\n\n你的选择：\n\n"员工不是机械的执行者，企业价值的盲从者，而是扮演着创造者的角色。当企业丢掉了主责主业，员工只是服从却没有真正认同，这样的企业自然留不住人心。"',
       cond: g => !g.flags.workplacePUA && g.age>=22 && g.age<=35 && g.job!=='待业中' && g.mood<=50,
       choices:[
@@ -3521,7 +3697,7 @@ const EVENTS = [
         { label:'辞职离开', hint:'-💰 +😊', fn: g => { g.flags.workplacePUA=true; g.flags.quit=true; return{money:-5000,mood:20,health:15}; }},
         { label:'默默忍受', hint:'-😊 -💪', fn: g => { g.flags.workplacePUA=true; return{mood:-20,health:-15,intel:-5}; }},
       ]},
-    { id:'digital_addiction', icon:'📱', title:'电子榨菜成瘾',
+    { id:'digital_addiction_v2', icon:'📱', title:'电子榨菜成瘾',
       body:'你吃饭时必须看视频，否则觉得饭不香。\n\n你的"电子榨菜"清单：\n- 影视解说：5分钟看完一部电影\n- 综艺切片：只看最搞笑的片段\n- 短视频：15秒一个爽点\n- 直播切片：只看精华部分\n\n"电子榨菜——碎片化时代的佐料，还是慢性毒药？"\n\n你的症状：\n- 文章超过1000字就没耐心看\n- 视频超过1分钟就想快进\n- 吃饭不看手机就觉得空虚\n- 睡前刷短视频到凌晨2点\n- 第二天上班精神恍惚\n\n"63.3%的受访者会随时随地刷短视频，50.3%的人感觉思考能力下降。"\n\n你开始反思：\n- "我是不是被算法控制了？"\n- "我还能深度阅读吗？"\n- "我的注意力是不是被碎片化了？"\n\n"电子榨菜虽然满足了人们的诸多需求，却也使当代人不知不觉地陷入了难以挣脱的困局——减少线下人际交往，让大脑在用餐时间持续兴奋，压缩休息时间，长此以往将导致过度疲劳、消化不良。"',
       cond: g => !g.flags.digitalAddiction && g.age>=18 && g.age<=35 && g.mood<=60,
       choices:[
@@ -3542,7 +3718,7 @@ const EVENTS = [
         { label:'彻底躺平', hint:'-😊 -💪', fn: g => { g.flags.pretendToWork=true; g.flags.fullLyingFlat=true; return{mood:-20,health:-10}; }},
       ]},
     // === v7.4 EVENTS - 延迟退休与养老焦虑 ===
-    { id:'delayed_retirement', icon:'👴', title:'延迟退休',
+    { id:'delayed_retirement_v2', icon:'👴', title:'延迟退休',
       body:'2025年1月1日，《实施弹性退休制度暂行办法》正式生效。\n\n你看着新闻：男职工退休年龄逐步延至63岁，女职工分档延至55岁和58岁。\n\n"90后大概率要工作到65岁才能退休。"\n\n你算了一笔账：你现在25岁，还有40年才能退休。40年，足够你经历多少次"中年危机"？\n\n"延迟退休——年轻人眼中的「压力」，还是「新机」？"\n\n你的焦虑：\n- "刚上班就要面对延迟退休，这辈子要工作到60多岁？"\n- "能否健康工作到65岁？"\n- "老员工延迟退休，会不会挤压我的晋升空间？"\n- "上有老下有小，延迟退休让经济压力陡增"\n\n但你也在思考：职业生涯被拉长，"35岁危机"的时间节点可能随之延后。\n\n"与其被动焦虑，不如主动规划——「终身成长」才能对抗年龄焦虑。"',
       cond: g => !g.flags.delayedRetirement && g.age>=20 && g.age<=35,
       choices:[
@@ -3560,7 +3736,7 @@ const EVENTS = [
         { label:'向朋友倾诉', hint:'+😊 +👥', fn: g => { g.flags.mentalHealthCrisis=true; g.flags.talkToFriends=true; return{mood:10,social:8}; }},
         { label:'硬扛', hint:'-😊 -❤️', fn: g => { g.flags.mentalHealthCrisis=true; return{mood:-15,health:-10}; }},
       ]},
-    { id:'age_35_crisis', icon:'🎂', title:'35岁危机',
+    { id:'age_35_crisis_v3', icon:'🎂', title:'35岁危机',
       body:'你35岁了。投简历时，你发现很多岗位写着"35岁以下"。\n\n"35岁歧视——全社会的问题，却让你一个人承受。"\n\n你的处境：\n- 投了50份简历，只收到3个面试邀请\n- HR问："您35岁了，为什么还要换工作？"\n- 面试官暗示："我们团队平均年龄28岁，怕您不适应"\n- 薪资要求被砍："您这个年龄，性价比不高"\n\n"35岁正是年富力强之时，却成了职场一道难以逾越的门槛。"\n\n你的焦虑：\n- 房贷还有20年要还\n- 孩子刚上小学，教育费用越来越高\n- 父母年纪大了，医疗支出增加\n- 存款不够失业半年\n\n"当环卫工岗位都要求「35岁以下」时，暴露的不仅是年龄歧视，更是整个社会对中年劳动者价值认知的扭曲。"\n\n"35岁不是危机，而是转折点——那些能跳出「打工者思维」，主动拥抱变化的人，终将在新的价值体系中找到自己的位置。"',
       cond: g => !g.flags.age35Crisis && g.age>=33 && g.age<=37 && g.job!=='待业中',
       choices:[
@@ -3570,7 +3746,7 @@ const EVENTS = [
         { label:'躺平接受', hint:'-😊 -💪', fn: g => { g.flags.age35Crisis=true; return{mood:-20,health:-10}; }},
       ]},
     // === v7.3 EVENTS - 相亲角与婚恋困境 ===
-    { id:'matchmaking_corner', icon:'💕', title:'相亲角',
+    { id:'matchmaking_corner_v2', icon:'💕', title:'相亲角',
       body:'你被父母拉去了人民公园相亲角：满墙的简历，写着学历、收入、房产、户口。\n\n"相亲角——不是在相亲，而是在拍卖阶级。"\n\n你看了看条件：\n- 男方：985硕士、年薪50万、上海户口、有房有车\n- 女方：海归硕士、年薪30万、独生女、父母有退休金\n\n"66%的年轻人不愿因压力调整择偶标准，拒绝「将就婚恋」。"\n\n你被一个阿姨问："小伙子/小姑娘，你什么条件？"\n\n你尴尬地笑了笑：我的条件是——我还不想结婚。\n\n"63%的00后认为带有强目的性的相亲行为并不是首选。"\n\n但你也在思考：相亲角是父母的焦虑，还是年轻人的无奈？\n\n"婚恋市场不生产爱情，而是在批发焦虑。"',
       cond: g => !g.flags.matchmakingCorner && g.age>=25 && g.age<=35 && !g.flags.married,
       choices:[
@@ -3588,7 +3764,7 @@ const EVENTS = [
         { label:'不结婚', hint:'+💰 +😊', fn: g => { g.flags.marriageCost=true; g.flags.noMarriage=true; return{money:5000,mood:10}; }},
         { label:'再等等', hint:'+🧠', fn: g => { g.flags.marriageCost=true; return{intel:5}; }},
       ]},
-    { id:'single_economy', icon:'💍', title:'单身经济',
+    { id:'single_economy_v2', icon:'💍', title:'单身经济',
       body:'你发现了一个新词：单身经济。\n\n"单身经济——一个人也要好好生活，一个人也要消费得起。"\n\n你看了看产品：\n- 一人食：小份菜、单人火锅、迷你电饭煲\n- 迷你家电：小型洗衣机、单人烤箱\n- 宠物经济：猫狗陪伴\n- 一人旅行：定制行程、拼房旅行\n\n2025年，中国单身经济规模突破4万亿元，超过2.4亿单身成年人。\n\n"都市白领在婚前的亲密朋友数量平均仅有3个。"\n\n你开始享受单身生活：\n- 一个人吃火锅\n- 一个人看电影\n- 一个人旅行\n- 养一只猫/狗\n\n"单身不是失败，而是选择——选择自由，选择独立，选择为自己而活。"\n\n但你也在思考：单身经济是解放，还是孤独的代名词？',
       cond: g => !g.flags.singleEconomy && g.age>=22 && g.age<=35 && !g.flags.married,
       choices:[
@@ -3688,6 +3864,249 @@ const EVENTS = [
         { label:'坚持自己，暂时疏远', hint:'+✨ -👥 +🧠', fn: g => { g.flags.familyPressureCrisis=true; g.flags.distanceFromFamily=true; G.relationships.family = clamp((G.relationships.family||60)-15,0,100); return{charm:5,social:-10,intel:5}; }},
         { label:'写长信解释', hint:'+🧠 +👥 +😊', fn: g => { g.flags.familyPressureCrisis=true; g.flags.writeLetter=true; G.relationships.family = clamp((G.relationships.family||60)+10,0,100); return{intel:8,social:5,mood:10}; }},
       ]},
+    // === v8.0 新增黑色幽默事件（借鉴北京浮生记风格） ===
+    { id:'loan_shark', icon:'🦈', title:'民间借贷', weight:2,
+      body:'你在网上看到一个广告："急用钱？无需征信，当天放款！"\n\n利息"只有"月息3%。你算了一下——年化36%。\n\n但你的花呗已经逾期了，信用卡也刷爆了。你看了看这个数字，又看了看账单。\n\n"当你开始考虑高利贷的时候，说明你已经走投无路了。"',
+      cond: g => g.money < -20000 && !g.flags.loanShark,
+      choices:[
+        { label:'借5万应急', hint:'🎲🎲', fn: g => { g.flags.loanShark=true; g.flags.onlineLoan=true; return{money:50000,mood:5,health:-5}; }},
+        { label:'算了，自己扛', hint:'+🧠', fn: g => ({intel:5,mood:-10}) },
+        { label:'跟父母坦白', hint:'+👥 -😊', fn: g => { if(g.relationships) g.relationships.family = clamp((g.relationships.family||60)-10,0,100); return{money:20000,mood:-15,social:5}; }},
+      ]},
+    { id:'loan_shark_chase', icon:'🏃', title:'催收来了', weight:1, isChain:true,
+      body:'你接到了催收电话。对方说："你今天不还钱，我们就打你通讯录里所有人的电话。"\n\n你妈打来电话问："儿子，你是不是借了高利贷？"\n\n"你借的每一分钱，都有人替你记着。只是利息不同。"',
+      cond: g => g.flags.loanShark && !g.flags.loanSharkPaid && g.months > 3,
+      choices:[
+        { label:'砸锅卖铁还钱', hint:'-💰 +😊', fn: g => { g.flags.loanSharkPaid=true; return{money:-Math.min(g.money,60000),mood:10,health:-5}; }},
+        { label:'换手机号跑路', hint:'+😊 -👥', fn: g => { g.flags.loanSharkPaid=true; if(g.relationships) g.relationships.family = clamp((g.relationships.family||60)-20,0,100); return{mood:-5,social:-15}; }},
+        { label:'报警求助', hint:'🎲', fn: g => { g.flags.loanSharkPaid=true; if(Math.random()>0.5){return{mood:10,social:5}}else{return{mood:-15,money:-5000}} }},
+      ]},
+    { id:'rent_trap', icon:'🏠', title:'租房踩雷', weight:3,
+      body:() => {
+        const traps = [
+          '你租的房子，隔壁是麻将馆。每天晚上10点准时开打，吵到凌晨2点。\n\n房东说："这个价格你还想安静？"\n\n"在大城市租房，噪音是标配，安静是奢侈品。"',
+          '你发现你的出租屋有"室友"——蟑螂。不是一两只，是一大家子。\n\n你买了三瓶杀虫剂，打了一场"人虫大战"。你赢了，但它们明天会卷土重来。\n\n"你以为你在租房，其实你在和昆虫合租。"',
+          '你搬进新房第一天，发现楼上在装修。每天早上8点准时开工，周末也不休息。\n\n你去找物业，物业说："装修是业主权利。"\n\n你去找楼上，楼上说："再忍两个月就好了。"\n\n两个月后，隔壁单元又开始装修了。',
+          '你的房东是个"二房东"——他租了整套房子，然后把每间卧室单独加价租给你和另外两个人。\n\n你付的房租，够他在老家还月供了。\n\n"你不是在租房，你是在替房东还房贷。"',
+        ];
+        return traps[Math.floor(Math.random() * traps.length)];
+      },
+      cond: g => !g.flags.hasHouse && !g.flags.rentTrap,
+      choices:[
+        { label:'忍了，搬家太麻烦', hint:'-😊 -❤️', fn: g => { g.flags.rentTrap=true; return{mood:-10,health:-3}; }},
+        { label:'花钱搬家', hint:'-💰 +😊', fn: g => { g.flags.rentTrap=true; return{money:-3000,mood:5}; }},
+        { label:'跟房东理论', hint:'🎲', fn: g => { g.flags.rentTrap=true; if(g.charm>60&&Math.random()>0.4){return{money:1000,mood:10,charm:3}}else{return{mood:-15}} }},
+      ]},
+    { id:'food_poisoning', icon:'🤢', title:'外卖食物中毒', weight:2,
+      body:'你点了一份15块钱的黄焖鸡米饭。吃完后开始上吐下泻。\n\n你打开外卖App，发现这家店评分4.9——全是刷的。\n\n你去医院挂急诊，花了800块。\n\n"15块的饭，800块的医药费。这就是省钱的下场。"',
+      cond: g => g.money < 20000 && !g.flags.foodPoisoning,
+      choices:[
+        { label:'去急诊', hint:'-💰 +❤️', fn: g => { g.flags.foodPoisoning=true; return{money:-800,health:-5,mood:-8}; }},
+        { label:'硬扛，吃点药', hint:'-❤️', fn: g => { g.flags.foodPoisoning=true; return{health:-12,mood:-5,money:-50}; }},
+        { label:'给差评+投诉', hint:'🎲', fn: g => { g.flags.foodPoisoning=true; if(Math.random()>0.5){return{money:-800,mood:5,intel:2}}else{return{money:-800,health:-8,mood:-10}} }},
+      ]},
+    { id:'office_gossip_caught', icon:'👂', title:'被卷入办公室八卦', weight:3,
+      body:'茶水间里，你无意间听到两个同事在议论：领导要换人了，新领导是个"屠夫"。\n\n你正准备悄悄离开，被其中一个发现了："哎，你听到了什么？"\n\n现在你成了"知情者"。\n\n"办公室八卦，听到是运气，传出去是灾难。"',
+      cond: g => g.job !== '待业中' && !g.flags.officeGossipCaught,
+      choices:[
+        { label:'装傻："啊？你们在说什么？"', hint:'+😊', fn: g => { g.flags.officeGossipCaught=true; return{mood:3}; }},
+        { label:'加入八卦，交换情报', hint:'+👥 🎲', fn: g => { g.flags.officeGossipCaught=true; g.flags.knowsOfficeSecret=true; if(Math.random()>0.6){return{social:8,mood:5}}else{return{social:-10,mood:-15}} }},
+        { label:'直接走开，什么都不说', hint:'+🧠', fn: g => { g.flags.officeGossipCaught=true; return{intel:3,mood:-2}; }},
+      ]},
+    { id:'double_11_trap', icon:'🛍️', title:'双十一购物车', weight:3,
+      body:'双十一到了。你的购物车里堆了37件"必买"商品，总价8000块。\n\n你告诉自己："这些都是打折的，不买就是亏。"\n\n但你的银行卡告诉你："再买就是亏。"\n\n"双十一的本质：你以为你在省钱，其实你在花钱。"',
+      cond: g => g.month === 11 && !g.flags.double11,
+      choices:[
+        { label:'全部清空！买！', hint:'-💰 +😊', fn: g => { g.flags.double11=true; return{money:-8000,mood:15,charm:5}; }},
+        { label:'只买3件最需要的', hint:'-💰 +🧠', fn: g => { g.flags.double11=true; return{money:-2000,mood:5,intel:3}; }},
+        { label:'一件都不买', hint:'+💰 +🧠 -😊', fn: g => { g.flags.double11=true; return{money:0,intel:5,mood:-8}; }},
+        { label:'全退了', hint:'+🧠 +😊', fn: g => { g.flags.double11=true; g.flags.minimalist=true; return{intel:5,mood:3}; }},
+      ]},
+    { id:'spring_festival_dilemma', icon:'🧧', title:'过年回家还是留下', weight:2,
+      body:'又快过年了。你妈已经打了8个电话催你回家。\n\n但回家意味着：来回高铁票1200、各种红包至少5000、七大姑八大姨的拷问……\n\n不回家意味着：清净的7天假期，但代价是你妈的冷暴力。\n\n"过年回家的本质：用金钱和尊严换一顿团圆饭。"',
+      cond: g => g.month === 12 && !g.flags.springFestivalChoice && g.months > 6,
+      choices:[
+        { label:'回家过年', hint:'-💰 +👥 +😊', fn: g => {
+          g.flags.springFestivalChoice=true; g.flags.hometownVisit=true;
+          if(g.relationships) g.relationships.family = clamp((g.relationships.family||60)+15,0,100);
+          return{money:-6000,mood:15,social:8};
+        }},
+        { label:'留在大城市', hint:'+💰 -👥 +😊', fn: g => {
+          g.flags.springFestivalChoice=true;
+          if(g.relationships) g.relationships.family = clamp((g.relationships.family||60)-10,0,100);
+          return{money:3000,mood:5,social:-5};
+        }},
+        { label:'旅游过年', hint:'-💰 +😊 +✨', fn: g => {
+          g.flags.springFestivalChoice=true;
+          if(g.relationships) g.relationships.family = clamp((g.relationships.family||60)-5,0,100);
+          return{money:-5000,mood:20,charm:8};
+        }},
+      ]},
+    { id:'shared_flat_hell', icon:'🏚️', title:'合租地狱', weight:3,
+      body:() => {
+        const hell = [
+          '你的室友半夜2点开始练吉他。你敲门提醒，他说："我白天要上班，只有晚上有时间。"\n\n你看了看他白天11点才起床的作息——"你的白天，是我的深夜。"',
+          '你的室友从不洗碗。水池里堆了两周的碗，已经开始"自我进化"了。\n\n你发了条微信提醒，他回了个"好的"——然后继续不洗。\n\n"合租最大的考验不是房租，是忍耐力的极限。"',
+          '你的室友带了个"朋友"回来过夜。第二天"朋友"还在。第三天还在。\n\n你问他："你朋友什么时候走？"\n\n他说："她不是朋友，是我女朋友。"\n\n"你付的是单间房租，但享受的是三人间体验。"',
+        ];
+        return hell[Math.floor(Math.random() * hell.length)];
+      },
+      cond: g => !g.flags.hasHouse && !g.flags.flatHell && g.money < 50000,
+      choices:[
+        { label:'忍了', hint:'-😊', fn: g => { g.flags.flatHell=true; return{mood:-10}; }},
+        { label:'找室友谈', hint:'🎲', fn: g => { g.flags.flatHell=true; if(Math.random()>0.5){return{mood:5,social:3}}else{return{mood:-15,social:-5}} }},
+        { label:'自己搬走', hint:'-💰 +😊', fn: g => { g.flags.flatHell=true; return{money:-4000,mood:8}; }},
+      ]},
+    { id:'work_from_home_trap', icon:'💻', title:'居家办公的陷阱', weight:2,
+      body:'公司宣布本周居家办公。你很高兴——终于可以边工作边摸鱼了。\n\n结果：你从早上9点坐到下午6点，中间只去了3次冰箱和2次厕所。工作效率比在公司还低。\n\n更糟糕的是：你发现自己一整天没跟任何人说话。\n\n"居家办公的自由，是另一种形式的牢笼。你的监狱没有围墙，只有WiFi。"',
+      cond: g => g.job !== '待业中' && !g.flags.wfhTrap,
+      choices:[
+        { label:'严格规划时间', hint:'+🧠 +❤️', fn: g => { g.flags.wfhTrap=true; return{intel:5,health:3,mood:-3}; }},
+        { label:'享受摸鱼的快乐', hint:'+😊 -🧠', fn: g => { g.flags.wfhTrap=true; return{mood:8,intel:-3}; }},
+        { label:'去咖啡馆办公', hint:'-💰 +👥', fn: g => { g.flags.wfhTrap=true; return{money:-100,social:5,mood:5}; }},
+      ]},
+    { id:'medical_bill_shock', icon:'🏥', title:'看病贵到离谱', weight:2,
+      body:'你感冒了，去社区医院看病。挂号费、检查费、药费——一共花了1200块。\n\n你看着处方单：一盒感冒灵、一盒板蓝根、两盒阿莫西林。\n\n你想起小时候，感冒了妈妈煮碗姜汤就好了。\n\n"看病三件套：排队两小时，看病三分钟，花了一千块。"',
+      cond: g => g.health < 60 && !g.flags.medicalBillShock,
+      choices:[
+        { label:'乖乖付钱', hint:'-💰 +❤️', fn: g => { g.flags.medicalBillShock=true; return{money:-1200,health:8,mood:-5}; }},
+        { label:'去药店自己买药', hint:'-💰 🎲', fn: g => { g.flags.medicalBillShock=true; if(Math.random()>0.4){return{money:-200,health:5}}else{return{money:-200,health:-5,mood:-8}} }},
+        { label:'硬扛，多喝热水', hint:'-❤️', fn: g => { g.flags.medicalBillShock=true; return{health:-8,mood:-3}; }},
+      ]},
+    { id:'social_media_compare', icon:'📱', title:'朋友圈焦虑', weight:4,
+      body:'你打开朋友圈：\n\n同学A买了新房，晒了房产证。\n同学B升了总监，晒了工牌。\n同学C去了马尔代夫，晒了比基尼。\n\n你看了看自己的出租屋、工位、和外卖。\n\n"朋友圈是别人的高光集锦，却是你的日常暴击。"\n\n但你不知道的是：A背着30年房贷，B已经三个月没休息了，C的照片P了两个小时。',
+      cond: g => g.mood < 60 && !g.flags.socialMediaAnxiety,
+      choices:[
+        { label:'关掉朋友圈', hint:'+😊 +🧠', fn: g => { g.flags.socialMediaAnxiety=true; g.flags.digitalDetox=true; return{mood:12,intel:5,social:-5}; }},
+        { label:'也发一条装逼的', hint:'+✨ -🧠', fn: g => { g.flags.socialMediaAnxiety=true; return{charm:5,intel:-2,mood:-3}; }},
+        { label:'接受现实，继续刷', hint:'-😊', fn: g => { g.flags.socialMediaAnxiety=true; return{mood:-8}; }},
+      ]},
+    { id:'salary_comparison', icon:'💰', title:'工资对比暴击', weight:2,
+      body:'你在脉脉上看到一个帖子：同样是工作3年，某大厂程序员年薪60万。\n\n你看了看自己的工资条——月薪8000，一年到头96000。\n\n你默默关掉了App，但那个数字像钉子一样扎在脑子里。\n\n"人比人，气死人。但不比，你永远不知道自己值多少钱。"',
+      cond: g => g.jobSalary < 15000 && g.jobSalary > 0 && g.age < 35 && !g.flags.salaryCompare,
+      choices:[
+        { label:'准备跳槽', hint:'+🧠 🎲', fn: g => { g.flags.salaryCompare=true; if(g.intel>70&&Math.random()>0.4){g.jobSalary=Math.floor(g.jobSalary*1.5);return{mood:20,intel:5}}else{return{mood:-10,intel:3}} }},
+        { label:'学新技能提升竞争力', hint:'+🧠', fn: g => { g.flags.salaryCompare=true; return{intel:8,mood:3}; }},
+        { label:'算了，比上不足比下有余', hint:'+😊', fn: g => { g.flags.salaryCompare=true; return{mood:5}; }},
+      ]},
+    { id:'night_taxi', icon:'🚕', title:'深夜打车', weight:3,
+      body:'加班到凌晨1点，你打了个出租车回家。\n\n司机是个50多岁的大叔，他说："小伙子，这么晚下班啊？"\n\n你说是。他说："我以前也是程序员，后来颈椎病犯了，干不了了。"\n\n"你以为你在用命换钱，其实你在用命换一种随时可能被替代的能力。"',
+      cond: g => g.job !== '待业中' && g.jobSalary > 10000,
+      choices:[
+        { label:'跟司机聊聊人生', hint:'+👥 +🧠', fn: g => ({social:5,intel:3,mood:3}) },
+        { label:'在后座偷偷哭一会儿', hint:'+😊 -✨', fn: g => ({mood:-5,charm:-2}) },
+        { label:'到家后认真想了想未来', hint:'+🧠', fn: g => ({intel:5,mood:-3}) },
+      ]},
+    { id:'wechat_red_packet', icon:'🧧', title:'微信红包大战', weight:3,
+      body:'公司群里，领导发了个200块红包，30个人抢。\n\n你以迅雷不及掩耳之势抢了——0.01元。\n\n你看了看排行榜：有个同事抢了68块。你怀疑他用了外挂。\n\n"抢红包是人类最后的公平——除了手速和运气。"',
+      cond: g => g.job !== '待业中',
+      choices:[
+        { label:'发一个更大的红包', hint:'-💰 +👥 +✨', fn: g => ({money:-200,social:8,charm:5,mood:3}) },
+        { label:'默默退出群聊', hint:'+😊', fn: g => ({mood:3}) },
+        { label:'@领导再发一个', hint:'🎲', fn: g => { if(Math.random()>0.6){return{money:50,mood:8,social:3}}else{return{mood:-5,social:-3}} }},
+      ]},
+    { id:'delivery_addiction', icon:'📦', title:'外卖成瘾', weight:4,
+      body:'你算了一下这个月的外卖账单——2800块。\n\n平均每天93块。你吃了47顿外卖，覆盖了方圆3公里内所有的黄焖鸡、麻辣烫、螺蛳粉。\n\n你的体重涨了3公斤，你的厨艺依然是——泡面。\n\n"外卖是大城市的脐带，它让你活着，但不让你生活。"',
+      cond: g => !g.flags.deliveryAddiction && g.job !== '待业中',
+      choices:[
+        { label:'学做饭！买锅买菜', hint:'-💰 +❤️ +🧠', fn: g => { g.flags.deliveryAddiction=true; g.flags.cookingSkill=true; return{money:-500,health:8,intel:3,mood:5}; }},
+        { label:'算了，时间就是金钱', hint:'+😊', fn: g => { g.flags.deliveryAddiction=true; return{mood:3}; }},
+        { label:'只点健康餐', hint:'-💰 +❤️', fn: g => { g.flags.deliveryAddiction=true; return{money:-500,health:5,mood:-3}; }},
+      ]},
+    // === v8.0 事件链：炒股亏钱 → 借高利贷/割肉/死扛 ===
+    { id:'stock_deep_loss', icon:'📉', title:'股票深套', weight:1, isChain:true,
+      body:'你买的股票跌了40%。你的账户从10万变成了6万。\n\n你每天打开App看一次，每看一次心碎一次。\n\n同事说："要不割肉吧，止损。"\n\n但你看着那个数字，心里只有一个想法："再等等，会涨回来的。"\n\n"炒股亏钱的三个阶段：1.不卖就不亏 2.补仓拉低成本 3.装死。"',
+      cond: g => g.flags.invested && g.money > 10000 && !g.flags.stockDeepLoss,
+      choices:[
+        { label:'割肉止损', hint:'-💰 +🧠', fn: g => { g.flags.stockDeepLoss=true; g.flags.stockCrash=true; return{money:-Math.floor(g.money*0.3),intel:5,mood:-10}; }},
+        { label:'死扛不卖', hint:'🎲🎲', fn: g => { g.flags.stockDeepLoss=true; if(Math.random()>0.7){g.flags.stockRecovery=true;return{money:Math.floor(g.money*0.5),mood:25}}else{return{money:-Math.floor(g.money*0.4),mood:-20,health:-5}} }},
+        { label:'补仓拉低成本', hint:'-💰 🎲', fn: g => { g.flags.stockDeepLoss=true; if(Math.random()>0.5){return{money:-5000,mood:-5}}else{return{money:-15000,mood:-15}} }},
+      ]},
+    // === v8.0 黑色幽默：中年人的朋友圈 ===
+    { id:'midlife_social_media', icon:'📱', title:'中年朋友圈', weight:2,
+      body:'你发了一条朋友圈："又是充实的一天！"\n\n配图是一杯星巴克和一台MacBook。\n\n实际上你今天投了20份简历，一个回复都没有。星巴克是蹭WiFi的，MacBook是公司的。\n\n"朋友圈是中年人最后的体面。"',
+      cond: g => g.age >= 30 && g.job === '待业中' && !g.flags.midlifeSocial,
+      choices:[
+        { label:'继续维持人设', hint:'+✨ -😊', fn: g => { g.flags.midlifeSocial=true; return{charm:5,mood:-8}; }},
+        { label:'发一条真实的', hint:'+😊 +👥 -✨', fn: g => { g.flags.midlifeSocial=true; return{mood:10,social:5,charm:-3}; }},
+        { label:'删掉朋友圈', hint:'+🧠', fn: g => { g.flags.midlifeSocial=true; return{intel:3,mood:3}; }},
+      ]},
+    // === v8.0 突发事件链：被裁后的一系列连锁反应 ===
+    { id:'post_layoff_crisis', icon:'📦', title:'被裁后的第一周', weight:1, isChain:true,
+      body:'被裁的第一周：\n\n周一：睡到自然醒，假装还在上班。\n周二：投了50份简历，收到2个回复。\n周三：跟老婆说公司调整，暂时在家办公。\n周四：在星巴克坐了一天，假装在开会。\n周五：终于忍不住告诉了老婆。\n\n"被裁不是最可怕的，最可怕的是假装没被裁。"',
+      cond: g => g.job === '待业中' && g.flags.techLayoff && g.age >= 30 && !g.flags.postLayoff,
+      choices:[
+        { label:'全力找工作', hint:'+🧠 -❤️', fn: g => { g.flags.postLayoff=true; return{intel:5,health:-5,mood:-5}; }},
+        { label:'先休息一段时间', hint:'+😊 +❤️ -💰', fn: g => { g.flags.postLayoff=true; return{mood:10,health:5,money:-5000}; }},
+        { label:'考虑转行', hint:'+🧠 🎲', fn: g => { g.flags.postLayoff=true; g.flags.careerChange=true; return{intel:8,mood:-3}; }},
+        { label:'假装上班（瞒着家人）', hint:'-😊 -❤️', fn: g => { g.flags.postLayoff=true; g.flags.pretendToWork=true; return{mood:-15,health:-8}; }},
+      ]},
+    // === v8.0 更多黑色幽默 ===
+    { id:'gym_new_year', icon:'🏋️', title:'新年健身计划', weight:3,
+      body:'1月1日，你发了条朋友圈："新的一年，新的自己！"配了张健身房的自拍。\n\n你办了一张年卡，3600块。\n\n1月去了15次，2月去了5次，3月去了1次。\n\n4月到12月——0次。\n\n平均每次健身成本：720块。\n\n"健身房的商业模式：赚的是你不去的那部分钱。"',
+      cond: g => g.month === 1 && !g.flags.gymNewYear,
+      choices:[
+        { label:'坚持锻炼！', hint:'+❤️ +😊', fn: g => { g.flags.gymNewYear=true; g.flags.gymMember=true; return{health:10,mood:8,money:-3600}; }},
+        { label:'买卡但大概率不去', hint:'-💰', fn: g => { g.flags.gymNewYear=true; return{money:-3600,mood:3}; }},
+        { label:'在家做Keep就行', hint:'+❤️ +🧠', fn: g => { g.flags.gymNewYear=true; return{health:5,intel:3,mood:5}; }},
+      ]},
+    { id:'office_politics_trap', icon:'🎭', title:'站队的代价', weight:2,
+      body:'公司两个领导闹矛盾，你被迫选边站。\n\n你选了看起来更强的A。结果B赢了。\n\nB在周会上看着你说："有些人啊，眼光不太好。"\n\n"办公室政治的本质：你以为你在下棋，其实你是棋子。"',
+      cond: g => g.job !== '待业中' && g.age >= 28 && !g.flags.officePoliticsTrap,
+      choices:[
+        { label:'找新领导表忠心', hint:'🎲', fn: g => { g.flags.officePoliticsTrap=true; if(Math.random()>0.5){return{mood:5,social:3}}else{return{mood:-15,social:-8}} }},
+        { label:'装糊涂，谁都不站', hint:'+🧠', fn: g => { g.flags.officePoliticsTrap=true; return{intel:5,mood:-5}; }},
+        { label:'趁机跳槽', hint:'-💰 +😊', fn: g => { g.flags.officePoliticsTrap=true; g.flags.careerChange=true; return{money:-2000,mood:5}; }},
+      ]},
+    // === v8.1 策划团队新增事件（阿墨叙事设计） ===
+    { id:'roommate_from_hell', icon:'🏠', title:'室友是人类吗',
+      body:'你的室友凌晨3点还在打游戏外放，你敲门提醒，他回你："你住得起单间吗？"\n\n你看了看合同：确实，你们签的是"隔断间"，严格来说连房间都不算。\n\n冰箱里你的酸奶被喝了，洗衣机的衣服三天没人收，公共区域的垃圾堆成了行为艺术。\n\n"合租是检验人性的试金石——而你室友刚好是反面教材。"',
+      cond: g => !g.flags.hasHouse && g.money < 50000 && !g.flags.roommateHell,
+      choices:[
+        { label:'忍了，戴上降噪耳机', hint:'+🧠', fn: g => { g.flags.roommateHell=true; return{mood:-12,health:-5,intel:3}; }},
+        { label:'正面对线！', hint:'🎲', fn: g => { g.flags.roommateHell=true; if(Math.random()>0.4){return{mood:8,social:-3}}else{return{mood:-20,health:-8,money:-1000}} }},
+        { label:'搬走！找新房子', hint:'-💰', fn: g => { g.flags.roommateHell=true; return{money:-5000,mood:10,health:5}; }},
+      ]},
+    { id:'spring_ticket_war', icon:'🚄', title:'春运抢票大战',
+      body:'春节到了。你打开了12306、携程、飞猪、智行，同时开抢。\n\n验证码问你："请选出所有含有红绿灯的图片"——你怀疑连AI都选不对。\n\n终于抢到了！站票。16个小时。你看着窗外飞速后退的风景，想着妈妈包的饺子。\n\n"春运是人类最大规模的周期性迁徙——而你，是其中最渺小的一只候鸟。"\n\n列车广播："本次列车超员，请无座旅客不要坐在行李箱上。"',
+      cond: g => g.month >= 12 || g.month <= 2,
+      choices:[
+        { label:'站回去！为了妈妈的饺子', hint:'-❤️ +😊', fn: g => { g.flags.springFestivalThisYear=true; return{health:-8,mood:15,money:-800}; }},
+        { label:'买黄牛票（加价3倍）', hint:'-💰 +😊', fn: g => { g.flags.springFestivalThisYear=true; return{money:-3000,mood:12}; }},
+        { label:'算了，就地过年', hint:'+💰 -😊', fn: g => { return{money:2000,mood:-15,social:-5}; }},
+      ]},
+    { id:'colleague_karoshi_news', icon:'⚰️', title:'同事猝死了',
+      body:'今天上班，隔壁工位的小王没来。下午才知道：他昨晚加班到凌晨3点，在回家的出租车上心脏骤停。\n\n他才28岁。上个月还在朋友圈说"今年要开始跑步"。\n\n公司发了内部邮件："请大家注意身体，合理安排工作。"然后HR把加班审批改成了"自愿加班"。\n\n茶水间里有人小声说："上个月他的KPI是部门第一。"\n\n"拿命换钱，拿钱换命——但命只有一条，钱可以再来。问题是，这个道理要死一次才懂。"',
+      cond: g => g.job !== '待业中' && g.age >= 24 && !g.flags.colleagueKaroshi,
+      choices:[
+        { label:'立刻准点下班', hint:'+❤️ +😊', fn: g => { g.flags.colleagueKaroshi=true; g.flags.healthScare=true; return{health:5,mood:-8}; }},
+        { label:'去健身房办卡', hint:'-💰 +❤️', fn: g => { g.flags.colleagueKaroshi=true; g.flags.gymMember=true; g.flags.fitnessJourney=true; return{money:-3000,health:10,mood:5}; }},
+        { label:'"跟我有什么关系"', hint:'🎲', fn: g => { g.flags.colleagueKaroshi=true; if(Math.random()>0.6){return{mood:-3}}else{return{health:-10,mood:-15}} }},
+      ]},
+    { id:'ai_replacement_fear', icon:'🤖', title:'AI要替代你了',
+      body:'老板开会宣布："公司引入了AI工具，效率提升了300%。"\n\n你看了看自己的工作内容——确实，AI做得比你好，比你快，还不摸鱼。\n\nHR开始"优化"你的部门。同事小张昨天还在工位上，今天他的工位已经空了。\n\n你打开招聘App，发现你的岗位描述变成了："熟练使用AI工具，有AI无法替代的核心竞争力优先。"\n\n"你学了四年编程，AI四天就学会了。但你有一样AI没有的——你会焦虑。"',
+      cond: g => g.job !== '待业中' && g.intel >= 50 && !g.flags.aiReplacementFear,
+      choices:[
+        { label:'疯狂学AI！成为驾驭AI的人', hint:'+🧠 -💰', fn: g => { g.flags.aiReplacementFear=true; g.flags.aiSkills=true; return{intel:12,mood:-5,money:-2000}; }},
+        { label:'转型做AI做不了的事', hint:'+😊', fn: g => { g.flags.aiReplacementFear=true; g.flags.careerChange=true; return{mood:8,social:5,charm:5}; }},
+        { label:'假装没看到，继续摸鱼', hint:'🎲', fn: g => { g.flags.aiReplacementFear=true; if(Math.random()>0.5){return{mood:-5}}else{return{mood:-20,money:-5000}} }},
+      ]},
+    { id:'matchmaking_corner_v3', icon:'💒', title:'人民公园相亲角',
+      body:'你妈逼你去相亲角。你的简历被挂在绳子上，跟旁边的985硕士和年薪50万的程序员并排。\n\n你的"条件"被大妈们评头论足："没房？""外地户口？""工资多少？"\n\n一个大爷看了看你的简历，摇了摇头："你这个条件，在我女儿那里排不上号。"\n\n你站在人群里，突然觉得自己像超市货架上的打折商品。\n\n"相亲角的残酷真相：你以为你在找爱情，其实你在做资产评估。"',
+      cond: g => g.age >= 26 && !g.flags.married && !g.flags.hasPartner && !g.flags.matchmakingCorner,
+      choices:[
+        { label:'配合演出，留联系方式', hint:'+👥', fn: g => { g.flags.matchmakingCorner=true; if(Math.random()>0.6){return{social:8,charm:3,mood:5}}else{return{social:3,mood:-10,charm:-3}} }},
+        { label:'"我的爱情不需要被标价"', hint:'+😊', fn: g => { g.flags.matchmakingCorner=true; return{mood:10,charm:5}; }},
+        { label:'当场跟你妈吵架', hint:'-😊 -👥', fn: g => { g.flags.matchmakingCorner=true; if(g.relationships) g.relationships.family=clamp((g.relationships.family||60)-15,0,100); return{mood:-12,social:-5}; }},
+      ]},
+    { id:'rent_scam', icon:'🏚️', title:'黑中介陷阱',
+      body:'你找了个新房子，中介说"押一付一，精装修，近地铁"。\n\n你交了钱，搬进去才发现：\n- "精装修" = 墙刷白了\n- "近地铁" = 坐公交20分钟到地铁\n- "押一付一" = 押金不退\n\n住了两个月，中介跑了，真房东来了："你谁啊？这房子是我的，中介是骗子。"\n\n你被扫地出门，行李被扔在楼道里。\n\n"在大城市租房，你不仅要跟房东斗，还要跟中介斗，跟骗子斗。最后发现，你谁都斗不过。"',
+      cond: g => !g.flags.hasHouse && !g.flags.rentScam && g.money > 0,
+      choices:[
+        { label:'报警！找法律援助', hint:'+🧠', fn: g => { g.flags.rentScam=true; g.flags.laborRights=true; return{money:-3000,intel:5,mood:-8}; }},
+        { label:'认栽，找新房子', hint:'-💰', fn: g => { g.flags.rentScam=true; return{money:-5000,mood:-15}; }},
+        { label:'赖着不走，跟真房东谈判', hint:'🎲', fn: g => { g.flags.rentScam=true; if(Math.random()>0.5){return{money:-2000,mood:-5}}else{return{money:-8000,mood:-20,health:-5}} }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3713,9 +4132,7 @@ const ACHIEVEMENTS = [
     { id:'minimalist', icon:'📉', name:'消费觉醒', desc:'学会精打细算', check: g => g.flags.minimalist },
     { id:'scam_survivor', icon:'🛡️', name:'反诈达人', desc:'识破了骗局', check: g => g.flags.hadScam && g.money>5000 },
     { id:'investor', icon:'📈', name:'韭菜觉醒', desc:'参与过投资', check: g => g.flags.invested },
-    { id:'married', icon:'💍', name:'步入婚姻', desc:'结婚了', check: g => g.flags.married },
     { id:'divorced', icon:'💔', name:'围城之外', desc:'离婚了', check: g => g.flags.divorced },
-    { id:'parent', icon:'👶', name:'为人父母', desc:'有了孩子', check: g => g.flags.hasChild },
     { id:'lying_flat', icon:'🛋️', name:'躺平大师', desc:'选择了躺平', check: g => g.flags.lyingFlat },
     { id:'gym_rat', icon:'🏋️', name:'健身达人', desc:'办了健身卡', check: g => g.flags.gymMember },
     { id:'bookworm', icon:'📚', name:'书虫', desc:'养成阅读习惯', check: g => g.flags.readingHabit },
@@ -3774,7 +4191,7 @@ const ACHIEVEMENTS = [
     { id:'true_love', icon:'💕', name:'真爱', desc:'恋人关系达到90+', check: g => g.relationships && g.relationships.partner>=90 },
     { id:'team_player', icon:'👥', name:'团队之星', desc:'同事关系达到90+', check: g => g.relationships && g.relationships.colleagues>=90 },
     { id:'kaogong_prepper', icon:'📚', name:'考公预备役', desc:'开始备考公务员', check: g => g.flags.kaogongPrep },
-    { id:'digital_detox', icon:'📵', name:'数字排毒', desc:'完成数字戒断', check: g => g.flags.digitalDetox },
+    { id:'digital_detox_ach', icon:'📵', name:'数字排毒', desc:'完成数字戒断', check: g => g.flags.digitalDetox },
     // v2.18 achievements
     { id:'healthy_life', icon:'🥗', name:'健康生活', desc:'开始健康生活方式', check: g => g.flags.healthyLifestyle },
     { id:'side_hustle', icon:'💡', name:'斜杠青年', desc:'开始做副业', check: g => g.flags.sideHustle },
@@ -3799,7 +4216,7 @@ const ACHIEVEMENTS = [
     { id:'stock_veteran', icon:'📉', name:'股市老兵', desc:'经历过股市暴跌', check: g => g.flags.stockCrash },
     { id:'midlife_awakening', icon:'🎭', name:'中年觉醒', desc:'经历过中年危机', check: g => g.flags.midlifeCrisis },
     // v2.23 achievements
-    { id:'remote_worker', icon:'💻', name:'远程工作者', desc:'体验过远程办公', check: g => g.flags.remoteWork },
+    { id:'remote_worker_v2', icon:'💻', name:'远程工作者v2', desc:'体验过远程办公', check: g => g.flags.remoteWork },
     { id:'content_creator', icon:'📱', name:'内容创作者', desc:'尝试做自媒体', check: g => g.flags.influencer },
     { id:'lottery_dreamer', icon:'🎰', name:'彩票梦想家', desc:'买过彩票', check: g => g.flags.lotteryTicket },
     { id:'hometown_visitor', icon:'🚄', name:'归乡者', desc:'回老家过年', check: g => g.flags.hometownVisit },
@@ -3834,7 +4251,7 @@ const ACHIEVEMENTS = [
     // v2.33 achievements
     { id:'office_diplomat', icon:'🎭', name:'办公室外交官', desc:'处理了办公室政治', check: g => g.flags.officePolitics && g.relationships && g.relationships.colleagues>=50 },
     { id:'relationship_master', icon:'💑', name:'感情大师', desc:'通过了感情考验', check: g => g.flags.relationshipTest && g.relationships && g.relationships.partner>=70 },
-    { id:'viral_star', icon:'📱', name:'一夜爆红', desc:'在社交媒体意外走红', check: g => g.flags.socialMediaFame },
+    { id:'viral_star_v2', icon:'📱', name:'一夜爆红', desc:'在社交媒体意外走红', check: g => g.flags.socialMediaFame },
     { id:'super_parent', icon:'👶', name:'超级父母', desc:'面对育儿挑战', check: g => g.flags.childcareCrisis && g.flags.hasChild },
     { id:'hometown_heart', icon:'🌾', name:'乡愁诗人', desc:'感受到了乡愁', check: g => g.flags.hometownNostalgia },
     // v2.34 achievements
@@ -3851,14 +4268,14 @@ const ACHIEVEMENTS = [
     { id:'smart_renter', icon:'🏠', name:'租房达人', desc:'和房东成功谈判', check: g => g.flags.rentIncrease && g.charm>=65 },
     // v2.36 achievements
     { id:'blind_box_fan', icon:'🎁', name:'盲盒玩家', desc:'体验了盲盒经济', check: g => g.flags.blindBox },
-    { id:'digital_detox', icon:'📵', name:'数字断联', desc:'成功戒掉短视频', check: g => g.flags.digitalDetox },
+    { id:'digital_detox_v2', icon:'📵', name:'数字断联', desc:'成功戒掉短视频', check: g => g.flags.digitalDetox },
     { id:'good_neighbor', icon:'🏘️', name:'好邻居', desc:'和新邻居成为朋友', check: g => g.flags.goodNeighbor },
     { id:'marathon_runner', icon:'🏃', name:'马拉松跑者', desc:'完成了一次马拉松挑战', check: g => g.flags.marathonChallenge && g.health>=70 },
     { id:'side_project_done', icon:'💻', name:'副业起步', desc:'开始了自己的副业项目', check: g => g.flags.sideProject },
     { id:'homecoming', icon:'🚄', name:'常回家看看', desc:'回家看望了父母', check: g => g.flags.hometownVisit },
     // v2.37 achievements
     { id:'freelancer_start', icon:'💻', name:'自由职业者', desc:'开始了自由职业生涯', check: g => g.flags.freelancer },
-    { id:'investor', icon:'📊', name:'投资者', desc:'尝试了理财投资', check: g => g.flags.investmentAdvice },
+    { id:'investor_v2', icon:'📊', name:'投资者', desc:'尝试了理财投资', check: g => g.flags.investmentAdvice },
     { id:'mentee', icon:'👨‍🏫', name:'得到指点', desc:'遇到了职业导师', check: g => g.flags.mentorFound },
     { id:'freelance_win', icon:'🌟', name:'自由职业成功', desc:'自由职业获得成功', check: g => g.flags.freelanceSuccess },
     // v2.38 achievements
@@ -3868,7 +4285,7 @@ const ACHIEVEMENTS = [
     { id:'conflict_resolver', icon:'🤝', name:'矛盾调解员', desc:'成功解决了室友矛盾', check: g => g.flags.roommateConflict && g.social>=55 },
     { id:'dating_explorer', icon:'💘', name:'交友探索者', desc:'尝试了交友软件', check: g => g.flags.datingApp },
     // v2.39 achievements
-    { id:'city_explorer', icon:'🗺️', name:'城市探索者', desc:'在多个城市生活过', check: g => g.flags.citySwitch },
+    { id:'city_explorer_v2', icon:'🗺️', name:'城市探索者', desc:'在多个城市生活过', check: g => g.flags.citySwitch },
     { id:'midlife_reflection', icon:'🎂', name:'四十不惑', desc:'在40岁时重新审视人生', check: g => g.flags.midlifeCrisis40 },
     { id:'skill_learner', icon:'📚', name:'终身学习', desc:'学习了新技能', check: g => g.flags.learnNewSkill },
     { id:'good_child', icon:'👨‍👩‍👦', name:'孝顺子女', desc:'照顾好了父母的健康', check: g => (g.flags.parentHealthIssue || g.flags.hometownVisit) && g.relationships && g.relationships.family>=70 },
@@ -3876,9 +4293,9 @@ const ACHIEVEMENTS = [
     // v2.40 achievements
     { id:'lottery_player', icon:'🎫', name:'彩票玩家', desc:'买了彩票试试手气', check: g => g.flags.lotteryTicket },
     { id:'viral_moment', icon:'📸', name:'意外走红', desc:'体验了一把网红感觉', check: g => g.flags.socialMediaFame },
-    { id:'career_changer', icon:'🔀', name:'职业转型', desc:'勇敢走出了职业舒适区', check: g => g.flags.careerCrossroads },
+    { id:'career_changer_v2', icon:'🔀', name:'职业转型', desc:'勇敢走出了职业舒适区', check: g => g.flags.careerCrossroads },
     { id:'health_conscious', icon:'🏥', name:'健康意识', desc:'认真对待了年度体检', check: g => g.flags.annualCheckup },
-    { id:'bookworm', icon:'📚', name:'读书会成员', desc:'加入了读书会', check: g => g.flags.bookClub },
+    { id:'bookworm_v2', icon:'📚', name:'读书会成员', desc:'加入了读书会', check: g => g.flags.bookClub },
     // v3.8 achievements
     { id:'matchmaking_corner_visitor', icon:'💑', name:'相亲角体验者', desc:'经历公园相亲', check: g => g.flags.matchmakingCorner },
     { id:'retirement_planner', icon:'👴', name:'延迟退休规划者', desc:'面对延迟退休', check: g => g.flags.delayedRetirement },
@@ -3888,13 +4305,13 @@ const ACHIEVEMENTS = [
     { id:'crisis_planner', icon:'⚠️', name:'危机规划者', desc:'面对35岁危机', check: g => g.flags.age35Crisis && (g.flags.sidePlan || g.flags.civilServicePrep) },
     // v4.0 achievements
     { id:'pickle_master', icon:'📱', name:'电子榨菜品鉴师', desc:'享受电子榨菜下饭', check: g => g.flags.electronicPickle },
-    { id:'smart_shopper', icon:'💸', name:'反向消费达人', desc:'成为平替专家', check: g => g.flags.reverseConsumption },
+    { id:'smart_shopper_v2', icon:'💸', name:'反向消费达人', desc:'成为平替专家', check: g => g.flags.reverseConsumption },
     // v4.1 achievements
     { id:'guzi_collector', icon:'🎭', name:'吃谷人', desc:'开始收集谷子', check: g => g.flags.guziCollector },
     { id:'mbti_master', icon:'🧩', name:'MBTI专家', desc:'做了MBTI测试', check: g => g.flags.mbtiTest },
     // v4.2 achievements
     { id:'budget_traveler', icon:'🎒', name:'特种兵游客', desc:'体验特种兵旅游', check: g => g.flags.specialForcesTravel },
-    { id:'city_explorer', icon:'🏙️', name:'City玩家', desc:'体验City感生活', check: g => g.flags.cityOrNot },
+    { id:'city_explorer_v3', icon:'🏙️', name:'City玩家', desc:'体验City感生活', check: g => g.flags.cityOrNot },
     // v4.3 achievements
     { id:'emotional_shopper', icon:'💝', name:'情绪消费者', desc:'为快乐买单', check: g => g.flags.emotionalValue },
     // v4.4 achievements
@@ -3912,8 +4329,8 @@ const ACHIEVEMENTS = [
     // v4.8 achievements
     { id:'boundary_setter', icon:'🚪', name:'边界感大师', desc:'实践断亲或轻断亲', check: g => g.flags.familyDisconnect },
     // v4.9 achievements
-    { id:'quiet_quitter', icon:'😶', name:'精神离职者', desc:'实践安静离职', check: g => g.flags.quietQuitting },
-    { id:'burnout_survivor', icon:'🔥', name:'职业倦怠幸存者', desc:'经历职业倦怠', check: g => g.flags.jobBurnout },
+    { id:'quiet_quitter_v2', icon:'😶', name:'精神离职者', desc:'实践安静离职', check: g => g.flags.quietQuitting },
+    { id:'burnout_survivor_v2', icon:'🔥', name:'职业倦怠幸存者', desc:'经历职业倦怠', check: g => g.flags.jobBurnout },
     // v5.0 achievements
     { id:'single_and_proud', icon:'💎', name:'单身贵族', desc:'享受单身生活', check: g => g.flags.singleAndHappy },
     { id:'marriage_free', icon:'💍', name:'不婚主义者', desc:'坚持不婚主义', check: g => g.flags.committedSingle },
@@ -3958,14 +4375,14 @@ const ACHIEVEMENTS = [
     { id:'silver_entrepreneur', icon:'👴', name:'银发经济创业者', desc:'投身养老产业', check: g => g.flags.silverEconomy },
     // v6.5 achievements
     { id:'digital_nomad_pro', icon:'💻', name:'数字游民', desc:'成为自由职业者', check: g => g.flags.digitalNomad },
-    { id:'freelancer', icon:'🎨', name:'自由职业者', desc:'远程工作或自由接单', check: g => g.flags.freelancer },
+    { id:'freelancer_v2', icon:'🎨', name:'自由职业者', desc:'远程工作或自由接单', check: g => g.flags.freelancer },
     { id:'civil_service_veteran', icon:'📋', name:'考公老手', desc:'参加公务员考试', check: g => g.flags.civilServiceExam },
     { id:'persistent_examinee', icon:'🔄', name:'二战三战', desc:'多次参加考公', check: g => g.flags.secondCareer },
     // v6.6 achievements
     { id:'slash_youth', icon:'💼', name:'斜杠青年', desc:'开展副业', check: g => g.flags.sideHustle },
     { id:'street_vendor', icon:'🛒', name:'摆摊达人', desc:'摆摊创业', check: g => g.flags.streetVendor },
     { id:'frugal_master', icon:'📉', name:'消费降级大师', desc:'实践消费降级', check: g => g.flags.consumptionDowngrade },
-    { id:'minimalist', icon:'🎯', name:'极简主义者', desc:'选择极简生活', check: g => g.flags.minimalist },
+    { id:'minimalist_v2', icon:'🎯', name:'极简主义者', desc:'选择极简生活', check: g => g.flags.minimalist },
     { id:'pingti_expert', icon:'🔄', name:'平替专家', desc:'拥抱平替文化', check: g => g.flags.pingtiCulture },
     // v6.7 achievements
     { id:'ai_creator', icon:'🤖', name:'AI创作者', desc:'学习AI创作', check: g => g.flags.aiCreation },
@@ -3973,7 +4390,7 @@ const ACHIEVEMENTS = [
     { id:'opc_founder', icon:'🏢', name:'一人公司创始人', desc:'创办一人公司', check: g => g.flags.onePersonCompany },
     { id:'ai_tool_master', icon:'🛠️', name:'AI工具达人', desc:'掌握AI工具', check: g => g.flags.aiToolUser },
     // v6.8 achievements
-    { id:'pet_parent', icon:'🐾', name:'宠物家长', desc:'养宠物', check: g => g.flags.petEconomy },
+    { id:'pet_parent_v2', icon:'🐾', name:'宠物家长', desc:'养宠物', check: g => g.flags.petEconomy },
     { id:'cat_lover', icon:'🐱', name:'猫奴', desc:'养猫', check: g => g.flags.catOwner },
     { id:'dog_lover', icon:'🐶', name:'铲屎官', desc:'养狗', check: g => g.flags.dogOwner },
     { id:'outdoor_enthusiast', icon:'⛰️', name:'户外爱好者', desc:'参与户外运动', check: g => g.flags.outdoorSports },
@@ -3990,7 +4407,7 @@ const ACHIEVEMENTS = [
     { id:'emotional_worker', icon:'💔', name:'情感劳动者', desc:'从事情感服务', check: g => g.flags.emotionalLabor },
     { id:'family_healer', icon:'❤️', name:'家庭疗愈者', desc:'反思亲子关系', check: g => g.flags.familyReflection },
     // v7.1 achievements
-    { id:'guzi_collector', icon:'🎌', name:'谷子收藏家', desc:'入坑谷子经济', check: g => g.flags.goodsEconomy2 },
+    { id:'guzi_collector_v2', icon:'🎌', name:'谷子收藏家', desc:'入坑谷子经济', check: g => g.flags.goodsEconomy2 },
     { id:'cosplayer_pro', icon:'🎭', name:'Coser', desc:'玩Cosplay', check: g => g.flags.cosplay },
     { id:'ip_enthusiast', icon:'🤝', name:'IP联名爱好者', desc:'购买联名产品', check: g => g.flags.ipCollaboration },
     // v7.2 achievements
@@ -4003,12 +4420,12 @@ const ACHIEVEMENTS = [
     { id:'marriage_realist', icon:'💸', name:'婚姻现实主义者', desc:'面对结婚成本', check: g => g.flags.marriageCost },
     { id:'single_happy', icon:'💍', name:'快乐单身族', desc:'享受单身生活', check: g => g.flags.singleHappy },
     // v7.4 achievements
-    { id:'pension_planner', icon:'👴', name:'养老规划师', desc:'提前规划养老金', check: g => g.flags.pensionPlanning },
+    { id:'pension_planner_v2', icon:'👴', name:'养老规划师', desc:'提前规划养老金', check: g => g.flags.pensionPlanning },
     { id:'mental_health_warrior', icon:'💭', name:'心理健康战士', desc:'寻求心理帮助', check: g => g.flags.seekHelp },
     { id:'age_35_survivor', icon:'🎂', name:'35岁幸存者', desc:'度过35岁危机', check: g => g.flags.age35Crisis },
     { id:'career_transformer', icon:'💪', name:'职业转型者', desc:'35岁后成功转型', check: g => g.flags.careerTransition },
     // v7.5 achievements
-    { id:'pua_resister', icon:'😰', name:'PUA反抗者', desc:'拒绝职场PUA', check: g => g.flags.standUp },
+    { id:'pua_resister_v2', icon:'😰', name:'PUA反抗者', desc:'拒绝职场PUA', check: g => g.flags.standUp },
     { id:'digital_detox_pro', icon:'📱', name:'数字排毒达人', desc:'戒除电子榨菜成瘾', check: g => g.flags.digitalDetox },
     { id:'pretend_worker', icon:'🎭', name:'假装上班族', desc:'体验假装上班', check: g => g.flags.pretendToWork },
     { id:'routine_keeper', icon:'💪', name:'生活节奏保持者', desc:'失业期间保持规律生活', check: g => g.flags.keepRoutine },
@@ -4020,7 +4437,7 @@ const ACHIEVEMENTS = [
     // v7.7 achievements
     { id:'social_media_persona', icon:'📸', name:'人设打造师', desc:'预制朋友圈打造人设', check: g => g.flags.socialMediaPersona },
     { id:'authentic_sharer', icon:'💯', name:'真实分享者', desc:'坚持真实记录生活', check: g => g.flags.authenticSharing },
-    { id:'personal_brand', icon:'🎯', name:'个人品牌专家', desc:'用社交媒体打造个人品牌', check: g => g.flags.personalBranding },
+    { id:'personal_brand_v2', icon:'🎯', name:'个人品牌专家', desc:'用社交媒体打造个人品牌', check: g => g.flags.personalBranding },
     { id:'cyber_wellness_user', icon:'🤖', name:'赛博养生达人', desc:'尝试AI中医养生', check: g => g.flags.cyberWellness },
     { id:'medical_companion', icon:'🏥', name:'陪诊师', desc:'成为陪诊师或请陪诊师', check: g => g.flags.medicalCompanion },
     { id:'pet_funeral', icon:'🐾', name:'宠物告别师', desc:'体验宠物殡葬服务', check: g => g.flags.petFuneral },
@@ -4030,7 +4447,26 @@ const ACHIEVEMENTS = [
     { id:'therapy_seeker', icon:'💭', name:'心理咨询求助者', desc:'情绪崩溃后寻求专业帮助', check: g => g.flags.seekTherapy },
     { id:'reconciliation_master', icon:'💑', name:'感情修复大师', desc:'经历分手危机并成功挽回', check: g => g.flags.tryToReconcile && g.relationships && g.relationships.partner > 50 },
     { id:'social_rebuilder', icon:'🤝', name:'社交重建者', desc:'从孤立危机中重建社交圈', check: g => g.flags.reconnectFriends && g.social > 50 },
-    { id:'family_healer', icon:'❤️', name:'家庭关系修复者', desc:'化解家庭危机', check: g => g.flags.familyTalk && g.relationships && g.relationships.family > 60 },
+    { id:'family_healer_v2', icon:'❤️', name:'家庭关系修复者', desc:'化解家庭危机', check: g => g.flags.familyTalk && g.relationships && g.relationships.family > 60 },
+    // v8.0 新系统成就
+    { id:'trade_novice', icon:'🏪', name:'倒卖新手', desc:'完成第一笔倒卖交易', check: g => g.flags.tradeFirstBuy },
+    { id:'trade_master', icon:'💰', name:'倒卖大亨', desc:'通过倒卖累计赚取5万以上', check: g => g.flags.tradeProfit && g.money > 50000 },
+    { id:'trade_king', icon:'👑', name:'地下市场之王', desc:'持有全部8种商品', check: g => { const goods = Object.keys(g.inventory||{}); return goods.length >= 8; } },
+    { id:'surprise_survivor', icon:'⚡', name:'意外幸存者', desc:'经历5次以上突发事件', check: g => g.flags.surpriseCount >= 5 },
+    { id:'loan_shark_survivor', icon:'🦈', name:'高利贷幸存者', desc:'借了高利贷还能活着', check: g => g.flags.loanShark && g.flags.loanSharkPaid },
+    { id:'food_poisoning_survivor', icon:'🤢', name:'外卖中毒幸存者', desc:'从外卖食物中毒中恢复', check: g => g.flags.foodPoisoning && g.health > 60 },
+    { id:'rent_warrior', icon:'🏠', name:'租房战士', desc:'经历了租房踩雷', check: g => g.flags.rentTrap },
+    { id:'delivery_quitter', icon:'🍳', name:'外卖戒断者', desc:'学会了做饭', check: g => g.flags.cookingSkill },
+    { id:'spring_festival_hero', icon:'🧧', name:'过年达人', desc:'做出了过年的选择', check: g => g.flags.springFestivalChoice },
+    { id:'stock_zen', icon:'📉', name:'股市禅修者', desc:'经历股票深套后还活着', check: g => g.flags.stockDeepLoss && g.money > 0 },
+    // === v8.1 新增成就 ===
+    { id:'roommate_survivor', icon:'🏠', name:'合租幸存者', desc:'熬过了室友的折磨', check: g => g.flags.roommateHell && g.mood >= 50 },
+    { id:'spring_hero', icon:'🚄', name:'春运勇士', desc:'成功回家过年', check: g => g.flags.springFestivalThisYear },
+    { id:'ai_adopter', icon:'🤖', name:'AI先驱', desc:'主动拥抱AI技术', check: g => g.flags.aiSkills },
+    { id:'matchmaking_veteran', icon:'💒', name:'相亲老手', desc:'去过相亲角', check: g => g.flags.matchmakingCorner },
+    { id:'rent_scam_survivor', icon:'🏚️', name:'租房老江湖', desc:'被黑中介坑过还活着', check: g => g.flags.rentScam && g.money > -20000 },
+    { id:'health_awakening_v2', icon:'⚰️', name:'生死觉悟', desc:'同事猝死后开始重视健康', check: g => g.flags.colleagueKaroshi && g.flags.fitnessJourney },
+    { id:'newbie_survivor', icon:'🌱', name:'新手不死', desc:'活过了头3个月', check: g => g.months >= 3 },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -4122,7 +4558,10 @@ const ENDINGS = [
     // --- v2.40 ENDINGS ---
     { id:'lottery_winner_end', badge:'🎰', title:'彩票幸运儿', desc:'你真的中了彩票！\n\n虽然不是头奖，但也够你潇洒一阵子了。\n\n你没有辞职，没有炫富，只是默默地把钱存了起来。\n\n"运气是实力的一部分——但你这次，纯粹是运气。"', cond: g => g.flags.lotteryWin && g.money>=50000 && g.age>=28 },
     { id:'accidental_influencer', badge:'⭐', title:'意外网红', desc:'你的一条动态火了，你成了"15分钟名人"。\n\n你没有成为大V，但你体验了被关注的感觉。\n\n你明白了一个道理：名气是暂时的，真实的生活才是永恒的。\n\n"走红不是目的，是副产品。"', cond: g => g.flags.socialMediaFame && g.charm>=70 && g.social>=65 && g.age>=28 },
-    { id:'career_transformer', badge:'🔄', title:'职业转型者', desc:'你勇敢地走出了舒适区，完成了职业转型。\n\n新的领域让你重新找回了激情。\n\n"转行不是失败，是重新开始。"', cond: g => g.flags.careerChange && g.jobSalary>=15000 && g.intel>=75 && g.mood>=65 && g.age>=32 },
+    { id:'career_transformer_end', badge:'🔄', title:'职业转型者', desc:'你勇敢地走出了舒适区，完成了职业转型。\n\n新的领域让你重新找回了激情。\n\n"转行不是失败，是重新开始。"', cond: g => g.flags.careerChange && g.jobSalary>=15000 && g.intel>=75 && g.mood>=65 && g.age>=32 },
+    // --- v8.1 NEW ENDINGS (策划团队建议) ---
+    { id:'trade_king_end', badge:'🏪', title:'倒爷之王', desc:'你成了地下交易市场的传奇。\n\n从华强北到中关村，从黄牛票到限量球鞋，没有你没倒过的东西。你的商业嗅觉比华尔街的分析师还灵敏。\n\n有人说你"投机倒把"，你说这叫"资源配置优化"。\n\n"市场经济的本质就是信息差——你只是比别人更懂这个道理。"\n\n你的仓库堆满了货，你的微信好友5000人，你的账上有六位数。\n\n虽然你妈至今不知道你具体做什么工作。', cond: g => g.flags.tradeProfit && g.money>=200000 && g.intel>=65 && g.age>=28 },
+    { id:'loan_shark_end', badge:'🦈', title:'网贷深渊', desc:'你借了网贷。然后以贷养贷。然后利滚利。\n\n从借5000变成了欠50万。催收电话打给了你所有的通讯录好友，你的同事、领导、父母都收到了短信。\n\n你不敢接陌生电话，不敢看微信消息，不敢出门。\n\n"你以为借的是钱，其实借的是命。"\n\n你终于鼓起勇气，给家里打了电话。你妈在电话那头哭了。\n\n（如果你或身边的人遭遇网贷困扰，请拨打法律援助热线：12348）', cond: g => g.flags.loanSharkOwed && g.money<=-50000 && g.mood<=25 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
@@ -4226,10 +4665,15 @@ function startGame() {
         },
         flags: { hasPartner: false, partnerName: '', marriedMonths: 0 },
         currentEvent: null, isEnded: false, consecutiveOvertime: 0,
+        // v8.0: 初始化新系统
+        recentEventIds: [],
+        inventory: {},
+        consecutiveChoices: {},
     });
 
     showScreen('screen-game');
     updateHUD();
+    updateTradePrices(); // v8.0: 初始化交易价格
 
     const log = document.getElementById('event-log');
     log.innerHTML = '';
@@ -4249,12 +4693,13 @@ function startGame() {
 // === MONTHLY ACTIVITY SYSTEM ===
 let selectedActivity = null;
 
+// v8.1: 策划团队平衡调整 - 锻炼不再OP，各活动更均衡
 const ACTIVITY_EFFECTS = {
     work: { money: 3000, health: -5, mood: -3, intel: 2, social: -2, charm: 0, label: '拼命工作' },
-    rest: { money: -500, health: 8, mood: 10, intel: 0, social: 0, charm: 2, label: '休息放松' },
-    study: { money: -200, health: 0, mood: 3, intel: 10, social: 0, charm: 3, label: '学习充电' },
-    socialize: { money: -1000, health: 0, mood: 8, intel: 0, social: 10, charm: 5, label: '社交聚会' },
-    exercise: { money: -300, health: 10, mood: 5, intel: 0, social: 0, charm: 5, label: '运动锻炼' },
+    rest: { money: -500, health: 6, mood: 8, intel: 0, social: 0, charm: 2, label: '休息放松' },
+    study: { money: -200, health: -1, mood: -2, intel: 8, social: 0, charm: 3, label: '学习充电' },
+    socialize: { money: -1000, health: -1, mood: 6, intel: 0, social: 8, charm: 5, label: '社交聚会' },
+    exercise: { money: -300, health: 6, mood: 3, intel: 0, social: 0, charm: 4, label: '运动锻炼' },
 };
 
 function selectActivity(type) {
@@ -4308,6 +4753,9 @@ function advanceMonth() {
 
     G.months++; G.month++;
     if (G.month > 12) { G.month = 1; G.age++; G.year++; G.flags.springFestivalThisYear = false; }
+
+    // v8.0: 每月更新倒卖交易价格
+    updateTradePrices();
 
     // 季节效果
     const season = getSeason(G.month);
@@ -4404,10 +4852,18 @@ function advanceMonth() {
     checkAchievements();
 
     // 多重结局检查
-    if (G.health <= 0) { triggerEnding(); return; }
-    if (G.money <= -100000) { triggerEnding(); return; }
+    // v8.1: 新手保护期 - 前3个月不会暴毙/破产，给玩家适应时间
+    const isNewbieProtected = G.months <= 3;
+    if (G.health <= 0 && !isNewbieProtected) { triggerEnding(); return; }
+    if (G.money <= -100000 && !isNewbieProtected) { triggerEnding(); return; }
     if (G.age >= 60) { triggerEnding(); return; }
-    if (G.mood <= 0) { triggerEnding(); return; }
+    if (G.mood <= 0 && !isNewbieProtected) { triggerEnding(); return; }
+    // 新手保护期内属性不会低于20
+    if (isNewbieProtected) {
+        G.health = Math.max(G.health, 20);
+        G.mood = Math.max(G.mood, 20);
+        G.money = Math.max(G.money, -20000);
+    }
 
     const event = pickEvent();
     if (event) { showEvent(event); } else { showMonthlySummary(); }
@@ -4455,19 +4911,41 @@ function applySeasonEffects(season) {
 }
 
 function pickEvent() {
-    // 合并通用事件和当前城市专属事件
+    // v8.0: 事件冷却去重 - 最近15个事件不会重复出现
     const cityEvents = CITIES[G.city]?.events || [];
     const allEvents = [...EVENTS, ...cityEvents];
-    const eligible = allEvents.filter(e => (!e.cond || e.cond(G)) && (!e.minAge || G.age>=e.minAge) && (!e.maxAge || G.age<=e.maxAge));
-    if (!eligible.length) return null;
+    const recentSet = new Set(G.recentEventIds || []);
+    const eligible = allEvents.filter(e =>
+        (!e.cond || e.cond(G)) && (!e.minAge || G.age>=e.minAge) && (!e.maxAge || G.age<=e.maxAge)
+        && !recentSet.has(e.id) // v8.0: 排除最近见过的事件
+    );
+    // 如果过滤后没有可用事件，清空冷却池重试
+    const pool = eligible.length > 0 ? eligible : allEvents.filter(e =>
+        (!e.cond || e.cond(G)) && (!e.minAge || G.age>=e.minAge) && (!e.maxAge || G.age<=e.maxAge)
+    );
+    if (!pool.length) return null;
     const weighted = [];
-    eligible.forEach(e => { for(let i=0;i<(e.weight||1);i++) weighted.push(e); });
-    return weighted[Math.floor(Math.random()*weighted.length)];
+    pool.forEach(e => { for(let i=0;i<(e.weight||1);i++) weighted.push(e); });
+    const picked = weighted[Math.floor(Math.random()*weighted.length)];
+    // v8.0: 记录已见事件（保留最近15个）
+    if (!G.recentEventIds) G.recentEventIds = [];
+    G.recentEventIds.push(picked.id);
+    if (G.recentEventIds.length > 15) G.recentEventIds.shift();
+    return picked;
 }
 
 function showEvent(event) {
     G.currentEvent = event; G.eventsSeen++;
     const body = typeof event.body === 'function' ? event.body() : event.body;
+    // v8.0: hint 神秘化 - 不直接暴露具体属性，只给风格暗示
+    const hintMap = {
+        '+💰': '💰?', '-💰': '💰↓', '+❤️': '❤️↑', '-❤️': '❤️↓',
+        '+😊': '☀️', '-😊': '🌧️', '+🧠': '💡', '-🧠': '🤔',
+        '+👥': '🤝', '-👥': '🚪', '+✨': '⭐', '-✨': '💫',
+        '🎲': '🎲', '+💰 +😊': '🎰', '-💰 +😊': '💸☀️',
+        '+💰 +🧠': '💰💡', '+💰 -❤️': '💰🫀', '-💰 +❤️': '💸❤️',
+        '+😊 +👥': '🎉', '+❤️ +😊': '🌈',
+    };
     document.getElementById('current-event').innerHTML = `
         <div class="event-card">
             <div class="event-card-header">
@@ -4477,7 +4955,11 @@ function showEvent(event) {
             </div>
             <div class="event-card-body">${body}</div>
             <div class="event-choices">
-                ${event.choices.map((c,i) => `<button class="choice-btn" onclick="makeChoice(${i})"><span class="choice-label">${c.label}</span>${c.hint?`<span class="choice-hint">${c.hint}</span>`:''}</button>`).join('')}
+                ${event.choices.map((c,i) => {
+                    // v8.0: 将hint翻译为神秘版本
+                    const mysteryHint = c.hint ? (hintMap[c.hint.trim()] || '❓') : '';
+                    return `<button class="choice-btn" onclick="makeChoice(${i})"><span class="choice-label">${c.label}</span>${mysteryHint?`<span class="choice-hint">${mysteryHint}</span>`:''}</button>`;
+                }).join('')}
             </div>
         </div>`;
     const _advBtn = document.getElementById('btn-advance');
@@ -4546,6 +5028,17 @@ function makeChoice(i) {
             const nextEvent = typeof result.nextEvent === 'function' ? result.nextEvent(G) : result.nextEvent;
             if (nextEvent) showEvent(nextEvent);
         }, 800);
+        return; // v8.0: 如果有链式事件，不触发突发事件
+    }
+
+    // v8.0: 突发事件系统 - 35%概率触发意外事件（打破回合制单调感）
+    if (!G.currentEvent && Math.random() < 0.35) {
+        const surprise = pickSurpriseEvent();
+        if (surprise) {
+            setTimeout(() => {
+                showSurpriseEvent(surprise);
+            }, 600);
+        }
     }
 }
 
@@ -4557,6 +5050,160 @@ function showMonthlySummary() {
         `平静的一个月。你偶尔会想，这样的日子还要持续多久。`,
     ];
     addEventCard({ icon:'📅', title:`${G.year}年${G.month}月`, body: s[Math.floor(Math.random()*s.length)], type:'' }, true);
+}
+
+// === v8.0 突发事件系统 ===
+function pickSurpriseEvent() {
+    if (!SURPRISE_EVENTS || !SURPRISE_EVENTS.length) return null;
+    const weighted = [];
+    SURPRISE_EVENTS.forEach(e => { for(let i=0;i<(e.weight||1);i++) weighted.push(e); });
+    return weighted[Math.floor(Math.random()*weighted.length)];
+}
+
+function showSurpriseEvent(event) {
+    // v8.0: 追踪突发事件次数
+    G.flags.surpriseCount = (G.flags.surpriseCount || 0) + 1;
+    const body = typeof event.body === 'function' ? event.body() : event.body;
+    const result = event.fn(G);
+    // 应用属性变化
+    if (result.money) G.money += result.money;
+    if (result.health) G.health = clamp(G.health + result.health, 0, 100);
+    if (result.mood) G.mood = clamp(G.mood + result.mood, 0, 100);
+    if (result.intel) G.intel = clamp(G.intel + result.intel, 0, 100);
+    if (result.social) G.social = clamp(G.social + result.social, 0, 100);
+    if (result.charm) G.charm = clamp(G.charm + result.charm, 0, 100);
+
+    // 显示变化
+    const labels = {money:'💰',health:'❤️',mood:'😊',intel:'🧠',social:'👥',charm:'✨'};
+    let changes = '';
+    for (const [k,v] of Object.entries(result)) {
+        if (labels[k] && v) {
+            const d = k==='money' ? fmtMoney(v) : (v>0?`+${v}`:`${v}`);
+            changes += `<span class="stat-change-item ${v>0?'positive':'negative'}">${labels[k]} ${d}</span>`;
+            showStatChange(k, v, labels[k], d);
+        }
+    }
+
+    // 突发事件特殊效果：卡片从右侧滑入
+    addEventCard({
+        icon: event.icon,
+        title: `⚡ ${event.title}`,
+        body: body + `\n\n<div class="meme-quote" style="color:var(--accent)">— 意料之外 —</div>`,
+        changes,
+        type: (result.mood||0) > 0 ? 'positive' : (result.mood||0) < 0 ? 'negative' : ''
+    }, true);
+
+    // 屏幕效果
+    if ((result.mood||0) < -10 || (result.health||0) < -5) {
+        document.getElementById('screen-game').classList.add('shake');
+        setTimeout(() => document.getElementById('screen-game').classList.remove('shake'), 500);
+    }
+
+    updateHUD();
+    if (G.health<=0 || G.mood<=0 || G.money<=-100000) triggerEnding();
+    checkAchievements();
+    playSound('chain');
+}
+
+// === v8.0 倒卖交易系统 ===
+function openTradeMarket() {
+    if (!tradePrices || Object.keys(tradePrices).length === 0) updateTradePrices();
+    const modal = document.getElementById('modal-trade') || createTradeModal();
+    const content = modal.querySelector('.trade-content');
+    if (!content) return;
+
+    const invCount = getInventoryCount();
+    const city = CITIES[G.city];
+
+    let goodsHtml = '';
+    for (const [key, good] of Object.entries(TRADE_GOODS)) {
+        const price = tradePrices[key] || good.basePrice;
+        const owned = G.inventory[key] || 0;
+        const canBuy = G.money >= price && invCount < MAX_INVENTORY;
+        const canSell = owned > 0;
+        // 价格趋势指示（对比基准价）
+        const ratio = price / (good.basePrice * (good.cityMod[G.city] || 1.0));
+        const trend = ratio > 1.3 ? '📈 高价' : ratio < 0.7 ? '📉 低价' : '➡️ 正常';
+        const trendColor = ratio > 1.3 ? '#f87171' : ratio < 0.7 ? '#4ade80' : '#888';
+
+        goodsHtml += `
+            <div class="trade-item">
+                <div class="trade-item-header">
+                    <span class="trade-icon">${good.icon}</span>
+                    <span class="trade-name">${good.name}</span>
+                    <span class="trade-trend" style="color:${trendColor}">${trend}</span>
+                </div>
+                <div class="trade-item-body">
+                    <span class="trade-price">💰 ${fmtMoney(price)}</span>
+                    <span class="trade-owned">📦 持有: ${owned}</span>
+                </div>
+                <div class="trade-item-actions">
+                    <button class="btn-small btn-buy" ${canBuy?'':`disabled`} onclick="buyGoods('${key}')">买入</button>
+                    <button class="btn-small btn-sell" ${canSell?'':`disabled`} onclick="sellGoods('${key}')">卖出</button>
+                </div>
+            </div>`;
+    }
+
+    content.innerHTML = `
+        <div class="trade-header">
+            <h3>🏪 ${city.name}地下市场</h3>
+            <p class="trade-hint">背包: ${invCount}/${MAX_INVENTORY} | 资金: ${fmtMoney(G.money)}</p>
+            <p class="trade-tip" style="color:var(--text-muted);font-size:12px">💡 提示：低价买入、高价卖出。不同城市价格不同！价格每月刷新。</p>
+        </div>
+        <div class="trade-grid">${goodsHtml}</div>
+    `;
+    modal.classList.add('open');
+}
+
+function buyGoods(key) {
+    const price = tradePrices[key];
+    if (!price || G.money < price || getInventoryCount() >= MAX_INVENTORY) {
+        notify('❌ 资金不足或背包已满！'); return;
+    }
+    G.money -= price;
+    G.inventory[key] = (G.inventory[key] || 0) + 1;
+    G.flags.tradeFirstBuy = true; // v8.0: 追踪成就
+    playSound('money');
+    notify(`✅ 买入 ${TRADE_GOODS[key].name}（${fmtMoney(price)}）`);
+    updateHUD();
+    checkAchievements();
+    openTradeMarket(); // 刷新
+}
+
+function sellGoods(key) {
+    if (!G.inventory[key] || G.inventory[key] <= 0) {
+        notify('❌ 你没有这个商品！'); return;
+    }
+    const rawPrice = tradePrices[key];
+    // v8.1: 策划团队平衡 - 10%手续费，防止无脑倒卖暴利
+    const fee = Math.floor(rawPrice * 0.10);
+    const price = rawPrice - fee;
+    G.money += price;
+    G.inventory[key]--;
+    if (G.inventory[key] <= 0) delete G.inventory[key];
+    G.flags.tradeProfit = true; // v8.0: 追踪成就
+    playSound('money');
+    notify(`💰 卖出 ${TRADE_GOODS[key].name}（+${fmtMoney(price)}，手续费${fmtMoney(fee)}）`);
+    updateHUD();
+    checkAchievements();
+    openTradeMarket(); // 刷新
+}
+
+function createTradeModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.id = 'modal-trade';
+    modal.innerHTML = `
+        <div class="modal-overlay" onclick="closeModal('modal-trade')"></div>
+        <div class="modal-content modal-large">
+            <button class="modal-close" onclick="closeModal('modal-trade')" aria-label="关闭">×</button>
+            <h2>🏪 地下市场</h2>
+            <div class="trade-content"></div>
+            <button class="btn btn-secondary" onclick="closeModal('modal-trade')" style="margin-top:16px">关闭</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    return modal;
 }
 
 // === UI ===
@@ -5034,7 +5681,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.40' };
+    const saveData = { ...G, savedAt: Date.now(), version: '8.1' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
@@ -5206,6 +5853,11 @@ function initKeyboardShortcuts() {
             case '5':
                 e.preventDefault();
                 selectActivity('exercise');
+                break;
+            case 't':
+            case 'T':
+                e.preventDefault();
+                openTradeMarket();
                 break;
             case 's':
             case 'S':
