@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v22.3
+// 都市浮生记 - Game Engine v22.4
 // ============================================
 
 // === GAME STATE ===
@@ -10699,6 +10699,87 @@ const EVENTS = [
         { label:'开始研究电车保值攻略', hint:'+🧠 +💰', fn: g => { g.flags.evDepreciation=true; return{intel:8,money:3000}; }},
         { label:'后悔了，下次还是买油车', hint:'', fn: g => { g.flags.evDepreciation=true; return{mood:-8}; }},
       ]},
+    // === v22.4 新增事件（电竞游戏文化） ===
+    { id:'esports_watch', icon:'🎮', title:'看电竞比赛', category:'hobby',
+      body:'你的同事拉你去看了一场英雄联盟比赛。\n\n你本来不感兴趣——但到了现场，你被震撼了。\n\n体育馆里坐满了人。大屏幕上播放着比赛画面，解说的声音响彻全场。\n\n每当有精彩操作——全场欢呼。你旁边一个20岁的妹子激动得哭了。\n\n你开始理解：电竞不是玩游戏——是一种竞技体育。选手的反应速度、团队配合、战术策略——不亚于任何传统运动。\n\n比赛结束后，你在微博上搜索了电竞行业的新闻：\n- 中国电竞市场规模超过1500亿\n- 电竞选手平均年龄22岁\n- 顶级选手年薪千万\n\n你的同事说：「我们的时代是看NBA——现在年轻人的时代是看电竞。」\n\n「每一代人都有自己的运动。足球属于父辈，电竞属于这一代。」',
+      cond: g => !g.flags.esportsWatch && g.age >= 22 && g.age <= 40,
+      choices:[
+        { label:'被电竞氛围感染，开始关注赛事', hint:'+😊 +👥', fn: g => { g.flags.esportsWatch=true; return{mood:8,social:5}; }},
+        { label:'觉得挺有意思，但不太懂', hint:'+😊', fn: g => { g.flags.esportsWatch=true; return{mood:5}; }},
+        { label:'看不懂，还是觉得是玩游戏', hint:'', fn: g => { g.flags.esportsWatch=true; return{mood:2}; }},
+      ]},
+    { id:'mobile_gaming', icon:'📱', title:'手游社交', category:'social',
+      body:'你发现：你的同事们每天午休都在打王者荣耀。\n\n你不太会玩——但为了融入团队，你下载了游戏。\n\n你的同事带你打了几把。你从「送人头」变成了「不拖后腿」。\n\n午休时间变成了「开黑时间」。你们五个人组队，一边打一边吐槽。\n\n你发现：手游成了你和同事之间的社交货币。你们在群里讨论英雄、皮肤、赛季。\n\n你的段位从青铜打到了钻石。你的同事说：「你这进步速度，可以啊！」\n\n你发了条朋友圈：「从青铜到钻石——就像人生一样，慢慢磨就行了。」\n\n「手游不只是游戏——是成年人最廉价的团建。一局30分钟，五个人开心一下午。」',
+      cond: g => !g.flags.mobileGaming && g.age >= 22 && g.age <= 40 && g.social >= 25,
+      choices:[
+        { label:'爱上了手游，成了同事间的游戏搭子', hint:'+👥 +😊', fn: g => { g.flags.mobileGaming=true; return{social:8,mood:8}; }},
+        { label:'偶尔玩玩，主要是为了社交', hint:'+👥 +😊', fn: g => { g.flags.mobileGaming=true; return{social:5,mood:5}; }},
+        { label:'觉得浪费时间，卸载了', hint:'', fn: g => { g.flags.mobileGaming=true; return{mood:-3,social:-3}; }},
+      ]},
+    { id:'gaming_addiction_v22_4', icon:'😵', title:'游戏成瘾', category:'health',
+      body:'你发现自己越来越离不开游戏了。\n\n上班时想着下班打游戏。下班后从7点打到凌晨2点。周末可以从早打到晚。\n\n你的工作效率下降了。你的睡眠不足了。你的外卖费用暴增——因为没时间做饭。\n\n你的一个朋友说：「你最近怎么老不回消息？」你说：「在打游戏。」\n\n你在知乎上搜了「游戏成瘾怎么办」。一个回答触动你：\n\n「你不是在游戏里找到了快乐——你是在逃避现实中的不快乐。」\n\n你开始反思：你打游戏是因为喜欢——还是因为不想面对加班、孤独、焦虑？\n\n你决定每天限制游戏时间到2小时。第一周很痛苦——但你坚持了下来。\n\n「游戏成瘾的本质：不是游戏太好——是现实太难。真正的解药不是戒游戏——是让现实变得值得面对。」',
+      cond: g => g.flags.mobileGaming && !g.flags.gamingAddiction && g.mood <= 45,
+      choices:[
+        { label:'成功控制了游戏时间，重新平衡了生活', hint:'+❤️ +🧠 +😊', fn: g => { g.flags.gamingAddiction=true; return{health:8,intel:5,mood:8}; }},
+        { label:'减了一些但还是控制不住', hint:'+❤️', fn: g => { g.flags.gamingAddiction=true; return{health:3,mood:3}; }},
+        { label:'沉迷了，直到某件事敲醒了你', hint:'-❤️', fn: g => { g.flags.gamingAddiction=true; return{health:-8,mood:-5}; }},
+      ]},
+    { id:'indie_game', icon:'🎨', title:'独立游戏', category:'tech',
+      body:'你在Steam上发现了一款独立游戏。是一个中国团队做的——三个人，做了三年。\n\n游戏的主题是「在大城市漂泊的年轻人」。你玩了之后——哭了。\n\n因为游戏里的角色就是你：\n- 月薪8000，房租3000\n- 加班到深夜，吃外卖\n- 想家但不敢回去\n- 有梦想但不敢追\n\n你在评论区写了一段话：「这不是游戏——这是我的生活。谢谢你们把它做出来了。」\n\n你发现：独立游戏的魅力在于——它不追求画面和特效，它追求的是「共鸣」。\n\n你关注了这个团队。他们的下一条动态是：「感谢每一个玩家。你们的评论是我们继续做下去的动力。」\n\n「独立游戏是数字时代的诗歌——用代码写出的，关于人的故事。」',
+      cond: g => !g.flags.indieGame && g.age >= 22 && g.intel >= 40,
+      choices:[
+        { label:'成了独立游戏爱好者，开始支持国产游戏', hint:'+🧠 +😊 +💰-', fn: g => { g.flags.indieGame=true; return{intel:8,mood:10,money:-200}; }},
+        { label:'被游戏感动了，开始思考自己的人生', hint:'+🧠 +😊', fn: g => { g.flags.indieGame=true; return{intel:5,mood:8}; }},
+        { label:'玩了觉得一般，还是喜欢3A大作', hint:'', fn: g => { g.flags.indieGame=true; return{mood:3}; }},
+      ]},
+    { id:'game_streaming', icon:'📺', title:'游戏直播', category:'career',
+      body:'你开始看游戏直播。起初只是无聊——但后来你发现：好的主播不只是在玩游戏。\n\n你关注了一个主播。他每天直播8小时，一边玩一边和观众聊天。\n\n他的口头禅是：「游戏是假的——但快乐是真的。」\n\n你开始在直播间发弹幕。你和弹幕里的其他人成了「直播间老友」。你们每天准时来看直播，像看一档综艺节目。\n\n你算了一下：你在这个直播间待了超过500小时。你送过500块的礼物。\n\n你妈知道你花钱给「一个打游戏的人」后说：「你是不是疯了？」\n\n你说：「妈，我是在为快乐付费。和你买电视剧会员一样。」\n\n「直播经济的本质：你买的不是内容——是陪伴。在一个孤独的时代，陪伴是最贵的商品。」',
+      cond: g => g.flags.mobileGaming && !g.flags.gameStreaming && g.money >= 2000,
+      choices:[
+        { label:'成了忠实粉丝，在直播间交了很多朋友', hint:'+👥 +😊 +💰-', fn: g => { g.flags.gameStreaming=true; return{social:8,mood:8,money:-500}; }},
+        { label:'偶尔看看，当消遣', hint:'+😊', fn: g => { g.flags.gameStreaming=true; return{mood:5}; }},
+        { label:'觉得看别人打游戏是浪费时间', hint:'', fn: g => { g.flags.gameStreaming=true; return{mood:2}; }},
+      ]},
+    { id:'retro_gaming', icon:'🕹️', title:'怀旧游戏', category:'hobby',
+      body:'你在网上看到了一个帖子：「小时候玩过的游戏，你还记得吗？」\n\n你下载了一个模拟器。红警、CS、魔兽争霸、仙剑奇侠传……\n\n你打开了仙剑一——李逍遥的故事。你小时候不懂剧情，只觉得好玩。\n\n现在你28岁了。你重新玩了一遍——你在林月如死的时候哭了。\n\n你突然明白：游戏没有变——是你变了。\n\n你开始收集怀旧游戏。买了一个迷你红白机，花了300块。\n\n你和大学室友联机打了一晚CS1.6。你们从晚上8点打到凌晨3点。\n\n你的室友说：「感觉回到了大学宿舍。」你说：「是啊——但我们已经不是那个无忧无虑的孩子了。」\n\n「怀旧游戏卖的不是游戏体验——是一张回到过去的车票。」',
+      cond: g => !g.flags.retroGaming && g.age >= 26 && g.age <= 40,
+      choices:[
+        { label:'沉浸在怀旧游戏中，找回了童年', hint:'+😊 +👥', fn: g => { g.flags.retroGaming=true; return{mood:12,social:5,money:-300}; }},
+        { label:'玩了一会儿很感动，但没时间继续', hint:'+😊', fn: g => { g.flags.retroGaming=true; return{mood:8}; }},
+        { label:'觉得画面太老了，玩不下去', hint:'', fn: g => { g.flags.retroGaming=true; return{mood:2}; }},
+      ]},
+    { id:'game_dev_dream', icon:'💻', title:'做游戏的梦想', category:'career',
+      body:'你一直有一个梦想：做一款自己的游戏。\n\n你在B站看了很多教程：Unity、Unreal、Godot……\n\n你开始利用下班时间学游戏开发。你选了Godot引擎——开源免费。\n\n你做了一个小游戏：一个像素风格的「打工人模拟器」。玩家需要平衡工作、生活、健康。\n\n你发到了Taptap上。第一天下载量：50。\n\n但评论区有一个人写了长评：「这个游戏让我想起了自己。谢谢你。」\n\n你看着这条评论，眼眶红了。你做游戏不是为了赚钱——是为了让一个人觉得「有人理解我」。\n\n你继续做。第二个月，下载量到了5000。有人找你谈合作。\n\n「做游戏是最浪漫的创业：你用自己的想象力，创造了一个别人可以逃进去的世界。」',
+      cond: g => !g.flags.gameDevDream && g.age >= 23 && g.age <= 35 && g.intel >= 50,
+      choices:[
+        { label:'坚持做了下去，游戏获得了好评', hint:'+💰 +😊 +✨', fn: g => { g.flags.gameDevDream=true; g.flags.indieGameDev=true; return{money:5000,mood:15,charm:8,intel:10}; }},
+        { label:'做了一个demo就放弃了，太难了', hint:'+🧠 +😊', fn: g => { g.flags.gameDevDream=true; return{intel:8,mood:5}; }},
+        { label:'觉得做游戏不如打游戏', hint:'', fn: g => { g.flags.gameDevDream=true; return{mood:2}; }},
+      ]},
+    { id:'esports_dream', icon:'🏆', title:'电竞梦想', category:'career',
+      body:'你在王者荣耀里打到了全国前1000名。\n\n一个电竞俱乐部的星探联系了你：「要不要来试训？」\n\n你犹豫了。电竞选手的黄金年龄是18-24岁——你已经23了。\n\n你去试训了。每天训练12小时。你发现：电竞选手的生活和你想象的完全不同。\n\n不是「打游戏」——是「练技术」。每天重复同样的操作，练反应速度，练团队配合。\n\n你的手开始疼了——腱鞘炎。你的腰也疼了——坐太久。\n\n教练说：「电竞选手的职业寿命只有5-8年。退役后你怎么办？」\n\n你开始认真思考：电竞是一个值得用青春去赌的梦想吗？\n\n「电竞梦和所有梦想一样：你愿意为之承受多少——决定了你能走多远。」',
+      cond: g => g.flags.mobileGaming && !g.flags.esportsDream && g.age >= 20 && g.age <= 26,
+      choices:[
+        { label:'全力以赴追梦，哪怕只有几年', hint:'+✨ +💰 +😊', fn: g => { g.flags.esportsDream=true; g.flags.careerTransition=true; setJob(g,'电竞选手',15000); return{mood:12,charm:10,money:5000}; }},
+        { label:'试训后觉得太辛苦，放弃了', hint:'+🧠 +😊', fn: g => { g.flags.esportsDream=true; return{intel:5,mood:3}; }},
+        { label:'选择了学业/工作，把电竞当爱好', hint:'+🧠 +😊', fn: g => { g.flags.esportsDream=true; return{intel:5,mood:5}; }},
+      ]},
+    { id:'game_nostalgia', icon:'🎲', title:'桌游之夜', category:'social',
+      body:'朋友约你去玩桌游。你以为是打牌——结果是《狼人杀》《剧本杀》《大富翁》。\n\n你们六个人围坐在桌前。有人当狼人，有人当预言家，有人当平民。\n\n你们互相猜疑、辩论、演戏。你的一个平时很安静的朋友——玩狼人杀的时候变成了一个演技派。\n\n你们笑了一晚上。\n\n你发现：桌游的魅力在于——它让你放下了手机。你和朋友面对面交流，而不是隔着屏幕。\n\n你的朋友说：「在一个所有人都在看手机的时代——坐在一起玩桌游，是一种奢侈。」\n\n你发了朋友圈：「最好的社交不在微信里——在桌子上。」\n\n「桌游是数字化时代的反叛：当一切都在屏幕上发生——你们选择了面对面。」',
+      cond: g => !g.flags.gameNostalgia && g.age >= 22 && g.social >= 30,
+      choices:[
+        { label:'爱上了桌游，成了聚会常客', hint:'+👥 +😊', fn: g => { g.flags.gameNostalgia=true; return{social:10,mood:10}; }},
+        { label:'玩得很开心，偶尔约一局', hint:'+👥 +😊', fn: g => { g.flags.gameNostalgia=true; return{social:5,mood:8}; }},
+        { label:'觉得太烧脑了，不太适合你', hint:'', fn: g => { g.flags.gameNostalgia=true; return{mood:3}; }},
+      ]},
+    { id:'gaming_balance', icon:'⚖️', title:'游戏与生活的平衡', category:'psychology',
+      body:'你在知乎上看到了一个问题：「成年人该怎么平衡游戏和生活？」\n\n高赞回答：「游戏不是你的敌人——时间管理才是。如果你能安排好时间，游戏是最好的放松方式。」\n\n你开始尝试一种新方法：\n- 工作日只玩1小时\n- 周末可以玩3小时\n- 完成工作任务后才玩\n- 游戏时间当作奖励\n\n你发现：有了限制之后，你反而更享受游戏了。因为你知道：这是你应得的放松。\n\n你的工作效率反而提高了——因为你有了一个期待的东西。\n\n你的一个朋友说：「你把游戏变成了自律的工具？」你说：「不是工具——是奖励。」\n\n「成年人不需要戒游戏——需要学会把游戏放进生活的正确位置。」',
+      cond: g => g.flags.gamingAddiction && !g.flags.gamingBalance,
+      choices:[
+        { label:'找到了平衡，游戏和生活两不误', hint:'+😊 +🧠 +❤️', fn: g => { g.flags.gamingBalance=true; g.flags.personalGrowth=true; return{mood:12,intel:5,health:5}; }},
+        { label:'试着平衡但很难坚持', hint:'+😊', fn: g => { g.flags.gamingBalance=true; return{mood:5}; }},
+        { label:'还是控制不住，游戏太好玩了', hint:'', fn: g => { g.flags.gamingBalance=true; return{mood:-3}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -11690,6 +11771,12 @@ const ACHIEVEMENTS = [
     { id:'green_liver_ach', icon:'🌱', name:'绿色生活践行者', desc:'开始了低碳环保的生活方式', check: g => g.flags.greenLiving },
     { id:'ev_explorer_ach', icon:'🛣️', name:'电车自驾达人', desc:'开电车完成了一次自驾旅行', check: g => g.flags.evRoadTrip },
     { id:'ev_community_ach', icon:'🔌', name:'充电社交家', desc:'在充电站结识了志同道合的朋友', check: g => g.flags.chargingSocial },
+    // === v22.4 新增成就（电竞游戏文化） ===
+    { id:'gamer_ach', icon:'🎮', name:'游戏玩家', desc:'在游戏中找到了乐趣和社交', check: g => g.flags.mobileGaming },
+    { id:'indie_fan_ach', icon:'🎨', name:'独立游戏爱好者', desc:'被独立游戏的创意和情感打动', check: g => g.flags.indieGame },
+    { id:'indie_dev_ach', icon:'💻', name:'独立游戏开发者', desc:'做出了自己的第一款游戏', check: g => g.flags.indieGameDev },
+    { id:'retro_gamer_ach', icon:'🕹️', name:'怀旧玩家', desc:'在老游戏中找回了童年的记忆', check: g => g.flags.retroGaming },
+    { id:'game_balance_ach', icon:'⚖️', name:'游戏生活平衡师', desc:'学会了平衡游戏和工作', check: g => g.flags.gamingBalance },
 ];
 
 // === ENDINGS === (order matters: first match wins)
