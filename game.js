@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v30.8
+// 都市浮生记 - Game Engine v30.9
 // ============================================
 
 // === GAME STATE ===
@@ -16628,6 +16628,87 @@ const EVENTS = [
         { label:'至少尝试了虽然还有距离', hint:'+🧠', fn: g => { g.flags.bridgingGenerations=true; g.flags.triedBridge=true; return{intel:5}; }},
         { label:'代沟太深了无法跨越', hint:'-👥', fn: g => { g.flags.bridgingGenerations=true; g.flags.giveUpBridge=true; return{social:-3}; }},
       ]},
+    // v30.9 事件 - 移民与海外生活
+    { id:'emigration_consideration', icon:'✈️', title:'移民的念头', category:'immigration',
+      body:'你在某个时刻——产生了「移民」的念头。\n\n你的「原因」：\n- 「工作压力」——你觉得「太卷了」\n- 「环境问题」——你想要「更好的空气/食品安全」\n- 「教育」——你想给孩子「更好的教育」\n- 「生活方式」——你想要「work-life balance」\n- 「自由」——你想要「更多的个人空间」\n\n你的「犹豫」：\n- 「家人」——父母怎么办？\n- 「文化」——你能适应吗？\n- 「职业」——你能找到好工作吗？\n- 「身份」——你会变成「二等公民」吗？\n\n你的「调查」：\n- 移民成本：50万-500万不等\n- 适应时间：1-5年\n- 成功率：因国家/条件而异\n- 回国率：30%-50%\n\n你的「思考」：\n- 「移民」不是「逃离」——是「选择」\n- 「国外」不是「天堂」——是「另一种生活」\n- 「留下」不是「失败」——是「另一种勇敢」\n\n「移民」是一个「重大决定」——不是「冲动」。',
+      cond: g => g.age >= 25 && g.age <= 45 && g.money >= 50000 && !g.flags.emigrationConsideration,
+      choices:[
+        { label:'认真准备开始移民流程', hint:'+🧠 -💰', fn: g => { g.flags.emigrationConsideration=true; g.flags.startImmigration=true; return{intel:5,money:-10000}; }},
+        { label:'只是想想还是留在国内', hint:'+😊', fn: g => { g.flags.emigrationConsideration=true; g.flags.stayChina=true; return{mood:3}; }},
+        { label:'先去考察一下再决定', hint:'+🧠', fn: g => { g.flags.emigrationConsideration=true; g.flags.visitFirst=true; return{intel:3}; }},
+      ]},
+    { id:'culture_shock', icon:'🌍', title:'文化冲击', category:'immigration',
+      body:'你到了国外——经历了「文化冲击」。\n\n你的「震惊」：\n- 「语言」——你「说不清楚」「听不明白」\n- 「社交」——你「不懂规则」「不知道如何交朋友」\n- 「工作」——你「不适应文化」「不知道如何表现」\n- 「生活」——你「不会办事」「不知道规则」\n\n你的「阶段」：\n- 「蜜月期」——「一切都好新鲜好有趣」\n- 「挫折期」——「一切都好难好累」\n- 「调整期」——「开始适应了」\n- 「接受期」——「这就是生活」\n\n你的「感受」：\n- 「孤独」——你「没有朋友」\n- 「焦虑」——你「害怕犯错」\n- 「思乡」——你「想念家乡的味道」\n- 「身份困惑」——你「不知道我是谁」\n\n你的「应对」：\n- 「学语言」——这是「基础」\n- 「交朋友」——这是「支持」\n- 「保持开放」——这是「态度」\n- 「接纳自己」——这是「关键」\n\n「文化冲击」不是「弱点」——是「成长的必经之路」。',
+      cond: g => g.flags.startImmigration && !g.flags.cultureShock,
+      choices:[
+        { label:'积极适应努力学习语言和文化', hint:'+🧠 +👥', fn: g => { g.flags.cultureShock=true; g.flags.activeAdapt=true; return{intel:8,social:3}; }},
+        { label:'找华人圈子抱团取暖', hint:'+👥', fn: g => { g.flags.cultureShock=true; g.flags.chineseBubble=true; return{social:5}; }},
+        { label:'太难了想回国', hint:'-😊', fn: g => { g.flags.cultureShock=true; g.flags.wantReturn=true; return{mood:-5}; }},
+      ]},
+    { id:'overseas_career', icon:'💼', title:'海外职业发展', category:'immigration',
+      body:'你在国外开始了「新的职业生涯」。\n\n你的「挑战」：\n- 「学历不被认可」——你的「985」在这里「不算什么」\n- 「经验不被承认」——你的「10年经验」在这里「从0开始」\n- 「语言障碍」——你的「英语」不够「专业」\n- 「文化差异」——你的「工作方式」不被「接受」\n\n你的「起点」：\n- 从「entry level」开始——虽然你「35岁」了\n- 做「低薪工作」——虽然你「以前是经理」\n- 「重新考证」——虽然你「已经有证」\n\n你的「成长」：\n- 第一年：「生存」——先有工作\n- 第三年：「稳定」——找到位置\n- 第五年：「发展」——开始晋升\n- 第十年：「成功」——成为专家/管理层\n\n你的「理解」：\n- 「海外职业」不是「捷径」——是「另一条路」\n- 「重新开始」不是「失败」——是「勇气」\n- 「成功」不是「职位」——是「能力」\n\n「海外职业」的本质——是「重新证明自己」。',
+      cond: g => g.flags.cultureShock && g.age >= 25 && !g.flags.overseasCareer,
+      choices:[
+        { label:'从底层做起一步步证明自己', hint:'+💪 +🧠', fn: g => { g.flags.overseasCareer=true; g.flags.startFromBottom=true; return{intel:5,money:3000}; }},
+        { label:'考虑回国发展', hint:'+😊', fn: g => { g.flags.overseasCareer=true; g.flags.considerReturn=true; return{mood:3}; }},
+        { label:'创业做自己的事业', hint:'+💰 +🧠', fn: g => { g.flags.overseasCareer=true; g.flags.startupOverseas=true; return{money:-5000,intel:8}; }},
+      ]},
+    { id:'homesickness', icon:'🏠', title:'思乡之情', category:'immigration',
+      body:'你在海外——「想家了」。\n\n你的「思乡」：\n- 「食物」——你想吃「妈妈做的菜」「家乡的火锅」「正宗的豆浆油条」\n- 「语言」——你想说「中文」「方言」「不用翻译的话」\n- 「节日」——你想过「春节」「中秋」「有人一起的日子」\n- 「人」——你想见「父母」「朋友」「熟悉的面孔」\n\n你的「应对」：\n- 做「中国菜」——虽然「味道不对」\n- 看「中文节目」——虽然「有时差」\n- 视频「家人」——虽然「摸不到」\n- 找「华人社区」——虽然「不是家乡」\n\n你的「感受」：\n- 「孤独」——你「不属于这里」\n- 「矛盾」——你「选择了离开」却「想念留下的」\n- 「成长」——你「学会了独立」\n\n你的「理解」：\n- 「思乡」不是「软弱」——是「爱」\n- 「想家」不是「后悔」——是「人之常情」\n- 「距离」不是「分离」——是「另一种连接」\n\n「家」不是一个「地方」——是「一种感觉」。',
+      cond: g => g.flags.cultureShock && !g.flags.homesickness,
+      choices:[
+        { label:'接纳思乡情绪找到平衡', hint:'+😊 +🧠', fn: g => { g.flags.homesickness=true; g.flags.acceptHomesick=true; return{mood:5,intel:3}; }},
+        { label:'多回国看看保持联系', hint:'+👥 -💰', fn: g => { g.flags.homesickness=true; g.flags.visitHome=true; return{social:5,money:-5000}; }},
+        { label:'忍忍吧这是自己的选择', hint:'-😊', fn: g => { g.flags.homesickness=true; g.flags.endureHomesick=true; return{mood:-3}; }},
+      ]},
+    { id:'identity_crisis_overseas', icon:'🪞', title:'海外身份认同', category:'immigration',
+      body:'你在海外——经历了「身份认同危机」。\n\n你的「困惑」：\n- 你「不是」当地人——你「永远」是「外国人」\n- 你「不再」是「纯中国人」——你「变了」\n- 你「不知道」自己「是谁」——你「在两个世界之间」\n\n你的「经历」：\n- 当地人问：「你从哪里来？」——你说「中国」，他们说「但你的英语很好」\n- 回国时朋友说：「你变了」——你说「我没变」，他们说「你变了」\n- 你自己想：「我到底属于哪里？」\n\n你的「探索」：\n- 「身份」不是「单一的」——是「多重的」\n- 「身份」不是「固定的」——是「流动的」\n- 「身份」不是「别人定义的」——是「你自己定义的」\n\n你的「接受」：\n- 你可以是「中国人」也是「世界公民」\n- 你可以「爱中国」也「爱世界」\n- 你可以「保留根」也「展翅飞」\n\n「身份」不是「问题」——是「丰富」。',
+      cond: g => g.flags.cultureShock && g.intel >= 30 && !g.flags.identityCrisisOverseas,
+      choices:[
+        { label:'接受多元身份拥抱复杂性', hint:'+😊 +🧠', fn: g => { g.flags.identityCrisisOverseas=true; g.flags.acceptMultiIdentity=true; return{mood:5,intel:8}; }},
+        { label:'坚持中国身份不忘初心', hint:'+🧠', fn: g => { g.flags.identityCrisisOverseas=true; g.flags.keepChineseIdentity=true; return{intel:5}; }},
+        { label:'身份危机太痛苦了', hint:'-😊', fn: g => { g.flags.identityCrisisOverseas=true; g.flags.sufferIdentity=true; return{mood:-5}; }},
+      ]},
+    { id:'return_to_china', icon:'🇨🇳', title:'归国潮', category:'immigration',
+      body:'你决定「回国」了——加入了「归国潮」。\n\n你的「原因」：\n- 「家人」——你想「离父母近一点」\n- 「机会」——中国「发展很快」「机会多」\n- 「归属感」——你想「回到熟悉的地方」\n- 「文化」——你想「生活在自己的文化里」\n\n你的「期待」：\n- 「高薪」——听说「海归很吃香」\n- 「重视」——听说「海归被重视」\n- 「轻松」——以为「回国就轻松了」\n\n你的「现实」：\n- 「海归贬值」——现在「海归太多了」\n- 「文化冲击」——你「不适应国内了」\n- 「内卷依旧」——「哪里都卷」\n\n你的「调整」：\n- 「降低预期」——「海归不是金字招牌了」\n- 「重新适应」——「国内变化太快了」\n- 「找到位置」——「你的海外经验还是有价值的」\n\n「归国」不是「回家」——是「重新开始」。',
+      cond: g => g.flags.startImmigration && g.age >= 28 && !g.flags.returnToChina,
+      choices:[
+        { label:'积极适应国内重新出发', hint:'+😊 +🧠', fn: g => { g.flags.returnToChina=true; g.flags.activeReturn=true; return{mood:5,intel:5}; }},
+        { label:'利用海归优势找好工作', hint:'+💰', fn: g => { g.flags.returnToChina=true; g.flags.leverageReturnee=true; return{money:5000}; }},
+        { label:'后悔回国了但已经回不去了', hint:'-😊', fn: g => { g.flags.returnToChina=true; g.flags.regretReturn=true; return{mood:-5}; }},
+      ]},
+    { id:'third_culture_kid', icon:'🌐', title:'第三文化孩子', category:'immigration',
+      body:'如果你有孩子——他们变成了「第三文化孩子」（TCK）。\n\n他们的「特点」：\n- 他们在「多个文化」中「成长」\n- 他们「不属于」任何一个「单一文化」\n- 他们「适应力强」但「根感弱」\n- 他们「视野广」但「归属感低」\n\n你的「观察」：\n- 孩子「中文退步了」——你「很担心」\n- 孩子「英文流利了」——你「很欣慰」\n- 孩子「朋友很多元」——你「很骄傲」\n- 孩子「不知道家在哪里」——你「很心疼」\n\n你的「选择」：\n- 「强调中文和中国文化」——让他们「有根」\n- 「让他们自由发展」——让他们「成为自己」\n- 「找到平衡」——「两者兼顾」\n\n你的「理解」：\n- 「第三文化孩子」不是「问题」——是「新人类」\n- 「多元文化」不是「负担」——是「资产」\n- 「身份」不是「你给他们的」——是「他们自己创造的」\n\n「第三文化孩子」是「全球化」的「产物」——也是「未来」。',
+      cond: g => g.flags.startImmigration && g.flags.hasChild && !g.flags.thirdCultureKid,
+      choices:[
+        { label:'强调中国文化让孩子有根', hint:'+🧠', fn: g => { g.flags.thirdCultureKid=true; g.flags.emphasizeChinese=true; return{intel:5}; }},
+        { label:'让孩子自由发展多元身份', hint:'+😊', fn: g => { g.flags.thirdCultureKid=true; g.flags.freeDevelop=true; return{mood:5}; }},
+        { label:'找到中西文化的平衡', hint:'+🧠 +😊', fn: g => { g.flags.thirdCultureKid=true; g.flags.balancedCulture=true; return{intel:5,mood:3}; }},
+      ]},
+    { id:'reverse_culture_shock_v30_9', icon:'🔄', title:'反向文化冲击', category:'immigration',
+      body:'你回国了——却经历了「反向文化冲击」。\n\n你的「震惊」：\n- 「变化太快」——你「不认识」这个城市了\n- 「规则变了」——你「不知道」怎么办事了\n- 「朋友变了」——你们「没话说了」\n- 「你变了」——你「不适应」了\n\n你的「感受」：\n- 「陌生」——这是「你的国家」却「感觉像外国」\n- 「孤独」——你「没人理解」\n- 「焦虑」——你「不知道怎么办」\n- 「后悔」——你「是不是做错了」\n\n你的「理解」：\n- 「反向文化冲击」比「文化冲击」更「难」——因为「你以为回家了」\n- 「你变了」——这是「成长」不是「问题」\n- 「适应需要时间」——给自己「耐心」\n\n你的「应对」：\n- 「找海归群体」——他们「理解你」\n- 「保持开放」——不要「一直比较」\n- 「给自己时间」——「3-6个月」会「好起来」\n\n「回家」不是「终点」——是「另一个开始」。',
+      cond: g => g.flags.returnToChina && !g.flags.reverseCultureShock,
+      choices:[
+        { label:'积极适应重新融入', hint:'+😊 +🧠', fn: g => { g.flags.reverseCultureShock=true; g.flags.activeReadapt=true; return{mood:5,intel:5}; }},
+        { label:'找海归圈子互相支持', hint:'+👥', fn: g => { g.flags.reverseCultureShock=true; g.flags.findCommunity=true; return{social:5}; }},
+        { label:'太难了想再出国', hint:'-😊', fn: g => { g.flags.reverseCultureShock=true; g.flags.wantLeaveAgain=true; return{mood:-5}; }},
+      ]},
+    { id:'global_citizen', icon:'🌏', title:'世界公民', category:'immigration',
+      body:'你在海外生活后——变成了「世界公民」。\n\n你的「变化」：\n- 「视野」——你「看到了更大的世界」\n- 「包容」——你「接受不同的文化和价值观」\n- 「适应」——你「可以在任何地方生活」\n- 「独立」——你「学会了靠自己」\n\n你的「收获」：\n- 「语言能力」——你「会说多种语言」\n- 「跨文化能力」——你「可以和不同文化的人合作」\n- 「全球视野」——你「理解世界趋势」\n- 「人脉网络」——你「有世界各地的朋友」\n\n你的「理解」：\n- 「世界公民」不是「没有根」——是「根在世界各地」\n- 「国际化」不是「西化」——是「多元化」\n- 「全球化」不是「同质化」——是「互相理解」\n\n你的「选择」：\n- 你可以「在任何地方生活」\n- 你可以「做跨文化的工作」\n- 你可以「成为桥梁」\n\n「世界公民」是「21世纪」的「新身份」。',
+      cond: g => g.flags.cultureShock && g.flags.overseasCareer && g.intel >= 35 && !g.flags.globalCitizen,
+      choices:[
+        { label:'拥抱世界公民身份', hint:'+😊 +🧠', fn: g => { g.flags.globalCitizen=true; g.flags.embraceGlobal=true; return{mood:8,intel:5}; }},
+        { label:'用全球视野做事业', hint:'+💰 +🧠', fn: g => { g.flags.globalCitizen=true; g.flags.globalCareer=true; return{money:5000,intel:5}; }},
+        { label:'还是觉得家乡最好', hint:'+👥', fn: g => { g.flags.globalCitizen=true; g.flags.preferHome=true; return{social:3}; }},
+      ]},
+    { id:'immigration_regret', icon:'💭', title:'移民的后悔', category:'immigration',
+      body:'你在海外生活了几年——你开始「后悔」了。\n\n你的「后悔」：\n- 「错过了父母的晚年」——你「不在身边」\n- 「错过了朋友的婚礼」——你「没能见证」\n- 「错过了孩子的成长」——你「忙于适应」\n- 「错过了中国的发展」——你「没能参与」\n\n你的「反思」：\n- 「移民」是「交换」——你「得到了一些」也「失去了一些」\n- 「完美选择」不存在——每个选择都有「代价」\n- 「后悔」是正常的——但「后悔」不能「改变过去」\n\n你的「选择」：\n- 「接受现实」——「这是你的选择」\n- 「弥补遗憾」——「多回国看看」\n- 「重新规划」——「也许该回去了」\n\n你的「理解」：\n- 「后悔」不是「失败」——是「成长」\n- 「遗憾」不是「终点」——是「新的开始」\n- 「人生」没有「完美」——只有「选择」\n\n「移民」不是「童话故事」——是「真实人生」。',
+      cond: g => g.flags.startImmigration && g.age >= 30 && g.mood <= 50 && !g.flags.immigrationRegret,
+      choices:[
+        { label:'接受选择继续前行', hint:'+😊 +🧠', fn: g => { g.flags.immigrationRegret=true; g.flags.acceptChoice=true; return{mood:5,intel:5}; }},
+        { label:'计划回国弥补遗憾', hint:'+👥 +😊', fn: g => { g.flags.immigrationRegret=true; g.flags.planReturn=true; return{social:5,mood:3}; }},
+        { label:'后悔太深无法释怀', hint:'-😊', fn: g => { g.flags.immigrationRegret=true; g.flags.deepRegret=true; return{mood:-8}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -18150,6 +18231,15 @@ const ACHIEVEMENTS = [
     { id:'own_marriage_view_ach', icon:'💒', name:'婚姻自主', desc:'坚持了自己的婚姻观念', check: g => g.flags.ownMarriageView },
     { id:'patient_teach_ach', icon:'📱', name:'耐心教导', desc:'耐心教父母使用数字科技跨越数字鸿沟', check: g => g.flags.patientTeach },
     { id:'better_relation_ach', icon:'🌉', name:'跨越代际', desc:'成功建立了更好的代际关系和沟通', check: g => g.flags.betterRelation },
+    // v30.9 achievements - 移民与海外生活
+    { id:'active_adapt_ach', icon:'🌍', name:'积极适应', desc:'在海外积极适应努力学习语言和文化', check: g => g.flags.activeAdapt },
+    { id:'start_from_bottom_ach', icon:'💪', name:'从头开始', desc:'在海外从底层做起一步步证明自己', check: g => g.flags.startFromBottom },
+    { id:'accept_homesick_ach', icon:'🏠', name:'接纳思乡', desc:'接纳了思乡情绪并找到了平衡', check: g => g.flags.acceptHomesick },
+    { id:'accept_multi_identity_ach', icon:'🪞', name:'多元身份', desc:'接受了多元身份拥抱了身份的复杂性', check: g => g.flags.acceptMultiIdentity },
+    { id:'active_return_ach', icon:'🇨🇳', name:'积极归国', desc:'回国后积极适应国内重新出发', check: g => g.flags.activeReturn },
+    { id:'balanced_culture_ach', icon:'🌐', name:'文化平衡', desc:'为孩子找到了中西文化的平衡', check: g => g.flags.balancedCulture },
+    { id:'active_readapt_ach', icon:'🔄', name:'重新融入', desc:'回国后积极适应重新融入国内生活', check: g => g.flags.activeReadapt },
+    { id:'embrace_global_ach', icon:'🌏', name:'世界公民', desc:'拥抱了世界公民身份', check: g => g.flags.embraceGlobal },
 ];
 
 // === ENDINGS === (order matters: first match wins)
