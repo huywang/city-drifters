@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v11.0
+// 都市浮生记 - Game Engine v11.1
 // ============================================
 
 // === GAME STATE ===
@@ -5239,6 +5239,49 @@ const EVENTS = [
         { label:'只坚持一周', hint:'+😊', fn: g => { return{mood:8}; }},
         { label:'还是加班吧', hint:'+💰', fn: g => { return{money:1000,mood:-8}; }},
       ]},
+    // === v11.1 隐藏事件（稀有触发条件） ===
+    { id:'hidden_perfect_life', icon:'🌟', title:'人生赢家',
+      body:'你站在阳台上，看着城市的夜景。\n\n你有房、有车、有家庭、有事业。你曾经是那个挤地铁、吃泡面、住在10平米出租屋的年轻人。\n\n现在你拥有了很多人梦想的生活。但你偶尔会想起那个一无所有却充满希望的自己。\n\n"人生赢家不是终点，是你一路走来的每一步。"',
+      cond: g => g.flags.hasHouse && g.flags.married && g.flags.hasChild && g.money >= 200000 && g.mood >= 60 && g.age >= 35,
+      choices:[
+        { label:'感恩一路', hint:'+😊 +✨', fn: g => { return{mood:20,charm:5,social:5}; }},
+        { label:'继续前行', hint:'+🧠', fn: g => { return{intel:5,mood:10}; }},
+      ]},
+    { id:'hidden_free_soul', icon:'🦅', title:'自由灵魂',
+      body:'你没有买房、没有结婚、没有固定的工作。\n\n但你走遍了大半个中国，你养了一只猫，你有几个知心的朋友，你每天都在做自己喜欢的事。\n\n有人说你"不务正业"，有人说你"活得通透"。\n\n你不在乎别人的评价。因为你知道：自由不是没有束缚，是选择了什么样的束缚。\n\n"自由的代价是孤独，但孤独是自由最好的朋友。"',
+      cond: g => !g.flags.married && !g.flags.hasHouse && g.flags.hasPet && g.mood >= 65 && g.charm >= 50 && g.age >= 30 && (g.flags.spontaneousTrip || g.flags.nightCycling),
+      choices:[
+        { label:'继续自由', hint:'+😊 +✨', fn: g => { return{mood:15,charm:5}; }},
+        { label:'偶尔也想安定', hint:'+👥', fn: g => { return{social:8,mood:5}; }},
+      ]},
+    { id:'hidden_full_circle', icon:'🔄', title:'人生轮回',
+      body:'你在街上遇到了一个年轻人，TA看起来和你刚来这座城市时一模一样：拖着行李箱，眼神里既有迷茫又有期待。\n\n你想起了十年前的自己。你忍不住走上前说："加油，一切都会好起来的。"\n\nTA看了看你，笑了笑："谢谢。"\n\n你不知道TA会不会记住你，但你知道：十年前如果有人对你说了同样的话，你也不会记住。\n\n"每一代漂泊者都在重复同样的故事——不同的城市，同样的勇气。"',
+      cond: g => g.age >= 32 && g.months > 80 && g.intel >= 55,
+      choices:[
+        { label:'请TA喝杯咖啡', hint:'-💰 +😊', fn: g => { return{money:-50,mood:15,social:5}; }},
+        { label:'默默祝福', hint:'+😊', fn: g => { return{mood:10}; }},
+      ]},
+    { id:'hidden_dual_identity', icon:'🎭', title:'双面人生',
+      body:'白天你是一个普通的打工人，晚上你是一个网红博主/网文作家/直播主播。\n\n你的同事们不知道你的另一面。你的粉丝们不知道你的真名。\n\n你活在两个世界里，每个世界都有一个不同的你。\n\n有时候你会想：哪个才是真正的你？\n\n"也许，每个人都是双面人——只是有些人更擅长隐藏。"',
+      cond: g => g.flags.hasSideHustle && (g.flags.webNovelist || g.flags.triedLivestream || g.flags.influencer) && g.money >= 50000 && g.charm >= 55,
+      choices:[
+        { label:'享受双面', hint:'+✨ +😊', fn: g => { return{charm:8,mood:10}; }},
+        { label:'公开身份', hint:'+👥 🎲', fn: g => { return{social:10,charm:5,mood:5}; }},
+      ]},
+    { id:'hidden_quiet_victory', icon:'🕊️', title:'无声的胜利',
+      body:'没有人注意到你今天做了什么。\n\n你按时上班、按时下班、做了一顿健康的晚饭、看了30分钟书、10点就上了床。\n\n这看起来平凡得不能再平凡。但对于曾经996、吃外卖、凌晨2点才睡的你来说——这就是一场无声的胜利。\n\n"真正的成功不是别人眼中的辉煌，是你自己内心的平静。"',
+      cond: g => g.flags.workLifeBalance && g.health >= 65 && g.mood >= 65 && g.months > 48,
+      choices:[
+        { label:'继续这样生活', hint:'+💪 +😊', fn: g => { return{health:5,mood:10}; }},
+        { label:'记录平凡的一天', hint:'+✨', fn: g => { return{charm:5,mood:5}; }},
+      ]},
+    { id:'hidden_generational_bridge', icon:'🌉', title:'代际桥梁',
+      body:'你带你6岁的孩子视频通话给你70岁的父母。\n\n孩子说："爷爷奶奶，我爱你们！"\n你的父母笑得合不拢嘴："我们也爱你！"\n\n三代人，隔着一千公里，通过一块屏幕连接在一起。\n\n你突然觉得：科技不只是冰冷的工具，它也可以是温暖的桥梁。\n\n"距离隔不断爱——只要我们愿意连接。"',
+      cond: g => g.flags.hasChild && g.relationships && g.relationships.family >= 75 && g.age >= 32,
+      choices:[
+        { label:'计划下次见面', hint:'+👥 +😊', fn: g => { if(g.relationships) g.relationships.family=clamp((g.relationships.family||60)+10,0,100); return{mood:15,social:5}; }},
+        { label:'珍惜此刻', hint:'+😊', fn: g => { return{mood:10}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'first_job', icon:'💼', name:'职场新人', desc:'找到第一份工作', check: g => g.flags.gotFirstJob },
@@ -5687,6 +5730,12 @@ const ACHIEVEMENTS = [
     { id:'mentor_found', icon:'🎯', name:'有师可学', desc:'找到了职场导师', check: g => g.flags.hasMentor },
     { id:'wlb_master', icon:'⚖️', name:'生活大师', desc:'实现了工作生活平衡', check: g => g.flags.workLifeBalance },
     { id:'fulltime_hustler', icon:'🎉', name:'全职追梦人', desc:'全职做副业', check: g => g.flags.fulltimeHustle },
+    // === v11.1 新增成就 ===
+    { id:'perfect_life_ach', icon:'🌟', name:'人生赢家', desc:'拥有房产、家庭、事业和幸福生活', check: g => g.flags.hasHouse && g.flags.married && g.flags.hasChild && g.money >= 200000 },
+    { id:'free_soul_ach', icon:'🦅', name:'自由灵魂', desc:'选择了自由的生活方式', check: g => !g.flags.married && g.flags.hasPet && g.mood >= 65 && g.charm >= 50 && g.age >= 30 },
+    { id:'dual_identity_ach', icon:'🎭', name:'双面人生', desc:'同时拥有主业和成功的副业', check: g => g.flags.hasSideHustle && (g.flags.webNovelist || g.flags.triedLivestream || g.flags.influencer) && g.money >= 50000 },
+    { id:'quiet_victory_ach', icon:'🕊️', name:'无声的胜利', desc:'实现了工作与生活的平衡', check: g => g.flags.workLifeBalance && g.health >= 65 && g.mood >= 65 },
+    { id:'gen_bridge_ach', icon:'🌉', name:'代际桥梁', desc:'连接了三代人的感情', check: g => g.flags.hasChild && g.relationships && g.relationships.family >= 75 },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -5824,6 +5873,9 @@ const ENDINGS = [
     { id:'startup_success_end', badge:'🚀', title:'创业成功', desc:'你的创业项目活了。\n\n从一个人到十个人，从一个想法到一个产品。你经历了融资失败、合伙人跑路、产品被骂，但你挺过来了。\n\n你在公司年会上说："创业不是赌博，是把所有筹码都押在自己身上。"\n\n"创业者是疯子，但正是这些疯子，让这个世界变得更好。"', cond: g => g.flags.startupPhase && (g.flags.startupPhase==='funded'||g.flags.startupPhase==='bootstrapped') && g.money >= 100000 && g.age >= 30 },
     { id:'wlb_end', badge:'⚖️', title:'工作生活平衡', desc:'你终于找到了工作和生活的平衡点。\n\n你不再996，不再把生命浪费在无意义的加班上。你有了时间运动、看书、陪家人。\n\n你的领导觉得你"不上进"，但你觉得自己终于开始"活着"了。\n\n"人生不是赛跑，不需要每时每刻都在冲刺。"', cond: g => g.flags.workLifeBalance && g.mood >= 70 && g.health >= 65 && g.age >= 28 },
     { id:'layoff_comeback', badge:'📦', title:'裁员逆袭', desc:'你被裁了，但你没有被打败。\n\n你拿了赔偿，休息了三个月，然后找到了一份更好的工作。薪资涨了50%，还不加班。\n\n你发了一条朋友圈："感谢被裁，让我看清了什么是真正重要的。"\n\n"被裁不是失败，是被生活推了一把——推向了更好的方向。"', cond: g => g.flags.wasLaidOff && g.jobSalary >= 15000 && g.mood >= 60 && g.age >= 28 },
+    // --- v11.1 NEW ENDINGS (HIDDEN) ---
+    { id:'perfect_life_end', badge:'🌟', title:'人生赢家', desc:'你做到了。\n\n有房、有车、有家庭、有事业。你从一个月薪3000的打工仔，变成了一个拥有完整人生的成年人。\n\n你的孩子叫你爸爸/妈妈的时候，你想起自己刚来这座城市时的样子——那个什么都没有却什么都不怕的年轻人。\n\n"人生赢家不是拥有一切，是珍惜拥有的一切。"', cond: g => g.flags.hasHouse && g.flags.married && g.flags.hasChild && g.money >= 200000 && g.mood >= 65 && g.age >= 36 },
+    { id:'free_soul_end', badge:'🦅', title:'自由灵魂', desc:'你选择了大多数人不敢选择的路。\n\n没有房贷、没有婚姻的枷锁、没有固定的工作。你有的是：一只猫、几个好朋友、一颗自由的心。\n\n你在朋友圈写道："我不是什么都没有，我拥有自由。"\n\n有人说你勇敢，有人说你疯了。但你知道：真正的自由，是不在乎别人的评价。\n\n"自由不是逃避，是另一种活法。"', cond: g => !g.flags.married && !g.flags.hasHouse && g.flags.hasPet && g.mood >= 70 && g.charm >= 55 && g.age >= 32 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
