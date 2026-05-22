@@ -1351,6 +1351,10 @@ html[style*="font-size: 18px"] .modal-content {
     background: linear-gradient(135deg, #06b6d4, #0891b2);
     font-size: 0.75rem;
 }
+.btn-invest {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    font-size: 0.75rem;
+}
 .city-switch-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));

@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v9.1
+// 都市浮生记 - Game Engine v9.2
 // ============================================
 
 // === GAME STATE ===
@@ -19,6 +19,8 @@ const G = {
     consecutiveChoices: {},
     // v8.2: 延迟后果系统 - 某些选择的后果在数月后显现
     delayedEffects: [],
+    // v9.2: 投资理财系统
+    investments: {},
 };
 
 // === BACKGROUNDS ===
@@ -4281,6 +4283,104 @@ const EVENTS = [
         { label:'领养！', hint:'-💰 +😊', fn: g => { g.flags.hasPet=true; return{money:-2000,mood:20,health:5}; }},
         { label:'下次吧', hint:'+😊', fn: g => { return{mood:5}; }},
       ]},
+    // === v9.2 35岁危机事件链 ===
+    { id:'crisis_35_notice', icon:'⚠️', title:'35岁危机',
+      body:'你在招聘网站上看到一条岗位，JD写得明明白白：「35岁以下」。\n\n你今年刚好35。\n\n你打开更多招聘页面——十个岗位八个写着"35岁以下"。你突然理解了一个词：保质期。\n\n"打工人的保质期是35岁。过了这个年龄，你不是被淘汰，是被遗忘。"',
+      cond: g => g.age >= 34 && g.age <= 36 && !g.flags.crisis35seen && g.job !== '待业中',
+      choices:[
+        { label:'考个证，提升竞争力', hint:'+🧠 -💰', fn: g => { g.flags.crisis35seen=true; return{intel:10,mood:-5,money:-3000}; }},
+        { label:'考虑转行/创业', hint:'🎲', fn: g => { g.flags.crisis35seen=true; g.flags.crisis35pivot=true; return{mood:-10,intel:5}; }},
+        { label:'考公务员，进体制', hint:'+💰 +😊', fn: g => { g.flags.crisis35seen=true; g.flags.tryCivilService=true; if(g.intel>70&&Math.random()>0.5){setJob(g,'公务员',10000);return{mood:15,money:5000}}else{return{mood:-15,money:-2000}} }},
+        { label:'算了，认命了', hint:'+😊', fn: g => { g.flags.crisis35seen=true; g.flags.resigned35=true; return{mood:-20}; }},
+      ]},
+    { id:'crisis_35_layoff', icon:'💔', title:'大厂毕业',
+      body:'HR找你谈话："公司正在优化人员结构……"\n\n你早就有预感了。35岁，P7，没有管理经验——标准的"优化"对象。\n\n你拿到N+1赔偿金，走出大楼。阳光很好，你坐在公司楼下的星巴克，打开招聘App。\n\n"毕业快乐。下一站，不知道在哪。"',
+      cond: g => g.age >= 35 && g.age <= 38 && g.jobSalary >= 15000 && !g.flags.laidOff35,
+      choices:[
+        { label:'接受赔偿，重新找工作', hint:'+💰 -😊', fn: g => { g.flags.laidOff35=true; setJob(g,'待业中',0); return{money:Math.floor(g.jobSalary*6),mood:-20}; }},
+        { label:'趁机创业', hint:'🎲', fn: g => { g.flags.laidOff35=true; g.flags.entrepreneur=true; setJob(g,'创业者',0); if(Math.random()>0.5){return{money:Math.floor(g.jobSalary*3),mood:10,social:10}}else{return{money:-20000,mood:-20}} }},
+        { label:'休息一段时间', hint:'+❤️ +😊', fn: g => { g.flags.laidOff35=true; setJob(g,'待业中',0); return{money:Math.floor(g.jobSalary*6),mood:10,health:10}; }},
+      ]},
+    // === v9.2 恋爱/婚姻系统深化 ===
+    { id:'dating_app', icon:'💕', title:'交友App',
+      body:'你下载了一个交友App，刷了一个小时。\n\n右滑了50个人，匹配了3个。聊了3个，见了1个。\n\n见面的时候你发现：对方的照片和本人，差距约等于美颜前和美颜后。\n\n"线上交友就像拆盲盒——你永远不知道打开的是什么。"',
+      cond: g => !g.flags.hasPartner && g.age >= 24 && g.social < 50 && g.months > 3,
+      choices:[
+        { label:'继续右滑', hint:'🎲', fn: g => { if(g.charm>50&&Math.random()>0.4){ g.flags.hasPartner=true; if(g.relationships) g.relationships.partner=40; return{mood:15,charm:5,social:8}; }else{ return{mood:-5,money:-100}; } }},
+        { label:'删了App', hint:'+😊', fn: g => { return{mood:5,intel:2}; }},
+      ]},
+    { id:'relationship_milestone', icon:'💑', title:'恋爱百日',
+      body:'你和TA在一起一百天了。\n\nTA问你："你觉得我们以后会怎样？"\n\n你看了看TA，又看了看银行卡余额，又看了看房价。\n\n"这个问题比面试还难回答。"',
+      cond: g => g.flags.hasPartner && g.relationships && g.relationships.partner >= 40 && g.months > 6,
+      choices:[
+        { label:'我们结婚吧', hint:'-💰 +😊', fn: g => { if(g.money>50000){g.flags.married=true;g.flags.hasPartner=true;g.relationships.partner=80;return{money:-50000,mood:25,social:15}}else{return{mood:-10}} }},
+        { label:'再处处看', hint:'+😊', fn: g => { if(g.relationships) g.relationships.partner=clamp((g.relationships.partner||0)+10,0,100); return{mood:10}; }},
+        { label:'我们分手吧', hint:'💔', fn: g => { g.flags.hasPartner=false;if(g.relationships) g.relationships.partner=0; return{mood:-20,social:-5}; }},
+      ]},
+    { id:'wedding_pressure', icon:'💒', title:'催婚',
+      body:'过年回家，你妈拉着你的手："隔壁老王家的儿子都二胎了。"\n\n你爸在旁边看报纸，偶尔插一句："你妈说得对。"\n\n你的七大姑八大姨轮番上阵，你的微信被拉进了三个相亲群。\n\n"在中国，单身是一种需要解释的状态。"',
+      cond: g => !g.flags.hasPartner && g.age >= 27 && g.months > 12 && g.month % 12 <= 1,
+      choices:[
+        { label:'答应去相亲', hint:'🎲', fn: g => { g.flags.blindDate=true; if(Math.random()>0.5&&g.charm>40){ g.flags.hasPartner=true;if(g.relationships) g.relationships.partner=30; return{mood:10,social:8}; }else{ return{mood:-5,money:-200}; } }},
+        { label:'我单身我骄傲', hint:'+😊', fn: g => { return{mood:8,charm:3}; }},
+        { label:'假装已有对象', hint:'🎲', fn: g => { if(Math.random()>0.7){return{mood:5,social:-3}}else{return{mood:-15,social:-8}} }},
+      ]},
+    // === v9.2 投资相关事件 ===
+    { id:'stock_crash', icon:'📉', title:'股市暴跌',
+      body:'今天A股暴跌3000点，你的股票账户一片绿色（在中国，绿色=跌）。\n\n朋友圈全是"天台见"的段子。你看了看自己的持仓——亏了30%。\n\n"别人恐惧我贪婪，别人贪婪我……也恐惧。"',
+      cond: g => g.investments && g.investments.stock > 5000 && Math.random() > 0.7,
+      choices:[
+        { label:'割肉止损', hint:'-💰', fn: g => { const loss = Math.floor(g.investments.stock * 0.3); g.investments.stock = Math.floor(g.investments.stock * 0.7); return{money:0,mood:-15}; }},
+        { label:'抄底加仓', hint:'🎲', fn: g => { if(Math.random()>0.5){ addDelayedEffect(6, function(g2){ g2.investments.stock=(g2.investments.stock||0)+10000; return{mood:20}; }, '你抄底的股票涨了！看来你真的是股神。'); return{money:-5000,mood:-5}; }else{ g.investments.stock=Math.floor((g.investments.stock||0)*0.5); return{money:-5000,mood:-20}; } }},
+        { label:'卸载炒股软件', hint:'+😊', fn: g => { return{mood:5,intel:3}; }},
+      ]},
+    { id:'fund_gain', icon:'📈', title:'基金回本了',
+      body:'你定投了两年的基金，终于回本了！\n\n两年啊！你经历了多少个"跌到怀疑人生"的日夜。\n\n你发了条朋友圈："价值投资，从我做起。"配了张基金收益截图。',
+      cond: g => g.investments && g.investments.fund > 10000 && g.months > 24,
+      choices:[
+        { label:'落袋为安', hint:'+💰', fn: g => { const amount = g.investments.fund; G.money += amount; g.investments.fund = 0; return{money:amount,mood:15}; }},
+        { label:'继续定投', hint:'🎲', fn: g => { addDelayedEffect(12, function(g2){ if(Math.random()>0.4){g2.investments.fund=(g2.investments.fund||0)*1.3;return{mood:15}}else{g2.investments.fund=(g2.investments.fund||0)*0.8;return{mood:-10}} }, '一年后你的基金……'); return{mood:5}; }},
+      ]},
+    { id:'crypto_mania', icon:'₿', title:'币圈暴涨',
+      body:'你的同事兴奋地跟你说：比特币又创新高了！\n\n他上周刚买了5万块的比特币，现在翻了3倍。\n\n你看着他激动的脸，心里五味杂陈。\n\n"每一次币圈暴涨，都觉得自己错过了一个亿。"',
+      cond: g => g.money > 10000 && g.months > 6,
+      choices:[
+        { label:'FOMO入场', hint:'🎲', fn: g => { if(!g.investments) g.investments={}; g.investments.crypto=(g.investments.crypto||0)+10000; G.money-=10000; if(Math.random()>0.5){ addDelayedEffect(3, function(g2){ g2.investments.crypto=(g2.investments.crypto||0)*2; return{mood:20}; }, '你的比特币翻倍了！'); return{mood:10}; }else{ addDelayedEffect(3, function(g2){ g2.investments.crypto=Math.floor((g2.investments.crypto||0)*0.3); return{mood:-20}; }, '你的比特币暴跌了。'); return{mood:-5}; } }},
+        { label:'理性观望', hint:'+🧠', fn: g => { addDelayedEffect(6, {mood:5,intel:3}, '半年后比特币暴跌50%，你庆幸自己没冲动。'); return{intel:5,mood:3}; }},
+      ]},
+    // === v9.2 季节事件 ===
+    { id:'spring_festival', icon:'🧧', title:'春节回家',
+      body:'春节到了。你抢到了回家的火车票——硬座，26小时。\n\n到家后你发现：你妈老了很多，你爸头发白了不少。\n\n年夜饭上亲戚轮番问候：工资多少？有对象没？买房了吗？\n\n你笑着说"都挺好的"，然后偷偷在桌下攥紧了拳头。',
+      cond: g => g.month % 12 === 1 && g.months > 12,
+      choices:[
+        { label:'大方给红包', hint:'-💰 +😊', fn: g => { if(g.relationships) g.relationships.family=clamp((g.relationships.family||60)+15,0,100); return{money:-5000,mood:15,social:5}; }},
+        { label:'说工作忙提前走', hint:'+💰 -😊', fn: g => { return{money:-1000,mood:-5}; }},
+        { label:'春节旅游不回家', hint:'+😊 -👥', fn: g => { return{money:-3000,mood:10,social:-5}; if(g.relationships) g.relationships.family=clamp((g.relationships.family||60)-10,0,100); }},
+      ]},
+    { id:'graduation_season', icon:'🎓', title:'毕业季来了',
+      body:'六月，大学毕业生涌入城市。你在地铁上看到一群群拖着行李箱的年轻人，眼神里充满期待。\n\n你想起自己刚来这座城市的样子——也是这样满怀期待。\n\n现在你最大的期待是：这个月别再加班了。',
+      cond: g => g.month % 12 === 6 && g.age >= 24 && g.months > 12,
+      choices:[
+        { label:'感慨万千', hint:'+😊', fn: g => { return{mood:5,intel:3}; }},
+        { label:'请实习生吃饭', hint:'-💰 +👥', fn: g => { return{money:-200,social:8,charm:3}; }},
+        { label:'发条朋友圈', hint:'+✨', fn: g => { return{charm:5,mood:3}; }},
+      ]},
+    { id:'double_eleven', icon:'🛒', title:'双十一来了',
+      body:'双十一预售开始了。你打开购物车：30件商品，总价8000块。\n\n你的理智说：你不需要这些。你的手指说：买买买！\n\n你看了李佳琦的直播，三分钟后你已经付了两个定金。\n\n"双十一教会你一个道理：省钱的方式只有一种，就是不看。"',
+      cond: g => g.month % 12 === 11 && g.money > 3000,
+      choices:[
+        { label:'清空购物车', hint:'-💰 +😊', fn: g => { const spent = Math.min(g.money, Math.floor(Math.random()*5000)+3000); return{money:-spent,mood:15,charm:5}; }},
+        { label:'只买必需品', hint:'-💰', fn: g => { return{money:-800,mood:5}; }},
+        { label:'什么都不买', hint:'+💰 +🧠', fn: g => { addDelayedEffect(1, {mood:5,intel:3}, '双十一过去了，你看着同事拆快递，心里竟然有点优越感。'); return{mood:3}; }},
+      ]},
+    { id:'summer_heat', icon:'🌡️', title:'高温预警',
+      body:'气温突破40度。你从公司走到地铁站的5分钟，感觉自己像一块铁板烧。\n\n你的外卖小哥迟到了半小时，因为他的电动车在高温下爆胎了。\n\n你给了五星好评——因为你觉得他比你更辛苦。',
+      cond: g => g.month % 12 >= 7 && g.month % 12 <= 8,
+      choices:[
+        { label:'买杯冰奶茶续命', hint:'-💰 +😊', fn: g => { return{money:-30,mood:8,health:-2}; }},
+        { label:'请假在家吹空调', hint:'+😊 -💰', fn: g => { return{mood:10,health:3,money:-500}; }},
+        { label:'继续上班', hint:'+💰 -❤️', fn: g => { return{money:500,health:-5,mood:-8}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -4658,6 +4758,13 @@ const ACHIEVEMENTS = [
     { id:'gym_member', icon:'💪', name:'健身会员', desc:'办了健身年卡', check: g => g.flags.hasGymCard },
     { id:'cheap_rent_ach', icon:'🏠', name:'租房达人', desc:'成功申请到公租房', check: g => g.flags.cheapRent },
     { id:'emo_night', icon:'🌙', name:'深夜emo', desc:'经历过一次深夜情绪低落', check: g => g.mood < 30 && g.months > 12 },
+    // === v9.2 新增成就 ===
+    { id:'investor', icon:'💰', name:'理财新手', desc:'第一次进行投资', check: g => g.flags.hasInvestment },
+    { id:'stock_master', icon:'📈', name:'股海沉浮', desc:'在股市中存活超过一年', check: g => g.investments && g.investments.stock > 0 && g.months > 12 },
+    { id:'married_ach', icon:'💍', name:'已婚人士', desc:'成功结婚', check: g => g.flags.married },
+    { id:'crisis35_survivor', icon:'⚡', name:'35岁突围', desc:'经历过35岁危机', check: g => g.flags.crisis35seen },
+    { id:'spring_festival_ach', icon:'🧧', name:'春节回家', desc:'度过了一个春节', check: g => g.months > 12 && g.month % 12 === 1 },
+    { id:'double11_survivor', icon:'🛒', name:'双十一战士', desc:'经历了双十一', check: g => g.flags.double11spent },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -4757,6 +4864,10 @@ const ENDINGS = [
     { id:'info_broker_end', badge:'🕸️', title:'消息灵通人士', desc:'你成了圈子里的"消息灵通人士"。\n\n谁家要卖房、哪家公司要招人、哪个领导要被调走——你比他们的HR还先知道。\n\n你用这些信息换了无数人情，也在不知不觉中编织了一张无形的关系网。\n\n有人说你"八面玲珑"，你说你只是"比较爱聊天"。\n\n"信息就是权力——即使你只是一个爱八卦的打工人。"', cond: g => g.flags._rumorCooldown && g.flags._rumorCooldown.length >= 8 && g.social >= 70 && g.intel >= 60 },
     { id:'pet_companion_end', badge:'🐱', title:'猫奴人生', desc:'你领养了那只橘猫。从此你的生活多了一个室友。\n\n它会在你加班时趴在键盘上，会在你emo时蹭你的手，会在你睡着时偷看你的手机。\n\n你给它取名"房租"——因为它比你更会占地方。\n\n"养猫之后你才明白：被需要，也是一种幸福。"', cond: g => g.flags.hasPet && g.mood >= 60 && g.age >= 30 },
     { id:'city_nomad_end', badge:'🗺️', title:'城市游牧民', desc:'你搬了三次以上的城市，每次都是重新开始。\n\n你在北京挤过地铁，在上海喝过咖啡，在深圳加过班，在成都吃过火锅。\n\n你见过不同的城市，也见过同样的自己——一个永远在寻找更好生活的漂泊者。\n\n"也许没有最好的城市，只有最适合自己的节奏。"', cond: g => g.flags.citySwitch && g.age >= 35 && g.social >= 50 },
+    // --- v9.2 NEW ENDINGS ---
+    { id:'investor_end', badge:'💰', title:'理财达人', desc:'你从一个"月光族"变成了"理财达人"。\n\n你的投资组合从余额宝到A股，从基金到比特币，收益率跑赢了90%的散户。\n\n你在知乎上写了篇《我的投资心得》，获得了10万+阅读。\n\n"钱不是万能的，但没有钱是万万不能的。而你，已经学会了让钱为你工作。"', cond: g => g.flags.hasInvestment && g.investments && Object.values(g.investments).some(v => v > 50000) && g.money >= 100000 && g.intel >= 65 },
+    { id:'happy_family_end', badge:'👨‍👩‍👧', title:'幸福家庭', desc:'你结了婚，有了家。\n\n在大城市里，你们有了自己的小天地。虽然房子是租的，但生活是自己的。\n\n每个周末你们会一起做饭、看电影、逛公园。你觉得这就是幸福。\n\n"幸福不是拥有多少，而是和谁在一起。"', cond: g => g.flags.married && g.mood >= 70 && g.age >= 30 },
+    { id:'crisis35_triumph', badge:'⚡', title:'35岁逆袭', desc:'35岁危机？你把它变成了转折点。\n\n当别人在焦虑中躺平时，你找到了新的方向——可能是创业，可能是转行，可能是考公。\n\n你证明了一件事：35岁不是终点，而是另一段旅程的起点。\n\n"人生没有太晚的开始。"', cond: g => g.flags.crisis35seen && g.age >= 38 && g.mood >= 65 && (g.flags.entrepreneur || g.job === '公务员' || g.jobSalary >= 20000) },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
@@ -4867,6 +4978,8 @@ function startGame() {
         // v8.2: 延迟后果系统初始化
         delayedEffects: [],
         _consecutiveActivity: { type: null, count: 0 },
+        // v9.2: 投资理财系统初始化
+        investments: {},
     });
 
     showScreen('screen-game');
@@ -4962,6 +5075,9 @@ function advanceMonth() {
 
     // v9.1: 信息谣言后续效果
     processRumorEffects();
+
+    // v9.2: 投资理财月度结算
+    updateInvestments();
 
     // v8.2: 连续活动惩罚/奖励 - 连续选同一活动会有额外后果
     processConsecutiveActivity();
@@ -5426,6 +5542,118 @@ function triggerQuarterlyEvent() {
             type: 'neutral'
         }, true);
     }
+}
+
+// === v9.2 投资理财系统 ===
+const INVEST_OPTIONS = {
+    yuebao: { name: '余额宝', icon: '🏦', risk: 'low', monthlyReturn: [0.001, 0.003], desc: '年化2-3%，稳如老狗' },
+    stock: { name: 'A股', icon: '📈', risk: 'high', monthlyReturn: [-0.08, 0.12], desc: '七亏二平一赚，你是那一个吗？' },
+    fund: { name: '基金定投', icon: '💹', risk: 'mid', monthlyReturn: [-0.03, 0.05], desc: '定投一时爽，赎回火葬场' },
+    crypto: { name: '比特币', icon: '₿', risk: 'extreme', monthlyReturn: [-0.20, 0.30], desc: '波动即正义，信仰即财富' },
+    house: { name: '房产投资', icon: '🏠', risk: 'mid', monthlyReturn: [-0.01, 0.02], minAmount: 100000, desc: '中国人的信仰，但你需要首付' },
+};
+
+function openInvestMarket() {
+    const modal = document.getElementById('modal-invest') || createInvestModal();
+    const content = modal.querySelector('.invest-content');
+    if (!content) return;
+
+    let html = '<p style="color:var(--text-muted);font-size:13px;margin-bottom:12px">💡 投资有风险，入市需谨慎。你的选择会影响未来的财富。</p>';
+
+    for (const [key, opt] of Object.entries(INVEST_OPTIONS)) {
+        const holding = G.investments[key] || 0;
+        const riskLabel = { low:'🟢低风险', mid:'🟡中风险', high:'🔴高风险', extreme:'⚫极高风险' }[opt.risk];
+        const minAmt = opt.minAmount || 100;
+
+        html += `
+        <div class="invest-card" style="border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;background:var(--card-bg)">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+                <span>${opt.icon} <strong>${opt.name}</strong> <span style="font-size:11px;color:var(--text-muted)">${riskLabel}</span></span>
+                <span style="font-size:12px">持有: ¥${holding.toLocaleString()}</span>
+            </div>
+            <div style="font-size:11px;color:var(--text-muted);margin:4px 0">${opt.desc}</div>
+            <div style="display:flex;gap:6px;margin-top:6px">
+                <button class="btn-small" onclick="investBuy('${key}',500)" ${G.money>=500&&500>=minAmt?'':'disabled'}>投¥500</button>
+                <button class="btn-small" onclick="investBuy('${key}',5000)" ${G.money>=5000&&5000>=minAmt?'':'disabled'}>投¥5000</button>
+                <button class="btn-small" onclick="investBuy('${key}',50000)" ${G.money>=50000&&50000>=minAmt?'':'disabled'}>投¥5万</button>
+                ${holding>0 ? `<button class="btn-small" style="color:#f87171" onclick="investSell('${key}')">全部赎回</button>` : ''}
+            </div>
+        </div>`;
+    }
+    content.innerHTML = html;
+    modal.classList.add('open');
+}
+
+function createInvestModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.id = 'modal-invest';
+    modal.innerHTML = `
+        <div class="modal-overlay" onclick="closeModal('modal-invest')"></div>
+        <div class="modal-content modal-large">
+            <button class="modal-close" onclick="closeModal('modal-invest')" aria-label="关闭">×</button>
+            <h2>💰 投资理财</h2>
+            <div class="invest-content"></div>
+        </div>`;
+    document.body.appendChild(modal);
+    return modal;
+}
+
+function investBuy(key, amount) {
+    const opt = INVEST_OPTIONS[key];
+    if (!opt || G.money < amount) { notify('❌ 资金不足'); return; }
+    if (opt.minAmount && amount < opt.minAmount) { notify('❌ 最低投资额不足'); return; }
+
+    G.money -= amount;
+    G.investments[key] = (G.investments[key] || 0) + amount;
+    G.flags.hasInvestment = true;
+    updateHUD();
+    openInvestMarket(); // 刷新界面
+    notify(`✅ 已投资${opt.icon}${opt.name} ¥${amount.toLocaleString()}`);
+    playSound('coin');
+}
+
+function investSell(key) {
+    const opt = INVEST_OPTIONS[key];
+    const holding = G.investments[key] || 0;
+    if (holding <= 0) return;
+
+    // 赎回时有手续费（1%）和随机波动
+    const fee = Math.floor(holding * 0.01);
+    const returnAmount = holding - fee;
+
+    G.money += returnAmount;
+    G.investments[key] = 0;
+
+    // 计算盈亏
+    const profit = returnAmount - holding; // 这里简化处理
+    updateHUD();
+    openInvestMarket();
+
+    if (returnAmount > holding) {
+        notify(`💰 赎回${opt.name}，赚了¥${(returnAmount - holding).toLocaleString()}`);
+    } else {
+        notify(`📉 赎回${opt.name}，到手¥${returnAmount.toLocaleString()}`);
+    }
+    playSound('coin');
+}
+
+// 每月更新投资收益
+function updateInvestments() {
+    if (!G.investments) return;
+    let totalProfit = 0;
+    for (const [key, amount] of Object.entries(G.investments)) {
+        if (amount <= 0) continue;
+        const opt = INVEST_OPTIONS[key];
+        if (!opt) continue;
+
+        const [minR, maxR] = opt.monthlyReturn;
+        const returnRate = minR + Math.random() * (maxR - minR);
+        const profit = Math.floor(amount * returnRate);
+        G.investments[key] = Math.max(0, amount + profit);
+        totalProfit += profit;
+    }
+    return totalProfit;
 }
 
 // === v9.1 信息/谣言系统 ===
@@ -6324,7 +6552,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '9.1' };
+    const saveData = { ...G, savedAt: Date.now(), version: '9.2' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
@@ -6506,6 +6734,11 @@ function initKeyboardShortcuts() {
             case 'C':
                 e.preventDefault();
                 openCitySwitch();
+                break;
+            case 'i':
+            case 'I':
+                e.preventDefault();
+                openInvestMarket();
                 break;
             case 's':
             case 'S':
