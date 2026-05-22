@@ -1712,6 +1712,65 @@ const EVENTS = [
         { label:'去旅行，寻找答案', hint:'-💰 +😊 +✨', fn: g => { g.flags.midlifeCrisis=true; g.flags.worldTravel=true; return{money:-20000,mood:20,charm:8}; }},
         { label:'接受现实，继续前行', hint:'+🧠 +😊', fn: g => { g.flags.midlifeCrisis=true; return{intel:10,mood:15}; }},
       ]},
+    // ===== v2.23: MORE 2025-2026 EVENTS & BALANCE =====
+    { id:'remote_work', icon:'💻', title:'远程办公',
+      body:'公司宣布可以远程办公了！你高兴了三秒，然后发现：\n\n- 在家办公=永远在办公\n- 视频会议比面对面还累\n- 你分不清上班和下班了\n\n你的床变成了办公桌，你的客厅变成了会议室。\n\n"远程办公不是自由，是7×24小时待命。"',
+      cond: g => g.job!=='待业中' && g.intel>55 && !g.flags.remoteWork && g.age>=24 && g.age<=40,
+      choices:[
+        { label:'享受灵活，提高效率', hint:'+😊 +💰', fn: g => { g.flags.remoteWork=true; return{mood:15,money:5000,health:5}; }},
+        { label:'设立工作区，划清界限', hint:'+🧠 +❤️', fn: g => { g.flags.remoteWork=true; return{intel:8,health:8,mood:10}; }},
+        { label:'申请回办公室', hint:'+👥 -😊', fn: g => { g.flags.remoteWork=true; g.relationships.colleagues = clamp((g.relationships.colleagues||30)+10, 0, 100); return{social:8,mood:-5}; }},
+      ]},
+    { id:'influencer_economy', icon:'📱', title:'网红经济',
+      body:'你刷抖音/小红书，看到有人说："做自媒体月入10万！"\n\n你心动了：要不辞职做网红？\n\n你查了一下数据：90%的自媒体月收入不到3000元。\n\n"网红经济是金字塔——你看到的是塔尖，看不到的是塔底。"',
+      cond: g => g.age>=22 && g.age<=35 && g.charm>50 && !g.flags.influencer && g.money>10000,
+      choices:[
+        { label:'辞职全职做', hint:'🎲🎲', fn: g => { g.flags.influencer=true; if(Math.random()>0.7){return{money:30000,charm:20,mood:25,social:15}}else{return{money:-20000,mood:-15,health:-10}} }},
+        { label:'兼职试水', hint:'+✨ +🧠', fn: g => { g.flags.influencer=true; return{money:5000,charm:10,intel:5,mood:8}; }},
+        { label:'算了，太卷了', hint:'+😊', fn: g => ({mood:5}) },
+      ]},
+    { id:'lottery_ticket', icon:'🎰', title:'彩票梦',
+      body:'路过彩票店，你看到有人中了500万。\n\n你买了10注双色球，花了20块钱。\n\n你开始幻想：如果中了，先买房，再买车，然后辞职环游世界……\n\n开奖了。你一个号都没中。\n\n"彩票是穷人的税——但偶尔做做梦也不错。"',
+      cond: g => g.money>500 && Math.random()>0.7,
+      choices:[
+        { label:'买100注！', hint:'🎲 -💰', fn: g => { g.money-=200; if(Math.random()>0.95){return{money:50000,mood:30,charm:5}}else{return{money:-200,mood:-5}} }},
+        { label:'买10注意思意思', hint:'🎲 -💰', fn: g => { g.money-=20; if(Math.random()>0.98){return{money:10000,mood:25}}else{return{money:-20,mood:-3}} }},
+        { label:'不买，这是智商税', hint:'+🧠', fn: g => ({intel:3,mood:5}) },
+      ]},
+    { id:'hometown_visit', icon:'🚄', title:'回老家过年',
+      body:'过年了，你回老家了。\n\n亲戚们的问题三连击：\n1. 有对象了吗？\n2. 买房了吗？\n3. 工资多少？\n\n你笑着应付，心里在想：我为什么要回来？\n\n但当你吃到妈妈做的红烧肉，看到爸爸偷偷抹眼泪，你又觉得：回来真好。\n\n"老家是你想逃离，但又想回去的地方。"',
+      cond: g => g.month===1 || g.month===2 && !g.flags.hometownVisit,
+      choices:[
+        { label:'多陪陪父母', hint:'+👨‍👩‍👧 +😊', fn: g => { g.flags.hometownVisit=true; g.relationships.family = clamp((g.relationships.family||60)+20, 0, 100); return{mood:15,money:-3000}; }},
+        { label:'应付一下，早点回城', hint:'+💰 -👨‍👩‍👧', fn: g => { g.flags.hometownVisit=true; g.relationships.family = clamp((g.relationships.family||60)-10, 0, 100); return{money:2000,mood:-5}; }},
+        { label:'带父母来城里玩', hint:'-💰 +👨‍👩‍👧 +😊', fn: g => { g.flags.hometownVisit=true; g.relationships.family = clamp((g.relationships.family||60)+25, 0, 100); return{mood:20,money:-8000}; }},
+      ]},
+    { id:'social_media_anxiety', icon:'📱', title:'社交媒体焦虑',
+      body:'你刷朋友圈/Instagram，看到：\n\n- 同学A：提了保时捷\n- 同事B：去了马尔代夫\n- 朋友C：升职加薪\n- 你：在出租屋吃泡面\n\n你关掉手机，叹了口气。\n\n"社交媒体不是生活，是生活的精选集——但你还是会焦虑。"',
+      cond: g => g.mood<60 && g.age>=22 && g.age<=35 && !g.flags.socialMediaAnxiety,
+      choices:[
+        { label:'卸载社交媒体', hint:'+😊 +🧠 +❤️', fn: g => { g.flags.socialMediaAnxiety=true; g.flags.digitalDetox=true; return{mood:20,intel:8,health:5}; }},
+        { label:'减少使用，专注自己', hint:'+😊 +🧠', fn: g => { g.flags.socialMediaAnxiety=true; return{mood:15,intel:5}; }},
+        { label:'继续刷，继续焦虑', hint:'-😊 -❤️', fn: g => { g.flags.socialMediaAnxiety=true; return{mood:-15,health:-5}; }},
+        { label:'也发朋友圈秀一下', hint:'+✨ -😊', fn: g => { g.flags.socialMediaAnxiety=true; return{charm:10,mood:-5,money:-500}; }},
+      ]},
+    { id:'career_change', icon:'🔄', title:'转行',
+      body:'你已经干了3年现在的工作，但你越来越觉得：这不是你想要的。\n\n你想转行：从程序员转产品经理，从运营转市场，从销售转创业……\n\n但转行意味着：从零开始，降薪，重新证明自己。\n\n"转行是勇敢者的游戏——但勇敢者不一定能赢。"',
+      cond: g => g.job!=='待业中' && g.months>36 && g.age>=26 && g.age<=38 && !g.flags.careerChange,
+      choices:[
+        { label:'勇敢转行', hint:'🎲 +🧠 -💰', fn: g => { g.flags.careerChange=true; if(Math.random()>0.5){setJob(g,'产品经理',g.jobSalary*1.2);return{intel:15,mood:20,money:-10000}}else{setJob(g,'实习生',6000);return{intel:10,mood:-10,money:-20000}} }},
+        { label:'先学习，再转行', hint:'+🧠 -💰', fn: g => { g.flags.careerChange=true; return{intel:12,mood:5,money:-8000}; }},
+        { label:'算了，先干着吧', hint:'-😊', fn: g => ({mood:-10}) },
+      ]},
+    { id:'burnout_warning', icon:'🔥', title:'倦怠警告',
+      body:'你最近总是：\n\n- 早上不想起床\n- 上班像上坟\n- 对什么都提不起兴趣\n- 晚上失眠，白天犯困\n\n你查了一下"职业倦怠"的定义：情绪衰竭、去人格化、成就感降低。\n\n三条全中。\n\n"倦怠不是懒，是你的身心在求救。"',
+      cond: g => g.health<50 && g.mood<45 && g.job!=='待业中' && !g.flags.burnoutWarning,
+      choices:[
+        { label:'请假休息一周', hint:'+❤️ +😊 -💰', fn: g => { g.flags.burnoutWarning=true; return{health:20,mood:25,money:-5000}; }},
+        { label:'看心理医生', hint:'+🧠 +❤️ -💰', fn: g => { g.flags.burnoutWarning=true; return{intel:8,health:15,mood:15,money:-3000}; }},
+        { label:'辞职，gap year', hint:'+😊 +❤️ -💰💰', fn: g => { g.flags.burnoutWarning=true; g.flags.lyingFlat=true; setJob(g,'待业中',0); return{mood:30,health:20,money:-30000}; }},
+        { label:'硬撑，为了房贷', hint:'-❤️ -😊', fn: g => { g.flags.burnoutWarning=true; return{health:-15,mood:-20}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -1784,6 +1843,14 @@ const ACHIEVEMENTS = [
     { id:'filial_child', icon:'🏥', name:'孝顺子女', desc:'照顾过生病的父母', check: g => g.flags.parentAging },
     { id:'stock_veteran', icon:'📉', name:'股市老兵', desc:'经历过股市暴跌', check: g => g.flags.stockCrash },
     { id:'midlife_awakening', icon:'🎭', name:'中年觉醒', desc:'经历过中年危机', check: g => g.flags.midlifeCrisis },
+    // v2.23 achievements
+    { id:'remote_worker', icon:'💻', name:'远程工作者', desc:'体验过远程办公', check: g => g.flags.remoteWork },
+    { id:'content_creator', icon:'📱', name:'内容创作者', desc:'尝试做自媒体', check: g => g.flags.influencer },
+    { id:'lottery_dreamer', icon:'🎰', name:'彩票梦想家', desc:'买过彩票', check: g => g.flags.lotteryTicket },
+    { id:'hometown_visitor', icon:'🚄', name:'归乡者', desc:'回老家过年', check: g => g.flags.hometownVisit },
+    { id:'digital_detoxer', icon:'📵', name:'数字排毒者', desc:'戒掉社交媒体', check: g => g.flags.socialMediaAnxiety && g.flags.digitalDetox },
+    { id:'career_changer', icon:'🔄', name:'转行勇士', desc:'勇敢转行', check: g => g.flags.careerChange },
+    { id:'burnout_survivor', icon:'🔥', name:'倦怠幸存者', desc:'经历过职业倦怠', check: g => g.flags.burnoutWarning },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -2428,7 +2495,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.22' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.23' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
