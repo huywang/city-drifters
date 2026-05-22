@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v21.2
+// 都市浮生记 - Game Engine v21.3
 // ============================================
 
 // === GAME STATE ===
@@ -4630,7 +4630,7 @@ const EVENTS = [
         { label:'学打麻将', hint:'+👥 +🧠', fn: g => { return{social:10,intel:3,mood:8}; }},
         { label:'觉得浪费时间', hint:'-😊', fn: g => { return{mood:-5,intel:2}; }},
       ]},
-    { id:'chengdu_panda', icon:'🐼', title:'熊猫基地',
+    { id:'chengdu_panda_v2', icon:'🐼', title:'熊猫基地',
       body:'你去了成都大熊猫基地，看到了刚出生的小熊猫。\n\n它们圆滚滚的，在草地上打滚。你看了一个小时，完全忘了工作。\n\n"大熊猫教会你一个道理：只要够可爱，就不用努力。"',
       cond: g => g.city === 'chengdu' && g.mood < 50,
       choices:[
@@ -10011,14 +10011,96 @@ const EVENTS = [
         { label:'偶尔泡泡，感觉不错', hint:'+❤️ +😊', fn: g => { g.flags.herbalTeaCulture=true; return{health:5,mood:5}; }},
         { label:'还是喝咖啡吧', hint:'', fn: g => { g.flags.herbalTeaCulture=true; return{mood:2}; }},
       ]},
+    // === v21.3 新增事件（财经智慧 + 理财进阶 + FIRE运动） ===
+    { id:'emergency_fund', icon:'🏦', title:'应急备用金', category:'finance',
+      body:'你的一个朋友突然被裁了。他慌了——因为他没有一分钱存款。\n\n他说：「我以为只要工作稳定就行，从没想过要存应急金。现在我连3个月的生活费都拿不出来。」\n\n你查了一下理财知识：专家建议每个人都应该有「3-6个月生活费」的应急备用金。不是用来投资——是用来应对突发事件。\n\n你算了算：你每月的开销是8000块。3个月就是24000块。你决定：先存够24000块的应急金，再考虑投资。\n\n你开了一个专门的储蓄账户，每月自动转入2000块。6个月后，你的应急金存够了。\n\n你发现：有了应急金之后，你的焦虑减少了很多。因为你知道：即使失去了工作，你至少还有6个月的缓冲。\n\n「应急金：不是让你变富——是让你不怕变穷。」',
+      cond: g => !g.flags.emergencyFund && g.age >= 22 && g.money >= 5000,
+      choices:[
+        { label:'认真存了应急备用金', hint:'+🧠 +😊 +💰', fn: g => { g.flags.emergencyFund=true; g.flags.hasEmergencyFund=true; return{intel:5,mood:8}; }},
+        { label:'开始存但还没存够', hint:'+🧠', fn: g => { g.flags.emergencyFund=true; return{intel:3,mood:3}; }},
+        { label:'觉得没必要', hint:'', fn: g => { g.flags.emergencyFund=true; return{}; }},
+      ]},
+    { id:'passive_income', icon:'💰', title:'被动收入', category:'finance',
+      body:'你读了一本书：《富爸爸穷爸爸》。书里有一个概念击中了你：「被动收入」。\n\n作者说：「富人不是靠工作赚钱——是靠资产赚钱。房租、股息、版税、利息——这些都是你睡觉时还在帮你赚钱的东西。」\n\n你开始思考：你有没有什么能产生被动收入？\n\n你有一套小房子的首付够了——租金可以覆盖月供。你的摄影作品可以上传到图片库赚版税。你会写代码，可以做一个小App卖广告。\n\n你决定：每月拿出20%的收入来建立「被动收入管道」。3年后，你的被动收入已经能覆盖基本生活了。\n\n你的同事说：「你真幸运。」你说：「不是幸运——是我在别人消费的时候选择了投资。」\n\n「被动收入：不是不工作就有钱——是让钱替你工作。」',
+      cond: g => !g.flags.passiveIncome && g.age >= 24 && g.intel >= 45,
+      choices:[
+        { label:'开始系统性建立被动收入', hint:'+💰 +🧠', fn: g => { g.flags.passiveIncome=true; g.flags.passiveIncomeBuilder=true; return{money:5000,intel:8}; }},
+        { label:'尝试了一些被动收入方式', hint:'+💰 +🧠', fn: g => { g.flags.passiveIncome=true; return{money:2000,intel:5}; }},
+        { label:'了解了一下，以后再说', hint:'+🧠', fn: g => { g.flags.passiveIncome=true; return{intel:3}; }},
+      ]},
+    { id:'compound_interest', icon:'📈', title:'复利的力量', category:'finance',
+      body:'你的理财顾问给你算了一笔账：\n\n如果你从25岁开始，每月定投3000块到年化收益8%的指数基金。到60岁退休时，你将拥有：\n\n本金：126万\n收益：318万\n总计：444万\n\n但如果你从35岁才开始（只晚了10年），同样的投入：\n\n本金：90万\n收益：122万\n总计：212万\n\n你被这个数字震撼了：晚10年，少了232万。不是因为投入少——是因为复利的时间短了。\n\n你的顾问说：「爱因斯坦说复利是世界第八大奇迹。理解它的人赚它的钱，不理解它的人付它的代价。」\n\n你做了一个决定：从今天开始定投。不管金额多少——先开始。\n\n「复利：时间是最好的朋友——前提是你愿意等。」',
+      cond: g => !g.flags.compoundInterest && g.age >= 22 && g.age <= 40,
+      choices:[
+        { label:'立刻开始定投，让时间成为朋友', hint:'+💰 +🧠 +😊', fn: g => { g.flags.compoundInterest=true; g.flags.earlyInvestor=true; return{intel:8,mood:5}; }},
+        { label:'学了很多理财知识，开始规划', hint:'+🧠 +💰', fn: g => { g.flags.compoundInterest=true; return{intel:5,money:2000}; }},
+        { label:'觉得太遥远了，先过好当下', hint:'', fn: g => { g.flags.compoundInterest=true; return{intel:2}; }},
+      ]},
+    { id:'budget_tracking', icon:'📒', title:'记账的力量', category:'finance',
+      body:'你下载了一个记账App，开始记录每一笔开销。\n\n一个月后，你看了账单——你震惊了：\n\n外卖：3200块（你以为只有1500）\n咖啡：800块\n打车：600块\n网购：2500块\n娱乐：1200块\n\n总计：8300块——你月薪的70%。\n\n你的同事说：「不记账不知道，一记账吓一跳。原来我花了这么多冤枉钱。」\n\n你开始调整：自己做饭替代外卖（省1500）、自带咖啡（省600）、减少打车（省300）、控制网购（省1500）。每月能省下3900块。\n\n一年下来：你多存了46800块。5年下来：23.4万。\n\n你发现：记账不是限制你花钱——是让你看清钱去了哪里。当你知道钱去了哪里，你就能决定钱应该去哪里。\n\n「记账：不是为了省钱——是为了让每一分钱都花得值。」',
+      cond: g => !g.flags.budgetTracking && g.age >= 22 && g.money <= 50000,
+      choices:[
+        { label:'坚持记账，成功控制了开支', hint:'+💰 +🧠 +😊', fn: g => { g.flags.budgetTracking=true; g.flags.budgetMaster=true; return{money:8000,intel:5,mood:5}; }},
+        { label:'记了几个月，省了不少钱', hint:'+💰 +🧠', fn: g => { g.flags.budgetTracking=true; return{money:5000,intel:3}; }},
+        { label:'记了几天就忘了', hint:'', fn: g => { g.flags.budgetTracking=true; return{intel:2}; }},
+      ]},
+    { id:'side_hustle_income', icon:'💼', title:'副业变现', category:'career',
+      body:'你决定把爱好变成副业。\n\n你喜欢摄影——你开始接商业拍摄。你喜欢写东西——你开始接文案外包。你会设计——你开始在猪八戒网接设计单。\n\n第一个月：副业收入2000块。不多，但这是你用自己的技能赚到的——不是出卖时间换的。\n\n第三个月：副业收入5000块。你开始有了固定客户。\n第六个月：副业收入8000块。已经快赶上你的主业了。\n\n你的一个朋友说：「你为什么不上班了做全职自由职业？」\n\n你说：「不。主业给我安全感，副业给我可能性。两个都要。」\n\n你发现：副业不只是赚钱——是给自己多一个选择。当你的收入来源不止一个的时候，你就不再被一份工作绑住了。\n\n「副业变现：不是赚更多的钱——是拥有更多的选择。」',
+      cond: g => !g.flags.sideHustleIncome && g.age >= 22 && g.age <= 40 && g.job !== '待业中',
+      choices:[
+        { label:'副业做得很成功，收入翻倍', hint:'+💰 +😊 +🧠', fn: g => { g.flags.sideHustleIncome=true; g.flags.successfulSideHustle=true; g.flags.sideHustle=true; return{money:10000,mood:8,intel:5}; }},
+        { label:'副业有一些收入，但不稳定', hint:'+💰 +🧠', fn: g => { g.flags.sideHustleIncome=true; g.flags.sideHustle=true; return{money:5000,intel:3}; }},
+        { label:'尝试了但没做起来', hint:'+🧠', fn: g => { g.flags.sideHustleIncome=true; return{intel:3,mood:-2}; }},
+      ]},
+    { id:'financial_independence', icon:'🎯', title:'经济独立', category:'finance',
+      body:'你终于实现了经济独立。\n\n不是财务自由——是经济独立。意思是：你不再需要父母的钱、不再需要借钱、不再需要靠信用卡套现过日子。\n\n你记得刚毕业的时候：月薪5000，房租2000，吃饭1500，交通500。每个月只剩1000块。不够花的时候就跟父母要。\n\n现在你每月能存下3000块。你有应急金、有保险、有定投。你不再为下个月的房租发愁。\n\n你给你妈转了10000块，说：「妈，这是我以前花你们的钱，现在还给你们。」\n\n你妈说：「不用还，你过得好就行。」\n\n你哭了。你发现：经济独立不只是一个数字——是一种尊严。\n\n「经济独立：不是变富——是不再欠任何人。」',
+      cond: g => !g.flags.financialIndependence && g.age >= 24 && g.money >= 30000 && g.job !== '待业中',
+      choices:[
+        { label:'实现了经济独立，开始追求更多', hint:'+💰 +😊 +🧠', fn: g => { g.flags.financialIndependence=true; g.flags.econIndependent=true; return{money:5000,mood:12,intel:5}; }},
+        { label:'接近经济独立，还需要努力', hint:'+🧠 +😊', fn: g => { g.flags.financialIndependence=true; return{intel:3,mood:5}; }},
+        { label:'还差得远', hint:'-😊', fn: g => { g.flags.financialIndependence=true; return{mood:-3}; }},
+      ]},
+    { id:'index_fund_start', icon:'📊', title:'指数基金入门', category:'finance',
+      body:'你的一个做金融的朋友推荐你买指数基金。\n\n他说：「不要选个股、不要追热点、不要频繁操作。就买沪深300或中证500的指数基金，每月定投，长期持有。」\n\n你问：「为什么是指数基金？」\n\n他说：「因为连巴菲特都说：「普通投资者最好的选择就是指数基金。」它跟踪整个市场，不依赖基金经理的水平，费率低，长期收益跑赢80%的主动基金。」\n\n你开始每月定投3000块到沪深300指数基金。第一年：跌了8%。你有点慌。\n\n你的朋友说：「别慌。指数基金是长期投资。你定投的好处就是——跌的时候你买到了更多的份额。」\n\n第三年：你的收益率达到了25%。你终于理解了：投资不是投机——是用时间和纪律换取回报。\n\n「指数基金：最无聊的投资方式——也是最有效的。」',
+      cond: g => !g.flags.indexFundStart && g.age >= 22 && g.money >= 10000,
+      choices:[
+        { label:'开始定期定投标普/沪深300', hint:'+💰 +🧠', fn: g => { g.flags.indexFundStart=true; g.flags.indexFundInvestor=true; return{money:3000,intel:8}; }},
+        { label:'学了很多投资知识', hint:'+🧠', fn: g => { g.flags.indexFundStart=true; return{intel:5}; }},
+        { label:'觉得太慢了，想赚快钱', hint:'-💰', fn: g => { g.flags.indexFundStart=true; return{money:-2000,mood:-3}; }},
+      ]},
+    { id:'insurance_planning', icon:'🛡️', title:'保险规划', category:'finance',
+      body:'你的一个同事突然得了重病。治疗费50万——他没有保险。\n\n他在朋友圈发起了众筹。3天筹了8万。还差42万。\n\n你看着这个故事，开始认真思考保险。\n\n你咨询了保险顾问，他建议：「年轻人最需要的四种保险：医疗险（几百块/年）、重疾险（几千块/年）、意外险（一两百块/年）、定期寿险（几百块/年）。每年花不到1万块，就能覆盖大部分风险。」\n\n你花了8000块买了一套保险。你的同事说：「你年纪轻轻的买什么保险？」\n\n你说：「因为我不知道明天会发生什么。但我知道：如果发生了什么，我不想成为家人的负担。」\n\n你发现：保险不是消费——是给自己和家人的一份安全感。\n\n「保险：不是为了出事后有钱——是为了出事后不欠债。」',
+      cond: g => !g.flags.insurancePlanning && g.age >= 24 && g.money >= 10000,
+      choices:[
+        { label:'认真做了保险规划', hint:'+🧠 +😊 -💰', fn: g => { g.flags.insurancePlanning=true; g.flags.insured=true; return{intel:5,mood:5,money:-8000}; }},
+        { label:'买了基础医疗险', hint:'+🧠 -💰', fn: g => { g.flags.insurancePlanning=true; return{intel:3,money:-500}; }},
+        { label:'觉得自己还年轻，不需要', hint:'', fn: g => { g.flags.insurancePlanning=true; return{}; }},
+      ]},
+    { id:'money_relationship', icon:'💑', title:'金钱与感情', category:'finance',
+      body:'你和你的伴侣因为钱吵了一架。\n\n原因是：你发现他/她偷偷给家里转了2万块。你觉得应该一起商量；他/她觉得这是自己的钱。\n\n你们坐下来谈了谈。你们发现：你们对钱的态度完全不同——你觉得应该先存钱、他/她觉得应该先享受。\n\n你们决定建立一个「家庭财务协议」：\n- 每人每月转入共同账户50%的收入\n- 剩下的50%各自管理\n- 超过5000块的支出要一起商量\n\n你的一个已婚朋友说：「婚姻里最大的矛盾不是出轨——是钱。不是因为钱多钱少——是因为两个人对钱的态度不同。」\n\n你发现：谈钱不伤感情——不谈钱才伤感情。\n\n「金钱与感情：好的关系不是不谈钱——是学会一起谈钱。」',
+      cond: g => !g.flags.moneyRelationship && g.age >= 24 && g.flags.married,
+      choices:[
+        { label:'建立了共同财务管理方式', hint:'+🧠 +❤️ +😊', fn: g => { g.flags.moneyRelationship=true; g.flags.financialAgreement=true; return{intel:5,mood:5,social:5}; }},
+        { label:'谈了但没达成共识', hint:'+🧠', fn: g => { g.flags.moneyRelationship=true; return{intel:3,mood:-3}; }},
+        { label:'不想因为钱吵架，各管各的', hint:'', fn: g => { g.flags.moneyRelationship=true; return{mood:-2}; }},
+      ]},
+    { id:'asset_allocation', icon:'🥧', title:'资产配置', category:'finance',
+      body:'你参加了一个理财讲座。讲师说了一句话让你印象深刻：\n\n「投资最重要的不是买什么——是怎么分配。」\n\n他展示了一个经典的资产配置方案：\n- 40%稳健资产（债券、存款、货币基金）\n- 30%增长资产（股票基金、指数基金）\n- 20%不动产（房产）\n- 10%另类投资（黄金、加密货币）\n\n「这个比例不是固定的——要根据你的年龄和风险承受能力调整。年轻时可以多配增长资产，年纪大了要多配稳健资产。」\n\n你开始按照这个框架调整你的资产。你发现：配置好了之后，你不再每天盯着股市看了。因为你知道：短期波动不影响长期策略。\n\n你的一个朋友说：「投资最难的不是选股——是控制情绪。」\n\n「资产配置：不是追求最高收益——是追求最稳的睡眠。」',
+      cond: g => !g.flags.assetAllocation && g.age >= 25 && g.money >= 50000 && g.intel >= 45,
+      choices:[
+        { label:'认真做了资产配置，投资变得从容', hint:'+💰 +🧠 +😊', fn: g => { g.flags.assetAllocation=true; g.flags.allocator=true; return{money:8000,intel:8,mood:5}; }},
+        { label:'学了很多，开始调整', hint:'+🧠 +💰', fn: g => { g.flags.assetAllocation=true; return{intel:5,money:3000}; }},
+        { label:'太复杂了，还是存银行吧', hint:'', fn: g => { g.flags.assetAllocation=true; return{intel:2}; }},
+      ]},
 ];
 
+// === ACHIEVEMENTS ===
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
     { id:'homeowner', icon:'🏡', name:'有房一族', desc:'在大城市买房', check: g => g.flags.hasHouse },
     { id:'married', icon:'💒', name:'人生赢家？', desc:'结婚', check: g => g.flags.married },
     { id:'parent', icon:'👶', name:'成为父母', desc:'有了孩子', check: g => g.flags.hasChild },
-    { id:'influencer', icon:'📸', name:'网红达人', desc:'成为自媒体', check: g => g.flags.influencer },
+    { id:'influencer_v2', icon:'📸', name:'网红达人', desc:'成为自媒体', check: g => g.flags.influencer },
     { id:'survivor', icon:'🏆', name:'生存专家', desc:'在大城市存活5年', check: g => g.months>=60 },
     { id:'saver', icon:'🐷', name:'存钱达人', desc:'存款超过10万', check: g => g.money>=100000 },
     { id:'social_butterfly', icon:'🦋', name:'社交达人', desc:'人脉超过80', check: g => g.social>=80 },
@@ -10027,7 +10109,7 @@ const ACHIEVEMENTS = [
     { id:'civil_servant', icon:'📋', name:'铁饭碗', desc:'考上公务员', check: g => g.flags.civilServant },
     { id:'entrepreneur', icon:'🚀', name:'创业先锋', desc:'开始创业', check: g => g.flags.entrepreneur },
     { id:'pet_owner', icon:'🐱', name:'铲屎官', desc:'养了宠物', check: g => g.flags.hasPet },
-    { id:'hukou', icon:'📋', name:'落户成功', desc:'获得户口', check: g => g.flags.hasHukou },
+    { id:'hukou_v2', icon:'📋', name:'落户成功', desc:'获得户口', check: g => g.flags.hasHukou },
     { id:'took_off_gown', icon:'👔', name:'脱下长衫', desc:'放下身段，脚踏实地', check: g => g.flags.tookOffGown },
     { id:'lockdown_survivor', icon:'🔒', name:'封控幸存者', desc:'熬过了疫情', check: g => g.flags.hadLockdown },
     { id:'ai_ready', icon:'🤖', name:'AI时代幸存者', desc:'拥抱了AI', check: g => g.flags.aiAnxiety && g.intel>75 },
@@ -10085,7 +10167,7 @@ const ACHIEVEMENTS = [
     { id:'teacher', icon:'👨‍🏫', name:'为人师表', desc:'做了培训师', check: g => g.flags.teacher },
     { id:'shop_owner', icon:'🏪', name:'小店老板', desc:'开了小店', check: g => g.flags.smallShop },
     { id:'volunteer', icon:'🤝', name:'志愿者', desc:'参加过志愿者活动', check: g => g.flags.volunteer },
-    { id:'personal_brand', icon:'🌟', name:'个人品牌', desc:'建立个人品牌', check: g => g.flags.personalBrand },
+    { id:'personal_brand_v2', icon:'🌟', name:'个人品牌', desc:'建立个人品牌', check: g => g.flags.personalBrand },
     { id:'fire_planner', icon:'🎯', name:'FIRE计划', desc:'开始FIRE计划', check: g => g.flags.firePlan },
     // v2.14 Relationship achievements
     { id:'family_love', icon:'👨‍👩‍👧', name:'孝顺子女', desc:'家人关系达到90+', check: g => g.relationships && g.relationships.family>=90 },
@@ -10096,16 +10178,16 @@ const ACHIEVEMENTS = [
     { id:'digital_detox_ach', icon:'📵', name:'数字排毒', desc:'完成数字戒断', check: g => g.flags.digitalDetox },
     // v2.18 achievements
     { id:'healthy_life', icon:'🥗', name:'健康生活', desc:'开始健康生活方式', check: g => g.flags.healthyLifestyle },
-    { id:'side_hustle', icon:'💡', name:'斜杠青年', desc:'开始做副业', check: g => g.flags.sideHustle },
+    { id:'side_hustle_v2_v2', icon:'💡', name:'斜杠青年', desc:'开始做副业', check: g => g.flags.sideHustle },
     { id:'long_timer', icon:'📅', name:'老员工', desc:'在同一家公司工作超过3年', check: g => g.job!=='待业中' && g.months>36 },
     { id:'challenge_master', icon:'🎯', name:'挑战达人', desc:'完成10个每日挑战', check: g => { const c = JSON.parse(localStorage.getItem('cityDrifters_challenges')||'[]'); return c.length>=10; }},
     // v2.21 achievements
     { id:'mortgage_survivor', icon:'🏚️', name:'房贷幸存者', desc:'经历过断供危机', check: g => g.flags.mortgageDefault },
     { id:'unfinished_building_fighter', icon:'🏗️', name:'维权斗士', desc:'参与过烂尾楼维权', check: g => g.flags.unfinishedBuilding },
-    { id:'full_time_child', icon:'🏠', name:'全职儿女', desc:'回家做全职儿女', check: g => g.flags.fullTimeChild },
+    { id:'full_time_child_v2', icon:'🏠', name:'全职儿女', desc:'回家做全职儿女', check: g => g.flags.fullTimeChild },
     { id:'kaogong_warrior', icon:'📚', name:'考公战士', desc:'备考公务员', check: g => g.flags.kaogongPrep },
     { id:'workplace_pua_survivor', icon:'😤', name:'职场PUA幸存者', desc:'经历过职场PUA', check: g => g.flags.workplacePUA },
-    { id:'tiger_parent', icon:'📖', name:'鸡娃家长', desc:'开始鸡娃', check: g => g.flags.tigerParenting },
+    { id:'tiger_parent_v2', icon:'📖', name:'鸡娃家长', desc:'开始鸡娃', check: g => g.flags.tigerParenting },
     { id:'digital_helper', icon:'📱', name:'数字桥梁', desc:'帮助家人跨越数字鸿沟', check: g => g.flags.digitalRefugee },
     { id:'school_district_hero', icon:'🏫', name:'学区房勇士', desc:'买了学区房', check: g => g.flags.schoolDistrictHouse },
     // v2.22 achievements
@@ -10116,7 +10198,7 @@ const ACHIEVEMENTS = [
     { id:'betrayal_survivor', icon:'🗡️', name:'背叛幸存者', desc:'经历过朋友背叛', check: g => g.flags.friendBetrayal },
     { id:'filial_child', icon:'🏥', name:'孝顺子女', desc:'照顾过生病的父母', check: g => g.flags.parentAging },
     { id:'stock_veteran', icon:'📉', name:'股市老兵', desc:'经历过股市暴跌', check: g => g.flags.stockCrash },
-    { id:'midlife_awakening', icon:'🎭', name:'中年觉醒', desc:'经历过中年危机', check: g => g.flags.midlifeCrisis },
+    { id:'midlife_awakening_v2_v2', icon:'🎭', name:'中年觉醒', desc:'经历过中年危机', check: g => g.flags.midlifeCrisis },
     // v2.23 achievements
     { id:'remote_worker_v2', icon:'💻', name:'远程工作者v2', desc:'体验过远程办公', check: g => g.flags.remoteWork },
     { id:'content_creator', icon:'📱', name:'内容创作者', desc:'尝试做自媒体', check: g => g.flags.influencer },
@@ -10170,7 +10252,7 @@ const ACHIEVEMENTS = [
     { id:'smart_renter', icon:'🏠', name:'租房达人', desc:'和房东成功谈判', check: g => g.flags.rentIncrease && g.charm>=65 },
     // v2.36 achievements
     { id:'blind_box_fan', icon:'🎁', name:'盲盒玩家', desc:'体验了盲盒经济', check: g => g.flags.blindBox },
-    { id:'digital_detox_v2', icon:'📵', name:'数字断联', desc:'成功戒掉短视频', check: g => g.flags.digitalDetox },
+    { id:'digital_detox_v2_v2', icon:'📵', name:'数字断联', desc:'成功戒掉短视频', check: g => g.flags.digitalDetox },
     { id:'good_neighbor', icon:'🏘️', name:'好邻居', desc:'和新邻居成为朋友', check: g => g.flags.goodNeighbor },
     { id:'marathon_runner', icon:'🏃', name:'马拉松跑者', desc:'完成了一次马拉松挑战', check: g => g.flags.marathonChallenge && g.health>=70 },
     { id:'side_project_done', icon:'💻', name:'副业起步', desc:'开始了自己的副业项目', check: g => g.flags.sideProject },
@@ -10188,13 +10270,13 @@ const ACHIEVEMENTS = [
     { id:'dating_explorer', icon:'💘', name:'交友探索者', desc:'尝试了交友软件', check: g => g.flags.datingApp },
     // v2.39 achievements
     { id:'city_explorer_v2', icon:'🗺️', name:'城市探索者', desc:'在多个城市生活过', check: g => g.flags.citySwitch },
-    { id:'midlife_reflection', icon:'🎂', name:'四十不惑', desc:'在40岁时重新审视人生', check: g => g.flags.midlifeCrisis40 },
+    { id:'midlife_reflection_v2', icon:'🎂', name:'四十不惑', desc:'在40岁时重新审视人生', check: g => g.flags.midlifeCrisis40 },
     { id:'skill_learner', icon:'📚', name:'终身学习', desc:'学习了新技能', check: g => g.flags.learnNewSkill },
     { id:'good_child', icon:'👨‍👩‍👦', name:'孝顺子女', desc:'照顾好了父母的健康', check: g => (g.flags.parentHealthIssue || g.flags.hometownVisit) && g.relationships && g.relationships.family>=70 },
     { id:'traveler', icon:'🏖️', name:'周末旅行家', desc:'来了一次说走就走的旅行', check: g => g.flags.weekendTrip },
     // v2.40 achievements
     { id:'lottery_player', icon:'🎫', name:'彩票玩家', desc:'买了彩票试试手气', check: g => g.flags.lotteryTicket },
-    { id:'viral_moment', icon:'📸', name:'意外走红', desc:'体验了一把网红感觉', check: g => g.flags.socialMediaFame },
+    { id:'viral_moment_v2', icon:'📸', name:'意外走红', desc:'体验了一把网红感觉', check: g => g.flags.socialMediaFame },
     { id:'career_changer_v2', icon:'🔀', name:'职业转型', desc:'勇敢走出了职业舒适区', check: g => g.flags.careerCrossroads },
     { id:'health_conscious', icon:'🏥', name:'健康意识', desc:'认真对待了年度体检', check: g => g.flags.annualCheckup },
     { id:'bookworm_v2', icon:'📚', name:'读书会成员', desc:'加入了读书会', check: g => g.flags.bookClub },
@@ -10281,8 +10363,8 @@ const ACHIEVEMENTS = [
     { id:'civil_service_veteran', icon:'📋', name:'考公老手', desc:'参加公务员考试', check: g => g.flags.civilServiceExam },
     { id:'persistent_examinee', icon:'🔄', name:'二战三战', desc:'多次参加考公', check: g => g.flags.secondCareer },
     // v6.6 achievements
-    { id:'slash_youth', icon:'💼', name:'斜杠青年', desc:'开展副业', check: g => g.flags.sideHustle },
-    { id:'street_vendor', icon:'🛒', name:'摆摊达人', desc:'摆摊创业', check: g => g.flags.streetVendor },
+    { id:'slash_youth_v2', icon:'💼', name:'斜杠青年', desc:'开展副业', check: g => g.flags.sideHustle },
+    { id:'street_vendor_v2', icon:'🛒', name:'摆摊达人', desc:'摆摊创业', check: g => g.flags.streetVendor },
     { id:'frugal_master', icon:'📉', name:'消费降级大师', desc:'实践消费降级', check: g => g.flags.consumptionDowngrade },
     { id:'minimalist_v2', icon:'🎯', name:'极简主义者', desc:'选择极简生活', check: g => g.flags.minimalist },
     { id:'pingti_expert', icon:'🔄', name:'平替专家', desc:'拥抱平替文化', check: g => g.flags.pingtiCulture },
@@ -10320,7 +10402,7 @@ const ACHIEVEMENTS = [
     // v7.3 achievements
     { id:'blind_date_survivor', icon:'💕', name:'相亲角幸存者', desc:'体验相亲角', check: g => g.flags.matchmakingCorner },
     { id:'marriage_realist', icon:'💸', name:'婚姻现实主义者', desc:'面对结婚成本', check: g => g.flags.marriageCost },
-    { id:'single_happy', icon:'💍', name:'快乐单身族', desc:'享受单身生活', check: g => g.flags.singleHappy },
+    { id:'single_happy_v2', icon:'💍', name:'快乐单身族', desc:'享受单身生活', check: g => g.flags.singleHappy },
     // v7.4 achievements
     { id:'pension_planner_v2', icon:'👴', name:'养老规划师', desc:'提前规划养老金', check: g => g.flags.pensionPlanning },
     { id:'mental_health_warrior', icon:'💭', name:'心理健康战士', desc:'寻求心理帮助', check: g => g.flags.seekHelp },
@@ -10339,10 +10421,10 @@ const ACHIEVEMENTS = [
     // v7.7 achievements
     { id:'social_media_persona', icon:'📸', name:'人设打造师', desc:'预制朋友圈打造人设', check: g => g.flags.socialMediaPersona },
     { id:'authentic_sharer', icon:'💯', name:'真实分享者', desc:'坚持真实记录生活', check: g => g.flags.authenticSharing },
-    { id:'personal_brand_v2', icon:'🎯', name:'个人品牌专家', desc:'用社交媒体打造个人品牌', check: g => g.flags.personalBranding },
+    { id:'personal_brand_v2_v2', icon:'🎯', name:'个人品牌专家', desc:'用社交媒体打造个人品牌', check: g => g.flags.personalBranding },
     { id:'cyber_wellness_user', icon:'🤖', name:'赛博养生达人', desc:'尝试AI中医养生', check: g => g.flags.cyberWellness },
-    { id:'medical_companion', icon:'🏥', name:'陪诊师', desc:'成为陪诊师或请陪诊师', check: g => g.flags.medicalCompanion },
-    { id:'pet_funeral', icon:'🐾', name:'宠物告别师', desc:'体验宠物殡葬服务', check: g => g.flags.petFuneral },
+    { id:'medical_companion_v2', icon:'🏥', name:'陪诊师', desc:'成为陪诊师或请陪诊师', check: g => g.flags.medicalCompanion },
+    { id:'pet_funeral_v2', icon:'🐾', name:'宠物告别师', desc:'体验宠物殡葬服务', check: g => g.flags.petFuneral },
     // v7.8 crisis achievements
     { id:'health_crisis_survivor', icon:'🚑', name:'健康危机幸存者', desc:'经历健康危机并恢复', check: g => g.flags.healthCrisisHospital && g.health > 50 },
     { id:'debt_fighter', icon:'💪', name:'还债勇士', desc:'经历债务危机并努力还债', check: g => g.flags.workToPayDebt && g.money > 0 },
@@ -10456,7 +10538,7 @@ const ACHIEVEMENTS = [
     { id:'job_hopper', icon:'📞', name:'跳槽达人', desc:'成功跳槽', check: g => g.flags.jobHopped },
     { id:'layoff_survivor_v2', icon:'📦', name:'裁员幸存者', desc:'经历了裁员', check: g => g.flags.wasLaidOff },
     { id:'startup_founder', icon:'💡', name:'创业者', desc:'开始创业', check: g => g.flags.startupPhase },
-    { id:'mentor_found', icon:'🎯', name:'有师可学', desc:'找到了职场导师', check: g => g.flags.hasMentor },
+    { id:'mentor_found_v2_v2', icon:'🎯', name:'有师可学', desc:'找到了职场导师', check: g => g.flags.hasMentor },
     { id:'wlb_master', icon:'⚖️', name:'生活大师', desc:'实现了工作生活平衡', check: g => g.flags.workLifeBalance },
     { id:'fulltime_hustler', icon:'🎉', name:'全职追梦人', desc:'全职做副业', check: g => g.flags.fulltimeHustle },
     // === v11.1 新增成就 ===
@@ -10581,7 +10663,7 @@ const ACHIEVEMENTS = [
     { id:'solo_liver', icon:'🏠', name:'独居达人', desc:'开始了独居生活', check: g => g.flags.soloLiving },
     { id:'rent_survivor', icon:'💸', name:'租房老手', desc:'经历了又一次涨租', check: g => g.flags.rentHikeV2 },
     { id:'commuter', icon:'🚇', name:'通勤战士', desc:'征服了地狱通勤', check: g => g.flags.subwayCommute },
-    { id:'neighbor_war', icon:'🔊', name:'邻里战争', desc:'遇到了奇葩邻居', check: g => g.flags.neighborFromHell },
+    { id:'neighbor_war_v2', icon:'🔊', name:'邻里战争', desc:'遇到了奇葩邻居', check: g => g.flags.neighborFromHell },
     { id:'night_foodie', icon:'🍜', name:'深夜食客', desc:'找到了深夜食堂', check: g => g.flags.midnightSnack },
     { id:'delivery_master', icon:'📦', name:'外卖专家', desc:'反思了外卖生活', check: g => g.flags.deliveryAddiction },
     { id:'house_hunter', icon:'🔑', name:'找房达人', desc:'经历了租房大战', check: g => g.flags.apartmentHunting },
@@ -10630,7 +10712,7 @@ const ACHIEVEMENTS = [
     { id:'cohabiter', icon:'🏠', name:'同居时代', desc:'开始了同居生活', check: g => g.flags.cohabitation },
     { id:'marriage_pressured', icon:'💍', name:'催婚受害者', desc:'被催婚了', check: g => g.flags.marriagePressure },
     { id:'wedding_planner', icon:'💒', name:'婚礼筹备者', desc:'筹备了婚礼', check: g => g.flags.weddingCost },
-    { id:'single_happy_v2', icon:'🎉', name:'快乐单身', desc:'享受单身生活', check: g => g.flags.singleLife },
+    { id:'single_happy_v2_v2', icon:'🎉', name:'快乐单身', desc:'享受单身生活', check: g => g.flags.singleLife },
     { id:'fighter_love', icon:'🥊', name:'爱情战士', desc:'和对象大吵一架', check: g => g.flags.relationshipFight },
     { id:'prenup_talker', icon:'📋', name:'婚前协议', desc:'谈了婚前协议', check: g => g.flags.prenupTalk },
     { id:'divorce_thinker', icon:'💔', name:'围城思考者', desc:'想过离婚', check: g => g.flags.divorceThought },
@@ -10946,6 +11028,14 @@ const ACHIEVEMENTS = [
     { id:'baduanjin_ach', icon:'🧘', name:'八段锦练习者', desc:'坚持每天做八段锦', check: g => g.flags.baduanjinRegular },
     { id:'mindful_eater_ach', icon:'🥗', name:'正念饮食者', desc:'开始践行正念饮食', check: g => g.flags.mindfulEater },
     { id:'lifestyle_change_ach', icon:'🔄', name:'生活方式改变者', desc:'因亚健康警告而认真改变了生活方式', check: g => g.flags.lifestyleChange },
+    // === v21.3 新增成就（财经智慧） ===
+    { id:'emergency_fund_ach', icon:'🏦', name:'应急备用金', desc:'建立了6个月生活费的应急基金', check: g => g.flags.emergencyFund },
+    { id:'passive_income_ach', icon:'💵', name:'被动收入者', desc:'开始获得稳定的被动收入', check: g => g.flags.passiveIncome },
+    { id:'compound_ach', icon:'📈', name:'复利信徒', desc:'理解了复利的力量并坚持长期投资', check: g => g.flags.compoundInterest },
+    { id:'budget_master_ach', icon:'📒', name:'记账达人', desc:'坚持记账并养成了预算习惯', check: g => g.flags.budgetTracking },
+    { id:'allocator_ach', icon:'🥧', name:'资产配置师', desc:'完成了科学的资产配置', check: g => g.flags.assetAllocation },
+    { id:'fire_pursuer_ach', icon:'🔥', name:'FIRE追求者', desc:'开始践行财务自由、提前退休', check: g => g.flags.financialIndependence },
+    { id:'insurance_planner_ach', icon:'🛡️', name:'风险管理者', desc:'合理规划了保险保障', check: g => g.flags.insurancePlanning },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -10955,10 +11045,10 @@ const ENDINGS = [
     { id:'bankruptcy', badge:'💸', title:'债务深渊', desc:'你破产了。网贷、房贷、信用卡——债务像雪球一样越滚越大。\n\n催收电话从早打到晚，你的通讯录好友都收到了短信。你上了征信黑名单，坐不了高铁，买不了机票。\n\n"贫穷限制了我的想象力，债务限制了我的一切。"\n\n但你没有放弃。你还年轻，还可以重新开始。\n\n（个人破产不是终点，是重新开始的起点。）', cond: g => g.money<=-100000 },
     { id:'jail', badge:'🔒', title:'铁窗泪', desc:'你因为一时糊涂犯了法。也许是帮人"走账"变成了洗钱，也许是副业踩了法律红线。\n\n你站在法庭上，法官宣读判决书的时候，你妈在旁听席上哭了。\n\n"法律面前人人平等，但蹲监狱的人不平等。"\n\n你在里面学会了缝纫和做饭。出来后你发现：有案底的人，连外卖平台都不让你注册。', cond: g => g.flags.committedCrime },
     // --- NEGATIVE ---
-    { id:'burnout', badge:'🔥', title:'过劳人生', desc:'你的身体终于扛不住了。长期996、熬夜、吃外卖——体检报告比简历还厚。\n\n医生说："你需要休息。"你苦笑：休息？在这个城市是奢侈品。\n\n"身体是革命的本钱——但打工人的本钱，早就不够了。"', cond: g => g.health<=15 },
+    { id:'burnout_v2', badge:'🔥', title:'过劳人生', desc:'你的身体终于扛不住了。长期996、熬夜、吃外卖——体检报告比简历还厚。\n\n医生说："你需要休息。"你苦笑：休息？在这个城市是奢侈品。\n\n"身体是革命的本钱——但打工人的本钱，早就不够了。"', cond: g => g.health<=15 },
     { id:'depression', badge:'🌧️', title:'至暗时刻', desc:'你抑郁了。不是因为某一件事，而是所有事的叠加。\n\n但你拨打了心理热线：400-161-9995。\n\n"你已经很勇敢了。"\n\n你哭了一场，然后洗了把脸。明天又是新的一天。\n\n（求助不是软弱，活着就是胜利。）', cond: g => g.mood<=10 },
     { id:'startup_fail', badge:'💔', title:'创业失败', desc:'你的公司倒闭了。赔光了积蓄，欠了一屁股债。\n\n但你知道：创业失败不丢人，不敢创业才丢人。（虽然你现在觉得这是毒鸡汤。）\n\n你打开招聘App重新投简历。至少简历上多了"联合创始人"。', cond: g => g.flags.entrepreneur && g.money<=-30000 },
-    { id:'influencer_scandal', badge:'📉', title:'网红翻车', desc:'你成了网红，然后又翻车了。\n\n也许是说错了话，也许是被扒出了黑历史，也许只是算法不再推荐你。\n\n粉丝从10万跌到1万，评论区从"家人们"变成了"取关了"。\n\n你发了条道歉视频，播放量还没你的道歉信字数多。\n\n"互联网没有记忆，但互联网有截图。"\n\n你开始理解：流量是借来的，迟早要还。', cond: g => g.flags.influencer && g.charm<30 && g.mood<30 },
+    { id:'influencer_scandal_v2', badge:'📉', title:'网红翻车', desc:'你成了网红，然后又翻车了。\n\n也许是说错了话，也许是被扒出了黑历史，也许只是算法不再推荐你。\n\n粉丝从10万跌到1万，评论区从"家人们"变成了"取关了"。\n\n你发了条道歉视频，播放量还没你的道歉信字数多。\n\n"互联网没有记忆，但互联网有截图。"\n\n你开始理解：流量是借来的，迟早要还。', cond: g => g.flags.influencer && g.charm<30 && g.mood<30 },
     // --- POSITIVE (most specific first) ---
     { id:'fire', badge:'🌟', title:'FIRE人生', desc:'你实现了财务自由，提前退休了。在大理买了栋小房子，种花养狗。\n\n"少吃外卖，少喝奶茶，少看直播——省下来的钱够你提前退休了。"\n\n（其实是因为你运气好。）', cond: g => g.money>=500000 && g.mood>=70 && g.health>=60 },
     { id:'executive', badge:'👔', title:'大厂高管', desc:'你从初级做到了技术VP。工牌从绿色变成了金色，办公室从工位变成了独立间。\n\n但头发从浓密变成了稀疏，颈椎从正常变成了C5-C6突出。\n\n你用健康换了财富，现在想用财富换健康。', cond: g => g.jobSalary>=50000 && g.money>=300000 },
@@ -10975,7 +11065,7 @@ const ENDINGS = [
     { id:'investment_guru', badge:'📈', title:'投资达人', desc:'你从韭菜变成了投资达人。股票、基金、房产——你都有了。\n\n但你知道，运气占了80%。剩下的20%，是你用无数个失眠的夜晚换来的。\n\n"投资有风险，入市需谨慎。但你已经入局了。"', cond: g => g.flags.invested && g.money>=200000 && g.intel>=70 },
     { id:'lying_flat_end', badge:'🛋️', title:'躺平人生', desc:'你选择了躺平。不卷了，不拼了，不争了。\n\n你在郊区租了个小房子，种花养猫，偶尔打零工。\n\n有人说你是loser，有人说你是智者。你不在乎。\n\n"人生不是赛道，是旷野。你选择了自己的路。"', cond: g => g.flags.lyingFlat && g.mood>=65 && g.health>=60 && g.age>=30 },
     { id:'divorced_life', badge:'💔', title:'围城之外', desc:'你离婚了。不是失败，是选择。\n\n你重新开始一个人的生活。周末约朋友，工作日加班，偶尔相亲。\n\n你发现：离婚不是终点，是另一种开始。\n\n"婚姻不是人生的必选项。幸福才是。"', cond: g => g.flags.divorced && g.mood>=50 && g.age>=35 },
-    { id:'digital_nomad', badge:'🌍', title:'数字游民', desc:'你成了数字游民。一边旅行一边工作，今天在清迈，下个月在巴厘岛。\n\n你的办公室是咖啡厅，你的同事是WiFi。\n\n"不是逃离，是选择另一种活法。"\n\n你在朋友圈发了张海边的照片，配文："这才是生活。"\n\n虽然你偶尔也会想念大城市的便利和熟悉。', cond: g => g.flags.lyingFlat && g.money>=80000 && g.intel>=65 && g.charm>=55 && g.age>=28 && g.age<=40 },
+    { id:'digital_nomad_v2_v2_fix', badge:'🌍', title:'数字游民', desc:'你成了数字游民。一边旅行一边工作，今天在清迈，下个月在巴厘岛。\n\n你的办公室是咖啡厅，你的同事是WiFi。\n\n"不是逃离，是选择另一种活法。"\n\n你在朋友圈发了张海边的照片，配文："这才是生活。"\n\n虽然你偶尔也会想念大城市的便利和熟悉。', cond: g => g.flags.lyingFlat && g.money>=80000 && g.intel>=65 && g.charm>=55 && g.age>=28 && g.age<=40 },
     { id:'freelancer_end', badge:'💻', title:'自由职业者', desc:'你成了自由职业者。没有老板，没有打卡，没有固定收入。\n\n有时候一个月赚5万，有时候三个月没单子。\n\n但你享受这种自由：想接就接，想休息就休息。\n\n"自由职业不是不工作，是为自己工作。"', cond: g => g.flags.sideHustle && g.intel>=60 && g.money>=50000 && g.age>=30 },
     { id:'teacher_end', badge:'👨‍🏫', title:'教育培训师', desc:'你转型做了教育培训师。教孩子编程，教成人英语，教职场新人沟通技巧。\n\n虽然收入不如大厂，但你觉得有意义。\n\n"教育的本质是一棵树摇动另一棵树，一朵云推动另一朵云。"', cond: g => g.intel>=75 && g.social>=50 && g.mood>=55 && g.age>=30 },
     { id:'small_business', badge:'🏪', title:'小店老板', desc:'你开了家小店——也许是咖啡厅，也许是花店，也许是书店。\n\n没有996，但有7×24。你既是老板也是员工。\n\n但你享受这种踏实感：每天开门营业，看到熟客微笑。\n\n"开一家小店，是很多人的梦想。你把它变成了现实。"', cond: g => g.flags.entrepreneur && g.money>=30000 && g.mood>=50 && g.age>=32 },
@@ -10988,8 +11078,8 @@ const ENDINGS = [
     // --- v2.19 NEW ENDINGS ---
     { id:'health_guru', badge:'🏃', title:'健康达人', desc:'你把健康放在了第一位。规律作息、健康饮食、坚持运动。\n\n你的体检报告比简历还漂亮。同事们都说你"越活越年轻"。\n\n你用行动证明：健康不是投资，是习惯。\n\n"身体是革命的本钱——你是最富有的人。"', cond: g => g.health>=90 && g.flags.healthyLifestyle && g.age>=35 },
     { id:'side_hustle_king', badge:'💡', title:'副业达人', desc:'你的副业收入超过了主业。从独立开发到内容创作，你成了真正的"斜杠青年"。\n\n白天上班摸鱼，晚上副业赚钱。你找到了属于自己的节奏。\n\n有人说你不务正业，但你知道：多条路，多个选择。\n\n"主业是生存，副业是生活。你两者都兼顾了。"', cond: g => g.flags.sideHustle && g.money>=150000 && g.intel>=70 && g.age>=30 },
-    { id:'burnout_recovery', badge:'🌱', title:'浴火重生', desc:'你曾经差点过劳死，但你选择了改变。\n\n你辞掉了高薪但高压的工作，找了一份能平衡生活的工作。\n\n现在的你：准点下班，周末爬山，晚上陪家人。\n\n"人生不是百米冲刺，是马拉松。你学会了配速。"', cond: g => g.health>=70 && g.mood>=70 && g.flags.healthyLifestyle && g.age>=40 && g.consecutiveOvertime===0 },
-    { id:'pet_parent', badge:'🐾', title:'铲屎官人生', desc:'你和你的宠物成了最好的朋友。\n\n每天下班回家，它都在门口等你。周末你们一起窝在沙发上，你看剧，它睡觉。\n\n有人说："养宠物不如养孩子。"但你知道：它不会叛逆，不会催婚，不会借钱。\n\n"有猫/狗的人生，是最好的人生。"', cond: g => g.flags.hasPet && g.mood>=65 && g.relationships.partner<50 && g.age>=30 },
+    { id:'burnout_recovery_v2', badge:'🌱', title:'浴火重生', desc:'你曾经差点过劳死，但你选择了改变。\n\n你辞掉了高薪但高压的工作，找了一份能平衡生活的工作。\n\n现在的你：准点下班，周末爬山，晚上陪家人。\n\n"人生不是百米冲刺，是马拉松。你学会了配速。"', cond: g => g.health>=70 && g.mood>=70 && g.flags.healthyLifestyle && g.age>=40 && g.consecutiveOvertime===0 },
+    { id:'pet_parent_v2_v2', badge:'🐾', title:'铲屎官人生', desc:'你和你的宠物成了最好的朋友。\n\n每天下班回家，它都在门口等你。周末你们一起窝在沙发上，你看剧，它睡觉。\n\n有人说："养宠物不如养孩子。"但你知道：它不会叛逆，不会催婚，不会借钱。\n\n"有猫/狗的人生，是最好的人生。"', cond: g => g.flags.hasPet && g.mood>=65 && g.relationships.partner<50 && g.age>=30 },
     // --- v2.21 NEW ENDINGS ---
     { id:'mortgage_default_end', badge:'🏚️', title:'断供人生', desc:'你的房子被银行收走了。你从有房一族变回了租客。\n\n你搬出小区的那天，回头看了一眼：那个你曾经以为属于你，但永远不属于你的家。\n\n"房子是租的，但生活不是——虽然有时候生活也是租的。"\n\n你重新开始攒钱，重新开始生活。至少，你不用再还房贷了。', cond: g => g.flags.mortgageDefault && g.flags.hasHouse===false && g.money<-50000 && g.age>=30 },
     { id:'full_time_child_end', badge:'🏠', title:'全职儿女', desc:'你选择了回家，做爸妈的"全职儿女"。\n\n你帮他们做饭、打扫、陪他们聊天。你妈说："你回来就好，妈养你。"\n\n有人说你是啃老，有人说你是gap。你不在乎。\n\n"不是每个人都要在大城市拼命。回家，也是一种选择。"\n\n你找到了属于自己的节奏：慢一点，暖一点。', cond: g => g.flags.fullTimeChild && g.flags.lyingFlat && g.relationships.family>=75 && g.mood>=60 && g.age>=28 },
@@ -10998,7 +11088,7 @@ const ENDINGS = [
     { id:'digital_nomad_senior', badge:'🌏', title:'数字游民（资深）', desc:'你成了资深数字游民。你的办公室是全世界：清迈、巴厘岛、里斯本、墨西哥城。\n\n你的收入是美元，你的生活成本是泰铢，你的朋友圈是全球。\n\n"不是逃离，是选择另一种活法——一种不被国界限制的活法。"\n\n你在Instagram上发了张海边的照片，配文："Office for today."\n\n虽然你偶尔也会想念家乡的火锅和父母的唠叨。', cond: g => g.flags.lyingFlat && g.flags.freelancer && g.money>=120000 && g.intel>=70 && g.charm>=60 && g.age>=30 && g.age<=42 },
     // --- v2.25 NEW ENDINGS ---
     { id:'social_influencer_end', badge:'🌟', title:'社会活动家', desc:'你从打工人变成了社会活动家。你关注劳工权益、性别平等、环境保护。\n\n你在微博上有50万粉丝，你的每一次发声都能引发讨论。\n\n有人说你是"公知"，有人说你是"圣母"。你不在乎。\n\n"改变世界太难，但发出声音是每个人的权利。"\n\n你知道：声音汇聚起来，就是力量。', cond: g => g.social>=85 && g.intel>=75 && g.charm>=70 && g.flags.volunteer && g.age>=30 },
-    { id:'minimalist_life', badge:'📦', title:'极简主义者', desc:'你选择了极简生活。你的家当只有：\n\n- 一个背包\n- 3套衣服\n- 一台笔记本\n- 几本书\n\n你卖掉了所有"多余"的东西。你的朋友说你疯了，但你觉得前所未有的轻松。\n\n"拥有越少，自由越多。"\n\n你终于明白：幸福不是拥有更多，而是需要更少。', cond: g => g.flags.minimalist && g.flags.digitalDetox && g.mood>=70 && g.money>=30000 && g.age>=30 },
+    { id:'minimalist_life_v2_v2', badge:'📦', title:'极简主义者', desc:'你选择了极简生活。你的家当只有：\n\n- 一个背包\n- 3套衣服\n- 一台笔记本\n- 几本书\n\n你卖掉了所有"多余"的东西。你的朋友说你疯了，但你觉得前所未有的轻松。\n\n"拥有越少，自由越多。"\n\n你终于明白：幸福不是拥有更多，而是需要更少。', cond: g => g.flags.minimalist && g.flags.digitalDetox && g.mood>=70 && g.money>=30000 && g.age>=30 },
     { id:'mentor_end', badge:'🎓', title:'人生导师', desc:'你成了很多年轻人的导师。你在知乎写回答，在B站做视频，在播客分享经验。\n\n你的口头禅是："我走过的弯路，你不必再走。"\n\n有人给你留言："谢谢你，让我少走了3年弯路。"\n\n你笑了：其实你走过的弯路，比任何人都多。\n\n"教育的本质是一棵树摇动另一棵树——你摇动了很多树。"', cond: g => g.intel>=80 && g.social>=65 && g.flags.teacher && g.age>=35 && g.months>=60 },
     { id:'community_builder', badge:'🏘️', title:'社区营造者', desc:'你在大城市建了一个"小社区"。你组织了读书会、跑步团、志愿者团队。\n\n你的微信群有500人，每个人都认识你，你也认识每个人。\n\n有人说："你让这座城市有了温度。"\n\n你笑了：其实你只是不想一个人孤独。\n\n"社区不是地理概念，是人与人的连接。"', cond: g => g.social>=80 && g.relationships.friends>=75 && g.flags.volunteer && g.mood>=65 && g.age>=32 },
     { id:'slow_life', badge:'🐌', title:'慢生活家', desc:'你选择了慢生活。你不加班、不社交、不内卷。\n\n你每天的生活：\n- 7点起床，做早餐\n- 8点上班，准点下班\n- 6点做饭，散步\n- 10点睡觉\n\n有人说你"没有上进心"，你说："我只是选择了不同的节奏。"\n\n"慢生活不是懒惰，是清醒。"', cond: g => g.flags.lyingFlat && g.flags.healthyLifestyle && g.health>=75 && g.mood>=70 && g.age>=33 },
@@ -11006,7 +11096,7 @@ const ENDINGS = [
     { id:'scam_victim', badge:'🎭', title:'杀猪盘受害者', desc:'你被杀猪盘骗了。不只是钱，还有感情。\n\n你把积蓄都投了进去，对方消失后你才发现：那些甜言蜜语，都是话术。\n\n你报了警，但钱追不回来了。你删掉了交友App，删掉了聊天记录，但删不掉那段记忆。\n\n"你以为遇到了真爱，其实遇到了KPI。"\n\n你开始告诉每一个朋友：天上不会掉馅饼，更不会掉真爱。\n\n（如果你或身边的人遭遇诈骗，请拨打反诈热线：96110）', cond: g => g.flags.romanceScam && g.money<-30000 },
     { id:'anti_fraud_hero', badge:'🛡️', title:'反诈达人', desc:'你不仅识破了杀猪盘，还成了反诈志愿者。\n\n你在社区做反诈宣传，帮老年人识别电信诈骗，在朋友圈科普各种骗局。\n\n有人说你"管太多"，但你知道：每多一个人识破骗局，就少一个受害者。\n\n"防人之心不可无——在这个时代，防人之心要升级。"', cond: g => g.flags.antiFraud && g.social>=60 && g.age>=30 },
     { id:'career_pivot', badge:'🔄', title:'华丽转身', desc:'35岁那年，你成功转型了。\n\n你没有被年龄焦虑打败，而是找到了新的赛道。也许是管理岗，也许是技术专家，也许是完全不同的领域。\n\n你的经验成了优势，而不是包袱。\n\n"35岁不是终点，是另一个起点——前提是你准备好了。"', cond: g => g.flags.age35Crisis && g.flags.careerTransition && g.jobSalary>=20000 && g.age>=38 },
-    { id:'sandwich_generation', badge:'🥪', title:'三明治一代', desc:'你上有老、下有小，你是全家的顶梁柱。\n\n父母的医药费、孩子的学费、房贷车贷——每一笔都压在你肩上。\n\n你不敢生病，不敢辞职，不敢休息。\n\n但你看着孩子的笑脸、父母的健康，你觉得一切都值了。\n\n"三明治虽然被夹在中间，但它是最有料的那一个。"', cond: g => g.flags.parentIllness && g.flags.hasChild && g.flags.married && g.age>=38 && g.mood>=50 },
+    { id:'sandwich_generation_v2', badge:'🥪', title:'三明治一代', desc:'你上有老、下有小，你是全家的顶梁柱。\n\n父母的医药费、孩子的学费、房贷车贷——每一笔都压在你肩上。\n\n你不敢生病，不敢辞职，不敢休息。\n\n但你看着孩子的笑脸、父母的健康，你觉得一切都值了。\n\n"三明治虽然被夹在中间，但它是最有料的那一个。"', cond: g => g.flags.parentIllness && g.flags.hasChild && g.flags.married && g.age>=38 && g.mood>=50 },
     { id:'phoenix_rising', badge:'🔥', title:'浴火凤凰', desc:'你经历了人生最黑暗的时刻——也许是破产，也许是失业，也许是失去亲人。\n\n但你没有倒下。你一步一步地爬了起来，重新开始。\n\n现在的你：更坚强、更清醒、更珍惜当下。\n\n"人不是被打败的。一个人可以被毁灭，但不能被打败。"\n\n你成了别人眼中的"传奇"——不是因为成功，而是因为不放弃。', cond: g => (g.flags.romanceScam || g.flags.mortgageDefault || g.flags.parentIllness) && g.money>=50000 && g.mood>=65 && g.health>=60 && g.age>=40 },
     // --- v2.34 NEW ENDINGS ---
     { id:'workplace_legend', badge:'👑', title:'职场传奇', desc:'你从职场小白做到了行业大佬。\n\n你的LinkedIn有5万粉丝，你的每一次跳槽都上了新闻。猎头不是找你谈offer，是找你谈合作。\n\n有人说你"运气好"，但你知道：运气是准备遇到了机会。\n\n"职场没有天花板，只有你不敢想的楼层。"', cond: g => g.jobSalary>=40000 && g.intel>=80 && g.social>=70 && g.months>=96 && g.age>=35 },
@@ -11033,7 +11123,7 @@ const ENDINGS = [
     // --- v2.39 ENDINGS ---
     { id:'city_hopper', badge:'🗺️', title:'城市探索者', desc:'你在多个大城市生活过，体验了不同的城市文化。\n\n你发现：没有完美的城市，只有适合你的城市。\n\n"旅行的意义不是去更多地方，是在每个地方都认真生活。"', cond: g => g.flags.citySwitch && g.months>=60 && g.charm>=65 && g.social>=55 && g.age>=30 },
     { id:'lifelong_learner', badge:'📖', title:'终身学习者', desc:'你从未停止学习。\n\n你学了新技能、读了很多书、保持了思考的习惯。\n\n你没有成为专家，但你成为了一个有深度的人。\n\n"学习不是为了知道答案，是为了提出更好的问题。"', cond: g => g.flags.learnNewSkill && g.intel>=85 && g.mood>=65 && g.age>=35 },
-    { id:'filial_child', badge:'👨‍👩‍👦', title:'孝顺子女', desc:'你在打拼事业的同时，也照顾好了父母。\n\n你经常回家看他们，给他们买保险，带他们体检。\n\n"孝顺不是给多少钱，是让父母知道你心里有他们。"', cond: g => (g.flags.parentHealthIssue || g.flags.hometownVisit) && (g.relationships && g.relationships.family>=80) && g.mood>=70 && g.age>=35 },
+    { id:'filial_child_v2_v2', badge:'👨‍👩‍👦', title:'孝顺子女', desc:'你在打拼事业的同时，也照顾好了父母。\n\n你经常回家看他们，给他们买保险，带他们体检。\n\n"孝顺不是给多少钱，是让父母知道你心里有他们。"', cond: g => (g.flags.parentHealthIssue || g.flags.hometownVisit) && (g.relationships && g.relationships.family>=80) && g.mood>=70 && g.age>=35 },
     // --- v2.40 ENDINGS ---
     { id:'lottery_winner_end', badge:'🎰', title:'彩票幸运儿', desc:'你真的中了彩票！\n\n虽然不是头奖，但也够你潇洒一阵子了。\n\n你没有辞职，没有炫富，只是默默地把钱存了起来。\n\n"运气是实力的一部分——但你这次，纯粹是运气。"', cond: g => g.flags.lotteryWin && g.money>=50000 && g.age>=28 },
     { id:'accidental_influencer', badge:'⭐', title:'意外网红', desc:'你的一条动态火了，你成了"15分钟名人"。\n\n你没有成为大V，但你体验了被关注的感觉。\n\n你明白了一个道理：名气是暂时的，真实的生活才是永恒的。\n\n"走红不是目的，是副产品。"', cond: g => g.flags.socialMediaFame && g.charm>=70 && g.social>=65 && g.age>=28 },
@@ -11055,9 +11145,9 @@ const ENDINGS = [
     { id:'civil_servant_end', badge:'📋', title:'体制内人生', desc:'你考上了公务员，成了"体制内"的人。\n\n工资不高不低，朝九晚五，稳定得让人安心。\n\n你妈终于不再催你找工作了。你的朋友圈从"加班打卡"变成了"养生茶推荐"。\n\n"体制内不是围城，是避风港。"', cond: g => g.flags.civilServant && g.mood >= 60 && g.age >= 28 },
     { id:'educated_end', badge:'🎓', title:'终身学习者', desc:'你从未停止学习。\n\n从考证到读研，从线上课程到线下沙龙。你的简历越来越长，你的视野越来越宽。\n\n你不确定学习能不能改变命运，但你知道：不学习一定不能。\n\n"学无止境——这不是鸡汤，是生存策略。"', cond: g => g.flags.hasMBA && g.flags.hasCertificate && g.intel >= 85 },
     // --- v10.2 NEW ENDINGS ---
-    { id:'burnout_recovery_v2', badge:'🌱', title:'浴火重生', desc:'你经历了职业倦怠，但你挺过来了。\n\n你看心理咨询师、学冥想、换工作、重新找到生活的节奏。\n\n你比以前更懂得照顾自己，也更懂得拒绝不合理的要求。\n\n"不是所有的跌倒都叫失败，有些叫成长。"', cond: g => g.flags.sawTherapist && g.mood >= 65 && g.health >= 60 && g.age >= 30 },
+    { id:'burnout_recovery_v2_v2', badge:'🌱', title:'浴火重生', desc:'你经历了职业倦怠，但你挺过来了。\n\n你看心理咨询师、学冥想、换工作、重新找到生活的节奏。\n\n你比以前更懂得照顾自己，也更懂得拒绝不合理的要求。\n\n"不是所有的跌倒都叫失败，有些叫成长。"', cond: g => g.flags.sawTherapist && g.mood >= 65 && g.health >= 60 && g.age >= 30 },
     { id:'simple_life_end', badge:'🌿', title:'简单生活', desc:'你没有成为有钱人，也没有成为名人。\n\n但你学会了做饭、养花、散步、看书。你有一个小圈子的好朋友，有一只猫，有一份还行的工作。\n\n你终于明白：幸福不在于拥有多少，而在于享受当下。\n\n"简单生活不是平庸，是选择。"', cond: g => g.flags.cookingSkill && g.flags.hasPet && g.mood >= 60 && g.health >= 55 && g.age >= 32 },
-    { id:'hometown_return', badge:'🏡', title:'回乡发展', desc:'你终于回到了老家。\n\n没有了大城市的繁华，也没有了大城市的压力。你在老家找了份工作，买了个小房子。\n\n你妈高兴得合不拢嘴。你爸偷偷在邻居面前炫耀："我孩子回来了。"\n\n"回家不是认输，是另一种勇敢。"', cond: g => g.flags.midlifeChange && g.money >= 20000 && g.age >= 33 && g.social >= 40 },
+    { id:'hometown_return_v2', badge:'🏡', title:'回乡发展', desc:'你终于回到了老家。\n\n没有了大城市的繁华，也没有了大城市的压力。你在老家找了份工作，买了个小房子。\n\n你妈高兴得合不拢嘴。你爸偷偷在邻居面前炫耀："我孩子回来了。"\n\n"回家不是认输，是另一种勇敢。"', cond: g => g.flags.midlifeChange && g.money >= 20000 && g.age >= 33 && g.social >= 40 },
     // --- v10.3 NEW ENDINGS ---
     { id:'dink_end', badge:'🍷', title:'丁克人生', desc:'你和TA选择了不要孩子。\n\n你们把省下来的钱用来旅行、学习、享受生活。周末睡到自然醒，假期想去哪就去哪。\n\n有人说你们自私，有人说你们潇洒。但你知道，这只是你们的选择——一个不需要向任何人解释的选择。\n\n"不是所有人都需要成为父母，有些人选择成为自己。"', cond: g => g.flags.dink && g.age >= 38 && g.mood >= 60 },
     { id:'super_parent_end', badge:'👨‍👩‍👧‍👦', title:'超级父母', desc:'你在大城市养大了一个孩子。\n\n从幼儿园到小学，从兴趣班到家长会，你在工作与家庭之间疲于奔命。\n\n但当你看到孩子画了一幅画，上面写着"爸爸/妈妈最棒"的时候——你觉得一切都值了。\n\n"父母是世上最难的职业，没有培训，没有工资，没有休假。但你甘之如饴。"', cond: g => g.flags.hasChild && g.mood >= 65 && g.age >= 35 && g.money >= -10000 },
@@ -11076,7 +11166,7 @@ const ENDINGS = [
     { id:'novelist_end', badge:'✍️', title:'网文作家', desc:'你写的小说终于有人看了。\n\n从0个读者到100个，从100个到10000个。你的故事被更多人看到。\n\n有人说你写得好，有人说你写得烂。但你知道：重要的不是评价，是你一直在写。\n\n"每个作家都是从无人问津开始的——区别是你有没有坚持下去。"', cond: g => g.flags.webNovelist && g.charm >= 50 && g.intel >= 60 && g.months > 36 },
     { id:'traveler_end', badge:'✈️', title:'行走的风景', desc:'你走遍了大半个中国。\n\n从大理到丽江，从厦门到成都，从西安到拉萨。\n\n你在每个城市都留下了照片和故事。你的朋友圈是一本旅行日记。\n\n"旅行不会改变世界，但会改变看世界的你。"', cond: g => g.flags.spontaneousTrip && g.charm >= 45 && g.mood >= 60 && g.age >= 28 },
     // --- v10.7 NEW ENDINGS ---
-    { id:'digital_minimalist', badge:'📵', title:'数字极简主义者', desc:'你学会了放下手机。\n\n你关闭了朋友圈通知，卸载了三个购物App，把屏幕时间控制在每天2小时以内。\n\n你开始有更多的时间看书、运动、和朋友面对面聊天。\n\n"放下手机不是与世界断联，是与自己重新连接。"', cond: g => g.flags.digitalDetox && g.flags.closedMoments && g.mood >= 65 && g.health >= 55 },
+    { id:'digital_minimalist_v2', badge:'📵', title:'数字极简主义者', desc:'你学会了放下手机。\n\n你关闭了朋友圈通知，卸载了三个购物App，把屏幕时间控制在每天2小时以内。\n\n你开始有更多的时间看书、运动、和朋友面对面聊天。\n\n"放下手机不是与世界断联，是与自己重新连接。"', cond: g => g.flags.digitalDetox && g.flags.closedMoments && g.mood >= 65 && g.health >= 55 },
     { id:'healed_heart', badge:'💚', title:'治愈之心', desc:'你经历了人生的低谷，但你走出来了。\n\n你看了心理咨询师，学会了和自己和解。你不再逃避情绪，而是面对它、理解它。\n\n你在日记里写道："我不需要完美，我只需要真实。"\n\n"治愈不是忘记伤痛，是学会带着伤痛继续前行。"', cond: g => g.flags.sawTherapist && g.mood >= 65 && g.age >= 26 },
     { id:'podcaster_end', badge:'🎧', title:'声音的旅人', desc:'你开了一档播客。\n\n从0个听众到100个，从100个到10000个。你在麦克风前聊生活、聊工作、聊那些没人敢说的真话。\n\n有听众说："你的节目陪我度过了最难的时候。"\n\n"声音是最温暖的媒介——你听不到我的表情，但你能听到我的心。"', cond: g => g.flags.podcaster && g.charm >= 50 && g.social >= 50 && g.months > 24 },
     // --- v10.8 NEW ENDINGS ---
