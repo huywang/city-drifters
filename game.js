@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v11.8
+// 都市浮生记 - Game Engine v11.9
 // ============================================
 
 // === GAME STATE ===
@@ -5737,6 +5737,87 @@ const EVENTS = [
         { label:'继续打磨', hint:'+🧠', fn: g => { g.flags.shortDramaCreator=true; return{intel:8,mood:5}; }},
         { label:'算了吧', hint:'', fn: g => { return{mood:-3}; }},
       ]},
+    // === v11.9 中年觉醒 + 人生转折 + 深层情感 ===
+    { id:'parents_aging', icon:'👴', title:'父母老了',
+      body:'过年回家，你第一次发现：爸爸的头发白了大半。妈妈走路开始慢了。冰箱里全是你小时候爱吃的东西——他们记不住新菜了。\n\n你帮妈妈看手机，发现她的字体调到了最大号。你帮爸爸看体检报告，发现好几项指标后面都有箭头。\n\n走的时候，妈妈站在门口看你上车。你在后视镜里看到她在擦眼泪。\n\n你突然意识到：你每次回家，都是见一面少一面。\n\n"父母在，人生尚有来处。父母去，人生只剩归途。"',
+      cond: g => g.age >= 30 && g.months > 24 && !g.flags.parentsAging,
+      choices:[
+        { label:'多回家看看', hint:'+👥❤️ -💰', fn: g => { g.flags.parentsAging=true; return{social:5,mood:-5,money:-2000}; }},
+        { label:'给父母买保险', hint:'-💰💰 +👥', fn: g => { g.flags.parentsAging=true; g.flags.parentInsurance=true; return{money:-8000,social:5,mood:3}; }},
+        { label:'视频通话', hint:'+👥', fn: g => { g.flags.parentsAging=true; return{social:3,mood:-3}; }},
+      ]},
+    { id:'reunion_gap', icon:'🍻', title:'十年同学聚会',
+      body:'大学同学聚会。十年没见了。\n\n当年睡你上铺的兄弟，现在是一家上市公司的CTO。当年追你的女生，嫁了一个富二代。当年最不起眼的那个人，开了三家奶茶店。\n\n而你——还是一个月薪两万的打工人。\n\n有人问：「你现在在哪高就？」你笑着说了一个公司名字，对方一脸茫然。\n\n酒过三巡，大家不再比较了。有人喝醉了哭，说「我好累」。有人说「我想离婚」。有人说「我上个月被裁了」。\n\n原来每个人都在装。装得很好。\n\n"同学聚会不是为了炫耀——是为了确认：原来大家都过得不容易。"',
+      cond: g => g.age >= 30 && g.age <= 40 && g.social >= 30,
+      choices:[
+        { label:'真诚交流', hint:'+👥 +😊', fn: g => { g.flags.classReunion=true; return{social:10,mood:5}; }},
+        { label:'找机会合作', hint:'+💰 +👥', fn: g => { g.flags.classReunion=true; return{money:3000,social:5}; }},
+        { label:'再也不去了', hint:'+🧠', fn: g => { g.flags.classReunion=true; return{intel:3,mood:-5}; }},
+      ]},
+    { id:'health_report', icon:'🏥', title:'体检报告',
+      body:'公司年度体检。你拿到报告，翻到异常项：\n\n血脂偏高 ↑\n尿酸偏高 ↑\n颈椎退行性变\n脂肪肝（轻度）\n甲状腺结节（3类）\n\n你才32岁。你的身体已经像一台用了十年的旧电脑——勉强能跑，但到处都是警告弹窗。\n\n医生对你说：「少熬夜、少喝酒、多运动、少吃外卖。」\n\n你点了点头，心里想：你说得对，但我做不到。\n\n"体检报告是成年人最害怕的成绩单——它不骗你。"',
+      cond: g => g.age >= 30 && g.health < 70 && !g.flags.healthReport,
+      choices:[
+        { label:'认真改变', hint:'+❤️❤️ +🧠', fn: g => { g.flags.healthReport=true; return{health:10,intel:3,mood:-3,money:-500}; }},
+        { label:'该咋活咋活', hint:'+😊 -❤️', fn: g => { g.flags.healthReport=true; return{mood:5,health:-5}; }},
+        { label:'买保健品', hint:'-💰', fn: g => { g.flags.healthReport=true; return{money:-2000,health:3,mood:3}; }},
+      ]},
+    { id:'midlife_pivot', icon:'🔄', title:'中年转行',
+      body:'你在大厂干了八年，做到了P7。然后你发现：比你年轻五岁的人也能做到P7，而且他们更能加班。\n\n一个猎头找到你：「有家创业公司想请你做技术合伙人。工资减半，但有期权。」\n\n另一个朋友说：「我在做跨境电商，月入20万。你来不来？」\n\n你老婆/老公说：「别折腾了，房贷还有20年呢。」\n\n你站在人生的十字路口，每个方向都有道理。但你知道：35岁以后，选择会越来越少了。\n\n"中年转行不是勇气——是绝望。因为你发现原来的路，也走不通了。"',
+      cond: g => g.age >= 33 && g.age <= 38 && g.jobSalary >= 15000 && !g.flags.midlifePivot,
+      choices:[
+        { label:'加入创业', hint:'🎲 高风险高回报', fn: g => { g.flags.midlifePivot=true; g.flags.entrepreneur=true; setJob(g,'创业合伙人',8000); return{mood:5,intel:5}; }},
+        { label:'做副业试水', hint:'+💰 +🧠', fn: g => { g.flags.midlifePivot=true; g.flags.sideHustle=true; return{money:-5000,intel:8,mood:3}; }},
+        { label:'稳定最重要', hint:'+😊', fn: g => { g.flags.midlifePivot=true; return{mood:-3}; }},
+      ]},
+    { id:'education_anxiety', icon:'📚', title:'鸡娃还是快乐教育',
+      body:'你的孩子5岁了。你的朋友圈分裂成两个阵营：\n\n阵营A（鸡娃派）：孩子已经学了钢琴、画画、英语、编程、围棋、游泳。每天的时间表排得比CEO还满。\n\n阵营B（快乐教育派）：让孩子自由成长，想玩就玩，想学就学。他们的口头禅是「快乐最重要」。\n\n你的孩子问你：「爸爸/妈妈，为什么小明不用上课？」\n\n你沉默了。你不知道哪种选择是对的。你只知道：你的钱包和焦虑，都在告诉你选A。\n\n"教育焦虑的本质：你怕孩子输在起跑线上——但你忘了，人生不是短跑。"',
+      cond: g => g.flags.hasChild && g.money > 5000 && g.age >= 30,
+      choices:[
+        { label:'鸡娃！', hint:'-💰💰 +🧠', fn: g => { g.flags.tigerParent=true; return{money:-15000,intel:5,mood:-5}; }},
+        { label:'快乐教育', hint:'+😊 +❤️', fn: g => { g.flags.happyEducation=true; return{mood:8,health:3}; }},
+        { label:'适度就好', hint:'平衡之道', fn: g => { return{money:-5000,mood:3,intel:2}; }},
+      ]},
+    { id:'midlife_loneliness', icon:'🌙', title:'中年孤独',
+      body:'周末，你想找人吃饭。打开通讯录，滑了五分钟：\n\nA：上次联系是半年前\nB：上个月约过一次，对方说「下次吧」\nC：最近升职了，估计很忙\nD：已经不在同一个城市了\n\n你合上手机，叫了一份外卖。一个人的那种。\n\n你发了条朋友圈：「周末一个人也挺好的。」三分钟后，你妈评论：「早点找对象/多陪陪家人。」\n\n你删了那条朋友圈。\n\n"中年孤独的真相：不是没人陪你——是每个人都有了自己的生活。"',
+      cond: g => g.age >= 32 && g.social < 50 && g.mood < 60,
+      choices:[
+        { label:'主动联系老朋友', hint:'+👥 +😊', fn: g => { g.flags.midlifeLoneliness=true; return{social:8,mood:8}; }},
+        { label:'享受独处', hint:'+🧠 +😊', fn: g => { g.flags.midlifeLoneliness=true; return{intel:5,mood:5}; }},
+        { label:'养个宠物', hint:'-💰 +❤️', fn: g => { if(!g.flags.hasPet) g.flags.hasPet=true; g.flags.midlifeLoneliness=true; return{money:-2000,mood:10,health:3}; }},
+      ]},
+    { id:'hometown_pull', icon:'🏠', title:'回不去的故乡',
+      body:'你妈打电话来：「你爸身体不太好，你回来看看吧。」\n\n你回了老家。小城变了很多：新修了高铁站，开了几家奶茶店，房价涨到了8000一平。\n\n你的高中同学在老家过得挺好：公务员，有房有车有老婆孩子。他请你吃饭，说：「回来吧，在老家一个月5000，比你在北京一个月2万舒服。」\n\n你站在老家的街头，看着熟悉又陌生的城市，心里五味杂陈。\n\n你知道：你回不来了。不是因为大城市有多好——是因为你已经不是原来的你了。\n\n"故乡是什么？是你拼命想离开，离开后又拼命想回去的地方。"',
+      cond: g => g.age >= 30 && g.months > 36 && !g.flags.hometownPull,
+      choices:[
+        { label:'考虑回乡', hint:'+👥❤️', fn: g => { g.flags.hometownPull=true; g.flags.hometownEntrepreneur=true; return{social:10,mood:5,money:-5000}; }},
+        { label:'留在大城市', hint:'+💰 +🧠', fn: g => { g.flags.hometownPull=true; return{money:2000,intel:3,mood:-5}; }},
+        { label:'两头牵挂', hint:'', fn: g => { g.flags.hometownPull=true; return{mood:-8}; }},
+      ]},
+    { id:'life_review_40', icon:'🪞', title:'四十不惑？',
+      body:'你40岁了。\n\n你坐在阳台上，看着城市的夜景，开始复盘自己的人生：\n\n22岁：大学毕业，满怀梦想\n25岁：第一份工作，月薪5000，觉得很多\n30岁：升了职，加了薪，买了房（或者没买）\n35岁：开始焦虑，开始怀疑\n40岁：……\n\n你不确定自己算成功还是失败。你有了一些东西，也失去了一些东西。你的头发少了，肚子大了，脾气变好了，梦想变小了。\n\n你看着镜子里的自己，说：「还行吧。」\n\n"四十不惑？不，四十更惑了——只是你已经懒得困惑了。"',
+      cond: g => g.age >= 39 && g.age <= 41 && !g.flags.lifeReview40,
+      choices:[
+        { label:'接受自己', hint:'+😊 +✨', fn: g => { g.flags.lifeReview40=true; g.flags.midlifeChange=true; return{mood:15,charm:5}; }},
+        { label:'重新出发', hint:'+🧠 +💰？', fn: g => { g.flags.lifeReview40=true; g.flags.midlifeChange=true; g.flags.midlifeRestart=true; return{intel:10,mood:5,money:-10000}; }},
+        { label:'继续混着', hint:'', fn: g => { g.flags.lifeReview40=true; return{mood:-5}; }},
+      ]},
+    { id:'insurance_claim', icon:'🛡️', title:'第一次用上保险',
+      body:'你住院了。不是什么大病，但手术费加住院费一共3万多。\n\n你躺在病床上，翻出了三年前买的商业保险。当时你妈说：「买这个干嘛，浪费钱。」你说：「以防万一。」\n\n现在，「万一」来了。\n\n保险公司审核通过后，报销了80%。你只需要自付6000块。\n\n你突然觉得三年前的自己特别英明。\n\n"保险是什么？是你花了三年钱骂它没用，然后用一次就觉得值了的东西。"',
+      cond: g => g.age >= 28 && g.flags.hasCommercialInsurance && !g.flags.insuranceClaim,
+      choices:[
+        { label:'庆幸买了', hint:'+😊 +🧠', fn: g => { g.flags.insuranceClaim=true; return{mood:10,intel:3,money:5000}; }},
+        { label:'加购保险', hint:'-💰 +🛡️', fn: g => { g.flags.insuranceClaim=true; return{money:-5000,mood:5}; }},
+        { label:'写攻略分享', hint:'+👥 +✨', fn: g => { g.flags.insuranceClaim=true; return{social:5,charm:3,mood:5}; }},
+      ]},
+    { id:'empty_nest_prepare', icon:'🪺', title:'空巢预备役',
+      body:'你的孩子12岁了，开始有了自己的房间、自己的朋友、自己的秘密。\n\n你发现：他不再缠着你讲故事了。他关上门，戴着耳机，沉浸在自己的世界里。\n\n你想敲门，又缩回了手。\n\n你妈打来电话说：「你小时候也是这样，关上门不理我。」你突然理解了当年你妈的心情。\n\n原来「空巢」不是孩子离开家那天才开始的——是从他关上房门那一刻就开始了。\n\n"父母的爱是一场漫长的告别——你用了十八年教会他离开，然后用余生适应他的离开。"',
+      cond: g => g.flags.hasChild && g.age >= 38 && !g.flags.emptyNestPrep,
+      choices:[
+        { label:'培养自己的爱好', hint:'+😊 +✨', fn: g => { g.flags.emptyNestPrep=true; return{mood:8,charm:5}; }},
+        { label:'珍惜当下', hint:'+❤️ +😊', fn: g => { g.flags.emptyNestPrep=true; return{mood:10,social:5}; }},
+        { label:'提前规划养老', hint:'+🧠', fn: g => { g.flags.emptyNestPrep=true; g.flags.pensionPlan=true; return{intel:5,mood:-3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -6230,6 +6311,14 @@ const ACHIEVEMENTS = [
     { id:'short_drama_fan_ach', icon:'📺', name:'短剧爱好者', desc:'沉迷短剧', check: g => g.flags.shortDramaFan },
     { id:'drama_creator_ach', icon:'🎬', name:'短剧创作者', desc:'拍摄了短剧', check: g => g.flags.shortDramaCreator },
     { id:'digital_vinegar_ach', icon:'🍚', name:'电子榨菜爱好者', desc:'吃饭必须配视频', check: g => g.flags.digitalVinegar },
+    // === v11.9 新增成就 ===
+    { id:'parents_love', icon:'👴', name:'孝顺觉醒', desc:'意识到父母变老了', check: g => g.flags.parentsAging },
+    { id:'class_reunion_ach', icon:'🍻', name:'老友重逢', desc:'参加了同学聚会', check: g => g.flags.classReunion },
+    { id:'health_wakeup', icon:'🏥', name:'健康警钟', desc:'收到异常体检报告', check: g => g.flags.healthReport },
+    { id:'midlife_pivot_ach', icon:'🔄', name:'中年转型', desc:'做出了中年职业转型', check: g => g.flags.midlifePivot },
+    { id:'tiger_parent_ach', icon:'📚', name:'虎妈虎爸v2', desc:'为孩子教育大力投入', check: g => g.flags.tigerParent },
+    { id:'hometown_return', icon:'🏠', name:'思乡之情', desc:'面对回乡还是留下的抉择', check: g => g.flags.hometownPull },
+    { id:'life_reviewer', icon:'🪞', name:'人生复盘者', desc:'在40岁反思了自己的人生', check: g => g.flags.lifeReview40 },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -6387,6 +6476,9 @@ const ENDINGS = [
     // --- v11.8 NEW ENDINGS ---
     { id:'drama_king_end', badge:'🎬', title:'短剧之王', desc:'你从一个普通打工人，变成了一个短剧创作者。\n\n你的短剧《重生之我在大厂当PPT侠》全网播放量破千万。平台给你开了专栏，投资人找上门来。\n\n你辞了职，成立了自己的工作室。虽然只有三个人，但你觉得——这才是你想做的事。\n\n你妈在亲戚面前终于有了新话题：「我儿子/女儿是拍短视频的，月入六位数。」\n\n"内容创业的黄金时代：每个人都可以讲故事，但不是每个故事都能被听见。你幸运地成为了被听见的那一个。"', cond: g => g.flags.shortDramaCreator && g.charm >= 55 && g.money >= 50000 && g.age >= 24 },
     { id:'digital_native_end', badge:'🤖', title:'数字原住民', desc:'你是AI时代的弄潮儿。\n\n你用AI写方案、用AI做PPT、用AI分析数据。你的工作效率是同事的三倍。领导说你是「最有潜力的人」。\n\n但你知道：你不是更有潜力——你只是更会用工具。\n\n你在公司内部分享会上说：「AI不会取代你，但会用AI的人会。」全场鼓掌。\n\n"AI时代的生存法则：不是跟AI比谁更强——是比谁更会用AI。"', cond: g => g.flags.aiPowerUser && g.intel >= 70 && g.jobSalary >= 15000 && g.age >= 24 },
+    // --- v11.9 NEW ENDINGS ---
+    { id:'hometown_return_end', badge:'🏠', title:'归乡', desc:'你回了老家。\n\n你在小城开了一家店，过上了朝九晚五的生活。没有996，没有通勤两小时，没有房租压力。\n\n你的收入少了一半，但你的笑容多了一倍。你可以每天回家吃饭，可以周末陪父母钓鱼，可以看着孩子在院子里疯跑。\n\n你的大城市朋友发微信：「你后悔了吗？」\n\n你回复：「不后悔回来。只后悔没早点回来。」\n\n"回家的路很长——但每一步都离幸福更近。"', cond: g => g.flags.hometownPull && g.flags.hometownEntrepreneur && g.mood >= 60 && g.age >= 33 },
+    { id:'midlife_wisdom_end', badge:'🪞', title:'四十知天命', desc:'你40岁了，终于想明白了一些事。\n\n你不再跟同事比工资，不再跟同学比房子，不再跟朋友圈里的「成功人士」比人生。\n\n你开始接受：自己就是一个普通人。普通的收入、普通的工作、普通的生活。但普通的你，养大了孩子、照顾了父母、没有放弃自己。\n\n你发了一条朋友圈：「40岁，学会了跟自己和解。」\n\n"人生最大的成就不是成为谁——是接受自己是谁。"', cond: g => g.flags.lifeReview40 && g.mood >= 55 && g.age >= 40 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
