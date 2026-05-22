@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v3.3
+// 都市浮生记 - Game Engine v3.4
 // ============================================
 
 // === GAME STATE ===
@@ -2747,6 +2747,32 @@ const EVENTS = [
         { label:'回去上班', hint:'+💰 -😊', fn: g => { g.flags.nomadChallenges=true; setJob(g,'程序员',12000); return{money:5000,mood:-10}; }},
         { label:'继续坚持', hint:'+✨ +😊', fn: g => { g.flags.nomadChallenges=true; return{charm:8,mood:10}; }},
       ]},
+    // === v3.4 EVENTS - 考公考研 ===
+    { id:'exam_vs_grad', icon:'📊', title:'考公vs考研',
+      body:'2026年，国考报名人数（371.8万）首次超过考研报名人数（343万）。\n\n你的同学群里：\n- 小王：考公，第三次了\n- 小李：考研，二战失败\n- 小张：直接工作，后悔没考公\n- 小刘：考公上岸，朋友圈晒工牌\n\n你妈说："考个公务员吧，稳定。"\n你爸说："考个研究生吧，学历高。"\n你说："能不能都别考了？"\n\n"考公考研是年轻人的两条路——但走哪条都不容易。"',
+      cond: g => !g.flags.examVsGrad && g.age>=22 && g.age<=30 && (g.job==='待业中' || g.months<12),
+      choices:[
+        { label:'考公，追求稳定', hint:'-💰 +🧠 🎲', fn: g => { g.flags.examVsGrad=true; if(g.intel>75&&Math.random()>0.6){g.flags.civilServant=true;setJob(g,'公务员',8000);return{mood:30,money:-8000,intel:10}}else{return{mood:-20,money:-8000,intel:5}} }},
+        { label:'考研，提升学历', hint:'-💰 +🧠 🎲', fn: g => { g.flags.examVsGrad=true; if(g.intel>80&&Math.random()>0.5){return{mood:25,money:-15000,intel:20}}else{return{mood:-15,money:-15000,intel:8}} }},
+        { label:'都不考，直接工作', hint:'+💰 +😊', fn: g => { g.flags.examVsGrad=true; setJob(g,'打工人',7000); return{money:3000,mood:10}; }},
+        { label:'边工作边考', hint:'-❤️ +🧠', fn: g => { g.flags.examVsGrad=true; return{health:-10,intel:8,mood:-5}; }},
+      ]},
+    { id:'inside_system', icon:'🏛️', title:'体制内真相',
+      body:'你考上了公务员，终于进入了体制内。\n\n入职第一天：\n- 领导说："年轻人要多学习"（意思是多干活）\n- 同事说："慢慢来，不急"（意思是别太积极）\n- 前辈说："到点就下班"（意思是别卷）\n\n一个月后你发现：\n- 工资不高，但稳定\n- 工作不累，但无聊\n- 福利很好，但晋升很慢\n\n"体制内不是天堂，也不是地狱——是一种选择。"',
+      cond: g => g.flags.civilServant && !g.flags.insideSystem && g.months>=3,
+      choices:[
+        { label:'适应体制内生活', hint:'+😊 +🧠', fn: g => { g.flags.insideSystem=true; return{mood:10,intel:5}; }},
+        { label:'寻找体制外的机会', hint:'+💰 +✨', fn: g => { g.flags.insideSystem=true; g.flags.sideHustle='system'; return{money:3000,charm:8}; }},
+        { label:'后悔了，想辞职', hint:'+😊 -💰', fn: g => { g.flags.insideSystem=true; setJob(g,'待业中',0); return{mood:15,money:-5000}; }},
+      ]},
+    { id:'grad_school_reality', icon:'🎓', title:'读研真相',
+      body:'你考上了研究生，开始了三年的学术生涯。\n\n第一年：上课、看论文、帮导师打杂\n第二年：做实验、写论文、被导师批评\n第三年：找工作、写毕业论文、焦虑\n\n你发现：\n- 导师把你当免费劳动力\n- 同学都在卷实习\n- 毕业要求越来越高\n\n你开始怀疑：读研到底值不值？\n\n"读研不是逃避工作的港湾，是另一场内卷的开始。"',
+      cond: g => !g.flags.gradSchool && g.age>=22 && g.age<=28 && g.intel>=75 && Math.random()>0.5,
+      choices:[
+        { label:'坚持读完', hint:'+🧠 -😊', fn: g => { g.flags.gradSchool=true; return{intel:20,mood:-10}; }},
+        { label:'边读边实习', hint:'+🧠 +💰 -❤️', fn: g => { g.flags.gradSchool=true; return{intel:15,money:5000,health:-8}; }},
+        { label:'退学，直接工作', hint:'+💰 -🧠', fn: g => { g.flags.gradSchool=true; setJob(g,'打工人',8000); return{money:5000,intel:-5,mood:5}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -2808,6 +2834,9 @@ const ACHIEVEMENTS = [
     { id:'fire_veteran', icon:'💼', name:'FIRE归来者', desc:'FIRE后又回来上班', check: g => g.flags.fireReality },
     { id:'digital_nomad_life', icon:'🌍', name:'数字游民', desc:'成为数字游民', check: g => g.flags.digitalNomad },
     { id:'nomad_survivor', icon:'😔', name:'游民幸存者', desc:'度过数字游民困境', check: g => g.flags.nomadChallenges },
+    { id:'exam_choice', icon:'📊', name:'考公考研选择者', desc:'面对人生选择', check: g => g.flags.examVsGrad },
+    { id:'system_insider', icon:'🏛️', name:'体制内人', desc:'了解体制内真相', check: g => g.flags.insideSystem },
+    { id:'grad_student', icon:'🎓', name:'研究生', desc:'经历读研生活', check: g => g.flags.gradSchool },
     { id:'photographer', icon:'📷', name:'摄影师', desc:'爱上摄影', check: g => g.flags.photographyHobby },
     { id:'viral_star', icon:'🌟', name:'网红初体验', desc:'意外走红', check: g => g.flags.viralMoment },
     { id:'freelancer', icon:'💻', name:'自由职业者', desc:'成为自由职业者', check: g => g.flags.freelancer },
