@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v5.0
+// 都市浮生记 - Game Engine v5.1
 // ============================================
 
 // === GAME STATE ===
@@ -3063,6 +3063,25 @@ const EVENTS = [
         { label:'跟父母谈谈', hint:'+👥 +😊', fn: g => { g.flags.noMarriage=true; g.flags.familyTalk=true; return{social:12,mood:10,intel:5}; }},
         { label:'算了，还是结吧', hint:'+👥 +😊 -✨', fn: g => { g.flags.noMarriage=true; return{social:10,mood:5,charm:-5}; }},
       ]},
+    // === v5.1 EVENTS - 斜杠青年与副业 ===
+    { id:'slash_youth', icon:'⚡', title:'斜杠青年',
+      body:'你决定成为"斜杠青年"：\n\n主业：程序员 / 副业：影评写手 / 兴趣：摄影师\n\n你开始在平台接单：\n- 写影评：450元/篇\n- 做PPT：800元/份\n- 摄影接单：1500元/场\n\n数据：945万年轻人在平台发布副业服务，00后占40.8%。\n\n"斜杠青年——主业是生存，副业是生活。"\n\n"不是贪心，是想活得更丰富。"',
+      cond: g => !g.flags.slashYouth && g.age>=20 && g.age<=35 && g.intel>=55,
+      choices:[
+        { label:'写网文/影评', hint:'+💰 +✨ +😊', fn: g => { g.flags.slashYouth=true; g.flags.writerSideHustle=true; return{money:3000,charm:10,mood:12,intel:8}; }},
+        { label:'做设计接单', hint:'+💰 +🧠', fn: g => { g.flags.slashYouth=true; g.flags.designerSideHustle=true; return{money:5000,intel:10,charm:5}; }},
+        { label:'摄影摄像', hint:'+💰 +✨', fn: g => { g.flags.slashYouth=true; g.flags.photographerSideHustle=true; return{money:4000,charm:12,mood:8}; }},
+        { label:'职场咨询', hint:'+💰 +🧠 +👥', fn: g => { g.flags.slashYouth=true; g.flags.consultantSideHustle=true; return{money:6000,intel:12,social:8}; }},
+      ]},
+    { id:'side_hustle_fail', icon:'💔', title:'副业翻车',
+      body:'你的副业翻车了：\n\n- 写了3个月网文，阅读量只有个位数\n- 接了5单设计，客户改了20次稿\n- 拍了10场照片，只收到2条好评\n\n"64.6%的斜杠青年表示副业收入不稳定。"\n\n你算了算：副业收入不到主业的20%，但占用了40%的休息时间。\n\n"副业不是捷径，是另一条需要坚持的路。"',
+      cond: g => !g.flags.sideHustleFail && g.flags.slashYouth && Math.random()>0.6,
+      choices:[
+        { label:'坚持，总会好的', hint:'+🧠 +😊', fn: g => { g.flags.sideHustleFail=true; return{intel:10,mood:5,charm:3}; }},
+        { label:'换个副业方向', hint:'+💰 +✨', fn: g => { g.flags.sideHustleFail=true; g.flags.sideHustlePivot=true; return{money:2000,charm:5,intel:5}; }},
+        { label:'放弃，专注主业', hint:'+💰 +🧠', fn: g => { g.flags.sideHustleFail=true; return{money:3000,intel:8,mood:-5}; }},
+        { label:'继续尝试新副业', hint:'+✨ +😊', fn: g => { g.flags.sideHustleFail=true; if(Math.random()>0.5){return{money:8000,mood:20,charm:10}}else{return{mood:-10,money:-1000}} }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3292,6 +3311,9 @@ const ACHIEVEMENTS = [
     // v5.0 achievements
     { id:'single_and_proud', icon:'💎', name:'单身贵族', desc:'享受单身生活', check: g => g.flags.singleAndHappy },
     { id:'marriage_free', icon:'💍', name:'不婚主义者', desc:'坚持不婚主义', check: g => g.flags.committedSingle },
+    // v5.1 achievements
+    { id:'slash_master', icon:'⚡', name:'斜杠青年', desc:'开展副业', check: g => g.flags.slashYouth },
+    { id:'side_hustle_survivor', icon:'💔', name:'副业幸存者', desc:'经历副业翻车', check: g => g.flags.sideHustleFail },
 ];
 
 // === ENDINGS === (order matters: first match wins)
