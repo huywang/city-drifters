@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v19.0
+// 都市浮生记 - Game Engine v19.1
 // ============================================
 
 // === GAME STATE ===
@@ -9145,6 +9145,87 @@ const EVENTS = [
         { label:'接受自己，不再追求"成为谁"', hint:'+😊 +❤️', fn: g => { g.flags.selfIdentity=true; g.flags.selfAcceptance=true; return{mood:18,health:5}; }},
         { label:'写一份"自我介绍"', hint:'+🧠', fn: g => { g.flags.selfIdentity=true; g.flags.selfReflection=true; return{intel:10,mood:5}; }},
       ]},
+    // === v19.1 新增事件（城市记忆 + 地域文化 + 身份认同） ===
+    { id:'bad_landlord', icon:'🏠', title:'奇葩房东', category:'city',
+      body:'你的房东是一个"传奇人物"：\n\n- 每月1号准时发微信催房租，精确到分\n- 每周"路过"你的房子，检查你有没有弄坏东西\n- 不让你养宠物、不让你钉钉子、不让你带朋友过夜\n- 空调坏了说"你自己修"，马桶堵了说"你找人来通"\n\n今天，你的热水器坏了。你打电话给房东，他说："这热水器你用了3年了，该你换了。"\n\n你说："热水器是固定设施，应该房东负责。"\n\n他说："那你就别用热水了。"\n\n你挂了电话。你想：在大城市租房，最大的成本不是房租——是尊严。\n\n"租房：你以为你在租一个家——其实你在租一个随时可能被赶走的权利。"',
+      cond: g => !g.flags.badLandlord && g.flags.renting && g.age >= 20,
+      choices:[
+        { label:'据理力争，查租房法规', hint:'+🧠 +✨', fn: g => { g.flags.badLandlord=true; g.flags.legalRights=true; return{intel:8,charm:5,mood:-5}; }},
+        { label:'忍了，自己修', hint:'-💰 -😊', fn: g => { g.flags.badLandlord=true; g.flags.endured=true; return{money:-2000,mood:-10}; }},
+        { label:'不租了，搬家', hint:'-💰💰 +😊', fn: g => { g.flags.badLandlord=true; g.flags.movedOut=true; return{money:-12000,mood:10}; }},
+      ]},
+    { id:'dialect_shame', icon:'🗣️', title:'方言困境', category:'city',
+      body:'你在公司开会，一激动说了一句方言。\n\n全场安静了3秒。有人笑了。有人问："你刚才说啥？"\n\n你红了脸，赶紧用普通话重新说了一遍。\n\n下班后你给你妈打电话，用方言说了30分钟。你突然觉得：只有说方言的时候，你才是"你自己"。\n\n在大城市，你说普通话——但总觉得少了点什么。\n回老家，你说方言——但发现有些词你已经不会说了。\n\n你的方言在消失。你的"根"也在消失。\n\n"方言是你的母语，普通话是你的面具。在大城市，你戴着面具生活——但面具下面的你，还是你吗？"',
+      cond: g => !g.flags.dialectShame && g.age >= 20 && !g.flags.hasHukou,
+      choices:[
+        { label:'不再隐藏方言，自豪地说', hint:'+✨ +😊 +👥', fn: g => { g.flags.dialectShame=true; g.flags.dialectProud=true; return{charm:8,mood:10,social:5}; }},
+        { label:'努力练好普通话，融入城市', hint:'+🧠 -❤️', fn: g => { g.flags.dialectShame=true; g.flags.assimilate=true; return{intel:5,charm:5,mood:-5}; }},
+        { label:'开始录方言视频，保护文化', hint:'+🧠 +✨ +😊', fn: g => { g.flags.dialectShame=true; g.flags.dialectPreservation=true; return{intel:8,charm:10,mood:8}; }},
+      ]},
+    { id:'city_stereotype', icon:'🏙️', title:'城市标签', category:'city',
+      body:'你的同事们在聊各自的城市：\n\n北京人："北京就是卷，但机会多。"\n上海人："上海精致，但排外。"\n深圳人："深圳只认钱，但公平。"\n广州人："广州好吃，但潮湿。"\n成都人："成都安逸，但工资低。"\n\n你发现：每个城市都有一个"标签"，而你不知不觉中被这个标签定义了。\n\n你在大城市待了5年，你变了：说话快了、走路快了、吃饭快了、连睡觉都快了。\n\n你的老家朋友说："你变了。"\n你说："不是我变了——是这个城市改变了我。"\n\n"城市标签：你以为你选择了一个城市——其实城市选择了你。它用它的节奏、文化、价值观，慢慢把你雕刻成它的样子。"',
+      cond: g => !g.flags.cityStereotype && g.age >= 22 && g.months > 36,
+      choices:[
+        { label:'接受改变，这就是成长', hint:'+🧠 +😊', fn: g => { g.flags.cityStereotype=true; g.flags.acceptedChange=true; return{intel:8,mood:8}; }},
+        { label:'保持自我，不被同化', hint:'+✨ +🧠', fn: g => { g.flags.cityStereotype=true; g.flags.keptIdentity=true; return{charm:5,intel:5}; }},
+        { label:'考虑换一个城市', hint:'🎲', fn: g => { g.flags.cityStereotype=true; g.flags.considerMove=true; return{mood:-3,intel:5}; }},
+      ]},
+    { id:'stranger_kindness', icon:'🤝', title:'陌生人的善意', category:'city',
+      body:'今天发生了几件小事：\n\n早上：地铁上你忘带交通卡，一个陌生人帮你刷了。\n中午：你在外面吃面，钱包忘带了。老板说："下次给就行。"\n晚上：下雨了，你没带伞。一个路过的阿姨把伞塞给你："我快到了，你拿着。"\n\n三件小事，来自三个你永远不会再见的陌生人。\n\n你的眼眶有点湿。你来这个城市5年了，第一次觉得：也许这里也没那么冷漠。\n\n你在日记里写："今天被三个陌生人温暖了。我也要做一个温暖别人的人。"\n\n第二天，你在地铁上帮一个老人刷了卡。\n\n"大城市的人情味：不是来自熟人——而是来自那些你永远不知道名字的陌生人。"',
+      cond: g => !g.flags.strangerKindness && g.age >= 20 && g.mood < 55,
+      choices:[
+        { label:'把善意传递下去', hint:'+👥 +😊 +❤️', fn: g => { g.flags.strangerKindness=true; g.flags.payItForward=true; return{social:12,mood:18,charm:5}; }},
+        { label:'发了条朋友圈感慨', hint:'+👥 +😊', fn: g => { g.flags.strangerKindness=true; g.flags.sharedKindness=true; return{social:5,mood:10}; }},
+        { label:'默默记住，继续生活', hint:'+🧠 +❤️', fn: g => { g.flags.strangerKindness=true; g.flags.quietGratitude=true; return{intel:5,mood:12}; }},
+      ]},
+    { id:'last_train', icon:'🚃', title:'末班车', category:'city',
+      body:'加班到11点，你冲向地铁站。\n\n你在关门前3秒挤上了末班车。车门关上的一瞬间，你看到了站台上另一个也在跑的人——他没赶上。\n\n车厢里只有几个人：一个靠在角落睡着的外卖小哥、一个对着手机哭的女生、一个拿着吉他的年轻人。\n\n你们互不相识，但你们有一个共同点：都是这个城市的夜归人。\n\n地铁到站了。你走出站台，冷风吹过来。你抬头看了看天——看不到星星，但远处的霓虹灯也很美。\n\n你想：也许漂泊不是一件坏事。至少你看到了这个城市白天看不到的样子。\n\n"末班车上的人，都是这座城市的守夜人——你们互不认识，但你们共同守护着这座城市的夜。"',
+      cond: g => !g.flags.lastTrain && g.age >= 20 && g.job !== '待业中' && g.jobSalary >= 6000,
+      choices:[
+        { label:'跟那个弹吉他的人聊了几句', hint:'+👥 +😊 +✨', fn: g => { g.flags.lastTrain=true; g.flags.nightFriend=true; return{social:8,mood:10,charm:3}; }},
+        { label:'默默走路回家，享受夜色', hint:'+🧠 +❤️', fn: g => { g.flags.lastTrain=true; g.flags.nightWalker=true; return{intel:5,mood:8,health:3}; }},
+        { label:'叫了个出租车，赶紧回家', hint:'-💰', fn: g => { g.flags.lastTrain=true; return{money:-80,mood:-3}; }},
+      ]},
+    { id:'going_home_visit', icon:'🚂', title:'回家看看', category:'city',
+      body:'你请了年假，回了趟老家。\n\n变化很大：\n- 你小时候玩的那条河，变成了商业街\n- 你的小学，合并到了另一所学校\n- 你家楼下的早餐店，关门了\n- 你的发小，胖了30斤\n\n变化不大的是：\n- 你妈做的红烧肉还是那个味道\n- 你爸还是那句"工作怎么样"\n- 你的房间还是你离开时的样子\n- 你走在街上，还是会遇到小时候的老师\n\n你在家待了5天。第3天开始你就想回大城市了——你受不了"什么都没有"的无聊。\n\n但离开的时候，你妈塞给你的行李箱里的东西——腊肉、咸鸭蛋、自家腌的菜——让你在路上哭了一路。\n\n"回家：你离开时觉得它是牢笼，回来时才发现它是港湾。但你不能留下——因为你的未来不在这里。"',
+      cond: g => !g.flags.goingHomeVisit && g.age >= 23 && g.months > 24 && !g.flags.hasHukou,
+      choices:[
+        { label:'多待几天，好好陪陪父母', hint:'+❤️ +👥 -💰', fn: g => { g.flags.goingHomeVisit=true; g.flags.extendedStay=true; return{mood:15,social:10,money:-3000}; }},
+        { label:'拍很多照片，记录变化', hint:'+🧠 +😊', fn: g => { g.flags.goingHomeVisit=true; g.flags.documented=true; return{intel:8,mood:10}; }},
+        { label:'带了一堆家乡特产回去', hint:'+😊 +❤️ -💰', fn: g => { g.flags.goingHomeVisit=true; g.flags.broughtFood=true; return{mood:12,money:-1000}; }},
+      ]},
+    { id:'city_friend_circle', icon:'🍻', title:'城市朋友圈', category:'city',
+      body:'你在大城市交到了几个"特别"的朋友：\n\n老王：你的前同事，现在创业做餐饮。你们每月约一次饭，他请你吃他新研发的菜品。\n小李：你的健身搭子，你们每周约三次健身房，互相监督。\n阿美：你在读书会认识的，你们每月交换一本书。\n小张：你的游戏战友，你们每晚一起打两小时游戏。\n\n你们不是从小玩到大的"发小"，但你们是"在大城市互相取暖"的人。\n\n有一天你生病了，小张给你送了药。老王给你炖了鸡汤。阿美给你推荐了一个好医生。\n\n你发了条朋友圈：「感谢大城市里的临时家人。」\n\n"大城市的朋友：不是血缘关系，但有时候比亲人更亲——因为他们选择了你。"',
+      cond: g => !g.flags.cityFriendCircle && g.age >= 22 && g.social >= 30 && g.months > 24,
+      choices:[
+        { label:'主动组织聚会，成为核心', hint:'+👥 +✨ +😊', fn: g => { g.flags.cityFriendCircle=true; g.flags.socialHub=true; return{social:15,charm:10,mood:12}; }},
+        { label:'珍惜每一个，深度经营', hint:'+👥 +❤️', fn: g => { g.flags.cityFriendCircle=true; g.flags.deepFriendships=true; return{social:10,mood:10}; }},
+        { label:'顺其自然，不刻意维护', hint:'+🧠', fn: g => { g.flags.cityFriendCircle=true; g.flags.naturalFriendships=true; return{social:5,intel:5}; }},
+      ]},
+    { id:'rental_room', icon:'🚪', title:'出租屋', category:'city',
+      body:'你的出租屋：\n\n面积：15平米\n月租：3500\n家具：一张床、一个衣柜、一张桌子、一把椅子\n窗户：朝北，永远晒不到太阳\n隔音：能听到隔壁打游戏的声音\n\n但这是你的"家"。\n\n你在墙上贴了照片墙：家人、朋友、旅行的照片。你在窗台放了一盆绿萝。你在桌上摆了一盏暖黄色的台灯。\n\n每天下班回到这里，你打开灯的那一刻——这个15平米的小房间，就变成了全世界最温暖的地方。\n\n你的一个朋友来玩说："你这儿也太小了吧。"\n\n你说："小怎么了？这是我在这个城市唯一属于自己的地方。"\n\n"出租屋：再小也是你的城堡。在这个冰冷的城市里，有一盏为你亮着的灯——就够了。"',
+      cond: g => !g.flags.rentalRoom && g.flags.renting && g.age >= 20 && g.months > 12,
+      choices:[
+        { label:'花点钱把出租屋布置得更好', hint:'-💰 +😊 +❤️', fn: g => { g.flags.rentalRoom=true; g.flags.decorated=true; return{money:-3000,mood:15,health:3}; }},
+        { label:'算了，这只是暂时的', hint:'-😊', fn: g => { g.flags.rentalRoom=true; g.flags.temporary=true; return{mood:-5}; }},
+        { label:'开始攒钱买房', hint:'+💰 +🧠', fn: g => { g.flags.rentalRoom=true; g.flags.savingForHouse=true; return{intel:5,mood:3,money:5000}; }},
+      ]},
+    { id:'city_seasons', icon:'🍂', title:'城市的四季', category:'city',
+      body:'你在这座城市已经过了5个四季了。\n\n春天：路边的花开了，你的过敏也来了。\n夏天：空调外机的热浪比太阳还大，你在地铁里蒸桑拿。\n秋天：银杏叶黄了，你拍了一张照片发朋友圈，收获了88个赞。\n冬天：你裹着羽绒服在寒风中等公交，鼻涕冻成了冰棍。\n\n你发现：大城市的四季不像老家那么分明。没有知了叫、没有萤火虫、没有晒谷子、没有堆雪人。\n\n但大城市有大城市的四季：\n春天的共享单车、夏天的露天电影、秋天的银杏大道、冬天的圣诞集市。\n\n你开始觉得：也许你不是不属于这个城市——你只是需要时间来发现它的美。\n\n"城市的四季：第一年你只看到了天气，第五年你看到了生活。"',
+      cond: g => !g.flags.citySeasons && g.months > 48 && g.age >= 22,
+      choices:[
+        { label:'用文字/照片记录城市四季', hint:'+✨ +🧠 +😊', fn: g => { g.flags.citySeasons=true; g.flags.cityChronicler=true; return{charm:10,intel:5,mood:12}; }},
+        { label:'每个季节尝试一件新事', hint:'+✨ +😊 +❤️', fn: g => { g.flags.citySeasons=true; g.flags.seasonalAdventures=true; return{charm:5,mood:15,health:5}; }},
+        { label:'四季如一日，没什么特别的', hint:'-😊', fn: g => { g.flags.citySeasons=true; return{mood:-3}; }},
+      ]},
+    { id:'belonging_question', icon:'❓', title:'归属感', category:'city',
+      body:'有人问你："你是哪里人？"\n\n你犹豫了。\n\n你的身份证上写的是老家地址。你的户口还没迁过来。你在这里没有房子。你说普通话带着口音。\n\n但你的生活在这里：你的工作、你的朋友、你的习惯、你的记忆。\n\n你说："我在XX工作。"\n对方说："我问的是你老家。"\n你说了老家名字。对方说："哦，那个地方啊……"\n\n你不知道该怎么定义自己。\n\n你是一个"XX漂"——北漂/沪漂/深漂/杭漂。你的名字前面永远带着一个"漂"字。\n\n"归属感：不是你在哪里——而是哪里需要你。当你不再被问「你是哪里人」的时候，也许你就找到归属了。"',
+      cond: g => !g.flags.belongingQuestion && g.age >= 24 && !g.flags.hasHukou && g.months > 36,
+      choices:[
+        { label:'我就是这个城市的人', hint:'+✨ +😊 +🧠', fn: g => { g.flags.belongingQuestion=true; g.flags.cityIdentity=true; return{charm:8,mood:12,intel:5}; }},
+        { label:'我永远是个异乡人', hint:'-😊 +🧠', fn: g => { g.flags.belongingQuestion=true; g.flags.foreverStranger=true; return{mood:-8,intel:8}; }},
+        { label:'哪里有家人的地方就是家', hint:'+❤️ +😊', fn: g => { g.flags.belongingQuestion=true; g.flags.familyIsHome=true; return{mood:10,social:5}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -10014,6 +10095,12 @@ const ACHIEVEMENTS = [
     { id:'growth_mindset_ach', icon:'🌱', name:'成长型思维', desc:'回顾了自己的成长历程', check: g => g.flags.personalGrowth },
     { id:'therapy_pioneer_ach', icon:'🛋️', name:'心理咨询先行者', desc:'勇敢地走进了咨询室', check: g => g.flags.longTermTherapy },
     { id:'self_knower_ach', icon:'🪞', name:'认识自己', desc:'开始了自我认同的探索', check: g => g.flags.selfIdentity && g.flags.selfAcceptance },
+    // === v19.1 新增成就（城市记忆） ===
+    { id:'dialect_proud_ach', icon:'🗣️', name:'方言守护者', desc:'为自己的方言感到自豪', check: g => g.flags.dialectProud || g.flags.dialectPreservation },
+    { id:'night_walker_ach', icon:'🌙', name:'城市夜归人', desc:'在末班车上找到了温暖', check: g => g.flags.lastTrain && g.flags.nightWalker },
+    { id:'kindness_chain_ach', icon:'🤝', name:'善意传递者', desc:'把陌生人的善意传递下去', check: g => g.flags.payItForward },
+    { id:'city_chronicler_ach', icon:'📸', name:'城市记录者', desc:'用文字或照片记录了城市的四季', check: g => g.flags.cityChronicler },
+    { id:'home_decorator_ach', icon:'🏠', name:'温馨小窝', desc:'把出租屋布置成了家的样子', check: g => g.flags.decorated },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -10306,6 +10393,8 @@ const ENDINGS = [
     { id:'inner_peace_end_v2', badge:'🧘', title:'内心平静', desc:'你找到了内心的平静。\n\n你做了心理咨询，直面了原生家庭创伤，克服冒名顶替综合征，学会了对不喜欢的事说"不"。\n\n你不再焦虑于别人的评价，不再害怕失败，不再为了讨好别人而委屈自己。\n\n你的焦虑没有消失——但你不再害怕它了。你知道它只是一个信号，不是一个命令。\n\n你的朋友说："你变了。你以前总是很焦虑。"\n\n你说："我还是会焦虑——但我学会了跟焦虑和平相处。"\n\n"内心平静不是没有问题——是终于有了面对问题的勇气。"', cond: g => g.flags.therapyJourney && g.flags.familyOrigin && (g.flags.learnToSayNo || g.flags.achievementJournal) && g.mood >= 70 && g.intel >= 60 && g.age >= 30 },
     { id:'wise_elder_end', badge:'🌅', title:'智者', desc:'你成了朋友中的"人生导师"。\n\n你经历了大城市的漂泊、职场的起伏、感情的波折、健康的危机。你没有被打倒——你把每一次跌倒都变成了智慧。\n\n你的朋友们喜欢找你聊天：因为你从不评判，总是理解。你说的每一句话都有分量——因为那是用30年的经历换来的。\n\n一个年轻人问你："人生最重要的事是什么？"\n\n你想了想说："认识自己。接受自己。成为自己。"\n\n"智者不是知道所有答案——是知道没有标准答案。每个人的人生都是独一无二的。"', cond: g => g.flags.personalGrowth && g.flags.selfIdentity && g.flags.midlifeAwakening && g.intel >= 75 && g.mood >= 60 && g.social >= 50 && g.age >= 38 },
     { id:'hometown_hero_end_v2', badge:'🏠', title:'小城故事', desc:'你回到了老家，在小城市找到了自己的位置。\n\n你没有在大城市买房，没有年薪百万，没有光鲜的履历。但你有：每天5点半下班的自由、周末陪父母吃饭的温暖、邻居见面打招呼的亲切。\n\n你的大城市朋友说："你不后悔吗？"\n\n你说："后悔什么？我每天睡到自然醒，有时间钓鱼、有时间陪家人、有时间做自己。这难道不是成功？"\n\n"小城市不是退路——是另一条路。不是每个人都必须在大城市证明自己。"', cond: g => g.flags.returnHometown && (g.flags.smallBusiness || g.flags.localCivilServant) && g.mood >= 70 && g.age >= 32 },
+    // --- v19.1 城市记忆结局 ---
+    { id:'city_belonging_end', badge:'🏙️', title:'城市归属', desc:'你终于在大城市找到了归属感。\n\n你来这里的时候，什么都不懂。你不会说本地方言，不知道哪条路通向哪里，不认识任何人。\n\n但现在：你有了自己的朋友圈，知道了最好吃的那家面馆在哪里，能在地铁里闭眼换乘。你的同事不再叫你"外地人"，你的邻居会跟你打招呼。\n\n有人问你："你是哪里人？"\n\n你笑了笑说："我就是这个城市的人。"\n\n"城市归属：不是你在这里买了房——是你在这里有了故事。当这个城市的每一条街道都有你的记忆，你就属于这里了。"', cond: g => g.flags.cityIdentity && g.flags.strangerKindness && g.flags.cityFriendCircle && g.social >= 55 && g.mood >= 60 && g.months >= 60 && g.age >= 27 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
