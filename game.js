@@ -1959,6 +1959,12 @@ const ENDINGS = [
     { id:'kaogong_success', badge:'🎉', title:'考公上岸', desc:'你考上了公务员，成了"体制内"的人。\n\n你妈逢人就夸："我孩子在政府上班！"你爸在酒桌上第一次主动敬了你一杯。\n\n你的朋友圈从加班照变成了食堂照，从咖啡变成了茶。\n\n"宇宙的尽头是编制——你终于找到了你的宇宙。"\n\n虽然工资不高，但稳定，在这个不确定的时代，稳定本身就是一种奢侈。', cond: g => g.flags.civilServant && g.mood>=65 && g.money>=30000 && g.age>=26 },
     { id:'kong_yiji_end', badge:'📚', title:'孔乙己', desc:'你读了很多书，但你找不到"配得上"你的工作。\n\n你不愿意做"低端"工作，但"高端"工作不要你。你成了当代孔乙己：站着喝酒而穿长衫的唯一的人。\n\n"学历是孔乙己的长衫，脱不下是面子，脱下了是生活。"\n\n你还在等，等一个配得上你学历的机会。也许它会来，也许不会。', cond: g => !g.flags.tookOffGown && g.job==='待业中' && g.intel>=75 && g.age>=28 && g.mood<45 },
     { id:'digital_nomad_senior', badge:'🌏', title:'数字游民（资深）', desc:'你成了资深数字游民。你的办公室是全世界：清迈、巴厘岛、里斯本、墨西哥城。\n\n你的收入是美元，你的生活成本是泰铢，你的朋友圈是全球。\n\n"不是逃离，是选择另一种活法——一种不被国界限制的活法。"\n\n你在Instagram上发了张海边的照片，配文："Office for today."\n\n虽然你偶尔也会想念家乡的火锅和父母的唠叨。', cond: g => g.flags.lyingFlat && g.flags.freelancer && g.money>=120000 && g.intel>=70 && g.charm>=60 && g.age>=30 && g.age<=42 },
+    // --- v2.25 NEW ENDINGS ---
+    { id:'social_influencer_end', badge:'🌟', title:'社会活动家', desc:'你从打工人变成了社会活动家。你关注劳工权益、性别平等、环境保护。\n\n你在微博上有50万粉丝，你的每一次发声都能引发讨论。\n\n有人说你是"公知"，有人说你是"圣母"。你不在乎。\n\n"改变世界太难，但发出声音是每个人的权利。"\n\n你知道：声音汇聚起来，就是力量。', cond: g => g.social>=85 && g.intel>=75 && g.charm>=70 && g.flags.volunteer && g.age>=30 },
+    { id:'minimalist_life', badge:'📦', title:'极简主义者', desc:'你选择了极简生活。你的家当只有：\n\n- 一个背包\n- 3套衣服\n- 一台笔记本\n- 几本书\n\n你卖掉了所有"多余"的东西。你的朋友说你疯了，但你觉得前所未有的轻松。\n\n"拥有越少，自由越多。"\n\n你终于明白：幸福不是拥有更多，而是需要更少。', cond: g => g.flags.minimalist && g.flags.digitalDetox && g.mood>=70 && g.money>=30000 && g.age>=30 },
+    { id:'mentor_end', badge:'🎓', title:'人生导师', desc:'你成了很多年轻人的导师。你在知乎写回答，在B站做视频，在播客分享经验。\n\n你的口头禅是："我走过的弯路，你不必再走。"\n\n有人给你留言："谢谢你，让我少走了3年弯路。"\n\n你笑了：其实你走过的弯路，比任何人都多。\n\n"教育的本质是一棵树摇动另一棵树——你摇动了很多树。"', cond: g => g.intel>=80 && g.social>=65 && g.flags.teacher && g.age>=35 && g.months>=60 },
+    { id:'community_builder', badge:'🏘️', title:'社区营造者', desc:'你在大城市建了一个"小社区"。你组织了读书会、跑步团、志愿者团队。\n\n你的微信群有500人，每个人都认识你，你也认识每个人。\n\n有人说："你让这座城市有了温度。"\n\n你笑了：其实你只是不想一个人孤独。\n\n"社区不是地理概念，是人与人的连接。"', cond: g => g.social>=80 && g.relationships.friends>=75 && g.flags.volunteer && g.mood>=65 && g.age>=32 },
+    { id:'slow_life', badge:'🐌', title:'慢生活家', desc:'你选择了慢生活。你不加班、不社交、不内卷。\n\n你每天的生活：\n- 7点起床，做早餐\n- 8点上班，准点下班\n- 6点做饭，散步\n- 10点睡觉\n\n有人说你"没有上进心"，你说："我只是选择了不同的节奏。"\n\n"慢生活不是懒惰，是清醒。"', cond: g => g.flags.lyingFlat && g.flags.healthyLifestyle && g.health>=75 && g.mood>=70 && g.age>=33 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
@@ -2472,11 +2478,11 @@ function triggerEnding() {
 
 function getEndingRarity(endingId) {
     // Legendary (rare endings that require specific conditions)
-    const legendary = ['fire', 'immigration', 'executive', 'retire_abroad', 'wealthy', 'family_first', 'burnout_recovery', 'digital_nomad_senior'];
+    const legendary = ['fire', 'immigration', 'executive', 'retire_abroad', 'wealthy', 'family_first', 'burnout_recovery', 'digital_nomad_senior', 'social_influencer_end'];
     // Rare (hard to achieve)
-    const rare = ['settled', 'startup_end', 'influencer_end', 'digital_nomad', 'karoshi', 'jail', 'social_butterfly_end', 'health_guru', 'side_hustle_king', 'kaogong_success'];
+    const rare = ['settled', 'startup_end', 'influencer_end', 'digital_nomad', 'karoshi', 'jail', 'social_butterfly_end', 'health_guru', 'side_hustle_king', 'kaogong_success', 'mentor_end', 'community_builder'];
     // Uncommon (moderately difficult)
-    const uncommon = ['hometown_hero', 'go_home', 'civil_end', 'ordinary', 'single', 'investment_guru', 'lying_flat_end', 'lonely_death', 'estranged', 'pet_parent', 'mortgage_default_end', 'kong_yiji_end', 'full_time_child_end'];
+    const uncommon = ['hometown_hero', 'go_home', 'civil_end', 'ordinary', 'single', 'investment_guru', 'lying_flat_end', 'lonely_death', 'estranged', 'pet_parent', 'mortgage_default_end', 'kong_yiji_end', 'full_time_child_end', 'minimalist_life', 'slow_life'];
 
     if (legendary.includes(endingId)) return 'legendary';
     if (rare.includes(endingId)) return 'rare';
@@ -2553,7 +2559,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.24' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.25' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
