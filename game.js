@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v28.3
+// 都市浮生记 - Game Engine v28.4
 // ============================================
 
 // === GAME STATE ===
@@ -14547,6 +14547,87 @@ const EVENTS = [
         { label:'调整了心态，慢慢适应', hint:'+😊 +🧠', fn: g => { g.flags.returnToWorkMom=true; return{mood:3,intel:3}; }},
         { label:'发现职场已经不需要自己了', hint:'-😊 -✨ -🧠', fn: g => { g.flags.returnToWorkMom=true; g.flags.feltReplaced=true; return{mood:-10,charm:-5,intel:-3}; }},
       ]},
+    // v28.4: 考证热 + 继续教育 + 终身学习
+    { id:'cpa_exam_prep', icon:'📊', title:'考CPA', category:'career',
+      body:'你决定考CPA了。\n\nCPA（注册会计师）——被称为「中国第一考」。\n\n考试难度：\n- 6门科目：会计、审计、税法、经济法、财务成本管理、公司战略\n- 通过率：每门约20-25%\n- 5年内必须通过全部6门\n- 平均备考时间：2-4年\n\n你的备考生活：\n- 每天下班后学3小时\n- 周末学8小时\n- 放弃了所有娱乐\n- 花了2万块买网课+教材\n\n第一年：过了2门\n第二年：过了1门（挂了1门）\n第三年：重考挂了的那门+新过1门\n\n你开始理解：考CPA——不是「学习」——是「用4年青春换一个证书」。\n\n你考过了——你的月薪可能增加5000。\n你没考过——你的4年青春——没了。\n\n你开始理解：考证——不是「提升自己」——是「赌市场会认这个证」。\n\n「考CPA：你不是在学习——你是在用4年青春赌一张纸的价值。」',
+      cond: g => g.age >= 22 && !g.flags.cpaExamPrep && g.intel >= 30 && g.jobSalary > 0,
+      choices:[
+        { label:'坚持4年终于考过了', hint:'+🧠 +💰 +✨ -😊 -❤️', fn: g => { g.flags.cpaExamPrep=true; g.flags.cpaPassed=true; g.money -= 20000; g.jobSalary += 5000; g.reputation.career += 10; return{intel:15,charm:5,mood:5,health:-5}; }},
+        { label:'考了2年过了3门', hint:'+🧠 -💰 -😊', fn: g => { g.flags.cpaExamPrep=true; g.flags.cpaPartial=true; g.money -= 15000; return{intel:10,mood:-3}; }},
+        { label:'考了1年放弃了', hint:'-💰 -🧠', fn: g => { g.flags.cpaExamPrep=true; g.flags.cpaGaveUp=true; g.money -= 10000; return{intel:-3,mood:-5}; }},
+      ]},
+    { id:'bar_exam_journey', icon:'⚖️', title:'法考之路', category:'career',
+      body:'你决定考法考（法律职业资格考试）了。\n\n法考——被称为「天下第一考」。\n\n考试数据：\n- 报名人数：每年80万+\n- 通过率：约15%\n- 备考时间：平均6-12个月\n- 内容：8个科目、200万字教材\n\n你的备考：\n- 每天学5小时（下班后）\n- 听了500小时的课\n- 做了3万道题\n- 背了500个法条\n\n考试那天——\n\n你走进考场——发现——\n\n你的同桌：一个40岁的转行程序员\n你的后排：一个刚毕业的法学生\n你的前排：一个已经考了3次的大姐\n\n你开始理解：法考——不是「法律人的专属」——是「所有想改变人生的人的选择」。\n\n你不是在考法律——你是在「考一个更好的未来」。\n\n「法考之路：你不是在背法条——你是在用500个小时赌一个「可以当律师」的资格。」',
+      cond: g => g.age >= 22 && !g.flags.barExamJourney && g.intel >= 35,
+      choices:[
+        { label:'一次通过！成了法律人', hint:'+🧠 +💰 +✨ +🤝', fn: g => { g.flags.barExamJourney=true; g.flags.barPassed=true; g.money -= 10000; g.reputation.career += 10; return{intel:15,charm:8,social:5}; }},
+        { label:'差5分没过，明年再战', hint:'+🧠 -😊 -💰', fn: g => { g.flags.barExamJourney=true; g.flags.barRetry=true; g.money -= 10000; return{intel:8,mood:-5}; }},
+        { label:'考完发现不想当律师了', hint:'+🧠 -💰', fn: g => { g.flags.barExamJourney=true; g.flags.barNotForMe=true; g.money -= 10000; return{intel:10,mood:-3}; }},
+      ]},
+    { id:'online_course_habit', icon:'📱', title:'在线课程', category:'career',
+      body:'你在网上买了很多课程。\n\n你的课程清单：\n- Python入门：199元（学了3章）\n- 数据分析：299元（学了5章）\n- 产品经理：399元（学了2章）\n- UI设计：249元（学了1章）\n- 英语口语：199元（学了0章——还没开始）\n\n总花费：1345元\n完成课程：0门\n\n你发现：\n- 你买了课——就觉得「自己会了」\n- 你看了前3章——就觉得「差不多懂了」\n- 你收藏了100个教程——但一个都没看完\n\n你开始理解：在线课程——不是「学习」——是「知识焦虑的消费」。\n\n你不是在「学习」——你是在「购买「我在学习」的感觉」。\n\n你的1345元——买的不是知识——是「缓解焦虑的安慰剂」。\n\n「在线课程：你不是在学习——你是在用1345元买一个「我在进步」的错觉。」',
+      cond: g => g.age >= 18 && !g.flags.onlineCourseHabit && g.money >= 500,
+      choices:[
+        { label:'挑了一门课坚持学完', hint:'+🧠 +✨', fn: g => { g.flags.onlineCourseHabit=true; g.flags.completedCourse=true; return{intel:10,charm:3}; }},
+        { label:'又买了几门课但没看', hint:'-💰 -🧠', fn: g => { g.flags.onlineCourseHabit=true; g.money -= 1345; return{intel:-3}; }},
+        { label:'意识到了自己在「假装学习」', hint:'+🧠 +😊', fn: g => { g.flags.onlineCourseHabit=true; g.flags.wokeUpFromFakeStudy=true; return{intel:8,mood:3}; }},
+      ]},
+    { id:'coding_bootcamp', icon:'💻', title:'编程培训', category:'career',
+      body:'你报了一个编程培训班。\n\n费用：2万\n时长：3个月（全日制）或6个月（周末）\n承诺：学完月薪15000+\n\n你选了周末班——6个月。\n\n你的学习过程：\n- 第1个月：HTML/CSS（挺简单的！）\n- 第2个月：JavaScript（有点难了）\n- 第3个月：React（听不懂了）\n- 第4个月：Node.js（完全听不懂了）\n- 第5个月：项目实战（copy paste）\n- 第6个月：毕业\n\n你「毕业」了——\n\n你的水平：\n- 能写一个简单的网页\n- 能看懂30%的代码\n- 能Google解决80%的问题\n\n你投了100份简历——\n\n回复：5个\n面试：3个\noffer：0个\n\n你开始理解：编程培训——不是「转行捷径」——是「用2万块换一个「你不行」的认知」。\n\n不是说编程不好——而是说「3个月学不会3年的积累」。\n\n「编程培训：你不是在学编程——你是在用2万块验证「编程不适合你」。」',
+      cond: g => g.age >= 20 && !g.flags.codingBootcamp && g.money >= 20000,
+      choices:[
+        { label:'坚持自学最终转行成功', hint:'+💰 +🧠 +✨ -😊', fn: g => { g.flags.codingBootcamp=true; g.flags.successfulSwitch=true; g.money -= 20000; setJob(g, '程序员', 15000); g.reputation.career += 5; return{intel:15,charm:3,mood:5}; }},
+        { label:'学了但没转行', hint:'-💰 +🧠', fn: g => { g.flags.codingBootcamp=true; g.flags.learnedNotSwitched=true; g.money -= 20000; return{intel:10}; }},
+        { label:'觉得编程太难了放弃了', hint:'-💰 -🧠', fn: g => { g.flags.codingBootcamp=true; g.money -= 20000; return{intel:-3,mood:-5}; }},
+      ]},
+    { id:'language_learning', icon:'🌍', title:'学英语', category:'career',
+      body:'你决定学英语了。\n\n因为——你的同事说：「英语好的人工资高30%。」\n\n你的学习方法：\n- 背单词APP：每天30个单词（坚持了2周）\n- 英语流利说：每天30分钟（坚持了1个月）\n- 美剧学口语：看了10集（只看中文字幕）\n- 外教一对一：100元/次（上了3次）\n\n你的英语水平：\n- 3个月前：能看懂Hello/Thank you\n- 3个月后：能看懂Hello/Thank you/How are you\n\n你开始理解：学英语——不是「方法不对」——是「你没有环境」。\n\n你在中国——你的工作不需要英语——你的生活不需要英语——\n\n你学英语——只是因为「别人说英语好的人工资高」。\n\n你不是在「学英语」——你是在「缓解「我什么都不会」的焦虑」。\n\n「学英语：你不是在学一门语言——你是在学一种「我还有救」的感觉。」',
+      cond: g => g.age >= 18 && !g.flags.languageLearning && g.intel >= 20,
+      choices:[
+        { label:'找到了英语角坚持练习', hint:'+🧠 +🤝 +✨', fn: g => { g.flags.languageLearning=true; g.flags.englishCorner=true; return{intel:8,social:5,charm:3}; }},
+        { label:'学了3个月放弃了', hint:'-🧠', fn: g => { g.flags.languageLearning=true; return{intel:-3}; }},
+        { label:'报了一个昂贵的培训班', hint:'-💰 +🧠', fn: g => { g.flags.languageLearning=true; g.money -= 20000; return{intel:8}; }},
+      ]},
+    { id:'skill_obsolescence', icon:'⏰', title:'技能过时', category:'career',
+      body:'你发现——你的技能——过时了。\n\n你5年前学的技能：\n- Photoshop → 被AI绘图替代\n- Excel高级功能 → 被Python替代\n- 传统营销 → 被抖音/小红书替代\n- 手工记账 → 被财务软件替代\n\n你10年前学的技能：\n- Flash → 死了\n- Dreamweaver → 死了\n- IE浏览器优化 → 死了\n\n你开始想：\n- 你现在学的技能——5年后——也会过时\n- 你的「核心竞争力」——有保质期\n- 你每3-5年——就要「重新学习」一次\n\n你开始理解：技能过时——不是「你学得不够」——是「世界变太快了」。\n\n你不是在「学习」——你是在「跟遗忘赛跑」。\n\n你学的速度——必须快过——世界遗忘的速度。\n\n「技能过时：你不是在学新东西——你是在防止自己变成「上一个时代的人」。」',
+      cond: g => g.age >= 28 && !g.flags.skillObsolescence && g.jobSalary > 0,
+      choices:[
+        { label:'开始系统学习新技能', hint:'+🧠 +✨ -😊', fn: g => { g.flags.skillObsolescence=true; g.flags.systematicLearner=true; g.reputation.career += 3; return{intel:10,charm:3,mood:-3}; }},
+        { label:'焦虑了一阵但没行动', hint:'-🧠 -😊', fn: g => { g.flags.skillObsolescence=true; return{intel:-3,mood:-5}; }},
+        { label:'接受了，觉得该转管理了', hint:'+🧠 +✨', fn: g => { g.flags.skillObsolescence=true; g.flags.managementTrack=true; return{intel:5,charm:5}; }},
+      ]},
+    { id:'reading_habit_v28_4', icon:'📚', title:'读书习惯', category:'psychology',
+      body:'你决定养成读书习惯了。\n\n你的计划：每月读4本书。\n\n第一个月：\n- 买了4本书：160元\n- 读了2本：完整读完\n- 另外2本：翻了前50页\n\n你的读书笔记：\n- 「原子习惯」：每天进步1%\n- 「被讨厌的勇气」：课题分离\n- 「思考快与慢」：系统1和系统2\n- 「原则」：（没读完）\n\n你发现：\n- 读书——确实让你「想得更清楚了」\n- 但读书——不能让你「赚更多钱」\n- 你读了10本书——你的工资——没变\n\n你开始理解：读书——不是「投资」——是「自我对话」。\n\n你不是在「获取知识」——你是在「跟比你聪明的人对话」。\n\n你的收获——不在书里——在你「读完之后」的「思考里」。\n\n「读书习惯：你不是在读书——你是在用别人的智慧——照亮自己的路。」',
+      cond: g => g.age >= 18 && !g.flags.readingHabit && g.intel >= 15,
+      choices:[
+        { label:'养成了读书习惯，每月读4本', hint:'+🧠 +✨ +😊', fn: g => { g.flags.readingHabit=true; g.flags.bookworm=true; g.money -= 50; return{intel:12,charm:5,mood:5}; }},
+        { label:'偶尔读读，一年读了10本', hint:'+🧠 +😊', fn: g => { g.flags.readingHabit=true; return{intel:5,mood:3}; }},
+        { label:'买了10本书读了2本', hint:'-💰 +🧠', fn: g => { g.flags.readingHabit=true; g.money -= 400; return{intel:3}; }},
+      ]},
+    { id:'podcast_learning', icon:'🎧', title:'播客学习', category:'career',
+      body:'你开始听播客了。\n\n你的播客清单：\n- 「商业就是这样」：商业分析\n- 「忽左忽右」：历史文化\n- 「故事FM」：真实故事\n- 「声东击西」：科技社会\n- 「随机波动」：性别议题\n\n你听播客的场景：\n- 通勤路上（每天2小时）\n- 做饭时（每天30分钟）\n- 跑步时（每天30分钟）\n\n你发现：\n- 你每天「被动学习」3小时\n- 你一个月听了40+集播客\n- 你的知识面——变广了\n\n但你也发现：\n- 你「听了很多」——但「记住的很少」\n- 你的「知识焦虑」——没有减少——反而增加了\n- 你总觉得「还不够」\n\n你开始理解：播客学习——不是「深度学习」——是「知识零食」。\n\n它能满足你的「知识食欲」——但不能给你「知识营养」。\n\n「播客学习：你不是在学习——你是在用别人的声音填满你的沉默。」',
+      cond: g => g.age >= 18 && !g.flags.podcastLearning && g.intel >= 15,
+      choices:[
+        { label:'开始做播客笔记深度消化', hint:'+🧠 +✨', fn: g => { g.flags.podcastLearning=true; g.flags.deepPodcastLearner=true; return{intel:10,charm:3}; }},
+        { label:'当背景音乐听听挺好的', hint:'+😊 +🧠', fn: g => { g.flags.podcastLearning=true; return{mood:3,intel:3}; }},
+        { label:'听了很多但什么都没变', hint:'-🧠', fn: g => { g.flags.podcastLearning=true; return{intel:-3}; }},
+      ]},
+    { id:'career_switch_study', icon:'🔄', title:'跨行学习', category:'career',
+      body:'你想转行了。\n\n你当前的工作：已经做了3年。\n你想转的行业：互联网/金融/教育（你选了一个）。\n\n你的转行计划：\n- 学3-6个月相关技能\n- 考1-2个相关证书\n- 投简历找机会\n\n你的转行困难：\n- 你没有「相关经验」\n- 你没有「行业人脉」\n- 你的简历——在新行业——等于白纸\n\n你投了50份简历——\n- 回复：8个\n- 面试：5个\n- 拒绝原因：「没有相关经验」\n\n你开始理解：转行——不是「学就行了」——是「你学的跟市场要的——永远有差距」。\n\n你不是在「转行」——你是在「用过去的积累换未来的可能」。\n\n转行最难的不是「学新东西」——是「接受自己从零开始」。\n\n「跨行学习：你不是在转行——你是在「用你的勇气换一个新的起点」。」',
+      cond: g => g.age >= 25 && g.age <= 40 && !g.flags.careerSwitchStudy && g.jobSalary > 0,
+      choices:[
+        { label:'坚持了6个月成功转行', hint:'+💰 +🧠 +✨ -😊', fn: g => { g.flags.careerSwitchStudy=true; g.flags.successfulCareerSwitch=true; g.money -= 30000; setJob(g, '新行业职员', Math.floor(g.jobSalary * 1.3)); g.reputation.career += 5; return{intel:10,charm:5,mood:5}; }},
+        { label:'学了但没转成功', hint:'+🧠 -😊 -💰', fn: g => { g.flags.careerSwitchStudy=true; g.money -= 15000; return{intel:8,mood:-5}; }},
+        { label:'想了想觉得风险太大', hint:'+💰 -✨', fn: g => { g.flags.careerSwitchStudy=true; return{charm:-3}; }},
+      ]},
+    { id:'exam_addiction', icon:'📝', title:'考试上瘾', category:'psychology',
+      body:'你发现——你上瘾了——上「考试」的瘾。\n\n你考了：\n- CPA（过了3门）\n- CFA一级（过了）\n- 基金从业（过了）\n- 证券从业（过了）\n- PMP（过了）\n- 雅思7分\n\n你的证书——能挂满一面墙。\n\n但你的工资——只涨了20%。\n\n你开始想：\n- 你为什么一直在考试？\n- 是因为「真的需要」？\n- 还是因为「考试让你觉得你在进步」？\n\n你开始理解：考试上瘾——不是「爱学习」——是「爱「通过考试」的感觉」。\n\n考试——是一种「有标准答案」的「确定性」。\n\n你在生活中——找不到确定性——所以你在考试里找。\n\n你不是在「提升自己」——你是在「用证书填补你的焦虑」。\n\n「考试上瘾：你不是在学习——你是在用「通过」的感觉——对抗生活的不确定。」',
+      cond: g => g.age >= 25 && !g.flags.examAddiction && g.intel >= 40 && g.jobSalary > 0,
+      choices:[
+        { label:'意识到问题了，开始聚焦实践', hint:'+🧠 +✨ +😊', fn: g => { g.flags.examAddiction=true; g.flags.practiceOverExam=true; return{intel:8,charm:5,mood:5}; }},
+        { label:'又报了一个考试', hint:'-💰 -🧠 +✨', fn: g => { g.flags.examAddiction=true; g.money -= 5000; return{intel:-3,charm:3}; }},
+        { label:'觉得证书多总没坏处', hint:'+✨ -🧠', fn: g => { g.flags.examAddiction=true; g.flags.certificateHoarder=true; return{charm:3,intel:-3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -15838,6 +15919,16 @@ const ACHIEVEMENTS = [
     { id:'refused_privacy_ach', icon:'💍', name:'拒绝隐私侵犯', desc:'面试时拒绝回答私人问题', check: g => g.flags.refusedPrivacy },
     { id:'parenting_balance_ach', icon:'📖', name:'育儿平衡大师', desc:'在育儿观念冲突中找到平衡点', check: g => g.flags.parentingBalance },
     { id:'hard_comeback_ach', icon:'💼', name:'强势回归', desc:'产假后加倍努力3个月回到正轨', check: g => g.flags.hardComeback },
+    // v28.4: 考证热 + 继续教育 + 终身学习
+    { id:'cpa_passed_ach', icon:'📊', name:'注册会计师', desc:'通过CPA考试拿到证书', check: g => g.flags.cpaPassed },
+    { id:'bar_passed_ach', icon:'⚖️', name:'法考通关', desc:'通过国家统一法律职业资格考试', check: g => g.flags.barPassed },
+    { id:'bookworm_ach_v28_4', icon:'📚', name:'书虫', desc:'养成每月读书的好习惯', check: g => g.flags.bookworm },
+    { id:'deep_podcast_ach', icon:'🎧', name:'深度学习者', desc:'听播客做笔记真正消化吸收', check: g => g.flags.deepPodcastLearner },
+    { id:'successful_switch_ach', icon:'🔄', name:'成功转型', desc:'勇敢转行并找到了新方向', check: g => g.flags.successfulSwitch },
+    { id:'practice_over_exam_ach', icon:'🛠️', name:'实践出真知', desc:'意识到实践经验比证书更重要', check: g => g.flags.practiceOverExam },
+    { id:'certificate_hoarder_ach', icon:'📜', name:'证书收集癖', desc:'考了五个以上证书但不知道有什么用', check: g => g.flags.certificateHoarder },
+    { id:'systematic_learner_ach', icon:'🎓', name:'系统学习者', desc:'建立系统化的学习方法论', check: g => g.flags.systematicLearner },
+    { id:'fake_study_recovered_ach', icon:'💡', name:'从假努力中醒悟', desc:'意识到考试成瘾是在逃避现实', check: g => g.flags.wokeUpFromFakeStudy },
 ];
 
 // === ENDINGS === (order matters: first match wins)
