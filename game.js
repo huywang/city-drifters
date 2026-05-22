@@ -2172,6 +2172,40 @@ const EVENTS = [
         { label:'视频通话就好', hint:'+👨‍👩‍👧', fn: g => { g.flags.hometownNostalgia=true; g.relationships.family=clamp((g.relationships.family||60)+5,0,100); return{mood:5}; }},
         { label:'发条朋友圈感慨一下', hint:'+😊 +✨', fn: g => { g.flags.hometownNostalgia=true; return{mood:8,charm:3}; }},
       ]},
+    // === v2.34 NICHE EVENTS ===
+    { id:'pet_adoption', icon:'🐕', title:'领养宠物',
+      body:'你路过一家宠物店，看到一只小奶猫/小奶狗在笼子里用无辜的眼神看着你。\n\n你心想：养宠物每月要花500+，要铲屎、要遛弯、要带它看病。\n\n但它真的好可爱啊……\n\n"宠物不会说话，但它会用一生来回答你一个问题：你愿意爱我吗？"',
+      cond: g => !g.flags.hasPet && g.money>5000 && g.age>=24 && Math.random()>0.6,
+      choices:[
+        { label:'领养它！', hint:'-💰 +😊 +❤️', fn: g => { g.flags.hasPet=true; return{money:-3000,mood:25,health:5,charm:3}; }},
+        { label:'先考虑考虑', hint:'+🧠', fn: g => ({intel:3,mood:5}) },
+        { label:'算了，养不起', hint:'-😊', fn: g => ({mood:-5}) },
+      ]},
+    { id:'gig_economy', icon:'🛵', title:'零工经济',
+      body:'你的同事辞职去送外卖了。他说："自由，不用看老板脸色。"\n\n你打开App看了看：高峰期一单8块，一天跑12小时能赚200多。\n\n你算了算你的工资，突然觉得：也许"自由"有另一种定义。\n\n"零工经济不是自由，是用自由换了另一种不自由。"',
+      cond: g => g.job!=='待业中' && g.jobSalary<12000 && !g.flags.gigEconomy && g.age>=25,
+      choices:[
+        { label:'下班后兼职送外卖', hint:'+💰 -❤️', fn: g => { g.flags.gigEconomy=true; g.flags.sideHustle=true; return{money:3000,health:-8,mood:-3}; }},
+        { label:'做网约车司机', hint:'+💰 -❤️', fn: g => { g.flags.gigEconomy=true; g.flags.sideHustle=true; return{money:4000,health:-5,mood:-5}; }},
+        { label:'算了，还是好好上班', hint:'+😊', fn: g => { g.flags.gigEconomy=true; return{mood:3}; }},
+      ]},
+    { id:'midnight_reflection', icon:'🌙', title:'深夜独白',
+      body:'凌晨2点，你一个人躺在床上，睡不着。\n\n你想起了很多事：小时候的梦想、大学时的热血、刚来大城市时的雄心壮志。\n\n你问自己："现在的我，是10年前的我想要的样子吗？"\n\n答案可能是yes，可能是no，可能是"我不知道"。\n\n"深夜是人最诚实的时候——因为你骗不了自己。"',
+      cond: g => g.age>=26 && g.mood<55 && !g.flags.midnightReflection && Math.random()>0.6,
+      choices:[
+        { label:'写日记记录心情', hint:'+🧠 +😊', fn: g => { g.flags.midnightReflection=true; return{intel:8,mood:10}; }},
+        { label:'给老朋友打个电话', hint:'+👥 +😊', fn: g => { g.flags.midnightReflection=true; g.relationships.friends=clamp((g.relationships.friends||40)+10,0,100); return{social:8,mood:12}; }},
+        { label:'刷手机到天亮', hint:'-❤️ -😊', fn: g => { g.flags.midnightReflection=true; return{health:-5,mood:-5}; }},
+        { label:'打开招聘网站', hint:'+🧠', fn: g => { g.flags.midnightReflection=true; return{intel:5,mood:3}; }},
+      ]},
+    { id:'consumer_trap', icon:'🛍️', title:'消费主义陷阱',
+      body:'双十一/618来了。你的购物车里堆满了东西：\n\n- 最新款手机（虽然现在的还能用）\n- 一堆衣服（虽然衣柜里还有没拆标签的）\n- 各种护肤品（虽然你根本用不完）\n\n直播间里，主播在喊："3、2、1，上链接！"你的手指已经在付款按钮上了。\n\n"消费主义最大的谎言：你以为你在买快乐，其实你在买焦虑。"',
+      cond: g => (g.month===6 || g.month===11) && !g.flags.consumerTrap && g.money>5000,
+      choices:[
+        { label:'清空购物车！', hint:'-💰💰 +😊', fn: g => { g.flags.consumerTrap=true; return{money:-15000,mood:20,charm:5}; }},
+        { label:'只买必需品', hint:'-💰 +🧠', fn: g => { g.flags.consumerTrap=true; return{money:-2000,intel:5,mood:3}; }},
+        { label:'什么都不买', hint:'+💰 +🧠 +😊', fn: g => { g.flags.consumerTrap=true; g.flags.minimalist=true; return{intel:8,mood:8}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -2283,6 +2317,12 @@ const ACHIEVEMENTS = [
     { id:'viral_star', icon:'📱', name:'一夜爆红', desc:'在社交媒体意外走红', check: g => g.flags.socialMediaFame },
     { id:'super_parent', icon:'👶', name:'超级父母', desc:'面对育儿挑战', check: g => g.flags.childcareCrisis && g.flags.hasChild },
     { id:'hometown_heart', icon:'🌾', name:'乡愁诗人', desc:'感受到了乡愁', check: g => g.flags.hometownNostalgia },
+    // v2.34 achievements
+    { id:'pet_adopted', icon:'🐾', name:'铲屎官进阶', desc:'领养了一只宠物', check: g => g.flags.hasPet },
+    { id:'gig_worker', icon:'🛵', name:'零工达人', desc:'体验了零工经济', check: g => g.flags.gigEconomy },
+    { id:'night_thinker', icon:'🌙', name:'深夜思想家', desc:'经历了一次深夜独白', check: g => g.flags.midnightReflection },
+    { id:'smart_shopper', icon:'🧘', name:'理性消费者', desc:'抵制了消费主义陷阱', check: g => g.flags.minimalist },
+    { id:'five_year_drift', icon:'🎒', name:'五年漂泊', desc:'在大城市漂泊超过5年', check: g => g.months >= 60 },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -2345,6 +2385,12 @@ const ENDINGS = [
     { id:'career_pivot', badge:'🔄', title:'华丽转身', desc:'35岁那年，你成功转型了。\n\n你没有被年龄焦虑打败，而是找到了新的赛道。也许是管理岗，也许是技术专家，也许是完全不同的领域。\n\n你的经验成了优势，而不是包袱。\n\n"35岁不是终点，是另一个起点——前提是你准备好了。"', cond: g => g.flags.age35Crisis && g.flags.careerTransition && g.jobSalary>=20000 && g.age>=38 },
     { id:'sandwich_generation', badge:'🥪', title:'三明治一代', desc:'你上有老、下有小，你是全家的顶梁柱。\n\n父母的医药费、孩子的学费、房贷车贷——每一笔都压在你肩上。\n\n你不敢生病，不敢辞职，不敢休息。\n\n但你看着孩子的笑脸、父母的健康，你觉得一切都值了。\n\n"三明治虽然被夹在中间，但它是最有料的那一个。"', cond: g => g.flags.parentIllness && g.flags.hasChild && g.flags.married && g.age>=38 && g.mood>=50 },
     { id:'phoenix_rising', badge:'🔥', title:'浴火凤凰', desc:'你经历了人生最黑暗的时刻——也许是破产，也许是失业，也许是失去亲人。\n\n但你没有倒下。你一步一步地爬了起来，重新开始。\n\n现在的你：更坚强、更清醒、更珍惜当下。\n\n"人不是被打败的。一个人可以被毁灭，但不能被打败。"\n\n你成了别人眼中的"传奇"——不是因为成功，而是因为不放弃。', cond: g => (g.flags.romanceScam || g.flags.mortgageDefault || g.flags.parentIllness) && g.money>=50000 && g.mood>=65 && g.health>=60 && g.age>=40 },
+    // --- v2.34 NEW ENDINGS ---
+    { id:'workplace_legend', badge:'👑', title:'职场传奇', desc:'你从职场小白做到了行业大佬。\n\n你的LinkedIn有5万粉丝，你的每一次跳槽都上了新闻。猎头不是找你谈offer，是找你谈合作。\n\n有人说你"运气好"，但你知道：运气是准备遇到了机会。\n\n"职场没有天花板，只有你不敢想的楼层。"', cond: g => g.jobSalary>=40000 && g.intel>=80 && g.social>=70 && g.months>=96 && g.age>=35 },
+    { id:'relationship_guru', badge:'💕', title:'幸福人生', desc:'你有了一段美好的感情/婚姻。\n\n你们互相理解、互相支持、互相成长。不是没有争吵，而是每次争吵后都更了解彼此。\n\n你们一起旅行、一起做饭、一起看日落。\n\n"幸福不是找到完美的人，而是学会用完美的眼光看不完美的人。"', cond: g => g.flags.married && g.relationships && g.relationships.partner>=80 && g.mood>=70 && g.age>=35 },
+    { id:'lonely_achiever', badge:'🏅', title:'孤独的成功者', desc:'你成功了——有钱、有地位、有名气。\n\n但你的通讯录里找不到一个可以深夜打电话的人。你的家人不理解你，你的朋友嫉妒你，你的同事利用你。\n\n你站在高楼落地窗前，看着城市的灯火，突然觉得：这些灯没有一盏是为你亮的。\n\n"成功有很多种。你得到了全世界，却失去了自己。"', cond: g => g.money>=200000 && g.social>=60 && g.relationships && g.relationships.friends<30 && g.relationships.family<30 && g.age>=35 },
+    { id:'comeback_kid', badge:'🎯', title:'逆风翻盘', desc:'所有人都觉得你完了——失业、负债、分手。\n\n但你用3年时间，从零开始，重新站了起来。\n\n你没有变得更富有，但你变得更强大。\n\n"人生最精彩的不是成功的时刻，而是从谷底爬起来的瞬间。"', cond: g => g.flags.techLayoff && g.money>=80000 && g.jobSalary>=15000 && g.mood>=60 && g.age>=32 },
+    { id:'wanderer', badge:'🚶', title:'漂泊者', desc:'你在大城市漂了很多年，没有买房，没有结婚，没有扎根。\n\n但你去了很多地方，见了很多世面，活得很自由。\n\n有人说你"不稳定"，你说："我只是还没找到值得停留的地方。"\n\n"漂泊不是无根，是在寻找最适合自己的土壤。"', cond: g => !g.flags.hasHouse && !g.flags.married && g.money>=30000 && g.charm>=60 && g.months>=72 && g.age>=32 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
@@ -2901,6 +2947,23 @@ function triggerEnding() {
         achievementShowcase.innerHTML = achievementSummary ? `<h3>🏆 获得成就</h3><div class="achievement-showcase">${achievementSummary}</div>` : '';
     }
 
+    // v2.34: Add attribute visualization
+    const attrViz = document.getElementById('attribute-viz');
+    if (attrViz) {
+        const attrs = [
+            { label: '💰 金钱', value: clamp(Math.floor((G.money+100000)/3000), 0, 100), raw: fmtMoney(G.money) },
+            { label: '❤️ 健康', value: G.health, raw: G.health },
+            { label: '😊 心情', value: G.mood, raw: G.mood },
+            { label: '🧠 智力', value: G.intel, raw: G.intel },
+            { label: '👥 人脉', value: G.social, raw: G.social },
+            { label: '✨ 魅力', value: G.charm, raw: G.charm },
+        ];
+        attrViz.innerHTML = `<h3>📊 人生属性</h3><div class="attr-bars">${attrs.map(a => {
+            const color = a.value >= 70 ? '#4ade80' : a.value >= 40 ? '#fbbf24' : '#f87171';
+            return `<div class="attr-row"><span class="attr-label">${a.label}</span><div class="attr-bar-bg"><div class="attr-bar-fill" style="width:${a.value}%;background:${color}"></div></div><span class="attr-value">${a.raw}</span></div>`;
+        }).join('')}</div>`;
+    }
+
     // Update ending progress
     const progressText = `已解锁 ${endingsUnlocked.length}/${ENDINGS.length} 种结局`;
     const progressEl = document.getElementById('ending-progress');
@@ -2958,11 +3021,11 @@ function getReplaySuggestions(endingId) {
 
 function getEndingRarity(endingId) {
     // Legendary (rare endings that require specific conditions)
-    const legendary = ['fire', 'immigration', 'executive', 'retire_abroad', 'wealthy', 'family_first', 'burnout_recovery', 'digital_nomad_senior', 'social_influencer_end', 'phoenix_rising'];
+    const legendary = ['fire', 'immigration', 'executive', 'retire_abroad', 'wealthy', 'family_first', 'burnout_recovery', 'digital_nomad_senior', 'social_influencer_end', 'phoenix_rising', 'workplace_legend'];
     // Rare (hard to achieve)
-    const rare = ['settled', 'startup_end', 'influencer_end', 'digital_nomad', 'karoshi', 'jail', 'social_butterfly_end', 'health_guru', 'side_hustle_king', 'kaogong_success', 'mentor_end', 'community_builder', 'career_pivot', 'anti_fraud_hero'];
+    const rare = ['settled', 'startup_end', 'influencer_end', 'digital_nomad', 'karoshi', 'jail', 'social_butterfly_end', 'health_guru', 'side_hustle_king', 'kaogong_success', 'mentor_end', 'community_builder', 'career_pivot', 'anti_fraud_hero', 'relationship_guru', 'comeback_kid'];
     // Uncommon (moderately difficult)
-    const uncommon = ['hometown_hero', 'go_home', 'civil_end', 'ordinary', 'single', 'investment_guru', 'lying_flat_end', 'lonely_death', 'estranged', 'pet_parent', 'mortgage_default_end', 'kong_yiji_end', 'full_time_child_end', 'minimalist_life', 'slow_life', 'scam_victim', 'sandwich_generation'];
+    const uncommon = ['hometown_hero', 'go_home', 'civil_end', 'ordinary', 'single', 'investment_guru', 'lying_flat_end', 'lonely_death', 'estranged', 'pet_parent', 'mortgage_default_end', 'kong_yiji_end', 'full_time_child_end', 'minimalist_life', 'slow_life', 'scam_victim', 'sandwich_generation', 'lonely_achiever', 'wanderer'];
 
     if (legendary.includes(endingId)) return 'legendary';
     if (rare.includes(endingId)) return 'rare';
@@ -3146,7 +3209,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.33' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.34' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
