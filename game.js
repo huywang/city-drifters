@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v11.2
+// 都市浮生记 - Game Engine v11.3
 // ============================================
 
 // === GAME STATE ===
@@ -5355,6 +5355,63 @@ const EVENTS = [
         { label:'只逛逛不吃', hint:'+😊', fn: g => { return{mood:5}; }},
         { label:'拍照发朋友圈', hint:'+✨', fn: g => { return{charm:5,mood:8}; }},
       ]},
+    // === v11.3 美食/夜生活/城市探索 ===
+    { id:'food_explorer', icon:'🍜', title:'美食探店',
+      body:'你在大众点评上发现了一家评分4.9的小店，藏在居民楼里。\n\n你点了老板推荐的招牌菜——一碗普通的牛肉面。但第一口你就明白了为什么评分这么高。\n\n你问老板秘诀是什么，他说："做了30年，就是秘诀。"\n\n"大城市的宝藏不在CBD，在居民楼里。"',
+      cond: g => g.months > 6 && g.money > 500,
+      choices:[
+        { label:'成为常客', hint:'-💰 +😊', fn: g => { g.flags.foodExplorer=true; return{money:-100,mood:10,health:3}; }},
+        { label:'写点评推荐', hint:'+✨', fn: g => { g.flags.foodExplorer=true; return{charm:5,social:3,mood:5}; }},
+        { label:'下次再来', hint:'+😊', fn: g => { return{mood:5}; }},
+      ]},
+    { id:'late_night_canteen', icon:'🌙', title:'深夜食堂',
+      body:'凌晨1点，你加完班走进一家还开着门的小饭馆。\n\n店里只有你和一个同样加班到很晚的人。你们对视了一眼，互相点了点头。\n\n老板端来一碗热汤面："看你每天都这么晚，多给你加了个蛋。"\n\n"深夜食堂卖的不是食物，是温暖。"',
+      cond: g => g.months > 6 && g.mood < 55,
+      choices:[
+        { label:'慢慢吃完', hint:'+😊 +💪', fn: g => { return{mood:12,health:5}; }},
+        { label:'和陌生人聊天', hint:'+👥', fn: g => { return{social:8,mood:8}; }},
+        { label:'给老板小费', hint:'-💰 +😊', fn: g => { return{money:-20,mood:8,charm:3}; }},
+      ]},
+    { id:'cooking_class', icon:'👨‍🍳', title:'学做饭',
+      body:'你报了一个周末烹饪课。300块一节课，学做川菜。\n\n你切的土豆丝像薯条，炒的回锅肉像黑暗料理。但老师说："第一次做成这样已经很好了。"\n\n你回家后做了一顿饭给自己吃——虽然味道一般，但你觉得比外卖好吃一百倍。\n\n"做饭是成年人最低成本的治愈方式。"',
+      cond: g => g.age >= 22 && g.money > 500 && !g.flags.cookingSkill,
+      choices:[
+        { label:'继续学', hint:'-💰 +🧠', fn: g => { g.flags.cookingSkill=true; return{money:-1200,intel:3,health:5,mood:8}; }},
+        { label:'只学这一节', hint:'+🧠', fn: g => { g.flags.cookingSkill=true; return{money:-300,health:3,mood:5}; }},
+        { label:'还是点外卖', hint:'+😊', fn: g => { return{mood:-3}; }},
+      ]},
+    { id:'rooftop_bar', icon:'🍸', title:'天台酒吧',
+      body:'朋友带你去了一家藏在楼顶的天台酒吧。没有招牌，没有大众点评，只有熟客才知道。\n\n你坐在楼顶，喝着精酿啤酒，看着城市的夜景。风很大，灯很暖。\n\n你突然觉得：这座城市没有你想的那么糟。\n\n"天台酒吧是大城市的秘密——你需要一个足够高的地方，才能看到城市的美。"',
+      cond: g => g.age >= 22 && g.money > 1000 && g.social >= 30,
+      choices:[
+        { label:'常来', hint:'-💰 +😊', fn: g => { g.flags.rooftopRegular=true; return{money:-200,mood:12,charm:3}; }},
+        { label:'发条朋友圈', hint:'+✨', fn: g => { return{charm:8,mood:5}; }},
+        { label:'喝完就走', hint:'+😊', fn: g => { return{mood:5}; }},
+      ]},
+    { id:'food_blogger', icon:'📸', title:'美食博主',
+      body:'你开始把每天吃的饭拍照发到小红书上。\n\n一开始只有10个人看，慢慢地变成了100个、1000个。有人评论说："看你吃饭好治愈。"\n\n你开始被店家邀请试吃——免费的。你觉得自己找到了人生方向。\n\n"美食博主的秘诀：把普通的饭拍得不普通。就像把普通的生活过得不普通。"',
+      cond: g => g.flags.foodExplorer && g.charm >= 40 && g.months > 12,
+      choices:[
+        { label:'认真经营', hint:'+✨ +👥', fn: g => { g.flags.foodBlogger=true; return{charm:10,social:5,mood:8}; }},
+        { label:'佛系更新', hint:'+✨', fn: g => { g.flags.foodBlogger=true; return{charm:5,mood:5}; }},
+        { label:'只是记录', hint:'+😊', fn: g => { return{mood:5}; }},
+      ]},
+    { id:'night_market', icon:'🏮', title:'夜市经济',
+      body:'你发现了一个新的夜市，就在你家附近。\n\n烤串的、卖花的、算命的、贴膜的——什么都有。你在一个摊位前停了下来：一个90后在卖手工皮具。\n\n他说："白天上班，晚上摆摊，一个月多赚3000。"\n\n你心想：这就是大城市的生存智慧。\n\n"夜市是大城市的毛细血管——看不见，但维持着城市的活力。"',
+      cond: g => g.months > 6 && g.money > 200,
+      choices:[
+        { label:'逛逛买买', hint:'-💰 +😊', fn: g => { return{money:-150,mood:10,social:3}; }},
+        { label:'也去摆摊', hint:'+💰 +👥', fn: g => { g.flags.streetVendor=true; return{money:500,social:5,mood:8}; }},
+        { label:'拍照记录', hint:'+✨', fn: g => { return{charm:5,mood:5}; }},
+      ]},
+    { id:'bookstore_cafe', icon:'📖', title:'独立书店',
+      body:'你在一条小巷里发现了一家独立书店。店里很安静，只有翻书的声音和咖啡机嗡嗡的声音。\n\n老板是个文艺中年，他说："这家店开了十年了，从来没赚过钱。但我舍不得关。"\n\n你买了一本书，在店里坐了一下午。这是你来这座城市以来，最平静的一个下午。\n\n"独立书店是城市的精神灯塔——它不赚钱，但它让城市值得生活。"',
+      cond: g => g.intel >= 40 && g.months > 6 && g.money > 200,
+      choices:[
+        { label:'办会员卡', hint:'-💰 +🧠', fn: g => { g.flags.bookstoreMember=true; return{money:-200,intel:5,mood:8}; }},
+        { label:'买书回家看', hint:'-💰 +🧠', fn: g => { return{money:-50,intel:3,mood:5}; }},
+        { label:'下次再来', hint:'+😊', fn: g => { return{mood:5}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'first_job', icon:'💼', name:'职场新人', desc:'找到第一份工作', check: g => g.flags.gotFirstJob },
@@ -5813,6 +5870,11 @@ const ACHIEVEMENTS = [
     { id:'resolution_keeper', icon:'🎯', name:'新年践行者', desc:'认真执行了新年计划', check: g => g.flags.newYearResolution },
     { id:'stock_survivor', icon:'📉', name:'股市幸存者', desc:'经历了股市崩盘', check: g => g.investments && g.investments.stock >= 0 },
     { id:'frugal_master', icon:'💹', name:'节俭大师', desc:'在通胀中保持理性', check: g => g.money >= 10000 && g.months > 48 && g.intel >= 50 },
+    // === v11.3 新增成就 ===
+    { id:'food_explorer_ach', icon:'🍜', name:'美食探险家', desc:'发现了宝藏小店', check: g => g.flags.foodExplorer },
+    { id:'food_blogger_ach', icon:'📸', name:'美食博主', desc:'开始在小红书分享美食', check: g => g.flags.foodBlogger },
+    { id:'rooftop_regular', icon:'🍸', name:'天台常客', desc:'找到了秘密酒吧', check: g => g.flags.rooftopRegular },
+    { id:'bookworm_ach', icon:'📖', name:'书虫', desc:'成为独立书店会员', check: g => g.flags.bookstoreMember },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -5955,6 +6017,8 @@ const ENDINGS = [
     { id:'free_soul_end', badge:'🦅', title:'自由灵魂', desc:'你选择了大多数人不敢选择的路。\n\n没有房贷、没有婚姻的枷锁、没有固定的工作。你有的是：一只猫、几个好朋友、一颗自由的心。\n\n你在朋友圈写道："我不是什么都没有，我拥有自由。"\n\n有人说你勇敢，有人说你疯了。但你知道：真正的自由，是不在乎别人的评价。\n\n"自由不是逃避，是另一种活法。"', cond: g => !g.flags.married && !g.flags.hasHouse && g.flags.hasPet && g.mood >= 70 && g.charm >= 55 && g.age >= 32 },
     // --- v11.2 NEW ENDINGS ---
     { id:'festival_lover_end', badge:'🏮', title:'生活家', desc:'你把每一个平凡的日子都过成了节日。\n\n春节你会包饺子、贴春联。中秋你会赏月、吃月饼。国庆你会出去浪。双11你会买买买。\n\n你的朋友说："跟你在一起，每天都有意思。"\n\n"生活不在于有多少大事件，在于你能不能把小事过得有滋味。"', cond: g => g.mood >= 70 && g.charm >= 45 && g.age >= 28 && g.social >= 50 },
+    // --- v11.3 NEW ENDINGS ---
+    { id:'foodie_end', badge:'🍜', title:'城市美食家', desc:'你吃遍了这座城市的每一个角落。\n\n从路边摊到米其林，从早餐铺到深夜食堂。你知道哪条巷子有最好的小面，哪个小区藏着最正宗的川菜。\n\n你在小红书上有了1万粉丝，他们叫你"城市胃王"。\n\n"美食是城市最好的名片——你用味蕾读完了这座城市的每一页。"', cond: g => g.flags.foodExplorer && g.flags.foodBlogger && g.charm >= 50 && g.mood >= 60 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
