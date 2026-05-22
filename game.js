@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v3.8
+// 都市浮生记 - Game Engine v3.9
 // ============================================
 
 // === GAME STATE ===
@@ -2844,6 +2844,34 @@ const EVENTS = [
         { label:'考虑FIRE提前退休', hint:'+💰 +😊', fn: g => { g.flags.delayedRetirement=true; g.flags.fireMovement=true; return{money:5000,mood:8}; }},
         { label:'不管了，活在当下', hint:'+😊 -💰', fn: g => { g.flags.delayedRetirement=true; return{mood:10,money:-2000}; }},
       ]},
+    // === v3.9 EVENTS - 脆皮打工人、搭子文化、35岁职场危机 ===
+    { id:'fragile_worker', icon:'🏥', title:'脆皮打工人',
+      body:'你爬三层楼梯气喘吁吁，熬一次夜心悸三天。\n\n体检报告上写着：颈椎反弓、甲状腺结节、腰椎间盘突出。\n\n你才26岁，但你的颈椎已经46岁了。\n\n"脆皮打工人"——一碰就坏，但还得继续上班。\n\n你决定开始养生：保温杯里泡枸杞，工位上做八段锦，睡前泡脚加艾草。',
+      cond: g => !g.flags.fragileWorker && g.age>=22 && g.age<=35 && g.health<60,
+      choices:[
+        { label:'开始轻养生', hint:'+❤️ +😊', fn: g => { g.flags.fragileWorker=true; g.flags.lightWellness=true; return{health:10,mood:8,money:-500}; }},
+        { label:'买保健品', hint:'-💰 +❤️', fn: g => { g.flags.fragileWorker=true; return{money:-3000,health:5,mood:3}; }},
+        { label:'办健身卡', hint:'-💰 +❤️ +😊', fn: g => { g.flags.fragileWorker=true; g.flags.gymMember=true; return{money:-2000,health:15,mood:10}; }},
+        { label:'算了，继续脆着', hint:'+😊 -❤️', fn: g => { g.flags.fragileWorker=true; return{mood:5,health:-10}; }},
+      ]},
+    { id:'dazi_culture', icon:'👥', title:'找搭子',
+      body:'你发现朋友圈都在找"搭子"：饭搭子、旅游搭子、运动搭子、摸鱼搭子。\n\n"搭子"——比朋友浅，比陌生人深。有相同目的，但不用交心。\n\n你在小红书发帖："找饭搭子，要求：不迟到、不矫情、AA制。"\n\n3分钟后，8个人私信你。\n\n"搭子文化的精髓：精准陪伴，互不打扰。"',
+      cond: g => !g.flags.daziCulture && g.age>=20 && g.age<=35 && g.social<70,
+      choices:[
+        { label:'找个饭搭子', hint:'+👥 +😊', fn: g => { g.flags.daziCulture=true; g.flags.foodDazi=true; return{social:15,mood:10}; }},
+        { label:'找个运动搭子', hint:'+👥 +❤️', fn: g => { g.flags.daziCulture=true; g.flags.sportsDazi=true; return{social:12,health:8,mood:8}; }},
+        { label:'找个旅游搭子', hint:'+👥 +✨', fn: g => { g.flags.daziCulture=true; g.flags.travelDazi=true; return{social:18,mood:15,money:-2000}; }},
+        { label:'不需要搭子', hint:'+😊', fn: g => { g.flags.daziCulture=true; return{mood:5,social:-5}; }},
+      ]},
+    { id:'age_35_crisis', icon:'⚠️', title:'35岁危机',
+      body:'你看到了数据：超60%的岗位明确要求"35岁以下"，40岁以上求职者简历回复率不足20%。\n\n阿里员工从25万锐减到12万，百度员工减少21%。\n\n你已经32岁了。还有3年。\n\n同事说："35岁是职场的保质期。过了这个年龄，你就是过期的罐头。"\n\n"中年不是危机，是清醒：你开始意识到，打工不是长久之计。"',
+      cond: g => !g.flags.age35Crisis && g.age>=30 && g.age<=38,
+      choices:[
+        { label:'开始副业计划', hint:'+💰 +🧠', fn: g => { g.flags.age35Crisis=true; g.flags.sidePlan=true; return{intel:10,mood:-5}; }},
+        { label:'考公上岸', hint:'+🧠 -😊', fn: g => { g.flags.age35Crisis=true; g.flags.civilServicePrep=true; return{intel:15,mood:-10,money:-5000}; }},
+        { label:'学习新技能', hint:'+🧠 +✨', fn: g => { g.flags.age35Crisis=true; return{intel:12,charm:5,money:-3000}; }},
+        { label:'焦虑，但继续上班', hint:'+😊 -🧠', fn: g => { g.flags.age35Crisis=true; return{mood:5,intel:-3}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3038,6 +3066,10 @@ const ACHIEVEMENTS = [
     // v3.8 achievements
     { id:'matchmaking_corner_visitor', icon:'💑', name:'相亲角体验者', desc:'经历公园相亲', check: g => g.flags.matchmakingCorner },
     { id:'retirement_planner', icon:'👴', name:'延迟退休规划者', desc:'面对延迟退休', check: g => g.flags.delayedRetirement },
+    // v3.9 achievements
+    { id:'wellness_beginner', icon:'🏥', name:'养生新手', desc:'开始轻养生', check: g => g.flags.lightWellness || g.flags.gymMember },
+    { id:'dazi_master', icon:'👥', name:'搭子达人', desc:'找到了搭子', check: g => g.flags.foodDazi || g.flags.sportsDazi || g.flags.travelDazi },
+    { id:'crisis_planner', icon:'⚠️', name:'危机规划者', desc:'面对35岁危机', check: g => g.flags.age35Crisis && (g.flags.sidePlan || g.flags.civilServicePrep) },
 ];
 
 // === ENDINGS === (order matters: first match wins)
