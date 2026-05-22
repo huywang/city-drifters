@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v27.8
+// 都市浮生记 - Game Engine v28.0
 // ============================================
 
 // === GAME STATE ===
@@ -14223,6 +14223,87 @@ const EVENTS = [
         { label:'很感动，以后也要帮助别人', hint:'+🤝 +😊', fn: g => { g.flags.neighborHelpNetwork=true; return{social:5,mood:5}; }},
         { label:'谢了大家，但觉得欠了人情', hint:'+😊 -🤝', fn: g => { g.flags.neighborHelpNetwork=true; return{mood:3,social:-3}; }},
       ]},
+    // v28.0: 消费决策系统 - 人生重大消费决策
+    { id:'buy_car_decision', icon:'🚗', title:'买车抉择', category:'finance',
+      body:'你决定买车了。\n\n你的选择：\n\n方案A：经济型（10万）\n- 月供：2500元（3年）\n- 保险：5000/年\n- 油费/电费：800/月\n- 停车费：500/月\n\n方案B：中档（20万）\n- 月供：5000元（3年）\n- 保险：8000/年\n- 油费：1200/月\n- 停车费：500/月\n\n方案C：豪华（40万）\n- 月供：10000元（3年）\n- 保险：15000/年\n- 油费：2000/月\n- 停车费：800/月\n\n你同事说：「车是消耗品，买便宜的就行。」\n你爸说：「买好一点的，有面子。」\n你妈说：「别买，打车多便宜。」\n你的内心：「我想要那个推背感……」\n\n你开始理解：买车——不是「买交通工具」——是「买一种身份认同」。\n\n你买什么车——取决于你想让别人觉得你是什么人。\n\n「买车抉择：你不是在买车——你是在买一个「移动的自我介绍」。」',
+      cond: g => g.age >= 22 && !g.flags.buyCarDecision && g.money >= 30000,
+      choices:[
+        { label:'买了经济型，够用就好', hint:'-💰 +🧠 +✨', fn: g => { g.flags.buyCarDecision=true; g.flags.economicCar=true; g.money -= 30000; g.reputation.economy += 3; return{intel:5,charm:3}; }},
+        { label:'买了中档车，平衡面子和钱包', hint:'-💰 +✨', fn: g => { g.flags.buyCarDecision=true; g.flags.midRangeCar=true; g.money -= 60000; g.reputation.economy += 5; return{charm:5}; }},
+        { label:'咬咬牙买了豪华车', hint:'-💰 +✨ -🧠', fn: g => { g.flags.buyCarDecision=true; g.flags.luxuryCar=true; g.money -= 120000; g.reputation.economy += 8; return{charm:10,intel:-3}; }},
+      ]},
+    { id:'home_renovation_v28_0', icon:'🏠', title:'装修大作战', category:'finance',
+      body:'你买了房（或者租了房），要装修了。\n\n你的预算：\n- 简装：5万（基本能住）\n- 中等：15万（舒适美观）\n- 豪装：30万（设计师+进口材料）\n\n你选了中等——15万。\n\n装修开始后——\n\n增项来了：\n- 「水电改造要加2万」\n- 「防水层要重做，加1万」\n- 「这个瓷砖没了，换进口的加3万」\n- 「吊顶要加钱，不然不好看」\n\n最终花费：22万（超预算47%）\n\n你发现：\n- 装修——是中国人一生中——被坑得最惨的消费\n- 每一个装修公司——都会给你「增项」\n- 每一个工人——都会说「这个要加钱」\n\n你开始理解：装修——不是「按预算来」——是「按实际来的预算只是个笑话」。\n\n你的预算——只是你「以为」要花多少。\n\n「装修大作战：装修预算——就是用来超的。」',
+      cond: g => g.age >= 25 && !g.flags.homeRenovation && g.money >= 50000,
+      choices:[
+        { label:'严格控制预算，只花了16万', hint:'+🧠 +✨ -💰', fn: g => { g.flags.homeRenovation=true; g.flags.budgetController=true; g.money -= 160000; return{intel:8,charm:3}; }},
+        { label:'超了预算但效果不错', hint:'-💰 +😊 +✨', fn: g => { g.flags.homeRenovation=true; g.money -= 220000; return{mood:5,charm:5}; }},
+        { label:'被坑了很多，花了30万', hint:'-💰 -😊', fn: g => { g.flags.homeRenovation=true; g.flags.renovationScammed=true; g.money -= 300000; return{mood:-8}; }},
+      ]},
+    { id:'insurance_decision', icon:'🛡️', title:'买保险', category:'finance',
+      body:'你开始考虑买保险了。\n\n保险代理人的推荐：\n\n方案A：重疾险\n- 年缴：8000元\n- 保额：50万\n- 保障：100种重疾\n\n方案B：医疗险\n- 年缴：1500元\n- 报销：百万医疗\n\n方案C：意外险\n- 年缴：300元\n- 保额：100万\n\n方案D：全家组合\n- 年缴：25000元\n- 什么都保\n\n代理人说：「保险是最好的投资，万一出事呢？」\n\n你爸说：「买什么保险，浪费钱。」\n你妈说：「买！万一呢！」\n你朋友说：「我买了10年了一次没用过。」\n\n你开始想：\n- 保险——是「花钱买安心」还是「花钱买废纸」？\n- 如果你不出事——你每年白交\n- 如果你出事了——保险公司可能「拒赔」\n\n你开始理解：保险——不是「投资」——是「赌自己会倒霉」。\n\n你赌赢了——你不想要这个奖。\n你赌输了——恭喜你，你出事了。\n\n「买保险：你不是在保护自己——你是在花几千块买一个「万一」的安心。」',
+      cond: g => g.age >= 25 && !g.flags.insuranceDecision && g.money >= 5000,
+      choices:[
+        { label:'买了重疾险+医疗险', hint:'-💰 +🧠 +😊', fn: g => { g.flags.insuranceDecision=true; g.flags.hasInsurance=true; g.money -= 9500; return{intel:5,mood:3}; }},
+        { label:'只买了百万医疗', hint:'-💰 +🧠', fn: g => { g.flags.insuranceDecision=true; g.flags.basicInsurance=true; g.money -= 1500; return{intel:3}; }},
+        { label:'觉得保险是骗人的，不买', hint:'+💰 -🧠', fn: g => { g.flags.insuranceDecision=true; g.flags.noInsurance=true; return{intel:-3}; }},
+      ]},
+    { id:'study_abroad_dream_v28_0', icon:'✈️', title:'出国留学梦', category:'career',
+      body:'你在考虑出国留学。\n\n你的选择：\n\n方案A：美国硕士\n- 学费+生活费：80万/2年\n- 回国竞争力：高\n- 留美概率：30%（H1B抽签）\n\n方案B：英国硕士\n- 学费+生活费：50万/1年\n- 回国竞争力：中\n- 留英概率：20%\n\n方案C：日本/韩国\n- 学费+生活费：30万/2年\n- 回国竞争力：中低\n- 留当地概率：40%\n\n你开始算：\n- 投入：50-80万\n- 回国后月薪增幅：+3000-5000\n- 回本周期：10-20年\n\n你开始想：\n- 留学——到底是「投资自己」还是「逃避就业」？\n- 你的同学——考研只需要2年+0成本\n- 你花80万——买的是什么？学历？经历？还是面子？\n\n你开始理解：留学——不是「值不值」——是「你能不能承担」。\n\n如果你家里有钱——留学是「锦上添花」。\n如果你借钱留学——留学是「雪上加霜」。\n\n「出国留学梦：你不是在买教育——你是在赌一个「更好的未来」。」',
+      cond: g => g.age >= 20 && g.age <= 30 && !g.flags.studyAbroadDream && g.intel >= 30,
+      choices:[
+        { label:'申请了奖学金去留学', hint:'+🧠 +✨ -💰', fn: g => { g.flags.studyAbroadDream=true; g.flags.scholarshipStudent=true; g.money -= 200000; g.reputation.culture += 10; return{intel:15,charm:8}; }},
+        { label:'自费去了英国读一年硕', hint:'-💰 +🧠 +✨', fn: g => { g.flags.studyAbroadDream=true; g.flags.ukMasters=true; g.money -= 500000; g.reputation.culture += 8; return{intel:10,charm:5}; }},
+        { label:'算了，国内考研/直接工作', hint:'+💰 +🧠', fn: g => { g.flags.studyAbroadDream=true; g.flags.choseDomestic=true; return{intel:5,mood:3}; }},
+      ]},
+    { id:'startup_gamble', icon:'🚀', title:'创业赌局', category:'career',
+      body:'你决定创业了。\n\n你的商业计划：\n- 行业：餐饮/互联网/教育（你选了一个）\n- 启动资金：30万（你的全部积蓄）\n- 合伙人：1个（你朋友）\n- 预计回本：18个月\n\n创业第3个月：\n- 收入：0\n- 支出：5万/月（房租+人工+材料）\n- 你的积蓄：还剩15万\n\n创业第6个月：\n- 收入：2万/月\n- 支出：4万/月\n- 你的积蓄：还剩3万\n- 合伙人开始动摇：「要不……算了吧？」\n\n创业第12个月：\n- 收入：5万/月\n- 支出：4.5万/月\n- 开始微利——但离「回本」还很远\n\n你开始理解：创业——不是「当老板」——是「用你的全部身家赌一个可能」。\n\n99%的创业——失败了。\n你看到的是那1%——因为他们上了新闻。\n\n你不是在创业——你是在「用30万买一个教训」。\n\n或者——你是在「用30万赌一个奇迹」。\n\n「创业赌局：你不是在创业——你是在用全部身家赌一个1%的可能。」',
+      cond: g => g.age >= 25 && !g.flags.startupGamble && g.money >= 300000,
+      choices:[
+        { label:'坚持下来了，第18个月开始盈利', hint:'+💰 +🧠 +✨ -😊', fn: g => { g.flags.startupGamble=true; g.flags.entrepreneur=true; g.flags.startupSurvivor=true; g.money -= 300000; setJob(g, '创业者', 15000); g.reputation.career += 10; return{intel:10,charm:5,mood:-3}; }},
+        { label:'撑了1年，赔光了关门了', hint:'-💰 -😊 +🧠', fn: g => { g.flags.startupGamble=true; g.flags.startupFailed=true; g.money -= 300000; setJob(g, '待业中', 0); return{mood:-10,intel:10}; }},
+        { label:'算了，还是回去上班吧', hint:'+💰 +😊 -✨', fn: g => { g.flags.startupGamble=true; g.flags.gaveUpStartup=true; return{mood:3,charm:-3}; }},
+      ]},
+    { id:'luxury_purchase', icon:'💎', title:'奢侈品消费', category:'finance',
+      body:'你路过了一家奢侈品店。\n\n橱窗里——一只包——标价28000元。\n\n你心动了。\n\n你开始算：\n- 28000 ÷ 你的月薪8000 = 3.5个月工资\n- 也就是说——你要工作3.5个月——才能买这只包\n\n你开始想：\n- 这个包——值3.5个月的劳动吗？\n- 你3.5个月的辛苦——换一个包？\n\n你的理由：\n- 「我工作这么辛苦——应该奖励自己」\n- 「这个包很经典——可以背10年」\n- 「背这个包——别人会觉得我混得不错」\n\n你的反对理由：\n- 「3.5个月工资——太夸张了」\n- 「同事会怎么想？」\n- 「这个钱——够交3个月房租了」\n\n你开始理解：奢侈品——不是「买品质」——是「买身份」。\n\n你不是在买包——你是在买「别人看你的眼神」。\n\n「奢侈品消费：你不是在买一个包——你是在用3.5个月的劳动换一个「面子」。」',
+      cond: g => g.age >= 22 && !g.flags.luxuryPurchase && g.money >= 28000,
+      choices:[
+        { label:'买了！对自己好一点', hint:'-💰 +✨ +😊 -🧠', fn: g => { g.flags.luxuryPurchase=true; g.flags.boughtLuxury=true; g.money -= 28000; g.reputation.economy += 3; return{charm:8,mood:5,intel:-3}; }},
+        { label:'试了试放下了，买不起', hint:'+🧠 -😊', fn: g => { g.flags.luxuryPurchase=true; g.flags.resistedLuxury=true; return{intel:5,mood:-3}; }},
+        { label:'买了个平替（拼多多200块）', hint:'+🧠 +😊', fn: g => { g.flags.luxuryPurchase=true; g.flags.smartSubstitute=true; g.money -= 200; return{intel:3,mood:3}; }},
+      ]},
+    { id:'tech_upgrade', icon:'💻', title:'电子产品升级', category:'finance',
+      body:'你的手机用了3年了——开始卡了。\n\n你想换新手机。\n\n你的选择：\n\niPhone 16 Pro Max：9999元\n- 优点：流畅、有面子、拍照好\n- 缺点：贵、每年贬值\n\n华为 Mate 60 Pro：6999元\n- 优点：国产、有情怀、信号好\n- 缺点：某些APP不兼容\n\n小米 14：3999元\n- 优点：性价比、配置高\n- 缺点：品牌不够高端\n\n二手 iPhone 14：3500元\n- 优点：便宜、够用\n- 缺点：电池不行\n\n你开始想：\n- 手机——是你使用最多的工具\n- 你每天用手机8小时\n- 9999 ÷ 3年 ÷ 365天 = 9元/天\n- 「一天9块而已」——你开始说服自己\n\n你开始理解：电子产品——不是「工具」——是「身份标签」。\n\n你用iPhone——别人觉得你「有钱」。\n你用小米——别人觉得你「务实」。\n你用华为——别人觉得你「爱国」。\n\n你用二手——别人什么都没觉得——因为没人注意你的手机。\n\n「电子产品升级：你不是在买手机——你是在选「别人怎么看你的钱包」。」',
+      cond: g => g.age >= 16 && !g.flags.techUpgrade && g.money >= 3500,
+      choices:[
+        { label:'买了最新款iPhone', hint:'-💰 +✨ -🧠', fn: g => { g.flags.techUpgrade=true; g.flags.latestTech=true; g.money -= 9999; return{charm:5,intel:-3}; }},
+        { label:'买了性价比最高的小米', hint:'-💰 +🧠 +✨', fn: g => { g.flags.techUpgrade=true; g.flags.valueTech=true; g.money -= 3999; return{intel:5,charm:3}; }},
+        { label:'买了二手的，够用就好', hint:'-💰 +🧠', fn: g => { g.flags.techUpgrade=true; g.flags.secondHandTech=true; g.money -= 3500; return{intel:8}; }},
+      ]},
+    { id:'education_investment', icon:'📚', title:'教育投资', category:'career',
+      body:'你在考虑「教育投资」。\n\n你的选择：\n\n方案A：MBA\n- 学费：30万\n- 时间：2年（周末上课）\n- 预期回报：升职加薪\n\n方案B：职业技能培训\n- 学费：2万\n- 时间：3个月\n- 预期回报：转行/加薪\n\n方案C：考证\n- CPA/CFA/司法考试\n- 学费：1万\n- 时间：1年备考\n- 预期回报：行业准入\n\n方案D：自学\n- 学费：0\n- 时间：不确定\n- 预期回报：不确定\n\n你开始算：\n- MBA：30万 ÷ (预期月薪增加5000 × 12月) = 5年回本\n- 培训：2万 ÷ (预期月薪增加2000 × 12月) = 10个月回本\n\n你开始理解：教育投资——不是「学了就有回报」——是「赌市场会认可你的证书」。\n\n你的MBA——市场可能不认。\n你的CPA——可能考不过。\n你的培训——可能过时了。\n\n唯一不亏的投资——是「真正的学习」——不是「买证书」。\n\n「教育投资：你不是在投资自己——你是在赌市场会为你的证书买单。」',
+      cond: g => g.age >= 22 && !g.flags.educationInvestment && g.money >= 10000 && g.jobSalary > 0,
+      choices:[
+        { label:'花了30万读了MBA', hint:'-💰 +🧠 +✨ +🤝', fn: g => { g.flags.educationInvestment=true; g.flags.hasMBA=true; g.money -= 300000; g.reputation.career += 8; g.reputation.culture += 5; return{intel:10,charm:5,social:5}; }},
+        { label:'考了行业证书', hint:'-💰 +🧠 +✨', fn: g => { g.flags.educationInvestment=true; g.flags.hasCertificate=true; g.money -= 10000; g.reputation.career += 5; return{intel:8,charm:3}; }},
+        { label:'选择了自学，省了钱', hint:'+💰 +🧠', fn: g => { g.flags.educationInvestment=true; g.flags.selfTaught=true; return{intel:5}; }},
+      ]},
+    { id:'wedding_budget', icon:'💒', title:'婚礼预算', category:'social',
+      body:'你要结婚了——要办婚礼。\n\n你的预算讨论：\n\n你妈：「至少20万，不能丢面子。」\n你爸：「10万够了，简单办。」\n你对象：「我想要一个浪漫的婚礼，50万。」\n你对象她妈：「彩礼30万+婚礼20万=50万。」\n你：「能不能旅行结婚？」\n\n所有人：「不行！」\n\n你算了算：\n- 酒店：5万（20桌）\n- 婚庆：3万\n- 婚纱+西装：2万\n- 摄影摄像：1万\n- 婚车：5000\n- 喜糖喜烟：5000\n- 其他：3万\n\n总计：15万\n\n你的存款：8万\n\n你开始理解：婚礼——不是「两个人的事」——是「两个家庭的面子工程」。\n\n你不是在办婚礼——你是在办一场「给亲戚看的表演」。\n\n婚礼的主角——不是你——是你妈的面子和你丈母娘的要求。\n\n「婚礼预算：你不是在办婚礼——你是在用15万买一天的「完美」和一辈子的「还债」。」',
+      cond: g => g.age >= 22 && !g.flags.weddingBudget && g.money >= 50000,
+      choices:[
+        { label:'简单办了，省了10万', hint:'+💰 +🧠 +✨ -😊', fn: g => { g.flags.weddingBudget=true; g.flags.simpleWedding=true; g.money -= 50000; return{intel:5,charm:3,mood:-3}; }},
+        { label:'按标准办了，花了15万', hint:'-💰 +😊 +🤝', fn: g => { g.flags.weddingBudget=true; g.flags.standardWedding=true; g.money -= 150000; return{mood:5,social:5}; }},
+        { label:'豪华婚礼，花了30万', hint:'-💰 +✨ +😊 -🧠', fn: g => { g.flags.weddingBudget=true; g.flags.luxuryWedding=true; g.money -= 300000; g.reputation.social += 5; return{charm:10,mood:8,intel:-3}; }},
+      ]},
+    { id:'parent_medical_fund', icon:'🏥', title:'父母医疗费', category:'health',
+      body:'你爸住院了。\n\n诊断：心脏支架手术。\n\n费用预估：\n- 手术费：5万\n- 住院费：2万\n- 后续药物：1万/年\n\n医保报销：60%\n自付部分：约3万\n\n你的存款：5万\n\n你开始想：\n- 如果只出3万——你的存款还剩2万\n- 如果你想用更好的支架（进口）——要加5万\n- 如果术后要请护工——要加1万\n\n你的兄弟姐妹：\n- 哥哥：「我出1万。」\n- 姐姐：「我出1万。」\n- 你：「那我出1万。」\n\n但你在心里算：\n- 如果父母再住一次院——你怎么办？\n- 如果父母需要长期护理——你怎么办？\n- 如果你自己也生病了——你怎么办？\n\n你开始理解：父母医疗费——不是「一笔钱」——是「一个持续一生的财务黑洞」。\n\n你不是在花钱治病——你是在「用钱换父母的时间」。\n\n这个钱——你不会想省——但你也没有那么多。\n\n「父母医疗费：你不是在花钱——你是在用你的一切换他们的每一天。」',
+      cond: g => g.age >= 25 && !g.flags.parentMedicalFund && g.money >= 10000,
+      choices:[
+        { label:'出了全部费用，用最好的', hint:'-💰 +😊 +❤️', fn: g => { g.flags.parentMedicalFund=true; g.flags.fullMedicalSupport=true; g.money -= 80000; g.reputation.social += 5; return{mood:5,health:-3,social:5}; }},
+        { label:'跟兄弟姐妹AA了费用', hint:'-💰 +🧠 +🤝', fn: g => { g.flags.parentMedicalFund=true; g.money -= 30000; return{intel:3,social:3}; }},
+        { label:'出了自己那份，但感到很焦虑', hint:'-💰 -😊 -🧠', fn: g => { g.flags.parentMedicalFund=true; g.flags.medicalAnxiety=true; g.money -= 30000; return{mood:-8,intel:-3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -15482,6 +15563,14 @@ const ACHIEVEMENTS = [
     { id:'neighbor_helper_ach', icon:'🏘️', name:'好邻居', desc:'开始主动帮助邻居成了热心人', check: g => g.flags.neighborHelper },
     { id:'group_helper_ach', icon:'📱', name:'群里的热心人', desc:'成了业主群里的热心人', check: g => g.flags.groupHelper },
     { id:'renovation_advocate_ach', icon:'🏗️', name:'改造先锋', desc:'积极参与老旧小区改造方案讨论', check: g => g.flags.renovationAdvocate },
+    // v28.0: 消费决策系统成就
+    { id:'economic_car_ach', icon:'🚗', name:'务实车主', desc:'买了经济型车够用就好', check: g => g.flags.economicCar },
+    { id:'budget_controller_ach', icon:'🏠', name:'装修控预算', desc:'装修严格控制预算只超了1万', check: g => g.flags.budgetController },
+    { id:'has_insurance_ach', icon:'🛡️', name:'未雨绸缪', desc:'买了重疾险和医疗险', check: g => g.flags.hasInsurance },
+    { id:'startup_survivor_ach', icon:'🚀', name:'创业幸存者', desc:'创业坚持到第18个月开始盈利', check: g => g.flags.startupSurvivor },
+    { id:'scholarship_student_ach', icon:'✈️', name:'奖学金留学', desc:'申请到奖学金去留学', check: g => g.flags.scholarshipStudent },
+    { id:'simple_wedding_ach', icon:'💒', name:'简约婚礼', desc:'简单办了婚礼省了10万', check: g => g.flags.simpleWedding },
+    { id:'smart_substitute_ach', icon:'💎', name:'平替达人', desc:'买了个平替省了几万块', check: g => g.flags.smartSubstitute },
 ];
 
 // === ENDINGS === (order matters: first match wins)
