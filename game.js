@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v20.3
+// 都市浮生记 - Game Engine v21.0
 // ============================================
 
 // === GAME STATE ===
@@ -9752,6 +9752,103 @@ const EVENTS = [
         { label:'单身也挺好的，但不排斥遇到对的人', hint:'+😊', fn: g => { g.flags.singleHappy=true; return{mood:8}; }},
         { label:'其实还是有点想谈恋爱', hint:'-😊', fn: g => { g.flags.singleHappy=true; return{mood:-3}; }},
       ]},
+    // === v21.0 新增事件（人生哲学 + 终极思考） ===
+    { id:'death_education', icon:'🕯️', title:'死亡教育', category:'psychology',
+      body:'你参加了一个「死亡咖啡馆」——一群人坐在一起，谈论死亡。\n\n主持人说：「我们不卖保险、不推销墓地。我们只是想让大家聊一聊：如果你只剩下一年，你会做什么？」\n\n有人说：「我会去旅行。」\n有人说：「我会跟所有我爱的人说我爱他们。」\n有人说：「我会写一本书。」\n\n轮到你了。你想了很久，说：「我不知道。但我觉得，这个问题应该早点想。」\n\n你的一个朋友说：「谈论死亡不是为了害怕——是为了更好地活着。当你知道什么是最重要的，你就不会在琐事上浪费时间了。」\n\n你走出咖啡馆，看了看天空。你觉得：今天的天空特别蓝。\n\n「死亡教育：不是教你怎么死——是教你怎么活。」',
+      cond: g => !g.flags.deathEducation && g.age >= 25,
+      choices:[
+        { label:'开始认真思考什么是最重要的', hint:'+🧠 +😊', fn: g => { g.flags.deathEducation=true; g.flags.deathAware=true; return{intel:8,mood:5}; }},
+        { label:'写了一封给未来的信', hint:'+🧠 +❤️', fn: g => { g.flags.deathEducation=true; g.flags.letterToFuture=true; return{intel:5,mood:8}; }},
+        { label:'不想太多，过好当下', hint:'+😊', fn: g => { g.flags.deathEducation=true; return{mood:5}; }},
+      ]},
+    { id:'bucket_list_execute', icon:'📋', title:'执行遗愿清单', category:'hobby',
+      body:'你列了一个「人生清单」——10件死之前一定要做的事。\n\n1. 看一次极光 ❌\n2. 学会弹吉他 ✅\n3. 去西藏 ❌\n4. 写一本书 ❌\n5. 跑一次马拉松 ❌\n6. 跟父母旅行 ✅\n7. 学一门外语 ❌\n8. 做一件疯狂的事 ❌\n9. 帮助100个陌生人 ❌\n10. 找到一生的热爱 ✅\n\n你看了看清单，只完成了3件。你决定：不能再等了。\n\n你请了一周年假，去了冰岛看极光。当绿色的光幕在天空中舞动的时候，你哭了。\n\n你给清单上的「看一次极光」打了个勾。还剩6件。\n\n「人生清单：不是等死之前才做的事——是提醒自己，活着就要行动。」',
+      cond: g => !g.flags.bucketListExecute && g.age >= 25 && g.money >= 20000,
+      choices:[
+        { label:'开始逐项完成人生清单', hint:'+😊 +🧠 -💰', fn: g => { g.flags.bucketListExecute=true; g.flags.listCompleter=true; return{mood:15,intel:5,money:-15000}; }},
+        { label:'完成了几件最想做的', hint:'+😊 -💰', fn: g => { g.flags.bucketListExecute=true; return{mood:10,money:-8000}; }},
+        { label:'列了清单但还没行动', hint:'+🧠', fn: g => { g.flags.bucketListExecute=true; return{intel:3}; }},
+      ]},
+    { id:'elder_wisdom', icon:'👴', title:'老人的智慧', category:'social',
+      body:'你在公园里遇到了一个80岁的老人。他在下棋，你坐在旁边看。\n\n他看了你一眼说：「年轻人，你看起来很累。」\n\n你跟他聊了起来。他说了一句话让你记了很久：\n\n「我活了80年，最后悔的不是做错的事——是没做的事。我后悔没在年轻的时候多旅行、多读书、多跟喜欢的人说喜欢。钱是赚不完的，但时间是用得完的。」\n\n你问他：「人生最重要的是什么？」\n\n他想了想说：「健康。没有健康，其他都是零。」\n\n你又问：「第二重要的呢？」\n\n他笑了：「自由。做自己想做的事，成为自己想成为的人。」\n\n你离开公园的时候，觉得：今天的阳光特别好。\n\n「老人的智慧：不是因为他们比你聪明——而是因为他们比你多活了一辈子。」',
+      cond: g => !g.flags.elderWisdom && g.age >= 22,
+      choices:[
+        { label:'被深深触动，开始重新审视生活', hint:'+🧠 +😊 +❤️', fn: g => { g.flags.elderWisdom=true; g.flags.lifePerspective=true; return{intel:10,mood:8,health:3}; }},
+        { label:'觉得有道理，但生活还是要继续', hint:'+🧠', fn: g => { g.flags.elderWisdom=true; return{intel:5,mood:3}; }},
+        { label:'鸡汤听听就好', hint:'', fn: g => { g.flags.elderWisdom=true; return{mood:2}; }},
+      ]},
+    { id:'write_memoir', icon:'📖', title:'写回忆录', category:'hobby',
+      body:'你开始写回忆录——不是为了出版，只是为了记录。\n\n你从童年开始写：那个夏天的午后、奶奶家门前的老槐树、第一次考100分的骄傲、第一次失恋的泪水。\n\n你发现：很多你以为忘记的事，写着写着就想起来了。很多你以为不重要的事，写着写着才发现它们改变了你。\n\n你的一个朋友说：「你写这些有什么用？」\n\n你说：「让我知道自己是谁。让我知道自己从哪里来。让我知道自己经历了什么。」\n\n你写了三个月，写了5万字。你把稿子打印出来，放在了书架上。\n\n也许有一天，你的孩子会翻开它。也许他们会理解：他们的父母，也曾是一个有梦想的年轻人。\n\n「回忆录：不是为了别人——是为了不让自己的人生变成一个无人知晓的故事。」',
+      cond: g => !g.flags.writeMemoir && g.age >= 30 && g.intel >= 50,
+      choices:[
+        { label:'坚持写完了回忆录', hint:'+🧠 +😊 +❤️', fn: g => { g.flags.writeMemoir=true; g.flags.memoirist=true; return{intel:10,mood:12,social:3}; }},
+        { label:'写了一部分，以后继续', hint:'+🧠 +😊', fn: g => { g.flags.writeMemoir=true; return{intel:5,mood:8}; }},
+        { label:'写了几页就放弃了', hint:'', fn: g => { g.flags.writeMemoir=true; return{intel:2}; }},
+      ]},
+    { id:'hospice_volunteer', icon:'🏥', title:'临终关怀志愿者', category:'society',
+      body:'你报名成为了临终关怀病房的志愿者。\n\n你的工作是陪伴那些即将离开人世的人——听他们说话、给他们读书、握住他们的手。\n\n你陪伴了一个78岁的老爷爷。他说：「我这辈子最大的遗憾，是没有对老婆说过一句「我爱你」。我以为她知道——但她不知道。」\n\n另一个病人说：「我这辈子最大的骄傲，不是赚了多少钱——是我的两个孩子都是好人。」\n\n你在那里待了三个月。你发现：在生命的最后时刻，没有人谈论工作、没有人谈论金钱、没有人谈论房子。所有人谈论的都是：爱、关系、回忆。\n\n你回到家，给你妈打了个电话：「妈，我爱你。」\n\n你妈说：「你是不是出什么事了？」\n\n你说：「没有。我只是想告诉你。」\n\n「临终关怀：不是陪别人走完最后一程——是提醒自己，还活着的时候，把该说的话说完。」',
+      cond: g => !g.flags.hospiceVolunteer && g.age >= 25 && g.social >= 40,
+      choices:[
+        { label:'坚持做志愿者，被深深改变', hint:'+❤️ +😊 +🧠', fn: g => { g.flags.hospiceVolunteer=true; g.flags.lifeChanged=true; return{mood:12,intel:8,social:5}; }},
+        { label:'做了一段时间，需要消化', hint:'+🧠 +❤️', fn: g => { g.flags.hospiceVolunteer=true; return{intel:5,mood:5}; }},
+        { label:'太沉重了，做不下去', hint:'-😊', fn: g => { g.flags.hospiceVolunteer=true; return{mood:-5}; }},
+      ]},
+    { id:'minimalist_ultimate', icon:'🏠', title:'极简人生', category:'psychology',
+      body:'你做了一个决定：扔掉所有不需要的东西。\n\n你花了整个周末整理家里：衣柜里3年没穿的衣服、书架上没看过的书、抽屉里过期的药、手机里2000张重复的照片。\n\n你扔了8袋垃圾、捐了3箱衣服、卖了20件闲置。你的家从拥挤变成了通透。\n\n你的室友说：「你怎么什么都扔了？」\n\n你说：「我不是在扔东西——我是在给生活留空间。当你的东西少了，你才能看到什么是真正重要的。」\n\n你发现：极简不是空无一物——是只留下让你心动的东西。当你不再被物品束缚，你才真正自由了。\n\n你坐在空了一半的房间里，觉得：前所未有的轻松。\n\n「极简人生：不是拥有更少——是需要更少就能满足。」',
+      cond: g => !g.flags.minimalistUltimate && g.age >= 25 && g.mood <= 50,
+      choices:[
+        { label:'彻底拥抱极简主义', hint:'+😊 +🧠 +❤️', fn: g => { g.flags.minimalistUltimate=true; g.flags.ultimateMinimalist=true; return{mood:15,intel:5,money:3000}; }},
+        { label:'精简了生活，保留真正重要的', hint:'+😊 +🧠', fn: g => { g.flags.minimalistUltimate=true; return{mood:10,intel:3,money:1500}; }},
+        { label:'整理了一下，但舍不得扔太多', hint:'+😊', fn: g => { g.flags.minimalistUltimate=true; return{mood:5}; }},
+      ]},
+    { id:'letter_to_future', icon:'✉️', title:'给未来的信', category:'psychology',
+      body:'你写了一封信——给10年后的自己。\n\n「亲爱的40岁的我：\n\n你好。我是30岁的你。你现在还好吗？\n\n我现在很焦虑。我不知道10年后会怎样——也许你已经实现了梦想，也许你已经放弃了。不管怎样，我希望你还是你。\n\n我希望你还记得：你曾经想做一个好人、想过有意义的生活、想让父母骄傲。\n\n如果10年后的你看到这些，请告诉我：这些梦想，实现了吗？」\n\n你把信封好，设了一个10年后的提醒。\n\n你的一个朋友也写了：「我给自己写了一封，内容是：如果你不开心，就辞职。不管你在做什么。」\n\n你发现：写信给未来的自己，其实是在跟现在的自己对话。\n\n「给未来的信：不是预测未来——是提醒自己，不要忘记现在。」',
+      cond: g => !g.flags.letterToFuture2 && g.age >= 22 && g.age <= 40,
+      choices:[
+        { label:'认真写了，封存起来等待未来打开', hint:'+🧠 +❤️', fn: g => { g.flags.letterToFuture2=true; g.flags.futureLetter=true; return{intel:5,mood:8}; }},
+        { label:'写了一封给父母的信', hint:'+❤️ +😊', fn: g => { g.flags.letterToFuture2=true; return{mood:10,social:3}; }},
+        { label:'想了想但没写', hint:'', fn: g => { g.flags.letterToFuture2=true; return{intel:2}; }},
+      ]},
+    { id:'retirement_dream', icon:'🏖️', title:'退休后的梦想', category:'midlife',
+      body:'你开始想：退休后做什么？\n\n你的同事说：「我要回农村种地、养鸡、种菜。」\n你的领导说：「我要环游世界。」\n你的父母说：「帮我们带孙子就行。」\n\n你想了想你的答案：你想开一家小书店。不赚钱没关系——只要有人来看书、喝茶、聊天就好。\n\n你的一个朋友已经退休了，他说：「退休后的第一年很爽，第二年很闲，第三年很无聊。你得有点事做。」\n\n另一个退休的朋友说：「我退休后学了画画、学了钢琴、还去老年大学学了英语。现在比以前上班还忙。」\n\n你开始理解：退休不是终点——是另一个起点。问题不是「退休后做什么」——是「你到底想成为什么样的人」。\n\n「退休后的梦想：不是你终于有时间了——是你终于可以只做自己想做的事了。」',
+      cond: g => !g.flags.retirementDream && g.age >= 40 && g.age <= 55,
+      choices:[
+        { label:'开始为退休后的生活做准备', hint:'+🧠 +💰', fn: g => { g.flags.retirementDream=true; g.flags.retirementPrep=true; g.flags.retirementPlanning=true; return{intel:5,mood:5}; }},
+        { label:'想了想，还早呢', hint:'+😊', fn: g => { g.flags.retirementDream=true; return{mood:3}; }},
+        { label:'不想退休，工作就是我的生活', hint:'', fn: g => { g.flags.retirementDream=true; return{mood:2}; }},
+      ]},
+    { id:'stoic_practice', icon:'🏛️', title:'斯多葛哲学', category:'psychology',
+      body:'你读了一本书：《沉思录》——罗马皇帝马可·奥勒留的私人日记。\n\n你被一句话击中了：「你无法控制风浪，但你可以调整船帆。」\n\n你开始实践斯多葛哲学：\n- 区分「能控制的」和「不能控制的」\n- 只关注能控制的事\n- 接受不能控制的事\n\n你发现：你的焦虑90%来自于你无法控制的事——别人的看法、经济形势、天气、交通。当你不再为这些焦虑，你的世界突然安静了。\n\n你的同事说：「你最近怎么这么淡定？」\n\n你说：「因为我终于明白了一件事：世界上只有三件事——我的事、你的事、老天的事。我管好我的事就行了。」\n\n「斯多葛哲学：不是冷漠——是在混乱的世界中，保持内心的秩序。」',
+      cond: g => !g.flags.stoicPractice && g.age >= 25 && g.intel >= 50,
+      choices:[
+        { label:'深入学习斯多葛哲学，改变了人生态度', hint:'+🧠 +😊', fn: g => { g.flags.stoicPractice=true; g.flags.stoic=true; return{intel:10,mood:10}; }},
+        { label:'觉得有道理，但做不到', hint:'+🧠', fn: g => { g.flags.stoicPractice=true; return{intel:5,mood:3}; }},
+        { label:'太消极了，我还是要积极面对', hint:'', fn: g => { g.flags.stoicPractice=true; return{intel:2}; }},
+      ]},
+    { id:'ikigai_search', icon:'🎯', title:'找到Ikigai', category:'psychology',
+      body:'你在网上看到了一个日本概念：Ikigai（生き甲斐）——活着的理由。\n\nIkigai是四个圈的交集：\n1. 你热爱的事\n2. 你擅长的事\n3. 世界需要的事\n4. 能养活你的事\n\n当这四个圈重叠的地方——就是你的Ikigai。\n\n你画了四个圈。你发现：你热爱写作、你擅长分析、世界需要清晰的思考、但写作和分析不太能养活你。\n\n你调整了一下：你热爱「帮人理解复杂事物」、你擅长「把复杂的东西变简单」、世界需要这个、而且很多公司愿意为这个付钱。\n\n你突然找到了你的Ikigai：知识传播者。\n\n你开始写科普文章、做知识分享。你的粉丝不多，但每一个都认真读了你的内容。\n\n你终于理解了Ikigai的意义：不是找到完美的工作——是找到让你愿意每天早起的理由。\n\n「Ikigai：不是目的地——是方向。当你找到了方向，每一步都有了意义。」',
+      cond: g => !g.flags.ikigaiSearch && g.age >= 25 && g.intel >= 55,
+      choices:[
+        { label:'找到了自己的Ikigai，开始实践', hint:'+😊 +🧠 +❤️', fn: g => { g.flags.ikigaiSearch=true; g.flags.foundIkigai=true; return{mood:15,intel:8,social:5}; }},
+        { label:'还在寻找中，但有了方向', hint:'+🧠 +😊', fn: g => { g.flags.ikigaiSearch=true; return{intel:5,mood:5}; }},
+        { label:'觉得太理想化了', hint:'', fn: g => { g.flags.ikigaiSearch=true; return{intel:2}; }},
+      ]},
+    { id:'gratitude_journal', icon:'📔', title:'感恩日记', category:'psychology',
+      body:'你开始写感恩日记——每天写3件值得感恩的事。\n\n第一天：\n1. 今天天气很好\n2. 午饭很好吃\n3. 同事帮我修了电脑\n\n第七天：\n1. 妈打电话来关心我\n2. 路上看到一只可爱的小狗\n3. 晚上看了一部好电影\n\n第三十天：\n你发现：你的注意力变了。以前你总是关注不好的事——加班、堵车、吵架。现在你会主动寻找值得感恩的事。\n\n你的一个朋友说：「这不是自我欺骗吗？」\n\n你说：「不是。事实没变——但我看事实的角度变了。同样的一天，你可以记住堵车，也可以记住小狗。」\n\n三个月后，你的幸福感明显提升了。不是因为生活变好了——而是因为你学会了看到好的一面。\n\n「感恩日记：不是忽视问题——是在问题中发现礼物。」',
+      cond: g => !g.flags.gratitudeJournal && g.age >= 22 && g.mood <= 55,
+      choices:[
+        { label:'坚持写了三个月，明显感到更幸福', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.gratitudeJournal=true; g.flags.gratitude=true; return{mood:15,health:5,intel:3}; }},
+        { label:'写了一个月，有帮助但没坚持', hint:'+😊 +🧠', fn: g => { g.flags.gratitudeJournal=true; return{mood:8,intel:2}; }},
+        { label:'写了几天就放弃了', hint:'', fn: g => { g.flags.gratitudeJournal=true; return{mood:2}; }},
+      ]},
+    { id:'life_philosophy_v2', icon:'🌟', title:'人生哲学', category:'psychology',
+      body:'你35岁了。你开始认真思考：我到底要过什么样的人生？\n\n你列了一个清单：\n- 成功是什么？——不是有钱，是做自己\n- 幸福是什么？——不是没有烦恼，是有意义\n- 自由是什么？——不是想做什么就做什么，是不想做什么就不做什么\n- 爱是什么？——不是占有，是成全\n\n你的一个朋友说：「你想太多了。」\n\n你说：「我以前想得太少了。我花了30年按照别人的期望生活——现在我想按照自己的方式生活。」\n\n你发现：人生哲学不是空谈——它是你每天做选择的底层逻辑。当你知道自己要什么，选择就变得简单了。\n\n你在笔记本上写下了一句话：「成为自己——这是我对人生唯一的要求。」\n\n「人生哲学：不是标准答案——是你自己的答案。当你找到了自己的哲学，你就不再需要别人告诉你怎么活。」',
+      cond: g => !g.flags.lifePhilosophy && g.age >= 30 && g.intel >= 55,
+      choices:[
+        { label:'形成了自己的人生哲学，活得更通透', hint:'+🧠 +😊 +❤️', fn: g => { g.flags.lifePhilosophy=true; g.flags.personalGrowth=true; return{intel:12,mood:10,social:3}; }},
+        { label:'还在思考中，但有了初步方向', hint:'+🧠 +😊', fn: g => { g.flags.lifePhilosophy=true; return{intel:8,mood:5}; }},
+        { label:'想太多不如做太多', hint:'', fn: g => { g.flags.lifePhilosophy=true; return{intel:3}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -10666,6 +10763,15 @@ const ACHIEVEMENTS = [
     { id:'family_healer_ach', icon:'🤝', name:'家庭和解者', desc:'与原生家庭达成了和解', check: g => g.flags.healedFamily },
     { id:'happy_single_ach_v2', icon:'🙋', name:'单身贵族', desc:'在单身生活中活出了精彩', check: g => g.flags.happySingle },
     { id:'best_roommate_ach', icon:'🏠', name:'神仙室友', desc:'在大城市遇到了最好的室友', check: g => g.flags.bestRoommate },
+    // === v21.0 新增成就（人生哲学） ===
+    { id:'death_aware_ach', icon:'🕯️', name:'向死而生', desc:'通过死亡教育重新理解了活着', check: g => g.flags.deathAware },
+    { id:'list_completer_ach', icon:'📋', name:'人生清单执行者', desc:'开始逐项完成人生愿望', check: g => g.flags.listCompleter },
+    { id:'memoirist_ach_v2', icon:'📖', name:'人生记录者', desc:'坚持写完了回忆录', check: g => g.flags.memoirist },
+    { id:'life_changed_ach', icon:'🏥', name:'生命志愿者', desc:'在临终关怀中改变了对生命的理解', check: g => g.flags.lifeChanged },
+    { id:'stoic_ach', icon:'🏛️', name:'斯多葛践行者', desc:'在混乱的世界中保持了内心秩序', check: g => g.flags.stoic },
+    { id:'ikigai_ach', icon:'🎯', name:'Ikigai发现者', desc:'找到了活着的理由和方向', check: g => g.flags.foundIkigai },
+    { id:'gratitude_ach', icon:'📔', name:'感恩践行者', desc:'通过感恩日记找到了幸福', check: g => g.flags.gratitude },
+    { id:'philosopher_ach_v2', icon:'🌟', name:'人生哲学家', desc:'形成了自己的人生哲学', check: g => g.flags.lifePhilosophy && g.flags.personalGrowth },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -10968,6 +11074,9 @@ const ENDINGS = [
     { id:'ai_master_end', badge:'🤖', title:'AI弄潮儿', desc:'你成了AI时代的弄潮儿。\n\n从DeepSeek到提示词工程，从AI创作到AI创业——你抓住了每一波AI浪潮。你的公司用AI改造了业务流程，你的团队每个人都成了AI高手。\n\n投资人说：「你们是AI原生公司。」\n\n你说：「不是AI原生——是学会跟AI一起工作。」\n\n你的一个同事说：「你当年学AI的时候，我们都在笑你。现在你笑得最好。」\n\n「AI时代最大的风险不是AI太强——而是你站在原地不动。」', cond: g => g.flags.aiPowerUser && (g.flags.promptEngineer || g.flags.aiWorkHelper) && g.intel >= 70 && g.money >= 100000 && g.age >= 28 },
     { id:'global_pioneer_end', badge:'🌍', title:'出海先锋', desc:'你成了中国企业出海的先锋。\n\n你从一个小员工成长为海外业务负责人。你走过越南、沙特、巴西、尼日利亚——你把中国的产品和模式带到了全世界。\n\n你的同事说：「你一年飞了20个国家。」\n\n你说：「不是我爱飞——是世界太大了，不去看看永远不知道自己有多渺小。」\n\n你的老板说：「下一个十年，属于出海的人。」\n\n「出海：不是逃离中国——是把中国的能力变成世界的能力。」', cond: g => g.flags.goingGlobalTrend && g.flags.overseasExp && g.money >= 200000 && g.social >= 60 && g.age >= 30 },
     { id:'green_pioneer_end', badge:'🌱', title:'绿色先锋', desc:'你成了绿色生活的践行者和推动者。\n\n你从自己做起：低碳出行、减少浪费、二手循环。你还投资了新能源产业，参与了碳中和项目。\n\n你的朋友圈不是种树就是捡垃圾，你的邻居都叫你「环保达人」。\n\n你的孩子问你：「为什么要保护环境？」\n\n你说：「因为这个地球不是我留给你的遗产——是我从你那里借来的。」\n\n「绿色生活：不是苦行僧——是用更聪明的方式，让自己和地球都活得更好。」', cond: g => g.flags.lowCarbon && g.flags.greenInvestment && g.flags.carbonNeutralLife && g.mood >= 65 && g.age >= 28 },
+    // --- v21.0 人生哲学结局 ---
+    { id:'philosopher_end', badge:'🌟', title:'觉醒者', desc:'你成了一个觉醒者。\n\n你经历了死亡教育、做了临终关怀志愿者、写了回忆录、找到了Ikigai、形成了自己的人生哲学。你不再焦虑于别人怎么看你，不再恐惧于未知的未来。\n\n你的朋友们说：「你变了。你以前很焦虑，现在很平静。」\n\n你说：「不是平静——是通透。我终于知道了什么是最重要的。」\n\n一个年轻人问你：「人生最重要的是什么？」\n\n你微笑着说：「活着。清醒地活着。」\n\n「觉醒：不是看透了世界——是看透了自己。当你不再跟自己较劲的时候，整个世界都变得温柔了。」', cond: g => g.flags.lifePhilosophy && g.flags.personalGrowth && (g.flags.deathAware || g.flags.lifeChanged) && (g.flags.foundIkigai || g.flags.stoic) && g.mood >= 70 && g.intel >= 70 && g.age >= 35 },
+    { id:'meaningful_life_end', badge:'📖', title:'有意义的一生', desc:'你过了有意义的一生。\n\n你没有成为亿万富翁，没有改变世界，没有名垂青史。但你：认真爱过几个人、做过几件让自己骄傲的事、帮助过一些需要帮助的人、写过一些让自己感动的文字。\n\n你的回忆录里有欢笑也有泪水。你的人生清单完成了7件。你的感恩日记写了365天。\n\n你的孩子在你的书架上发现了你的回忆录。他们翻开第一页，上面写着：\n\n「给我最爱的孩子们：你们的爸爸/妈妈，这辈子最大的成就，就是有了你们。」\n\n「有意义的一生：不是活得多长——是活得多深。当你的每一天都有意义，一辈子就够了。」', cond: g => (g.flags.memoirist || g.flags.listCompleter) && g.flags.gratitude && g.mood >= 65 && g.age >= 40 && g.achievements.length >= 15 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
@@ -12477,6 +12586,28 @@ function addEventCard(data, addToLog) {
 }
 
 // === ENDING ===
+// v21.0: 人生评分系统
+function calculateLifeScore() {
+    const details = [];
+    // 财富分 (0-20)
+    const wealthScore = G.money >= 500000 ? 20 : G.money >= 200000 ? 16 : G.money >= 100000 ? 12 : G.money >= 50000 ? 8 : G.money >= 0 ? 4 : 0;
+    details.push({label:'财富', score:wealthScore});
+    // 健康分 (0-20)
+    const healthScore = Math.floor(G.health / 5);
+    details.push({label:'健康', score:healthScore});
+    // 幸福分 (0-20)
+    const moodScore = Math.floor(G.mood / 5);
+    details.push({label:'幸福', score:moodScore});
+    // 成长分 (0-20)
+    const growthScore = Math.min(20, Math.floor(G.intel/5) + Math.floor(G.achievements.length/20) + (G.flags.careerTransition?3:0) + (G.flags.personalGrowth?3:0));
+    details.push({label:'成长', score:growthScore});
+    // 关系分 (0-20)
+    const relScore = Math.min(20, Math.floor(G.social/5) + (G.flags.married?3:0) + (G.flags.hasChild?2:0) + (G.flags.healedFamily?3:0) + (G.flags.closeToParents?2:0) + (G.flags.bestRoommate?2:0));
+    details.push({label:'关系', score:relScore});
+    const totalScore = wealthScore + healthScore + moodScore + growthScore + relScore;
+    return { score: totalScore, details };
+}
+
 function triggerEnding() {
     G.isEnded = true;
     const ending = ENDINGS.find(e => e.cond(G)) || ENDINGS[ENDINGS.length-1];
@@ -12539,6 +12670,16 @@ function triggerEnding() {
             const color = a.value >= 70 ? '#4ade80' : a.value >= 40 ? '#fbbf24' : '#f87171';
             return `<div class="attr-row"><span class="attr-label">${a.label}</span><div class="attr-bar-bg"><div class="attr-bar-fill" style="width:${a.value}%;background:${color}"></div></div><span class="attr-value">${a.raw}</span></div>`;
         }).join('')}</div>`;
+    }
+
+    // v21.0: 人生评分系统 - 综合计算人生得分
+    const lifeScore = calculateLifeScore();
+    const scoreEl = document.getElementById('attribute-viz');
+    if (scoreEl) {
+        const existingHTML = scoreEl.innerHTML;
+        const gradeLabel = lifeScore.score >= 90 ? 'S·传奇人生' : lifeScore.score >= 75 ? 'A·精彩人生' : lifeScore.score >= 60 ? 'B·充实人生' : lifeScore.score >= 40 ? 'C·平凡人生' : 'D·坎坷人生';
+        const gradeColor = lifeScore.score >= 90 ? '#f59e0b' : lifeScore.score >= 75 ? '#60a5fa' : lifeScore.score >= 60 ? '#4ade80' : lifeScore.score >= 40 ? '#fbbf24' : '#f87171';
+        scoreEl.innerHTML = existingHTML + `<h3>🎯 人生评分</h3><div class="life-score-display" style="text-align:center;margin:10px 0;"><div style="font-size:3em;font-weight:bold;color:${gradeColor}">${lifeScore.score}</div><div style="font-size:1.2em;color:${gradeColor};margin-top:5px">${gradeLabel}</div><div style="font-size:0.85em;color:#888;margin-top:8px">${lifeScore.details.map(d => d.label + ': ' + d.score).join(' · ')}</div></div>`;
     }
 
     // Update ending progress
