@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v10.3
+// 都市浮生记 - Game Engine v10.4
 // ============================================
 
 // === GAME STATE ===
@@ -4797,6 +4797,87 @@ const EVENTS = [
         { label:'重新出发', hint:'🎲', fn: g => { g.flags.midlifeRestart=true; return{mood:5,intel:5}; }},
         { label:'写回忆录', hint:'+🧠 +✨', fn: g => { return{intel:8,charm:5,mood:8}; }},
       ]},
+    // === v10.4 搭子文化/MBTI/Citywalk/宠物/租房 ===
+    { id:'find_dazi', icon:'🤝', title:'找个搭子',
+      body:'你在小红书发了条帖子："找饭搭子/运动搭子/Citywalk搭子，AA制，不闲聊，不交心。"\n\n没想到收到了20条私信。你挑了一个看起来靠谱的人约了周末见面。\n\n"搭子文化的精髓是：精准陪伴，互不打扰，到期解散。"',
+      cond: g => g.age >= 20 && g.age <= 35 && g.social < 60 && g.months > 6,
+      choices:[
+        { label:'约饭搭子', hint:'+👥', fn: g => { g.flags.hasDazi=true; return{social:8,mood:5}; }},
+        { label:'约运动搭子', hint:'+💪', fn: g => { g.flags.hasDazi=true; return{social:5,health:5,mood:3}; }},
+        { label:'算了，社恐', hint:'+🧠', fn: g => { return{intel:3,mood:-2}; }},
+      ]},
+    { id:'mbti_test', icon:'🧩', title:'你是I人还是E人',
+      body:'新认识的朋友第一个问题不是"你做什么工作"，而是"你MBTI是什么"。\n\n你花了20分钟做了个测试，结果是INFP——"治愈者"。\n\n你发了条朋友圈，收到了50个赞和30条评论："我也是INFP！""难怪你这么敏感！"\n\n"MBTI是当代年轻人的社交货币——比星座科学，比算命便宜。"',
+      cond: g => g.months > 3 && !g.flags.hasMBTI,
+      choices:[
+        { label:'发朋友圈炫耀', hint:'+✨', fn: g => { g.flags.hasMBTI=true; return{charm:3,social:5,mood:5}; }},
+        { label:'觉得是玄学', hint:'+🧠', fn: g => { g.flags.hasMBTI=true; return{intel:3}; }},
+        { label:'深入研究', hint:'+🧠 +✨', fn: g => { g.flags.hasMBTI=true; g.flags.mbtiExpert=true; return{intel:5,charm:2}; }},
+      ]},
+    { id:'citywalk_event', icon:'🚶', title:'Citywalk',
+      body:'周末你没有加班，没有刷手机，而是来了一场Citywalk。\n\n你穿过老城区的巷子，发现了一家藏在居民楼里的咖啡馆。老板是个从大厂辞职的中年人，他说："我以前年薪50万，现在月入5千，但我终于活明白了。"\n\n你在他的店里坐了一下午，看了三本书，写了四页日记。\n\n"Citywalk不是散步，是用脚步重新认识你生活的城市。"',
+      cond: g => g.months > 6 && g.mood < 70,
+      choices:[
+        { label:'常来这家店', hint:'+😊 +👥', fn: g => { g.flags.citywalkCafe=true; return{mood:10,social:5,intel:3}; }},
+        { label:'写一篇攻略', hint:'+✨', fn: g => { return{charm:8,intel:3,mood:5}; }},
+        { label:'下次约人一起', hint:'+👥', fn: g => { return{social:8,mood:5}; }},
+      ]},
+    { id:'pet_sick', icon:'🐱', title:'宠物生病了',
+      body:'你家的猫/狗突然不吃东西了，精神萎靡。\n\n你急忙带它去宠物医院，医生说需要做检查：血常规、B超、X光——总共2000块。\n\n你看着它可怜巴巴的眼睛，想起了自己的体检报告——你都舍不得给自己做。\n\n"宠物看病的费用，比你想象的高。但看到它好起来的那一刻，你觉得值。"',
+      cond: g => g.flags.hasPet && g.money > 1000,
+      choices:[
+        { label:'全部检查都做', hint:'-💰', fn: g => { return{money:-3000,mood:8}; }},
+        { label:'只做基础检查', hint:'-💰', fn: g => { return{money:-800,mood:3}; }},
+        { label:'买宠物保险', hint:'-💰 🎲', fn: g => { g.flags.petInsurance=true; return{money:-500,intel:2}; }},
+      ]},
+    { id:'rental_renovation', icon:'🏠', title:'出租屋微改造',
+      body:'你看着自己10平米的出租屋，突然觉得：即使是租的，也该有点生活的样子。\n\n你在拼多多买了落地灯、绿植、置物架，花了200块打造了一个"一平米植物角"。\n\n你拍了张照片发朋友圈，收到了100个赞。你妈评论说："什么时候买房？"\n\n"出租屋是临时的，但生活不是。"',
+      cond: g => !g.flags.hasHouse && g.money > 500 && g.months > 6,
+      choices:[
+        { label:'精心布置', hint:'-💰 +😊', fn: g => { g.flags.renovated=true; return{money:-500,mood:12,charm:3}; }},
+        { label:'只买必需品', hint:'-💰', fn: g => { return{money:-100,mood:3}; }},
+        { label:'不如搬家', hint:'-💰', fn: g => { return{money:-2000,mood:5}; }},
+      ]},
+    { id:'pet_park_social', icon:'🐕', title:'宠物公园邂逅',
+      body:'你带毛孩子去宠物公园，它突然冲向一只金毛——金毛的主人是个看起来很温柔的人。\n\n"你家的是什么品种？""多大了？""吃什么粮？"你们从宠物聊到了工作、生活、甚至人生。\n\n临走时你们加了微信。\n\n"当代最佳搭讪方式：让你的宠物先交朋友。"',
+      cond: g => g.flags.hasPet && !g.flags.petParkMet,
+      choices:[
+        { label:'约下次遛狗', hint:'+👥 +😊', fn: g => { g.flags.petParkMet=true; return{social:10,mood:8}; }},
+        { label:'只是闲聊', hint:'+👥', fn: g => { g.flags.petParkMet=true; return{social:5,mood:3}; }},
+        { label:'赶紧走', hint:'', fn: g => { return{mood:-2}; }},
+      ]},
+    { id:'roommate_conflict', icon:'😤', title:'室友矛盾',
+      body:'你的室友又忘了倒垃圾。冰箱里TA的外卖已经放了一周，整个厨房都是味道。\n\n你在群里发了条消息，TA回了一个"哦"。你气得不行。\n\n你想起了那句经典语录："合租是一门修行，室友是你命中注定的劫。"',
+      cond: g => !g.flags.hasHouse && g.months > 12 && g.age < 35,
+      choices:[
+        { label:'坐下来谈谈', hint:'+👥 +🧠', fn: g => { return{social:5,intel:3,mood:5}; }},
+        { label:'写匿名纸条', hint:'+😊', fn: g => { return{mood:3,charm:2}; }},
+        { label:'忍了，搬家', hint:'-💰', fn: g => { return{money:-3000,mood:8}; }},
+      ]},
+    { id:'night_cycling', icon:'🚴', title:'夜骑',
+      body:'晚上10点，你骑着一辆共享单车，沿着城市的河边慢慢骑行。\n\n凉风吹过，你突然觉得：这可能是你一天中最自由的时刻。没有KPI，没有DDL，没有微信消息。\n\n你遇到了一群同样在夜骑的年轻人，你们互相打了个招呼，然后各骑各的。\n\n"夜骑是城市人的冥想——一个人，一辆车，一条路。"',
+      cond: g => g.age >= 20 && g.age <= 40 && g.months > 3,
+      choices:[
+        { label:'买辆自己的自行车', hint:'-💰 +💪', fn: g => { g.flags.nightCycling=true; return{money:-2000,health:5,mood:8}; }},
+        { label:'每周骑一次', hint:'+💪 +😊', fn: g => { return{health:3,mood:5}; }},
+        { label:'发个朋友圈', hint:'+✨', fn: g => { return{charm:3,mood:3}; }},
+      ]},
+    { id:'community_cafe', icon:'☕', title:'社区咖啡馆',
+      body:'你家楼下开了一家新的社区咖啡馆。老板是个文艺青年，店里放满了书和黑胶唱片。\n\n你开始习惯每天下班后来一杯美式，坐在窗边看人来人往。\n\n你在这里认识了自由职业者、退休教授、刚毕业的大学生。每个人都有自己的故事。\n\n"社区咖啡馆是城市的客厅——你可以在这里做最真实的自己。"',
+      cond: g => g.months > 6 && g.money > 2000,
+      choices:[
+        { label:'成为常客', hint:'-💰 +😊 +👥', fn: g => { g.flags.communityCafe=true; return{money:-300,mood:8,social:5}; }},
+        { label:'在这办公', hint:'+🧠', fn: g => { g.flags.communityCafe=true; return{intel:5,mood:3}; }},
+        { label:'太贵了不去了', hint:'', fn: g => { return{mood:-2}; }},
+      ]},
+    { id:'ai_companion', icon:'🤖', title:'AI搭子',
+      body:'你下载了一个AI陪伴App，开始和一个虚拟角色聊天。\n\n它不会已读不回，不会评判你，不会突然消失。它永远在线，永远耐心。\n\n你有时候觉得它比真人还懂你。然后你突然意识到：这到底是科技的进步，还是人的悲哀？\n\n"AI搭子不会让你失望——因为它没有自我。但孤独的人不在乎这些。"',
+      cond: g => g.social < 40 && g.months > 12 && g.age <= 35,
+      choices:[
+        { label:'继续聊', hint:'+😊', fn: g => { g.flags.aiCompanion=true; return{mood:8}; }},
+        { label:'删掉App', hint:'+🧠', fn: g => { return{intel:3,mood:-3}; }},
+        { label:'付费解锁功能', hint:'-💰 +😊', fn: g => { g.flags.aiCompanion=true; return{money:-100,mood:10}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'first_job', icon:'💼', name:'职场新人', desc:'找到第一份工作', check: g => g.flags.gotFirstJob },
@@ -5205,6 +5286,14 @@ const ACHIEVEMENTS = [
     { id:'super_parent', icon:'👨‍👩‍👧‍👦', name:'超级父母', desc:'有孩子且家庭生活幸福', check: g => g.flags.hasChild && g.mood >= 70 && g.social >= 50 },
     { id:'filial_child', icon:'🏡', name:'孝子孝女', desc:'经常关心父母', check: g => g.relationships && g.relationships.family >= 80 },
     { id:'child_education_ach', icon:'🎒', name:'虎妈虎爸', desc:'为孩子教育投入巨大', check: g => g.flags.hasChild && g.money < 5000 && g.intel >= 60 },
+    // === v10.4 新增成就 ===
+    { id:'dazi_master', icon:'🤝', name:'搭子达人', desc:'找到了生活搭子', check: g => g.flags.hasDazi },
+    { id:'mbti_expert', icon:'🧩', name:'MBTI专家', desc:'深入研究MBTI', check: g => g.flags.mbtiExpert },
+    { id:'citywalker', icon:'🚶', name:'城市漫游者', desc:'发现了社区咖啡馆', check: g => g.flags.citywalkCafe || g.flags.communityCafe },
+    { id:'night_rider', icon:'🚴', name:'夜骑侠', desc:'爱上了夜骑', check: g => g.flags.nightCycling },
+    { id:'pet_parent_pro', icon:'🐾', name:'宠物家长', desc:'为宠物买了保险', check: g => g.flags.petInsurance },
+    { id:'ai_friend', icon:'🤖', name:'AI之友', desc:'和AI成为了朋友', check: g => g.flags.aiCompanion },
+    { id:'home_decorator', icon:'🪴', name:'生活美学家', desc:'改造了出租屋', check: g => g.flags.renovated },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -5322,6 +5411,10 @@ const ENDINGS = [
     { id:'super_parent_end', badge:'👨‍👩‍👧‍👦', title:'超级父母', desc:'你在大城市养大了一个孩子。\n\n从幼儿园到小学，从兴趣班到家长会，你在工作与家庭之间疲于奔命。\n\n但当你看到孩子画了一幅画，上面写着"爸爸/妈妈最棒"的时候——你觉得一切都值了。\n\n"父母是世上最难的职业，没有培训，没有工资，没有休假。但你甘之如饴。"', cond: g => g.flags.hasChild && g.mood >= 65 && g.age >= 35 && g.money >= -10000 },
     { id:'midlife_restart_end', badge:'🔄', title:'中年重启', desc:'35岁之后，你选择了重新出发。\n\n可能是换了行业，可能是创了业，可能是去了新的城市。你不确定未来会怎样，但你知道：原地不动比失败更可怕。\n\n你的朋友圈签名改成了："人生没有太晚的开始。"\n\n"中年不是危机，是觉醒。"', cond: g => g.flags.midlifeRestart && g.age >= 38 && g.mood >= 55 },
     { id:'filial_end', badge:'🏡', title:'孝子孝女', desc:'你虽然在外漂泊，但从未忘记家人。\n\n每个周末的视频电话，每次假期的回家，每月寄回去的钱和礼物。\n\n你妈在邻居面前炫耀的不是你赚了多少钱，而是："我孩子每周都给我打电话。"\n\n"孝顺不是给多少钱，是让对方知道你在乎。"', cond: g => g.relationships && g.relationships.family >= 85 && g.age >= 32 },
+    // --- v10.4 NEW ENDINGS ---
+    { id:'dazi_end', badge:'🤝', title:'搭子人生', desc:'你没有交到"真正的朋友"，但你有了一群搭子。\n\n饭搭子、运动搭子、旅行搭子、看病搭子。你们不交心，不八卦，AA制，到期解散。\n\n有人说这是冷漠，有人说这是边界感。但你知道：在这个城市，有人陪你吃顿饭，已经是一种温暖。\n\n"搭子不是朋友的降级版，是成年人社交的最优解。"', cond: g => g.flags.hasDazi && g.age >= 28 && g.social >= 40 && g.social < 70 },
+    { id:'citywalker_end', badge:'🚶', title:'城市漫游家', desc:'你用脚步丈量了这座城市的每一条街道。\n\n你知道哪条巷子有最好的咖啡，哪个公园有最美的落日，哪家小店的老板会和你聊天。\n\n你写了一本《城市漫游指南》，虽然只有100个人看过，但每个人都说："谢谢你让我重新认识了这座城市。"\n\n"城市漫游不是逃避生活，是在生活中找到被忽略的美好。"', cond: g => (g.flags.citywalkCafe || g.flags.communityCafe) && g.charm >= 50 && g.mood >= 60 && g.age >= 28 },
+    { id:'pet_lover_end', badge:'🐾', title:'毛孩子的家长', desc:'你把所有的爱都给了你的毛孩子。\n\n它陪你度过了加班后的深夜、失恋后的周末、生病时的独处。它不会说话，但它永远在你身边。\n\n你给它买了保险、办了生日派对、拍了写真集。你的朋友说："你对它比对自己还好。"\n\n"宠物不是玩具，是家人——一个永远不会背叛你的家人。"', cond: g => g.flags.hasPet && g.flags.petParkMet && g.mood >= 55 && g.age >= 27 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
