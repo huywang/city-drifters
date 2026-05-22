@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v27.5
+// 都市浮生记 - Game Engine v27.6
 // ============================================
 
 // === GAME STATE ===
@@ -13980,6 +13980,87 @@ const EVENTS = [
         { label:'体验很好但回来后又恢复了', hint:'+😊 -💰', fn: g => { g.flags.digitalDetoxRetreat=true; g.money -= 5000; return{mood:5}; }},
         { label:'觉得太无聊了，提前退营了', hint:'-💰 -😊', fn: g => { g.flags.digitalDetoxRetreat=true; g.money -= 3000; return{mood:-3}; }},
       ]},
+    // v27.6: 城市生存成本 + 生活经济学
+    { id:'rent_negotiation', icon:'🏠', title:'租房博弈', category:'finance',
+      body:'你的房租到期了。\n\n房东说：「涨500，不涨不行。」\n\n你的现状：\n- 现在月租：3500\n- 涨后月租：4000\n- 你的月薪：8000\n- 涨后房租占收入：50%\n\n你试着砍价：\n- 「能不能不涨？我住了2年了。」\n- 房东：「隔壁租4500了，给你涨500算少的。」\n\n你查了查：\n- 同小区同户型：3800-4200\n- 搬家的成本：押金+中介费+搬家费 = 8000+\n- 搬家的时间成本：看房2周+搬家1天+适应1周\n\n你开始算：\n- 涨500 × 12月 = 一年多花6000\n- 搬家成本 = 8000+\n- 结论：涨500比搬家便宜\n\n你开始理解：租房博弈——不是「你能不能赢」——是「你只能选少输」。\n\n你不是在跟房东博弈——你是在跟你的「搬家成本」博弈。\n\n「租房博弈：你不是在选「好房子」——你是在选「不那么亏的选择」。」',
+      cond: g => g.age >= 18 && !g.flags.rentNegotiation && g.money >= 3000 && !g.flags.hasHouse,
+      choices:[
+        { label:'砍到了涨300，签了新合同', hint:'+🧠 +💰', fn: g => { g.flags.rentNegotiation=true; g.flags.rentNegotiator=true; g.money -= 300; return{intel:5,mood:3}; }},
+        { label:'认了涨500，不想折腾了', hint:'-💰 +😊', fn: g => { g.flags.rentNegotiation=true; g.money -= 500; return{mood:-3}; }},
+        { label:'搬家！不惯着房东', hint:'-💰 -😊 +✨', fn: g => { g.flags.rentNegotiation=true; g.flags.movedForRent=true; g.money -= 8000; return{mood:-5,charm:3}; }},
+      ]},
+    { id:'commute_hell', icon:'🚇', title:'通勤地狱', category:'career',
+      body:'你的通勤时间：单程1小时20分钟。\n\n你的日常：\n- 6:30 起床\n- 7:00 出门\n- 7:15 到地铁站（人挤人）\n- 7:30 上车（被挤成相片）\n- 8:15 换乘（再挤一次）\n- 8:20 到公司\n\n你的一天：\n- 通勤：2小时40分钟\n- 工作：9小时\n- 吃饭/洗漱：2小时\n- 睡眠：7小时\n- 自由时间：3小时20分钟\n\n你的自由时间——\n- 1小时：刷手机\n- 1小时：做家务\n- 1小时：「自己的时间」\n\n你开始理解：通勤——不是「浪费时间」——是「用时间换便宜房租」。\n\n你住在郊区——因为市中心你住不起。\n\n你的时间——不值钱——因为你买不起近的房子。\n\n「通勤地狱：你不是在工作——你是在花2小时40分钟去工作的路上。」',
+      cond: g => g.age >= 18 && !g.flags.commuteHell && g.jobSalary > 0,
+      choices:[
+        { label:'搬到公司附近，房租贵了但省了时间', hint:'-💰 +😊 +🧠', fn: g => { g.flags.commuteHell=true; g.flags.movedCloser=true; g.money -= 2000; return{mood:8,intel:3}; }},
+        { label:'利用通勤时间学习', hint:'+🧠 -😊', fn: g => { g.flags.commuteHell=true; g.flags.commuteLearner=true; return{intel:8,mood:-3}; }},
+        { label:'习惯了，刷刷手机就过去了', hint:'-🧠 +😊', fn: g => { g.flags.commuteHell=true; return{intel:-3,mood:3}; }},
+      ]},
+    { id:'food_delivery_trap', icon:'🍜', title:'外卖陷阱', category:'health',
+      body:'你算了算你的外卖账单。\n\n本月外卖：\n- 午餐：25元 × 22天 = 550元\n- 晚餐：30元 × 20天 = 600元\n- 周末外卖：40元 × 8次 = 320元\n- 奶茶/咖啡：15元 × 15次 = 225元\n\n本月外卖总计：1695元\n\n你开始对比：\n- 自己做饭：每月约800元（省895元）\n- 但自己做饭需要：买菜30分钟+做饭40分钟+洗碗20分钟 = 每天1.5小时\n\n你的时间值多少钱？\n- 你的时薪：8000 ÷ 22天 ÷ 9小时 = 40元/小时\n- 做饭1.5小时 = 60元\n- 做饭省的：895 - 60×22 = -425元（亏了！）\n\n你开始理解：外卖陷阱——不是「外卖贵」——是「你的时间太便宜了」。\n\n你不是不会做饭——你是「做饭的时间成本太高了」。\n\n「外卖陷阱：你不是在花钱买饭——你是在花钱买时间。」',
+      cond: g => g.age >= 18 && !g.flags.foodDeliveryTrap && g.jobSalary > 0,
+      choices:[
+        { label:'开始周末备餐，省钱又健康', hint:'+💰 +❤️ +🧠 -😊', fn: g => { g.flags.foodDeliveryTrap=true; g.flags.mealPrepper=true; g.money += 500; return{health:5,intel:3,mood:-3}; }},
+        { label:'减少外卖频率，偶尔自己做', hint:'+💰 +❤️', fn: g => { g.flags.foodDeliveryTrap=true; g.money += 200; return{health:3}; }},
+        { label:'认了，外卖就是我的生活方式', hint:'-💰 -❤️', fn: g => { g.flags.foodDeliveryTrap=true; return{health:-3,mood:3}; }},
+      ]},
+    { id:'salary_transparency', icon:'💰', title:'薪资透明', category:'career',
+      body:'你不小心看到了同事的工资单。\n\n同事小王——跟你同岗位、同年限——\n\n月薪：12000。\n\n你的月薪：8000。\n\n差了4000。\n\n你开始想：\n- 为什么？\n- 他比我强吗？\n- 他谈判的时候多要了？\n- 还是你被「压价」了？\n\n你去问HR：\n- HR说：「薪资是保密的，不方便透露。」\n- HR说：「你的薪资是根据面试表现综合评定的。」\n\n你开始理解：薪资保密——不是「保护你」——是「保护公司」。\n\n如果所有人都知道彼此工资——公司就要给每个人涨到一样。\n\n薪资保密——让公司可以「因人而异」地付薪——也就是「能压多少压多少」。\n\n你不是工资低——你是「不知道自己值多少」。\n\n「薪资透明：你不知道你值多少钱——所以公司给你定了价。」',
+      cond: g => g.age >= 22 && !g.flags.salaryTransparency && g.jobSalary > 0,
+      choices:[
+        { label:'拿着数据去跟老板谈加薪', hint:'+💰 +✨ -😊', fn: g => { g.flags.salaryTransparency=true; g.flags.askedForRaise=true; const raise=Math.floor(g.jobSalary*0.2); g.jobSalary+=raise; g.money+=raise; return{charm:5,mood:-3}; }},
+        { label:'开始看外面的机会', hint:'+🧠 +💰', fn: g => { g.flags.salaryTransparency=true; g.flags.jobShopping=true; return{intel:5,charm:3}; }},
+        { label:'算了，多一事不如少一事', hint:'-💰 -✨', fn: g => { g.flags.salaryTransparency=true; return{mood:-5,charm:-3}; }},
+      ]},
+    { id:'pinduoduo_habit', icon:'🛒', title:'拼多多式消费', category:'finance',
+      body:'你开始用拼多多了。\n\n你买了：\n- 9.9包邮的手机壳（淘宝19.9）\n- 5.9包邮的数据线（京东19.9）\n- 19.9的T恤（优衣库99）\n- 3.9的袜子（超市15）\n\n你省了：约100元。\n\n但你发现：\n- 手机壳：用了1周就裂了\n- 数据线：用了2周就断了\n- T恤：洗了1次就变形了\n- 袜子：穿了3天就破洞了\n\n你又买了新的——\n\n你又省了100元——\n\n你又买新的了——\n\n你开始算：\n- 便宜的东西 × 反复买 = 比贵的东西还贵\n- 你的时间 × 反复挑选 = 比直接买贵的还费\n\n你开始理解：拼多多式消费——不是「省钱」——是「用质量换价格」。\n\n你以为你在省钱——其实你在「花更多的钱买更多的垃圾」。\n\n「拼多多式消费：便宜的东西——往往是最贵的。」',
+      cond: g => g.age >= 16 && !g.flags.pinduoduoHabit && g.money < 20000,
+      choices:[
+        { label:'学会了「买少买好」的消费观', hint:'+🧠 +💰 +✨', fn: g => { g.flags.pinduoduoHabit=true; g.flags.qualityOverQuantity=true; g.money += 2000; return{intel:8,charm:3}; }},
+        { label:'有选择地买便宜货', hint:'+💰 +🧠', fn: g => { g.flags.pinduoduoHabit=true; g.money += 500; return{intel:3}; }},
+        { label:'继续买便宜货，反正便宜', hint:'-💰 -🧠', fn: g => { g.flags.pinduoduoHabit=true; g.money -= 1000; return{intel:-3}; }},
+      ]},
+    { id:'medical_cost_shock', icon:'🏥', title:'看病成本', category:'health',
+      body:'你感冒了。去了趟医院。\n\n挂号费：50元（专家号）\n检查费：\n- 血常规：80元\n- 胸片：120元\n- CT：500元（医生说「以防万一」）\n药费：\n- 3盒药：280元\n\n总计：1030元。\n\n你看着账单——\n\n你只是感冒啊。\n\n你问了问医生：「能不能不做CT？」\n\n医生说：「建议做，排除肺炎的可能。」\n\n你查了查：感冒做CT的概率不到5%。\n\n你开始理解：看病成本——不是「医生坑你」——是「医疗系统的设计就是过度检查」。\n\n医院靠检查赚钱——不靠给你看病赚钱。\n\n你不是在看病——你是在「为以防万一买单」。\n\n「看病成本：你不是在花钱治病——你是在花钱买「排除万一」的安心。」',
+      cond: g => g.age >= 18 && !g.flags.medicalCostShock && g.money >= 1000,
+      choices:[
+        { label:'开始学基础医学知识减少不必要的检查', hint:'+🧠 +💰', fn: g => { g.flags.medicalCostShock=true; g.flags.selfHealthEducated=true; return{intel:8,health:3}; }},
+        { label:'以后小病去社区医院', hint:'+💰 +🧠', fn: g => { g.flags.medicalCostShock=true; g.money += 500; return{intel:3}; }},
+        { label:'花钱买个安心吧', hint:'-💰 +😊', fn: g => { g.flags.medicalCostShock=true; g.money -= 1030; return{mood:3}; }},
+      ]},
+    { id:'subscription_overload', icon:'📋', title:'订阅地狱', category:'finance',
+      body:'你查了查你的月度订阅。\n\n视频会员：\n- 爱奇艺：25元/月\n- 优酷：25元/月\n- B站大会员：25元/月\n- Netflix：98元/月（你看不懂英文）\n\n音乐会员：\n- QQ音乐：15元/月\n- 网易云：15元/月\n\n其他：\n- 百度网盘：25元/月\n- WPS会员：15元/月\n- 知乎盐选：25元/月\n- Keep会员：25元/月\n\n月度订阅总计：293元\n年度总计：3516元\n\n你发现：\n- 你同时有4个视频会员——但你只看1个\n- 你有2个音乐会员——但你只听1个\n- 你有网盘会员——但你几乎不用\n- 你有Keep会员——但你已经3个月没运动了\n\n你开始理解：订阅地狱——不是「每个都很贵」——是「加起来很贵」。\n\n你以为每月25块不多——但你忘了你有10个「25块」。\n\n「订阅地狱：你不是在为服务付费——你是在为「我可能会用」付费。」',
+      cond: g => g.age >= 18 && !g.flags.subscriptionOverload && g.money >= 500,
+      choices:[
+        { label:'清理了所有不常用的订阅', hint:'+💰 +🧠 +😊', fn: g => { g.flags.subscriptionOverload=true; g.flags.subscriptionMinimalist=true; g.money += 200; return{intel:5,mood:5}; }},
+        { label:'保留了一两个常用的', hint:'+💰 +🧠', fn: g => { g.flags.subscriptionOverload=true; g.money += 100; return{intel:3}; }},
+        { label:'算了，每个都有用（骗自己）', hint:'-💰 -🧠', fn: g => { g.flags.subscriptionOverload=true; g.money -= 293; return{intel:-3}; }},
+      ]},
+    { id:'salary_day_ritual', icon:'📅', title:'发薪日仪式', category:'finance',
+      body:'今天是发薪日。\n\n你的工资到账了：8000元。\n\n你的「固定支出清单」：\n- 房租：3500元\n- 水电煤网：300元\n- 手机话费：128元\n- 交通卡：200元\n- 午餐外卖：550元\n- 社保公积金：1200元\n\n固定支出总计：5878元\n\n剩余：2122元\n\n你的「弹性支出」：\n- 晚餐/周末：800元\n- 社交/娱乐：500元\n- 日用品：200元\n\n弹性支出总计：1500元\n\n最终剩余：622元\n\n你看着622元——\n\n这是你一个月的「可自由支配收入」。\n\n622元 ÷ 30天 = 20.7元/天\n\n你每天——只能花20块——在「自己想花的事情」上。\n\n你开始理解：发薪日——不是「开心日」——是「算账日」。\n\n你不是在「赚钱」——你是在「给固定支出打工」。\n\n「发薪日仪式：你以为工资是你的——其实大部分已经是房东和公司的了。」',
+      cond: g => g.age >= 18 && !g.flags.salaryDayRitual && g.jobSalary > 0 && g.jobSalary < 15000,
+      choices:[
+        { label:'开始记账，控制每一笔支出', hint:'+🧠 +💰', fn: g => { g.flags.salaryDayRitual=true; g.flags.budgetTracker=true; g.money += 500; return{intel:5}; }},
+        { label:'设了自动储蓄，发薪先存20%', hint:'+💰 +🧠', fn: g => { g.flags.salaryDayRitual=true; g.flags.autoSaver=true; g.money += 1600; return{intel:3}; }},
+        { label:'今朝有酒今朝醉', hint:'+😊 -💰', fn: g => { g.flags.salaryDayRitual=true; g.money -= 500; return{mood:5}; }},
+      ]},
+    { id:'shared_apartment_drama', icon:'🏢', title:'合租风云', category:'social',
+      body:'你合租了。\n\n你的室友：\n- 室友A：程序员，996，基本不在家\n- 室友B：设计师，自由职业，永远在家\n- 室友C：销售，经常带朋友回来\n\n你的矛盾：\n- 室友B占用了客厅当工作室\n- 室友C半夜带人回来喝酒\n- 卫生间只有1个——早上排队\n- 冰箱里的东西经常「失踪」\n- 公共区域没人打扫\n\n你们开了个「室友会议」——\n\n室友A（视频参加）：「我都行，你们说了算。」\n室友B：「客厅我需要用，但我可以晚上让出来。」\n室友C：「我朋友会注意音量的。」\n\n你发现：合租——不是「省钱」——是「用忍耐力换房租」。\n\n你的室友——不是你选的——是中介给你分配的。\n\n你开始理解：合租的本质——是「跟陌生人共享生活空间」。\n\n你不是在「交朋友」——你是在「忍受」。\n\n「合租风云：你不是在省钱——你是在用隐私和自由换便宜2000块的房租。」',
+      cond: g => g.age >= 18 && !g.flags.sharedApartmentDrama && g.money >= 1000 && !g.flags.hasHouse,
+      choices:[
+        { label:'制定了室友公约，关系变好了', hint:'+🤝 +🧠 +😊', fn: g => { g.flags.sharedApartmentDrama=true; g.flags.roommateLeader=true; g.reputation.social += 3; return{social:5,intel:3,mood:3}; }},
+        { label:'忍了，反正也就住一阵', hint:'-😊 +💰', fn: g => { g.flags.sharedApartmentDrama=true; return{mood:-5}; }},
+        { label:'决定攒够钱自己住', hint:'+💰 +🧠 -😊', fn: g => { g.flags.sharedApartmentDrama=true; g.flags.savingForSolo=true; return{intel:3,mood:-3}; }},
+      ]},
+    { id:'city_survival_cost', icon:'🏙️', title:'城市生存成本计算器', category:'finance',
+      body:'你在网上看到一个「城市生存成本计算器」。\n\n你输入了你的信息——\n\n结果：\n- 你所在城市「体面生活」最低成本：12000元/月\n- 你的月薪：8000元\n- 差距：-4000元\n\n你看了看「体面生活」的标准：\n- 一居室房租：4000元\n- 餐饮：2000元\n- 交通：500元\n- 社交：1000元\n- 娱乐：500元\n- 服装/日用：500元\n- 医疗/保险：500元\n- 储蓄/投资：3000元\n\n你发现——\n- 你的「实际生活」——比「体面生活」差了4000块\n- 你不是在「生活」——你是在「生存」\n- 你省掉的——社交、娱乐、储蓄——恰恰是「让你活得不那么累」的部分\n\n你开始理解：大城市——不是「赚钱的地方」——是「花钱的地方」。\n\n你来大城市——是为了赚钱——但你发现——你赚的钱——不够在大城市活着。\n\n「城市生存成本：你不是在生活——你是在「付得起的范围内」活着。」',
+      cond: g => g.age >= 20 && !g.flags.citySurvivalCost && g.jobSalary > 0 && g.jobSalary < 15000,
+      choices:[
+        { label:'开始规划副业增加收入', hint:'+💰 +🧠 -😊', fn: g => { g.flags.citySurvivalCost=true; g.flags.incomeDiversifier=true; g.money += 2000; return{intel:5,mood:-3}; }},
+        { label:'调整了消费结构，减少不必要支出', hint:'+💰 +🧠', fn: g => { g.flags.citySurvivalCost=true; g.flags.smartSpender=true; g.money += 1000; return{intel:5}; }},
+        { label:'开始考虑是不是该离开大城市了', hint:'-😊 +🧠', fn: g => { g.flags.citySurvivalCost=true; g.flags.consideringLeaving=true; return{mood:-5,intel:5}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -15215,6 +15296,14 @@ const ACHIEVEMENTS = [
     { id:'privacy_guardian_ach', icon:'🔐', name:'隐私卫士', desc:'全面保护个人隐私', check: g => g.flags.privacyGuardian },
     { id:'sustained_detox_ach', icon:'🏕️', name:'数字排毒达人', desc:'排毒营后保持了低屏幕时间习惯', check: g => g.flags.sustainedDetox },
     { id:'authentic_sharing_ach', icon:'🎭', name:'真实分享', desc:'不再维护人设开始真实分享生活', check: g => g.flags.authenticSharing },
+    // v27.6: 城市生存成本成就
+    { id:'rent_negotiator_ach', icon:'🏠', name:'砍价高手', desc:'成功跟房东砍到只涨300', check: g => g.flags.rentNegotiator },
+    { id:'commute_learner_ach', icon:'🚇', name:'通勤学者', desc:'利用通勤时间学习提升自己', check: g => g.flags.commuteLearner },
+    { id:'meal_prepper_ach', icon:'🍱', name:'备餐达人', desc:'周末备餐省钱又健康', check: g => g.flags.mealPrepper },
+    { id:'quality_over_quantity_ach', icon:'🛒', name:'买少买好', desc:'学会了质量优先的消费观', check: g => g.flags.qualityOverQuantity },
+    { id:'subscription_minimalist_ach', icon:'📋', name:'订阅极简', desc:'清理了所有不常用的订阅', check: g => g.flags.subscriptionMinimalist },
+    { id:'budget_tracker_ach', icon:'📊', name:'记账达人', desc:'开始记账控制每一笔支出', check: g => g.flags.budgetTracker },
+    { id:'smart_spender_ach', icon:'🏙️', name:'精明消费者', desc:'调整消费结构减少不必要支出', check: g => g.flags.smartSpender },
 ];
 
 // === ENDINGS === (order matters: first match wins)
