@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v4.1
+// 都市浮生记 - Game Engine v4.2
 // ============================================
 
 // === GAME STATE ===
@@ -2910,6 +2910,25 @@ const EVENTS = [
         { label:'写进简历', hint:'+✨ +💰', fn: g => { g.flags.mbtiTest=true; return{charm:5,money:2000}; }},
         { label:'不信这个', hint:'+🧠', fn: g => { g.flags.mbtiTest=true; return{intel:5,mood:-3}; }},
       ]},
+    // === v4.2 EVENTS - 特种兵旅游与City不City ===
+    { id:'special_forces_travel', icon:'🎒', title:'特种兵旅游',
+      body:'你计划周末特种兵旅游：\n- 周五晚：硬座火车出发\n- 周六：打卡8个景点，步行2万步\n- 周日：再逛3个地方，晚上坐火车回来\n- 全程花费：650元\n\n"特种兵旅游的精髓：用最少的时间、最少的钱，去最多的地方。"\n\n"青春没有售价，硬座直达拉萨。"\n\n你的背包：青旅床位、街边小吃、夜间火车。省钱是艺术。',
+      cond: g => !g.flags.specialForcesTravel && g.age>=18 && g.age<=28 && g.money<20000,
+      choices:[
+        { label:'出发！650元6天', hint:'-💰 +😊 +❤️', fn: g => { g.flags.specialForcesTravel=true; return{money:-650,mood:25,health:-10,charm:8}; }},
+        { label:'48小时周末游', hint:'-💰 +😊', fn: g => { g.flags.specialForcesTravel=true; return{money:-400,mood:18,health:-5}; }},
+        { label:'穷游7国1万元', hint:'-💰 +😊 +✨', fn: g => { g.flags.specialForcesTravel=true; g.flags.budgetTraveler=true; return{money:-10000,mood:30,charm:15,intel:10}; }},
+        { label:'太累了，不去', hint:'+😊 +❤️', fn: g => { g.flags.specialForcesTravel=true; return{mood:5,health:3}; }},
+      ]},
+    { id:'city_or_not', icon:'🏙️', title:'City不City',
+      body:'你在朋友圈发了张照片：咖啡馆、梧桐树、老洋房。\n\n朋友评论："好City啊！"\n\n你问："什么是City？"\n\n"City就是：有咖啡馆、有梧桐树、有老洋房，还有你这种人。"\n\n你看了看窗外：便利店、共享单车、外卖骑手。这算不算City？\n\n"City不City——是一种审美，也是一种生活方式的自我认证。"',
+      cond: g => !g.flags.cityOrNot && g.age>=20 && g.age<=35,
+      choices:[
+        { label:'去网红打卡地', hint:'-💰 +✨ +😊', fn: g => { g.flags.cityOrNot=true; g.flags.influencer=true; return{money:-2000,charm:12,mood:15}; }},
+        { label:'拍City感照片', hint:'+✨ +😊', fn: g => { g.flags.cityOrNot=true; return{charm:10,mood:8}; }},
+        { label:'发朋友圈', hint:'+👥 +✨', fn: g => { g.flags.cityOrNot=true; return{social:12,charm:8,mood:5}; }},
+        { label:'不懂，也不care', hint:'+🧠 +😊', fn: g => { g.flags.cityOrNot=true; return{intel:5,mood:3}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3114,6 +3133,9 @@ const ACHIEVEMENTS = [
     // v4.1 achievements
     { id:'guzi_collector', icon:'🎭', name:'吃谷人', desc:'开始收集谷子', check: g => g.flags.guziCollector },
     { id:'mbti_master', icon:'🧩', name:'MBTI专家', desc:'做了MBTI测试', check: g => g.flags.mbtiTest },
+    // v4.2 achievements
+    { id:'budget_traveler', icon:'🎒', name:'特种兵游客', desc:'体验特种兵旅游', check: g => g.flags.specialForcesTravel },
+    { id:'city_explorer', icon:'🏙️', name:'City玩家', desc:'体验City感生活', check: g => g.flags.cityOrNot },
 ];
 
 // === ENDINGS === (order matters: first match wins)
