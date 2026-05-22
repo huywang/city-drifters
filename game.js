@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v26.1
+// 都市浮生记 - Game Engine v26.2
 // ============================================
 
 // === GAME STATE ===
@@ -12844,6 +12844,87 @@ const EVENTS = [
         { label:'买了商业养老保险，给自己兜底', hint:'+💰 +🧠', fn: g => { g.flags.retirementPlanning=true; g.flags.insuranceBuyer=true; g.money -= 30000; return{intel:5}; }},
         { label:'决定退休后继续做点事，不靠养老金', hint:'+😊 +🧠 +✨', fn: g => { g.flags.retirementPlanning=true; g.flags.activeRetiree=true; return{mood:5,intel:3,charm:3}; }},
       ]},
+    // v26.2: 住房生态 + 居住文化
+    { id:'rental_trap', icon:'🏘️', title:'租房陷阱', category:'city',
+      body:'你要换房子了。你开始找租房。\n\n你看到了各种：\n- 「房东直租」——其实是中介\n- 「精装温馨」——其实是甲醛超标\n- 「采光充足」——其实是顶楼西晒\n- 「交通便利」——其实要换乘3次\n- 「近地铁」——其实要骑车15分钟\n\n你看了10套房子：\n- 8套有各种问题\n- 2套能接受——但价格超预算\n\n你终于找到一套「看起来还行」的。签了合同，交了押金。\n\n搬进去第一天：\n- 空调不制冷\n- 热水器漏水\n- 邻居半夜吵架\n\n你给房东打电话——房东说：「这不在合同里。」\n\n「租房陷阱：你不是在租房子——是在跟房东对赌。」',
+      cond: g => g.age >= 18 && !g.flags.rentalTrap && !g.flags.hasHouse,
+      choices:[
+        { label:'跟房东死磕，要求修好一切', hint:'+🧠 +✨ -😊', fn: g => { g.flags.rentalTrap=true; g.flags.tenantFighter=true; return{intel:3,charm:3,mood:-5}; }},
+        { label:'认了，凑合住吧', hint:'+😊 -❤️', fn: g => { g.flags.rentalTrap=true; return{mood:-3,health:-2}; }},
+        { label:'果断搬走，损失押金换自由', hint:'-💰 +😊 +🧠', fn: g => { g.flags.rentalTrap=true; g.money -= 3000; return{mood:5,intel:3}; }},
+      ]},
+    { id:'mortgage_calc', icon:'🏦', title:'房贷计算', category:'finance',
+      body:'你决定买房了。你打开房贷计算器。\n\n总价300万：\n- 首付30%：90万\n- 贷款210万\n- 30年等额本息\n- 年利率3.5%\n- 月供：约9500元\n\n你算了一下：\n- 30年总还款：342万（比贷款本金多132万利息）\n- 每天要赚300元才能还月供\n- 一年要工作365天不能停\n\n你也看到了几种选择：\n- 贷款20年：月供1.2万（利息少80万）\n- 公积金贷款：利率3.1%（月供少500）\n- 先息后本：前几年只还利息\n\n你突然明白：房贷——是普通人能借到的最大一笔钱。也是最长的一份「卖身契」。\n\n「房贷计算：你不是在买房——是在用30年赌未来。」',
+      cond: g => g.age >= 25 && g.age <= 45 && !g.flags.mortgageCalc && !g.flags.hasHouse && g.money >= 300000,
+      choices:[
+        { label:'选了30年贷款，开始房奴生活', hint:'-💰 -😊 +🏠', fn: g => { g.flags.mortgageCalc=true; g.flags.houseBuyer=true; g.flags.hasHouse=true; g.money -= 300000; return{mood:-5}; }},
+        { label:'选了20年贷款，咬牙缩短年限', hint:'-💰 -😊 +🧠 +🏠', fn: g => { g.flags.mortgageCalc=true; g.flags.houseBuyer=true; g.flags.hasHouse=true; g.money -= 300000; return{mood:-8,intel:3}; }},
+        { label:'算完觉得买房不值，继续租', hint:'+🧠 +😊', fn: g => { g.flags.mortgageCalc=true; g.flags.rentForever=true; return{intel:5,mood:3}; }},
+      ]},
+    { id:'roommate_conflict_v26_2', icon:'👥', title:'合租室友', category:'city',
+      body:'你跟朋友合租了。\n\n一开始很好：\n- 房租AA，省了一半\n- 有人一起吃饭\n- 有人聊天\n- 周末一起看电影\n\n三个月后：\n- 他从不洗碗\n- 他的朋友经常来，很吵\n- 他晚上打游戏到凌晨\n- 他的脏衣服堆在客厅\n- 他欠了2个月水电费没交\n\n你试着谈了谈——他说：「哎呀，不好意思。」但没改。\n\n你开始明白：朋友——不一定适合当室友。\n\n你也学到：合租——最大的成本不是钱，是「磨合」。\n\n「合租室友：你以为省了钱——其实消耗了友情。」',
+      cond: g => g.age >= 18 && g.age <= 35 && !g.flags.roommateConflict && !g.flags.hasHouse,
+      choices:[
+        { label:'跟室友认真谈了一次，约法三章', hint:'+🧠 +🤝', fn: g => { g.flags.roommateConflict=true; g.flags.conflictResolver=true; return{intel:3,social:3}; }},
+        { label:'忍了，毕竟省了房租', hint:'-😊 -❤️ +💰', fn: g => { g.flags.roommateConflict=true; return{mood:-5,health:-3}; }},
+        { label:'搬出去单住，宁可多花钱', hint:'-💰 +😊 +🧠', fn: g => { g.flags.roommateConflict=true; g.flags.soloRenter=true; g.money -= 2000; return{mood:8,intel:3}; }},
+      ]},
+    { id:'basement_life', icon:'🕳️', title:'地下室生活', category:'city',
+      body:'为了省房租，你搬进了一间地下室。\n\n房租：800元/月（比地上便宜一半）。\n\n你的房间：\n- 10平米\n- 没有窗户（只有一个通风口）\n- 潮湿，衣服永远晒不干\n- 手机没信号\n- 共用一个卫生间\n\n你每天：\n- 早上被通风口的声音吵醒\n- 白天在外面待着（不想回地下室）\n- 晚上回去睡觉\n\n你也看到了：\n- 这个小区有50多间地下室\n- 住的都是像你一样的「城市漂泊者」\n- 快递小哥、餐厅服务员、刚毕业的大学生\n\n你问自己：我要在这里住多久？\n\n「地下室生活：城市的繁华——建立在一些人的「地下」之上。」',
+      cond: g => g.age >= 18 && g.age <= 35 && !g.flags.basementLife && g.money < 30000 && !g.flags.hasHouse,
+      choices:[
+        { label:'接受现实，努力赚钱早日搬出去', hint:'+🧠 -😊 +💰', fn: g => { g.flags.basementLife=true; g.flags.strivingTenant=true; return{intel:3,mood:-5,money:2000}; }},
+        { label:'在地下室也活出滋味，把它布置得很温馨', hint:'+😊 +✨ -❤️', fn: g => { g.flags.basementLife=true; g.flags.cozyBasement=true; return{mood:3,charm:3,health:-3}; }},
+        { label:'搬出去了，再穷也不住地下室', hint:'-💰 +😊 +❤️', fn: g => { g.flags.basementLife=true; g.money -= 1500; return{mood:5,health:3}; }},
+      ]},
+    { id:'renovation_nightmare', icon:'🔨', title:'装修噩梦', category:'city',
+      body:'你买了房，开始装修。\n\n你以为：装修=找个装修公司=搞定。\n\n现实：\n- 装修公司的报价差10倍\n- 「全包」其实什么都不包\n- 增项比合同价还多\n- 工期从3个月拖到6个月\n- 材料跟样品完全不一样\n- 邻居投诉噪音\n\n你每天：\n- 早上跟设计师吵\n- 中午跟工人吵\n- 晚上跟装修公司吵\n\n你发现：装修——是普通人要经历的最大一次「项目管理」。\n\n你花了30万——但得到了一个价值10万的效果。\n\n你学到了：\n- 合同要写细\n- 增项要提前约\n- 关键节点要亲自盯\n\n「装修噩梦：不是在装修房子——是在装修你的耐心。」',
+      cond: g => g.age >= 25 && g.age <= 55 && !g.flags.renovationNightmare && g.flags.hasHouse && g.money >= 100000,
+      choices:[
+        { label:'亲自盯着每个细节，成了装修专家', hint:'+🧠 -😊 -💰', fn: g => { g.flags.renovationNightmare=true; g.flags.diyExpert=true; g.money -= 200000; return{intel:8,mood:-5}; }},
+        { label:'交给装修公司，眼不见为净', hint:'-💰 -🧠 +😊', fn: g => { g.flags.renovationNightmare=true; g.money -= 300000; return{intel:-3,mood:3}; }},
+        { label:'简单装修，能住就行', hint:'+💰 +🧠', fn: g => { g.flags.renovationNightmare=true; g.flags.minimalDecorator=true; g.money -= 100000; return{intel:3}; }},
+      ]},
+    { id:'property_dispute', icon:'⚖️', title:'物业纠纷', category:'city',
+      body:'你小区的物业——突然要涨物业费。\n\n从每平米2元涨到3.5元。\n\n你算了算：一年要多交2000元。\n\n业主群里炸了锅：\n- 「凭什么涨？」\n- 「服务那么差！」\n- 「我们要换物业！」\n- 「成立业委会！」\n\n你参加了业主大会。你发现：\n- 100户里只有30户来开会\n- 30户里有20户只是抱怨\n- 真正愿意干事的只有5户\n\n你也看到：\n- 物业跟开发商有关系\n- 物业跟一些业主有利益往来\n- 换物业——要投票、要备案、要打官司\n\n你问自己：我一个普通人——真的能「维权」吗？\n\n「物业纠纷：你不是在跟物业斗——是在学「公民」这堂课。」',
+      cond: g => g.age >= 25 && !g.flags.propertyDispute && g.flags.hasHouse,
+      choices:[
+        { label:'加入了业委会，开始维权', hint:'+🧠 +✨ -😊', fn: g => { g.flags.propertyDispute=true; g.flags.committeeMember=true; return{intel:5,charm:5,mood:-3}; }},
+        { label:'默默交钱，不惹事', hint:'-💰 +😊', fn: g => { g.flags.propertyDispute=true; g.money -= 2000; return{mood:-3}; }},
+        { label:'联合邻居一起谈判，拿到了折中方案', hint:'+🧠 +🤝 +✨', fn: g => { g.flags.propertyDispute=true; g.flags.neighborOrganizer=true; return{intel:5,social:5,charm:3}; }},
+      ]},
+    { id:'community_building_v26_2', icon:'🏘️', title:'社区建设', category:'city',
+      body:'你发现：你住了3年的小区——你一个人都不认识。\n\n你开始参加社区活动：\n- 周末跳蚤市场\n- 社区合唱团\n- 老人智能手机教学\n- 小区植树\n\n你发现：\n- 小区里有很多「有趣的人」\n- 退休老师、独立音乐人、单亲妈妈、创业者\n- 每个人都有自己的故事\n\n你组织了：\n- 小区读书会（每月一次）\n- 邻里互助群（借个盐、代取快递）\n- 社区志愿者（帮助独居老人）\n\n你发现：城市——不是由高楼组成的，是由「人」组成的。\n\n当你开始关心邻居——你的「城市」才真正开始有了温度。\n\n「社区建设：你不是在「做公益」——是在建设自己的「家」。」',
+      cond: g => g.age >= 25 && !g.flags.communityBuilding && g.social >= 20,
+      choices:[
+        { label:'成了社区核心志愿者，认识了几十个邻居', hint:'+🤝 +✨ +😊 -💰', fn: g => { g.flags.communityBuilding=true; g.flags.communityLeader=true; return{social:10,charm:5,mood:5}; }},
+        { label:'偶尔参加，保持邻里关系', hint:'+🤝 +😊', fn: g => { g.flags.communityBuilding=true; return{social:5,mood:3}; }},
+        { label:'觉得太麻烦，还是关起门过自己的', hint:'-🤝 +😊', fn: g => { g.flags.communityBuilding=true; return{social:-3,mood:2}; }},
+      ]},
+    { id:'urban_village_v26_2', icon:'🏚️', title:'城中村', category:'city',
+      body:'你搬进了城中村。\n\n这里是城市的「异度空间」：\n- 狭窄的巷道，两人并行都难\n- 头顶密密麻麻的电线\n- 楼下是菜市场、烧烤摊、棋牌室\n- 楼上是各种「公寓」（其实是一间隔成10间）\n\n房租：600元/月。\n\n你喜欢这里的：\n- 便宜\n- 热闹\n- 楼下什么都有\n- 没人问你从哪来\n\n你也讨厌这里的：\n- 噪音\n- 卫生差\n- 安全隐患\n- 拆迁的传言（随时可能被赶走）\n\n你听说：这个城中村要拆了。建高档小区。\n\n你问自己：拆了以后——我们去哪？\n\n「城中村：城市的良心——藏在这些不起眼的角落。」',
+      cond: g => g.age >= 18 && g.age <= 40 && !g.flags.urbanVillage && g.money < 50000,
+      choices:[
+        { label:'在城中村扎了根，成了这里的「老人」', hint:'+🤝 +😊 -❤️', fn: g => { g.flags.urbanVillage=true; g.flags.villageLocal=true; return{social:5,mood:5,health:-5}; }},
+        { label:'努力赚钱，准备搬出去', hint:'+💰 +🧠 -😊', fn: g => { g.flags.urbanVillage=true; return{money:3000,intel:3,mood:-3}; }},
+        { label:'把这里当成临时落脚点，保持距离', hint:'+🧠', fn: g => { g.flags.urbanVillage=true; return{intel:3}; }},
+      ]},
+    { id:'house_anxiety', icon:'😰', title:'购房焦虑', category:'finance',
+      body:'你一直在考虑要不要买房。\n\n你看到了各种数据：\n- 房价收入比：30倍（要不吃不喝30年才能买房）\n- 租售比：1:500（买房不如租房）\n- 房价走势：有的城市涨，有的城市跌\n\n你也听到了各种声音：\n- 父母：「必须买，不然不踏实」\n- 朋友：「别买，租着自由」\n- 中介：「现在不买，以后更贵」\n- 经济学家：「房价泡沫要破了」\n\n你算了算：\n- 买房=30年房奴\n- 不买房=可能一辈子租房\n- 但租房=老了怎么办？\n\n你问自己：房子——到底是「必需品」，还是「枷锁」？\n\n「购房焦虑：你不是在选房子——是在选人生模式。」',
+      cond: g => g.age >= 25 && g.age <= 45 && !g.flags.houseAnxiety && !g.flags.hasHouse && g.money >= 100000,
+      choices:[
+        { label:'咬咬牙买了，开始房奴生活', hint:'-💰 +🏠 -😊', fn: g => { g.flags.houseAnxiety=true; g.flags.hasHouse=true; g.flags.reluctantBuyer=true; g.money -= 300000; return{mood:-5}; }},
+        { label:'继续租，把钱用来投资', hint:'+💰 +🧠', fn: g => { g.flags.houseAnxiety=true; g.flags.rentAndInvest=true; return{intel:5,money:5000}; }},
+        { label:'决定回老家买房，不在大城市硬撑', hint:'+💰 +😊 +🤝', fn: g => { g.flags.houseAnxiety=true; g.flags.hometownBuyer=true; g.money -= 100000; return{mood:5,social:3}; }},
+      ]},
+    { id:'homestead_dream', icon:'🏡', title:'宅基地', category:'city',
+      body:'你回老家的时候，发现村里有很多空房子。\n\n你爸说：「这些宅基地——很多城里人想买，但买不到。」\n\n你了解了一下：\n- 宅基地归村集体所有\n- 只能由本村村民使用\n- 城里人不能买宅基地\n- 但可以通过「租赁」长期使用\n\n你有了个想法：\n- 租一块宅基地\n- 花几十万盖个民宿\n- 周末接待城里人\n- 自己也能偶尔回来住\n\n你也想到了问题：\n- 20年租期到了怎么办？\n- 如果拆迁——补偿归谁？\n- 政策会不会变？\n\n你问自己：我是要在城市扎根——还是要给自己留一条「回去」的路？\n\n「宅基地：不是买地——是买一种「可以回去」的安心。」',
+      cond: g => g.age >= 30 && !g.flags.homesteadDream && g.money >= 50000,
+      choices:[
+        { label:'租了宅基地，开始建民宿', hint:'-💰 +✨ +😊', fn: g => { g.flags.homesteadDream=true; g.flags.homesteadBuilder=true; g.money -= 50000; return{charm:5,mood:5}; }},
+        { label:'觉得风险太大，放弃了', hint:'+🧠 +💰', fn: g => { g.flags.homesteadDream=true; return{intel:3}; }},
+        { label:'跟父母商量，准备以后回老家发展', hint:'+🤝 +😊 +💰', fn: g => { g.flags.homesteadDream=true; g.flags.hometownPlan=true; return{social:5,mood:5,money:2000}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -13989,6 +14070,12 @@ const ACHIEVEMENTS = [
     { id:'neutral_pro_ach', icon:'🕊️', name:'职场中立派', desc:'坚持中立靠能力说话', check: g => g.flags.neutralPro },
     { id:'serious_hustler_ach', icon:'💪', name:'副业达人', desc:'认真经营副业做到主业水平', check: g => g.flags.seriousHustler },
     { id:'active_retiree_ach', icon:'🌅', name:'积极退休派', desc:'决定退休后继续做事不靠养老金', check: g => g.flags.activeRetiree },
+    // v26.2: 住房生态成就
+    { id:'house_buyer_ach', icon:'🏠', name:'首套房买家', desc:'咬牙买下人生第一套房', check: g => g.flags.houseBuyer },
+    { id:'rent_forever_ach', icon:'🔑', name:'租房派', desc:'算完房贷决定继续租房', check: g => g.flags.rentForever },
+    { id:'diy_expert_ach', icon:'🔨', name:'装修专家', desc:'亲自盯装修成了半个专家', check: g => g.flags.diyExpert },
+    { id:'neighbor_organizer_ach', icon:'🤝', name:'邻里组织者', desc:'联合邻居一起跟物业谈判', check: g => g.flags.neighborOrganizer },
+    { id:'homestead_builder_ach', icon:'🏡', name:'宅基地梦想家', desc:'租了宅基地开始建民宿', check: g => g.flags.homesteadBuilder },
 ];
 
 // === ENDINGS === (order matters: first match wins)
