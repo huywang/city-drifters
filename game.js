@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v26.3
+// 都市浮生记 - Game Engine v26.4
 // ============================================
 
 // === GAME STATE ===
@@ -13006,6 +13006,87 @@ const EVENTS = [
         { label:'只给父母买了，自己还年轻再说', hint:'-💰 +🧠 +🤝', fn: g => { g.flags.longTermCare=true; g.money -= 3000; return{intel:3,social:3}; }},
         { label:'觉得还早，以后再说', hint:'+💰 -🧠', fn: g => { g.flags.longTermCare=true; return{intel:-2}; }},
       ]},
+    // v26.4: 文化娱乐 + 休闲生活
+    { id:'script_kill_v26_4', icon:'🎭', title:'剧本杀', category:'hobby',
+      body:'朋友拉你去玩剧本杀。\n\n你们8个人——围在一间布置过的房间里。\n\n你拿到一个角色：「民国时期的报社记者」。\n\n接下来4个小时：\n- 你要扮演这个角色\n- 你要跟其他角色互动、推理\n- 你要找出「凶手」\n- 你还要隐藏自己的「秘密」\n\n你发现：\n- 你比想象中更会演\n- 你居然哭了（剧情太感人）\n- 你跟陌生人成了朋友\n\n结束后，你说：「下次还来。」\n\n你开始明白：为什么剧本杀这么火——因为在一个「不能做自己」的世界里——你可以在这里「做别人」。\n\n「剧本杀：不是游戏——是另一种人生体验。」',
+      cond: g => g.age >= 18 && g.age <= 40 && !g.flags.scriptKill && g.money >= 200,
+      choices:[
+        { label:'成了剧本杀常客，每周玩一次', hint:'-💰 +🤝 +✨ +😊', fn: g => { g.flags.scriptKill=true; g.flags.scriptAddict=true; g.money -= 1500; return{social:5,charm:3,mood:8}; }},
+        { label:'偶尔玩，喜欢推理类', hint:'-💰 +🧠 +🤝', fn: g => { g.flags.scriptKill=true; g.money -= 200; return{intel:3,social:3}; }},
+        { label:'玩了一次觉得太中二，不去了', hint:'+💰 -😊', fn: g => { g.flags.scriptKill=true; return{mood:-2}; }},
+      ]},
+    { id:'escape_room_v26_4', icon:'🔐', title:'密室逃脱', category:'hobby',
+      body:'你跟朋友去玩了密室逃脱。\n\n主题：「古墓探险」。\n\n你们被关在一个布置过的房间里——要在60分钟内解开谜题逃出去。\n\n你的体验：\n- 第1个谜题：10分钟解开（很有成就感）\n- 第2个：卡住了（开始查提示）\n- 第3个：实在解不开（呼叫提示）\n- 最后：勉强逃出来\n\n你发现：\n- 你的逻辑思维——其实一般\n- 你朋友比你聪明\n- 但你们合作得很好\n\n你也发现：密室逃脱——是一种「协作+压力」的游戏。在工作中很难体验到的「团队合作」——在这里可以。\n\n「密室逃脱：不是考智商——是考协作。」',
+      cond: g => g.age >= 18 && g.age <= 40 && !g.flags.escapeRoom && g.money >= 200 && g.social >= 20,
+      choices:[
+        { label:'成了密室爱好者，挑战各种难度', hint:'-💰 +🧠 +🤝 +😊', fn: g => { g.flags.escapeRoom=true; g.flags.escapeAddict=true; g.money -= 1000; return{intel:5,social:5,mood:5}; }},
+        { label:'玩了一次，觉得挺有趣', hint:'-💰 +🧠 +😊', fn: g => { g.flags.escapeRoom=true; g.money -= 200; return{intel:3,mood:3}; }},
+        { label:'被吓到了（恐怖主题），再也不去了', hint:'-😊 -❤️', fn: g => { g.flags.escapeRoom=true; return{mood:-3,health:-2}; }},
+      ]},
+    { id:'music_festival_v26_4', icon:'🎸', title:'音乐节', category:'hobby',
+      body:'你去了一次音乐节。\n\n现场：\n- 几万人\n- 草坪\n- 巨大的音响\n- 各种奇装异服的人\n- 各种摊位（啤酒、周边、小吃）\n\n你最喜欢的乐队在台上——\n\n当他们唱起那首你听了100遍的歌——\n\n你跟几万人一起唱。\n\n你哭了。不是因为感动——是因为——\n\n在这个瞬间——你不再是「打工的你」——你只是「听音乐的你」。\n\n你发现：音乐——是一种「解脱」。\n\n「音乐节：不是去听音乐——是去找回那个被工作淹没的自己。」',
+      cond: g => g.age >= 18 && g.age <= 40 && !g.flags.musicFestival && g.money >= 500,
+      choices:[
+        { label:'成了音乐节常客，每年去3-4个', hint:'-💰 +😊 +✨ +🤝', fn: g => { g.flags.musicFestival=true; g.flags.festivalRegular=true; g.money -= 3000; return{mood:10,charm:5,social:3}; }},
+        { label:'体验了一次，挺震撼', hint:'-💰 +😊 +✨', fn: g => { g.flags.musicFestival=true; g.money -= 500; return{mood:5,charm:3}; }},
+        { label:'人太多太吵，不喜欢', hint:'-😊', fn: g => { g.flags.musicFestival=true; return{mood:-3}; }},
+      ]},
+    { id:'theater_show', icon:'🎪', title:'话剧演出', category:'hobby',
+      body:'朋友送了你一张话剧票。\n\n你本来不想去——「话剧？那不是老古董才看的吗？」\n\n但你去了。\n\n舞台上：\n- 演员离你只有几米\n- 他们的表情、呼吸——你都看得到\n- 没有特效、没有剪辑\n- 一气呵成的90分钟\n\n你被震撼了。\n\n你发现：话剧——是一种「在场」的艺术。\n\n在短视频、快节奏的时代——你需要花90分钟——坐在一个地方——专注地看一个故事。\n\n这是一种奢侈——也是一种治愈。\n\n你开始理解：为什么有人说「话剧是城市的精神食粮」。\n\n「话剧演出：不是在看戏——是在跟一群活生生的人「共振」。」',
+      cond: g => g.age >= 20 && !g.flags.theaterShow && g.money >= 200 && g.intel >= 20,
+      choices:[
+        { label:'成了话剧爱好者，每月看一部', hint:'-💰 +🧠 +✨ +😊', fn: g => { g.flags.theaterShow=true; g.flags.theaterLover=true; g.money -= 2000; return{intel:8,charm:5,mood:5}; }},
+        { label:'觉得挺有意思，偶尔去看', hint:'-💰 +🧠 +😊', fn: g => { g.flags.theaterShow=true; g.money -= 200; return{intel:3,mood:3}; }},
+        { label:'看不懂，太文艺了', hint:'-🧠', fn: g => { g.flags.theaterShow=true; return{intel:-2}; }},
+      ]},
+    { id:'concert', icon:'🎤', title:'演唱会', category:'hobby',
+      body:'你抢到了你最喜欢的歌手的演唱会门票。\n\n现场：\n- 2万人\n- 巨大的屏幕\n- 专业的灯光音响\n- 每个人都穿着应援服\n\n当歌手出场的那一刻——全场尖叫。\n\n你跟着唱每一首歌。\n\n你哭了——不是因为歌，是因为——\n\n这些歌——陪你度过了那些最难的日子。\n- 高考前的深夜\n- 失恋后的街头\n- 加班后的地铁\n\n你突然明白：演唱会——不是「看」歌手——是「见」那个被歌声陪伴过的自己。\n\n「演唱会：你买的不是门票——是跟过去的自己重逢。」',
+      cond: g => g.age >= 16 && g.age <= 50 && !g.flags.concert && g.money >= 500,
+      choices:[
+        { label:'成了追星族，跟着歌手巡回', hint:'-💰 +😊 +✨ -🧠', fn: g => { g.flags.concert=true; g.flags.tourFollower=true; g.money -= 5000; return{mood:10,charm:5,intel:-2}; }},
+        { label:'去了一次，成了珍贵的回忆', hint:'-💰 +😊 +✨', fn: g => { g.flags.concert=true; g.money -= 800; return{mood:8,charm:3}; }},
+        { label:'觉得太吵了，不喜欢', hint:'-😊', fn: g => { g.flags.concert=true; return{mood:-3}; }},
+      ]},
+    { id:'standup_comedy_v26_4', icon:'😂', title:'脱口秀', category:'hobby',
+      body:'你去看了线下脱口秀。\n\n小剧场——只有50个座位。\n\n演员离你只有2米。\n\n他讲的都是：\n- 职场吐槽\n- 恋爱糗事\n- 生活荒诞\n- 社会现象\n\n你笑了整整90分钟。\n\n你发现：脱口秀——是一种「用笑化解痛苦」的艺术。\n\n每一个笑话——背后都是一段真实的痛。\n\n演员说：「喜剧的内核——是悲剧。」\n\n你突然理解了：为什么这么多年轻人爱看脱口秀——因为生活太苦了，需要有人用幽默把它「翻译」一下。\n\n「脱口秀：不是让你笑——是让你用笑面对那些让你哭的事。」',
+      cond: g => g.age >= 18 && g.age <= 45 && !g.flags.standupComedy && g.money >= 100,
+      choices:[
+        { label:'成了脱口秀铁粉，每期必看', hint:'-💰 +😊 +🧠', fn: g => { g.flags.standupComedy=true; g.flags.comedyAddict=true; g.money -= 1000; return{mood:8,intel:3}; }},
+        { label:'偶尔看，喜欢某些演员', hint:'-💰 +😊', fn: g => { g.flags.standupComedy=true; g.money -= 100; return{mood:5}; }},
+        { label:'觉得自己也能讲，去参加了开放麦', hint:'+✨ +🧠 +😊', fn: g => { g.flags.standupComedy=true; g.flags.openMicPerformer=true; return{charm:5,intel:3,mood:5}; }},
+      ]},
+    { id:'camping', icon:'⛺', title:'露营', category:'hobby',
+      body:'你第一次去露营。\n\n你带了：\n- 帐篷（借的）\n- 野餐垫\n- 烧烤架\n- 一堆食物\n- 蓝牙音箱\n\n你到了营地——\n- 搭帐篷花了1小时（累死了）\n- 烧烤弄得到处都是烟\n- 晚上冷得睡不着\n- 早上被太阳晒醒\n\n但你也体验到了：\n- 星空（真的能看到！）\n- 篝火（真的有氛围！）\n- 朋友（真的聊了很多！）\n- 慢下来的时间（真的好久没有！）\n\n你开始理解：为什么露营这么火——因为城市人——太需要「离开城市」了。\n\n「露营：不是去「野」——是去「慢」。」',
+      cond: g => g.age >= 18 && g.age <= 50 && !g.flags.camping && g.money >= 500 && g.social >= 15,
+      choices:[
+        { label:'买了全套装备，成了露营达人', hint:'-💰 +😊 +❤️ +✨', fn: g => { g.flags.camping=true; g.flags.campingLover=true; g.money -= 5000; return{mood:8,health:3,charm:3}; }},
+        { label:'偶尔去，享受自然', hint:'-💰 +😊 +❤️', fn: g => { g.flags.camping=true; g.money -= 500; return{mood:5,health:3}; }},
+        { label:'被虫子咬了一晚上，再也不去了', hint:'-❤️ -😊', fn: g => { g.flags.camping=true; return{health:-2,mood:-3}; }},
+      ]},
+    { id:'road_trip_v26_4', icon:'🚗', title:'自驾游', category:'hobby',
+      body:'你跟朋友策划了一次自驾游。\n\n路线：北京→西安→成都→丽江（2周）。\n\n你们开着租的车——一路向西。\n\n路上的风景：\n- 黄土高原\n- 秦岭隧道\n- 川西草原\n- 雪山\n- 古镇\n\n你也遇到了：\n- 车抛锚（在荒无人烟的地方）\n- 堵车（在国庆假期）\n- 迷路（在没有信号的山里）\n- 争吵（因为路线选择）\n\n但你也收获了：\n- 绝美的风景\n- 真实的友情\n- 难忘的故事\n- 一个「活过」的证据\n\n你开始明白：旅行——不是去一个地方——是经历一段「失控」。\n\n「自驾游：不是在开车——是在用轮子丈量人生。」',
+      cond: g => g.age >= 20 && g.age <= 55 && !g.flags.roadTrip && g.money >= 5000 && g.social >= 20,
+      choices:[
+        { label:'爱上了自驾，计划每年一次', hint:'-💰 +😊 +✨ +🧠', fn: g => { g.flags.roadTrip=true; g.flags.roadTripAddict=true; g.money -= 8000; return{mood:10,charm:5,intel:3}; }},
+        { label:'去了一次，成了难忘的回忆', hint:'-💰 +😊 +🧠', fn: g => { g.flags.roadTrip=true; g.money -= 5000; return{mood:8,intel:3}; }},
+        { label:'觉得太累太麻烦，以后坐飞机', hint:'+💰 -😊', fn: g => { g.flags.roadTrip=true; return{mood:-3}; }},
+      ]},
+    { id:'amusement_park', icon:'🎢', title:'游乐场', category:'hobby',
+      body:'你去了环球影城。\n\n你排队：\n- 哈利·波特：90分钟\n- 变形金刚：120分钟\n- 侏罗纪：60分钟\n\n你体验了：\n- 过山车（吓得尖叫）\n- 4D电影（被水溅了一身）\n- 主题餐厅（贵但有趣）\n- 花车巡游（很梦幻）\n\n你发现：\n- 游乐场——是「大人」可以「做回小孩」的地方\n- 在这里——你可以尖叫、大笑、蹦蹦跳跳\n- 没人会觉得你「幼稚」\n\n你也发现：\n- 游乐场——是「被设计好的快乐」\n- 每一秒的「惊喜」——都是精心计算的\n- 但——管它呢，快乐就是快乐\n\n「游乐场：你买的不是门票——是一张「回到童年」的车票。」',
+      cond: g => g.age >= 16 && g.age <= 50 && !g.flags.amusementPark && g.money >= 500,
+      choices:[
+        { label:'成了游乐场常客，集齐了所有主题乐园', hint:'-💰 +😊 +✨', fn: g => { g.flags.amusementPark=true; g.flags.parkCollector=true; g.money -= 3000; return{mood:10,charm:5}; }},
+        { label:'去了一次，挺开心', hint:'-💰 +😊', fn: g => { g.flags.amusementPark=true; g.money -= 500; return{mood:5}; }},
+        { label:'排队太累，不喜欢', hint:'-😊 -❤️', fn: g => { g.flags.amusementPark=true; return{mood:-3,health:-2}; }},
+      ]},
+    { id:'museum_visit', icon:'🏛️', title:'博物馆', category:'hobby',
+      body:'你周末去了一趟博物馆。\n\n你看到了：\n- 商周青铜器\n- 唐代三彩\n- 宋代山水画\n- 明清瓷器\n\n你站在一件3000年前的青铜器前——\n\n你想：3000年前——有人用过它、珍惜过它、传承过它。\n\n而3000年后——你站在这里——看着它。\n\n你突然感到一种「跨越时间的连接」。\n\n你发现：博物馆——是一种「跟历史对话」的地方。\n\n在一个追求「新」的时代——博物馆提醒我们：有些东西——是「旧」的才珍贵。\n\n「博物馆：不是看古董——是看「我们从哪里来」。」',
+      cond: g => g.age >= 18 && !g.flags.museumVisit && g.intel >= 25,
+      choices:[
+        { label:'成了博物馆爱好者，集齐各大博物馆', hint:'-💰 +🧠 +✨ +😊', fn: g => { g.flags.museumVisit=true; g.flags.museumLover=true; g.money -= 1000; return{intel:8,charm:5,mood:5}; }},
+        { label:'偶尔去，增长见识', hint:'+🧠 +😊', fn: g => { g.flags.museumVisit=true; return{intel:5,mood:3}; }},
+        { label:'看不懂，觉得无聊', hint:'-🧠', fn: g => { g.flags.museumVisit=true; return{intel:-2}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -14163,6 +14244,12 @@ const ACHIEVEMENTS = [
     { id:'fully_insured_v26_3_ach', icon:'🛡️', name:'全面医保派', desc:'配齐了百万医疗和重疾险', check: g => g.flags.fullyInsured },
     { id:'patient_advocate_ach', icon:'📣', name:'患者权益倡导者', desc:'开始为患者权益发声', check: g => g.flags.patientAdvocate },
     { id:'therapy_regular_ach_v26_3b', icon:'🧘', name:'心理咨询常客', desc:'开始长期规律的心理咨询', check: g => g.flags.therapyRegular },
+    // v26.4: 文化娱乐成就
+    { id:'script_addict_ach', icon:'🎭', name:'剧本杀达人', desc:'成了剧本杀常客每周玩一次', check: g => g.flags.scriptAddict },
+    { id:'festival_regular_ach', icon:'🎸', name:'音乐节常客', desc:'每年去3-4个音乐节', check: g => g.flags.festivalRegular },
+    { id:'open_mic_performer_ach', icon:'🎤', name:'开放麦演员', desc:'鼓起勇气参加了脱口秀开放麦', check: g => g.flags.openMicPerformer },
+    { id:'camping_lover_ach', icon:'⛺', name:'露营爱好者', desc:'买了全套装备成了露营达人', check: g => g.flags.campingLover },
+    { id:'road_trip_addict_ach', icon:'🚗', name:'自驾达人', desc:'爱上了自驾游计划每年一次', check: g => g.flags.roadTripAddict },
 ];
 
 // === ENDINGS === (order matters: first match wins)
