@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v20.1
+// 都市浮生记 - Game Engine v20.2
 // ============================================
 
 // === GAME STATE ===
@@ -9590,6 +9590,87 @@ const EVENTS = [
         { label:'只买了真正需要的', hint:'+🧠 +😊', fn: g => { g.flags.xhsShopping=true; g.flags.smartShopper=true; return{intel:3,mood:5,money:-500}; }},
         { label:'全删了，一个都没买', hint:'+🧠', fn: g => { g.flags.xhsShopping=true; g.flags.resistTemptation=true; return{intel:5,mood:3}; }},
       ]},
+    // === v20.2 新增事件（职场新生态 + 职业焦虑 + 转型） ===
+    { id:'managing_up', icon:'📈', title:'向上管理', category:'career',
+      body:'你的同事升职了。你不服：他的能力明显不如你。\n\n但你的mentor说：「他不是能力比你强——他是比你更会向上管理。」\n\n你开始研究「向上管理」：定期汇报工作进展、主动对齐目标、提前预判领导需求、在关键会议上展示成果。\n\n你发现：向上管理不是拍马屁——是让领导知道你在做什么、做得怎么样、需要什么支持。\n\n三个月后，你的领导在季度会上说：「这个季度表现最好的是你。」\n\n你终于理解了：在职场，会做事和会做人同样重要——但很多人只学会了前者。\n\n「向上管理：不是讨好领导——是让你的努力被看见。」',
+      cond: g => !g.flags.managingUp && g.age >= 24 && g.age <= 40 && g.job !== '待业中',
+      choices:[
+        { label:'认真实践向上管理', hint:'+🧠 +💰', fn: g => { g.flags.managingUp=true; g.flags.goodAtManagingUp=true; return{intel:8,mood:5}; }},
+        { label:'试试看，但不太习惯', hint:'+🧠', fn: g => { g.flags.managingUp=true; return{intel:5}; }},
+        { label:'还是靠实力说话', hint:'', fn: g => { g.flags.managingUp=true; return{intel:2}; }},
+      ]},
+    { id:'interview_ptsd', icon:'😰', title:'面试PTSD', category:'career',
+      body:'你已经面试了8家公司了。\n\n每次都是：投简历 → 笔试 → 一面 → 二面 → 等通知 → 「感谢您的参与」。\n\n你开始害怕手机响——因为可能是HR打来的，也可能是又一封拒绝邮件。\n\n你的室友说：「你以前很自信的。」\n\n你说：「我以前也以为自己是个人才。」\n\n你在小红书上搜「面试PTSD」，发现几万人有同样的感受。一个网友的评论让你泪目：「不是你不够好——是这个市场太残酷了。」\n\n你深呼吸，打开了第9家公司的招聘页面。\n\n「面试PTSD：不是你不行——是你太累了。允许自己休息一下，然后再出发。」',
+      cond: g => !g.flags.interviewPtsd && g.age >= 22 && g.age <= 40 && (g.job === '待业中' || g.flags.beenLaidOff),
+      choices:[
+        { label:'调整心态，继续面试', hint:'+🧠 +😊', fn: g => { g.flags.interviewPtsd=true; g.flags.resilientInterviewer=true; return{intel:5,mood:3}; }},
+        { label:'先休息一段时间再说', hint:'+😊 +❤️', fn: g => { g.flags.interviewPtsd=true; g.flags.careerBreak=true; return{mood:8,health:5}; }},
+        { label:'降低标准，先就业再说', hint:'+💰 -😊', fn: g => { g.flags.interviewPtsd=true; setJob(g,'临时工',5000+Math.floor(Math.random()*3000)); return{money:2000,mood:-3}; }},
+      ]},
+    { id:'okr_nightmare', icon:'📊', title:'OKR噩梦', category:'career',
+      body:'你的公司开始推行OKR了。\n\n领导说：「OKR是谷歌的管理方式，能激发每个人的潜能！」\n\n你看了看你的OKR：\nO1：提升客户满意度（如何衡量？）\nKR1：NPS提升10个点（基线是多少？）\nKR2：客户投诉率降低20%（谁定义「投诉」？）\n\n你的同事说：「以前用KPI的时候，至少知道什么叫完成。现在用OKR，我连什么叫「好」都不知道了。」\n\n季度评审的时候，领导说：「你的OKR完成度只有60%。」\n\n你说：「因为我的OKR定得太高了。」\n\n领导说：「谷歌说OKR完成70%才是最好的。」\n\n你：？？？\n\n「OKR：当管理工具变成了管理人的工具——它就不再是工具了。」',
+      cond: g => !g.flags.okrNightmare && g.age >= 22 && g.age <= 40 && g.job !== '待业中',
+      choices:[
+        { label:'学会了用OKR包装自己的工作成果', hint:'+🧠', fn: g => { g.flags.okrNightmare=true; g.flags.okrMaster=true; return{intel:5,mood:2}; }},
+        { label:'表面应付，实际还是按自己的方式做事', hint:'+😊', fn: g => { g.flags.okrNightmare=true; return{mood:3}; }},
+        { label:'很焦虑，不知道怎么定OKR', hint:'-😊', fn: g => { g.flags.okrNightmare=true; return{mood:-5}; }},
+      ]},
+    { id:'gen_z_workplace', icon:'💪', title:'00后整顿职场', category:'career',
+      body:'你们部门来了一个00后实习生。\n\n第一天上班，她就做了三件事：\n1. 问HR：「加班有加班费吗？」\n2. 问领导：「周末为什么要开例会？」\n3. 在群里发了一条：「建议大家6点准时下班，我请奶茶。」\n\n你的老同事说：「现在的年轻人太嚣张了。」\n\n但你的另一个同事说：「她说的对啊——我们凭什么无偿加班？」\n\n你看着那个实习生，突然想起自己刚入职的时候：也是这样想的，但后来就习惯了。\n\n你开始想：是00后太嚣张，还是我们太能忍？\n\n「00后整顿职场：不是年轻人不懂事——是前辈们忍了太久。」',
+      cond: g => !g.flags.genZWorkplace && g.age >= 24 && g.age <= 40 && g.job !== '待业中',
+      choices:[
+        { label:'支持00后，开始争取自己的权益', hint:'+😊 +👥', fn: g => { g.flags.genZWorkplace=true; g.flags.rightsAdvocate=true; return{mood:8,social:5}; }},
+        { label:'理解但不参与，每个人有自己的方式', hint:'+🧠', fn: g => { g.flags.genZWorkplace=true; return{intel:3,mood:3}; }},
+        { label:'觉得太冲动了，职场不是这么玩的', hint:'', fn: g => { g.flags.genZWorkplace=true; return{mood:-2}; }},
+      ]},
+    { id:'naked_resignation', icon:'✈️', title:'裸辞', category:'career',
+      body:'你做了一个大胆的决定：裸辞。\n\n没有下家、没有计划、没有存款——你只是想停下来。\n\n辞职信上你写了一句话：「世界那么大，我想去看看。」（其实是：老子不想干了。）\n\n第一周：你睡到了自然醒。太爽了。\n第二周：你去了一个一直想去的地方旅行。太爽了。\n第三周：你开始焦虑了。没有收入，存款在减少。\n第四周：你开始投简历了。发现：「空窗期」是HR最关心的问题。\n\n你的一个朋友说：「裸辞的勇气我很佩服，但空窗期的代价你准备好了吗？」\n\n你发现：自由是有价格的——它的价格叫做「不确定性」。\n\n「裸辞：是勇敢的选择——但勇敢不等于鲁莽。停下来之前，先想好怎么再出发。」',
+      cond: g => !g.flags.nakedResignation && g.age >= 24 && g.age <= 38 && g.job !== '待业中' && g.mood <= 40,
+      choices:[
+        { label:'裸辞了，给自己放个长假', hint:'+😊 -💰', fn: g => { g.flags.nakedResignation=true; setJob(g,'待业中',0); return{mood:15,health:8,money:-5000}; }},
+        { label:'想裸辞但忍住了，先找好下家再说', hint:'+🧠', fn: g => { g.flags.nakedResignation=true; g.flags.patientJobSeeker=true; return{intel:3,mood:3}; }},
+        { label:'不敢裸辞，没那个勇气', hint:'', fn: g => { g.flags.nakedResignation=true; return{mood:-3}; }},
+      ]},
+    { id:'career_coach', icon:'🎯', title:'职业转型教练', category:'career',
+      body:'你花5000块请了一个职业转型教练。\n\n第一次咨询，教练问你三个问题：\n1.「你最享受工作的时候是什么？」\n2.「你最讨厌工作的时候是什么？」\n3.「如果不考虑钱，你最想做什么？」\n\n你思考了很久。你发现：你享受解决问题的时候，讨厌开会的时候。如果不考虑钱，你想做一个游戏设计师。\n\n教练说：「那你的方向就是：把解决问题的能力用在游戏行业。」\n\n三个月后，你成功转型进了一家游戏公司。工资比之前低了20%，但你第一次觉得上班不是一种折磨。\n\n你的同事说：「你怎么看起来这么开心？」\n\n你说：「因为我终于在做自己想做的事了。」\n\n「职业转型：不是换一份工作——是换一种活法。」',
+      cond: g => !g.flags.careerCoach && g.age >= 25 && g.age <= 40 && g.job !== '待业中' && g.money >= 10000,
+      choices:[
+        { label:'认真执行教练的建议，成功转型', hint:'+😊 +🧠 -💰', fn: g => { g.flags.careerCoach=true; g.flags.careerTransition=true; return{mood:15,intel:8,money:-5000}; }},
+        { label:'咨询了几次，有了方向但还没行动', hint:'+🧠 -💰', fn: g => { g.flags.careerCoach=true; return{intel:5,mood:3,money:-5000}; }},
+        { label:'觉得不值得这个价格', hint:'-💰', fn: g => { g.flags.careerCoach=true; return{mood:-3,money:-5000}; }},
+      ]},
+    { id:'ex_colleague_group', icon:'👥', title:'前同事群', category:'social',
+      body:'你有一个微信群——成员全是前同事。\n\n你们当初在同一个公司一起加班、一起吐槽、一起骂老板。后来你们一个接一个地离职了，但群没散。\n\n群里每天的对话：\n「你们公司也在裁员吗？」\n「我新公司更卷，但至少不加班。」\n「有没有内推？我在看机会。」\n「听说老东家股价跌了50%。」\n\n你的一个前同事说：「这个群比我现在的同事群有用多了——至少大家说的是真心话。」\n\n你发现：最好的职场人脉，不是现在的同事——而是跟你一起经历过风雨的前同事。\n\n「前同事群：是一群「前战友」——你们不在同一个战场了，但你们有共同的记忆。」',
+      cond: g => !g.flags.exColleagueGroup && g.age >= 25 && g.months >= 24,
+      choices:[
+        { label:'成了群里的活跃分子，经常交流机会', hint:'+👥 +🧠', fn: g => { g.flags.exColleagueGroup=true; g.flags.networkBuilder=true; return{social:10,intel:3}; }},
+        { label:'偶尔看看，有有用的信息', hint:'+👥', fn: g => { g.flags.exColleagueGroup=true; return{social:5}; }},
+        { label:'群太吵了，设了免打扰', hint:'', fn: g => { g.flags.exColleagueGroup=true; return{social:2}; }},
+      ]},
+    { id:'middle_age_reemployment', icon:'💼', title:'中年再就业', category:'career',
+      body:'你40岁了，被裁了。\n\n你投了100份简历，收到了3个面试邀请。其中一个面试官比你小15岁，问你：「你期望薪资是多少？」\n\n你说了一个数字。他皱了皱眉：「我们的预算可能不够。」\n\n你的一个朋友也40岁，也被裁了。他说：「我面试了20家，最后去了一家小公司，工资只有以前的一半。」\n\n你问：「你接受了吗？」\n\n他说：「不接受能怎么办？房贷还在，孩子还在上学。面子不值钱——活下去才值钱。」\n\n你看着镜子里的自己，想：40岁的人生不是结束了——是需要重新定义「成功」了。\n\n「中年再就业：不是从头开始——是带着20年的经验，从零开始证明自己的价值。」',
+      cond: g => !g.flags.middleAgeReemployment && g.age >= 35 && g.age <= 50 && g.job === '待业中',
+      choices:[
+        { label:'放低姿态，接受了一份新工作', hint:'+💰 +😊', fn: g => { g.flags.middleAgeReemployment=true; setJob(g,'资深顾问',12000+Math.floor(Math.random()*8000)); return{mood:8,money:3000}; }},
+        { label:'决定自己创业/做自由职业', hint:'+🧠 +😊 -💰', fn: g => { g.flags.middleAgeReemployment=true; g.flags.entrepreneur=true; setJob(g,'自由职业者',10000+Math.floor(Math.random()*10000)); return{intel:5,mood:5}; }},
+        { label:'还在找工作，不放弃', hint:'+🧠', fn: g => { g.flags.middleAgeReemployment=true; return{intel:3,mood:-3}; }},
+      ]},
+    { id:'workplace_mentor', icon:'🧓', title:'成为别人的导师', category:'career',
+      body:'你发现一个新来的同事经常加班到很晚——不是因为工作多，而是因为他不知道怎么高效地完成。\n\n你主动找他聊了聊：「我刚入职的时候也这样。我来教你几个技巧。」\n\n你花了三个月带他：怎么做PPT、怎么写邮件、怎么汇报工作、怎么跟领导沟通。\n\n三个月后，他成了部门表现最好的新人。他在朋友圈写：「感谢我的师父@你，没有他我可能已经辞职了。」\n\n你的领导说：「你最近带人带得不错。你有没有想过做管理？」\n\n你发现：教别人是最好的学习方式——当你把自己的经验传授给别人的时候，你自己也在成长。\n\n「成为导师：不是你多厉害——是你愿意让别人也变得厉害。」',
+      cond: g => !g.flags.workplaceMentor && g.age >= 28 && g.job !== '待业中' && g.months >= 36,
+      choices:[
+        { label:'认真做导师，开始走管理路线', hint:'+👥 +🧠 +😊', fn: g => { g.flags.workplaceMentor=true; g.flags.managementPath=true; return{social:8,intel:5,mood:8}; }},
+        { label:'偶尔指点一下新人', hint:'+👥 +😊', fn: g => { g.flags.workplaceMentor=true; return{social:5,mood:5}; }},
+        { label:'自己的事还忙不过来', hint:'', fn: g => { g.flags.workplaceMentor=true; return{mood:2}; }},
+      ]},
+    { id:'return_to_work', icon:'🏢', title:'重返职场', category:'career',
+      body:'你离开职场已经两年了——为了照顾孩子。\n\n现在孩子上了幼儿园，你决定重返职场。但你发现：你的简历上有两年的「空窗期」。\n\n面试官问：「这两年你做了什么？」\n\n你说：「我带了一个孩子——他学会了走路、说话、自己吃饭。我觉得这比任何项目都有挑战性。」\n\n面试官笑了笑，但你能感觉到：他们并不这么认为。\n\n你的一个朋友也是全职妈妈回归职场：「我面试了10家，只有1家给了我offer。但那一家的HR说：「全职妈妈的时间管理能力，比任何MBA都强。」」\n\n你终于找到了一个不介意你空窗期的公司。你发现：重返职场最难的不是技能——是自信。\n\n「重返职场：不是从零开始——是带着另一种经验重新出发。」',
+      cond: g => !g.flags.returnToWork && g.age >= 28 && g.age <= 42 && g.job === '待业中' && g.flags.hasChild,
+      choices:[
+        { label:'成功重返职场，找回了自信', hint:'+💰 +😊 +🧠', fn: g => { g.flags.returnToWork=true; setJob(g,'回归职场者',10000+Math.floor(Math.random()*8000)); return{mood:12,intel:5}; }},
+        { label:'还在努力找工作', hint:'+🧠', fn: g => { g.flags.returnToWork=true; return{intel:3,mood:-3}; }},
+        { label:'决定继续在家陪孩子', hint:'+❤️ +😊', fn: g => { g.flags.returnToWork=true; g.flags.stayHomeParent=true; return{mood:5,social:-5}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -10492,6 +10573,12 @@ const ACHIEVEMENTS = [
     { id:'tea_regular_ach', icon:'🍵', name:'围炉煮茶', desc:'在围炉煮茶中找到了慢生活的节奏', check: g => g.flags.teaRegular },
     { id:'digital_minimalist_ach_v2', icon:'📵', name:'数字极简主义者', desc:'成功断联社交媒体并改变了使用习惯', check: g => g.flags.digitalMinimalist },
     { id:'smart_shopper_ach_v2', icon:'🛍️', name:'种草免疫体', desc:'在小红书种草面前保持了理性', check: g => g.flags.smartShopper || g.flags.resistTemptation },
+    // === v20.2 新增成就（职场新生态） ===
+    { id:'managing_up_ach', icon:'📈', name:'向上管理大师', desc:'学会了让自己的努力被看见', check: g => g.flags.goodAtManagingUp },
+    { id:'resilient_interviewer_ach', icon:'💪', name:'百折不挠', desc:'在面试PTSD后重新找回了自信', check: g => g.flags.resilientInterviewer },
+    { id:'gen_z_ally_ach', icon:'✊', name:'职场觉醒者', desc:'支持年轻人为权益发声', check: g => g.flags.rightsAdvocate },
+    { id:'career_transition_ach', icon:'🎯', name:'华丽转身', desc:'通过职业转型找到了热爱的工作', check: g => g.flags.careerTransition },
+    { id:'workplace_mentor_ach', icon:'🧓', name:'薪火相传', desc:'成为了别人的职场导师', check: g => g.flags.workplaceMentor && g.flags.managementPath },
 ];
 
 // === ENDINGS === (order matters: first match wins)
