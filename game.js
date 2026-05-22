@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v22.8
+// 都市浮生记 - Game Engine v22.9
 // ============================================
 
 // === GAME STATE ===
@@ -11104,6 +11104,87 @@ const EVENTS = [
         { label:'学会了独处，但也学会了珍惜相聚', hint:'+😊 +🤝', fn: g => { g.flags.soloLifeJoy=true; g.flags.cherishGather=true; return{mood:12,social:8,intel:8}; }},
         { label:'偶尔享受，但大部分时间还是想有人陪', hint:'+🧠', fn: g => { g.flags.soloLifeJoy=true; return{intel:5,mood:3}; }},
       ]},
+    // === v22.9 新增事件（数字游民 + 远程办公 + 逃离北上广） ===
+    { id:'remote_work_offer', icon:'💻', title:'远程工作机会', category:'career',
+      body:'你收到了一封邮件：一家互联网公司邀请你加入他们的远程团队。\n\n条件很诱人：\n- 全远程办公，不限地点\n- 薪资比你现在高20%\n- 弹性工作时间\n- 每年两次团队线下聚会\n\n你心动了。这意味着你可以离开北上广深，去一个生活成本低、环境好的地方。\n\n但你也担心：\n- 远程办公会不会更孤独？\n- 不在办公室会不会影响晋升？\n- 自律够不够？\n\n你的老板听说后说：「远程办公的人，最后都变成了24小时在线。」\n\n你的一个远程办公的朋友说：「自由是真的自由——但自由的代价是，你永远不知道什么时候该下班。」\n\n「远程办公的承诺：你可以在任何地方工作。现实：你在所有地方工作。」',
+      cond: g => g.age >= 23 && g.age <= 40 && !g.flags.remoteWorkOffer && g.intel >= 30 && g.jobSalary >= 5000,
+      choices:[
+        { label:'接受了远程工作，准备搬离大城市', hint:'+💰 +😊', fn: g => { g.flags.remoteWorkOffer=true; g.flags.remoteWorker=true; g.flags.leftBigCity=true; return{mood:15,money:3000,intel:5}; }},
+        { label:'接受了但留在大城市，线上线下结合', hint:'+💰', fn: g => { g.flags.remoteWorkOffer=true; g.flags.hybridWork=true; return{mood:8,money:2000}; }},
+        { label:'婉拒了，觉得在办公室更踏实', hint:'', fn: g => { g.flags.remoteWorkOffer=true; return{mood:3}; }},
+      ]},
+    { id:'dali_dream', icon:'🏔️', title:'大理梦', category:'city',
+      body:'你第一次去大理旅行，就被迷住了。\n\n苍山洱海、蓝天白云、悠闲的人们。这里的生活节奏和北上广深完全不同。\n\n你遇到了很多「新大理人」：\n- 前程序员老张：开了一个民宿，月入8000，但生活成本只有2000\n- 设计师小林：远程办公，在古城租了个小院子\n- 自媒体人阿美：拍大理生活视频，粉丝50万\n- 咖啡师小刘：开了一家面朝洱海的咖啡馆\n\n他们都有一个共同点：逃离了大城市。\n\n老张说：「在北京月薪3万，但活得像条狗。在大理月薪8000，但我每天都在生活。」\n\n小林说：「大理不是终点——是一个让你重新思考自己要什么的地方。」\n\n你开始幻想：如果我也搬来这里……\n\n「大理是中国年轻人的精神故乡——不是因为大理有多好，是因为北上广深太累了。」',
+      cond: g => g.age >= 22 && g.age <= 40 && !g.flags.daliDream && g.mood < 50,
+      choices:[
+        { label:'决定搬到大理生活', hint:'+😊 -💰', fn: g => { g.flags.daliDream=true; g.flags.movedDali=true; g.flags.leftBigCity=true; return{mood:20,health:10,money:-3000}; }},
+        { label:'旅行结束回到了大城市', hint:'+😊', fn: g => { g.flags.daliDream=true; return{mood:10,intel:5}; }},
+        { label:'觉得大理只适合旅行，不适合生活', hint:'+🧠', fn: g => { g.flags.daliDream=true; return{intel:8,mood:5}; }},
+      ]},
+    { id:'digital_nomad_life', icon:'🌍', title:'数字游民生活', category:'career',
+      body:'你开始了数字游民生活。\n\n你的装备：\n- 一台笔记本电脑\n- 一个好用的降噪耳机\n- 一个能装下全部家当的背包\n\n你的日常：\n- 上午：在咖啡馆工作4小时\n- 下午：探索新城市或学习新技能\n- 晚上：和时区不同的同事开会\n\n你去了几个数字游民热门地：\n1. 大理——中国数字游民圣地\n2. 安吉——竹林里的联合办公\n3. 清迈——东南亚数字游民聚集地\n4. 巴厘岛——世界级游民天堂\n\n但你发现了数字游民的另一面：\n- 每换一个城市就要重新适应\n- 签证问题让人头疼\n- 社交关系很浅——大家都在路上\n- 自律是最大挑战\n\n一个资深游民告诉你：「数字游民不是度假——是一种需要高度自律的生活方式。」\n\n「数字游民的真相：你获得了地理自由，却可能失去归属感。」',
+      cond: g => g.flags.remoteWorker && !g.flags.digitalNomad,
+      choices:[
+        { label:'拥抱了游民生活，每2-3个月换一个城市', hint:'+😊 +🧠', fn: g => { g.flags.digitalNomad=true; g.flags.nomadLife=true; return{mood:15,intel:12,charm:8}; }},
+        { label:'选了一个城市安定下来', hint:'+😊 +🤝', fn: g => { g.flags.digitalNomad=true; g.flags.settledDown=true; return{mood:10,social:10}; }},
+        { label:'觉得太漂泊了，想回大城市', hint:'', fn: g => { g.flags.digitalNomad=true; g.flags.nomadRegret=true; return{mood:-5,intel:5}; }},
+      ]},
+    { id:'co_working', icon:'🏢', title:'共享办公空间', category:'career',
+      body:'你加入了一个共享办公空间。\n\n这里的氛围和传统办公室完全不同：\n- 开放工位，随便坐\n- 免费咖啡和零食\n- 每周有社交活动和分享会\n- 邻居有程序员、设计师、作家、创业者\n\n你的「同事」们：\n- 隔壁的小赵：独立游戏开发者\n- 对面的阿珍：跨境电商\n- 楼上的老王：自媒体矩阵\n- 角落的小美：远程外企员工\n\n你们不在同一家公司，但你们有共同的话题：\n- 怎么保持自律\n- 怎么避免社交隔离\n- 怎么在大城市活得有尊严\n\n共享办公的好处：有社交、有氛围、有网络。\n共享办公的坏处：月租2000+，有时候比在家效率还低。\n\n「共享办公的本质：用金钱购买一种假装自己不是一个人工作的感觉。」',
+      cond: g => (g.flags.remoteWorker || g.flags.hybridWork) && !g.flags.coWorking,
+      choices:[
+        { label:'成了常驻会员，认识了很多有趣的人', hint:'-💰 +🤝 +😊', fn: g => { g.flags.coWorking=true; g.flags.coWorkNetwork=true; return{social:15,mood:8,money:-2000,charm:5}; }},
+        { label:'试了几个月，觉得不值这个钱', hint:'+🧠', fn: g => { g.flags.coWorking=true; return{intel:5,money:-3000}; }},
+        { label:'在共享空间找到了创业合伙人', hint:'+💰 +🤝', fn: g => { g.flags.coWorking=true; g.flags.foundPartner=true; return{social:12,mood:10,intel:8}; }},
+      ]},
+    { id:'escape_tier1', icon:'🏃', title:'逃离北上广', category:'city',
+      body:'你做了一个重大决定：离开北上广。\n\n理由你已经想了一百遍：\n- 房价太高，买不起房\n- 通勤太远，每天浪费3小时\n- 空气质量差，身体越来越差\n- 社交疲惫，大城市的人情太冷漠\n- 工资看起来高，但生活成本更高\n\n你的选择：\n1. 回老家——稳定但可能无聊\n2. 去新一线城市（杭州/成都/长沙）——折中方案\n3. 去大理/丽江——追求诗和远方\n4. 去海外——换个赛道\n\n你的爸妈听到你要回来，高兴得哭了。\n\n你的同事说：「你这是提前认输。」\n\n你说：「这不是认输，这是换一种赢法。」\n\n「逃离北上广不是懦弱——是承认人生的赛道不止一条。」',
+      cond: g => g.age >= 25 && g.age <= 40 && !g.flags.escapeTier1 && g.city !== '成都' && g.mood < 45,
+      choices:[
+        { label:'回了老家，过上了安稳生活', hint:'+😊 +🤝 -💰', fn: g => { g.flags.escapeTier1=true; g.flags.returnedHome=true; g.flags.leftBigCity=true; return{mood:15,social:10,health:10,money:-2000}; }},
+        { label:'去了成都，开始了新生活', hint:'+😊 +🧠', fn: g => { g.flags.escapeTier1=true; g.flags.movedChengdu=true; g.flags.leftBigCity=true; return{mood:12,health:5,money:-3000}; }},
+        { label:'想清楚了，还是决定留在大城市', hint:'+🧠 +💪', fn: g => { g.flags.escapeTier1=true; g.flags.stayDecision=true; return{intel:10,mood:8,health:-3}; }},
+      ]},
+    { id:'small_city_shock', icon:'😳', title:'小城市冲击', category:'psychology',
+      body:'你搬到了小城市，但发现一切和想象的不一样。\n\n好的方面：\n- 房租只有大城市的1/5\n- 通勤10分钟\n- 空气好、食物新鲜\n- 生活节奏慢\n\n不好的方面：\n- 找不到同频的人——大家聊的是家长里短\n- 外卖选择少得可怜\n- 没有你喜欢的咖啡馆和书店\n- 社交全靠关系网——没有「人脉」寸步难行\n- 医疗和教育资源远不如大城市\n\n你的邻居问你：「你一个月挣多少钱？」\n你觉得这个问题很冒犯。但在这里，这是正常的话题。\n\n你开始理解一句话：大城市的好处是自由，小城市的好处是归属。但自由和归属往往不可兼得。\n\n「小城市的真相：你逃离了大城市的压力，却迎来了小城市的束缚。」',
+      cond: g => g.flags.leftBigCity && !g.flags.smallCityShock,
+      choices:[
+        { label:'慢慢适应了，找到了属于自己的节奏', hint:'+😊 +🧠', fn: g => { g.flags.smallCityShock=true; g.flags.adaptedSmallCity=true; return{mood:10,intel:8,social:5}; }},
+        { label:'开始怀念大城市的生活', hint:'+😊 -🧠', fn: g => { g.flags.smallCityShock=true; g.flags.missCity=true; return{mood:-8,intel:5}; }},
+        { label:'决定回去，小城市不适合自己', hint:'+💪', fn: g => { g.flags.smallCityShock=true; g.flags.goingBack=true; return{mood:5,intel:8}; }},
+      ]},
+    { id:'freelancer_path', icon:'🎯', title:'自由职业之路', category:'career',
+      body:'你辞掉了全职工作，成为了一名自由职业者。\n\n你的收入来源：\n- 接单（设计/编程/翻译/写作）\n- 线上课程销售\n- 偶尔的咨询项目\n\n第一个月：收入3000元。你慌了。\n第二个月：收入8000元。你松了口气。\n第三个月：收入15000元。你觉得自己做了正确的选择。\n\n但你很快发现了自由职业的另一面：\n- 没有社保——需要自己交\n- 没有带薪假——不工作就没钱\n- 客户拖欠款项——催收是门艺术\n- 收入不稳定——好的月份和坏的月份差距巨大\n\n你的一个自由职业前辈说：「自由职业不是自由——你是自己的老板，也是自己的员工，还是自己的财务和HR。」\n\n你开始建立系统：\n- 固定客户池\n- 最低月收入保障\n- 紧急备用金\n\n「自由职业的真相：你用稳定性换来了自由，但自由的代价是不稳定。」',
+      cond: g => g.age >= 24 && g.age <= 40 && !g.flags.freelancer && g.intel >= 35,
+      choices:[
+        { label:'建立了稳定的客户群，收入逐渐稳定', hint:'+💰 +🧠', fn: g => { g.flags.freelancer=true; g.flags.freelanceStable=true; setJob(g,'自由职业者',12000); return{intel:10,mood:8}; }},
+        { label:'试了半年，收入不稳定，回去上班了', hint:'+🧠', fn: g => { g.flags.freelancer=true; g.flags.freelanceFail=true; return{intel:8,mood:-5}; }},
+        { label:'找到了一个 niche，成了领域专家', hint:'+💰💰 +😊', fn: g => { g.flags.freelancer=true; g.flags.nicheExpert=true; setJob(g,'自由职业顾问',20000); return{intel:15,mood:15,charm:10}; }},
+      ]},
+    { id:'timezone_chaos', icon:'🌙', title:'时差混乱', category:'health',
+      body:'你的远程工作要求你和海外团队同步。\n\n这意味着：\n- 早上9点：和亚洲团队开会\n- 下午3点：和欧洲团队对接\n- 晚上10点：和美国团队同步\n\n你的生物钟完全乱了。\n\n你开始靠咖啡续命。早上喝咖啡提神，晚上吃褪黑素助眠。\n\n你的医生警告你：「长期的时差混乱会增加心血管疾病、肥胖和抑郁的风险。」\n\n你的同事（一个在纽约的印度人）说：「我已经远程工作5年了，习惯了。秘诀是：不要习惯。」\n\n你开始设置「核心工作时间」：每天下午2点到6点，其余时间异步沟通。\n\n但客户不会在乎你的核心时间——凌晨2点的紧急消息依然会响起。\n\n「远程工作的隐藏成本：当全世界都是你的办公室时，全世界都是你的时区。」',
+      cond: g => (g.flags.remoteWorker || g.flags.digitalNomad) && !g.flags.timezoneChaos,
+      choices:[
+        { label:'调整了作息，坚持了「核心时间」制度', hint:'+💪 +🧠', fn: g => { g.flags.timezoneChaos=true; g.flags.workBoundary=true; return{health:5,intel:8,mood:5}; }},
+        { label:'继续熬夜开会，身体越来越差', hint:'-💪 +💰', fn: g => { g.flags.timezoneChaos=true; return{health:-10,money:3000,mood:-8}; }},
+        { label:'和公司协商换了纯亚洲时区的团队', hint:'+😊', fn: g => { g.flags.timezoneChaos=true; return{mood:10,health:5}; }},
+      ]},
+    { id:'wanderlust_living', icon:'🧳', title:'旅居生活', category:'city',
+      body:'你开始了旅居生活——在每个城市住1-3个月，然后搬到下一个。\n\n你的旅居清单：\n- 大理3个月：苍山脚下的民宿，月租1500\n- 安吉2个月：竹林中的共享社区\n- 景德镇1个月：学做陶瓷\n- 泉州2个月：古城里的闽南文化\n- 西双版纳3个月：避寒过冬\n\n每个城市都有独特的魅力。你学会了：\n- 快速适应新环境\n- 在陌生城市找到好吃的外卖\n- 用最短时间建立临时社交圈\n- 在旅途中保持工作效率\n\n但你也付出了代价：\n- 没有固定的朋友圈\n- 没有「家」的感觉\n- 行李不能超过一个箱子\n- 每到一个地方都要重新办宽带\n\n「旅居不是旅行——是用生活的方式去体验世界。」',
+      cond: g => g.flags.digitalNomad && !g.flags.wanderlustLiving && g.money >= 10000,
+      choices:[
+        { label:'享受旅居生活，已经去了5个城市', hint:'+😊 +🧠', fn: g => { g.flags.wanderlustLiving=true; return{mood:15,intel:12,charm:10,money:-8000}; }},
+        { label:'旅居了几个月，找到了最爱的城市', hint:'+😊 +🤝', fn: g => { g.flags.wanderlustLiving=true; g.flags.foundCity=true; return{mood:12,social:8,money:-5000}; }},
+        { label:'觉得太漂泊了，想找个地方定下来', hint:'+🧠', fn: g => { g.flags.wanderlustLiving=true; g.flags.settleDesire=true; return{intel:8,mood:-3}; }},
+      ]},
+    { id:'home_or_road', icon:'🤔', title:'何处是家', category:'psychology',
+      body:'你开始思考一个问题：家在哪里？\n\n你出生在一个小城市。\n你在大城市读了大学。\n你在北上广深工作过。\n你在大理/成都/其他城市生活过。\n你旅居过不同的地方。\n\n每一个地方都有你的一部分。但没有任何一个地方让你觉得——这就是家。\n\n你的爸妈说：「家就是你长大的地方。」\n你的朋友说：「家是朋友在的地方。」\n你自己说：「家是……我不确定的地方。」\n\n你开始理解：「家」不是一个地点——是一种状态。\n\n当你内心安定的时候，哪里都是家。\n当你内心漂泊的时候，哪里都不是家。\n\n你决定不再纠结「家在哪里」这个问题。你决定：让自己成为自己的家。\n\n「这一代人的困境：我们离开了故乡，却在异乡找不到归属。最终我们明白——家不是地图上的一个点，是心中的一份安定。」',
+      cond: g => (g.flags.leftBigCity || g.flags.wanderlustLiving) && !g.flags.homeOrRoad && g.intel >= 30,
+      choices:[
+        { label:'找到了内心的安定，不再执着于地点', hint:'+😊 +🧠', fn: g => { g.flags.homeOrRoad=true; g.flags.innerPeace=true; return{mood:20,intel:15,health:5}; }},
+        { label:'选择了一个城市扎根', hint:'+😊 +🤝', fn: g => { g.flags.homeOrRoad=true; g.flags.rootedCity=true; return{mood:15,social:10}; }},
+        { label:'还在寻找中，但接受了这种不确定', hint:'+🧠 +😊', fn: g => { g.flags.homeOrRoad=true; return{intel:10,mood:8}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -11158,7 +11239,7 @@ const ACHIEVEMENTS = [
     { id:'zero_price_supporter', icon:'💚', name:'零彩礼支持者', desc:'支持婚俗改革', check: g => g.flags.zeroBridePrice },
     { id:'fire_practitioner', icon:'🔥', name:'FIRE实践者', desc:'开始FIRE计划', check: g => g.flags.fireMovement },
     { id:'fire_veteran', icon:'💼', name:'FIRE归来者', desc:'FIRE后又回来上班', check: g => g.flags.fireReality },
-    { id:'digital_nomad_life', icon:'🌍', name:'数字游民', desc:'成为数字游民', check: g => g.flags.digitalNomad },
+    { id:'digital_nomad_life_v22_9', icon:'🌍', name:'数字游民', desc:'成为数字游民', check: g => g.flags.digitalNomad },
     { id:'nomad_survivor', icon:'😔', name:'游民幸存者', desc:'度过数字游民困境', check: g => g.flags.nomadChallenges },
     { id:'exam_choice', icon:'📊', name:'考公考研选择者', desc:'面对人生选择', check: g => g.flags.examVsGrad },
     { id:'system_insider', icon:'🏛️', name:'体制内人', desc:'了解体制内真相', check: g => g.flags.insideSystem },
@@ -12123,6 +12204,12 @@ const ACHIEVEMENTS = [
     { id:'gym_warrior_ach', icon:'💪', name:'健身达人', desc:'坚持健身半年', check: g => g.flags.fitnessUp },
     { id:'solo_master_ach', icon:'🌟', name:'独处大师', desc:'学会了享受一个人的生活', check: g => g.flags.soloLifeJoy },
     { id:'social_minimalist_ach', icon:'🧹', name:'社交极简主义', desc:'精简了社交圈', check: g => g.flags.socialMinimal },
+    // === v22.9 新增成就（数字游民与逃离北上广） ===
+    { id:'remote_worker_ach_v22_9', icon:'💻', name:'远程办公族', desc:'开始了远程工作', check: g => g.flags.remoteWorker },
+    { id:'dali_dweller_ach', icon:'🏔️', name:'大理新居民', desc:'搬到了大理生活', check: g => g.flags.movedDali },
+    { id:'digital_nomad_ach_v22_9', icon:'🌍', name:'数字游民', desc:'过上了边走边工作的生活', check: g => g.flags.nomadLife },
+    { id:'freelancer_ach_v22_9', icon:'🎯', name:'自由职业者', desc:'成为了一名自由职业者', check: g => g.flags.freelanceStable },
+    { id:'inner_peace_ach', icon:'🕊️', name:'内心安定', desc:'找到了属于自己的家', check: g => g.flags.innerPeace },
 ];
 
 // === ENDINGS === (order matters: first match wins)
