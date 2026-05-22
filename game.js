@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v12.8
+// 都市浮生记 - Game Engine v12.9
 // ============================================
 
 // === GAME STATE ===
@@ -6578,6 +6578,87 @@ const EVENTS = [
         { label:'用行动证明自己', hint:'+💰 -❤️', fn: g => { g.flags.imposterSyndrome=true; return{money:2000,health:-3,mood:3}; }},
         { label:'去看心理咨询师', hint:'+😊 -💰', fn: g => { g.flags.imposterSyndrome=true; g.flags.therapyVisit=true; return{mood:10,money:-500}; }},
       ]},
+    // === v12.9 健康危机 + 养生觉醒 + 心理成长 ===
+    { id:'health_check_shock', icon:'📋', title:'体检报告惊魂',
+      body:'你拿到了年度体检报告。\n\n异常项：脂肪肝（轻度）、尿酸偏高、颈椎曲度变直、视力下降。\n\n医生建议：少喝酒、少吃海鲜、多运动、少看手机。\n\n你看了看自己的日常：啤酒+烧烤+通宵+手机。\n\n你突然理解了为什么体检报告叫「报告」——因为它报告了你正在走向死亡的速度。\n\n你发了条朋友圈：「从今天开始养生。」配了一张枸杞泡水的照片。\n\n"体检报告是年轻人最害怕的文件——比催款通知还恐怖。"',
+      cond: g => g.age >= 26 && g.health <= 70 && !g.flags.healthCheckShock,
+      choices:[
+        { label:'认真改变生活方式', hint:'+❤️ +🧠', fn: g => { g.flags.healthCheckShock=true; g.flags.healthyLifestyle=true; return{health:10,intel:5,mood:5}; }},
+        { label:'先枸杞泡水应付一下', hint:'+❤️', fn: g => { g.flags.healthCheckShock=true; return{health:3,mood:3}; }},
+        { label:'假装没看见', hint:'-❤️', fn: g => { g.flags.healthCheckShock=true; return{health:-5,mood:-5}; }},
+      ]},
+    { id:'gym_membership_v3', icon:'🏋️', title:'健身房年卡',
+      body:'你花了3000块办了一张健身房年卡。\n\n第一天：你发了3条朋友圈，练了20分钟。\n第一周：你去了5次，每次30分钟。\n第一个月：你去了8次。\n第三个月：你忘了卡放哪了。\n\n一年下来，你总共去了23次。每次成本130块。比请私教还贵。\n\n你的健身成果：腹肌从一块变成了一块更大的。\n\n"健身房年卡是当代最大的「安慰性消费」——你以为花钱就等于锻炼了。"',
+      cond: g => g.age >= 22 && g.age <= 38 && !g.flags.gymMembership,
+      choices:[
+        { label:'坚持去！', hint:'+❤️ +✨ -💰', fn: g => { g.flags.gymMembership=true; return{health:12,charm:8,mood:8,money:-3000}; }},
+        { label:'去几次就算了', hint:'-💰', fn: g => { g.flags.gymMembership=true; return{health:3,money:-3000}; }},
+        { label:'在家做Keep', hint:'+❤️', fn: g => { g.flags.gymMembership=true; return{health:8,mood:5}; }},
+      ]},
+    { id:'burnout_crisis', icon:'🔥', title:'职业倦怠',
+      body:'你不想上班了。\n\n不是懒——是真的不想。每天早上闹钟响的时候，你想的不是「今天要做什么」，而是「我为什么要活着」。\n\n你去看医生。医生说：「你这是职业倦怠。需要休息。」\n\n你苦笑：休息？房贷要还，花呗要还，信用卡要还。你哪敢休息？\n\n你开始理解：职业倦怠不是因为工作太多——是因为你看不到工作的意义。\n\n"职业倦怠最可怕的不是累——是麻木。当你对一切都无感的时候，你不是在活着——是在运行。"',
+      cond: g => g.age >= 25 && g.job !== '待业中' && g.mood <= 40 && !g.flags.burnoutCrisis,
+      choices:[
+        { label:'请一周假', hint:'+😊 +❤️ -💰', fn: g => { g.flags.burnoutCrisis=true; return{mood:15,health:8,money:-3000}; }},
+        { label:'找新工作', hint:'+😊 -❤️', fn: g => { g.flags.burnoutCrisis=true; return{mood:5,health:-3}; }},
+        { label:'硬扛', hint:'-❤️ -😊', fn: g => { g.flags.burnoutCrisis=true; return{health:-8,mood:-10}; }},
+      ]},
+    { id:'meditation_start', icon:'🧘', title:'开始冥想',
+      body:'你在网上看到一篇文章：冥想可以减少焦虑，提高专注力。\n\n你下载了一个冥想App。第一天：你闭着眼睛坐了5分钟，脑子里全在想中午吃什么。\n\n第七天：你坐了10分钟，有3分钟是真的什么都不想。\n\n第三十天：你居然习惯了。每天早上起来先冥想10分钟。\n\n你的同事说你最近「变了一个人」。你说：「我只是学会了安静。」\n\n"冥想不是放空——是学会和脑子里的噪音和平共处。"',
+      cond: g => g.age >= 24 && g.mood <= 60 && !g.flags.meditationStart,
+      choices:[
+        { label:'坚持30天', hint:'+😊 +🧠 +❤️', fn: g => { g.flags.meditationStart=true; return{mood:12,intel:5,health:5}; }},
+        { label:'试了几天放弃了', hint:'', fn: g => { g.flags.meditationStart=true; return{mood:3}; }},
+        { label:'报冥想课', hint:'+😊 -💰', fn: g => { g.flags.meditationStart=true; return{mood:15,money:-2000}; }},
+      ]},
+    { id:'tcm_wellness_v2', icon:'🍵', title:'中医养生',
+      body:'你开始信中医了。\n\n以前你觉得中医是玄学。现在你每天：枸杞泡水、艾灸足三里、泡脚加艾草、三伏贴。\n\n你的办公桌上摆着：保温杯（红枣+枸杞+黄芪）、艾草贴、刮痧板。\n\n你的同事说：「你这是提前进入老年生活了。」\n你说：「这叫觉醒。」\n\n你的体质确实好了。但你也开始理解了一件事：养生不是治病——是学会善待自己。\n\n"年轻人养生的本质：用最传统的方式，对抗最现代的焦虑。"',
+      cond: g => g.age >= 26 && !g.flags.tcmWellnessV2,
+      choices:[
+        { label:'全面养生', hint:'+❤️ +😊', fn: g => { g.flags.tcmWellnessV2=true; return{health:10,mood:8,money:-500}; }},
+        { label:'只喝枸杞水', hint:'+❤️', fn: g => { g.flags.tcmWellnessV2=true; return{health:5,mood:3}; }},
+        { label:'还是算了', hint:'', fn: g => { return{mood:-3}; }},
+      ]},
+    { id:'sleep_debt', icon:'😴', title:'睡眠债',
+      body:'你算了一下自己的「睡眠债」。\n\n正常睡眠：每天8小时。你的实际睡眠：每天5小时。\n每天的睡眠债：3小时。一年累积：1095小时 = 45天。\n\n也就是说，你去年欠了自己的身体45天的觉。\n\n你的身体开始报复了：脱发加重、记忆力下降、情绪波动、免疫力降低。\n\n你开始理解一个道理：你以为你在「节省时间」——其实你在「透支生命」。\n\n"睡眠债是世界上最贵的债——因为利息是你的寿命。"',
+      cond: g => g.age >= 24 && g.health <= 65 && !g.flags.sleepDebt,
+      choices:[
+        { label:'早睡早起！', hint:'+❤️ +😊', fn: g => { g.flags.sleepDebt=true; return{health:10,mood:8}; }},
+        { label:'周末补觉', hint:'+❤️', fn: g => { g.flags.sleepDebt=true; return{health:3,mood:3}; }},
+        { label:'吃褪黑素', hint:'+❤️ -💰', fn: g => { g.flags.sleepDebt=true; return{health:5,money:-200}; }},
+      ]},
+    { id:'marathon_dream', icon:'🏃', title:'跑马拉松',
+      body:'你决定跑一次马拉松。\n\n你从零开始训练。第一周：跑1公里，第二天腿疼得下不了楼梯。\n第一月：跑5公里，膝盖开始抗议。\n第三月：跑半马，你觉得自己是超人。\n\n比赛那天：42.195公里。你跑了4小时32分。冲过终点线的那一刻，你哭了。\n\n不是因为累——是因为你从来没想到自己能跑这么远。\n\n"跑马拉松不是为了赢别人——是为了证明：你比自己以为的更强大。"',
+      cond: g => g.age >= 24 && g.age <= 45 && g.health >= 60 && !g.flags.marathonDream,
+      choices:[
+        { label:'完成了！', hint:'+❤️ +😊 +✨', fn: g => { g.flags.marathonDream=true; return{health:15,mood:20,charm:8}; }},
+        { label:'跑到一半放弃了', hint:'+❤️', fn: g => { g.flags.marathonDream=true; return{health:8,mood:-5}; }},
+        { label:'训练太苦放弃了', hint:'', fn: g => { return{mood:-5}; }},
+      ]},
+    { id:'therapy_session_v2', icon:'💭', title:'心理咨询',
+      body:'你终于去看了心理咨询师。\n\n你犹豫了很久：「我又不是精神病，为什么要去看心理医生？」\n\n但你终于鼓起勇气走进那间温馨的办公室。咨询师说：「你觉得最近怎么样？」\n\n你张了张嘴——然后哭了。\n\n你哭了40分钟。咨询师递了你一盒纸巾。结束后她说：「你很勇敢。」\n\n你走出那扇门，阳光很好。你深呼吸了一下。你觉得：世界好像没那么沉重了。\n\n"求助不是软弱——是你能给自己最好的礼物。"',
+      cond: g => g.age >= 24 && g.mood <= 45 && !g.flags.therapySession,
+      choices:[
+        { label:'定期去', hint:'+😊 +💰', fn: g => { g.flags.therapySession=true; g.flags.therapyVisit=true; return{mood:18,money:-3000}; }},
+        { label:'去了一次', hint:'+😊 -💰', fn: g => { g.flags.therapySession=true; g.flags.therapyVisit=true; return{mood:10,money:-500}; }},
+        { label:'还是不敢去', hint:'', fn: g => { return{mood:-8}; }},
+      ]},
+    { id:'health_app_v2', icon:'⌚', title:'健康手环',
+      body:'你买了一个智能手环。\n\n它告诉你：每天走3247步（太少了）、深度睡眠1小时（太少了）、心率偏高（不太好）。\n\n你开始为了凑步数晚饭后在小区转圈。你开始为了睡眠质量提前半小时放下手机。\n\n你的手环成了你的「健康管家」——虽然它经常半夜震动把你吓醒。\n\n"健康手环的意义不是记录数据——是让你第一次真正「看见」了自己的身体。"',
+      cond: g => g.age >= 22 && !g.flags.healthApp,
+      choices:[
+        { label:'认真跟着数据走', hint:'+❤️ +🧠', fn: g => { g.flags.healthApp=true; return{health:10,intel:3,mood:5,money:-500}; }},
+        { label:'戴着玩', hint:'+❤️', fn: g => { g.flags.healthApp=true; return{health:3,money:-500}; }},
+        { label:'看了更焦虑', hint:'-😊', fn: g => { g.flags.healthApp=true; return{mood:-5,money:-500}; }},
+      ]},
+    { id:'body_image', icon:'🪞', title:'容貌焦虑',
+      body:'你刷小红书的时候，看到了一个和你同龄的人。他/她看起来比你年轻10岁。\n\n你照了照镜子：黑眼圈、法令纹、额头上的痘痘。\n\n你开始研究医美：热玛吉2万、水光针3000、玻尿酸5000、拉皮5万。\n\n你的同事说：「你本来就很好看啊。」\n你不信。你觉得他们在安慰你。\n\n直到有一天你翻到5年前的照片——你发现：其实你比以前更好看了。只是你每天看自己，看不到变化。\n\n"容貌焦虑不是因为你不好看——是因为你一直在跟不可能的人比。"',
+      cond: g => g.age >= 22 && g.age <= 35 && g.charm <= 60 && !g.flags.bodyImage,
+      choices:[
+        { label:'接受自己的样子', hint:'+😊 +🧠', fn: g => { g.flags.bodyImage=true; return{mood:12,intel:5}; }},
+        { label:'做点基础护肤', hint:'+✨ -💰', fn: g => { g.flags.bodyImage=true; return{charm:5,money:-1000}; }},
+        { label:'去做医美', hint:'+✨ -💰💰', fn: g => { g.flags.bodyImage=true; return{charm:10,mood:5,money:-10000}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -7166,6 +7247,17 @@ const ACHIEVEMENTS = [
     { id:'night_student', icon:'🌙', name:'夜校学员', desc:'在社区夜校充电', check: g => g.flags.nightSchool },
     { id:'startup_joiner', icon:'🚀', name:'创业参与者', desc:'加入了创业公司', check: g => g.flags.startupInvite },
     { id:'imposter_healer', icon:'🎭', name:'自我和解', desc:'面对了冒充者综合征', check: g => g.flags.imposterSyndrome },
+    // === v12.9 新增成就 ===
+    { id:'health_alarm', icon:'📋', name:'体检惊魂', desc:'被体检报告吓到了', check: g => g.flags.healthCheckShock },
+    { id:'gym_user', icon:'🏋️', name:'健身房会员', desc:'办了健身卡', check: g => g.flags.gymMembership },
+    { id:'burnout_survivor_v3', icon:'🔥', name:'倦怠幸存者', desc:'经历了职业倦怠', check: g => g.flags.burnoutCrisis },
+    { id:'meditator', icon:'🧘', name:'冥想者', desc:'开始冥想', check: g => g.flags.meditationStart },
+    { id:'tcm_fan', icon:'🍵', name:'养生爱好者', desc:'开始中医养生', check: g => g.flags.tcmWellnessV2 },
+    { id:'sleep_fixer', icon:'😴', name:'还觉人', desc:'开始还睡眠债', check: g => g.flags.sleepDebt },
+    { id:'marathoner', icon:'🏃', name:'马拉松跑者', desc:'完成了马拉松', check: g => g.flags.marathonDream },
+    { id:'therapy_goer_v2', icon:'💭', name:'勇敢求助者v2', desc:'去做了心理咨询', check: g => g.flags.therapySession },
+    { id:'health_tracker', icon:'⌚', name:'健康追踪者', desc:'开始用健康手环', check: g => g.flags.healthApp },
+    { id:'self_acceptor', icon:'🪞', name:'自我接纳者', desc:'面对了容貌焦虑', check: g => g.flags.bodyImage },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -7356,6 +7448,9 @@ const ENDINGS = [
     // --- v12.8 NEW ENDINGS ---
     { id:'lifelong_learner_end', badge:'📚', title:'终身学习者', desc:'你成了一个「学习怪人」。\n\n你考过公、读过MBA、上过夜校、刷过网课。你的证书摆满了书架。你的笔记本写了一摞又一摞。\n\n你最终没有成为任何一个领域的专家——但你成了所有领域都懂一点的「通才」。\n\n你的同事遇到任何问题都会来找你：「你好像什么都懂一点？」\n你笑着说：「我只是比你们多花了一点点时间在学习。」\n\n"学习的意义不在于成为专家——在于永远保持对世界的好奇。"', cond: g => g.flags.onlineCourse && g.flags.nightSchool && g.intel >= 80 && g.age >= 30 },
     { id:'brave_changer_end', badge:'🔄', title:'勇敢转身的人', desc:'你在大城市换了三次行业。\n\n从工程师到产品经理到培训师。每一次转行，都有人说你疯了。\n\n但你终于找到了自己热爱的事——不是因为它是最好的，而是因为你做的时候最开心。\n\n你爸说：「你这辈子能不能稳定一点？」\n你说：「爸，不稳定才是我的稳定。」\n\n"人生最大的风险不是选错路——是不敢走路。"', cond: g => g.flags.careerSwitch && g.flags.startupInvite && g.mood >= 60 && g.age >= 30 },
+    // --- v12.9 NEW ENDINGS ---
+    { id:'health_awakening_end', badge:'💪', title:'健康觉醒者', desc:'那次体检报告改变了你。\n\n你扔掉了所有的垃圾食品，开始跑步、冥想、早睡早起。你的冰箱从可乐换成了枸杞。\n\n一年后，你的体检报告全部正常。医生看了都惊讶：「你这个年纪能有这种指标，很少见。」\n\n你笑了。你知道：这不是运气——是365天的自律。\n\n"健康不是1，是前面那个1——没有它，后面所有的0都没有意义。"', cond: g => g.flags.healthCheckShock && g.flags.meditationStart && g.health >= 80 && g.age >= 30 },
+    { id:'self_healer_end', badge:'💭', title:'自我疗愈者', desc:'你学会了最重要的一件事：求助。\n\n你做了心理咨询，开始冥想，学会了跟自己的情绪相处。你不再假装坚强，不再压抑眼泪。\n\n你的朋友说：「你变了。以前你总是很紧绷，现在你很松弛。」\n你说：「不是我变了——是我不再装了。」\n\n"真正的强大不是永远不倒——是倒了之后，你知道怎么站起来。"', cond: g => g.flags.therapySession && g.flags.burnoutCrisis && g.mood >= 65 && g.age >= 28 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
