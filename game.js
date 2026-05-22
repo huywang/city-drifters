@@ -736,6 +736,183 @@ const EVENTS = [
         { label:'找正规银行贷款周转', hint:'+🧠', fn: g => { g.flags.onlineLoan=true; return{money:8000,intel:5,mood:-5}; }},
         { label:'死扛，自己还', hint:'-❤️', fn: g => { g.flags.onlineLoan=true; return{health:-10,mood:-15,money:3000}; }},
       ]},
+    // ===== v2.4: INVESTMENT & FINANCE =====
+    { id:'stock_market', icon:'📈', title:'股市风云',
+      body:'同事说最近股市大涨，他买的某只股票已经翻倍了。\n\n你看着自己的余额宝，年化2.5%，再看看股市——日涨3%。\n\n"不炒股的人，永远不懂什么叫\"一觉醒来财务自由\"——或者\"一觉醒来倾家荡产\"。"',
+      cond: g => g.age>=24 && !g.flags.invested && g.money>5000,
+      choices:[
+        { label:'入场！梭哈！', hint:'🎲🎲', fn: g => { g.flags.invested=true; g.flags.stockAmount=Math.floor(g.money*0.5); g.money-=g.flags.stockAmount; if(Math.random()>0.5){const gain=Math.floor(g.flags.stockAmount*(0.3+Math.random()*0.7));g.money+=g.flags.stockAmount+gain;return{money:gain,mood:20,intel:3}}else{const loss=Math.floor(g.flags.stockAmount*(0.2+Math.random()*0.5));g.money+=g.flags.stockAmount-loss;return{money:-loss,mood:-20,health:-5}} }},
+        { label:'先学点基础知识', hint:'+🧠', fn: g => { g.flags.invested=true; return{intel:10,mood:5}; }},
+        { label:'不碰，稳健理财', hint:'+🧠', fn: g => ({intel:5,mood:8}) },
+      ]},
+    { id:'crypto_craze', icon:'₿', title:'币圈一夜暴富？',
+      body:'你的大学同学小王在群里晒截图：他买的某币涨了100倍。\n\n"当初1万块买的，现在值100万。早知道我就……"\n\n你心动了。但你又看到新闻：有人炒币亏了几百万，跳楼了。\n\n"币圈一天，人间一年。这是赌场还是未来？"',
+      cond: g => g.age>=25 && g.age<=40 && !g.flags.crypto && g.intel>50,
+      choices:[
+        { label:'冲！All in！', hint:'🎲🎲🎲', fn: g => { g.flags.crypto=true; const bet=Math.min(20000,g.money); g.money-=bet; if(Math.random()>0.7){const win=bet*(3+Math.random()*7);g.money+=win;return{money:win-bet,mood:30,charm:5}}else if(Math.random()>0.5){g.money+=bet*0.3;return{money:-bet*0.7,mood:-25,health:-8}}else{g.money+=Math.floor(bet*0.1);return{money:-bet*0.9,mood:-35,health:-15}} }},
+        { label:'只买一点点试试', hint:'🎲', fn: g => { g.flags.crypto=true; const bet=Math.min(3000,g.money); g.money-=bet; if(Math.random()>0.5){g.money+=bet*2;return{money:bet,mood:15,intel:5}}else{g.money+=Math.floor(bet*0.2);return{money:-bet*0.8,mood:-15}} }},
+        { label:'这是赌博，不碰', hint:'+🧠', fn: g => ({intel:8,mood:5}) },
+      ]},
+    { id:'p2p_explosion', icon:'💥', title:'P2P暴雷',
+      body:'你投资的P2P平台突然跑路了。App打不开，客服电话空号，办公室人去楼空。\n\n你投进去的8万块，血本无归。\n\n维权群里有人说："早就知道是骗局，就是觉得自己不会是最后一个。"\n\n"你看中的是利息，人家看中的是你的本金。"',
+      cond: g => g.flags.invested && !g.flags.p2pLoss && g.age>=28,
+      choices:[
+        { label:'加入维权群', hint:'+👥 -😊', fn: g => { g.flags.p2pLoss=true; return{mood:-25,social:8,money:-8000}; }},
+        { label:'认栽，花钱买教训', hint:'+🧠', fn: g => { g.flags.p2pLoss=true; return{intel:15,mood:-20,money:-8000}; }},
+        { label:'报警', hint:'+🧠', fn: g => { g.flags.p2pLoss=true; return{intel:5,mood:-15,money:-6000}; }},
+      ]},
+    { id:'fund_investment', icon:'📊', title:'基金定投',
+      body:'你的理财顾问（其实是银行App推送）建议你做基金定投：\n\n"每月自动扣款2000元，长期投资，分散风险。"\n\n听起来很靠谱。但你又看到评论区：\n\n"定投三年，亏了30%。""基金经理跑路了。""还不如存余额宝。"\n\n"你以为你在理财，其实财在理你。"',
+      cond: g => g.age>=26 && g.money>10000 && !g.flags.fundInvest,
+      choices:[
+        { label:'开始定投', hint:'🎲 +💰', fn: g => { g.flags.fundInvest=true; if(Math.random()>0.4){return{money:5000,mood:10,intel:8}}else{return{money:-3000,mood:-10,intel:5}} }},
+        { label:'先观察一段时间', hint:'+🧠', fn: g => ({intel:5,mood:3}) },
+        { label:'不信任金融产品', hint:'+😊', fn: g => ({mood:5}) },
+      ]},
+    // ===== v2.4: RELATIONSHIPS =====
+    { id:'dating_app', icon:'📱', title:'探探/Tinder',
+      body:'你下载了一个交友App。左滑、右滑、左滑、右滑……\n\n你发现：\n- 80%的人头像都用了美颜\n- 70%的人简介写着"佛系随缘"\n- 60%的人第一句话是"在吗？"\n- 50%的人聊了三句就消失了\n\n你开始怀疑：这到底是交友App，还是孤独感贩卖机？\n\n"在这个左滑右滑的时代，爱情变成了概率游戏。"',
+      cond: g => g.age>=23 && g.age<=35 && !g.flags.married && !g.flags.datingApp,
+      choices:[
+        { label:'继续刷，总能遇到', hint:'🎲 +✨', fn: g => { g.flags.datingApp=true; if(Math.random()>0.6){g.flags.inRelationship=true;return{mood:20,charm:8,social:10}}else{return{mood:-10,charm:-3,money:-200}} }},
+        { label:'算了，卸载', hint:'+😊', fn: g => { g.flags.datingApp=true; return{mood:5,intel:3}; }},
+        { label:'花钱开VIP', hint:'-💰 🎲', fn: g => { g.flags.datingApp=true; g.money-=199; if(Math.random()>0.5){g.flags.inRelationship=true;return{mood:15,charm:5,social:8}}else{return{mood:-8,money:-199}} }},
+      ]},
+    { id:'blind_date', icon:'👥', title:'相亲局',
+      body:'你妈又给你安排相亲了。这次的对象是她同事的儿子/女儿：\n\n"人家有房有车，工作稳定，就缺个对象。"\n\n你坐在咖啡厅里，对方问你的第一个问题是：\n\n"你有北京户口吗？"\n\n"相亲市场比人才市场还卷：学历、户口、房产、收入，明码标价。"',
+      cond: g => g.age>=26 && !g.flags.married && !g.flags.blindDateFail && g.social>30,
+      choices:[
+        { label:'认真对待', hint:'🎲 +👥', fn: g => { g.flags.blindDate=true; if(Math.random()>0.5 && !g.flags.inRelationship){g.flags.inRelationship=true;return{mood:15,social:10,charm:5}}else if(g.flags.inRelationship){return{mood:-10,social:-5}}else{return{mood:-5,social:5}} }},
+        { label:'应付一下', hint:'+😊', fn: g => { g.flags.blindDate=true; return{mood:-5,social:3}; }},
+        { label:'拒绝相亲', hint:'-👥', fn: g => { g.flags.blindDateFail=true; return{mood:10,social:-8}; }},
+      ]},
+    { id:'marriage_pressure', icon:'💍', title:'催婚风暴',
+      body:'过年回家了。七大姑八大姨轮番上阵：\n\n"有对象了吗？""什么时候结婚？""隔壁老王家孩子都会打酱油了。"\n\n你妈说："你再不结婚，我都没脸出门了。"\n\n你爸说："结了婚就稳定了。"\n\n你想说：结婚不是任务，但话到嘴边又咽了回去。\n\n"在中国，结婚不是两个人的事，是两个家庭的事——外加七大姑八大姨的事。"',
+      cond: g => g.age>=28 && g.age<=40 && !g.flags.married && !g.flags.marriagePressureHandled,
+      choices:[
+        { label:'妥协，开始认真找对象', hint:'🎲 +👥', fn: g => { g.flags.marriagePressureHandled=true; if(g.flags.inRelationship && Math.random()>0.3){g.flags.married=true;g.flags.inRelationship=false;return{mood:25,social:15,money:-50000,charm:10}}else{return{mood:-10,social:8}} }},
+        { label:'坚持单身主义', hint:'+😊 -👥', fn: g => { g.flags.marriagePressureHandled=true; g.flags.lyingFlat=true; return{mood:15,social:-10,charm:5}; }},
+        { label:'租个对象回家', hint:'-💰 🎲', fn: g => { g.flags.marriagePressureHandled=true; g.money-=3000; if(Math.random()>0.7){return{mood:5,social:5}}else{return{mood:-20,social:-15,charm:-10}} }},
+      ]},
+    { id:'wedding_cost', icon:'💒', title:'天价婚礼',
+      body:'你要结婚了。但婚礼预算让你崩溃：\n\n- 婚房装修：20万\n- 婚纱照：2万\n- 婚宴（30桌）：15万\n- 蜜月：3万\n- 三金/五金：5万\n\n总计：45万。你现在的存款是……不敢算。\n\n丈母娘说："没有45万，别想娶我女儿。"\n\n"爱情是无价的，但婚礼是有价目表的。"',
+      cond: g => g.flags.married && !g.flags.weddingDone && g.age>=28,
+      choices:[
+        { label:'办豪华婚礼', hint:'-💰💰 +😊', fn: g => { g.flags.weddingDone=true; return{money:-450000,mood:30,charm:15,social:20}; }},
+        { label:'简单办', hint:'-💰 +😊', fn: g => { g.flags.weddingDone=true; return{money:-80000,mood:15,social:5}; }},
+        { label:'旅行结婚', hint:'+😊 +✨', fn: g => { g.flags.weddingDone=true; return{money:-50000,mood:25,charm:10}; }},
+        { label:'裸婚', hint:'+🧠 -👥', fn: g => { g.flags.weddingDone=true; return{intel:10,social:-10,mood:5}; }},
+      ]},
+    { id:'having_child', icon:'👶', title:'生不生娃？',
+      body:'你结婚了，下一个问题：生孩子吗？\n\n支持派："孩子是爱情的结晶，是人生的完整。"\n反对派："养个孩子要花100万，还要搭上一辈子的时间和精力。"\n\n你看了看银行卡余额，又看了看学区房价格。\n\n"在中国，生孩子不是选择题，是奥数题——算到你怀疑人生。"',
+      cond: g => g.flags.married && !g.flags.hasChild && g.age>=28 && g.age<=40,
+      choices:[
+        { label:'生！', hint:'-💰💰 +😊', fn: g => { g.flags.hasChild=true; return{money:-30000,mood:25,health:-5,charm:5,social:10}; }},
+        { label:'先不要，攒钱', hint:'+💰 +😊', fn: g => ({money:10000,mood:5}) },
+        { label:'丁克', hint:'+💰 +😊 -👥', fn: g => ({money:15000,mood:10,social:-8}) },
+      ]},
+    { id:'divorce_crisis', icon:'💔', title:'婚姻危机',
+      body:'你和另一半吵架了。这次的导火索是：\n\n- 家务分配不均\n- 孩子教育分歧\n- 婆媳关系\n- 经济压力\n\n或者，只是累了。\n\n你说："我们冷静一下。"对方说："冷静就是冷暴力。"\n\n民政局门口，你犹豫了：进去，还是回去？\n\n"婚姻就像围城，外面的人想进去，里面的人想出来。"',
+      cond: g => g.flags.married && g.flags.hasChild && g.mood<40 && !g.flags.divorced,
+      choices:[
+        { label:'离婚', hint:'+😊 -💰 -👥', fn: g => { g.flags.divorced=true; g.flags.married=false; return{mood:15,money:-100000,social:-15,health:-5}; }},
+        { label:'为了孩子忍忍', hint:'-😊', fn: g => ({mood:-15,health:-5,social:5}) },
+        { label:'去做婚姻咨询', hint:'-💰 +😊', fn: g => { g.money-=5000; if(Math.random()>0.5){return{mood:20,social:8}}else{return{mood:-5}} }},
+      ]},
+    // ===== v2.4: 2025-2026 CULTURAL EVENTS =====
+    { id:'ai_job_replacement', icon:'🤖', title:'AI来了，你的工作还在吗？',
+      body:'公司引进了AI工具，你的同事被裁了一半。\n\n老板说："AI效率是人的10倍，成本是1/10。"\n\n你的工作是：写代码/写文案/做设计/做客服——这些AI都能做。\n\n你看着ChatGPT生成的方案，比你的还专业。\n\n"工业革命淘汰了马车夫，AI革命会淘汰谁？也许就是你。"',
+      cond: g => g.age>=24 && g.age<=45 && !g.flags.aiReplaced && g.intel>50,
+      choices:[
+        { label:'学习AI，成为AI工程师', hint:'+🧠 +💰', fn: g => { g.flags.aiAnxiety=true; if(g.intel>70){return{intel:15,money:10000,mood:10}}else{return{intel:10,mood:-5,money:3000}} }},
+        { label:'转型做AI替代不了的工作', hint:'🎲', fn: g => { g.flags.aiReplaced=true; if(Math.random()>0.5){setJob(g,'技术工人',8000);return{mood:5,health:5}}else{setJob(g,'待业中',0);return{mood:-20}} }},
+        { label:'躺平，爱咋咋地', hint:'+😊 -💰', fn: g => { g.flags.lyingFlat=true; g.flags.aiReplaced=true; setJob(g,'待业中',0); return{mood:15,money:-5000}; }},
+      ]},
+    { id:'lying_flat_movement', icon:'🛋️', title:'躺平还是内卷？（终极版）',
+      body:'你在网上看到一个帖子："我25岁，月入3万，但我选择了辞职躺平。"\n\n评论区炸了：\n\n"有钱人的躺平叫gap year，穷人的躺平叫失业。"\n"你不卷，有的是人替你卷。"\n"人生不是赛道，是旷野。"\n\n你看了看自己的工位，又看了看窗外。你想：也许生活不只有KPI和房贷。\n\n"躺平不是放弃，是选择另一种活法。但前提是——你躺得起。"',
+      cond: g => g.age>=23 && g.age<=32 && g.months>18 && !g.flags.lyingFlatChoice,
+      choices:[
+        { label:'辞职gap year', hint:'-💰 +😊 +❤️', fn: g => { g.flags.lyingFlatChoice=true; g.flags.lyingFlat=true; setJob(g,'待业中',0); return{mood:25,health:15,money:-10000,charm:8}; }},
+        { label:'边工作边找生活', hint:'+🧠', fn: g => { g.flags.lyingFlatChoice=true; return{intel:10,mood:8,health:5}; }},
+        { label:'继续卷，不敢停', hint:'+💰 -❤️', fn: g => { g.flags.lyingFlatChoice=true; return{money:5000,health:-8,mood:-10}; }},
+      ]},
+    { id:'consumer_downgrade', icon:'📉', title:'消费降级',
+      body:'你开始消费降级了：\n\n- 星巴克 → 瑞幸 → 自己冲咖啡\n- 海底捞 → 呷哺呷哺 → 自己煮火锅\n- 优衣库 → 拼多多 → 穿旧衣服\n- 打车 → 地铁 → 骑共享单车\n\n你发现：其实也没那么难受。甚至有点爽。\n\n"消费主义最大的骗局是：让你以为你需要。"\n\n你开始理解：极简生活不是没钱，是看透。',
+      cond: g => g.age>=25 && g.money<20000 && !g.flags.minimalist,
+      choices:[
+        { label:'彻底极简', hint:'+💰 +🧠', fn: g => { g.flags.minimalist=true; return{money:8000,intel:10,mood:10,charm:5}; }},
+        { label:'该省省该花花', hint:'+😊', fn: g => ({money:3000,mood:8}) },
+        { label:'降级但不降质', hint:'+🧠 +✨', fn: g => ({intel:8,charm:5,mood:5,money:5000}) },
+      ]},
+    { id:'remote_work', icon:'🏠', title:'远程办公时代',
+      body:'你的公司开始实行混合办公：每周三天在家，两天在公司。\n\n你发现：\n- 在家工作效率更高（因为没人打扰）\n- 通勤时间省下来可以健身/学习/睡觉\n- 但你也更孤独了\n\n"远程办公让打工人获得了自由，也失去了同事。"\n\n你开始思考：工作的意义到底是什么？',
+      cond: g => g.age>=24 && g.age<=40 && g.job!=='待业中' && !g.flags.remoteWork,
+      choices:[
+        { label:'享受远程办公', hint:'+😊 +❤️', fn: g => { g.flags.remoteWork=true; return{mood:15,health:8,intel:5,money:2000}; }},
+        { label:'还是喜欢去公司', hint:'+👥', fn: g => { g.flags.remoteWork=true; return{social:10,mood:5}; }},
+        { label:'趁机搞副业', hint:'+💰 -❤️', fn: g => { g.flags.remoteWork=true; g.flags.sideHustle='remote'; return{money:6000,health:-5,mood:5}; }},
+      ]},
+    { id:'mental_health_awakening', icon:'🧠', title:'心理健康觉醒',
+      body:'你开始关注心理健康了。\n\n也许是朋友圈里有人发了心理咨询的截图，也许是新闻里又有年轻人自杀的消息。\n\n你第一次意识到：原来"不开心"不是矫情，是病。\n\n你下载了一个冥想App，开始每天练习10分钟。\n\n"承认自己需要帮助，是勇敢的第一步。"',
+      cond: g => g.mood<50 && g.age>=25 && !g.flags.mentalHealthAware,
+      choices:[
+        { label:'去做心理咨询', hint:'-💰 +😊 +🧠', fn: g => { g.flags.mentalHealthAware=true; g.money-=3000; return{mood:25,intel:8,health:5}; }},
+        { label:'自己调整', hint:'+😊', fn: g => { g.flags.mentalHealthAware=true; return{mood:15,health:5}; }},
+        { label:'算了，我没事', hint:'-😊', fn: g => ({mood:-10}) },
+      ]},
+    { id:'aging_parents', icon:'👴', title:'父母养老',
+      body:'你爸打电话来："你妈最近身体不太好，你有空回来看看。"\n\n你查了查老家的养老院：便宜的3000/月，好的8000/月。你在外地的房子还没着落，父母怎么办？\n\n"80后90后的困境：上有老下有小，中间还有房贷和996。"\n\n你站在人生的十字路口：回老家陪父母，还是留在大城市赚钱？',
+      cond: g => g.age>=32 && !g.flags.parentsHandled && g.social>40,
+      choices:[
+        { label:'接父母来大城市', hint:'-💰💰 +😊', fn: g => { g.flags.parentsHandled=true; return{money:-50000,mood:20,social:10,health:5}; }},
+        { label:'给父母买商业保险', hint:'-💰 +🧠', fn: g => { g.flags.parentsHandled=true; return{money:-20000,intel:5,mood:10}; }},
+        { label:'多打电话，定期回家', hint:'+😊 +👥', fn: g => { g.flags.parentsHandled=true; return{mood:10,social:8}; }},
+        { label:'先顾好自己', hint:'-😊', fn: g => { g.flags.parentsHandled=true; return{mood:-15,social:-5}; }},
+      ]},
+    { id:'middle_age_crisis', icon:'🔄', title:'中年危机',
+      body:'你35岁了。\n\n- 职场上：比你年轻的人更便宜更能加班\n- 身体上：体检报告一年比一年厚\n- 财务上：房贷、车贷、孩子教育、父母养老\n- 心理上：开始怀疑人生的意义\n\n你看着镜子里的自己：头发少了，肚子大了，眼睛里的光没了。\n\n"35岁，是中国职场的\"保质期\"。过了这个年纪，你就是\"前浪\"。"',
+      cond: g => g.age===35 && !g.flags.midlifeCrisisHandled,
+      choices:[
+        { label:'转型做管理', hint:'+🧠 +💰', fn: g => { g.flags.midlifeCrisisHandled=true; if(g.intel>70 && g.social>50){return{intel:10,money:15000,mood:10}}else{return{intel:5,mood:-10}} }},
+        { label:'创业', hint:'🎲🎲', fn: g => { g.flags.midlifeCrisisHandled=true; g.flags.entrepreneur=true; setJob(g,'创业者',0); if(Math.random()>0.6){return{money:-30000,mood:15,social:10}}else{return{money:-50000,mood:-25}} }},
+        { label:'接受现实，继续打工', hint:'+😊', fn: g => { g.flags.midlifeCrisisHandled=true; return{mood:5,health:5}; }},
+        { label:'提前退休，回老家', hint:'+❤️ +😊 -💰', fn: g => { g.flags.midlifeCrisisHandled=true; g.flags.lyingFlat=true; setJob(g,'待业中',0); return{health:20,mood:20,money:-20000,social:-10}; }},
+      ]},
+    { id:'friendship_fade', icon:'👥', title:'渐行渐远的朋友',
+      body:'你翻看微信通讯录，发现有2000个好友，但能打电话聊天的不超过5个。\n\n大学室友结婚了，同事跳槽了，老朋友回老家了。你的社交圈越来越小。\n\n"成年人的友谊，不是渐行渐远，就是渐行渐远。"\n\n你发了条朋友圈，只有3个赞。其中一个是你妈。',
+      cond: g => g.age>=28 && g.social<40 && !g.flags.friendshipFade,
+      choices:[
+        { label:'主动联系老朋友', hint:'+👥 +😊', fn: g => { g.flags.friendshipFade=true; return{social:15,mood:15}; }},
+        { label:'结交新朋友', hint:'+👥', fn: g => { g.flags.friendshipFade=true; return{social:10,charm:5}; }},
+        { label:'享受独处', hint:'+🧠', fn: g => { g.flags.friendshipFade=true; return{intel:8,mood:5}; }},
+      ]},
+    { id:'pet_companion', icon:'🐱', title:'养个宠物？',
+      body:'你路过宠物店，看到一只橘猫在橱窗里打盹。\n\n你心想：在这个城市，也许我需要的不是伴侣，而是一个不会评判你的毛茸茸的朋友。\n\n但你又想到：\n- 猫粮/狗粮：每月500-1000\n- 疫苗/驱虫：每年1000-2000\n- 绝育手术：2000-3000\n- 生病看病：3000-10000\n\n"养宠物就像养孩子，只不过这个孩子永远长不大——而且不会跟你要学区房。"',
+      cond: g => g.age>=25 && g.age<=45 && !g.flags.hasPet && g.money>8000,
+      choices:[
+        { label:'养猫', hint:'-💰 +😊 +❤️', fn: g => { g.flags.hasPet=true; return{money:-5000,mood:20,health:5,charm:5}; }},
+        { label:'养狗', hint:'-💰 +😊 +❤️', fn: g => { g.flags.hasPet=true; return{money:-6000,mood:18,health:8,social:5}; }},
+        { label:'云养宠', hint:'+😊', fn: g => ({mood:8}) },
+        { label:'养不起自己', hint:'-😊', fn: g => ({mood:-5}) },
+      ]},
+    { id:'education_upgrade', icon:'🎓', title:'学历提升',
+      body:'你在职场遇到了瓶颈：学历成了天花板。\n\n选项：\n- 在职MBA：20万，2年\n- 非全日制硕士：10万，3年\n- 考证（CPA/CFA/PMP）：3-5万，1-2年\n- 在线课程：几千块，随时学\n\n"学历不代表能力，但HR只看学历。"\n\n你开始计算：投入产出比到底值不值？',
+      cond: g => g.age>=25 && g.age<=35 && g.intel>60 && !g.flags.educationUpgrade,
+      choices:[
+        { label:'读MBA', hint:'-💰💰 +🧠 +👥', fn: g => { g.flags.educationUpgrade=true; return{money:-200000,intel:20,social:15,charm:8}; }},
+        { label:'考个专业证书', hint:'-💰 +🧠', fn: g => { g.flags.educationUpgrade=true; return{money:-30000,intel:15,mood:10}; }},
+        { label:'在线学习', hint:'+🧠', fn: g => { g.flags.educationUpgrade=true; return{intel:10,mood:5}; }},
+        { label:'经验比学历重要', hint:'+😊', fn: g => ({mood:8,intel:3}) },
+      ]},
+    { id:'retirement_planning_2025', icon:'👴', title:'养老金焦虑',
+      body:'你看到新闻：2025年养老金缺口达到X万亿。专家说："80后90后可能领不到养老金。"\n\n你算了算：你现在交的养老保险，到你60岁的时候能领多少？\n\n答案是：不知道。因为政策一直在变。\n\n"养老金就像薛定谔的猫：在你退休之前，你永远不知道它还在不在。"',
+      cond: g => g.age>=30 && g.age<=45 && !g.flags.retirementPlanning && g.intel>55,
+      choices:[
+        { label:'自己存养老钱', hint:'+💰 +🧠', fn: g => { g.flags.retirementPlanning=true; return{money:15000,intel:8,mood:5}; }},
+        { label:'买商业养老保险', hint:'-💰 +🧠', fn: g => { g.flags.retirementPlanning=true; return{money:-30000,intel:5,mood:8}; }},
+        { label:'靠孩子养老', hint:'+😊 -💰', fn: g => { g.flags.retirementPlanning=true; if(g.flags.hasChild){return{mood:10}}else{return{mood:-10}} }},
+        { label:'走一步看一步', hint:'+😊', fn: g => ({mood:5}) },
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -760,6 +937,11 @@ const ACHIEVEMENTS = [
     { id:'ai_ready', icon:'🤖', name:'AI时代幸存者', desc:'拥抱了AI', check: g => g.flags.aiAnxiety && g.intel>75 },
     { id:'minimalist', icon:'📉', name:'消费觉醒', desc:'学会精打细算', check: g => g.flags.minimalist },
     { id:'scam_survivor', icon:'🛡️', name:'反诈达人', desc:'识破了骗局', check: g => g.flags.hadScam && g.money>5000 },
+    { id:'investor', icon:'📈', name:'韭菜觉醒', desc:'参与过投资', check: g => g.flags.invested },
+    { id:'married', icon:'💍', name:'步入婚姻', desc:'结婚了', check: g => g.flags.married },
+    { id:'divorced', icon:'💔', name:'围城之外', desc:'离婚了', check: g => g.flags.divorced },
+    { id:'parent', icon:'👶', name:'为人父母', desc:'有了孩子', check: g => g.flags.hasChild },
+    { id:'lying_flat', icon:'🛋️', name:'躺平大师', desc:'选择了躺平', check: g => g.flags.lyingFlat },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -786,6 +968,9 @@ const ENDINGS = [
     { id:'startup_end', badge:'🚀', title:'创业有成', desc:'你的公司活过了三年——这在创业圈已经是奇迹。\n\n没有上市，但你养活了10人团队，做出了有人用的产品。\n\n你偶尔想起当初在出租屋写第一行代码的夜晚。那时你什么都没有，除了笔记本和一腔热血。', cond: g => g.flags.entrepreneur && g.money>=100000 },
     { id:'ordinary', badge:'☀️', title:'小确幸人生', desc:'你没有成为大佬，没有买房，没有财务自由。\n\n但你有还不错的工作、几个交心的朋友、一只猫、一个爱你的人。\n\n周末跑步，晚上做饭，睡前看书。\n\n"不是每个人都要成为传奇。认真生活的人，本身就是英雄。"', cond: g => g.mood>=55 && g.health>=50 && g.money>=20000 },
     { id:'single', badge:'🌸', title:'单身贵族', desc:'你选择了单身。不是找不到，而是发现一个人也挺好。\n\n随时加班、随时旅行、随时吃火锅。\n\n你妈依然每周催婚，但你学会了微笑以对。\n\n"幸福的标准不止一种。一个人的日子，也可以过得很精彩。"', cond: g => !g.flags.married && !g.flags.hasPartner && g.mood>=60 && g.age>=35 },
+    { id:'investment_guru', badge:'📈', title:'投资达人', desc:'你从韭菜变成了投资达人。股票、基金、房产——你都有了。\n\n但你知道，运气占了80%。剩下的20%，是你用无数个失眠的夜晚换来的。\n\n"投资有风险，入市需谨慎。但你已经入局了。"', cond: g => g.flags.invested && g.money>=200000 && g.intel>=70 },
+    { id:'lying_flat_end', badge:'🛋️', title:'躺平人生', desc:'你选择了躺平。不卷了，不拼了，不争了。\n\n你在郊区租了个小房子，种花养猫，偶尔打零工。\n\n有人说你是loser，有人说你是智者。你不在乎。\n\n"人生不是赛道，是旷野。你选择了自己的路。"', cond: g => g.flags.lyingFlat && g.mood>=65 && g.health>=60 && g.age>=30 },
+    { id:'divorced_life', badge:'💔', title:'围城之外', desc:'你离婚了。不是失败，是选择。\n\n你重新开始一个人的生活。周末约朋友，工作日加班，偶尔相亲。\n\n你发现：离婚不是终点，是另一种开始。\n\n"婚姻不是人生的必选项。幸福才是。"', cond: g => g.flags.divorced && g.mood>=50 && g.age>=35 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
@@ -1088,7 +1273,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.3' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.4' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
