@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v28.1
+// 都市浮生记 - Game Engine v28.2
 // ============================================
 
 // === GAME STATE ===
@@ -14385,6 +14385,87 @@ const EVENTS = [
         { label:'设置了社交媒体仅自己可见', hint:'+🧠 +✨', fn: g => { g.flags.digitalReputation=true; g.flags.privacySettings=true; return{intel:5,charm:3}; }},
         { label:'觉得无所谓，那是真实的我', hint:'+✨ -🧠', fn: g => { g.flags.digitalReputation=true; g.flags.authenticDigital=true; return{charm:5,intel:-3}; }},
       ]},
+    // v28.2: 中年文化 + 养生 + 文玩 + 茶道
+    { id:'walnut_collecting', icon:'🥜', title:'文玩核桃', category:'hobby',
+      body:'你开始玩文玩了。\n\n你买了一对核桃——\n- 品种：狮子头\n- 尺寸：45mm\n- 价格：2000元\n\n你每天盘——\n- 上班盘\n- 下班盘\n- 看电视盘\n- 睡觉前盘\n\n3个月后——核桃开始「包浆」了——颜色变深了——变得油润了。\n\n你很开心——\n\n你的同事问：「你手里盘什么呢？」\n你：「核桃。」\n同事：「这玩意有什么用？」\n你：「……修身养性？」\n\n你开始理解：文玩——不是「玩东西」——是「玩时间」。\n\n你盘的——不是核桃——是你「无聊的时间」。\n\n核桃变美了——你的时间——也有了「痕迹」。\n\n你开始理解为什么中年男人喜欢文玩——\n\n因为你终于有了「可以掌控的东西」。\n\n工作你掌控不了——家庭你掌控不了——但核桃——你可以。\n\n「文玩核桃：你不是在盘核桃——你是在盘你「无处安放的焦虑」。」',
+      cond: g => g.age >= 28 && !g.flags.walnutCollecting && g.money >= 2000,
+      choices:[
+        { label:'成了文玩达人，收集了很多核桃', hint:'-💰 +😊 +✨', fn: g => { g.flags.walnutCollecting=true; g.flags.walnutMaster=true; g.money -= 10000; return{mood:8,charm:5}; }},
+        { label:'盘了一对觉得挺有意思', hint:'+😊 +🧠', fn: g => { g.flags.walnutCollecting=true; return{mood:5,intel:3}; }},
+        { label:'盘了两天觉得没意思', hint:'-💰', fn: g => { g.flags.walnutCollecting=true; g.money -= 2000; return{mood:-3}; }},
+      ]},
+    { id:'tea_ceremony', icon:'🍵', title:'茶道入门', category:'hobby',
+      body:'你开始喝茶了。\n\n以前——你只喝咖啡。\n\n现在——你开始觉得——茶比咖啡「有味道」。\n\n你买了：\n- 紫砂壶：500元\n- 铁观音：200元/斤\n- 大红袍：300元/斤\n- 普洱：500元/饼\n- 茶具套装：800元\n\n你开始研究：\n- 什么水泡什么茶\n- 多少度水合适\n- 第一泡要不要倒掉\n- 怎么「洗茶」「醒茶」\n\n你朋友来你家——你给他泡了一壶大红袍——\n\n朋友：「你这茶不错，多少钱一斤？」\n你：「300。」\n朋友：「我喝不出跟50块的有什么区别。」\n\n你开始理解：茶道——不是「茶好喝」——是「泡茶的过程让你慢下来」。\n\n你不是在喝茶——你是在「用一壶茶的时间——让自己安静一会儿」。\n\n「茶道入门：你不是在品茶——你是在找一个「合法发呆」的理由。」',
+      cond: g => g.age >= 25 && !g.flags.teaCeremony && g.money >= 2000,
+      choices:[
+        { label:'成了茶道爱好者，开始收藏好茶', hint:'-💰 +😊 +✨ +🧠', fn: g => { g.flags.teaCeremony=true; g.flags.teaCollector=true; g.money -= 8000; return{mood:8,charm:5,intel:3}; }},
+        { label:'偶尔泡泡茶，挺享受的', hint:'+😊 +🧠', fn: g => { g.flags.teaCeremony=true; return{mood:5,intel:3}; }},
+        { label:'觉得太复杂了，还是喝咖啡吧', hint:'-💰', fn: g => { g.flags.teaCeremony=true; g.money -= 2000; return{mood:-3}; }},
+      ]},
+    { id:'tcm_wellness_v28_2', icon:'🧑‍⚕️', title:'中医养生', category:'health',
+      body:'你开始看中医了。\n\n因为你的体检报告——有5个箭头朝上。\n\n中医把了脉——\n\n「你这是——气虚血瘀——肝郁脾虚——肾虚。」\n\n你：「那怎么办？」\n\n中医：「我给你开个方子——每天喝中药——忌生冷辛辣——早睡早起——不要生气。」\n\n你看了看方子：\n- 黄芪30g\n- 当归15g\n- 枸杞20g\n- 党参15g\n- ……还有10味你不认识的\n\n药费：每副50元，一天一副，喝3个月 = 4500元\n\n你开始养生：\n- 保温杯里泡枸杞\n- 泡脚桶泡到出汗\n- 艾灸贴满了背\n- 每天早上打八段锦\n\n你开始理解：中医养生——不是「治病」——是「治你的生活方式」。\n\n你不是在吃药——你是在「为以前的熬夜和外卖买单」。\n\n「中医养生：你不是在养生——你是在「用枸杞为996续命」。」',
+      cond: g => g.age >= 28 && !g.flags.tcmWellness && g.health < 60,
+      choices:[
+        { label:'坚持中药调理+改善生活习惯', hint:'+❤️ +😊 -💰', fn: g => { g.flags.tcmWellness=true; g.flags.tcmBeliever=true; g.money -= 5000; return{health:10,mood:5}; }},
+        { label:'喝了一个月中药，感觉好了一些', hint:'+❤️ -💰', fn: g => { g.flags.tcmWellness=true; g.money -= 1500; return{health:5}; }},
+        { label:'觉得中药没用，还是去看西医', hint:'+🧠 -💰', fn: g => { g.flags.tcmWellness=true; g.flags.tcmSkeptic=true; g.money -= 500; return{intel:3}; }},
+      ]},
+    { id:'calligraphy_hobby', icon:'✒️', title:'练书法', category:'hobby',
+      body:'你开始练书法了。\n\n起因：你在抖音看到一个书法家写行书——太帅了。\n\n你买了：\n- 毛笔：100元\n- 墨汁：30元\n- 宣纸：50元（100张）\n- 字帖：80元（颜真卿《多宝塔碑》）\n- 砚台：200元\n\n你开始练——\n\n第一周：\n- 你的字——像蚯蚓爬\n- 你握笔——手抖\n- 你写的「永」字——像「氷」\n\n第一个月：\n- 你的手不抖了\n- 你的字——能看了\n- 你开始享受「一笔一划」的感觉\n\n第三个月：\n- 你写了100张宣纸\n- 你的字——开始有「味道」了\n- 你发朋友圈——收获了50个赞\n\n你开始理解：书法——不是「写字」——是「用毛笔做冥想」。\n\n你写字的时候——脑子里什么都没有——只有「下一个笔画」。\n\n这是你一天中——最安静的时刻。\n\n「练书法：你不是在写字——你是在用毛笔「让大脑停下来」。」',
+      cond: g => g.age >= 25 && !g.flags.calligraphyHobby && g.intel >= 20,
+      choices:[
+        { label:'坚持每天练字，字越来越好', hint:'+🧠 +✨ +😊', fn: g => { g.flags.calligraphyHobby=true; g.flags.calligraphyMaster=true; return{intel:10,charm:8,mood:5}; }},
+        { label:'偶尔练练，修身养性', hint:'+🧠 +😊', fn: g => { g.flags.calligraphyHobby=true; return{intel:5,mood:3}; }},
+        { label:'练了一个月放弃了', hint:'-💰 -🧠', fn: g => { g.flags.calligraphyHobby=true; g.money -= 460; return{intel:-3}; }},
+      ]},
+    { id:'tai_chi_morning', icon:'🧘', title:'晨练太极', category:'health',
+      body:'你开始在公园打太极了。\n\n每天早上6点——公园里有一群老人在打太极。\n\n你加入了——\n\n你是最年轻的——平均年龄：62岁。\n\n太极拳师傅——70岁的王大爷——\n\n「小伙子，你的腰太硬了——要放松。」\n「小伙子，你的呼吸不对——要腹式呼吸。」\n「小伙子，你的心太急了——太极要慢。」\n\n你练了3个月——\n\n你发现：\n- 你的腰不疼了（以前久坐腰疼）\n- 你的睡眠变好了\n- 你的心态平和了\n- 你跟王大爷成了朋友\n\n王大爷说：「你们年轻人啊——就是太急了。太极——就是让你慢下来。」\n\n你开始理解：太极——不是「老人运动」——是「让年轻人学会慢」。\n\n你不是在学太极——你是在学「不着急」。\n\n「晨练太极：你不是在运动——你是在用60岁的速度——治愈25岁的焦虑。」',
+      cond: g => g.age >= 25 && !g.flags.taiChiMorning && g.health >= 20,
+      choices:[
+        { label:'坚持每天打太极，身体好多了', hint:'+❤️ +😊 +🧠', fn: g => { g.flags.taiChiMorning=true; g.flags.taiChiRegular=true; return{health:10,mood:8,intel:5}; }},
+        { label:'偶尔去打打，挺舒服', hint:'+❤️ +😊', fn: g => { g.flags.taiChiMorning=true; return{health:5,mood:3}; }},
+        { label:'太慢了，还是去健身房吧', hint:'-😊', fn: g => { g.flags.taiChiMorning=true; return{mood:-3}; }},
+      ]},
+    { id:'bracelet_collecting', icon:'📿', title:'盘手串', category:'hobby',
+      body:'你开始盘手串了。\n\n你买了第一条：小叶紫檀——500元。\n\n你发现——盘手串——比盘核桃——更有「仪式感」。\n\n你的手串进化：\n- 第1个月：棕色（新的）\n- 第3个月：深棕色（开始变色）\n- 第6个月：紫红色（开始包浆）\n- 第12个月：深紫色（完全包浆，像玉一样）\n\n你的收藏：\n- 小叶紫檀：500元\n- 崖柏：300元\n- 黄花梨：2000元\n- 沉香：5000元\n\n你开始理解：盘手串——不是「玩珠子」——是「看着一个东西在你的手里变美」。\n\n你的手串——记录了你的时间。\n\n每一颗珠子——都被你的手——磨过了一万次。\n\n你开始理解：中年男人的三大爱好——核桃、手串、钓鱼——本质上是一样的：\n\n都是在「用耐心——换一个可以掌控的结果」。\n\n「盘手串：你不是在盘珠子——你是在「用一万次抚摸——换一个属于你的美」。」',
+      cond: g => g.age >= 25 && !g.flags.braceletCollecting && g.money >= 500,
+      choices:[
+        { label:'成了手串收藏家', hint:'-💰 +😊 +✨', fn: g => { g.flags.braceletCollecting=true; g.flags.braceletCollector=true; g.money -= 15000; return{mood:8,charm:5}; }},
+        { label:'盘了一条挺有意思', hint:'+😊', fn: g => { g.flags.braceletCollecting=true; return{mood:5}; }},
+        { label:'觉得是智商税', hint:'+🧠 -💰', fn: g => { g.flags.braceletCollecting=true; g.money -= 500; return{intel:3}; }},
+      ]},
+    { id:'foot_soaking', icon:'🦶', title:'泡脚养生', category:'health',
+      body:'你开始泡脚了。\n\n因为你妈说：「热水泡脚，赛过吃人参。」\n\n你买了：\n- 泡脚桶：200元（带加热的）\n- 泡脚药包：50元/月\n- 浴盐：30元\n\n你每天晚上——泡脚30分钟——\n\n你发现：\n- 泡完脚——全身暖呼呼的\n- 睡眠变好了\n- 脚不臭了（？重要吗？重要。）\n\n你的泡脚配方：\n- 冬天：生姜+艾叶（驱寒）\n- 夏天：薄荷+盐（清凉）\n- 加班后：薰衣草（助眠）\n\n你开始理解：泡脚——是「最低成本的养生」。\n\n你不需要花很多钱——你只需要一桶热水。\n\n这是中年人的「最后的倔强」——\n\n你不再熬夜——不再喝酒——不再吃垃圾食品——\n\n但你每天——都要泡脚。\n\n因为——这是你「唯一能坚持的养生」。\n\n「泡脚养生：你不是在泡脚——你是在用一桶热水——跟自己和解。」',
+      cond: g => g.age >= 25 && !g.flags.footSoaking && g.money >= 200,
+      choices:[
+        { label:'坚持每天泡脚，睡眠好了很多', hint:'+❤️ +😊 -💰', fn: g => { g.flags.footSoaking=true; g.flags.footSoakingRegular=true; g.money -= 500; return{health:8,mood:5}; }},
+        { label:'偶尔泡泡挺舒服', hint:'+❤️', fn: g => { g.flags.footSoaking=true; return{health:3}; }},
+        { label:'泡了几天就忘了', hint:'-💰', fn: g => { g.flags.footSoaking=true; g.money -= 280; return{mood:-3}; }},
+      ]},
+    { id:'fangyuan_philosophy', icon:'🎋', title:'方圆哲学', category:'psychology',
+      body:'你开始理解「方圆哲学」了。\n\n你爸跟你说过一句话：「做人要外圆内方。」\n\n你以前觉得——这是「圆滑」。\n\n现在你理解了——\n\n外圆：\n- 跟同事：不争论，微笑\n- 跟领导：不反驳，执行\n- 跟客户：不较真，合作\n- 跟家人：不计较，包容\n\n内方：\n- 自己的底线：不碰\n- 自己的原则：不改\n- 自己的价值观：不动摇\n- 自己的梦想：不放弃\n\n你开始理解：「外圆内方」——不是「虚伪」——是「保护自己」。\n\n你不需要让所有人知道你「方」——你只需要自己知道。\n\n在外面——你「圆」——因为你不想受伤。\n在里面——你「方」——因为你不想失去自己。\n\n你开始理解：中年人的智慧——就是「知道什么时候圆——什么时候方」。\n\n「方圆哲学：你不是在学圆滑——你是在学「如何在不失去自己的情况下活下来」。」',
+      cond: g => g.age >= 30 && !g.flags.fangyuanPhilosophy && g.intel >= 30,
+      choices:[
+        { label:'深度践行方圆哲学，变得从容了', hint:'+🧠 +✨ +😊', fn: g => { g.flags.fangyuanPhilosophy=true; g.flags.fangyuanMaster=true; g.reputation.culture += 5; return{intel:10,charm:8,mood:8}; }},
+        { label:'理解了但还做不到', hint:'+🧠 +😊', fn: g => { g.flags.fangyuanPhilosophy=true; return{intel:5,mood:3}; }},
+        { label:'觉得这样太累了，还是做自己', hint:'+✨ -🧠', fn: g => { g.flags.fangyuanPhilosophy=true; g.flags.authenticSelf=true; return{charm:5,intel:-3}; }},
+      ]},
+    { id:'tcm_food_therapy', icon:'🍲', title:'食疗养生', category:'health',
+      body:'你开始「食疗」了。\n\n你关注了10个养生公众号——\n\n你学到了：\n- 冬天吃羊肉暖胃\n- 夏天喝绿豆汤清热\n- 枸杞配红枣补血\n- 山药配莲子健脾\n\n你的日常饮食变了：\n- 早餐：红枣枸杞粥\n- 午餐：山药排骨汤\n- 晚餐：银耳莲子羹\n- 零食：黑芝麻丸\n\n你同事问：「你怎么不吃外卖了？」\n你：「我在食疗。」\n同事：「食疗有用吗？」\n你：「不知道，但我感觉好了一些。」\n\n你开始理解：食疗——不是「治病」——是「用心对待每一顿饭」。\n\n你不是在「吃药膳」——你是在「认真对待你的身体」。\n\n你的身体——是你最忠诚的伙伴——你怎么对它——它就怎么对你。\n\n「食疗养生：你不是在吃饭——你是在用每一口食物——跟你的身体说「对不起」。」',
+      cond: g => g.age >= 25 && !g.flags.tcmFoodTherapy && g.money >= 500,
+      choices:[
+        { label:'坚持食疗半年，体检指标好了', hint:'+❤️ +😊 -💰', fn: g => { g.flags.tcmFoodTherapy=true; g.flags.foodTherapyExpert=true; g.money -= 3000; return{health:10,mood:5}; }},
+        { label:'开始注意饮食了', hint:'+❤️ +🧠', fn: g => { g.flags.tcmFoodTherapy=true; return{health:5,intel:3}; }},
+        { label:'吃了一个月觉得太清淡了', hint:'-❤️ +😊', fn: g => { g.flags.tcmFoodTherapy=true; return{health:-3,mood:3}; }},
+      ]},
+    { id:'middle_age_hobbies', icon:'🎯', title:'中年三宝', category:'psychology',
+      body:'你发现——你已经集齐了「中年三宝」。\n\n中年三宝：\n1. 钓鱼（你已经入坑了）\n2. 手串（你已经在盘了）\n3. 保温杯（你已经泡枸杞了）\n\n你的周末：\n- 早上：打太极\n- 上午：钓鱼\n- 下午：喝茶+盘手串\n- 晚上：泡脚+看养生节目\n\n你25岁的时候：\n- 周末：喝酒、KTV、打游戏\n- 觉得中年人「无聊」\n\n你35岁的时候：\n- 周末：钓鱼、喝茶、泡脚\n- 觉得年轻人「太闹」\n\n你开始理解：中年三宝——不是「无聊」——是「终于知道自己要什么了」。\n\n你不再需要「热闹」——你需要「安静」。\n你不再需要「刺激」——你需要「平和」。\n你不再需要「朋友多」——你需要「朋友真」。\n\n你不是变老了——你是「终于长大了」。\n\n「中年三宝：钓鱼、手串、保温杯——不是中年男人的标配——是「活明白了」的标配。」',
+      cond: g => g.age >= 30 && !g.flags.middleAgeHobbies && (g.flags.fishingMiddleAge || g.flags.braceletCollecting || g.flags.teaCeremony || g.flags.tcmWellness),
+      choices:[
+        { label:'完全接受了自己的中年生活', hint:'+😊 +🧠 +✨', fn: g => { g.flags.middleAgeHobbies=true; g.flags.acceptedMiddleAge=true; return{mood:10,intel:5,charm:5}; }},
+        { label:'有点不甘心，但也挺好的', hint:'+😊 +🧠', fn: g => { g.flags.middleAgeHobbies=true; return{mood:5,intel:3}; }},
+        { label:'觉得自己还没到中年呢', hint:'+😊 -🧠', fn: g => { g.flags.middleAgeHobbies=true; g.flags.denyMiddleAge=true; return{mood:3,intel:-3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -15660,6 +15741,14 @@ const ACHIEVEMENTS = [
     { id:'news_faster_ach', icon:'😡', name:'新闻断食', desc:'开始新闻断食只看一次新闻', check: g => g.flags.newsFaster },
     { id:'debate_reformed_ach', icon:'⚔️', name:'对线戒断', desc:'意识到网络对线没用不再参与', check: g => g.flags.debateReformed },
     { id:'defended_colleague_ach', icon:'🚫', name:'仗义执言', desc:'为被网络审判的同事发声', check: g => g.flags.defendedColleague },
+    // v28.2: 中年文化成就
+    { id:'walnut_master_ach', icon:'🥜', name:'文玩达人', desc:'成了文玩达人收集了很多核桃', check: g => g.flags.walnutMaster },
+    { id:'tea_collector_ach', icon:'🍵', name:'茶道爱好者', desc:'成了茶道爱好者开始收藏好茶', check: g => g.flags.teaCollector },
+    { id:'calligraphy_master_ach', icon:'✒️', name:'书法达人', desc:'坚持每天练字字越来越好', check: g => g.flags.calligraphyMaster },
+    { id:'tai_chi_regular_ach', icon:'🧘', name:'太极常客', desc:'坚持每天打太极身体好多了', check: g => g.flags.taiChiRegular },
+    { id:'fangyuan_master_ach', icon:'🎋', name:'方圆大师', desc:'深度践行方圆哲学变得从容', check: g => g.flags.fangyuanMaster },
+    { id:'food_therapy_expert_ach', icon:'🍲', name:'食疗专家', desc:'坚持食疗半年体检指标好了', check: g => g.flags.foodTherapyExpert },
+    { id:'accepted_middle_age_ach', icon:'🎯', name:'活明白了', desc:'完全接受了自己的中年生活', check: g => g.flags.acceptedMiddleAge },
 ];
 
 // === ENDINGS === (order matters: first match wins)
