@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v30.1
+// 都市浮生记 - Game Engine v30.2
 // ============================================
 
 // === GAME STATE ===
@@ -16061,6 +16061,87 @@ const EVENTS = [
         { label:'定期和好朋友深度交流', hint:'+👥 +😊', fn: g => { g.flags.friendshipMaintenance=true; g.flags.regularDeepTalk=true; return{social:5,mood:5}; }},
         { label:'觉得维护关系太累了', hint:'-😊 -👥', fn: g => { g.flags.friendshipMaintenance=true; return{mood:-3,social:-3}; }},
       ]},
+    // === v30.2 理财投资与韭菜文化 ===
+    { id:'fund_investing_start', icon:'📊', title:'基金定投入门', category:'finance',
+      body:'你的同事推荐你买基金：「定投是普通人最好的理财方式。」\n\n你的基金之旅：\n- 第1个月：投了1000元，涨了50\n- 第2个月：投了1000元，跌了200\n- 第3个月：投了1000元，跌了500\n- 第6个月：总计投了6000元，账户余额4800元\n\n你开始焦虑：\n- 「为什么别人赚钱我亏钱？」\n- 「是不是该止损？」\n- 「是不是该加仓？」\n\n你的同事说：「别看了，定投就是长期持有，别天天看涨跌。」\n\n你开始理解：基金定投——不是「赚钱」——是「强制储蓄+对抗通胀」。\n\n「基金定投：你买的不是基金——是「纪律」。」',
+      cond: g => g.jobSalary > 0 && g.money >= 3000 && !g.flags.fundInvesting,
+      choices:[
+        { label:'坚持定投不看短期波动', hint:'+🧠 +💪', fn: g => { g.flags.fundInvesting=true; g.flags.longTermInvestor=true; return{intel:5,mood:3}; }},
+        { label:'亏钱后恐慌全部赎回', hint:'-💰 +😊', fn: g => { g.flags.fundInvesting=true; g.flags.panicSold=true; return{money:-1200,mood:3}; }},
+        { label:'开始系统学习理财知识', hint:'+🧠 +💰', fn: g => { g.flags.fundInvesting=true; g.flags.financialLiteracy=true; return{intel:8,mood:2}; }},
+      ]},
+    { id:'stock_market_entry', icon:'📈', title:'炒股入门', category:'finance',
+      body:'你决定炒股——因为「钱放在银行会贬值」。\n\n你的炒股历程：\n- 第1天：买了1万块的股票\n- 第1周：涨了800，你觉得自己是「股神」\n- 第2周：跌了1500，你开始焦虑\n- 第1个月：跌了3000，你开始怀疑人生\n- 第3个月：涨回来了2000，你又觉得自己行了\n- 第6个月：账户余额7500元\n\n你学到的教训：\n- 「追涨杀跌」是散户的通病\n- 「别人恐惧我贪婪」说起来容易做起来难\n- 你不是在「投资」——你是在「赌博」\n\n「炒股入门：你以为你在投资——其实你在交「学费」。」',
+      cond: g => g.money >= 10000 && g.age >= 22 && !g.flags.stockMarketEntry,
+      choices:[
+        { label:'交完学费开始认真学习投资', hint:'+🧠 +💪', fn: g => { g.flags.stockMarketEntry=true; g.flags.learnedInvesting=true; return{intel:8,mood:3}; }},
+        { label:'觉得股市就是赌场不玩了', hint:'+😊 -💰', fn: g => { g.flags.stockMarketEntry=true; g.flags.quitStocks=true; return{mood:5,money:-2500}; }},
+        { label:'越亏越想回本加大投入', hint:'-💰 -🧠', fn: g => { g.flags.stockMarketEntry=true; g.flags.gamblingMindset=true; return{money:-5000,intel:-3}; }},
+      ]},
+    { id:'investment_course_scam', icon:'🎓', title:'理财课割韭菜', category:'finance',
+      body:'你在网上看到一个广告：「小白理财训练营——0元学理财——月入过万不是梦」\n\n你报了名——\n\n课程流程：\n- 第1天：免费课——教你「富人思维」（让你焦虑）\n- 第3天：免费课——展示学员「成功案例」（让你心动）\n- 第5天：推荐进阶课——3980元（让你觉得值得）\n- 第7天：推荐VIP课——19800元（让你觉得是「投资自己」）\n\n你花了3980元报了进阶课——发现：\n- 内容都是网上能搜到的\n- 讲师没有金融资质\n- 学员群全是「托」\n\n你不是在学理财——你是被「理财」理了。\n\n「理财课割韭菜：你买的不是知识——是「暴富」的幻想。」',
+      cond: g => g.money >= 5000 && !g.flags.investmentCourseScam,
+      choices:[
+        { label:'被骗后开始看免费的理财书籍', hint:'+🧠 +💪', fn: g => { g.flags.investmentCourseScam=true; g.flags.freeBooksInstead=true; return{intel:8,mood:3}; }},
+        { label:'花钱买教训以后谨慎了', hint:'+🧠 -💰', fn: g => { g.flags.investmentCourseScam=true; g.flags.scamLesson=true; return{intel:5,money:-3980}; }},
+        { label:'不信邪又报了更贵的课', hint:'-💰 -🧠', fn: g => { g.flags.investmentCourseScam=true; g.flags.doubleDown=true; return{money:-19800,intel:-5}; }},
+      ]},
+    { id:'moonlight_clan', icon:'🌙', title:'月光族觉醒', category:'finance',
+      body:'你发现自己每个月都是「月光」。\n\n你的月度账单：\n- 房租：4000\n- 吃饭：3000\n- 交通：500\n- 社交：1000\n- 购物：2000\n- 娱乐：1500\n- 总计：12000\n- 收入：12000\n- 结余：0\n\n你算了一下——如果你一直这样：\n- 5年后存款：0\n- 10年后存款：0\n- 退休后：0\n\n你慌了。\n\n你开始理解：「月光」不是「自由」——是「没有退路」。\n一场病、一次失业、一个意外——都能让你崩溃。\n\n「月光族觉醒：你不是「及时行乐」——你是「对未来不负责」。」',
+      cond: g => g.jobSalary > 0 && g.money < 5000 && g.age >= 22 && !g.flags.moonlightClan,
+      choices:[
+        { label:'开始记账控制消费', hint:'+🧠 +💪', fn: g => { g.flags.moonlightClan=true; g.flags.startedBudgeting=true; return{intel:5,mood:5}; }},
+        { label:'设定每月存20%的目标', hint:'+💰 +💪', fn: g => { g.flags.moonlightClan=true; g.flags.savingsGoal=true; return{money:2000,mood:3}; }},
+        { label:'知道该存钱但控制不住', hint:'-💪 -😊', fn: g => { g.flags.moonlightClan=true; return{mood:-5}; }},
+      ]},
+    { id:'insurance_pushy', icon:'🛡️', title:'保险推销员', category:'finance',
+      body:'你的一个朋友突然联系你——原来她开始卖保险了。\n\n她的话术：\n- 「万一你得了大病怎么办？」\n- 「你的家庭谁来照顾？」\n- 「每天不到10块钱就能买个安心」\n- 「趁年轻保费便宜赶紧买」\n\n你看了看方案：\n- 年交保费：12000元\n- 保障范围：重疾+医疗+意外\n- 你觉得：有点贵但好像也有道理\n\n你不知道的是：\n- 她的佣金是保费的30-50%\n- 很多条款你根本没看懂\n- 「便宜」的保险不一定适合你\n\n「保险推销：你买的不是保障——可能是「人情」。」',
+      cond: g => g.jobSalary > 0 && g.age >= 22 && !g.flags.insurancePushy,
+      choices:[
+        { label:'认真研究后买适合自己的保险', hint:'+🧠 +💰', fn: g => { g.flags.insurancePushy=true; g.flags.smartInsurance=true; return{intel:5,money:-5000}; }},
+        { label:'碍于面子买了朋友推荐的', hint:'-💰 +👥', fn: g => { g.flags.insurancePushy=true; g.flags.boughtFriendInsurance=true; return{money:-12000,social:3}; }},
+        { label:'婉拒了说以后再说', hint:'+🧠 +😊', fn: g => { g.flags.insurancePushy=true; return{intel:2,mood:2}; }},
+      ]},
+    { id:'crypto_belief', icon:'₿', title:'加密货币信仰', category:'finance',
+      body:'你的同事跟你说：「比特币是数字黄金——现在不买以后更贵。」\n\n你的加密货币之旅：\n- 买了5000元的比特币\n- 涨到8000——你觉得自己是天才\n- 涨到15000——你后悔买少了\n- 跌到6000——你开始焦虑\n- 跌到3000——你开始怀疑人生\n- 涨到10000——你又觉得自己行了\n\n你的心情——完全跟着K线走。\n\n你开始理解：加密货币——对大多数人来说——不是「投资」——是「情绪过山车」。\n\n你不是在「信仰区块链」——你是在「信仰暴富」。\n\n「加密货币信仰：你买的不是币——是「下一个暴富机会」的幻觉。」',
+      cond: g => g.money >= 5000 && g.age >= 22 && !g.flags.cryptoBelief,
+      choices:[
+        { label:'亏钱后理性看待加密资产', hint:'+🧠 +💪', fn: g => { g.flags.cryptoBelief=true; g.flags.rationalCrypto=true; return{intel:5,mood:3}; }},
+        { label:'HODL到底不管涨跌', hint:'+💪 -💰', fn: g => { g.flags.cryptoBelief=true; g.flags.hodl=true; return{mood:3}; }},
+        { label:'追涨杀跌越操作越亏', hint:'-💰 -🧠', fn: g => { g.flags.cryptoBelief=true; return{money:-5000,intel:-3}; }},
+      ]},
+    { id:'financial_freedom_dream', icon:'🏖️', title:'财务自由梦', category:'finance',
+      body:'你算了一下——达到「财务自由」需要多少钱。\n\n你的计算：\n- 每月生活费：8000元\n- 年生活费：96000元\n- 按4%法则（每年取4%不影响本金）\n- 需要：96000 ÷ 0.04 = 240万\n\n你目前的存款：5万\n你每年能存：3万\n达到240万需要：78年\n\n你78岁的时候——就「财务自由」了。\n\n你笑了——然后你哭了。\n\n你开始理解：对大多数人来说——「财务自由」不是目标——是「焦虑源」。\n\n你不是在追求「自由」——你是在被「自由的数字」绑架。\n\n「财务自由梦：不是每个人都需要自由——每个人都需要「不焦虑」。」',
+      cond: g => g.jobSalary > 0 && g.age >= 25 && g.intel >= 30 && !g.flags.financialFreedomDream,
+      choices:[
+        { label:'重新定义自己的「足够」', hint:'+😊 +🧠', fn: g => { g.flags.financialFreedomDream=true; g.flags.redefinedEnough=true; return{mood:10,intel:5}; }},
+        { label:'制定现实的理财计划', hint:'+🧠 +💰', fn: g => { g.flags.financialFreedomDream=true; g.flags.realisticPlan=true; return{intel:5,mood:3}; }},
+        { label:'焦虑到开始找副业增加收入', hint:'-😊 +💰', fn: g => { g.flags.financialFreedomDream=true; g.flags.freedomAnxiety=true; return{mood:-3,money:1000}; }},
+      ]},
+    { id:'savings_challenge_v30_2', icon:'🐷', title:'存钱挑战', category:'finance',
+      body:'你在网上看到一个「52周存钱挑战」：\n\n- 第1周存10元\n- 第2周存20元\n- 第3周存30元\n- ……\n- 第52周存520元\n- 总计：13780元\n\n你开始了——\n- 前4周：轻松完成\n- 第8周：开始觉得有点紧\n- 第20周：每次存200有点肉疼\n- 第40周：每次存400开始想放弃\n- 第52周：你完成了！\n\n看着账户里的13780元——你觉得：\n- 这不是很多——但这是你「第一次」有计划地存钱\n- 你学到的不是「存钱技巧」——是「延迟满足」\n\n「存钱挑战：你存的不是钱——是「自律」。」',
+      cond: g => g.jobSalary > 0 && !g.flags.savingsChallenge,
+      choices:[
+        { label:'完成挑战并养成存钱习惯', hint:'+💰 +💪', fn: g => { g.flags.savingsChallenge=true; g.flags.savingsHabit=true; return{money:5000,mood:8}; }},
+        { label:'中途放弃但学到了理财意识', hint:'+🧠 -💪', fn: g => { g.flags.savingsChallenge=true; g.flags.partialSavings=true; return{intel:3,mood:2}; }},
+        { label:'觉得太慢了想找更快的方法', hint:'-🧠 +💰', fn: g => { g.flags.savingsChallenge=true; return{intel:-2,mood:-2}; }},
+      ]},
+    { id:'money_and_happiness', icon:'💭', title:'金钱与幸福', category:'finance',
+      body:'你在想一个问题：「钱真的能买到幸福吗？」\n\n你的观察：\n- 月入5000时：每天都在为钱焦虑\n- 月入10000时：焦虑少了但还是焦虑\n- 月入20000时：开始焦虑「怎么花」\n- 月入50000时：焦虑「够不够」\n\n你发现：\n- 钱不够时——钱=幸福\n- 钱够时——钱≠幸福\n- 钱很多时——钱的边际幸福感递减\n\n有研究表明：年收入超过某个数字后——更多的钱不会让你更幸福。\n\n你不是「不需要钱」——你是需要「足够的钱+其他东西」。\n其他东西：健康、关系、意义感、自由。\n\n「金钱与幸福：钱是幸福的「基础」——但不是幸福的「全部」。」',
+      cond: g => g.age >= 25 && g.intel >= 25 && !g.flags.moneyAndHappiness,
+      choices:[
+        { label:'找到金钱和幸福的平衡点', hint:'+😊 +🧠', fn: g => { g.flags.moneyAndHappiness=true; g.flags.balancedFinance=true; return{mood:10,intel:5}; }},
+        { label:'投资「关系」比投资「钱」更重要', hint:'+👥 +😊', fn: g => { g.flags.moneyAndHappiness=true; g.flags.investRelationships=true; return{social:5,mood:5}; }},
+        { label:'还是觉得有钱才能幸福', hint:'-😊 +💰', fn: g => { g.flags.moneyAndHappiness=true; return{mood:-3}; }},
+      ]},
+    { id:'side_hustle_income_v30_2', icon:'💸', title:'副业收入', category:'finance',
+      body:'你决定发展副业——因为「一份工资不够花」。\n\n你尝试的副业：\n- 开闲鱼店：卖了一些旧东西，赚了500\n- 写公众号：写了3个月，粉丝50\n- 跑外卖：跑了2周，赚了800，累到不行\n- 做PPT代做：接了3单，赚了1500\n\n你的感悟：\n- 副业不是「轻松的额外收入」——是「另一份工作」\n- 没有一技之长——副业就是「卖时间」\n- 最好的副业——是把你「擅长的」变成「产品」\n\n你的副业收入虽然不多——但你学到了：\n- 主动收入的天花板是「时间」\n- 被动收入需要「前期投入」\n- 最好的投资——是投资「自己」\n\n「副业收入：不是多赚一份钱——是多学一种「生存方式」。」',
+      cond: g => g.jobSalary > 0 && g.age >= 22 && !g.flags.sideHustleIncome,
+      choices:[
+        { label:'找到一个可持续的副业方向', hint:'+💰 +🧠', fn: g => { g.flags.sideHustleIncome=true; g.flags.sustainableSide=true; return{money:3000,intel:5}; }},
+        { label:'副业太累影响主业了', hint:'-💪 -😊', fn: g => { g.flags.sideHustleIncome=true; g.flags.sideHustleBurnout=true; return{health:-3,mood:-3}; }},
+        { label:'放弃副业主业加薪更现实', hint:'+🧠 +💰', fn: g => { g.flags.sideHustleIncome=true; g.flags.focusMainJob=true; return{intel:3,mood:3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -17520,6 +17601,15 @@ const ACHIEVEMENTS = [
     { id:'social_energy_ach', icon:'🔋', name:'社交能量管理', desc:'学会了管理自己的社交电量', check: g => g.flags.manageSocialEnergy },
     { id:'online_to_off_ach', icon:'🌐', name:'网友奔现', desc:'把网上认识的朋友变成了现实中的朋友', check: g => g.flags.onlineToOffline },
     { id:'quality_friend_ach', icon:'💎', name:'质量胜于数量', desc:'明白了朋友不在多而在真', check: g => g.flags.cherishQuality },
+    // v30.2 achievements - 理财投资与韭菜文化
+    { id:'long_term_investor_ach', icon:'📈', name:'长期主义者', desc:'开始了基金定投，学会了延迟满足', check: g => g.flags.longTermInvestor },
+    { id:'financial_literacy_ach', icon:'📚', name:'财商觉醒', desc:'意识到理财是一门需要认真学习的技能', check: g => g.flags.financialLiteracy },
+    { id:'learned_investing_ach', icon:'📊', name:'股市入门', desc:'迈出了投资理财的第一步', check: g => g.flags.learnedInvesting },
+    { id:'smart_insurance_ach', icon:'🛡️', name:'未雨绸缪', desc:'学会了理性选择适合自己的保险', check: g => g.flags.smartInsurance },
+    { id:'rational_crypto_ach', icon:'🪙', name:'理性投资者', desc:'在加密货币的狂热中保持了理性', check: g => g.flags.rationalCrypto },
+    { id:'savings_habit_ach', icon:'💰', name:'储蓄达人', desc:'养成了定期储蓄的好习惯', check: g => g.flags.savingsHabit },
+    { id:'redefined_enough_ach', icon:'🌱', name:'知足常乐', desc:'重新定义了什么是"够用"的生活', check: g => g.flags.redefinedEnough },
+    { id:'sustainable_side_ach', icon:'🔄', name:'可持续副业', desc:'找到了工作与副业的平衡点', check: g => g.flags.sustainableSide },
 ];
 
 // === ENDINGS === (order matters: first match wins)
