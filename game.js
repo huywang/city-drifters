@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v28.2
+// 都市浮生记 - Game Engine v28.3
 // ============================================
 
 // === GAME STATE ===
@@ -14466,6 +14466,87 @@ const EVENTS = [
         { label:'有点不甘心，但也挺好的', hint:'+😊 +🧠', fn: g => { g.flags.middleAgeHobbies=true; return{mood:5,intel:3}; }},
         { label:'觉得自己还没到中年呢', hint:'+😊 -🧠', fn: g => { g.flags.middleAgeHobbies=true; g.flags.denyMiddleAge=true; return{mood:3,intel:-3}; }},
       ]},
+    // v28.3: 职场性别 + 生育困境 + 女性职场
+    { id:'gender_pay_gap', icon:'💰', title:'同工不同酬', category:'career',
+      body:'你发现了公司的「薪资秘密」。\n\n你和你的同事——同岗位、同能力、同业绩——\n\n但工资不一样。\n\n男同事月薪：12000\n女同事月薪：9000\n你（如果是女性）：9000\n你（如果是男性）：11000\n\n你问HR：「为什么男女工资不一样？」\n\nHR：「薪资是根据面试表现和市场供需综合评定的。」\n\n你查了数据：\n- 中国女性平均收入：男性的78.3%\n- 同样的岗位：女性工资平均低15-20%\n- 管理层女性占比：不到30%\n\n你开始理解：同工不同酬——不是「女性能力差」——是「社会对女性的定价低」。\n\n女性被低估——不是因为她们不行——是因为「系统」认为她们「可能会生孩子」。\n\n你不是在争取「平等」——你是在争取「不被歧视」。\n\n「同工不同酬：你不是工资低——你是被「性别折扣」打了八折。」',
+      cond: g => g.age >= 22 && !g.flags.genderPayGap && g.jobSalary > 0,
+      choices:[
+        { label:'拿着数据去找领导谈加薪', hint:'+💰 +✨ -😊', fn: g => { g.flags.genderPayGap=true; g.flags.foughtForPay=true; const raise=Math.floor(g.jobSalary*0.15); g.jobSalary+=raise; g.money+=raise; return{charm:5,mood:-3}; }},
+        { label:'开始关注性别平等议题', hint:'+🧠 +✨', fn: g => { g.flags.genderPayGap=true; g.flags.genderAdvocate=true; return{intel:8,charm:3}; }},
+        { label:'算了，能有一份工作就不错了', hint:'-✨ -😊', fn: g => { g.flags.genderPayGap=true; return{mood:-5,charm:-3}; }},
+      ]},
+    { id:'pregnancy_discrimination', icon:'🤰', title:'怀孕被歧视', category:'career',
+      body:'你怀孕了。\n\n你告诉领导——\n\n领导的反应：\n- 「你怀孕了？那项目怎么办？」\n- 「你什么时候生？生完打算全职带娃吗？」\n- 「你产假期间——你的活谁干？」\n\n你发现：\n- 你被「移出」了核心项目组\n- 你的绩效评分——突然「下降」了\n- 你不再被邀请参加重要会议\n- 你的工位——被换到了角落\n\n你开始理解：怀孕歧视——不是「公司不想要你」——是「公司不想要一个「不能全力工作」的人」。\n\n你不是被歧视——你是被「效率至上」淘汰了。\n\n你的同事——不是不关心你——是不敢关心你（怕被「连坐」）。\n\n你开始理解：在中国——怀孕——是职场女性最大的「风险」。\n\n「怀孕被歧视：你不是在「给公司添麻烦」——你是在「为人类繁衍付代价」。」',
+      cond: g => g.age >= 22 && g.age <= 40 && !g.flags.pregnancyDiscrimination && g.jobSalary > 0,
+      choices:[
+        { label:'依法维权，投诉了公司', hint:'+✨ +🧠 -😊', fn: g => { g.flags.pregnancyDiscrimination=true; g.flags.legalRightsFighter=true; g.reputation.social += 5; return{charm:8,intel:5,mood:-5}; }},
+        { label:'忍了，休完产假回来再说', hint:'-😊 -✨ +🧠', fn: g => { g.flags.pregnancyDiscrimination=true; g.flags.enduredIt=true; return{mood:-8,charm:-3,intel:3}; }},
+        { label:'决定生完孩子做全职妈妈', hint:'+😊 -💰 -✨', fn: g => { g.flags.pregnancyDiscrimination=true; g.flags.fullTimeMom=true; setJob(g, '全职妈妈', 0); return{mood:5,charm:-5}; }},
+      ]},
+    { id:'glass_ceiling', icon:'🏢', title:'职场天花板', category:'career',
+      body:'你在公司5年了——\n\n你的同事——比你晚来2年的男同事——升职了。\n\n你——还在原来的岗位。\n\n你问领导：「为什么不是我？」\n\n领导：「他更有「领导力」。」\n\n你开始想：\n- 你的业绩——比他好\n- 你的能力——不比他差\n- 你的经验——比他多\n\n但——他升职了。\n\n你开始理解：职场天花板——不是「你不够好」——是「系统不认为你适合领导」。\n\n在你的公司：\n- 基层：女性占60%\n- 中层：女性占30%\n- 高层：女性占10%\n- 顶层：女性占0%\n\n你不是在爬楼梯——你是在爬一个「没有顶层」的楼梯。\n\n「职场天花板：你不是不够高——是这个天花板——是为你「专门设计的」。」',
+      cond: g => g.age >= 28 && !g.flags.glassCeiling && g.jobSalary > 0 && g.months >= 24,
+      choices:[
+        { label:'开始争取管理岗位', hint:'+✨ +🧠 -😊', fn: g => { g.flags.glassCeiling=true; g.flags.seekingLeadership=true; g.reputation.career += 3; return{charm:5,intel:5,mood:-3}; }},
+        { label:'考虑跳槽到有更好文化的公司', hint:'+🧠 +✨', fn: g => { g.flags.glassCeiling=true; g.flags.consideringSwitch=true; return{intel:5,charm:3}; }},
+        { label:'接受了现实', hint:'-✨ -😊', fn: g => { g.flags.glassCeiling=true; return{mood:-5,charm:-3}; }},
+      ]},
+    { id:'childcare_cost', icon:'👶', title:'育儿成本', category:'finance',
+      body:'你算了算——养一个孩子要花多少钱。\n\n从出生到18岁：\n- 奶粉+尿不湿：6万\n- 幼儿园（3年）：10万\n- 小学+补习（6年）：15万\n- 初中+补习（3年）：10万\n- 高中+补习（3年）：10万\n- 大学（4年）：20万\n- 生活费/医疗/其他：15万\n\n总计：86万\n\n这还只是「基本款」——\n\n如果是「精英款」：\n- 国际学校：50万+\n- 课外班（钢琴/游泳/编程）：30万+\n- 学区房溢价：200万+\n\n精英款总计：300万+\n\n你开始理解：孩子——不是「爱情的结晶」——是「财务的碎钞机」。\n\n你不是在「养孩子」——你是在「用86万买一个「生命的意义」」。\n\n你的工资——要养自己+养房+养车+养孩子——\n\n你开始想：为什么年轻人不想生孩子？\n\n因为——生不起。\n\n「育儿成本：你不是不想生——你是算了一笔账——然后不想生了。」',
+      cond: g => g.age >= 25 && !g.flags.childcareCost && g.money >= 1000,
+      choices:[
+        { label:'开始为未来孩子存钱', hint:'+💰 +🧠 -😊', fn: g => { g.flags.childcareCost=true; g.flags.childFundStarted=true; g.money += 10000; return{intel:5,mood:-3}; }},
+        { label:'决定丁克不生了', hint:'+💰 +😊 -✨', fn: g => { g.flags.childcareCost=true; g.flags.choseDINK=true; return{intel:3,mood:5}; }},
+        { label:'觉得孩子比钱重要，生！', hint:'-💰 +😊 +✨', fn: g => { g.flags.childcareCost=true; g.flags.childFirst=true; return{mood:5,charm:3}; }},
+      ]},
+    { id:'work_life_balance_mom', icon:'⚖️', title:'职场妈妈的平衡', category:'career',
+      body:'你成了职场妈妈。\n\n你的一天：\n- 6:00 起床给孩子做早餐\n- 7:00 送孩子上学\n- 8:30 到公司\n- 9:00-18:00 工作（中间吸奶2次）\n- 18:30 接孩子\n- 19:00 做饭\n- 20:00 辅导作业\n- 21:00 哄孩子睡觉\n- 22:00 处理工作邮件\n- 23:00 终于「属于自己」的时间\n\n你发现：\n- 你没有「自己的时间」\n- 你没有「休息」\n- 你只有「切换」——从「员工」切换到「妈妈」——再切换到「妻子」\n\n你的同事说：「你怎么总是准时下班？」\n你的婆婆说：「你怎么不自己带孩子？」\n你的老公说：「我帮你带了，你还想怎样？」\n\n你开始理解：职场妈妈——不是「平衡」——是「永远不够」。\n\n工作不够好——因为你「总请假」。\n妈妈不够好——因为你「总加班」。\n妻子不够好——因为你「太累了」。\n\n「职场妈妈的平衡：你不是在平衡——你是在「被两边拉扯」。」',
+      cond: g => g.age >= 25 && !g.flags.workLifeBalanceMom && g.jobSalary > 0,
+      choices:[
+        { label:'学会了设界限，不再追求完美', hint:'+😊 +🧠 +✨', fn: g => { g.flags.workLifeBalanceMom=true; g.flags.boundariesSet=true; return{mood:8,intel:5,charm:3}; }},
+        { label:'找了保姆分担', hint:'-💰 +😊', fn: g => { g.flags.workLifeBalanceMom=true; g.money -= 5000; return{mood:5}; }},
+        { label:'快崩溃了，什么都做不好', hint:'-😊 -❤️ -🧠', fn: g => { g.flags.workLifeBalanceMom=true; g.flags.burnoutMom=true; return{mood:-10,health:-5,intel:-3}; }},
+      ]},
+    { id:'interview_marriage_question', icon:'💍', title:'面试被问婚育', category:'career',
+      body:'你去面试了。\n\n面试官的问题：\n\n「你有男朋友吗？」\n「打算什么时候结婚？」\n「打算什么时候要孩子？」\n「如果怀孕了会辞职吗？」\n「你老公支持你工作吗？」\n\n你开始想：\n- 这些问题——跟我的能力有关吗？\n- 男面试官——会被问这些问题吗？\n- 为什么——我的「生育计划」——比我的「工作能力」——更重要？\n\n你开始理解：面试问婚育——不是「关心你」——是「评估你的「风险」」。\n\n在他们眼里——\n- 未婚女性 = 「可能要结婚」\n- 已婚女性 = 「可能要生孩子」\n- 已育女性 = 「可能要二胎」\n\n你不是在面试——你是在被「风险评估」。\n\n你的能力——不重要——你的「生育时间表」——才重要。\n\n「面试被问婚育：你不是在找工作——你是在「证明你不会因为生孩子而影响工作」。」',
+      cond: g => g.age >= 22 && g.age <= 38 && !g.flags.interviewMarriageQ,
+      choices:[
+        { label:'据理力争，拒绝回答私人问题', hint:'+✨ +🧠 -😊', fn: g => { g.flags.interviewMarriageQ=true; g.flags.refusedPrivacy=true; return{charm:8,intel:5,mood:-3}; }},
+        { label:'回答了但心里很不舒服', hint:'+🧠 -😊', fn: g => { g.flags.interviewMarriageQ=true; return{intel:3,mood:-5}; }},
+        { label:'说了「近期没有生育计划」', hint:'-✨ -😊', fn: g => { g.flags.interviewMarriageQ=true; g.flags.liedAboutPlan=true; return{charm:-3,mood:-5}; }},
+      ]},
+    { id:'stay_at_home_dad', icon:'👨‍👶', title:'全职爸爸', category:'social',
+      body:'你决定做全职爸爸了。\n\n因为：\n- 你老婆的工资是你的3倍\n- 保姆费每月8000\n- 你辞职——家庭每月省8000\n\n你开始了全职爸爸的生活：\n- 送孩子上学\n- 做饭\n- 打扫卫生\n- 辅导作业\n- 接孩子放学\n\n你发现：\n- 带孩子——比上班累10倍\n- 你没有「下班时间」\n- 你的社交圈——缩小到0\n- 你的朋友——不理解你\n\n你的亲戚问：「你现在做什么工作？」\n你：「全职带娃。」\n亲戚：「那你……不赚钱？」\n\n你开始理解：全职爸爸——比全职妈妈——更难。\n\n因为——社会觉得「男人不赚钱=没用」。\n\n你不是在「吃软饭」——你是在「做最有价值的无偿劳动」。\n\n「全职爸爸：你不是「没工作」——你的工作是24小时——没有工资——没有假期。」',
+      cond: g => g.age >= 25 && !g.flags.stayAtHomeDad && g.jobSalary > 0,
+      choices:[
+        { label:'享受全职爸爸的生活', hint:'+😊 +❤️ +🧠 -✨', fn: g => { g.flags.stayAtHomeDad=true; g.flags.happyStayHome=true; setJob(g, '全职爸爸', 0); return{mood:8,health:3,intel:3,charm:-5}; }},
+        { label:'做了一段时间觉得很压抑', hint:'-😊 -✨ +❤️', fn: g => { g.flags.stayAtHomeDad=true; g.flags.depressedDad=true; setJob(g, '全职爸爸', 0); return{mood:-8,charm:-5,health:-3}; }},
+        { label:'还是回去上班了', hint:'+✨ +💰 -😊', fn: g => { g.flags.stayAtHomeDad=true; g.flags.returnedToWork=true; return{charm:3,mood:-3}; }},
+      ]},
+    { id:'fertility_anxiety', icon:'🍼', title:'生育焦虑', category:'psychology',
+      body:'你30岁了——你妈开始催你生孩子了。\n\n你妈：「你看你表妹——孩子都2岁了。」\n你妈：「再不生——就高龄产妇了。」\n你妈：「你以为你还能年轻多久？」\n\n你开始焦虑：\n- 你想生——但你还没准备好\n- 你不想生——但你怕以后后悔\n- 你不知道——「对的时间」是什么时候\n\n你查了数据：\n- 中国女性平均生育年龄：29岁\n- 35岁以上生育风险增加\n- 不孕不育率：15%（越来越高）\n\n你开始理解：生育焦虑——不是「你想不想生」——是「你被「时钟」追着跑」。\n\n你的身体——有一个「生育窗口」——而这个窗口——在慢慢关闭。\n\n你不是在焦虑——你是在跟「生物钟」赛跑。\n\n「生育焦虑：你不是不想生——你是「还没准备好就要来不及了」。」',
+      cond: g => g.age >= 28 && g.age <= 38 && !g.flags.fertilityAnxiety,
+      choices:[
+        { label:'开始认真考虑生育计划', hint:'+🧠 -😊 +✨', fn: g => { g.flags.fertilityAnxiety=true; g.flags.fertilityPlanner=true; return{intel:5,mood:-3,charm:3}; }},
+        { label:'决定先冻卵/冻精给自己留后路', hint:'-💰 +🧠 +✨', fn: g => { g.flags.fertilityAnxiety=true; g.flags.fertilityPreserved=true; g.money -= 50000; return{intel:5,charm:3}; }},
+        { label:'决定不要孩子了', hint:'+😊 +🧠 -✨', fn: g => { g.flags.fertilityAnxiety=true; g.flags.childFree=true; return{mood:5,intel:5}; }},
+      ]},
+    { id:'parenting_philosophy', icon:'📖', title:'育儿观念冲突', category:'social',
+      body:'你跟你婆婆/岳母——在育儿上——产生了严重分歧。\n\n你的观念：\n- 科学育儿\n- 不喂饭让孩子自己吃\n- 不穿太多以免捂出病\n- 不打骂用正面管教\n\n婆婆的观念：\n- 经验育儿\n- 「我就是这样带大你老公的」\n- 「孩子冷了就生病了」\n- 「不打不成器」\n\n你们吵了：\n- 你说：「书上说的……」\n- 她说：「我带了30年孩子……」\n- 你老公/老婆：「你们别吵了……」\n\n你开始理解：育儿观念冲突——不是「谁对谁错」——是「两代人的认知鸿沟」。\n\n你不是在争论「怎么带孩子」——你是在争论「谁有权定义「对」」。\n\n你的科学——不一定比她的经验——更有效。\n\n但你的坚持——是因为你不想「重复上一代的错误」。\n\n「育儿观念冲突：你不是在跟婆婆吵架——你是在「用你的方式保护你的孩子」。」',
+      cond: g => g.age >= 25 && !g.flags.parentingPhilosophy && g.social >= 15,
+      choices:[
+        { label:'找到平衡点，互相学习', hint:'+🤝 +🧠 +😊', fn: g => { g.flags.parentingPhilosophy=true; g.flags.parentingBalance=true; return{social:5,intel:5,mood:5}; }},
+        { label:'坚持科学育儿，跟婆婆保持距离', hint:'+🧠 -🤝', fn: g => { g.flags.parentingPhilosophy=true; g.flags.scientificParent=true; return{intel:5,social:-5}; }},
+        { label:'妥协了，让婆婆带', hint:'+🤝 -🧠 -😊', fn: g => { g.flags.parentingPhilosophy=true; g.flags.parentingCompromise=true; return{social:3,intel:-3,mood:-3}; }},
+      ]},
+    { id:'return_to_work_mom', icon:'💼', title:'重返职场', category:'career',
+      body:'你休完产假——要重返职场了。\n\n你发现：\n- 你的工位——被占了\n- 你的项目——被别人接了\n- 你的客户——跟别人合作了\n- 你的技能——有点生疏了\n\n你回来第一天——\n\n领导：「你先适应适应——不急着给你安排活。」\n\n翻译：「你的活——已经给别人了。」\n\n你开始想：\n- 你休了6个月产假——你的位置——已经不在了\n- 你的同事——在你休假期间——成长了\n- 你——「倒退」了6个月\n\n你开始理解：重返职场——不是「重新开始」——是「从-6开始」。\n\n你不是回到了原点——你是回到了「原点之后6个月的地方」。\n\n你需要：\n- 重新学习\n- 重新建立关系\n- 重新证明自己\n\n「重返职场：你不是在「回来」——你是在「重新开始」——但你已经落后了6个月。」',
+      cond: g => g.age >= 25 && !g.flags.returnToWorkMom && g.jobSalary > 0,
+      choices:[
+        { label:'加倍努力追赶，3个月回到正轨', hint:'+🧠 +✨ -😊 -❤️', fn: g => { g.flags.returnToWorkMom=true; g.flags.hardComeback=true; g.reputation.career += 3; return{intel:8,charm:5,mood:-3,health:-3}; }},
+        { label:'调整了心态，慢慢适应', hint:'+😊 +🧠', fn: g => { g.flags.returnToWorkMom=true; return{mood:3,intel:3}; }},
+        { label:'发现职场已经不需要自己了', hint:'-😊 -✨ -🧠', fn: g => { g.flags.returnToWorkMom=true; g.flags.feltReplaced=true; return{mood:-10,charm:-5,intel:-3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -15749,6 +15830,14 @@ const ACHIEVEMENTS = [
     { id:'fangyuan_master_ach', icon:'🎋', name:'方圆大师', desc:'深度践行方圆哲学变得从容', check: g => g.flags.fangyuanMaster },
     { id:'food_therapy_expert_ach', icon:'🍲', name:'食疗专家', desc:'坚持食疗半年体检指标好了', check: g => g.flags.foodTherapyExpert },
     { id:'accepted_middle_age_ach', icon:'🎯', name:'活明白了', desc:'完全接受了自己的中年生活', check: g => g.flags.acceptedMiddleAge },
+    // v28.3: 职场性别 + 生育成就
+    { id:'fought_for_pay_ach', icon:'💰', name:'薪酬战士', desc:'拿着数据去找领导谈加薪', check: g => g.flags.foughtForPay },
+    { id:'legal_rights_fighter_ach', icon:'🤰', name:'维权妈妈', desc:'怀孕被歧视后依法维权', check: g => g.flags.legalRightsFighter },
+    { id:'gender_advocate_ach', icon:'⚖️', name:'性别平等倡导者', desc:'开始关注性别平等议题', check: g => g.flags.genderAdvocate },
+    { id:'boundaries_set_ach', icon:'⚖️', name:'界限达人', desc:'学会了设界限不再追求完美', check: g => g.flags.boundariesSet },
+    { id:'refused_privacy_ach', icon:'💍', name:'拒绝隐私侵犯', desc:'面试时拒绝回答私人问题', check: g => g.flags.refusedPrivacy },
+    { id:'parenting_balance_ach', icon:'📖', name:'育儿平衡大师', desc:'在育儿观念冲突中找到平衡点', check: g => g.flags.parentingBalance },
+    { id:'hard_comeback_ach', icon:'💼', name:'强势回归', desc:'产假后加倍努力3个月回到正轨', check: g => g.flags.hardComeback },
 ];
 
 // === ENDINGS === (order matters: first match wins)
