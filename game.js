@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v7.5
+// 都市浮生记 - Game Engine v7.6
 // ============================================
 
 // === GAME STATE ===
@@ -3490,6 +3490,26 @@ const EVENTS = [
         { label:'做文化传播', hint:'+💰 +✨ +🧠', fn: g => { g.flags.culturalHeritage=true; g.flags.culturePromoter=true; return{money:5000,charm:12,intel:10}; }},
         { label:'不感兴趣', hint:'+🧠', fn: g => { g.flags.culturalHeritage=true; return{intel:3}; }},
       ]},
+    // === v7.6 EVENTS - 县城生活与学历困境 ===
+    { id:'county_town_life', icon:'🏘️', title:'县城贵妇/返乡创业',
+      body:'你厌倦了大城市的996，决定回老家县城。\n\n你的新生活：\n- 房价：大城市的1/10\n- 通勤：骑电动车10分钟\n- 工作：事业单位或自己创业\n- 生活节奏：慢，但有更多时间陪家人\n\n"县城贵妇——不是真的贵妇，而是一种自嘲：在县城过着相对优渥的生活，但内心仍有不甘。"\n\n2025年，全国返乡入乡创业青年数量约1200万-1500万人。\n\n你的纠结：\n- "县城安逸，但圈子太小，八卦太多"\n- "孩子的教育资源不如大城市"\n- "我还是想去看看更大的世界"\n- "家庭是后盾，也是枷锁"\n\n"北上广未必是天堂，家乡小县城也绝不是无可奈何的退路。安身立命之处，即是家园。"\n\n但你也看到了机会：\n- 即时零售、文旅创业在县城蓬勃发展\n- 三线城市文旅创业占比已达22.7%，超过新一线城市\n- 数字化消费基础设施下沉，县城也能享受大城市的便利',
+      cond: g => !g.flags.countyTownLife && g.age>=25 && g.age<=35 && (g.city==='beijing' || g.city==='shanghai' || g.city==='shenzhen'),
+      choices:[
+        { label:'返乡创业，开民宿/咖啡店', hint:'-💰 +😊 +👥', fn: g => { g.flags.countyTownLife=true; g.flags.hometownEntrepreneur=true; return{money:-30000,mood:15,social:10}; }},
+        { label:'考县城事业单位', hint:'+💰 +😊', fn: g => { g.flags.countyTownLife=true; g.flags.countyCivilServant=true; return{money:5000,mood:10}; }},
+        { label:'做即时零售', hint:'+💰 +🧠', fn: g => { g.flags.countyTownLife=true; g.flags.instantRetail=true; return{money:8000,intel:10}; }},
+        { label:'还是留在大城市', hint:'+💰 -😊', fn: g => { g.flags.countyTownLife=true; return{money:3000,mood:-10}; }},
+      ]},
+    { id:'education_devaluation', icon:'🎓', title:'脱下孔乙己的长衫',
+      body:'你硕士毕业，投了200份简历，收到的offer月薪只有5000。\n\n"学历不但是敲门砖，也是我下不来的高台，更是孔乙己脱不下的长衫。"\n\n你的困境：\n- 2025届高校毕业生规模1222万，创历史新高\n- 硕士研究生平均月薪7500元，仅比本科高1200元\n- 学历溢价大幅缩水，5年前硕士起薪12000元\n- "中国现在不缺大学生，缺的只是交学费的人"\n\n"孔乙己的长衫——读书人的面子，还是束缚自己的枷锁？"\n\n你的选择：\n- 放下身段，去做体力活\n- 继续考公考编，等待"体面"的工作\n- 接受低薪，先就业再说\n- gap year，思考人生\n\n"脱下长衫，又怎么样？各方观点分为两派：要么劝告年轻人放下读书人的面子，做'短衣帮'；要么批评社会没有给年轻人足够的机会。"\n\n但你也在思考：学历贬值，是教育的问题，还是社会的问题？\n\n"历史也许不会重演，但它肯定会押韵。美国的经验告诉我们：精英生产过剩，最终会导致整个社会的焦虑。"',
+      cond: g => !g.flags.educationDevaluation && g.age>=22 && g.age<=30 && g.intel>=70 && g.money<5000,
+      choices:[
+        { label:'脱下长衫，做体力活', hint:'+💰 +💪 -✨', fn: g => { g.flags.educationDevaluation=true; g.flags.tookOffGown=true; return{money:3000,health:10,charm:-5}; }},
+        { label:'接受低薪，先就业', hint:'+💰 +🧠', fn: g => { g.flags.educationDevaluation=true; g.flags.acceptLowSalary=true; return{money:2000,intel:5}; }},
+        { label:'继续考公考编', hint:'-💰 +🧠', fn: g => { g.flags.educationDevaluation=true; g.flags.keepExamining=true; return{money:-3000,intel:8}; }},
+        { label:'gap year，思考人生', hint:'-💰 +😊', fn: g => { g.flags.educationDevaluation=true; g.flags.gapYear=true; return{money:-5000,mood:10}; }},
+        { label:'继续读博', hint:'-💰 +🧠', fn: g => { g.flags.educationDevaluation=true; g.flags.phdStudent=true; return{money:-10000,intel:15}; }},
+      ]},
     // === v7.5 EVENTS - 职场PUA与电子榨菜 ===
     { id:'workplace_pua', icon:'😰', title:'职场PUA',
       body:'你的领导又在"为你好"：\n\n"我批评你是因为你还有救，别人我都不说。"\n"你这个年龄，能进我们公司是你的福气。"\n"加班是自愿的，但不加班的人我们都记在心里。"\n"你看看其他人，怎么就你做不到？"\n\n"职场PUA——用'为你好'的名义，摧毁你的自信心和判断力。"\n\n你开始怀疑自己：\n- 是不是我真的能力不行？\n- 是不是我太矫情了？\n- 离开这里我还能去哪？\n- 也许领导说得对，我应该感恩\n\n"职场PUA的本质：上司利用话语权和利益决策权，对下属进行精神控制，目的是让你产生自我怀疑，从而被迫服从。"\n\n你的选择：\n\n"员工不是机械的执行者，企业价值的盲从者，而是扮演着创造者的角色。当企业丢掉了主责主业，员工只是服从却没有真正认同，这样的企业自然留不住人心。"',
@@ -3901,6 +3921,11 @@ const ACHIEVEMENTS = [
     { id:'digital_detox_pro', icon:'📱', name:'数字排毒达人', desc:'戒除电子榨菜成瘾', check: g => g.flags.digitalDetox },
     { id:'pretend_worker', icon:'🎭', name:'假装上班族', desc:'体验假装上班', check: g => g.flags.pretendToWork },
     { id:'routine_keeper', icon:'💪', name:'生活节奏保持者', desc:'失业期间保持规律生活', check: g => g.flags.keepRoutine },
+    // v7.6 achievements
+    { id:'hometown_entrepreneur', icon:'🏘️', name:'返乡创业者', desc:'回老家创业', check: g => g.flags.hometownEntrepreneur },
+    { id:'county_civil_servant', icon:'📋', name:'县城公务员', desc:'在县城考上编制', check: g => g.flags.countyCivilServant },
+    { id:'gown_remover', icon:'🎓', name:'脱下长衫者', desc:'放下学历包袱', check: g => g.flags.tookOffGown },
+    { id:'gap_year_taker', icon:'🌍', name:'间隔年体验者', desc:'选择gap year', check: g => g.flags.gapYear },
 ];
 
 // === ENDINGS === (order matters: first match wins)
