@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v32.2
+// 都市浮生记 - Game Engine v32.3
 // ============================================
 
 // === GAME STATE ===
@@ -17701,6 +17701,97 @@ const EVENTS = [
         { label:'给爸妈各买了一件新衣服', hint:'-💰 +👥 +😊', fn: g => { g.flags.newYearHome=true; g.money-=1000; return{social:5,mood:8}; }},
         { label:'待了三天就回去了，假期太短', hint:'-😊', fn: g => { g.flags.newYearHome=true; return{mood:-5}; }},
       ]},
+
+    // === v32.3 城市边缘人 ===
+    { id:'delivery_rider_v32_3', icon:'🛵', title:'外卖骑手', category:'marginal',
+      body:'你点了一份外卖，等了四十分钟还没到。你准备给差评的时候，骑手打电话来了。\n\n「对不起，刚才摔了一跤，餐洒了，我重新给你买了一份，马上就到。」\n\n十分钟后骑手到了，一个二十出头的小伙子，膝盖上贴着创可贴，手里的餐盒还是热的。\n\n他鞠了个躬说：「真的对不起，别给差评行吗？一个差评我要被扣五百块。」\n\n你看着他，把差评改成了好评，还多给了五块钱小费。\n\n你不知道他今天跑了多少单，不知道他的腿还疼不疼。你只知道这个城市离不开他们。',
+      cond: g => g.age >= 18,
+      choices:[
+        { label:'给了好评和小费', hint:'+👥 +😊', fn: g => { g.flags.deliveryRider=true; g.money-=5; return{social:3,mood:5}; }},
+        { label:'跟他聊了几句，问他辛不辛苦', hint:'+👥 +🧠', fn: g => { g.flags.deliveryRider=true; g.flags.talkedToRider=true; return{social:5,intel:3}; }},
+        { label:'还是给了差评，等了太久了', hint:'-😊', fn: g => { g.flags.deliveryRider=true; g.flags.gaveBadReview=true; return{mood:-5}; }},
+      ]},
+
+    { id:'street_sweeper_v32_3', icon:'🧹', title:'凌晨的环卫工人', category:'marginal',
+      body:'凌晨五点，你还在加班，从窗户往下看，街道上已经有了人影。\n\n是环卫工人。一个五十多岁的大姐，穿着橘红色的工作服，一下一下地扫着落叶。\n\n她的动作很慢但很仔细，连花坛边上的烟头都捡了起来。\n\n你下楼买了杯咖啡，顺手给她带了一瓶热水。她愣了一下，然后笑了：「谢谢啊小伙子/姑娘。」\n\n她告诉你，她每天凌晨四点就出门了，一个月工资两千八。她有个孙子在老家上学，她每个月寄钱回去。\n\n你走回办公室，觉得自己的疲惫好像没那么重了。',
+      cond: g => g.jobSalary > 0 && g.age >= 20,
+      choices:[
+        { label:'以后每天早上都带瓶热水', hint:'+👥 +💪', fn: g => { g.flags.streetSweeper=true; g.flags.dailyWater=true; return{social:5,health:2}; }},
+        { label:'在网上写了一篇关于她们的文章', hint:'+✨ +🧠', fn: g => { g.flags.streetSweeper=true; g.flags.wroteArticle=true; return{charm:5,intel:3}; }},
+        { label:'喝完咖啡继续加班', hint:'+🧠', fn: g => { g.flags.streetSweeper=true; return{intel:3}; }},
+      ]},
+
+    { id:'construction_worker_v32_3', icon:'🏗️', title:'建筑工人', category:'marginal',
+      body:'你每天路过的那个工地，今天终于封顶了。\n\n工人们在楼顶放鞭炮，远远地能听到他们喊：「封顶了！封顶了！」\n\n你看到一群满身灰土的男人从工地上走出来，他们摘下安全帽，脸上全是汗和水泥。\n\n其中一个在打电话：「老婆，我们盖的那栋楼封顶了，三十层呢！等交工了我就回去看你们。」\n\n你住的房子、上班的写字楼、逛的商场——都是他们一砖一瓦盖起来的。\n\n但你从来没有跟他们说过一句话。',
+      cond: g => g.age >= 18,
+      choices:[
+        { label:'买了一箱水送过去', hint:'-💰 +👥 +😊', fn: g => { g.flags.constructionWorker=true; g.money-=100; return{social:8,mood:8}; }},
+        { label:'远远地拍了一张照片', hint:'+✨', fn: g => { g.flags.constructionWorker=true; return{charm:3}; }},
+        { label:'在心里默默感谢了他们', hint:'+🧠 +😊', fn: g => { g.flags.constructionWorker=true; g.flags.silentGratitude=true; return{intel:3,mood:3}; }},
+      ]},
+
+    { id:'security_guard_v32_3', icon:'🚶', title:'保安大叔', category:'marginal',
+      body:'你小区门口有个保安大叔，每天早上看到你都会说：「上班去啊？」\n\n有一天你加班到很晚回来，他还在岗亭里，给你留了门。你说谢谢，他说：「你们年轻人辛苦。」\n\n后来你注意到，他每天的工作就是：站岗、巡逻、帮人开门、收快递、跟大爷大妈聊天。\n\n有一次下大雨，你看到他在帮一个老太太搬菜上楼。老太太说：「小张啊，你真好。」他笑着说：「应该的。」\n\n你后来听说他工资三千，住在小区的地下室。他在这个城市已经待了十年了，但好像从来没有人把他当成这个城市的一部分。',
+      cond: g => g.age >= 18,
+      choices:[
+        { label:'过年的时候给他包了个红包', hint:'-💰 +👥 +😊', fn: g => { g.flags.securityGuard=true; g.money-=200; return{social:5,mood:8}; }},
+        { label:'每次路过都主动打招呼', hint:'+👥', fn: g => { g.flags.securityGuard=true; g.flags.dailyGreeting=true; return{social:5,mood:3}; }},
+        { label:'跟物业建议给他们涨工资', hint:'+🧠 +👥', fn: g => { g.flags.securityGuard=true; g.flags.suggestedRaise=true; return{intel:3,social:3}; }},
+      ]},
+
+    { id:'housekeeper_v32_3', icon:'🧽', title:'家政阿姨', category:'marginal',
+      body:'你请了一个家政阿姨来打扫卫生。\n\n她叫王阿姨，五十岁出头，手脚麻利。两个小时就把你的出租屋收拾得干干净净。\n\n打扫的时候她跟你聊天：她从湖南来的，在这边做了五年家政。老公在工厂上班，两个孩子一个在读大学一个在读高中。\n\n她说：「我多干几家，孩子学费就够了。」\n\n她看到你桌上的外卖盒，说：「年轻人别老吃外卖，对身体不好。有空自己做做饭。」\n\n她走的时候你多给了五十块钱，她说什么也不要。你说：「阿姨，您收着。」她才笑着接了。',
+      cond: g => g.money > 3000 && g.age >= 22,
+      choices:[
+        { label:'成了她的固定客户', hint:'-💰 +👥 +💪', fn: g => { g.flags.housekeeper=true; g.flags.regularClient=true; g.money-=400; return{social:5,health:3}; }},
+        { label:'给她介绍了几家新客户', hint:'+👥 +😊', fn: g => { g.flags.housekeeper=true; return{social:8,mood:5}; }},
+        { label:'请她吃了顿饭聊了很久', hint:'+👥 +🧠', fn: g => { g.flags.housekeeper=true; g.flags.hadMeal=true; return{social:5,intel:3}; }},
+      ]},
+
+    { id:'recycling_station_v32_3', icon:'♻️', title:'废品回收站', category:'marginal',
+      body:'你把攒了几个月的纸箱和旧衣服拿去废品回收站。\n\n回收站在一座桥下面，堆满了各种废品。老板是个四十多岁的男人，手上全是老茧和裂口。\n\n他一样一样地称你的东西，纸箱五毛一斤、旧衣服两毛一斤。一共卖了二十八块五。\n\n你看着他用粗糙的手数着零钱给你，突然想起你小时候也是靠卖废品攒零花钱的。\n\n他旁边有个小桌子，上面放着一个电饭锅和一碟咸菜。这就是他的午饭。\n\n他说：「这一行越来越不好做了，现在纸箱越来越薄，以前一个能卖两毛，现在才五分。」',
+      cond: g => g.age >= 18,
+      choices:[
+        { label:'说以后都拿来这里卖', hint:'+👥', fn: g => { g.flags.recyclingStation=true; return{social:3,mood:2}; }},
+        { label:'把旧衣服直接送给他了', hint:'+👥 +😊', fn: g => { g.flags.recyclingStation=true; g.flags.donated=true; return{social:5,mood:5}; }},
+        { label:'想了想消费主义的问题', hint:'+🧠', fn: g => { g.flags.recyclingStation=true; g.flags.consumerismThink=true; return{intel:5}; }},
+      ]},
+
+    { id:'night_market_v32_3', icon:'🏮', title:'夜市摊主', category:'marginal',
+      body:'周末你去逛夜市，在一个烧烤摊前停了下来。\n\n摊主是一对夫妻，男的烤串、女的收钱。两个人配合得很默契，偶尔相视一笑。\n\n你等串的时候跟老板娘聊了几句。她说他们从河南来的，在这个夜市摆了三年了。每天早上五点去进货，晚上十点收摊。\n\n「累是累，但自由。以前在工厂里加班到半夜才赚三千块，现在自己干虽然辛苦，但赚得多一点。」\n\n串烤好了，你吃了一口——真的好吃。烟火气十足，跟店里吃的不一样。\n\n走的时候你回头看了一眼，他们还在忙碌。夜市的灯光照着他们的背影，平凡而坚韧。',
+      cond: g => g.age >= 18,
+      choices:[
+        { label:'成了常客，每次都来吃', hint:'+😊 +💪', fn: g => { g.flags.nightMarket=true; g.flags.regularVendor=true; return{mood:5,health:2}; }},
+        { label:'帮他们拍了张合照', hint:'+👥 +✨', fn: g => { g.flags.nightMarket=true; g.flags.tookPhoto=true; return{social:5,charm:3}; }},
+        { label:'在大众点评上写了好评推荐', hint:'+✨ +👥', fn: g => { g.flags.nightMarket=true; return{charm:3,social:3}; }},
+      ]},
+
+    { id:'meal_stand_v32_3', icon:'🍱', title:'工地旁的盒饭摊', category:'marginal',
+      body:'你路过一个工地，旁边有个大姐摆了个简易的盒饭摊。\n\n十块钱一份，米饭管够，菜是两荤一素。工人们排着队来买，大姐忙得满头大汗。\n\n你好奇也买了一份。说实话，比很多外卖好吃。米饭是现蒸的，菜是大锅炒的，有家的味道。\n\n一个工人坐在路牙子上，大口大口地扒饭，吃完又去添了一碗。他说：「这是我在这边吃过最饱的饭。」\n\n大姐笑着说：「你们干活的，不吃饱怎么行？」\n\n你算了一下：一份十块，去掉成本，大姐一份也就赚两三块。但她每天要卖一两百份。',
+      cond: g => g.age >= 18,
+      choices:[
+        { label:'以后经常来吃', hint:'+💪 +👥', fn: g => { g.flags.mealStand=true; g.flags.regularCustomer2=true; return{health:3,social:3}; }},
+        { label:'帮大姐在美团上开了个店', hint:'+🧠 +👥', fn: g => { g.flags.mealStand=true; g.flags.helpOnline=true; return{intel:5,social:5}; }},
+        { label:'跟工人们一起吃了一顿', hint:'+👥 +😊', fn: g => { g.flags.mealStand=true; g.flags.ateWithWorkers=true; return{social:8,mood:5}; }},
+      ]},
+
+    { id:'urban_scavenger_v32_3', icon:'🚮', title:'拾荒者', category:'marginal',
+      body:'你搬家的时候扔了很多东西——旧书、旧衣服、坏了的小家电。\n\n下楼倒垃圾的时候，你看到一个老人在翻垃圾桶。他从里面翻出了你扔的那些东西，一样一样地检查。\n\n他拿起你扔的那本旧书，翻了翻，问：「这个你还要吗？」\n\n你说：「不要了，您拿走吧。」\n\n他小心翼翼地把书放进他的编织袋里，说：「我喜欢看书，虽然很多看不懂。」\n\n你看着他佝偻的背影消失在巷子里。你不知道他住在哪里，不知道他有没有家人，不知道他今天晚上有没有地方睡觉。\n\n你突然觉得你扔掉的那些东西，对另一个人来说可能是宝贝。',
+      cond: g => g.age >= 18,
+      choices:[
+        { label:'把还能用的东西整理好给了他', hint:'+👥 +😊', fn: g => { g.flags.urbanScavenger=true; g.flags.donatedStuff=true; return{social:5,mood:8}; }},
+        { label:'以后扔东西前先想想有没有人需要', hint:'+🧠', fn: g => { g.flags.urbanScavenger=true; g.flags.thinkBeforeThrow=true; return{intel:5}; }},
+        { label:'回去想了很久关于消费和浪费', hint:'+🧠 +😊', fn: g => { g.flags.urbanScavenger=true; return{intel:5,mood:3}; }},
+      ]},
+
+    { id:'delivery_station_v32_3', icon:'📦', title:'快递站打工', category:'marginal',
+      body:'双十一后，你兼职去快递站帮忙分拣快递。\n\n快递站里堆满了小山一样的包裹，五六个工人在里面快速地扫描、分拣。站长是个三十多岁的男人，一边干活一边骂：「这单送不到要扣钱的！」\n\n你干了八个小时，弯腰几千次，搬了不知道多少箱子。你的腰快断了，手也磨出了水泡。\n\n站长说：「你们兼职的还行，我们正式的一天要干十四个小时。」\n\n你拿到了200块钱。你算了算时薪，不到25块。\n\n但你知道了每一个快递包裹背后，都有人在拼命。',
+      cond: g => g.age >= 18 && g.age <= 40,
+      choices:[
+        { label:'决定以后对快递员好一点', hint:'+👥 +😊', fn: g => { g.flags.deliveryStation=true; g.flags.beKind=true; return{social:5,mood:5}; }},
+        { label:'干了几天就不想干了，太累', hint:'-💪', fn: g => { g.flags.deliveryStation=true; return{health:-3,money:200}; }},
+        { label:'写了一篇体验日记发在网上', hint:'+✨ +🧠', fn: g => { g.flags.deliveryStation=true; g.flags.wroteDiary=true; return{charm:5,intel:3}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -19366,6 +19457,18 @@ const ACHIEVEMENTS = [
     { id:'parents_plan_ach', icon:'🏠', name:'养老规划', desc:'跟爸妈讨论了养老计划', check: g => g.flags.parentsPlan },
     { id:'old_photos_ach', icon:'📷', name:'时光相册', desc:'翻看了家里的老照片', check: g => g.flags.oldPhotos },
     { id:'new_year_home_ach', icon:'🧧', name:'回家过年', desc:'回家过了一个温暖的年', check: g => g.flags.newYearHome },
+
+    // --- v32.3 城市边缘人成就 ---
+    { id:'delivery_rider_ach_v32_3', icon:'🛵', name:'骑手的故事', desc:'了解了外卖骑手的不易', check: g => g.flags.deliveryRider },
+    { id:'street_sweeper_ach', icon:'🧹', name:'凌晨的守护者', desc:'认识了凌晨的环卫工人', check: g => g.flags.streetSweeper },
+    { id:'construction_ach', icon:'🏗️', name:'城市建造者', desc:'感谢了建筑工人的付出', check: g => g.flags.constructionWorker },
+    { id:'security_ach', icon:'🚶', name:'门口的守护', desc:'和小区保安大叔建立了联系', check: g => g.flags.securityGuard },
+    { id:'housekeeper_ach', icon:'🧽', name:'家政阿姨', desc:'认识了一位勤劳的家政阿姨', check: g => g.flags.housekeeper },
+    { id:'recycling_ach', icon:'♻️', name:'回收站的故事', desc:'在废品回收站看到了另一面生活', check: g => g.flags.recyclingStation },
+    { id:'night_market_ach', icon:'🏮', name:'夜市烟火', desc:'在夜市感受到了小人物的坚韧', check: g => g.flags.nightMarket },
+    { id:'meal_stand_ach', icon:'🍱', name:'工地盒饭', desc:'在工地旁的盒饭摊吃了一顿饱饭', check: g => g.flags.mealStand },
+    { id:'scavenger_ach', icon:'🚮', name:'拾荒者', desc:'从拾荒者身上学到了珍惜', check: g => g.flags.urbanScavenger },
+    { id:'delivery_station_ach', icon:'📦', name:'快递背后', desc:'亲身体验了快递分拣的辛苦', check: g => g.flags.deliveryStation },
 ];
 
 // === ENDINGS === (order matters: first match wins)
