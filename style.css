@@ -884,3 +884,23 @@ html[style*="font-size: 18px"] .modal-content {
 .challenge-complete {
     background: linear-gradient(135deg, var(--accent-emerald), var(--accent-cyan)) !important;
 }
+
+/* v2.20 Daily Challenge Bar */
+.daily-challenge-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(6, 182, 212, 0.1));
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: var(--radius-md);
+    font-size: 0.85rem;
+}
+.challenge-icon {
+    font-size: 1rem;
+}
+.challenge-text {
+    color: var(--text-primary);
+    flex: 1;
+}

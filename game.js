@@ -2002,9 +2002,27 @@ function updateHUD() {
     // v2.15: 更新人际关系面板
     updateRelationshipHUD();
 
+    // v2.20: 更新每日挑战显示
+    updateDailyChallengeHUD();
+
     document.getElementById('play-months').textContent = G.months;
     document.getElementById('total-choices').textContent = G.choices;
     document.getElementById('total-events').textContent = G.eventsSeen;
+}
+
+// v2.20: 每日挑战HUD更新
+function updateDailyChallengeHUD() {
+    const bar = document.getElementById('daily-challenge-bar');
+    const text = document.getElementById('challenge-text');
+    if (!bar || !text) return;
+
+    const challenge = getDailyChallenge();
+    if (challenge) {
+        bar.style.display = 'flex';
+        text.textContent = `${challenge.title}：${challenge.desc}`;
+    } else {
+        bar.style.display = 'none';
+    }
 }
 
 // v2.15: 人际关系HUD更新
@@ -2215,7 +2233,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.19' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.20' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
