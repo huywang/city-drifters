@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v18.1
+// 都市浮生记 - Game Engine v18.2
 // ============================================
 
 // === GAME STATE ===
@@ -8854,6 +8854,95 @@ const EVENTS = [
         { label:'加入一个兴趣社群', hint:'+👥 +🧠 +😊', fn: g => { g.flags.socialIsolation=true; g.flags.communityJoin=true; return{social:12,intel:8,mood:10}; }},
         { label:'享受独处，不需要别人', hint:'+😊 +🧠 -👥', fn: g => { g.flags.socialIsolation=true; g.flags.soloLife=true; return{mood:8,intel:5,social:-5}; }},
       ]},
+    // === v18.2 新增事件（社会观察 + 网络文化 + 阶层流动） ===
+    { id:'neighbor_war', icon:'🏘️', title:'邻里战争', category:'society',
+      body:'你的楼上搬来了一个新住户。\n\n第一周：凌晨1点跳绳。\n第二周：周末早上7点电钻装修。\n第三周：他家的狗开始凌晨3点吠叫。\n\n你去敲门，对方说："我交了物业费的，你管不着。"\n\n你找了物业，物业说："我们只能协调。"\n你打了12345市民热线，转了5个部门，最后告诉你"归物业管"。\n你报了警，警察说："这是民事纠纷，建议协商。"\n\n你的黑眼圈越来越重，工作效率越来越低。你开始认真考虑：是搬家，还是买一副好耳塞？\n\n"大城市最贵的不是房子——是一个安静睡觉的权利。"',
+      cond: g => !g.flags.neighborWar && g.age >= 22 && g.flags.renting,
+      choices:[
+        { label:'买最好的隔音耳塞忍了', hint:'+💰 -❤️', fn: g => { g.flags.neighborWar=true; g.flags.enduredNoise=true; return{money:-500,health:-8,mood:-10}; }},
+        { label:'在业主群发动舆论战', hint:'+👥 🎲', fn: g => { g.flags.neighborWar=true; g.flags.ownerGroupWar=true; if(Math.random()>0.4){return{social:10,mood:15};}else{return{social:-5,mood:-15};} }},
+        { label:'认怂，搬家', hint:'-💰💰 +😊 +❤️', fn: g => { g.flags.neighborWar=true; g.flags.movedAway=true; return{money:-15000,mood:20,health:10}; }},
+      ]},
+    { id:'delivery_rider_v2', icon:'🛵', title:'外卖骑手的一天', category:'society',
+      body:'你因为公司裁员/项目间隙，注册了外卖骑手。\n\n你的第一天：\n- 早上10点开始接单\n- 系统给你分配了一个3公里内的单——但要求28分钟送到\n- 你骑电动车闯红灯、逆行、超速，终于准时送到了\n- 客户说："汤洒了一点。"给了你差评\n- 系统扣了你5块钱\n\n你干了12小时，送了32单，收入176块。扣掉电动车租金、充电费、罚款——净赚89块。\n\n你看着手机上"月入过万"的招聘广告，苦笑了一下。\n\n"平台经济：你的时间不值钱，你的命更不值钱。算法只在乎客户满不满意。"',
+      cond: g => !g.flags.deliveryRider && g.age >= 18 && g.age <= 45 && (g.job==='待业中' || g.money < 20000),
+      choices:[
+        { label:'咬牙继续干，先活下来', hint:'+💰 -❤️ -😊', fn: g => { g.flags.deliveryRider=true; g.flags.riderPersist=true; setJob(g,'外卖骑手',5500); return{money:3000,health:-10,mood:-5}; }},
+        { label:'干了两周就辞了', hint:'+😊 -💰', fn: g => { g.flags.deliveryRider=true; g.flags.riderQuit=true; return{mood:5,health:-5}; }},
+        { label:'边跑外卖边准备面试', hint:'+🧠 +💰', fn: g => { g.flags.deliveryRider=true; g.flags.riderStudy=true; setJob(g,'外卖骑手',5500); return{intel:5,mood:-3,health:-5}; }},
+      ]},
+    { id:'trending_topic', icon:'🔥', title:'热搜吃瓜', category:'society',
+      body:'微博热搜第一条词条：#某某明星出轨#。\n\n你的朋友圈被刷屏了。你的同事在茶水间讨论，你的微信群在转发各种"证据"。\n\n你本来不想关注——但你发现自己还是点进去看了。你看了2小时，从明星微博看到了他前女友的闺蜜的抖音。\n\n然后热搜反转了：是假的。P图。\n\n那些骂得最凶的人悄悄删了评论。那些转发"石锤"的人假装什么都没发生过。热搜换了新的词条。\n\n"吃瓜群众的集体记忆只有7秒——但当事人被网暴的痕迹永远都在。"',
+      cond: g => !g.flags.trendingTopic && g.age >= 18,
+      choices:[
+        { label:'深度吃瓜，转发评论', hint:'+👥 -🧠', fn: g => { g.flags.trendingTopic=true; g.flags.deepMelonEater=true; return{social:5,intel:-3,mood:3}; }},
+        { label:'看破不说破，默默关掉', hint:'+🧠 +😊', fn: g => { g.flags.trendingTopic=true; g.flags.calmObserver=true; return{intel:5,mood:3}; }},
+        { label:'写了一篇分析长文', hint:'+🧠 +✨', fn: g => { g.flags.trendingTopic=true; g.flags.mediaCritic=true; return{intel:8,charm:5}; }},
+      ]},
+    { id:'romance_scam', icon:'💔', title:'杀猪盘', category:'society',
+      body:'你在社交软件上认识了一个人。TA温柔、体贴、懂你——完美的灵魂伴侣。\n\n你们聊了一个月。TA说TA在做投资，收益很好。TA给你看了截图：年化收益30%。\n\nTA说："你也试试吧，我带你。"\n\n你犹豫了。但TA说："你不信我没关系，你先投1000块试试。"\n\n你投了1000，3天后变成了1500。你取了500出来——真的到账了。\n\n你开始加大投入：1万、5万、10万……然后有一天，TA的微信头像消失了。你的投资账户登不上了。你的10万块钱——没了。\n\n"杀猪盘：骗子最厉害的地方不是技术——是耐心。他们会花3个月养一段感情，然后用5分钟卷走你的钱。"',
+      cond: g => !g.flags.romanceScam && g.age >= 20 && g.age <= 50 && g.money > 50000 && !g.flags.married,
+      choices:[
+        { label:'差点上当，及时止损', hint:'+🧠', fn: g => { g.flags.romanceScam=true; g.flags.avoidedScam=true; return{intel:10,mood:-5}; }},
+        { label:'被骗了5000块才发现', hint:'-💰 +🧠', fn: g => { g.flags.romanceScam=true; g.flags.minorScam=true; return{money:-5000,intel:8,mood:-15}; }},
+        { label:'报警并分享经历警示他人', hint:'+👥 +🧠 -💰', fn: g => { g.flags.romanceScam=true; g.flags.scamWarner=true; return{money:-8000,social:10,intel:10,mood:-10}; }},
+      ]},
+    { id:'elderly_scam', icon:'👵', title:'爸妈被骗了', category:'society',
+      body:'你妈打电话来："儿子/女儿，妈买了一个保健品，才花了8000块，据说能治高血压糖尿病……"\n\n你一听就知道是骗局。你让你妈把产品发给你看——一个三无产品，成本不超过50块。\n\n你妈说："人家讲座上专家说的，还能有假？人家还送了我一袋鸡蛋呢！"\n\n你试图解释这是骗局。你妈说："你就是舍不得给我花钱。"\n\n你的爸爸在旁边说："你别管了，你妈高兴就行。"\n\n你挂掉电话，又心疼钱，又心疼父母。他们那一代人，不是不聪明——是太善良了。\n\n"保健品骗局：骗子卖的不是药——是陪伴。老人买的不是健康——是不想给子女添麻烦。"',
+      cond: g => !g.flags.elderlyScam && g.age >= 25 && g.flags.parentsAlive,
+      choices:[
+        { label:'耐心解释，陪她看医生', hint:'+👥 +😊', fn: g => { g.flags.elderlyScam=true; g.flags.patientExplain=true; return{social:10,mood:5,money:-1000}; }},
+        { label:'直接退了产品，找商家退钱', hint:'+💰 🎲', fn: g => { g.flags.elderlyScam=true; g.flags.demandRefund=true; if(Math.random()>0.5){return{money:5000,mood:8};}else{return{mood:-10,social:-5};} }},
+        { label:'算了，8000块买个开心', hint:'-💰 +😊', fn: g => { g.flags.elderlyScam=true; g.flags.letItGo=true; return{money:-8000,mood:3}; }},
+      ]},
+    { id:'class_divide', icon:'🏰', title:'阶层落差', category:'society',
+      body:'你的孩子和隔壁小区的孩子同龄。\n\n你的孩子上公立小学，放学后去少年宫学画画（200块/月）。\n隔壁小区的孩子上国际学校（15万/年），放学后学马术（5万/年）、高尔夫（3万/年）、一对一外教英语（8万/年）。\n\n周末在公园碰到了。你的孩子在玩沙子，隔壁的孩子在练英语口语。\n\n你的孩子问："为什么他说的英语我听不懂？"\n\n你不知道怎么回答。你说："因为……他学的比较早。"\n\n晚上你躺在床上想：你的孩子将来要和这些孩子竞争同一份工作、同一个大学名额。起点差了十万八千里。\n\n"阶层固化：不是你不努力——是有人出生就在终点线。而你连起跑线都还没找到。"',
+      cond: g => !g.flags.classDivide && g.flags.hasChild && g.age >= 30 && g.money < 300000,
+      choices:[
+        { label:'加倍努力，给孩子更好的', hint:'+💰 -❤️ -😊', fn: g => { g.flags.classDivide=true; g.flags.workHarder=true; return{money:8000,health:-8,mood:-5}; }},
+        { label:'接受现实，快乐教育', hint:'+😊 +❤️', fn: g => { g.flags.classDivide=true; g.flags.happyEducation=true; return{mood:15,health:5}; }},
+        { label:'开始研究"鸡娃"攻略', hint:'+🧠 +💰', fn: g => { g.flags.classDivide=true; g.flags.tigerParent=true; return{intel:8,mood:-8,money:-20000}; }},
+      ]},
+    { id:'online_activism', icon:'✊', title:'网络维权', category:'society',
+      body:'你在某电商平台买了一件电子产品，3天就坏了。客服拒绝退换，说"过了7天无理由退换期"。\n\n你打了12315，等了3天，转了4个部门，没解决。\n\n你在微博/黑猫投诉发了一个帖子，详细描述了经过。你的帖子被转发了5000次。媒体跟进报道了。\n\n48小时内，平台主动联系你，全额退款+赔偿500元。\n\n你赢了——但你也在想：如果不是你会上网写帖子，如果不是你的帖子火了，你还能维权成功吗？那些不会上网的人怎么办？\n\n"网络维权：正义不应该取决于你的粉丝数——但现实就是这样。"',
+      cond: g => !g.flags.onlineActivism && g.age >= 18 && g.intel >= 40,
+      choices:[
+        { label:'继续曝光，帮更多人维权', hint:'+👥 +✨ -😊', fn: g => { g.flags.onlineActivism=true; g.flags.consumerAdvocate=true; return{social:15,charm:10,mood:-5,money:500}; }},
+        { label:'见好就收，钱要回来就行', hint:'+💰 +😊', fn: g => { g.flags.onlineActivism=true; g.flags.pragmaticActivist=true; return{money:500,mood:10}; }},
+        { label:'反思：这不应该靠舆论解决', hint:'+🧠', fn: g => { g.flags.onlineActivism=true; g.flags.systemThinker=true; return{intel:10,mood:3}; }},
+      ]},
+    { id:'community_garden_v3', icon:'🌱', title:'社区花园', category:'society',
+      body:'你所在的小区建了一个"社区花园"。居民可以认领一小块地，种菜种花。\n\n你花了200块认领了2平方米。你种了西红柿、小葱、薄荷、罗勒。\n\n三个月后，你的西红柿大丰收——结了20多个。你分给了邻居们。\n\n你的邻居王阿姨回赠了你一盘她包的饺子。你们在花园里聊了一个下午。你知道了她老伴去年走了，孩子们都在外地。\n\n楼下的张大爷教你怎么种黄瓜。他说："我种了一辈子地，到了城里还是想种。"\n\n你发现：社区花园种出的不只是菜——是连接。在钢筋水泥的城市里，一块泥土就能让你找到归属感。\n\n"社区花园：城市人最后的乡愁——种的是菜，收获的是邻居。"',
+      cond: g => !g.flags.communityGarden && g.age >= 25 && !g.flags.renting,
+      choices:[
+        { label:'认真种菜，成了花园达人', hint:'+😊 +👥 +❤️', fn: g => { g.flags.communityGarden=true; g.flags.gardenExpert=true; return{mood:15,social:12,health:8}; }},
+        { label:'种了两天就放弃了', hint:'-💰', fn: g => { g.flags.communityGarden=true; g.flags.gardenFail=true; return{money:-200,mood:-3}; }},
+        { label:'组织花园聚会，认识邻居', hint:'+👥 +✨ +😊', fn: g => { g.flags.communityGarden=true; g.flags.gardenOrganizer=true; return{social:18,charm:8,mood:12,money:-500}; }},
+      ]},
+    { id:'digital_divide', icon:'📱', title:'数字鸿沟', category:'society',
+      body:'你带你爸去医院看病。\n\n挂号要用App。你爸不会用智能手机。\n签到要用二维码。你爸没有微信。\n缴费要用手机支付。你爸只有现金。\n看报告要用小程序。你爸连小程序是什么都不知道。\n\n你帮他搞定了所有流程。但你在想：如果你不在呢？那些没有人陪的老人怎么办？\n\n你在候诊区看到一个老人，拿着一个老人机，对着自助挂号机发呆。没有人帮他。\n\n"数字鸿沟：科技进步了，但有些人被留在了上一个时代。不是他们不努力——是世界变得太快了。"',
+      cond: g => !g.flags.digitalDivide && g.age >= 25 && g.flags.parentsAlive,
+      choices:[
+        { label:'给爸妈买个智能手机，教他们用', hint:'+👥 -💰 +😊', fn: g => { g.flags.digitalDivide=true; g.flags.taughtParents=true; return{social:10,mood:8,money:-3000}; }},
+        { label:'以后每次都陪他们去', hint:'+👥 +😊 -😊', fn: g => { g.flags.digitalDivide=true; g.flags.alwaysAccompany=true; return{social:12,mood:5,health:-3}; }},
+        { label:'在网上写文章呼吁关注', hint:'+🧠 +✨', fn: g => { g.flags.digitalDivide=true; g.flags.advocacyWriter=true; return{intel:8,charm:8,social:5}; }},
+      ]},
+    { id:'gig_economy_v3', icon:'📦', title:'零工经济', category:'society',
+      body:'你发现你身边越来越多的人在做"零工"：\n\n你的前同事辞了职，做自由设计师。\n你的大学同学白天上班，晚上做代驾。\n你的邻居阿姨做社区团购团长。\n你的朋友在闲鱼上卖二手货，月入5000。\n\n你也心动了。你开始利用下班时间接一些私活：写文案/做PPT/设计Logo/翻译文件。\n\n第一个月你赚了3000块外快。你很开心——这比加班费多多了。\n\n但你也发现：你没有五险一金，没有带薪假，没有劳动保障。如果某天你病了或老了，谁来保障你？\n\n"零工经济：自由是有代价的——代价是你自己承担所有风险。"',
+      cond: g => !g.flags.gigEconomy && g.age >= 20 && g.age <= 45 && g.job !== '待业中' && g.intel >= 40,
+      choices:[
+        { label:'全职做自由职业者', hint:'+😊 -💰 🎲', fn: g => { g.flags.gigEconomy=true; g.flags.fullTimeFreelancer=true; setJob(g,'自由职业者',8000); return{mood:15,health:5}; }},
+        { label:'保持主业，兼职零工', hint:'+💰 -❤️', fn: g => { g.flags.gigEconomy=true; g.flags.sideHustle=true; return{money:5000,health:-5,mood:3}; }},
+        { label:'算了，稳定更重要', hint:'+🧠', fn: g => { g.flags.gigEconomy=true; g.flags.choseStability=true; return{intel:5,mood:-3}; }},
+      ]},
+    { id:'public_shaming', icon:'📸', title:'社死现场', category:'society',
+      body:'你在地铁上看手机，不小心外放了一段很尴尬的视频。\n\n整个车厢的人都看向你。\n\n更尴尬的是：有人录了下来，发到了抖音。标题是"地铁上外放XX的社死瞬间"。\n\n视频火了。50万播放。评论区在笑你。有人认出了你的公司logo，@了你的公司。\n\n你的HR找你谈话了："你要注意个人形象。"\n\n你删了所有能删的视频，但互联网的记忆是永恒的。\n\n"社死：在社交媒体时代，你的一次尴尬可能成为别人的50万次快乐。而你永远无法真正删除它。"',
+      cond: g => !g.flags.publicShaming && g.age >= 18 && g.age <= 40,
+      choices:[
+        { label:'自嘲化解，拍了条回应视频', hint:'+✨ +👥 +😊', fn: g => { g.flags.publicShaming=true; g.flags.selfDeprecation=true; return{charm:12,social:8,mood:5}; }},
+        { label:'低调等风头过去', hint:'+🧠 -😊', fn: g => { g.flags.publicShaming=true; g.flags.layLow=true; return{intel:3,mood:-15,social:-5}; }},
+        { label:'投诉平台要求删除', hint:'+🧠 🎲', fn: g => { g.flags.publicShaming=true; g.flags.legalAction=true; if(Math.random()>0.5){return{mood:10,intel:5};}else{return{mood:-10,money:-2000};} }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -9699,6 +9788,14 @@ const ACHIEVEMENTS = [
     { id:'pet_parent_ach', icon:'🐱', name:'毛孩子家长', desc:'把宠物当家人', check: g => g.flags.petAsFamily },
     { id:'reconnect_ach', icon:'🤝', name:'重拾友情', desc:'主动联系老朋友', check: g => g.flags.reconnectFriends },
     { id:'boundary_setter_ach', icon:'🛡️', name:'边界感达人', desc:'跟父母建立了健康边界', check: g => g.flags.boundarySetting },
+    // === v18.2 新增成就（社会观察） ===
+    { id:'patient_neighbor_ach', icon:'🏘️', name:'中国好邻居', desc:'成功化解邻里矛盾', check: g => g.flags.neighborWar && g.flags.ownerGroupWar },
+    { id:'rider_respect_ach', icon:'🛵', name:'骑手之光', desc:'体验了外卖骑手的生活', check: g => g.flags.deliveryRider },
+    { id:'media_literate_ach', icon:'📰', name:'媒介素养', desc:'在热搜面前保持理性', check: g => g.flags.calmObserver },
+    { id:'scam_survivor_ach', icon:'🛡️', name:'反诈达人', desc:'识破并避免了骗局', check: g => g.flags.avoidedScam || g.flags.scamWarner },
+    { id:'consumer_hero_ach', icon:'✊', name:'维权先锋', desc:'通过网络维权成功', check: g => g.flags.consumerAdvocate },
+    { id:'garden_hero_ach', icon:'🌱', name:'社区花园达人', desc:'在社区花园种出了丰收', check: g => g.flags.gardenExpert },
+    { id:'bridge_builder_ach', icon:'🌉', name:'数字桥梁', desc:'帮助父母跨越数字鸿沟', check: g => g.flags.taughtParents },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -9981,6 +10078,9 @@ const ENDINGS = [
     // --- v18.1 社交结局 ---
     { id:'family_harmony_end', badge:'🏡', title:'家庭和谐', desc:'你在事业和家庭之间找到了完美的平衡。\n\n你有稳定的收入、健康的孩子、和睦的父母、理解你的伴侣。你的周末是全家一起去公园，你的晚上是一起吃晚饭、一起看电视。\n\n你的同事说："你怎么什么都搞得定？"\n\n你说："我什么都没搞定——我只是把时间花在了最重要的地方。"\n\n你的孩子长大后回忆起童年，会说："我的爸爸/妈妈虽然很忙，但他/她总是在我最需要的时候出现。"\n\n"家庭和谐：不是完美——是在不完美中，找到爱的方式。"', cond: g => g.flags.married && g.flags.hasChild && g.flags.elderlyCare && g.mood >= 65 && g.social >= 50 && g.age >= 35 },
     { id:'happy_single_end', badge:'🌟', title:'快乐单身', desc:'你选择了单身，而且过得很快乐。\n\n你不需要向任何人解释你的生活。你想旅行就旅行，想加班就加班，想养猫就养猫。\n\n你的妈妈说："你不结婚以后怎么办？"\n\n你说："我现在就很好。以后的事以后再说。"\n\n你有几个交心的朋友、一份还行的工作、一只可爱的猫。你的周末是自己安排的，你的夜晚是属于自己的。\n\n"快乐单身：不是找不到——是终于明白，幸福不一定要两个人才能拥有。"', cond: g => g.flags.happySingle && !g.flags.married && g.mood >= 70 && g.age >= 32 },
+    // --- v18.2 社会观察结局 ---
+    { id:'community_leader_end', badge:'🏘️', title:'社区领袖', desc:'你成了你所在小区的灵魂人物。\n\n你组织了社区花园、业主互助群、邻里聚餐。你认识小区里80%的住户，大家有事都找你。\n\n你的邻居们说："自从你来了，咱们小区变得不一样了。"\n\n物业请你当业主代表，居委会请你当顾问。你发现：你在大城市找到了一个小社区里的归属感。\n\n"社区领袖：不是当了多大的官——是让多少人觉得，这里像家。"', cond: g => g.flags.communityGarden && g.flags.gardenOrganizer && g.social >= 65 && g.age >= 30 },
+    { id:'social_conscious_end', badge:'🌍', title:'社会良心', desc:'你成了一个有社会责任感的公民。\n\n你帮助过被骗的老人维权，你曝光过不良商家，你参加过消费者保护活动，你写文章呼吁关注数字鸿沟。\n\n你不是大V，不是网红——你只是一个不愿沉默的普通人。\n\n有人说你"多管闲事"。你说："如果每个人都沉默，这个世界只会更糟。"\n\n你的一个朋友说："你是我认识的人里最有正义感的。"\n\n你说："不是我有正义感——是我看到了不公平，然后选择不闭眼。"\n\n"社会良心：不是每个人都必须做英雄——但每个人都应该做一个不沉默的人。"', cond: g => g.flags.consumerAdvocate && (g.flags.scamWarner || g.flags.advocacyWriter) && g.social >= 50 && g.charm >= 50 && g.age >= 28 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
