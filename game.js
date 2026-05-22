@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v16.2
+// 都市浮生记 - Game Engine v16.3
 // ============================================
 
 // === GAME STATE ===
@@ -8170,6 +8170,79 @@ const EVENTS = [
         { label:'买辆二手车', hint:'-💰 +🧠 +😊', fn: g => { g.flags.carBuyingDilemma=true; g.flags.usedCarOwner=true; return{money:-30000,intel:5,mood:8}; }},
         { label:'继续打车/骑车', hint:'+💰 +🧠', fn: g => { g.flags.carBuyingDilemma=true; g.flags.carFree=true; return{money:2000,intel:5}; }},
       ]},
+    // === v16.3 文化娱乐 + 剧本杀 + 追星文化 ===
+    { id:'script_murder', icon:'🔍', title:'剧本杀',
+      body:'朋友拉你去玩剧本杀。\n\n你扮演一个民国时期的侦探。你的任务是找出凶手。你推理了4个小时，怀疑了每一个人——最后发现凶手是你自己。\n\n你的朋友笑得前仰后合：「你推理了半天，推理到自己头上。」你说：「这叫沉浸式体验。」\n\n你们玩到凌晨2点。你的嗓子哑了（因为一直在说话）、你的脑子乱了（因为一直在推理）、但你很开心。\n\n你发现：剧本杀最好玩的不是推理——是和朋友一起扮演另一个自己。\n\n"剧本杀：不是在游戏里找凶手——是在扮演中找到真实的自己。"',
+      cond: g => g.age >= 20 && !g.flags.scriptMurder,
+      choices:[
+        { label:'成为剧本杀常客', hint:'+👥 +😊 +🧠', fn: g => { g.flags.scriptMurder=true; g.flags.regularPlayer=true; return{social:12,mood:10,intel:8}; }},
+        { label:'尝试写剧本', hint:'+🧠 +✨ +💰', fn: g => { g.flags.scriptMurder=true; g.flags.scriptWriter=true; return{intel:15,charm:8,money:2000}; }},
+        { label:'偶尔玩一次就好', hint:'+😊 +👥', fn: g => { g.flags.scriptMurder=true; return{mood:8,social:5}; }},
+      ]},
+    { id:'fangirl_fanboy', icon:'🌟', title:'追星文化',
+      body:'你的同事是一个狂热的追星族。\n\n她的手机壁纸是偶像、手机壳是偶像、电脑桌面是偶像。她每个月花3000块买偶像的周边。她为了给偶像打榜，可以熬夜到凌晨3点。\n\n你问：「你图什么？」她说：「他让我觉得生活有盼头。」\n\n你不太理解。但后来你发现——每个人都有自己的「精神支柱」。有人靠咖啡续命，有人靠追星充电。\n\n你的同事在你生日那天送了你一张她偶像的签名照。你说：「我不追星。」她说：「没关系——我追你就够了。」\n\n"追星：不是在追一个人——是在追一个让自己开心的理由。"',
+      cond: g => g.age >= 18 && !g.flags.fanCulture,
+      choices:[
+        { label:'理解并支持', hint:'+👥 +😊', fn: g => { g.flags.fanCulture=true; g.flags.supportiveFriend=true; return{social:8,mood:5}; }},
+        { label:'也找个偶像', hint:'+😊 +✨', fn: g => { g.flags.fanCulture=true; g.flags.newFan=true; return{mood:10,charm:5}; }},
+        { label:'觉得没必要', hint:'+🧠 -👥', fn: g => { g.flags.fanCulture=true; return{intel:5,social:-3}; }},
+      ]},
+    { id:'standup_comedy', icon:'🎤', title:'脱口秀',
+      body:'你去看了一场线下脱口秀。\n\n演员讲了1小时，你笑了59分钟。他说：「大城市打工人最辛苦的事是——笑着加班。」全场鼓掌。\n\n他说：「你以为你在追求梦想——其实你在追求不用加班的梦想。」你又鼓掌了。\n\n散场后你在路上想：他说的每一句话都是你的生活。原来把痛苦变成笑话——就是一种疗愈。\n\n你发了条朋友圈：「今晚笑到肚子疼。」配图是脱口秀门票。你的评论里全是：「在哪？下次带我！」\n\n"脱口秀：不是在讲笑话——是在用幽默化解生活的荒诞。"',
+      cond: g => g.age >= 20 && !g.flags.standupComedy,
+      choices:[
+        { label:'成为脱口秀常客', hint:'+😊 +👥 +🧠', fn: g => { g.flags.standupComedy=true; g.flags.comedyFan=true; return{mood:15,social:8,intel:5}; }},
+        { label:'尝试自己上台', hint:'+✨ +🧠 +👥', fn: g => { g.flags.standupComedy=true; g.flags.openMic=true; return{charm:12,intel:8,social:10}; }},
+        { label:'看线上就好', hint:'+😊 +🧠', fn: g => { g.flags.standupComedy=true; return{mood:8,intel:5}; }},
+      ]},
+    { id:'mobile_game_addiction', icon:'🎮', title:'手游成瘾',
+      body:'你开始玩一款新手游。\n\n第一周：每天1小时。第二周：每天3小时。第三周：你上班的时候也在偷偷玩。\n\n你的排位从青铜到了黄金、从黄金到了钻石。你的现实生活从钻石掉到了青铜。\n\n你的领导发现了你在开会时打游戏。他说：「你的KPI什么时候能像你的排位一样高？」\n\n你算了一下：你在游戏里花了400小时。如果这400小时用来学一门技能——你大概已经能转行了。\n\n"手游：不是在玩游戏——是在用虚拟的成就感替代现实的无力感。"',
+      cond: g => g.age >= 18 && !g.flags.mobileGameAddiction,
+      choices:[
+        { label:'控制游戏时间', hint:'+🧠 +💪 +😊', fn: g => { g.flags.mobileGameAddiction=true; g.flags.gameController=true; return{intel:10,health:5,mood:3}; }},
+        { label:'卸载游戏', hint:'+🧠 +💪 +💰', fn: g => { g.flags.mobileGameAddiction=true; g.flags.gameDeleted=true; return{intel:8,health:8,money:500}; }},
+        { label:'继续冲分', hint:'+😊 -💪 -🧠', fn: g => { g.flags.mobileGameAddiction=true; return{mood:8,health:-8,intel:-5}; }},
+      ]},
+    { id:'escape_room', icon:'🚪', title:'密室逃脱',
+      body:'你和朋友们去玩了密室逃脱。\n\n你们选了「恐怖主题」。进去之后你就后悔了——黑漆漆的房间、突然弹出的NPC、诡异的音乐。\n\n你的朋友吓得抱住了你。你其实也怕——但你装作不怕。你们花了90分钟终于逃出来了。\n\n你在出口看到阳光的那一刻，觉得——外面的世界真好。\n\n你的一个朋友说：「下次还来吗？」你说：「来——但换个不那么吓人的主题。」\n\n"密室逃脱：不是在逃——是在恐惧中找到勇气。当然，有朋友在身边会更有勇气。"',
+      cond: g => g.age >= 18 && !g.flags.escapeRoom,
+      choices:[
+        { label:'成为密室达人', hint:'+🧠 +👥 +😊', fn: g => { g.flags.escapeRoom=true; g.flags.escapeRoomExpert=true; return{intel:10,social:10,mood:8}; }},
+        { label:'尝试设计密室', hint:'+🧠 +✨ +💰', fn: g => { g.flags.escapeRoom=true; g.flags.roomDesigner=true; return{intel:12,charm:5,money:1000}; }},
+        { label:'下次选轻松主题', hint:'+😊 +👥', fn: g => { g.flags.escapeRoom=true; return{mood:8,social:5}; }},
+      ]},
+    { id:'movie_night', icon:'🎬', title:'电影之夜',
+      body:'你一个人去看了一场电影。\n\n电影院里只有你和另外3个人。你选了最后一排的位置，买了一桶爆米花（一个人的份刚刚好）。\n\n电影讲的也是一个在大城市漂泊的年轻人。你看着看着，觉得那就是你自己。\n\n电影结束后，你坐在座位上没动。等字幕走完、等灯亮了、等其他人都走了——你才站起来。\n\n你走出电影院的时候，天已经黑了。城市的灯光比电影里的还亮。\n\n"一个人看电影：不是孤独——是和自己约会。"',
+      cond: g => g.age >= 18 && !g.flags.movieNight,
+      choices:[
+        { label:'成为影迷', hint:'+🧠 +😊 +✨', fn: g => { g.flags.movieNight=true; g.flags.cinephile=true; return{intel:10,mood:10,charm:5}; }},
+        { label:'约朋友一起看', hint:'+👥 +😊', fn: g => { g.flags.movieNight=true; return{social:8,mood:8}; }},
+        { label:'回家写影评', hint:'+🧠 +✨ +😊', fn: g => { g.flags.movieNight=true; g.flags.filmCritic=true; return{intel:12,charm:8,mood:5}; }},
+      ]},
+    { id:'board_game_night', icon:'🎲', title:'桌游之夜',
+      body:'你和几个朋友在家玩桌游。\n\n你们玩的是「卡坦岛」。你的一个朋友疯狂囤积羊毛，另一个垄断了砖块。你选择了外交路线——和每个人交易。\n\n游戏进行了3个小时。你们吵了4次、笑了无数次、吃了2袋薯片、喝了1箱啤酒。\n\n最终你赢了。你的一个朋友不服：「再来一局！」你说：「好——但这次我不当商人了，我要当海盗。」\n\n你发现：桌游最好的部分不是游戏——是和朋友们围坐在一起的时光。\n\n"桌游之夜：不是在玩游戏——是在用骰子和卡牌编织友谊。"',
+      cond: g => g.age >= 20 && !g.flags.boardGameNight,
+      choices:[
+        { label:'组织定期桌游聚会', hint:'+👥 +😊 +🧠', fn: g => { g.flags.boardGameNight=true; g.flags.gameOrganizer=true; return{social:15,mood:12,intel:5}; }},
+        { label:'收藏桌游', hint:'-💰 +🧠 +😊', fn: g => { g.flags.boardGameNight=true; g.flags.gameCollector=true; return{money:-500,intel:8,mood:8}; }},
+        { label:'偶尔玩玩就好', hint:'+😊 +👥', fn: g => { g.flags.boardGameNight=true; return{mood:8,social:5}; }},
+      ]},
+    { id:'music_festival', icon:'🎵', title:'音乐节',
+      body:'你去了一个户外音乐节。\n\n3万人、6个舞台、2天的音乐狂欢。你站在最前排，跟着节拍跳了3个小时。\n\n你的嗓子喊哑了、你的腿跳软了、你的手机没电了。但你觉得——这是今年最开心的时刻。\n\n你旁边的人你完全不认识，但你们一起合唱了同一首歌。那一刻，你们是最亲近的陌生人。\n\n散场的时候，你看着满地的垃圾和远处渐渐暗下去的舞台，想：音乐节的魔力不在于音乐——在于和3万人一起忘记了日常。\n\n"音乐节：不是去听歌——是去找到那个和你同频的世界。"',
+      cond: g => g.age >= 18 && g.age <= 40 && !g.flags.musicFestival,
+      choices:[
+        { label:'成为音乐节常客', hint:'+😊 +👥 +✨', fn: g => { g.flags.musicFestival=true; g.flags.festivalRegular=true; return{mood:15,social:10,charm:8}; }},
+        { label:'学一门乐器', hint:'+🧠 +✨ +💪', fn: g => { g.flags.musicFestival=true; g.flags.instrumentLearner=true; return{intel:12,charm:10,health:3}; }},
+        { label:'线上看直播就好', hint:'+😊 +🧠', fn: g => { g.flags.musicFestival=true; return{mood:8,intel:5}; }},
+      ]},
+    { id:'book_club', icon:'📚', title:'读书会',
+      body:'你加入了一个读书会。\n\n每个月读一本书、线下讨论一次。这个月的书目是《百年孤独》。你读了3遍——第一遍没看懂、第二遍看了一半睡着了、第三遍终于看完了。\n\n讨论会上，一个退休的老教授说：「这本书讲的是孤独。」一个大学生说：「讲的是家族。」一个白领说：「讲的是时间。」\n\n你说：「讲的是每一个在大城市漂泊的人。」\n\n大家沉默了几秒。然后有人说：「说得真好。」\n\n"读书会：不是在读书——是在别人的故事里，找到自己的影子。"',
+      cond: g => g.age >= 22 && !g.flags.bookClub,
+      choices:[
+        { label:'坚持每月参加', hint:'+🧠 +👥 +😊', fn: g => { g.flags.bookClub=true; g.flags.regularReader=true; return{intel:15,social:8,mood:8}; }},
+        { label:'成为领读人', hint:'+🧠 +✨ +👥', fn: g => { g.flags.bookClub=true; g.flags.bookLeader=true; return{intel:12,charm:10,social:10}; }},
+        { label:'自己看书就好', hint:'+🧠 +😊', fn: g => { g.flags.bookClub=true; return{intel:10,mood:5}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -8944,6 +9017,14 @@ const ACHIEVEMENTS = [
     { id:'commute_optimizer_ach', icon:'🚗', name:'通勤优化师', desc:'学会了错峰出行', check: g => g.flags.trafficJam },
     { id:'driver_license_ach', icon:'🚙', name:'持证上路', desc:'考取了驾照', check: g => g.flags.drivingTest },
     { id:'ebike_rider_ach', icon:'🛵', name:'电动车骑士', desc:'骑上了电动车', check: g => g.flags.ebikeLife },
+    // === v16.3 新增成就（文化娱乐） ===
+    { id:'script_player_ach', icon:'🔍', name:'剧本杀玩家', desc:'体验了剧本杀', check: g => g.flags.scriptMurder },
+    { id:'comedy_fan_ach', icon:'🎤', name:'脱口秀迷', desc:'看了脱口秀', check: g => g.flags.standupComedy },
+    { id:'game_controller_ach', icon:'🎮', name:'游戏自律者', desc:'控制了游戏时间', check: g => g.flags.mobileGameAddiction },
+    { id:'escape_artist_ach', icon:'🚪', name:'密室达人', desc:'玩了密室逃脱', check: g => g.flags.escapeRoom },
+    { id:'cinephile_ach', icon:'🎬', name:'影迷', desc:'享受了一个人的电影', check: g => g.flags.movieNight },
+    { id:'festival_goer_ach', icon:'🎵', name:'音乐节达人', desc:'参加了音乐节', check: g => g.flags.musicFestival },
+    { id:'bookworm_ach_v2', icon:'📚', name:'读书会成员', desc:'加入了读书会', check: g => g.flags.bookClub },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -9202,6 +9283,9 @@ const ENDINGS = [
     // --- v16.2 NEW ENDINGS (交通出行) ---
     { id:'city_explorer_end', badge:'🗺️', title:'城市探索者', desc:'你比任何人都了解这个城市。\n\n你骑着电动车/自行车/走路，探索了每一条街道、每一个公园、每一家小店。你知道哪条巷子最安静、哪个路口日落最美、哪里的煎饼最好吃。\n\n你的朋友们来这个城市旅游，都找你要攻略。你说：「不用攻略——跟着我走就行。」\n\n你的地图App上标记了500多个你去过的地方。每一个标记都是一段记忆。\n\n"城市探索：不是走过多少路——是记住了多少风景。"', cond: g => g.flags.cityExplorer && g.flags.bikeCommuter && g.flags.nightCity && g.mood >= 65 && g.age >= 25 },
     { id:'commute_master_end', badge:'🚇', title:'通勤大师', desc:'你把通勤变成了一种生活方式。\n\n你学会了利用通勤时间学习、找到了最优路线、掌握了错峰出行的秘诀。你的通勤时间不再是浪费——而是你的「第二课堂」。\n\n你在地铁上听完了一整个大学课程、在公交上看完了50本书、在堵车时写完了一部小说的初稿。\n\n你的同事问你：「你不觉得通勤很累吗？」你说：「通勤不累——是你没有给它赋予意义。」\n\n"通勤大师：不是在路上浪费时间——是在路上创造价值。"', cond: g => g.flags.commuteLearner && g.flags.offPeakCommuter && g.flags.subwayCommute && g.intel >= 70 && g.age >= 28 },
+    // --- v16.3 NEW ENDINGS (文化娱乐) ---
+    { id:'cultural_life_end', badge:'🎭', title:'文艺生活家', desc:'你把大城市的文化生活过成了日常。\n\n你是剧本杀常客、脱口秀爱好者、读书会领读人、音乐节参与者。你的周末永远排满了文化活动。\n\n你的朋友圈不是美食就是演出。有人说你「活得像个文化人」。你说：「我只是活得像个好奇的人。」\n\n你的书架上有200本书、你的电影票根有100多张、你的剧本杀角色有30多个。每一个都是一段不同的体验。\n\n"文艺生活：不是在消费文化——是在用文化丰富自己的人生。"', cond: g => g.flags.bookClub && g.flags.standupComedy && g.flags.musicFestival && g.flags.scriptMurder && g.intel >= 65 && g.mood >= 65 && g.age >= 25 },
+    { id:'social_entertainer_end', badge:'🎉', title:'社交组织者', desc:'你成了朋友圈里的社交灵魂。\n\n你组织了无数次桌游之夜、密室逃脱、剧本杀、KTV。你的朋友们说：「没有你的局不叫局。」\n\n你的微信群有500个人，每周至少组一次局。你认识的人比你记得的名字还多。\n\n你的一个朋友说：「你怎么认识这么多人？」你说：「不是我认识的人多——是我珍惜每一次遇见。」\n\n"社交组织者：不是爱热闹——是害怕朋友们变得疏远。每一次聚会，都是在缝合人与人之间的距离。"', cond: g => g.flags.gameOrganizer && g.flags.scriptMurder && g.flags.escapeRoom && g.social >= 80 && g.age >= 25 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
