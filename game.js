@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v3.9
+// 都市浮生记 - Game Engine v4.0
 // ============================================
 
 // === GAME STATE ===
@@ -2872,6 +2872,25 @@ const EVENTS = [
         { label:'学习新技能', hint:'+🧠 +✨', fn: g => { g.flags.age35Crisis=true; return{intel:12,charm:5,money:-3000}; }},
         { label:'焦虑，但继续上班', hint:'+😊 -🧠', fn: g => { g.flags.age35Crisis=true; return{mood:5,intel:-3}; }},
       ]},
+    // === v4.0 EVENTS - 电子榨菜与反向消费 ===
+    { id:'electronic_pickle', icon:'📱', title:'电子榨菜',
+      body:'你打开外卖，架起手机，播放《武林外传》。\n\n这是你的"电子榨菜"——吃饭时必须看的视频，如同榨菜般为平淡的饭点提味增鲜。\n\n"一个人吃饭的时候需要有个背景音，不看点什么，总感觉少了一丝味道。"\n\n你的电子榨菜清单：《甄嬛传》、《武林外传》、搞笑短视频、影视解说。\n\n"电子榨菜是当代年轻人的孤独解药——让你一个人吃饭也不觉得孤单。"',
+      cond: g => !g.flags.electronicPickle && g.age>=18 && g.age<=35,
+      choices:[
+        { label:'追剧下饭', hint:'+😊 -🧠', fn: g => { g.flags.electronicPickle=true; return{mood:10,intel:-3}; }},
+        { label:'看纪录片', hint:'+😊 +🧠', fn: g => { g.flags.electronicPickle=true; g.flags.docuFan=true; return{mood:8,intel:8}; }},
+        { label:'刷短视频', hint:'+😊 -❤️', fn: g => { g.flags.electronicPickle=true; return{mood:12,health:-5,intel:-5}; }},
+        { label:'专心吃饭', hint:'+❤️ +🧠', fn: g => { g.flags.electronicPickle=true; return{health:5,intel:3,mood:-3}; }},
+      ]},
+    { id:'reverse_consumption', icon:'💸', title:'反向消费',
+      body:'你开始研究"平替"：不是大牌买不起，而是平替更有性价比。\n\n你的购物清单：\n- 护肤品：国货平替，成分是王\n- 衣服：优衣库联名款，时尚又实惠\n- 零食：临期折扣店，半价拿下\n\n"57.2%的消费者更倾向选择性价比更高的替代商品。"\n\n"反向消费不是消费降级，而是消费觉醒：不再为品牌溢价买单，只为真正的价值付费。"',
+      cond: g => !g.flags.reverseConsumption && g.age>=20 && g.age<=35 && g.money<50000,
+      choices:[
+        { label:'成为平替达人', hint:'+💰 +🧠', fn: g => { g.flags.reverseConsumption=true; g.flags.pingtiExpert=true; return{money:3000,intel:8,charm:3}; }},
+        { label:'逛临期折扣店', hint:'+💰 +😊', fn: g => { g.flags.reverseConsumption=true; return{money:2000,mood:8}; }},
+        { label:'研究薅羊毛攻略', hint:'+💰 +✨', fn: g => { g.flags.reverseConsumption=true; return{money:5000,intel:5}; }},
+        { label:'该买还是买', hint:'-💰 +😊', fn: g => { g.flags.reverseConsumption=true; return{money:-3000,mood:5}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3070,6 +3089,9 @@ const ACHIEVEMENTS = [
     { id:'wellness_beginner', icon:'🏥', name:'养生新手', desc:'开始轻养生', check: g => g.flags.lightWellness || g.flags.gymMember },
     { id:'dazi_master', icon:'👥', name:'搭子达人', desc:'找到了搭子', check: g => g.flags.foodDazi || g.flags.sportsDazi || g.flags.travelDazi },
     { id:'crisis_planner', icon:'⚠️', name:'危机规划者', desc:'面对35岁危机', check: g => g.flags.age35Crisis && (g.flags.sidePlan || g.flags.civilServicePrep) },
+    // v4.0 achievements
+    { id:'pickle_master', icon:'📱', name:'电子榨菜品鉴师', desc:'享受电子榨菜下饭', check: g => g.flags.electronicPickle },
+    { id:'smart_shopper', icon:'💸', name:'反向消费达人', desc:'成为平替专家', check: g => g.flags.reverseConsumption },
 ];
 
 // === ENDINGS === (order matters: first match wins)
