@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v27.3
+// 都市浮生记 - Game Engine v27.4
 // ============================================
 
 // === GAME STATE ===
@@ -13818,6 +13818,87 @@ const EVENTS = [
         { label:'有选择地租，省了一些钱', hint:'+💰 +🧠', fn: g => { g.flags.rentNotBuy=true; g.money += 2000; return{intel:3}; }},
         { label:'觉得租不划算，还是买了', hint:'-💰 +✨', fn: g => { g.flags.rentNotBuy=true; g.money -= 10000; return{charm:3}; }},
       ]},
+    // v27.4: AI焦虑 + 职场新现象
+    { id:'ai_anxiety_v27_4', icon:'🤖', title:'AI替代焦虑', category:'career',
+      body:'公司开了全员大会。\n\n领导说：「我们要全面拥抱AI。」\n\n你听到了：\n- 客服部门：从50人裁到10人（AI客服替代了40人）\n- 设计部门：从20人裁到5人（AI出图3秒一张）\n- 文案部门：从15人裁到3人（AI写稿比人快10倍）\n- 翻译部门：整个部门没了\n\n你开始慌了：\n- 你的工作——AI能做吗？\n- 你的技能——还有价值吗？\n- 你的经验——还值钱吗？\n\n你开始搜索：「什么工作不会被AI替代」\n\n答案让你更焦虑了：「目前来看——没有。」\n\n你开始理解：AI焦虑——不是「AI会替代你」——是「会用AI的人会替代你」。\n\n「AI替代焦虑：不是机器在抢你的饭碗——是会用机器的人在抢。」',
+      cond: g => g.age >= 22 && !g.flags.aiAnxiety && g.jobSalary > 0,
+      choices:[
+        { label:'主动学AI工具，成了公司AI达人', hint:'+🧠 +💰 +✨', fn: g => { g.flags.aiAnxiety=true; g.flags.aiAdapter=true; g.reputation.career += 5; return{intel:10,charm:3}; }},
+        { label:'焦虑了一阵，开始自学新技能', hint:'+🧠 -😊', fn: g => { g.flags.aiAnxiety=true; return{intel:5,mood:-3}; }},
+        { label:'觉得AI还早，继续躺平', hint:'+😊 -🧠', fn: g => { g.flags.aiAnxiety=true; return{mood:3,intel:-5}; }},
+      ]},
+    { id:'degree_inflation_v27_4', icon:'🎓', title:'学历通胀', category:'career',
+      body:'你去面试了。\n\n岗位要求：本科以上。\n\n你到了现场——\n\n你发现：\n- 应聘者：200人\n- 硕士：80人\n- 985/211：50人\n- 海归：20人\n- 博士：5人\n\n你（本科）：排名150/200。\n\n面试官看了看你的简历：「你是本科啊……我们这基本都硕士起步了。」\n\n你开始想：\n- 你读了16年书——本科——已经是「最低学历」了\n- 你爸妈那个年代——初中毕业就能进工厂\n- 你花了多少钱读书——换来的是一张「不值钱」的文凭\n\n你开始理解：学历通胀——不是「学历没用」——是「学历越来越不值钱了」。\n\n你爸说：「早知道这样，还不如让你早点出来打工。」\n\n「学历通胀：你不是不努力——是所有人都在努力——你的努力就不值钱了。」',
+      cond: g => g.age >= 22 && !g.flags.degreeInflation && g.intel >= 20,
+      choices:[
+        { label:'决定考研，提升学历', hint:'-💰 -😊 +🧠', fn: g => { g.flags.degreeInflation=true; g.flags.goingForMasters=true; g.money -= 20000; return{intel:8,mood:-5}; }},
+        { label:'接受现实，用能力证明自己', hint:'+🧠 +✨', fn: g => { g.flags.degreeInflation=true; g.flags.skillOverDegree=true; return{intel:5,charm:3}; }},
+        { label:'开始怀疑读书的意义', hint:'-😊 -🧠', fn: g => { g.flags.degreeInflation=true; return{mood:-8,intel:-3}; }},
+      ]},
+    { id:'side_hustle_culture', icon:'💼', title:'副业刚需', category:'finance',
+      body:'你发现——你身边所有人都有副业。\n\n同事A：下班后跑滴滴，月入3000\n同事B：周末做家教，月入5000\n同事C：晚上做自媒体，月入8000（偶尔）\n同事D：卖保险，月入2000\n同事E：做代购，月入4000\n\n你算了算：\n- 你的主业月薪：8000\n- 同事A的主业+副业：11000\n- 同事B的主业+副业：13000\n- 同事C的主业+副业：16000（好的月份）\n\n你开始焦虑了：\n- 你——是不是太不上进了？\n- 你——是不是应该也搞个副业？\n- 你——有什么技能可以变现？\n\n你开始理解：副业刚需——不是「想赚更多」——是「主业不够活」。\n\n「副业刚需：不是因为热爱——是因为穷。」',
+      cond: g => g.age >= 20 && !g.flags.sideHustleCulture && g.jobSalary > 0 && g.jobSalary < 15000,
+      choices:[
+        { label:'开始做自媒体副业', hint:'+💰 +🧠 -😊', fn: g => { g.flags.sideHustleCulture=true; g.flags.selfMediaSide=true; g.money += 3000; return{intel:5,mood:-3}; }},
+        { label:'下班后跑外卖/滴滴', hint:'+💰 -😊 -❤️', fn: g => { g.flags.sideHustleCulture=true; g.flags.deliverySide=true; g.money += 2000; return{mood:-5,health:-3}; }},
+        { label:'觉得主业够忙了，不搞副业', hint:'+😊 -💰', fn: g => { g.flags.sideHustleCulture=true; return{mood:3,health:2}; }},
+      ]},
+    { id:'layoff_crisis', icon:'📦', title:'大厂裁员', category:'career',
+      body:'你被裁了。\n\n不是因为你做得不好——是因为「业务调整」。\n\nHR说：「公司很感谢你，但这是战略决定。」\n\n你拿到了：\n- N+1赔偿（你在公司待了3年，拿到4个月工资）\n- 一封「感谢信」\n- 一个纸箱（装你的东西）\n\n你走出公司大楼——\n\n你发现：\n- 今天被裁的：200人\n- 这周被裁的：1000人\n- 这个月行业被裁的：10000人\n\n你在脉脉上看到：\n- 「恭喜毕业」\n- 「优化是福报」\n- 「下一个会更好」\n\n你开始理解：大厂裁员——不是「你不行」——是「你只是一行代码」。\n\n领导在内部信里说：「这是组织进化。」\n\n你的工位——已经被下一个人坐了。\n\n「大厂裁员：你以为你是员工——其实你只是成本。」',
+      cond: g => g.age >= 25 && !g.flags.layoffCrisis && g.jobSalary >= 8000,
+      choices:[
+        { label:'拿了赔偿休息一段时间', hint:'+💰 +😊 -🧠', fn: g => { g.flags.layoffCrisis=true; g.money += g.jobSalary * 4; setJob(g, '待业中', 0); return{mood:5}; }},
+        { label:'马上开始投简历', hint:'+🧠 -😊', fn: g => { g.flags.layoffCrisis=true; g.flags.immediateJobHunt=true; g.money += g.jobSalary * 4; setJob(g, '待业中', 0); return{intel:3,mood:-5}; }},
+        { label:'趁此机会转行/创业', hint:'-💰 +🧠 +✨', fn: g => { g.flags.layoffCrisis=true; g.flags.pivotAfterLayoff=true; g.money += g.jobSalary * 4; setJob(g, '待业中', 0); return{intel:5,charm:3,mood:-3}; }},
+      ]},
+    { id:'ai_writing_tool', icon:'✍️', title:'AI写作助手', category:'career',
+      body:'你开始用AI写作了。\n\n你的工作：\n- 写周报：以前2小时 → 现在5分钟\n- 写方案：以前1天 → 现在2小时\n- 写邮件：以前30分钟 → 现在2分钟\n- 写PPT：以前3小时 → 现在30分钟\n\n你的效率提升了：300%。\n\n但你发现：\n- 你的同事也在用AI\n- 你领导的周报也是AI写的\n- 老板的发言稿也是AI写的\n- 客户的需求文档也是AI写的\n\n所有人都在用AI——所有人都在假装自己没在用AI。\n\n你开始想：\n- 如果所有人都在用AI——那「原创」还有意义吗？\n- 如果AI写得比你好——你的价值在哪里？\n\n你开始理解：AI写作——不是「替你写」——是「让所有人写得一样」。\n\n「AI写作：当所有人都在用AI写作——真正的写作就变成了奢侈品。」',
+      cond: g => g.age >= 20 && !g.flags.aiWritingTool && g.intel >= 25,
+      choices:[
+        { label:'深度研究AI写作，成了专家', hint:'+🧠 +💰 +✨', fn: g => { g.flags.aiWritingTool=true; g.flags.aiWritingExpert=true; g.reputation.career += 3; return{intel:8,charm:3}; }},
+        { label:'用AI提高了效率，省了很多时间', hint:'+🧠 +😊', fn: g => { g.flags.aiWritingTool=true; return{intel:5,mood:3}; }},
+        { label:'觉得AI写的没灵魂，坚持手写', hint:'+✨ -🧠', fn: g => { g.flags.aiWritingTool=true; g.flags.humanWriter=true; return{charm:5,intel:-3}; }},
+      ]},
+    { id:'livestream_dream', icon:'📺', title:'直播带货梦', category:'career',
+      body:'你决定做直播带货了。\n\n你投入了：\n- 设备：手机+补光灯+麦克风 = 2000元\n- 样品：1000元\n- 学习时间：2个月\n\n你开播了——\n\n第一天：\n- 观看人数：3人（你妈、你爸、你自己）\n- 成交额：0元\n\n第一周：\n- 最高观看：15人\n- 成交额：38元（你表妹买了一瓶洗面奶）\n\n第一个月：\n- 平均观看：8人\n- 月成交额：280元\n- 扣除成本：-2720元\n\n你看到了另一个主播——\n- 观看人数：50万\n- 月成交额：500万\n- 佣金：50万\n\n你开始理解：直播带货——不是「人人都能做」——是「头部通吃」。\n\n你看到的是「成功者偏差」——你没看到的是——99%的主播月入不到500元。\n\n「直播带货：你以为是风口——其实你是风口上的韭菜。」',
+      cond: g => g.age >= 18 && !g.flags.livestreamDream && g.money >= 2000,
+      choices:[
+        { label:'坚持直播，慢慢积累粉丝', hint:'-💰 -😊 +✨', fn: g => { g.flags.livestreamDream=true; g.flags.persistentStreamer=true; g.money -= 5000; return{charm:5,mood:-5}; }},
+        { label:'试了一个月，认清现实放弃了', hint:'+🧠 -💰', fn: g => { g.flags.livestreamDream=true; g.money -= 2000; return{intel:5}; }},
+        { label:'转做幕后，帮别人做直播运营', hint:'+💰 +🧠', fn: g => { g.flags.livestreamDream=true; g.flags.livestreamOps=true; g.money += 3000; return{intel:5,charm:3}; }},
+      ]},
+    { id:'age_35_crisis_v27_4', icon:'3️⃣5️⃣', title:'35岁危机', category:'career',
+      body:'你35岁了。\n\n你发现：\n- 招聘网站上：80%的岗位要求「35岁以下」\n- 公司新来的同事：都比你小10岁\n- 你的工资：是应届生的3倍（但你做的事差不多）\n- 你的体力：明显不如以前了\n\n你的处境：\n- 上有老（父母开始生病）\n- 下有小（孩子在上学）\n- 中有房贷（还有20年）\n- 职场有天花板（升不上去了）\n\n你开始想：\n- 如果被裁了——你还能找到工作吗？\n- 如果生病了——你的存款够吗？\n- 如果离婚了——你养得起孩子吗？\n\n你开始理解：35岁危机——不是「35岁就不行了」——是「35岁的性价比最低」。\n\n你不是不能干——你是太贵了。\n\n「35岁危机：不是你在被淘汰——是你的价格在被淘汰。」',
+      cond: g => g.age >= 33 && g.age <= 37 && !g.flags.age35Crisis && g.jobSalary > 0,
+      choices:[
+        { label:'未雨绸缪，开始准备Plan B', hint:'+🧠 -😊 +💰', fn: g => { g.flags.age35Crisis=true; g.flags.planBReady=true; g.money += 10000; return{intel:8,mood:-3}; }},
+        { label:'接受现实，做好本职工作', hint:'+😊 +🧠', fn: g => { g.flags.age35Crisis=true; return{mood:3,intel:3}; }},
+        { label:'焦虑到失眠', hint:'-😊 -❤️ -🧠', fn: g => { g.flags.age35Crisis=true; g.flags.midlifeAnxiety=true; return{mood:-10,health:-5,intel:-3}; }},
+      ]},
+    { id:'flexible_employment', icon:'🏃', title:'灵活就业', category:'career',
+      body:'你成了「灵活就业者」。\n\n你的工作组合：\n- 上午：送外卖（3小时，收入80元）\n- 下午：跑闪送（4小时，收入120元）\n- 晚上：代驾（3小时，收入150元）\n\n你的月收入：约10000元。\n\n但你的状态：\n- 没有社保\n- 没有公积金\n- 没有带薪假\n- 没有年终奖\n- 没有工伤保障\n\n你在系统里：\n- 不是「员工」——是「合作伙伴」\n- 不是「被雇佣」——是「自主经营」\n- 不是「被剥削」——是「灵活就业」\n\n你开始理解：灵活就业——不是「自由」——是「没有保障的自由」。\n\n你不是不想稳定——是稳定的工作不要你。\n\n统计局说：「灵活就业是就业。」\n\n你说：「灵活就业是没有选择的选择。」\n\n「灵活就业：你不是在工作——你是在用时间换生存。」',
+      cond: g => g.age >= 18 && !g.flags.flexibleEmployment && g.money < 5000,
+      choices:[
+        { label:'一边灵活就业一边学技能', hint:'+🧠 -😊 +💰', fn: g => { g.flags.flexibleEmployment=true; g.flags.upskillingGig=true; setJob(g, '灵活就业', 10000); return{intel:5,mood:-3}; }},
+        { label:'接受灵活就业，觉得挺自由', hint:'+😊 -🧠', fn: g => { g.flags.flexibleEmployment=true; setJob(g, '灵活就业', 10000); return{mood:3}; }},
+        { label:'拼命投简历找稳定工作', hint:'+🧠 -😊', fn: g => { g.flags.flexibleEmployment=true; g.flags.seekingStable=true; setJob(g, '灵活就业', 10000); return{intel:3,mood:-5}; }},
+      ]},
+    { id:'involution_escape', icon:'🏃‍♂️', title:'逃离内卷', category:'psychology',
+      body:'你决定——不卷了。\n\n你做了：\n- 辞了996的工作\n- 退了500人的工作群\n- 删了脉脉和领英\n- 离开了北上广\n\n你回到了老家——\n\n你发现：\n- 老家月薪3000——但你不用加班\n- 老家房价5000/平——但你买得起\n- 老家没什么娱乐——但你睡够了\n- 老家没什么机会——但你不用焦虑了\n\n你的朋友圈：\n- 前同事：「又加班到11点了😭」\n- 你：「今天钓了一下午鱼🎣」\n\n但你也有点慌：\n- 你的同学——都升职加薪了\n- 你的积蓄——在减少\n- 你的技能——在退化\n\n你开始理解：逃离内卷——不是「胜利」——是「选择另一种代价」。\n\n你不是不想赢——你是不想玩这个游戏了。\n\n「逃离内卷：不是你放弃了——是你换了一个赛道。」',
+      cond: g => g.age >= 25 && !g.flags.involutionEscape && g.mood < 50,
+      choices:[
+        { label:'彻底躺平，享受慢生活', hint:'+😊 +❤️ -💰 -🧠', fn: g => { g.flags.involutionEscape=true; g.flags.fullLyingFlat=true; setJob(g, '自由职业', 3000); return{mood:15,health:5,intel:-5}; }},
+        { label:'在老家找了份轻松工作', hint:'+😊 +💰 -🧠', fn: g => { g.flags.involutionEscape=true; setJob(g, '小城职员', 3500); return{mood:8,charm:-3}; }},
+        { label:'休息了半年，又回去卷了', hint:'+🧠 -😊', fn: g => { g.flags.involutionEscape=true; g.flags.returnedToRatRace=true; return{intel:3,mood:-5}; }},
+      ]},
+    { id:'ai_job_interview', icon:'🎯', title:'AI面试官', category:'career',
+      body:'你参加了一场面试。\n\n面试官——不是人——是AI。\n\n你对着屏幕：\n- 回答问题（AI分析你的语义）\n- 做表情管理（AI分析你的微表情）\n- 做逻辑题（AI评估你的智商）\n- 做性格测试（AI评估你的情商）\n\nAI面试官给了你评分：72/100。\n\n评语：「候选人逻辑能力较强，但情绪管理能力一般。建议观察。」\n\n你被拒了。\n\n你不服——你问：「我哪里不行？」\n\nAI回复：「根据大数据分析，您的综合匹配度为72%，低于本岗位80%的最低要求。」\n\n你开始想：\n- 你被一个「没有感情」的机器拒了\n- 你的价值——被一个算法——用数字定义了\n- 你连「被人类拒」的资格都没有了\n\n你开始理解：AI面试——不是「更公平」——是「用另一种不公平替代旧的不公平」。\n\n「AI面试官：你不再是被人评判——你是被数据评判。数据没有偏见——但训练数据有。」',
+      cond: g => g.age >= 20 && !g.flags.aiJobInterview && g.intel >= 20,
+      choices:[
+        { label:'专门研究AI面试技巧', hint:'+🧠 +✨ -😊', fn: g => { g.flags.aiJobInterview=true; g.flags.aiInterviewHacker=true; return{intel:8,charm:3,mood:-3}; }},
+        { label:'接受了AI面试，成功入职', hint:'+💰 +🧠', fn: g => { g.flags.aiJobInterview=true; return{intel:3,mood:3}; }},
+        { label:'觉得太荒谬了，拒绝AI面试', hint:'+✨ -💰', fn: g => { g.flags.aiJobInterview=true; g.flags.rejectAIInterview=true; return{charm:5,mood:-3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -15037,6 +15118,14 @@ const ACHIEVEMENTS = [
     { id:'repair_master_ach', icon:'🔧', name:'修理大师', desc:'什么都自己修，省了大笔钱', check: g => g.flags.repairMaster },
     { id:'digital_detoxer_ach_v27_3', icon:'📱', name:'数字断舍离', desc:'成功戒掉手机依赖每天多出4小时', check: g => g.flags.digitalDetoxer },
     { id:'vintage_collector_ach', icon:'🏪', name:'复古收藏家', desc:'成了二手店常客收藏vintage', check: g => g.flags.vintageCollector },
+    // v27.4: AI焦虑 + 职场新现象成就
+    { id:'ai_adapter_ach', icon:'🤖', name:'AI先行者', desc:'主动学习AI工具成了公司AI达人', check: g => g.flags.aiAdapter },
+    { id:'skill_over_degree_ach', icon:'🎓', name:'能力至上', desc:'接受学历通胀，用能力证明自己', check: g => g.flags.skillOverDegree },
+    { id:'persistent_streamer_ach', icon:'📺', name:'坚持直播', desc:'明知99%失败还坚持做直播', check: g => g.flags.persistentStreamer },
+    { id:'plan_b_ready_ach', icon:'3️⃣5️⃣', name:'未雨绸缪', desc:'35岁危机时提前准备了Plan B', check: g => g.flags.planBReady },
+    { id:'full_lying_flat_ach', icon:'🏃‍♂️', name:'彻底躺平', desc:'逃离内卷选择了慢生活', check: g => g.flags.fullLyingFlat },
+    { id:'ai_interview_hacker_ach', icon:'🎯', name:'AI面试专家', desc:'专门研究AI面试技巧', check: g => g.flags.aiInterviewHacker },
+    { id:'livestream_ops_ach', icon:'🎬', name:'直播幕后', desc:'转型做直播运营找到了新出路', check: g => g.flags.livestreamOps },
 ];
 
 // === ENDINGS === (order matters: first match wins)
