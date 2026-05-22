@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v29.6
+// 都市浮生记 - Game Engine v29.7
 // ============================================
 
 // === GAME STATE ===
@@ -15632,6 +15632,87 @@ const EVENTS = [
         { label:'开始找心理咨询师', hint:'+🧠 +😊', fn: g => { g.flags.burnoutRecovery=true; g.flags.burnoutTherapy=true; return{intel:3,mood:5}; }},
         { label:'硬撑着不承认倦怠', hint:'-💪 -😊', fn: g => { g.flags.burnoutRecovery=true; g.flags.denialBurnout=true; return{health:-5,mood:-8}; }},
       ]},
+    // === v29.7 住房问题与租房生活 ===
+    { id:'rent_increase_v29_7', icon:'📈', title:'房租又涨了', category:'housing',
+      body:'房东发来微信：「下个月房租涨500，不接受就搬。」\n\n你的反应：\n- 愤怒：「去年已经涨过一次了！」\n- 无奈：「搬家更贵更累……」\n- 焦虑：「再涨就真的要走了」\n\n你算了笔账：\n- 房租：4500/月（涨了500）\n- 工资：12000/月\n- 房租占比：37.5%（超过30%的警戒线）\n\n你不是在给房东打工——你是在给房子「卖命」。\n\n你的工资涨幅——永远跑不赢房租涨幅。\n你不是在「租」房子——你是在被房子「租」。\n\n「房租涨价：你的努力——永远赶不上房东的涨价通知。」',
+      cond: g => g.jobSalary > 0 && g.money < 50000 && !g.flags.rentIncrease,
+      choices:[
+        { label:'接受涨价但开始找更便宜的房', hint:'+🧠 -💰', fn: g => { g.flags.rentIncrease=true; g.flags.searchingCheaper=true; return{intel:2,mood:-3}; }},
+        { label:'和房东谈判要求不涨或少涨', hint:'+💪 +🧠', fn: g => { g.flags.rentIncrease=true; g.flags.negotiatedRent=true; return{charm:3,mood:2}; }},
+        { label:'决定搬到更远的地方省钱', hint:'-😊 +💰', fn: g => { g.flags.rentIncrease=true; g.flags.movedFarther=true; return{mood:-5,money:2000}; }},
+      ]},
+    { id:'roommate_from_hell_v29_7', icon:'👤', title:'奇葩室友', category:'housing',
+      body:'你的合租室友——让你崩溃了。\n\n室友罪状：\n- 半夜2点打游戏开语音\n- 用完厨房从不收拾\n- 冰箱里你的东西经常「失踪」\n- 带对象回来不提前说\n- 公共区域的垃圾永远不扔\n- 水电费永远拖着不AA\n\n你和他谈了一次——\n「大家都是成年人了能不能注意点？」\n他回你：「你管得着吗？房租我交了。」\n\n你想搬走——但押金还没退。\n你想忍——但每天都在崩溃的边缘。\n\n你开始理解：合租——不是省钱——是「用精神健康换房租」。\n\n「奇葩室友：你不是在合租——你是在「修行」。」',
+      cond: g => g.money < 30000 && g.social >= 20 && !g.flags.roommateHell,
+      choices:[
+        { label:'直接摊牌定规矩签合租协议', hint:'+💪 +🧠', fn: g => { g.flags.roommateHell=true; g.flags.roommateAgreement=true; return{charm:3,mood:3}; }},
+        { label:'忍到合同到期再搬', hint:'-😊 -💪', fn: g => { g.flags.roommateHell=true; g.flags.endureRoommate=true; return{mood:-8,health:-3}; }},
+        { label:'宁愿损失押金也要搬走', hint:'+😊 -💰', fn: g => { g.flags.roommateHell=true; g.flags.lostDeposit=true; return{mood:5,money:-3000}; }},
+      ]},
+    { id:'rental_platform_crash', icon:'💥', title:'长租公寓暴雷', category:'housing',
+      body:'你用的长租公寓平台——暴雷了。\n\n你的情况：\n- 你交了1年租金（通过平台贷款）\n- 平台跑路了\n- 房东没收到钱要赶你走\n- 你的租金贷还要继续还\n\n你现在的状态：\n- 没房住（房东要收房）\n- 还在还贷（每月3000）\n- 维权群里500人（都没办法）\n\n你去投诉——「正在处理」\n你去报警——「属于经济纠纷」\n你去找媒体——「已经有很多报道了」\n\n你不是被房东坑了——你是被「平台+金融」一起坑了。\n\n「长租公寓暴雷：你以为签的是合同——其实签的是「卖命契」。」',
+      cond: g => g.money >= 5000 && !g.flags.rentalCrash,
+      choices:[
+        { label:'联合其他租客集体维权', hint:'+💪 +👥', fn: g => { g.flags.rentalCrash=true; g.flags.collectiveAction=true; return{social:5,mood:3}; }},
+        { label:'认栽搬家重新开始', hint:'+😊 -💰', fn: g => { g.flags.rentalCrash=true; g.flags.acceptedLoss=true; return{mood:3,money:-8000}; }},
+        { label:'找律师走法律途径', hint:'+🧠 -💰', fn: g => { g.flags.rentalCrash=true; g.flags.legalAction=true; return{intel:5,money:-3000}; }},
+      ]},
+    { id:'moving_fatigue', icon:'📦', title:'搬家疲劳', category:'housing',
+      body:'这是你在大城市的第5次搬家。\n\n你的搬家历程：\n- 第1次：刚来城市，住城中村\n- 第2次：涨工资了，搬个好点的小区\n- 第3次：房租涨了，搬远一点\n- 第4次：室友太奇葩，换地方\n- 第5次：现在\n\n每次搬家你都会丢一些东西：\n- 第1次：丢了梦想（从大厂梦到生存就好）\n- 第2次：丢了朋友（太远了聚不了）\n- 第3次：丢了时间（通勤2小时）\n- 第4次：丢了信任（被室友坑了）\n- 第5次：丢了「归属感」\n\n你永远在「搬」——永远没有「到家」的感觉。\n\n「搬家疲劳：你不是在换房子——你是在一次又一次地「重新开始」。」',
+      cond: g => g.months >= 24 && !g.flags.movingFatigue,
+      choices:[
+        { label:'咬牙多花点钱租个稳定的好房子', hint:'+😊 -💰', fn: g => { g.flags.movingFatigue=true; g.flags.stableHousing=true; return{mood:8,money:-5000}; }},
+        { label:'学会极简生活减少搬家负担', hint:'+🧠 +😊', fn: g => { g.flags.movingFatigue=true; g.flags.minimalistLiving=true; return{intel:5,mood:5}; }},
+        { label:'开始认真考虑买房的可能性', hint:'+🧠 +💰', fn: g => { g.flags.movingFatigue=true; g.flags.considerBuying=true; return{intel:3,mood:2}; }},
+      ]},
+    { id:'rental_renovation_v29_7', icon:'🔨', title:'租房改造', category:'housing',
+      body:'你决定改造你的出租屋。\n\n你的改造清单：\n- 刷墙（房东说不能改颜色）\n- 换窗帘（花了200）\n- 买地毯（花了300）\n- 装氛围灯（花了150）\n- 买绿植（花了100）\n- 贴墙纸（退租时还得撕掉）\n\n你花了1000元——让一个「睡觉的地方」变成了「家」。\n\n但你知道：\n- 这些都是「带不走」的\n- 下次搬家全部白费\n- 你是在「装修别人的房子」\n\n朋友说：「你花这钱还不如存着。」\n你说：「存着也买不起房——不如让现在的日子好过点。」\n\n「租房改造：房子是别人的——但生活是自己的。」',
+      cond: g => g.money >= 2000 && !g.flags.rentalRenovation,
+      choices:[
+        { label:'花钱把出租屋变成温暖的家', hint:'+😊 -💰', fn: g => { g.flags.rentalRenovation=true; g.flags.cozyHome=true; return{mood:10,money:-1500}; }},
+        { label:'只买能带走的东西装饰', hint:'+🧠 +💰', fn: g => { g.flags.rentalRenovation=true; g.flags.portableDecor=true; return{intel:3,mood:5}; }},
+        { label:'算了凑合住吧', hint:'-😊 +💰', fn: g => { g.flags.rentalRenovation=true; return{mood:-3}; }},
+      ]},
+    { id:'landlord_tricks', icon:'🦊', title:'房东套路', category:'housing',
+      body:'你的房东——套路了你。\n\n房东经典操作：\n- 签合同时说「不涨价」——到期涨500\n- 说「家电齐全」——洗衣机是10年前的\n- 说「押一付三」——退租时扣了2000「清洁费」\n- 东西坏了让你修——「这是你用的」\n- 提前收房——「我儿子要住」\n\n你想维权——\n- 合同上写得很模糊\n- 没有入住时的照片存证\n- 打12345——「建议协商」\n\n你终于理解：租房市场——租客永远是「弱势方」。\n\n「房东套路：你以为签的是合同——其实签的是「信任测试」。」',
+      cond: g => g.jobSalary > 0 && !g.flags.landlordTricks,
+      choices:[
+        { label:'学会签合同前仔细审查留证据', hint:'+🧠 +💪', fn: g => { g.flags.landlordTricks=true; g.flags.smartTenant=true; return{intel:5,charm:2}; }},
+        { label:'找中介托管虽然贵但省心', hint:'+😊 -💰', fn: g => { g.flags.landlordTricks=true; g.flags.agentManaged=true; return{mood:3,money:-2000}; }},
+        { label:'认了不想折腾', hint:'-😊 -💪', fn: g => { g.flags.landlordTricks=true; return{mood:-5}; }},
+      ]},
+    { id:'commute_hell_v29_7', icon:'🚇', title:'通勤地狱', category:'housing',
+      body:'你搬到了更远的地方——房租便宜了1500。\n\n但你的通勤变成了：\n- 早上7:00起床\n- 7:30出门\n- 公交30分钟到地铁站\n- 地铁1小时（被挤成照片）\n- 出地铁走15分钟\n- 9:00到公司\n\n晚上原路返回——到家20:00。\n\n你的每日通勤时间：4小时\n你的每日工作时间：9小时\n你的每日自由时间：扣除吃饭洗漱——2小时\n\n你省了1500房租——但你的时薪变成了：\n（工资-房租）÷（工作时间+通勤时间）\n你发现——其实更亏了。\n\n「通勤地狱：你用4小时的命——省了1500块的房租。」',
+      cond: g => g.jobSalary > 0 && g.money < 40000 && !g.flags.commuteHell,
+      choices:[
+        { label:'多花钱搬到公司附近', hint:'+😊 -💰', fn: g => { g.flags.commuteHell=true; g.flags.movedCloser=true; return{mood:8,money:-3000}; }},
+        { label:'利用通勤时间学习提升自己', hint:'+🧠 +💪', fn: g => { g.flags.commuteHell=true; g.flags.commuteLearning=true; return{intel:5}; }},
+        { label:'申请远程办公减少通勤', hint:'+🧠 +😊', fn: g => { g.flags.commuteHell=true; g.flags.requestedRemote=true; return{intel:3,mood:3}; }},
+      ]},
+    { id:'buy_vs_rent', icon:'🤔', title:'买房还是租房', category:'housing',
+      body:'你被这个问题折磨了很久：「到底该买房还是租房？」\n\n你的计算：\n- 买房：首付30万+月供8000×30年=总共318万\n- 租房：月租4000×30年=144万\n\n买房派说：\n- 「房子会升值」\n- 「有归属感」\n- 「可以落户」\n\n租房派说：\n- 「30年被房子绑住」\n- 「房价可能跌」\n- 「灵活性高」\n\n你发现——这不只是「经济问题」——这是「人生选择」。\n你买的不是房子——是「安全感」。\n你租的不是房子——是「自由」。\n\n「买房vs租房：没有正确答案——只有你能承受的答案。」',
+      cond: g => g.age >= 25 && g.jobSalary > 0 && !g.flags.buyVsRent,
+      choices:[
+        { label:'决定攒钱买房给自己安全感', hint:'+🧠 +💰', fn: g => { g.flags.buyVsRent=true; g.flags.decidedBuy=true; return{intel:3,mood:5}; }},
+        { label:'选择租房把钱投资自己', hint:'+🧠 +😊', fn: g => { g.flags.buyVsRent=true; g.flags.decidedRent=true; return{intel:5,mood:3}; }},
+        { label:'想不通继续纠结', hint:'-😊 +🧠', fn: g => { g.flags.buyVsRent=true; g.flags.stillConfused=true; return{mood:-3,intel:2}; }},
+      ]},
+    { id:'home_definition', icon:'🏠', title:'什么是家', category:'housing',
+      body:'某天深夜——你突然想家了。\n\n但你想的「家」——不是老家。\n也不是你现在住的地方。\n\n你想的「家」——\n- 是一个你不用假装的地方\n- 是一个你可以不坚强的地方\n- 是一个有人等你的地方\n- 是一个你回去就安心的地方\n\n你发现：\n- 你在大城市住了5年——从来没有「到家」的感觉\n- 你的出租屋——只是一个「睡觉的地方」\n- 你的房间——没有「你的味道」\n\n你开始思考：家——到底是「一个地方」还是「一种感觉」？\n\n也许——家不是买来的——是「活」出来的。\n\n「什么是家：不是有房子的地方——是有「你」的地方。」',
+      cond: g => g.months >= 36 && !g.flags.homeDefinition,
+      choices:[
+        { label:'开始用心经营现在住的地方', hint:'+😊 +💪', fn: g => { g.flags.homeDefinition=true; g.flags.createHome=true; return{mood:10,charm:3}; }},
+        { label:'接受「家」是一种心态不是地点', hint:'+🧠 +😊', fn: g => { g.flags.homeDefinition=true; g.flags.homeIsMindset=true; return{intel:5,mood:8}; }},
+        { label:'更加坚定了要买自己的房子', hint:'+💪 +🧠', fn: g => { g.flags.homeDefinition=true; g.flags.determinedBuy=true; return{charm:3,intel:2}; }},
+      ]},
+    { id:'living_alone', icon:'🌙', title:'独居生活', category:'housing',
+      body:'你开始了独居生活。\n\n独居的好处：\n- 想几点睡就几点睡\n- 想吃什么就吃什么\n- 不用迁就任何人\n- 房间永远是你喜欢的样子\n\n独居的坏处：\n- 生病了一个人去医院\n- 半夜害怕了没人陪\n- 做了饭没人一起吃\n- 说了话没人回应\n\n某天你加班到11点回家——打开灯的那一刻：\n- 空荡荡的房间\n- 安静的空气\n- 只有冰箱的嗡嗡声\n\n你突然理解了：独居——不是「自由」——是「自由和孤独的等价交换」。\n\n「独居生活：你拥有了整个世界——但没人分享。」',
+      cond: g => g.age >= 22 && !g.flags.livingAlone && !g.flags.married,
+      choices:[
+        { label:'享受独居的自由和安静', hint:'+😊 +🧠', fn: g => { g.flags.livingAlone=true; g.flags.enjoySolitude=true; return{mood:8,intel:3}; }},
+        { label:'开始主动社交对抗孤独', hint:'+👥 +💪', fn: g => { g.flags.livingAlone=true; g.flags.activeSocial=true; return{social:5,mood:3}; }},
+        { label:'养个宠物陪伴自己', hint:'+😊 -💰', fn: g => { g.flags.livingAlone=true; g.flags.gotPet=true; return{mood:8,money:-2000}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -17046,6 +17127,15 @@ const ACHIEVEMENTS = [
     { id:'insurance_expert_ach_v29_6', icon:'📋', name:'医保通', desc:'研究透了复杂的医保政策', check: g => g.flags.insuranceExpert },
     { id:'science_literacy_ach', icon:'🔬', name:'科学养生', desc:'学会了辨别伪科学养生产品', check: g => g.flags.scienceLiteracy },
     { id:'recovery_week_ach', icon:'🔋', name:'充电完成', desc:'请假一周完全断联治愈了职业倦怠', check: g => g.flags.recoveryWeek },
+    // v29.7 achievements - 住房问题与租房生活
+    { id:'rent_negotiator_ach_v29_7', icon:'📈', name:'房租谈判官', desc:'成功和房东谈判减少了涨幅', check: g => g.flags.negotiatedRent },
+    { id:'roommate_deal_ach', icon:'📝', name:'合租契约', desc:'和室友签了正式的合租协议', check: g => g.flags.roommateAgreement },
+    { id:'stable_home_ach', icon:'🏠', name:'安居乐业', desc:'找到了一个稳定温暖的住所', check: g => g.flags.stableHousing },
+    { id:'cozy_rental_ach', icon:'🔨', name:'出租屋改造家', desc:'把出租屋变成了温暖的家', check: g => g.flags.cozyHome },
+    { id:'smart_tenant_ach', icon:'🦊', name:'聪明租客', desc:'学会了签合同前仔细审查留证据', check: g => g.flags.smartTenant },
+    { id:'commute_learner_ach_v29_7', icon:'🚇', name:'通勤学习者', desc:'利用通勤时间学习提升自己', check: g => g.flags.commuteLearning },
+    { id:'home_mindset_ach', icon:'🏡', name:'心即是家', desc:'接受了家是一种心态不是地点', check: g => g.flags.homeIsMindset },
+    { id:'solitude_lover_ach', icon:'🌙', name:'享受独处', desc:'学会了享受独居生活的自由和安静', check: g => g.flags.enjoySolitude },
 ];
 
 // === ENDINGS === (order matters: first match wins)
