@@ -407,7 +407,8 @@ a:focus-visible {
 .action-bar { display: flex; gap: 10px; padding: 14px 20px; background: var(--bg-secondary); border-top: 1px solid rgba(255,255,255,0.06); flex-shrink: 0; }
 .btn-action { flex: 1; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px; background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); border: none; border-radius: var(--radius-md); color: white; font-family: var(--font-main); font-size: 1rem; font-weight: 600; cursor: pointer; transition: all var(--transition-med); box-shadow: var(--shadow-sm); }
 .btn-action:hover { transform: translateY(-1px); box-shadow: var(--shadow-md), 0 0 20px rgba(59,130,246,0.2); }
-.btn-action:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.btn-action:disabled { opacity: 0.5; cursor: not-allowed; transform: none; animation: btnPulse 2s ease-in-out infinite; }
+@keyframes btnPulse { 0%, 100% { box-shadow: none; } 50% { box-shadow: 0 0 14px rgba(59,130,246,0.35); } }
 .action-icon { font-size: 1.2rem; }
 
 /* Side Menu */

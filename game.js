@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v1.0
+// 都市浮生记 - Game Engine v3.0
 // ============================================
 
 // === GAME STATE ===
@@ -2504,6 +2504,127 @@ const EVENTS = [
         { label:'偶尔参加', hint:'+🧠', fn: g => { g.flags.bookClub=true; return{intel:5,social:3}; }},
         { label:'自己读就好', hint:'+🧠', fn: g => { g.flags.bookClub=true; return{intel:8,mood:3}; }},
       ]},
+    // === v3.0 EVENTS - 2025-2026 TRENDING TOPICS ===
+    { id:'exam_civil_war', icon:'📚', title:'考公大战',
+      body:'2026年国考报名人数突破371.8万，报录比98:1。\n\n你已经备考了两年，每天刷题到凌晨。你妈说："考不上就回来吧。"你爸说："再试一年。"\n\n你的同学小李去年上岸了，朋友圈每天发单位食堂的照片，配文："又是幸福的一天。"\n\n你在评论区回复："羡慕。"然后继续做题。\n\n"考公是当代年轻人的科举——上岸是神话，落榜是人生。"',
+      cond: g => g.age>=22 && g.age<=35 && !g.flags.civilServant && !g.flags.examCivilWar && g.intel>=60,
+      choices:[
+        { label:'全职备考一年', hint:'-💰 -❤️ 🎲', fn: g => { g.flags.examCivilWar=true; if(g.intel>80&&Math.random()>0.6){g.flags.civilServant=true;setJob(g,'公务员',8000);return{mood:40,money:-15000,health:-10}}else{return{mood:-25,money:-15000,health:-8,intel:10}} }},
+        { label:'边工作边备考', hint:'-❤️ 🎲', fn: g => { g.flags.examCivilWar=true; if(Math.random()>0.7){g.flags.civilServant=true;setJob(g,'公务员',8000);return{mood:30,health:-15,intel:8}}else{return{health:-12,mood:-10,intel:5}} }},
+        { label:'放弃考公，接受现实', hint:'+😊 +💰', fn: g => { g.flags.examCivilWar=true; return{mood:15,money:3000}; }},
+        { label:'报个培训班', hint:'-💰💰 🎲', fn: g => { g.flags.examCivilWar=true; if(Math.random()>0.5){g.flags.civilServant=true;setJob(g,'公务员',8000);return{money:-25000,mood:35}}else{return{money:-25000,mood:-15}} }},
+      ]},
+    { id:'consumption_downgrade', icon:'📉', title:'消费降级',
+      body:'你开始用拼多多买东西了。\n\n曾经你嘲笑"拼夕夕"，现在你是"拼爹爹"。你的购物车从淘宝变成了1688，从星巴克变成了瑞幸，从海底捞变成了自热火锅。\n\n你妈说："你终于懂事了。"你说："不是懂事，是没钱了。"\n\n你在豆瓣加入了"抠门女性联合会"，300万成员。你发现：原来不止你一个人在降级。\n\n"消费降级不是穷，是活明白了。"',
+      cond: g => g.money<30000 && !g.flags.consumptionDowngrade && g.age>=24,
+      choices:[
+        { label:'全面拥抱平替', hint:'+💰 +🧠', fn: g => { g.flags.consumptionDowngrade=true; g.flags.minimalist=true; return{money:5000,intel:5,mood:8}; }},
+        { label:'该省省，该花花', hint:'+💰 +😊', fn: g => { g.flags.consumptionDowngrade=true; return{money:3000,mood:5}; }},
+        { label:'只降级不升级', hint:'+💰 -😊', fn: g => { g.flags.consumptionDowngrade=true; return{money:8000,mood:-5}; }},
+        { label:'算了，对自己好点', hint:'-💰 +😊', fn: g => { g.flags.consumptionDowngrade=true; return{money:-2000,mood:10}; }},
+      ]},
+    { id:'ai_scam', icon:'🤖', title:'AI换脸诈骗',
+      body:'你接到"你妈"的视频电话，画面里她哭着说："我在医院，急需5万块钱手术费。"\n\n你慌了，差点就转了账。但你突然想起：这可能是AI换脸诈骗。\n\n你挂了电话，回拨过去——你妈在家看电视呢。\n\n"AI时代，连你妈的脸都不能信了。"\n\n你下载了国家反诈中心App。数据显示：2024年全国电信诈骗超213万起，损失970亿。平均每分钟4人被骗。',
+      cond: g => !g.flags.aiScam && g.money>5000 && g.age>=22,
+      choices:[
+        { label:'识破骗局，报警', hint:'+🧠 +😊', fn: g => { g.flags.aiScam=true; g.flags.hadScam=true; return{intel:10,mood:15}; }},
+        { label:'差点上当', hint:'-😊', fn: g => { g.flags.aiScam=true; g.flags.hadScam=true; return{mood:-15,intel:5}; }},
+        { label:'被骗了5万', hint:'-💰💰💰', fn: g => { g.flags.aiScam=true; g.flags.hadScam=true; return{money:-50000,mood:-30,intel:3}; }},
+        { label:'安装反诈App', hint:'+🧠 +😊', fn: g => { g.flags.aiScam=true; return{intel:8,mood:10}; }},
+      ]},
+    { id:'banwei', icon:'💼', title:'班味儿太重',
+      body:'你在地铁上刷到一条帖子："如何判断一个人有没有班味儿？"\n\n评论区：\n- "眼神空洞"\n- "说话像机器人"\n- "周末也在想工作"\n- "对什么都提不起兴趣"\n\n你照了照镜子，发现自己全中了。\n\n你发了条朋友圈："我的班味儿已经重到洗不掉了。"收获了87个赞，其中50个是同事。\n\n"班味儿是打工人的香水——你喷的不是香水，是疲惫。"',
+      cond: g => g.job!=='待业中' && g.mood<55 && !g.flags.banweiEvent && g.age>=24,
+      choices:[
+        { label:'请假去旅行', hint:'-💰 +😊 +❤️', fn: g => { g.flags.banweiEvent=true; return{money:-3000,mood:20,health:8}; }},
+        { label:'培养新爱好', hint:'+😊 +🧠', fn: g => { g.flags.banweiEvent=true; return{mood:12,intel:5}; }},
+        { label:'摸鱼到下班', hint:'+😊 -💰', fn: g => { g.flags.banweiEvent=true; return{mood:8,money:-500}; }},
+        { label:'接受这就是生活', hint:'+😊', fn: g => { g.flags.banweiEvent=true; return{mood:5}; }},
+      ]},
+    { id:'black_myth', icon:'🎮', title:'黑神话：悟空',
+      body:'《黑神话：悟空》发售了！\n\n你的朋友圈被刷屏了。同事们都在讨论，你的leader甚至请假三天打游戏。\n\n你打开Steam，看到价格：268元。你犹豫了：这钱够我吃一周外卖了。\n\n但你又想：这是中国第一款3A大作，不支持说不过去。\n\n"游戏是成年人的童话——但这个童话，值268块。"',
+      cond: g => !g.flags.blackMyth && g.money>500 && g.age>=20 && g.age<=40,
+      choices:[
+        { label:'买！支持国产', hint:'-💰 +😊 +✨', fn: g => { g.flags.blackMyth=true; return{money:-268,mood:25,charm:5}; }},
+        { label:'等打折', hint:'+💰', fn: g => { g.flags.blackMyth=true; return{mood:5}; }},
+        { label:'云通关', hint:'+😊', fn: g => { g.flags.blackMyth=true; return{mood:15}; }},
+        { label:'没时间玩', hint:'-😊', fn: g => { g.flags.blackMyth=true; return{mood:-5}; }},
+      ]},
+    { id:'anti_involution', icon:'🛌', title:'反内卷运动',
+      body:'你的同事小王辞职了。\n\n他在群里发了条消息："我不卷了，我要回家种地。"\n\n你以为他在开玩笑，结果他真的回了老家，开了个农场。朋友圈每天发种菜、养鸡的照片，配文："今天又是躺平的一天。"\n\n你开始思考：内卷到底为了什么？\n\n"反内卷不是躺平，是重新定义什么叫'站着'。"',
+      cond: g => !g.flags.antiInvolution && g.job!=='待业中' && g.months>=18 && g.mood<50,
+      choices:[
+        { label:'辞职，追求自由', hint:'-💰 +😊 +❤️', fn: g => { g.flags.antiInvolution=true; g.flags.lyingFlat=true; setJob(g,'待业中',0); return{mood:25,health:10,money:-5000}; }},
+        { label:'摸鱼式反抗', hint:'+😊 -💰', fn: g => { g.flags.antiInvolution=true; return{mood:15,money:-2000}; }},
+        { label:'继续卷，但降低期待', hint:'+🧠 +😊', fn: g => { g.flags.antiInvolution=true; return{intel:5,mood:8}; }},
+        { label:'副业Plan B', hint:'+💰 +🧠', fn: g => { g.flags.antiInvolution=true; g.flags.sideHustle='planB'; return{money:3000,intel:8}; }},
+      ]},
+    { id:'dazi_social', icon:'👥', title:'搭子社交',
+      body:'你在小红书上看到一个帖子："找一个饭搭子，不聊工作，不谈感情，只吃饭。"\n\n你心动了。你加了几个群：\n- 饭搭子群\n- 电影搭子群\n- 旅行搭子群\n- 运动搭子群\n\n你发现：搭子社交的精髓是——"不深入、不负担、不期待"。\n\n"搭子是成年人的友谊——轻量、即用、无负担。"',
+      cond: g => !g.flags.daziSocial && g.social<60 && g.age>=22 && g.age<=35,
+      choices:[
+        { label:'积极找搭子', hint:'+👥 +😊', fn: g => { g.flags.daziSocial=true; return{social:15,mood:10}; }},
+        { label:'偶尔参加', hint:'+👥', fn: g => { g.flags.daziSocial=true; return{social:8,mood:5}; }},
+        { label:'还是老朋友好', hint:'+👥 +😊', fn: g => { g.flags.daziSocial=true; return{social:5,mood:8}; }},
+        { label:'社恐，算了', hint:'+😊', fn: g => { g.flags.daziSocial=true; return{mood:5}; }},
+      ]},
+    { id:'xie_xiu', icon:'🔮', title:'邪修生活',
+      body:'你在B站看到一个视频："邪修减肥法——每天吃火锅，但只吃蔬菜。"\n\n你笑了。然后你开始实践"邪修生活"：\n- 邪修做饭：微波炉煮一切\n- 邪修健身：躺在床上做仰卧起坐\n- 邪修学习：听播客入睡，梦里学习\n- 邪修社交：发红包代替见面\n\n"邪修是年轻人的智慧——用离谱的方法，解决合理的问题。"',
+      cond: g => !g.flags.xieXiu && g.age>=20 && g.age<=35,
+      choices:[
+        { label:'全面邪修', hint:'+😊 +🧠', fn: g => { g.flags.xieXiu=true; return{mood:15,intel:8,health:-3}; }},
+        { label:'选择性邪修', hint:'+😊', fn: g => { g.flags.xieXiu=true; return{mood:10}; }},
+        { label:'还是正经点好', hint:'+🧠', fn: g => { g.flags.xieXiu=true; return{intel:5}; }},
+      ]},
+    { id:'city_not_city', icon:'🏙️', title:'City不City',
+      body:'你的外国朋友来中国旅游了。\n\n他拍了条视频："上海City不City？好City啊！"\n\n你带他去吃小笼包、坐地铁、逛外滩。他惊叹："中国太方便了！"\n\n你突然意识到：你习以为常的生活，在别人眼里是"City"的。\n\n"City不City，取决于你看世界的角度。"',
+      cond: g => !g.flags.cityNotCity && g.city==='shanghai' && g.charm>=50,
+      choices:[
+        { label:'当导游，重新认识城市', hint:'+😊 +✨ +👥', fn: g => { g.flags.cityNotCity=true; return{mood:20,charm:8,social:10}; }},
+        { label:'推荐好吃的店', hint:'+😊 +👥', fn: g => { g.flags.cityNotCity=true; return{mood:10,social:5}; }},
+        { label:'没时间陪', hint:'-😊', fn: g => { g.flags.cityNotCity=true; return{mood:-5}; }},
+      ]},
+    { id:'nong_ren_dan_ren', icon:'🎭', title:'浓人淡人',
+      body:'你在社交媒体看到一个测试："你是浓人还是淡人？"\n\n浓人：热情洋溢、表达欲强、喜欢社交\n淡人：平和内敛、享受独处、不喜欢热闹\n\n你测了一下，结果是"淡人"。\n\n你发了条朋友圈："我是淡人。"收获了3个赞。\n\n你的浓人朋友评论："我是浓人！"收获了30个赞。\n\n"浓人淡人，都是好人——只是活法不同。"',
+      cond: g => !g.flags.nongRenDanRen && g.age>=22 && g.age<=40,
+      choices:[
+        { label:'接受自己是淡人', hint:'+😊 +🧠', fn: g => { g.flags.nongRenDanRen=true; return{mood:10,intel:5}; }},
+        { label:'尝试变浓', hint:'+👥 -😊', fn: g => { g.flags.nongRenDanRen=true; return{social:10,mood:-5}; }},
+        { label:'我就是我', hint:'+✨ +😊', fn: g => { g.flags.nongRenDanRen=true; return{charm:8,mood:8}; }},
+      ]},
+    { id:'song_chi_gan', icon:'🧘', title:'松弛感',
+      body:'你在奥运会上看到中国00后选手，他们的表现让你印象深刻：\n\n- 赛前玩手机\n- 比赛中淡定自若\n- 赛后采访："还行吧。"\n\n你被他们的"松弛感"折服了。\n\n你开始反思：为什么我总是那么紧绷？\n\n"松弛感不是躺平，是知道自己能行。"',
+      cond: g => !g.flags.songChiGan && g.mood<60 && g.age>=20 && g.age<=35,
+      choices:[
+        { label:'学习松弛感', hint:'+😊 +❤️', fn: g => { g.flags.songChiGan=true; return{mood:15,health:5}; }},
+        { label:'冥想练习', hint:'+😊 +🧠', fn: g => { g.flags.songChiGan=true; return{mood:12,intel:5}; }},
+        { label:'我还是紧张点好', hint:'+🧠', fn: g => { g.flags.songChiGan=true; return{intel:3}; }},
+      ]},
+    { id:'youth_unemployment', icon:'📊', title:'青年失业率',
+      body:'新闻说：2025年16-24岁青年失业率16.9%-18.9%。\n\n你的同学群里，有人在考公，有人在考研，有人在送外卖，有人在家啃老。\n\n你发了条消息："大家都干嘛呢？"\n\n沉默了5分钟后，有人回复："活着。"\n\n"失业率是个数字，但对每个人来说，是一段人生。"',
+      cond: g => !g.flags.youthUnemployment && g.age>=22 && g.age<=28 && (g.job==='待业中' || g.months<12),
+      choices:[
+        { label:'继续找工作', hint:'+🧠 -😊', fn: g => { g.flags.youthUnemployment=true; return{intel:5,mood:-10}; }},
+        { label:'先做零工', hint:'+💰 -❤️', fn: g => { g.flags.youthUnemployment=true; setJob(g,'零工',5000); return{money:3000,health:-5,mood:-5}; }},
+        { label:'考研提升', hint:'-💰 +🧠', fn: g => { g.flags.youthUnemployment=true; return{money:-10000,intel:15,mood:5}; }},
+        { label:'接受现实', hint:'+😊', fn: g => { g.flags.youthUnemployment=true; return{mood:8}; }},
+      ]},
+    { id:'remote_work', icon:'💻', title:'远程办公',
+      body:'你的公司开始实行"混合办公"：每周2天在家，3天在公司。\n\n在家办公的第一天：\n- 早上9点起床（平时7点）\n- 穿着睡衣开会\n- 中午做了顿好的\n- 下午工作效率出奇地高\n\n你开始想：为什么要每天通勤2小时，就为了坐在办公室里发邮件？\n\n"远程办公是打工人的解放——但也是自律的考验。"',
+      cond: g => !g.flags.remoteWork && g.job!=='待业中' && g.intel>=60 && g.months>=12,
+      choices:[
+        { label:'申请全职远程', hint:'+😊 +❤️ 🎲', fn: g => { g.flags.remoteWork=true; if(Math.random()>0.5){return{mood:20,health:8,money:2000}}else{return{mood:-10}} }},
+        { label:'享受混合办公', hint:'+😊 +❤️', fn: g => { g.flags.remoteWork=true; return{mood:15,health:5}; }},
+        { label:'还是喜欢办公室', hint:'+👥', fn: g => { g.flags.remoteWork=true; return{social:8}; }},
+      ]},
+    { id:'mbti_personality', icon:'🧠', title:'MBTI人格测试',
+      body:'你的朋友圈被MBTI刷屏了。\n\n你是"INFP"——调停者，理想主义者，喜欢独处。\n\n你的同事说："难怪你这么内向。"\n你说："我不是内向，我只是需要充电。"\n\n你开始用MBTI理解所有人：\n- 老板是ENTJ（指挥官）——难怪这么强势\n- 同事是ESFP（表演者）——难怪这么爱社交\n- 你妈是ISFJ（守卫者）——难怪这么操心\n\n"MBTI是成年人的星座——但比星座更科学（大概）。"',
+      cond: g => !g.flags.mbti && g.age>=20 && g.age<=35,
+      choices:[
+        { label:'深入研究MBTI', hint:'+🧠 +✨', fn: g => { g.flags.mbti=true; return{intel:8,charm:5}; }},
+        { label:'用来社交破冰', hint:'+👥 +✨', fn: g => { g.flags.mbti=true; return{social:10,charm:5}; }},
+        { label:'不信这个', hint:'+🧠', fn: g => { g.flags.mbti=true; return{intel:5}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -2537,6 +2658,20 @@ const ACHIEVEMENTS = [
     { id:'bookworm', icon:'📚', name:'书虫', desc:'养成阅读习惯', check: g => g.flags.readingHabit },
     { id:'chef', icon:'🍳', name:'厨神', desc:'学会做饭', check: g => g.flags.cookingSkill },
     { id:'musician', icon:'🎸', name:'音乐人', desc:'学了乐器', check: g => g.flags.musicSkill },
+    { id:'exam_civil_warrior', icon:'⚔️', name:'考公战士', desc:'参加考公大战', check: g => g.flags.examCivilWar },
+    { id:'consumption_master', icon:'📉', name:'消费降级大师', desc:'学会精打细算', check: g => g.flags.consumptionDowngrade },
+    { id:'anti_scam', icon:'🛡️', name:'反诈英雄', desc:'识破AI诈骗', check: g => g.flags.aiScam },
+    { id:'banwei_free', icon:'🌿', name:'去班味儿', desc:'摆脱班味儿', check: g => g.flags.banweiEvent },
+    { id:'wukong_fan', icon:'🐵', name:'天命人', desc:'支持黑神话悟空', check: g => g.flags.blackMyth },
+    { id:'anti_invol', icon:'🛌', name:'反内卷先锋', desc:'选择反内卷', check: g => g.flags.antiInvolution },
+    { id:'dazi_expert', icon:'🤝', name:'搭子达人', desc:'找到你的搭子', check: g => g.flags.daziSocial },
+    { id:'xie_xiu_master', icon:'🔮', name:'邪修大师', desc:'掌握邪修之道', check: g => g.flags.xieXiu },
+    { id:'city_explorer', icon:'🏙️', name:'City探索者', desc:'发现城市的魅力', check: g => g.flags.cityNotCity },
+    { id:'nong_dan_ren', icon:'🎭', name:'浓淡自知', desc:'接受自己的性格', check: g => g.flags.nongRenDanRen },
+    { id:'song_chi', icon:'🧘', name:'松弛感大师', desc:'学会松弛', check: g => g.flags.songChiGan },
+    { id:'survivor_2025', icon:'📊', name:'2025幸存者', desc:'度过就业寒冬', check: g => g.flags.youthUnemployment },
+    { id:'remote_worker', icon:'💻', name:'数字游民', desc:'享受远程办公', check: g => g.flags.remoteWork },
+    { id:'mbti_believer', icon:'🧠', name:'MBTI专家', desc:'了解自己和他人', check: g => g.flags.mbti },
     { id:'photographer', icon:'📷', name:'摄影师', desc:'爱上摄影', check: g => g.flags.photographyHobby },
     { id:'viral_star', icon:'🌟', name:'网红初体验', desc:'意外走红', check: g => g.flags.viralMoment },
     { id:'freelancer', icon:'💻', name:'自由职业者', desc:'成为自由职业者', check: g => g.flags.freelancer },
@@ -3072,7 +3207,11 @@ function showEvent(event) {
                 ${event.choices.map((c,i) => `<button class="choice-btn" onclick="makeChoice(${i})"><span class="choice-label">${c.label}</span>${c.hint?`<span class="choice-hint">${c.hint}</span>`:''}</button>`).join('')}
             </div>
         </div>`;
-    document.getElementById('btn-advance').disabled = true;
+    const _advBtn = document.getElementById('btn-advance');
+    _advBtn.disabled = true;
+    _advBtn.querySelector('.action-text').textContent = '请先做出选择';
+    _advBtn.querySelector('.action-hint').textContent = '';
+    document.getElementById('current-event').scrollIntoView({ behavior: 'smooth', block: 'center' });
     // v2.32: Context-sensitive sound effects
     const dangerIds = ['karoshi','bankruptcy','jail','romanceScam','techLayoff','mortgageDefault','creditCrisis'];
     const emotionIds = ['oldFriendReunion','parentIllness','generationalClash','existentialDread','midlifeAwakening'];
@@ -3118,7 +3257,10 @@ function makeChoice(i) {
     addEventCard({ icon: event.icon, title: event.title, body, choice: choice.label, changes, type: result.mood>0?'positive':result.mood<0?'negative':'' }, true);
 
     document.getElementById('current-event').innerHTML = '';
-    document.getElementById('btn-advance').disabled = false;
+    const _advBtn2 = document.getElementById('btn-advance');
+    _advBtn2.disabled = false;
+    _advBtn2.querySelector('.action-text').textContent = '下个月';
+    _advBtn2.querySelector('.action-hint').textContent = '空格键';
     G.currentEvent = null;
 
     updateHUD();
