@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v22.2
+// 都市浮生记 - Game Engine v22.3
 // ============================================
 
 // === GAME STATE ===
@@ -10618,6 +10618,87 @@ const EVENTS = [
         { label:'看了一会儿，觉得很治愈', hint:'+😊', fn: g => { g.flags.stargazing=true; return{mood:10}; }},
         { label:'蚊子太多了，没看多久就下来了', hint:'', fn: g => { g.flags.stargazing=true; return{mood:3}; }},
       ]},
+    // === v22.3 新增事件（新能源汽车） ===
+    { id:'ev_test_drive', icon:'🚗', title:'试驾新能源车', category:'tech',
+      body:'你在商场看到了一家新能源车展厅。特斯拉、比亚迪、蔚来、小鹏……\n\n你走进去试驾了一辆。加速的感觉让你惊呆了——没有发动机的声音，只有推背感。\n\n销售说：「现在买有补贴，落地价比油车便宜。而且每公里成本只要1毛钱。」\n\n你算了一笔账：\n- 油车：每公里6毛，年1.5万公里=9000元油费\n- 电车：每公里1毛，年1.5万公里=1500元电费\n\n每年省7500元。但电车的电池衰减、二手车贬值、充电桩问题……\n\n你的一个开电车的朋友说：「开了电车就回不去了——就像用了智能手机回不去诺基亚。」\n\n「新能源不是未来——是现在。问题是：你准备好换了吗？」',
+      cond: g => !g.flags.evTestDrive && g.age >= 24 && g.money >= 30000,
+      choices:[
+        { label:'被种草了，开始认真考虑买电车', hint:'+🧠 +😊', fn: g => { g.flags.evTestDrive=true; g.flags.evInterested=true; return{intel:5,mood:8}; }},
+        { label:'试驾很爽但觉得还早，等等看', hint:'+😊', fn: g => { g.flags.evTestDrive=true; return{mood:5}; }},
+        { label:'还是觉得油车靠谱', hint:'', fn: g => { g.flags.evTestDrive=true; return{mood:2}; }},
+      ]},
+    { id:'ev_purchase', icon:'🔋', title:'买了新能源车', category:'finance',
+      body:'你终于买了一辆新能源车。\n\n选车过程让你头疼：比亚迪性价比最高、特斯拉品牌最强、蔚来服务最好、小鹏智驾最牛。\n\n你最终选了一辆15万的比亚迪。提车那天你发了朋友圈：「人生第一辆车！」\n\n你妈评论：「有车位吗？有充电桩吗？」\n\n你发现自己还没解决充电问题。你开始研究：\n- 小区装充电桩：需要物业同意+电力扩容\n- 公共充电桩：每度电1.5元，不算便宜\n- 单位充电：免费但排队\n\n一个月后你适应了电车生活。你发现：每个月的「油费」从800变成了100。\n\n但你的一个油车车主朋友说：「等你换电池的时候就知道了。」\n\n「买电车就像娶媳妇：娶的时候开心——过日子才知道合不合适。」',
+      cond: g => g.flags.evInterested && !g.flags.evPurchase && g.money >= 80000,
+      choices:[
+        { label:'装了家充桩，从此告别加油站', hint:'+😊 +💰-', fn: g => { g.flags.evPurchase=true; g.flags.evOwner=true; return{mood:12,money:-80000,charm:5}; }},
+        { label:'没装充电桩，靠公共充电凑合', hint:'+😊 +💰-', fn: g => { g.flags.evPurchase=true; g.flags.evOwner=true; return{mood:8,money:-80000}; }},
+        { label:'算了，还是先不买', hint:'', fn: g => { g.flags.evPurchase=true; return{mood:-3}; }},
+      ]},
+    { id:'range_anxiety', icon:'😰', title:'续航焦虑', category:'psychology',
+      body:'你开着电车去郊区玩。导航显示剩余路程80公里——你的续航还剩75公里。\n\n你开始焦虑了。你关掉了空调，减慢了速度，关掉了音响。\n\n你一边开一边盯着续航数字。70……65……60……\n\n你找到了一个充电桩。到了发现：坏了。\n\n你又开了5公里找到另一个。这次能用——但要等40分钟充满。\n\n你坐在车里等待，发了条微博：「续航焦虑是真的。油车5分钟加满——电车40分钟。」\n\n一个油车车主评论：「这就是我为什么不买电车的原因。」\n\n一个电车车主回复：「你一年跑几次长途？平时市区通勤，300公里续航绰绰有余。」\n\n「续航焦虑的本质不是技术问题——是心理适应问题。就像手机从3天续航变成1天——你也适应了。」',
+      cond: g => g.flags.evOwner && !g.flags.rangeAnxiety,
+      choices:[
+        { label:'焦虑过后学会了规划，不再担心', hint:'+🧠 +😊', fn: g => { g.flags.rangeAnxiety=true; return{intel:5,mood:5}; }},
+        { label:'每次长途都焦虑，成了心病', hint:'', fn: g => { g.flags.rangeAnxiety=true; return{mood:-5}; }},
+        { label:'买了增程式电动车，不再焦虑', hint:'+😊 +💰', fn: g => { g.flags.rangeAnxiety=true; return{mood:8,money:-5000}; }},
+      ]},
+    { id:'ev_road_trip', icon:'🛣️', title:'电车自驾游', category:'hobby',
+      body:'你决定开电车去自驾游。目的地：300公里外的海边。\n\n你提前规划了路线：沿途有3个充电站，每次充20分钟。\n\n旅程开始很顺利。你享受着电车的安静和平顺。没有发动机噪音，你甚至可以听到海浪声（其实是车载音响）。\n\n到了海边，你打开后备箱，用外放电功能煮了咖啡。\n\n你的一个路人走过来：「这车能外放电？」你说：「能，3.3kW。煮火锅都行。」\n\n他掏出了手机开始研究。\n\n你发了朋友圈：「电车自驾最大的乐趣——是在海边煮一杯自己冲的咖啡。」\n\n「电车改变了出行方式：不只是交通工具——是移动的电源、移动的空调、移动的家。」',
+      cond: g => g.flags.evOwner && !g.flags.evRoadTrip && g.money >= 2000,
+      choices:[
+        { label:'完美旅程，爱上了电车自驾', hint:'+😊 +✨', fn: g => { g.flags.evRoadTrip=true; return{mood:15,charm:5,money:-1500}; }},
+        { label:'充电等待有点烦，但整体还行', hint:'+😊', fn: g => { g.flags.evRoadTrip=true; return{mood:8,money:-1500}; }},
+        { label:'路上遇到了充电排队，体验一般', hint:'', fn: g => { g.flags.evRoadTrip=true; return{mood:3,money:-1500}; }},
+      ]},
+    { id:'charging_social', icon:'🔌', title:'充电社交', category:'social',
+      body:'你在公共充电站等车充电。旁边也有几个人在等。\n\n你们开始聊天。你发现：充电站是一个新的社交场景。\n\n一个网约车司机说：「我每天在这里充两次电，顺便休息一下。」\n\n一个快递小哥说：「我换了电车后每月省3000，但充电确实麻烦。」\n\n一个带孩子的妈妈说：「孩子喜欢在车上玩游戏等充电——他觉得很酷。」\n\n你加了几个人的微信。你发现：电车车主有一个独特的共同点——他们都喜欢讨论车。\n\n你发了条朋友圈：「充电站是新时代的社交广场。等车的时候，你会遇到有趣的人。」\n\n「充电站社交是新能源时代的意外收获——因为等待，你有了和陌生人聊天的时间。」',
+      cond: g => g.flags.evOwner && !g.flags.chargingSocial && g.social >= 25,
+      choices:[
+        { label:'在充电站认识了不少新朋友', hint:'+👥 +😊', fn: g => { g.flags.chargingSocial=true; return{social:8,mood:5}; }},
+        { label:'偶尔和别人聊几句，挺有意思', hint:'+👥', fn: g => { g.flags.chargingSocial=true; return{social:5,mood:3}; }},
+        { label:'充电时只想刷手机', hint:'', fn: g => { g.flags.chargingSocial=true; return{mood:2}; }},
+      ]},
+    { id:'ev_community', icon:'🏘️', title:'车友会', category:'social',
+      body:'你被拉进了一个电车车友群。\n\n群里500人，每天都很热闹：\n- 有人分享充电攻略\n- 有人吐槽某个充电桩品牌\n- 有人组织周末自驾\n- 有人对比不同品牌的OTA更新\n\n你参加了第一次车友会线下活动。20辆车停在停车场，大家打开后备箱，办了一个「后备箱集市」。\n\n你发现：电车车友会和传统车友会不一样。你们聊的不是马力和操控——是智能驾驶、OTA升级、电池技术。\n\n你认识了一个做电池回收的创业者。他说：「电池的梯次利用是下一个风口。」\n\n「新能源不只是换了一辆车——是加入了一个新的社区。你们共享的不只是车型——是对未来的想象。」',
+      cond: g => g.flags.evOwner && !g.flags.evCommunity && g.social >= 30,
+      choices:[
+        { label:'成了车友会的活跃成员', hint:'+👥 +😊 +✨', fn: g => { g.flags.evCommunity=true; return{social:10,mood:8,charm:3}; }},
+        { label:'参加了活动，认识了有意思的人', hint:'+👥 +😊', fn: g => { g.flags.evCommunity=true; return{social:5,mood:5}; }},
+        { label:'加了群但很少参与', hint:'', fn: g => { g.flags.evCommunity=true; return{social:2}; }},
+      ]},
+    { id:'smart_driving_v22_3', icon:'🤖', title:'智能驾驶体验', category:'tech',
+      body:'你的车推送了一个OTA更新：智能驾驶辅助升级。\n\n你上了高速，开启了智能驾驶。车自己保持车道、跟车、变道。\n\n你第一次感到：未来已经来了。\n\n但你还是紧张——你的手始终放在方向盘上。你知道：现在的技术还不完美。\n\n你看了很多测评：智能驾驶的事故率比人类低40%——但每一次事故都会上新闻。\n\n你的一个做AI的朋友说：「自动驾驶不是能不能的问题——是多久的问题。5年？10年？一定会来。」\n\n你在微博上写了一段话：「第一次让车自己开高速——紧张了10分钟后，我居然开始享受了。这也许是未来。」\n\n「智能驾驶让你思考一个问题：你愿意把生命交给算法吗？数据说：它比你靠谱。」',
+      cond: g => g.flags.evOwner && !g.flags.smartDriving && g.intel >= 35,
+      choices:[
+        { label:'开始信赖智能驾驶，高速上轻松了很多', hint:'+🧠 +😊', fn: g => { g.flags.smartDriving=true; return{intel:8,mood:8}; }},
+        { label:'体验很新奇，但还是不太放心', hint:'+🧠', fn: g => { g.flags.smartDriving=true; return{intel:5,mood:3}; }},
+        { label:'不敢用，怕出事', hint:'', fn: g => { g.flags.smartDriving=true; return{mood:-2}; }},
+      ]},
+    { id:'ev_vs_gas', icon:'⚡', title:'油电之争', category:'social',
+      body:'你和同事吵了一架——关于油车和电车。\n\n同事是油车死忠：「电车就是大号手机！电池衰减、不保值、冬天趴窝！」\n\n你是电车拥趸：「油车就是上个世纪的产物！噪音大、污染重、油费贵！」\n\n你们吵了半天，最后各自上网找数据。\n\n你发现：\n- 电车确实有电池衰减问题——但8年内衰减不超过20%\n- 油车确实更保值——但未来可能越来越不值钱\n- 电车冬天续航打7折——但日常通勤影响不大\n- 油车加油5分钟——但油价波动大\n\n你们最后达成了一个共识：适合自己的才是最好的。\n\n「油电之争的本质：不是哪个更好——是你愿意为哪种未来买单。」',
+      cond: g => g.flags.evOwner && !g.flags.evVsGas && g.age >= 25,
+      choices:[
+        { label:'辩论中学到了很多，更理性了', hint:'+🧠 +😊', fn: g => { g.flags.evVsGas=true; return{intel:8,mood:5}; }},
+        { label:'觉得各有所长，不必争论', hint:'+🧠', fn: g => { g.flags.evVsGas=true; return{intel:5,mood:3}; }},
+        { label:'吵完更坚定了自己的选择', hint:'+😊', fn: g => { g.flags.evVsGas=true; return{mood:5}; }},
+      ]},
+    { id:'green_living', icon:'🌱', title:'绿色生活', category:'psychology',
+      body:'买了电车后，你开始关注其他绿色生活方式。\n\n你做了这些改变：\n- 开始垃圾分类\n- 自带购物袋\n- 减少使用一次性用品\n- 选择公共交通或骑车通勤\n- 购买了碳足迹计算APP\n\n你发现：你的月碳排放量从1.2吨降到了0.8吨。\n\n你的一个朋友说：「一个人节约有什么用？工厂一天排放的比你一辈子都多。」\n\n你回答：「如果每个人都这么想——那永远不会改变。」\n\n你发了条微博：「绿色生活不是为了拯救地球——地球不需要你拯救。是为了让自己活在一个更好的世界里。」\n\n「环保的意义不在于一个人做了多少——在于多少人开始在意。」',
+      cond: g => g.flags.evOwner && !g.flags.greenLiving && g.intel >= 40,
+      choices:[
+        { label:'坚持了绿色生活方式', hint:'+😊 +🧠 +❤️', fn: g => { g.flags.greenLiving=true; g.flags.personalGrowth=true; return{mood:10,intel:5,health:3}; }},
+        { label:'做了一些改变，但没完全坚持', hint:'+😊 +🧠', fn: g => { g.flags.greenLiving=true; return{mood:5,intel:3}; }},
+        { label:'觉得个人力量太小了', hint:'', fn: g => { g.flags.greenLiving=true; return{mood:-3}; }},
+      ]},
+    { id:'ev_depreciation', icon:'📉', title:'电车保值率', category:'finance',
+      body:'你想换车了。你去二手车市场估价——你的电车开了两年，当时15万买的。\n\n估价结果：6.5万。\n\n你心碎了。两年亏了8.5万。贬值率57%。\n\n你查了同价位的油车：两年贬值率大约30%。同样的油车能卖10.5万。\n\n你开始怀疑：电车真的省钱吗？\n\n你算了一笔总账：\n- 两年油费省了：15000元\n- 两年贬值多亏：40000元\n- 净亏损：25000元\n\n但另一个角度：你开了两年的体验——安静、平顺、智能——值多少钱？\n\n你在论坛看到一个帖子：「买电车不是投资——是消费。就像买手机一样。」\n\n「电车的贬值率是新能源时代最诚实的代价：技术在进步——你今天买的，明天就过时了。」',
+      cond: g => g.flags.evOwner && !g.flags.evDepreciation && g.age >= 26,
+      choices:[
+        { label:'接受了贬值的现实，享受了就好', hint:'+🧠 +😊', fn: g => { g.flags.evDepreciation=true; return{intel:5,mood:5}; }},
+        { label:'开始研究电车保值攻略', hint:'+🧠 +💰', fn: g => { g.flags.evDepreciation=true; return{intel:8,money:3000}; }},
+        { label:'后悔了，下次还是买油车', hint:'', fn: g => { g.flags.evDepreciation=true; return{mood:-8}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -11603,6 +11684,12 @@ const ACHIEVEMENTS = [
     { id:'star_gazer_ach', icon:'🌟', name:'观星者', desc:'在城市里仰望星空', check: g => g.flags.starGazer },
     { id:'night_entrepreneur_ach', icon:'💼', name:'夜经济创业者', desc:'在夜间经济中找到了商机', check: g => g.flags.nightEconomyJob && g.flags.entrepreneur },
     { id:'night_walker_ach_v22_2', icon:'🌙', name:'深夜漫步者', desc:'在深夜的街道找到了平静', check: g => g.flags.nightWalk },
+    // === v22.3 新增成就（新能源汽车） ===
+    { id:'ev_owner_ach_v22_3', icon:'🚗', name:'电车车主', desc:'购买了自己的新能源车', check: g => g.flags.evOwner },
+    { id:'smart_driver_ach', icon:'🤖', name:'智能驾驶体验者', desc:'体验了智能驾驶辅助系统', check: g => g.flags.smartDriving },
+    { id:'green_liver_ach', icon:'🌱', name:'绿色生活践行者', desc:'开始了低碳环保的生活方式', check: g => g.flags.greenLiving },
+    { id:'ev_explorer_ach', icon:'🛣️', name:'电车自驾达人', desc:'开电车完成了一次自驾旅行', check: g => g.flags.evRoadTrip },
+    { id:'ev_community_ach', icon:'🔌', name:'充电社交家', desc:'在充电站结识了志同道合的朋友', check: g => g.flags.chargingSocial },
 ];
 
 // === ENDINGS === (order matters: first match wins)
