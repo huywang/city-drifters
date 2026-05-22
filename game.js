@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v13.3
+// 都市浮生记 - Game Engine v14.0
 // ============================================
 
 // === GAME STATE ===
@@ -526,6 +526,46 @@ const SURPRISE_EVENTS = [
     { id:'surprise_old_song', icon:'🎵', title:'回忆杀', weight:2,
       body:'你在商场等电梯的时候，突然响起了一首歌——是你高中时候最喜欢的歌。\n\n你站在那儿，听完了整首歌。你的脑海里闪过：教室、操场、那个你暗恋的人、毕业那天。\n\n你打开QQ看了看——那个人的头像是灰色的。已经离线好几年了。\n\n你笑了笑。走出商场的时候，你哼着那首歌。\n\n"音乐是时间机器——一首歌就能把你送回10年前。"',
       fn: g => ({mood: 8, intel: 2}) },
+    // === v14.0 新增惊喜事件 ===
+    { id:'surprise_lucky_draw', icon:'🎰', title:'抽奖中了！', weight:1,
+      body:'你随手参加了商场的抽奖活动——居然中了一等奖！\n\n奖品是一台最新款手机，价值8000块。\n\n你激动得手都在抖。旁边的阿姨说：「年轻人运气真好，我抽了10年都没中过。」\n\n你把手机挂闲鱼了。\n\n"运气这东西——信则有，不信则...反正也不亏。"',
+      fn: g => { const r = Math.random(); if (r > 0.8) { return {money: 8000, mood: 20, charm: 5}; } else { return {mood: -5}; /* 是假的 */ } } },
+    { id:'surprise_celebrity', icon:'⭐', title:'偶遇明星', weight:1,
+      body:'你在机场候机的时候，突然发现旁边坐着一个明星！\n\n你偷偷拍了张照片。明星发现后，对你笑了笑，还跟你合了影。\n\n你发了朋友圈，收获了100个赞。你的同事说：「真的假的？」\n\n你把照片洗出来，贴在了工位上。\n\n"追星的最高境界：让明星追你。（虽然只是看了一眼）"',
+      fn: g => ({mood: 15, charm: 8, social: 5}) },
+    { id:'surprise_traffic_jam', icon:'🚗', title:'大堵车', weight:3,
+      body:'你打车去面试/约会，结果遇到了大堵车。\n\n导航显示：前方拥堵5公里，预计通行时间2小时。\n\n你看着时间一分一秒过去，急得在车里转圈。司机说：「年轻人，别急，这就是大城市的生活。」\n\n你迟到了。对方说：「没关系，我也堵在路上了。」\n\n"大城市的交通：不是你控制时间，是时间控制你。"',
+      fn: g => ({mood: -12, charm: -5}) },
+    { id:'surprise_lost_pet', icon:'🐕', title:'捡到流浪猫/狗', weight:2,
+      body:'你在小区里看到一只脏兮兮的小猫/小狗，瘦得皮包骨，眼神可怜。\n\n你给它买了根火腿肠。它吃完后，蹭了蹭你的脚。\n\n你犹豫了：带回去？自己都快养不活了。不带？良心过不去。\n\n最后你把它带回了家。你的室友/对象说：「又多了一张嘴吃饭。」\n\n"收养流浪动物：你救了一条命，它治愈了你的心。"',
+      fn: g => { g.flags.hasPet = true; return {mood: 12, money: -500, health: 3, social: 5}; } },
+    { id:'surprise_wifi_down', icon:'📶', title:'断网了！', weight:2,
+      body:'你正在赶一个重要的deadline，突然——断网了。\n\n你重启路由器、打电话给运营商、甚至跑到楼下咖啡馆蹭网。\n\n等网恢复的时候，已经过了deadline。\n\n你发了条朋友圈：「现代人的命是WiFi给的。」收获了50个赞。\n\n"断网的恐惧：不是没网——是没网的时候你才发现自己什么都做不了。"',
+      fn: g => ({mood: -10, intel: -3}) },
+    { id:'surprise_compliment', icon:'😊', title:'陌生人的夸奖', weight:2,
+      body:'你在地铁上，突然有个陌生人对你说：「你的衣服好好看！」\n\n你愣了一下，说了声谢谢。然后你开心了一整天。\n\n你发现：有时候，陌生人的一句夸奖，比朋友的十句安慰还管用。\n\n"被看见的感觉：原来我值得被夸奖。"',
+      fn: g => ({mood: 10, charm: 5, social: 3}) },
+    { id:'surprise_power_outage', icon:'💡', title:'停电了', weight:2,
+      body:'晚上10点，你正在赶工，突然停电了。\n\n你打开手机手电筒，发现整个小区都黑了。\n\n你点了根蜡烛，坐在窗边看着城市的夜景。突然发现：没有电的夜晚，星星特别亮。\n\n来电后，你发了条朋友圈：「偶尔停电，也挺好。」\n\n"停电的意义：让你看见被灯光遮蔽的星空。"',
+      fn: g => ({mood: 5, intel: 3, health: 2}) },
+    { id:'surprise_food_delivery_wrong', icon:'🍱', title:'外卖送错了', weight:3,
+      body:'你点了一份宫保鸡丁，外卖小哥送来一份鱼香肉丝。\n\n你打电话给商家，商家说：「抱歉送错了，您先吃，我们再送一份。」\n\n于是你吃了两份。\n\n你摸着肚子想：这算不算因祸得福？\n\n"外卖送错：唯一一种让你吃两份还不胖的理由。（其实会胖）"',
+      fn: g => ({health: -3, mood: 8, money: 0}) },
+    { id:'surprise_old_friend', icon:'👋', title:'偶遇老同学', weight:2,
+      body:'你在街上走着，突然有人喊你的名字——是高中同学！\n\n你们聊了起来。ta现在是一家公司的CEO，年薪百万。\n\n你笑着说：「厉害啊！」心里想：当年ta成绩还没我好呢。\n\n你们加了微信，说「有空聚聚」。然后你们再也没联系过。\n\n"偶遇老同学：让你知道，人生没有标准答案。"',
+      fn: g => ({mood: -5, social: 3, intel: 2}) },
+    { id:'surprise_bonus', icon:'💰', title:'意外奖金', weight:1,
+      body:'公司突然发了一笔奖金——说是「季度绩效奖」。\n\n你看了看金额：5000块！你激动得差点跳起来。\n\n你的同事说：「别高兴太早，下个月可能要裁员。」\n\n你把钱存了起来。不管怎样，先开心一天。\n\n"意外奖金：老板的良心发现——虽然可能只有一天。"',
+      fn: g => ({money: 5000, mood: 15}) },
+    { id:'surprise_social_anxiety', icon:'😰', title:'社恐发作', weight:3,
+      body:'你被拉去参加一个聚会。到场后发现：一个认识的人都没有。\n\n你站在角落，假装看手机。有人来搭话，你紧张得手心出汗。\n\n你找了个借口溜了。回家的路上，你长舒一口气。\n\n你发了条朋友圈：「社恐患者的日常。」收获了100个赞——原来大家都一样。\n\n"社恐不是病——是这个世界太吵了。"',
+      fn: g => ({mood: -8, social: -5, intel: 2}) },
+    { id:'surprise_good_weather', icon:'☀️', title:'好天气', weight:2,
+      body:'今天天气特别好，阳光明媚，微风不燥。\n\n你走在上班的路上，突然觉得：活着真好。\n\n你拍了张天空的照片，发了朋友圈，配文：「今天也是元气满满的一天！」\n\n收获了30个赞。有人说：「被你治愈了。」\n\n"好天气的治愈力：比任何药物都有效。"',
+      fn: g => ({mood: 12, health: 3, charm: 2}) },
+    { id:'surprise_queue', icon:'🧍', title:'排队地狱', weight:3,
+      body:'你去网红店打卡，排队2小时。\n\n你看着前面还有50个人，后面又来了50个人。你进退两难。\n\n终于轮到你了，你发现：也就那样吧。\n\n你发了条小红书：「不值得排队。」收获了1000个赞——大家都在排队。\n\n"排队的真相：你排的不是队，是从众心理。"',
+      fn: g => ({mood: -10, money: -100, charm: -2}) },
 ];
 
 // === EVENTS (100+) ===
@@ -7069,6 +7109,87 @@ const EVENTS = [
         { label:'帮助年轻人', hint:'+👥 +🧠', fn: g => { g.flags.secondYouthDone=true; g.flags.mentor=true; return{social:12,intel:8,mood:8}; }},
         { label:'享受生活', hint:'+😊', fn: g => { g.flags.secondYouthDone=true; return{mood:12}; }},
       ]},
+    // === v14.0 数字生活 + 社交媒体 + 都市新现象 ===
+    { id:'digital_detox_week', icon:'📵', title:'数字断联一周',
+      body:'你决定做一件疯狂的事：断网一周。\n\n第一天：你焦虑得睡不着觉，每隔5分钟就摸口袋。\n第二天：你发现原来地铁上的人都在看手机，只有你在发呆。\n第三天：你开始看书了。一本一直没看完的书，三天看完了。\n第七天：你觉得世界变安静了，你的脑子也变清楚了。\n\n你重新上网，发现：99%的消息其实不重要。\n\n"数字断联：不是与世界断联——是与自己重新连接。"',
+      cond: g => g.age >= 25 && !g.flags.digitalDetoxWeek,
+      choices:[
+        { label:'坚持一周！', hint:'+🧠 +😊', fn: g => { g.flags.digitalDetoxWeek=true; g.flags.digitalDetox=true; return{intel:12,mood:15,health:5}; }},
+        { label:'半天就放弃了', hint:'-🧠', fn: g => { g.flags.digitalDetoxWeek=true; return{intel:-3,mood:-5}; }},
+        { label:'改为每天断联2小时', hint:'+😊 +💪', fn: g => { g.flags.digitalDetoxWeek=true; return{mood:8,health:3}; }},
+      ]},
+    { id:'social_media_addiction_v2', icon:'📱', title:'社交媒体成瘾',
+      body:'你算了一下自己每天的手机使用时间：8小时。\n\n其中：刷抖音3小时、刷微博2小时、刷朋友圈1.5小时、刷小红书1小时、回复消息0.5小时。\n\n你惊了：你把一天1/3的时间花在了看别人的生活上。\n\n你尝试把手机放一边，但5分钟后你又拿起来了。\n\n你说：「我只是看一眼时间。」然后你又刷了1小时。\n\n"社交媒体：你以为你在消磨时间，其实时间在消磨你。"',
+      cond: g => g.age >= 22 && !g.flags.socialMediaAddiction,
+      choices:[
+        { label:'卸载所有App', hint:'+🧠 +😊', fn: g => { g.flags.socialMediaAddiction=true; g.flags.digitalDetox=true; return{intel:10,mood:12}; }},
+        { label:'设置使用时间限制', hint:'+🧠', fn: g => { g.flags.socialMediaAddiction=true; g.flags.screenTimeLimit=true; return{intel:8,mood:5}; }},
+        { label:'算了，继续刷', hint:'-🧠 -😊', fn: g => { g.flags.socialMediaAddiction=true; return{intel:-5,mood:-8}; }},
+      ]},
+    { id:'online_shopping_addiction_v2', icon:'🛒', title:'网购成瘾',
+      body:'你打开了淘宝，本来只想买一包纸巾。\n\n2小时后，你的购物车里有：衣服3件、鞋子2双、零食1箱、小家电5件。\n\n总计：3000块。\n\n你看了看余额，又看了看购物车。你删掉了4件，留了1件——那件你其实不需要的「智能按摩仪」。\n\n你安慰自己：「我工作这么辛苦，应该犒劳一下自己。」\n\n"网购的真相：你买的不是商品——是多巴胺。"',
+      cond: g => g.age >= 22 && !g.flags.onlineShoppingAddiction,
+      choices:[
+        { label:'清空购物车', hint:'-💰 -💰', fn: g => { g.flags.onlineShoppingAddiction=true; return{money:-3000,mood:8,charm:3}; }},
+        { label:'只买纸巾', hint:'+💰 +🧠', fn: g => { g.flags.onlineShoppingAddiction=true; g.flags.minimalist=true; return{money:-30,intel:5,mood:3}; }},
+        { label:'卸载淘宝', hint:'+💰 +😊', fn: g => { g.flags.onlineShoppingAddiction=true; g.flags.digitalDetox=true; return{money:0,mood:10}; }},
+      ]},
+    { id:'livestream_shopping_v2', icon:'📺', title:'直播带货',
+      body:'你打开了直播间，主播正在卖一款「限时特价」的面膜。\n\n「家人们！原价299，今天只要99！还买一送一！最后100单！」\n\n你的手指已经点到了「立即购买」。你的理智说：「你不需要面膜。」\n\n但主播说：「不买就是不爱自己！」\n\n你买了3盒。到货后你发现：你根本不知道怎么用。\n\n"直播带货：你以为你在省钱，其实你在花钱买焦虑。"',
+      cond: g => g.age >= 23 && !g.flags.livestreamShopping,
+      choices:[
+        { label:'买买买！', hint:'-💰 +😊', fn: g => { g.flags.livestreamShopping=true; return{money:-500,mood:5,charm:3}; }},
+        { label:'理性消费', hint:'+🧠 +💰', fn: g => { g.flags.livestreamShopping=true; return{intel:8,mood:-3}; }},
+        { label:'退出直播间', hint:'+💰', fn: g => { g.flags.livestreamShopping=true; return{mood:3}; }},
+      ]},
+    { id:'remote_work_life', icon:'💻', title:'远程办公',
+      body:'你的公司开始允许远程办公了。\n\n第一周：你觉得这是天堂。不用通勤、不用穿正装、可以随时撸猫。\n第二周：你发现你的工作时间变成了24小时。领导随时发消息，你随时要回复。\n第三周：你开始怀念办公室了——至少在那里，下班就是下班。\n\n你说：「远程办公不是自由——是把办公室搬到了家里。」\n\n"远程办公的真相：你以为你在家里工作，其实你在家里生活。"',
+      cond: g => g.age >= 25 && g.jobSalary >= 10000 && !g.flags.remoteWork,
+      choices:[
+        { label:'享受自由！', hint:'+😊 +💪', fn: g => { g.flags.remoteWork=true; return{mood:10,health:5}; }},
+        { label:'设定工作边界', hint:'+🧠 +😊', fn: g => { g.flags.remoteWork=true; g.flags.workLifeBalance=true; return{intel:8,mood:8}; }},
+        { label:'申请回办公室', hint:'+👥', fn: g => { g.flags.remoteWork=true; return{social:10,mood:-3}; }},
+      ]},
+    { id:'food_delivery_addiction', icon:'🍱', title:'外卖依赖',
+      body:'你算了一下：这个月你点了25次外卖。\n\n你打开外卖App，你的「常点」列表有15家店。你闭着眼睛都能背出菜单。\n\n你尝试自己做饭，结果：厨房差点着火，做出来的东西连狗都不吃。\n\n你说：「外卖是我的命。」你的胃说：「不是。」\n\n"外卖依赖：你不是不会做饭——你是懒得做饭。（其实也是不会）"',
+      cond: g => g.age >= 22 && !g.flags.foodDeliveryAddiction,
+      choices:[
+        { label:'学做饭！', hint:'+💪 +😊', fn: g => { g.flags.foodDeliveryAddiction=true; g.flags.cookingSkill=true; return{health:10,mood:8,money:2000}; }},
+        { label:'继续点外卖', hint:'-💪 -💰', fn: g => { g.flags.foodDeliveryAddiction=true; return{health:-8,mood:-5,money:-1500}; }},
+        { label:'一周只做一次', hint:'+💪 +🧠', fn: g => { g.flags.foodDeliveryAddiction=true; return{health:5,intel:3,mood:5}; }},
+      ]},
+    { id:'subscription_fatigue', icon:'💳', title:'订阅疲劳',
+      body:'你查了一下银行卡账单，发现每月自动扣款：\n\n- 视频会员：30元\n- 音乐会员：15元\n- 云存储：20元\n- 健身App：50元\n- 知识付费：99元\n- 外卖会员：15元\n\n总计：229元/月。一年2748元。\n\n你发现：你80%的订阅根本没用过。那个健身App你已经3个月没打开了。\n\n你取消了5个订阅。你觉得：这是你今年最成功的「理财」。\n\n"订阅经济：你以为你在省钱，其实你在为懒惰付费。"',
+      cond: g => g.age >= 23 && !g.flags.subscriptionFatigue,
+      choices:[
+        { label:'取消所有订阅', hint:'+💰 +🧠', fn: g => { g.flags.subscriptionFatigue=true; g.flags.minimalist=true; return{money:2748,intel:5,mood:8}; }},
+        { label:'只保留常用的', hint:'+💰', fn: g => { g.flags.subscriptionFatigue=true; return{money:1500,mood:5}; }},
+        { label:'算了，懒得取消', hint:'-💰', fn: g => { g.flags.subscriptionFatigue=true; return{money:-500,mood:-3}; }},
+      ]},
+    { id:'urban_gardening', icon:'🌱', title:'阳台种菜',
+      body:'你在阳台上种了小番茄、辣椒、生菜。\n\n每天你都会去看看它们长高了没。你给它们浇水、施肥、除虫。\n\n3个月后，你收获了第一颗小番茄。你咬了一口——酸得你皱眉头。\n\n但你觉得：这是你吃过最好吃的番茄。因为它是你自己种的。\n\n你发了朋友圈：「都市农夫的日常。」收获了50个赞。\n\n"阳台种菜：不是为了省钱——是为了在城市里找到一点泥土的感觉。"',
+      cond: g => g.age >= 25 && !g.flags.urbanGardening,
+      choices:[
+        { label:'扩大种植规模', hint:'+😊 +💪', fn: g => { g.flags.urbanGardening=true; return{mood:12,health:5,money:-200}; }},
+        { label:'只种一盆薄荷', hint:'+😊', fn: g => { g.flags.urbanGardening=true; return{mood:8}; }},
+        { label:'放弃（养死了）', hint:'-😊', fn: g => { g.flags.urbanGardening=true; return{mood:-5}; }},
+      ]},
+    { id:'podcast_listener', icon:'🎧', title:'播客听众',
+      body:'你开始听播客了。\n\n上班路上听、做饭时听、跑步时听、睡前听。你听了100+档播客，从科技到人文，从商业到心理。\n\n你发现：原来世界上有这么多聪明人在思考你没想过的问题。\n\n你开始在朋友面前「掉书袋」了。你的朋友说：「你最近怎么说话像知乎？」\n\n你说：「因为我真的在知乎（播客）上学到东西了。」\n\n"播客：让你在碎片时间里，做完整的思考。"',
+      cond: g => g.age >= 25 && !g.flags.podcastListener,
+      choices:[
+        { label:'每天听2小时', hint:'+🧠 +😊', fn: g => { g.flags.podcastListener=true; return{intel:15,mood:8}; }},
+        { label:'只听感兴趣的', hint:'+🧠', fn: g => { g.flags.podcastListener=true; return{intel:10,mood:5}; }},
+        { label:'听了几期就放弃了', hint:'', fn: g => { g.flags.podcastListener=true; return{intel:3}; }},
+      ]},
+    { id:'urban_exploration', icon:'🗺️', title:'城市探险',
+      body:'你开始了一种新的爱好：城市探险。\n\n你去了废弃的工厂、老旧的胡同、隐藏的咖啡馆、没人知道的小公园。\n\n你发现：你住了5年的城市，你其实只了解了10%。\n\n你拍了很多照片，写了一本《我的城市探险日记》。虽然只有你妈看了。\n\n你说：「城市探险让我重新爱上了这座城市。」\n\n"城市探险：不是去远方——是发现身边被忽略的美。"',
+      cond: g => g.age >= 24 && !g.flags.urbanExploration,
+      choices:[
+        { label:'每周探险一次', hint:'+😊 +✨ +💪', fn: g => { g.flags.urbanExploration=true; g.flags.cityWalk=true; return{mood:15,charm:8,health:5}; }},
+        { label:'偶尔去一次', hint:'+😊', fn: g => { g.flags.urbanExploration=true; return{mood:8,charm:3}; }},
+        { label:'太累了不去', hint:'-😊', fn: g => { g.flags.urbanExploration=true; return{mood:-3}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -7716,6 +7837,17 @@ const ACHIEVEMENTS = [
     { id:'marriage_renewer', icon:'💑', name:'婚姻重塑者', desc:'面对了中年婚姻危机', check: g => g.flags.midlifeMarriageCrisis },
     { id:'legacy_builder', icon:'🌟', name:'遗产建造者', desc:'思考了人生遗产', check: g => g.flags.legacyThinking },
     { id:'second_youth_liver', icon:'🌸', name:'第二春', desc:'迎来了人生第二春', check: g => g.flags.secondYouthDone },
+    // === v14.0 新增成就 ===
+    { id:'digital_detox_week_ach', icon:'📵', name:'数字断联者', desc:'完成了一周数字断联', check: g => g.flags.digitalDetoxWeek },
+    { id:'social_media_quitter', icon:'📱', name:'社交媒体戒断者', desc:'面对了社交媒体成瘾', check: g => g.flags.socialMediaAddiction },
+    { id:'online_shopper', icon:'🛒', name:'网购达人', desc:'经历了网购成瘾', check: g => g.flags.onlineShoppingAddiction },
+    { id:'livestream_buyer', icon:'📺', name:'直播间剁手党', desc:'在直播间买了东西', check: g => g.flags.livestreamShopping },
+    { id:'remote_worker_v2_v2', icon:'💻', name:'远程办公者', desc:'体验了远程办公', check: g => g.flags.remoteWork },
+    { id:'food_delivery_master', icon:'🍱', name:'外卖专家', desc:'反思了外卖依赖', check: g => g.flags.foodDeliveryAddiction },
+    { id:'subscription_manager', icon:'💳', name:'订阅管理师', desc:'整理了所有订阅', check: g => g.flags.subscriptionFatigue },
+    { id:'urban_farmer_v2', icon:'🌱', name:'都市农夫', desc:'在阳台种了菜', check: g => g.flags.urbanGardening },
+    { id:'podcast_fan', icon:'🎧', name:'播客爱好者', desc:'成了播客听众', check: g => g.flags.podcastListener },
+    { id:'urban_explorer', icon:'🗺️', name:'城市探险家', desc:'探索了城市的角落', check: g => g.flags.urbanExploration },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -7926,6 +8058,10 @@ const ENDINGS = [
     { id:'second_startup_success_end', badge:'🚀', title:'二次创业成功', desc:'你的第二次创业成功了。\n\n这一次，你不是为了赚钱，而是为了做自己喜欢的事。你开了咖啡馆/做了自媒体/开了网店。\n\n虽然收入不如以前打工，但你每天都很开心。你的孩子说：「爸爸/妈妈，你现在笑得好多了。」\n\n你说：「因为我终于在做自己想做的事了。」\n\n"二次创业：不是为了成功——是为了不后悔。"', cond: g => g.flags.secondStartupDone && g.flags.entrepreneur && g.mood >= 65 && g.age >= 40 },
     { id:'midlife_wisdom_end_v2', badge:'🌟', title:'中年智者', desc:'你45岁了，终于活明白了。\n\n你不再追求升职加薪，不再跟同学比房子车子，不再为孩子的成绩焦虑。\n\n你开始享受生活的每一个瞬间：早上的咖啡、傍晚的散步、周末的画画。\n\n你的朋友说：「你变了，变得松弛了。」\n你说：「不是我变了——是我终于学会了放下。」\n\n"中年智慧：不是拥有更多——是需要的更少。"', cond: g => g.flags.midlifeCrisis35 && g.flags.legacyThinking && g.mood >= 70 && g.age >= 45 },
     { id:'second_youth_end', badge:'🌸', title:'第二春', desc:'你迎来了人生的第二春。\n\n孩子上大学了，房贷还完了，工作稳定了。你终于有了时间和自由。\n\n你学了画画、跑了马拉松、去了西藏。你活得比20岁还精彩。\n\n你的孩子说：「爸/妈，你比我还会玩。」\n你说：「因为我现在才真正活给自己。」\n\n"第二春不是老了——是终于有时间活给自己了。"', cond: g => g.flags.secondYouthDone && g.flags.emptyNest && g.mood >= 70 && g.age >= 45 },
+    // --- v14.0 NEW ENDINGS ---
+    { id:'digital_minimalist_end', badge:'📵', title:'数字极简主义者', desc:'你学会了与数字世界和解。\n\n你卸载了一半的App，关闭了朋友圈，把屏幕时间控制在每天2小时以内。\n\n你开始有更多的时间看书、运动、和朋友面对面聊天。你的注意力回来了，你的焦虑消失了。\n\n你的朋友圈签名改成了：「离线中，请勿打扰。」\n\n"数字极简：不是与世界断联——是选择性地连接。"', cond: g => g.flags.digitalDetoxWeek && g.flags.socialMediaAddiction && g.mood >= 70 && g.age >= 28 },
+    { id:'urban_farmer_end', badge:'🌱', title:'都市农夫', desc:'你在城市里种出了一片绿洲。\n\n你的阳台变成了小菜园：番茄、辣椒、生菜、薄荷。你每天花1小时照顾它们。\n\n你的邻居说：「你这是在城市里种田。」你说：「我这是在种田里找城市。」\n\n你送了一些菜给邻居。你们成了朋友。\n\n"都市农夫：不是为了自给自足——是为了在水泥森林里找到泥土的温度。"', cond: g => g.flags.urbanGardening && g.flags.urbanExploration && g.mood >= 65 && g.age >= 30 },
+    { id:'conscious_consumer_end', badge:'🛒', title:'理性消费者', desc:'你从一个购物狂变成了一个理性消费者。\n\n你不再冲动购物，不再被直播带货忽悠，不再为了满减凑单。你的购物车永远只有3件东西。\n\n你的存款从0变成了3万。不多，但那是你第一次觉得——自己掌控了欲望。\n\n"理性消费：不是不花钱——是花得值。"', cond: g => g.flags.onlineShoppingAddiction && g.flags.subscriptionFatigue && g.flags.minimalist && g.money >= 30000 && g.mood >= 60 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
