@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v28.5
+// 都市浮生记 - Game Engine v28.6
 // ============================================
 
 // === GAME STATE ===
@@ -14717,6 +14717,103 @@ const EVENTS = [
         { label:'先试养一周朋友的猫', hint:'+🧠 -💰', fn: g => { g.flags.secondPet=true; g.flags.triedFosteringFirst=true; g.money -= 500; return{intel:5,mood:3}; }},
         { label:'一只就够了，精力有限', hint:'+🧠', fn: g => { g.flags.secondPet=true; return{intel:3,mood:2}; }},
       ]},
+    // === v28.6: 相亲经济学 + 婚恋市场 + 催婚压力 ===
+    { id:'blind_date_dinner', icon:'🍽️', title:'相亲饭局', category:'social',
+      body:'你妈给你介绍了一个对象——让你周末去见面。\n\n地点：一家「还不错」的餐厅。\n\n你到了——对方已经坐在那了。\n\n前10分钟：\n- 「你做什么工作的？」\n- 「一个月赚多少？」\n- 「有房吗？」\n- 「有车吗？」\n- 「家里几口人？」\n\n你觉得——这不是「约会」——这是「面试」。\n\n结账时：\n- 账单：688元\n- 对方没有掏钱包的意思\n- 你看了看对方的包——大概是你半个月工资\n\n你开始理解：相亲饭局——不是「两个人吃饭」——是「一场无声的经济评估」。\n\n你的「市场价值」——在饭局的前5分钟——已经被对方「算出来了」。\n\n「相亲饭局：你以为你在约会——其实你在参加一场「没有薪水的面试」。」',
+      cond: g => g.age >= 25 && !g.flags.blindDateDinner && !g.flags.married,
+      choices:[
+        { label:'付了钱，但觉得很不舒服', hint:'-💰 -😊', fn: g => { g.flags.blindDateDinner=true; g.flags.paidForDate=true; g.money -= 688; return{mood:-5,social:3}; }},
+        { label:'提出AA，气氛瞬间尴尬', hint:'+🧠 -✨', fn: g => { g.flags.blindDateDinner=true; g.flags.proposedAA=true; g.money -= 344; return{mood:-3,charm:-3}; }},
+        { label:'借口上厕所然后买单', hint:'+✨ -💰', fn: g => { g.flags.blindDateDinner=true; g.money -= 688; return{charm:3,mood:-2}; }},
+      ]},
+    { id:'marriage_corner_park', icon:'🏛️', title:'相亲角', category:'social',
+      body:'你妈把你拉去了人民公园相亲角。\n\n你的「简历」被贴在伞上：\n- 年龄：28岁\n- 学历：本科\n- 身高：175cm\n- 工作：互联网\n- 年薪：15万\n- 房产：无\n- 车辆：无\n\n你站在旁边——看着大爷大妈们——像逛菜市场一样——挑挑拣拣。\n\n一个大妈看了你的简历：\n- 「15万？在上海？」\n- 「没房子？」\n- 「那你儿子拿什么娶老婆？」\n\n你的妈妈——脸红了。\n\n你开始理解：相亲角——不是「帮你找对象」——是「把你明码标价」。\n\n你在那里——不是「一个人」——是「一张简历」。\n\n你的「市场价值」——被简化成了——几个数字。\n\n「相亲角：你以为你在找爱情——其实你在经历一场「人力资本评估」。」',
+      cond: g => g.age >= 26 && !g.flags.visitedMarriageCorner && !g.flags.married,
+      choices:[
+        { label:'待了一下午，见了5个人', hint:'+✨ -😊', fn: g => { g.flags.visitedMarriageCorner=true; g.flags.marriageMarketExperienced=true; return{charm:3,mood:-8,social:5}; }},
+        { label:'跟妈妈吵了一架走了', hint:'-❤️ +🧠', fn: g => { g.flags.visitedMarriageCorner=true; g.flags.rebelledAgainstMatchmaking=true; return{mood:-5,intel:3,social:-5}; }},
+        { label:'认真聊了一个，觉得还行', hint:'+❤️ +😊', fn: g => { g.flags.visitedMarriageCorner=true; g.flags.metSomeoneNice=true; return{mood:5,social:5,charm:3}; }},
+      ]},
+    { id:'parents_marriage_pressure', icon:'📱', title:'爸妈催婚', category:'family',
+      body:'你妈打了第47个催婚电话。\n\n「你看看你表弟——比你小两岁——孩子都上幼儿园了。」\n\n「你表姐——嫁了个公务员——现在住大房子。」\n\n「你再不找——好男/女人都被别人挑走了。」\n\n你的内心独白：\n- 「我不是不想找——是没遇到合适的」\n- 「我工作忙——没时间社交」\n- 「我工资不够——养不起家庭」\n- 「我自己都没活明白——怎么照顾另一个人」\n\n你妈的逻辑：\n- 「先结婚——再一起奋斗」\n- 「你爸当年也穷——不也过来了」\n- 「你不结婚——我们死了都不瞑目」\n\n你开始理解：催婚——不是「关心」——是「焦虑的传递」。\n\n你妈的焦虑——不是「你单身」——是「她在亲戚面前抬不起头」。\n\n你不是她的「孩子」——你是她的「社交货币」。\n\n「催婚：你以为你在抵抗催婚——其实你在抵抗一整个「代际焦虑系统」。」',
+      cond: g => g.age >= 27 && !g.flags.married && !g.flags.resolvedMarriagePressure,
+      choices:[
+        { label:'妥协了，答应去相亲', hint:'+❤️ -😊', fn: g => { g.flags.resolvedMarriagePressure=true; g.flags.compromisedOnMarriage=true; return{mood:-5,social:3,charm:3}; }},
+        { label:'认真沟通了自己的想法', hint:'+🧠 +❤️', fn: g => { g.flags.resolvedMarriagePressure=true; g.flags.communicatedBoundaries=true; return{intel:5,mood:3,social:3}; }},
+        { label:'挂了电话假装没听见', hint:'+😊 -❤️', fn: g => { g.flags.resolvedMarriagePressure=true; g.flags.avoidedPressure=true; return{mood:2,social:-5}; }},
+      ]},
+    { id:'dating_app_reality', icon:'📲', title:'相亲APP的真相', category:'social',
+      body:'你下载了3个相亲APP。\n\n你的个人资料：\n- 照片：精修了2小时\n- 身高：+3cm\n- 年薪：×1.5\n- 爱好：「旅行、阅读、健身」（其实是刷手机、外卖、加班）\n\n你右滑了100个人：\n- 匹配了12个\n- 主动打招呼的：3个\n- 回复了的：1个\n- 聊了超过3天的：0个\n\n你发现：\n- 相亲APP——男多女少——比例约7:3\n- 女性用户的「标准」——比男性用户高2个档次\n- 「有房有车」——不是加分项——是「及格线」\n\n你的「竞争力分析」：\n- 年薪15万——在北京——排名后50%\n- 没房——直接被过滤掉\n- 身高175——在APP上——等于「不到180」\n\n你开始理解：相亲APP——不是「帮你找到爱情」——是「让你看清自己的「市场定位」」。\n\n「相亲APP：你以为你在寻找缘分——其实你在经历一场「大数据排名」。」',
+      cond: g => g.age >= 24 && !g.flags.triedDatingApp && !g.flags.married,
+      choices:[
+        { label:'优化资料继续刷', hint:'+✨ -🧠', fn: g => { g.flags.triedDatingApp=true; g.flags.datingAppOptimized=true; g.money -= 298; return{charm:5,intel:-3}; }},
+        { label:'卸载了，觉得太假了', hint:'+🧠 +😊', fn: g => { g.flags.triedDatingApp=true; g.flags.quitDatingApp=true; return{intel:5,mood:3}; }},
+        { label:'约了一个见面，结果还行', hint:'+❤️ +😊', fn: g => { g.flags.triedDatingApp=true; g.flags.appDateSuccess=true; return{mood:5,social:5}; }},
+      ]},
+    { id:'matchmaking_agency', icon:'🏢', title:'婚介所', category:'finance',
+      body:'你被朋友拉去了一家婚介所。\n\n收费标准：\n- 基础服务：9800元（介绍3个对象）\n- VIP服务：29800元（介绍10个+形象指导）\n- 至尊服务：68000元（无限介绍+约会教练+形象改造）\n\n婚介所顾问说：\n- 「您条件不错——但需要包装一下」\n- 「建议您拍一套专业写真」\n- 「我们可以安排您参加高端相亲活动」\n- 「保证3个月内找到合适的」\n\n你看了看合同：\n- 「不保证成功率」\n- 「不退款」\n- 「最终解释权归本公司所有」\n\n你开始理解：婚介所——不是「帮你找对象」——是「把你的焦虑——变成他们的营收」。\n\n你的「找对象焦虑」——被明码标价——卖给了你。\n\n「婚介所：你以为你在购买爱情——其实你在购买「希望」——而希望——是最贵的商品。」',
+      cond: g => g.age >= 28 && !g.flags.visitedMatchmaking && !g.flags.married && g.money >= 10000,
+      choices:[
+        { label:'买了基础套餐试试', hint:'-💰 +✨', fn: g => { g.flags.visitedMatchmaking=true; g.flags.paidForMatchmaking=true; g.money -= 9800; return{charm:3,social:5}; }},
+        { label:'看了看合同就走了', hint:'+🧠', fn: g => { g.flags.visitedMatchmaking=true; return{intel:5,mood:2}; }},
+        { label:'被销售忽悠买了VIP', hint:'-💰 -🧠', fn: g => { g.flags.visitedMatchmaking=true; g.flags.matchmakingScam=true; g.money -= 29800; return{mood:-5,charm:3}; }},
+      ]},
+    { id:'blind_date_fatigue', icon:'😩', title:'相亲疲劳', category:'psychology',
+      body:'你今年相亲了12次。\n\n你的「相亲简历」：\n- 第1次：紧张+期待\n- 第3次：麻木+应付\n- 第6次：开始走流程\n- 第9次：能在前3分钟判断「行不行」\n- 第12次：你已经不想去了\n\n你的「相亲开销」：\n- 饭局：12次 × 平均300元 = 3600元\n- 咖啡/茶：8次 × 平均80元 = 640元\n- 电影/活动：4次 × 平均200元 = 800元\n- 交通：12次 × 平均50元 = 600元\n\n总计：5640元。\n\n你的「成果」：\n- 第二次见面：2次\n- 第三次见面：0次\n- 交往：0次\n\n你开始理解：相亲——是一场「高成本低回报」的「投资」。\n\n你的ROI（投资回报率）——是负的。\n\n但你妈说：「再试试——下一个可能就是合适的。」\n\n「相亲疲劳：你以为你在寻找爱情——其实你在参加一场「永远无法毕业」的考试。」',
+      cond: g => g.age >= 27 && (g.flags.blindDateDinner || g.flags.visitedMarriageCorner || g.flags.triedDatingApp) && !g.flags.datingFatigue && !g.flags.married,
+      choices:[
+        { label:'暂停相亲，专注自己', hint:'+🧠 +😊', fn: g => { g.flags.datingFatigue=true; g.flags.datingBreak=true; return{intel:5,mood:5}; }},
+        { label:'降低标准再试试', hint:'+✨ -🧠', fn: g => { g.flags.datingFatigue=true; g.flags.loweredStandards=true; return{charm:3,intel:-3}; }},
+        { label:'开始怀疑自己是不是不配', hint:'-😊 -🧠', fn: g => { g.flags.datingFatigue=true; g.flags.datingSelfDoubt=true; return{mood:-10,intel:-3}; }},
+      ]},
+    { id:'gate_crashing_wedding', icon:'💒', title:'门当户对', category:'social',
+      body:'你谈了一个对象——但对方家长觉得你「不够格」。\n\n对方家长的「标准」：\n- 房子：至少在本市有一套\n- 车子：至少20万以上\n- 工作：公务员/事业编/大厂\n- 家庭：父母有退休金，无负担\n- 彩礼/嫁妆：30万起\n\n你的「现状」：\n- 房子：租房\n- 车子：无\n- 工作：私企\n- 家庭：父母在农村，无退休金\n- 存款：5万\n\n你的对象说：「我爸妈不是势利——他们只是不想我吃苦。」\n\n你开始理解：门当户对——不是「封建思想」——是「风险对冲」。\n\n对方家长——不是在「嫌你穷」——是在「评估你女儿/儿子的未来风险」。\n\n你的「爱情」——在「经济现实」面前——变得很轻。\n\n「门当户对：你以为爱情可以战胜一切——其实爱情——战胜不了房贷。」',
+      cond: g => g.age >= 26 && !g.flags.facedGateCrashing && !g.flags.married && g.money < 100000,
+      choices:[
+        { label:'努力赚钱证明自己', hint:'+💰 +🧠 -😊', fn: g => { g.flags.facedGateCrashing=true; g.flags.motivatedByRejection=true; return{intel:5,mood:-5,charm:3}; }},
+        { label:'分手了，不想委屈自己', hint:'-❤️ +🧠', fn: g => { g.flags.facedGateCrashing=true; g.flags.brokeUpOverMoney=true; return{mood:-10,intel:5}; }},
+        { label:'跟对象一起面对', hint:'+❤️ +✨', fn: g => { g.flags.facedGateCrashing=true; g.flags.fightingTogether=true; return{mood:3,social:5,charm:3}; }},
+      ]},
+    { id:'getting_ghosted_date', icon:'👻', title:'被放鸽子', category:'social',
+      body:'你精心准备了一次约会。\n\n你的准备：\n- 提前3天订了餐厅\n- 换了新衣服（花了800元）\n- 做了发型（花了200元）\n- 查了30分钟的「约会话题」\n\n到了约定时间：\n- 你提前10分钟到了\n- 对方说「马上到」\n- 15分钟后：「堵车了」\n- 30分钟后：「不好意思有点事」\n- 1小时后：对方不回复了\n\n你一个人坐在餐厅——服务员问：「还等人吗？」\n\n你说：「不来了，就我一个人吧。」\n\n你一个人吃了一顿饭——花了一个人的钱——但付了两个人的尴尬。\n\n你开始理解：被放鸽子——不是「你不够好」——是「对方不够尊重」。\n\n但你的内心——还是在想：「是不是我哪里做错了？」\n\n「被放鸽子：你以为你在等一个人——其实你在等一个「你值得被认真对待」的证明。」',
+      cond: g => g.age >= 24 && (g.flags.triedDatingApp || g.flags.blindDateDinner) && !g.flags.ghostedOnDate && !g.flags.married,
+      choices:[
+        { label:'删了对方联系方式，下一位', hint:'+🧠 +✨', fn: g => { g.flags.ghostedOnDate=true; g.flags.movedOnFromGhosting=true; g.money -= 500; return{intel:3,charm:3,mood:-3}; }},
+        { label:'追问原因，得到一个「不合适」', hint:'-😊 +🧠', fn: g => { g.flags.ghostedOnDate=true; g.money -= 500; return{mood:-8,intel:3}; }},
+        { label:'一个人把饭吃完了，觉得也挺好', hint:'+😊 +🧠', fn: g => { g.flags.ghostedOnDate=true; g.flags.enjoyedSoloDate=true; g.money -= 500; return{mood:3,intel:5}; }},
+      ]},
+    { id:'single_life_premium', icon:'💎', title:'单身税', category:'finance',
+      body:'你算了一笔账——单身的「隐性成本」。\n\n单身 vs 情侣的月度开销对比：\n\n住房：\n- 单身：整租 3500元/月\n- 情侣：合租分摊 1750元/月\n\n饮食：\n- 单身：做饭不划算，外卖 2000元/月\n- 情侣：一起做饭 1200元/月（人均600）\n\n社交：\n- 单身：需要更多社交填补空白 800元/月\n- 情侣：互相陪伴 200元/月（人均100）\n\n总计：\n- 单身月均：6300元\n- 情侣月均：3050元/人\n- 「单身税」：3250元/月 = 39000元/年\n\n你开始理解：单身——不是「自由选择」——是「一种昂贵的生活方式」。\n\n社会没有告诉你——「独立」是有价格的。\n\n你不是「享受单身」——你是「买得起单身的奢侈品」。\n\n「单身税：你以为你在为自由买单——其实你在为「没有分摊成本」买单。」',
+      cond: g => g.age >= 25 && !g.flags.married && !g.flags.calculatedSingleTax && g.money >= 0,
+      choices:[
+        { label:'认了，单身就是贵', hint:'+🧠 -💰', fn: g => { g.flags.calculatedSingleTax=true; g.flags.acceptedSingleCost=true; return{intel:5,mood:-3}; }},
+        { label:'开始认真找对象（经济角度）', hint:'+✨ -🧠', fn: g => { g.flags.calculatedSingleTax=true; g.flags.economicDating=true; return{charm:3,intel:-3}; }},
+        { label:'觉得一个人的自由值这个价', hint:'+😊 +🧠', fn: g => { g.flags.calculatedSingleTax=true; g.flags.valuesFreedom=true; return{mood:5,intel:5}; }},
+      ]},
+    { id:'anti_marriage_movement', icon:'🏴', title:'不婚主义', category:'psychology',
+      body:'你在豆瓣看到一篇帖子：「不婚不育保平安」。\n\n点赞：10万+。\n\n评论区的观点：\n- 「婚姻是合法的卖淫」——激进派\n- 「结婚是两个人的赌博」——理性派\n- 「不结婚至少不会离婚」——保守派\n- 「单身是最高级的自由」——理想派\n\n你的反思：\n- 你见过——太多「不幸福」的婚姻\n- 你见过——太多「为了结婚而结婚」的人\n- 你见过——太多「婚后后悔」的朋友\n\n你开始想：\n- 「结婚」——真的是「必须」的吗？\n- 「单身」——真的是「失败」的吗？\n- 「不婚」——是「选择」——还是「逃避」？\n\n你开始理解：不婚主义——不是「反对婚姻」——是「反对「必须结婚」的社会叙事」。\n\n你有权利——选择「不」。\n\n「不婚主义：你不是在拒绝爱情——你是在拒绝「被规定的人生」。」',
+      cond: g => g.age >= 26 && !g.flags.married && !g.flags.antiMarriage && (g.flags.datingFatigue || g.flags.facedGateCrashing || g.flags.ghostedOnDate),
+      choices:[
+        { label:'决定了，不结婚也挺好', hint:'+😊 +🧠', fn: g => { g.flags.antiMarriage=true; g.flags.chosenSingleLife=true; return{mood:8,intel:5}; }},
+        { label:'不排斥婚姻，但不强求', hint:'+🧠 +✨', fn: g => { g.flags.antiMarriage=true; g.flags.balancedViewOnMarriage=true; return{intel:5,charm:3}; }},
+        { label:'其实还是想找个人一起过', hint:'+❤️ -🧠', fn: g => { g.flags.antiMarriage=true; g.flags.stillWantsLove=true; return{mood:3,social:3}; }},
+      ]},
+    { id:'blind_date_checklist', icon:'📋', title:'相亲对象的Excel表格', category:'social',
+      body:'你的一个朋友——给你看了她的「相亲对象评估表」。\n\nExcel表格的字段：\n- 姓名\n- 年龄\n- 身高/体重\n- 学历（本科/硕士/博士）\n- 年薪（精确到万）\n- 房产（有/无/几套/哪个区）\n- 车辆（品牌/价格）\n- 家庭（父母职业/兄弟姐妹）\n- 性格（1-5分）\n- 外貌（1-5分）\n- 综合评分（加权平均）\n\n她已经评估了37个人。\n\n最高分：82分（已婚）\n第二高：78分（异地）\n第三高：75分（不喜欢她）\n\n你问她：「你找到合适的了吗？」\n\n她说：「分数高的看不上我，分数低的我看不上。」\n\n你开始理解：用Excel找对象——不是「理性」——是「用理性掩盖的恐惧」。\n\n她怕——「选错了」——所以她「永远在选」。\n\n「相亲Excel：你以为你在做数据分析——其实你在用数据——逃避做决定。」',
+      cond: g => g.age >= 26 && !g.flags.sawDatingSpreadsheet && !g.flags.married,
+      choices:[
+        { label:'觉得挺有道理的，自己也想做一个', hint:'+🧠 -❤️', fn: g => { g.flags.sawDatingSpreadsheet=true; g.flags.madeDatingSpreadsheet=true; return{intel:5,mood:-3}; }},
+        { label:'劝她别太理性了', hint:'+❤️ +✨', fn: g => { g.flags.sawDatingSpreadsheet=true; g.flags.advisedAgainstOverthinking=true; return{charm:5,mood:3}; }},
+        { label:'笑着摇摇头，每个人活法不同', hint:'+🧠 +😊', fn: g => { g.flags.sawDatingSpreadsheet=true; return{intel:3,mood:2,charm:2}; }},
+      ]},
+    { id:'wedding_gift_pressure', icon:'🧧', title:'份子钱地狱', category:'finance',
+      body:'十一黄金周——你收到了8份婚礼请帖。\n\n你的份子钱预算：\n- 普通同事：500元 × 3 = 1500元\n- 好朋友：1000元 × 2 = 2000元\n- 大学室友：2000元 × 1 = 2000元\n- 亲戚：3000元 × 1 = 3000元\n- 发小：随大流 = 1000元\n\n总计：9500元。\n\n你的月薪：8000元。\n\n你还没结婚——这意味着：\n- 你「只出不进」\n- 你送出去的份子钱——可能「永远收不回来」\n- 如果你不结婚——你就是「净亏损」\n\n你开始理解：份子钱——不是「祝福」——是「一种社交税」。\n\n不交——得罪人。\n交了——亏钱。\n不结婚——永远亏。\n\n「份子钱：你以为你在送祝福——其实你在为「单身」缴税。」',
+      cond: g => g.age >= 25 && !g.flags.married && !g.flags.weddingGiftHell && g.money >= 0,
+      choices:[
+        { label:'全去了，钱包在哭', hint:'-💰 +✨ -😊', fn: g => { g.flags.weddingGiftHell=true; g.money -= 9500; return{social:5,mood:-5,charm:3}; }},
+        { label:'只去关系最好的', hint:'+🧠 -✨', fn: g => { g.flags.weddingGiftHell=true; g.flags.selectiveWeddings=true; g.money -= 3000; return{intel:3,social:-3}; }},
+        { label:'决定以后不结婚把份子钱赚回来是不可能的', hint:'+🧠 +😊', fn: g => { g.flags.weddingGiftHell=true; g.flags.acceptedGiftLoss=true; return{intel:5,mood:2}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -16029,6 +16126,16 @@ const ACHIEVEMENTS = [
     { id:'two_pet_owner_ach', icon:'🐱🐕', name:'双宠家庭', desc:'养了两只宠物双倍的快乐', check: g => g.flags.twoPetOwner },
     { id:'adopted_stray_ach', icon:'🏠', name:'给它一个家', desc:'领养了流浪动物', check: g => g.flags.adoptedStray },
     { id:'pet_privacy_ach', icon:'🛡️', name:'不消费它', desc:'拒绝把宠物当流量工具', check: g => g.flags.petPrivacyAdvocate },
+    // v28.6: 相亲经济学 + 婚恋市场 + 催婚压力
+    { id:'paid_for_date_ach', icon:'🍽️', name:'绅士买单', desc:'相亲饭局主动买了单', check: g => g.flags.paidForDate },
+    { id:'rebelled_matchmaking_ach', icon:'🏴', name:'拒绝包办', desc:'反抗父母安排的相亲角', check: g => g.flags.rebelledAgainstMatchmaking },
+    { id:'communicated_boundaries_ach', icon:'💬', name:'有效沟通', desc:'跟父母认真谈了自己的婚恋想法', check: g => g.flags.communicatedBoundaries },
+    { id:'dating_break_ach', icon:'🧘', name:'相亲休息', desc:'决定暂停相亲专注自我成长', check: g => g.flags.datingBreak },
+    { id:'chosen_single_ach', icon:'💎', name:'主动单身', desc:'选择了不结婚的自由生活', check: g => g.flags.chosenSingleLife },
+    { id:'fighting_together_ach', icon:'💑', name:'共同面对', desc:'和对象一起面对家庭压力', check: g => g.flags.fightingTogether },
+    { id:'solo_date_ach', icon:'🍜', name:'一个人也很好', desc:'被放鸽子后享受了一人食', check: g => g.flags.enjoyedSoloDate },
+    { id:'selective_weddings_ach', icon:'🧧', name:'理性随礼', desc:'只参加最重要的婚礼', check: g => g.flags.selectiveWeddings },
+    { id:'values_freedom_ach', icon:'🕊️', name:'自由无价', desc:'觉得单身的自由值得这个价', check: g => g.flags.valuesFreedom },
 ];
 
 // === ENDINGS === (order matters: first match wins)
