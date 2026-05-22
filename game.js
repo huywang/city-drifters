@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v27.7
+// 都市浮生记 - Game Engine v27.8
 // ============================================
 
 // === GAME STATE ===
@@ -14142,6 +14142,87 @@ const EVENTS = [
         { label:'体验了一次挺特别的', hint:'-💰 +😊', fn: g => { g.flags.glampingLuxury=true; g.money -= 1500; return{mood:5}; }},
         { label:'觉得不值这个价，不如住酒店', hint:'-💰 -😊', fn: g => { g.flags.glampingLuxury=true; g.money -= 1500; return{mood:-3,intel:3}; }},
       ]},
+    // v27.8: 社区生活 + 邻里关系 + 基层治理
+    { id:'neighbor_noise_war', icon:'🔊', title:'噪音大战', category:'society',
+      body:'你的楼上邻居——又开始装修了。\n\n周一到周六：早上8点到晚上8点。\n\n持续了——3个月。\n\n你试过：\n- 上门沟通：「能不能限制一下时间？」→ 对方：「我在自己家装修，碍着你了？」\n- 找物业：「我们只能劝导，没有执法权。」\n- 打12345：「已转交相关部门处理。」（然后没然后了）\n- 报警：「这属于民事纠纷，建议协商解决。」\n\n你开始报复：\n- 买了个震楼器（300元）\n- 半夜开大音响\n- 在群里@他\n\n结果——\n- 你被邻居投诉了\n- 物业警告了你\n- 你的血压升高了20\n\n你开始理解：噪音大战——没有赢家——只有「更吵」。\n\n你不是在维权——你是在打一场「没有裁判的战争」。\n\n「噪音大战：你以为你在跟邻居斗——其实你在跟整个物业管理体系斗。」',
+      cond: g => g.age >= 18 && !g.flags.neighborNoiseWar && g.mood >= 20,
+      choices:[
+        { label:'通过法律途径解决了', hint:'+🧠 +✨ -💰', fn: g => { g.flags.neighborNoiseWar=true; g.flags.legalResolution=true; g.money -= 2000; return{intel:8,charm:3,mood:-3}; }},
+        { label:'忍了3个月终于装修完了', hint:'-😊 -❤️ +🧠', fn: g => { g.flags.neighborNoiseWar=true; g.flags.patienceWinner=true; return{mood:-10,health:-5,intel:5}; }},
+        { label:'买了降噪耳机，眼不见为净', hint:'-💰 +😊', fn: g => { g.flags.neighborNoiseWar=true; g.money -= 1500; return{mood:3}; }},
+      ]},
+    { id:'community_group_buy_v27_8', icon:'🛒', title:'社区团购', category:'finance',
+      body:'你加了小区团购群。\n\n团长是你的邻居——王大姐。\n\n今天团购：\n- 土鸡蛋30枚：18.9元（超市28元）\n- 五花肉500g：12.9元（超市19.9元）\n- 草莓2斤：15.9元（超市29.9元）\n\n你下单了——省了30元。\n\n你发现：\n- 社区团购——确实比超市便宜\n- 但你需要「第二天去团长家拿」\n- 质量——有好有坏（这次草莓很甜，上次烂了一半）\n\n你也发现：\n- 王大姐每单抽佣10%\n- 她一个月——光抽佣就赚了5000+\n- 她不用上班——在家「开团」就行\n\n你开始想：\n- 社区团购——是在「省钱」还是在「被薅」？\n- 你省了30元——但平台赚了10元——团长赚了3元\n\n你开始理解：社区团购——不是「大家一起省钱」——是「大家一起帮团长赚钱」。\n\n「社区团购：你以为你在省钱——其实你在帮邻居大姐实现财务自由。」',
+      cond: g => g.age >= 18 && !g.flags.communityGroupBuy && g.money >= 100,
+      choices:[
+        { label:'成了忠实用户，每周都团购', hint:'+💰 +🤝', fn: g => { g.flags.communityGroupBuy=true; g.flags.groupBuyRegular=true; g.money += 200; return{social:3}; }},
+        { label:'偶尔买买，看情况', hint:'+💰 +🧠', fn: g => { g.flags.communityGroupBuy=true; g.money += 50; return{intel:3}; }},
+        { label:'发现自己也想当团长', hint:'+💰 +🧠 +✨', fn: g => { g.flags.communityGroupBuy=true; g.flags.wannaBeGroupLeader=true; return{intel:5,charm:3}; }},
+      ]},
+    { id:'property_management_war', icon:'🏢', title:'物业大战', category:'society',
+      body:'你们小区的物业——又要涨物业费了。\n\n现在：2.5元/平米/月\n涨后：3.2元/平米/月\n你的房子80平：每月多交56元，一年多交672元。\n\n业主群炸了：\n- 「凭什么涨？」\n- 「服务这么差还涨？」\n- 「换物业！」\n\n你们成立了「业主委员会」——\n\n你发现：\n- 业委会主任——跟物业有关系\n- 投票过程——不透明\n- 反对的人——被踢出群了\n\n你开始理解：物业大战——不是「业主vs物业」——是「业主vs业主」。\n\n支持换物业的——和反对换物业的——在群里打了3天。\n\n你的物业费——还是涨了。\n\n你开始理解：在中国——业主维权——比员工维权——还难。\n\n「物业大战：你以为你在跟物业斗——其实你在跟整个小区的利益格局斗。」',
+      cond: g => g.age >= 25 && !g.flags.propertyManagementWar && g.flags.hasHouse,
+      choices:[
+        { label:'积极参与业委会，推动改革', hint:'+🤝 +🧠 +✨ -😊', fn: g => { g.flags.propertyManagementWar=true; g.flags.communityLeader=true; g.reputation.social += 5; return{social:5,intel:5,charm:3,mood:-3}; }},
+        { label:'在群里投了反对票，但没改变什么', hint:'+🧠 -😊', fn: g => { g.flags.propertyManagementWar=true; return{intel:3,mood:-5}; }},
+        { label:'算了，多交就多交吧', hint:'-💰 +😊', fn: g => { g.flags.propertyManagementWar=true; g.money -= 672; return{mood:3}; }},
+      ]},
+    { id:'delivery_package_chaos', icon:'📦', title:'快递江湖', category:'society',
+      body:'你的快递——又被放在驿站了。\n\n你明明写了「送货上门」——\n\n但你的快递永远在：\n- 菜鸟驿站（步行10分钟）\n- 丰巢柜（步行5分钟，但超时收费）\n- 门卫室（下班后已关门）\n\n你投诉了——\n\n快递员说：「一天送200件——你让我一件一件送上门——我送到明年？」\n\n你开始理解：\n- 快递员：每单赚0.8元，一天200单=160元\n- 送货上门：每单多花10分钟，200单=33小时\n- 结论：送货上门——对快递员来说——不可能\n\n你开始想：\n- 你付了「送货上门」的钱\n- 你得到了「自己取」的服务\n- 你的权益——被谁吃了？\n\n答案是：被「效率」吃了。\n\n你开始理解：快递江湖——不是「服务差」——是「便宜到不可能有好服务」。\n\n「快递江湖：你不是在收快递——你是在用10分钟步行换3块钱的运费。」',
+      cond: g => g.age >= 16 && !g.flags.deliveryPackageChaos,
+      choices:[
+        { label:'改用京东自营，至少送上门', hint:'-💰 +😊 +🧠', fn: g => { g.flags.deliveryPackageChaos=true; g.flags.jdPremium=true; return{mood:5,intel:3}; }},
+        { label:'接受了现实，每天散步取快递', hint:'+❤️ +😊', fn: g => { g.flags.deliveryPackageChaos=true; return{health:3,mood:3}; }},
+        { label:'每次都投诉，逼迫送上门', hint:'+✨ -😊 -🤝', fn: g => { g.flags.deliveryPackageChaos=true; g.flags.deliveryComplainer=true; return{charm:3,mood:-3,social:-3}; }},
+      ]},
+    { id:'neighborhood_wechat_group', icon:'📱', title:'业主群风云', category:'social',
+      body:'你被拉进了业主群。\n\n群里有500人。\n\n每天的消息：\n- 30%：「谁家孩子在哭？」\n- 20%：「谁家车挡了我的路？」\n- 15%：「物业又在搞什么？」\n- 10%：「谁捡了我的快递？」\n- 10%：广告（装修/家政/补习）\n- 10%：政治讨论（吵起来了）\n- 5%：有用信息\n\n你发现：\n- 群里最活跃的人——不用上班\n- 群里最爱吵架的人——住你隔壁\n- 群里发广告最多的人——是物业的人\n\n你也发现：\n- 你在群里认识了楼下的大爷（他养了一只很可爱的狗）\n- 你帮邻居收了一次快递（她送了你一盘饺子）\n- 你在群里找到了一个拼车伙伴\n\n你开始理解：业主群——是「微缩版的中国社会」。\n\n有吵架的、有和稀泥的、有默默围观的、有退群的。\n\n「业主群风云：500人的群——真正有用的消息不超过5条——但你不敢退。」',
+      cond: g => g.age >= 22 && !g.flags.neighborhoodGroup && g.social >= 10,
+      choices:[
+        { label:'成了群里的热心人', hint:'+🤝 +😊 +✨', fn: g => { g.flags.neighborhoodGroup=true; g.flags.groupHelper=true; g.reputation.social += 3; return{social:5,mood:3,charm:3}; }},
+        { label:'默默围观不发言', hint:'+🧠', fn: g => { g.flags.neighborhoodGroup=true; return{intel:3}; }},
+        { label:'太吵了，设置了免打扰', hint:'+😊 -🤝', fn: g => { g.flags.neighborhoodGroup=true; g.flags.mutedGroup=true; return{mood:3,social:-3}; }},
+      ]},
+    { id:'square_dancing_war', icon:'💃', title:'广场舞大战', category:'society',
+      body:'你楼下的大妈们——又开始跳广场舞了。\n\n时间：每天19:00-21:00\n音乐：《最炫民族风》循环播放\n音量：你能在15楼听到每一个字\n\n你试过：\n- 在群里说：「能不能小点声？」→ 被大妈们围攻：「你们年轻人就是矫情」\n- 找物业：「这是公共区域，我们管不了」\n- 打110：「这是民事纠纷」\n- 买了个「反广场舞音响干扰器」（800元）→ 被大妈发现了差点被打\n\n你开始理解：广场舞——不是一个「噪音问题」——是一个「代际战争」。\n\n大妈们的立场：「我跳了10年了，你搬来的时候就知道这里跳舞。」\n你的立场：「我上了一天班只想安静一会儿。」\n\n没有对错——只有「先来后到」和「人多势众」。\n\n大妈们——人多——而且有时间。\n\n「广场舞大战：你不是在跟噪音斗——你是在跟一整个退休群体斗。」',
+      cond: g => g.age >= 20 && !g.flags.squareDancingWar && g.mood >= 20,
+      choices:[
+        { label:'跟大妈们谈判达成了时间协议', hint:'+🤝 +🧠 +✨', fn: g => { g.flags.squareDancingWar=true; g.flags.negotiationMaster=true; return{social:5,intel:5,charm:3}; }},
+        { label:'买了降噪耳机认命了', hint:'-💰 +😊', fn: g => { g.flags.squareDancingWar=true; g.money -= 1000; return{mood:3}; }},
+        { label:'吵了几次没吵赢，准备搬家了', hint:'-😊 -💰', fn: g => { g.flags.squareDancingWar=true; return{mood:-8}; }},
+      ]},
+    { id:'community_volunteer', icon:'🤝', title:'社区志愿者', category:'social',
+      body:'你报名了社区志愿者。\n\n你的任务：\n- 周末在小区门口测体温\n- 帮老人拿快递\n- 组织小区清洁活动\n- 宣传垃圾分类\n\n你的报酬：0元\n\n但你的收获：\n- 认识了10个邻居（以前一个都不认识）\n- 楼下王奶奶给你做了好吃的\n- 门卫大爷给你讲了小区20年的故事\n- 你帮张叔叔修了手机——他介绍了一个客户给你\n\n你发现：\n- 你的小区——其实有很多有趣的人\n- 你以前——只是「住在这里」——不是「生活在这里」\n- 当你开始参与——你才觉得——这是「你的社区」\n\n你开始理解：社区志愿者——不是「免费劳动」——是「用时间换归属感」。\n\n你不是在做公益——你是在「找到你住的地方」。\n\n「社区志愿者：你不是在帮别人——你是在帮自己找到「家」的感觉。」',
+      cond: g => g.age >= 18 && !g.flags.communityVolunteer && g.social >= 15,
+      choices:[
+        { label:'成了社区骨干，大家都很信任你', hint:'+🤝 +😊 +✨ +🧠', fn: g => { g.flags.communityVolunteer=true; g.flags.communityBackbone=true; g.reputation.social += 8; return{social:8,mood:5,charm:5,intel:3}; }},
+        { label:'做了一段时间，感觉不错', hint:'+🤝 +😊', fn: g => { g.flags.communityVolunteer=true; return{social:5,mood:3}; }},
+        { label:'觉得浪费时间，不做了', hint:'-🤝 -😊', fn: g => { g.flags.communityVolunteer=true; return{social:-3,mood:-3}; }},
+      ]},
+    { id:'garbage_classification', icon:'♻️', title:'垃圾分类', category:'society',
+      body:'你所在的城市——开始严格垃圾分类了。\n\n你的垃圾桶——从一个——变成了四个：\n- 🟦 可回收：纸箱、塑料瓶、玻璃\n- 🟫 湿垃圾：剩菜剩饭、果皮\n- ⬛ 干垃圾：纸巾、尿不湿、猫砂\n- 🟥 有害垃圾：电池、过期药品\n\n你每天花10分钟——分类垃圾。\n\n但你发现：\n- 你分了——垃圾车来了——混在一起拉走了\n- 你问了收垃圾的大叔：「分了有什么用？」\n- 大叔说：「上面要求的，我们也只是走流程。」\n\n你开始想：\n- 你每天花10分钟分类——一年60小时\n- 你的分类——最后——还是混在一起\n- 你的环保行为——变成了「形式主义」\n\n但你又想：\n- 万一——有些城市——真的分开了呢？\n- 万一——你的行为——影响了别人呢？\n\n你开始理解：垃圾分类——不是「有没有用」——是「你做不做」。\n\n「垃圾分类：你不知道最后会不会混在一起——但你还是分了——因为你选择相信。」',
+      cond: g => g.age >= 16 && !g.flags.garbageClassification,
+      choices:[
+        { label:'坚持分类，还带动邻居一起', hint:'+🧠 +🤝 +✨', fn: g => { g.flags.garbageClassification=true; g.flags.ecoLeader=true; g.reputation.social += 3; return{intel:5,social:3,charm:3}; }},
+        { label:'认真分类，虽然不确定有没有用', hint:'+🧠 +😊', fn: g => { g.flags.garbageClassification=true; return{intel:3,mood:3}; }},
+        { label:'算了，反正最后都混在一起', hint:'-🧠 -✨', fn: g => { g.flags.garbageClassification=true; return{intel:-3,charm:-3}; }},
+      ]},
+    { id:'old_community_renovation', icon:'🏗️', title:'老旧小区改造', category:'society',
+      body:'你的小区被列入「老旧小区改造」名单了。\n\n改造内容：\n- 外墙翻新\n- 加装电梯（6层以上）\n- 更换水管电线\n- 增加停车位\n- 增加绿化\n\n你的期待：很高。\n\n现实：\n- 施工噪音：持续8个月\n- 临时停水停电：每周2-3次\n- 施工队把你的车划了：「不是我们干的」\n- 加装电梯：1楼2楼反对（影响采光）\n\n你发现：\n- 改造前：大家说「终于要改了」\n- 改造中：大家说「改的什么玩意」\n- 改造后：大家说「还行吧，比以前好」\n\n你开始理解：老旧小区改造——不是「让你满意」——是「让你不那么不满意」。\n\n政府花了钱——你受了罪——最后你「勉强满意」。\n\n这就是——公共工程的标准结局。\n\n「老旧小区改造：你以为会焕然一新——其实只是「缝缝补补又三年」。」',
+      cond: g => g.age >= 25 && !g.flags.oldCommunityReno && g.flags.hasHouse,
+      choices:[
+        { label:'积极参与改造方案讨论', hint:'+🤝 +🧠 +✨', fn: g => { g.flags.oldCommunityReno=true; g.flags.renovationAdvocate=true; g.reputation.social += 3; return{social:5,intel:5,charm:3}; }},
+        { label:'忍了8个月，改造完确实好了', hint:'+😊 -❤️', fn: g => { g.flags.oldCommunityReno=true; return{mood:5,health:-3}; }},
+        { label:'改造期间租房搬出去了', hint:'-💰 +😊', fn: g => { g.flags.oldCommunityReno=true; g.money -= 20000; return{mood:3}; }},
+      ]},
+    { id:'neighbor_help_network', icon:'🏘️', title:'邻里互助', category:'social',
+      body:'你生病了一个人在家。\n\n你在业主群发了条消息：「有没有人能帮忙买点药？」\n\n10分钟后——\n\n楼下张阿姨：「我家有退烧药，给你放门口了」\n隔壁李哥：「我做了粥，给你端一碗」\n对门王姐：「要不要我帮你带孩子？」\n\n你收到了：\n- 退烧药\n- 一碗热粥\n- 一袋水果\n- 3条「早点好起来」的消息\n\n你突然觉得——\n\n你在这个城市——不是一个人。\n\n你开始理解：远亲不如近邻——不是「客套话」——是「真理」。\n\n你在大城市漂泊——你的邻居——就是你最近的「家人」。\n\n你可能不知道他们的名字——但他们知道你生病了。\n\n你可能不常说话——但你需要的时候——他们在。\n\n「邻里互助：在大城市——你的邻居——是你最近的「家人」。」',
+      cond: g => g.age >= 18 && !g.flags.neighborHelpNetwork && g.social >= 10,
+      choices:[
+        { label:'开始主动帮助邻居，成了热心人', hint:'+🤝 +😊 +✨', fn: g => { g.flags.neighborHelpNetwork=true; g.flags.neighborHelper=true; g.reputation.social += 5; return{social:8,mood:8,charm:5}; }},
+        { label:'很感动，以后也要帮助别人', hint:'+🤝 +😊', fn: g => { g.flags.neighborHelpNetwork=true; return{social:5,mood:5}; }},
+        { label:'谢了大家，但觉得欠了人情', hint:'+😊 -🤝', fn: g => { g.flags.neighborHelpNetwork=true; return{mood:3,social:-3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -15393,6 +15474,14 @@ const ACHIEVEMENTS = [
     { id:'urban_farmer_ach', icon:'🌱', name:'都市农夫', desc:'在郊区租地种菜成了都市农夫', check: g => g.flags.urbanFarmer },
     { id:'scientific_runner_ach', icon:'🏃', name:'科学跑者', desc:'坚持科学跑步身体越来越好', check: g => g.flags.scientificRunner },
     { id:'hiking_enthusiast_ach', icon:'⛰️', name:'徒步爱好者', desc:'爱上徒步开始挑战更高的山', check: g => g.flags.hikingEnthusiast },
+    // v27.8: 社区生活成就
+    { id:'community_leader_ach_v27_8', icon:'🏢', name:'业委会领袖', desc:'积极参与业委会推动社区改革', check: g => g.flags.communityLeader },
+    { id:'community_backbone_ach', icon:'🤝', name:'社区骨干', desc:'成了社区志愿者骨干大家都很信任', check: g => g.flags.communityBackbone },
+    { id:'negotiation_master_ach', icon:'💃', name:'谈判达人', desc:'跟广场舞大妈谈判达成了时间协议', check: g => g.flags.negotiationMaster },
+    { id:'eco_leader_ach_v27_8', icon:'♻️', name:'环保先锋', desc:'坚持垃圾分类还带动邻居一起', check: g => g.flags.ecoLeader },
+    { id:'neighbor_helper_ach', icon:'🏘️', name:'好邻居', desc:'开始主动帮助邻居成了热心人', check: g => g.flags.neighborHelper },
+    { id:'group_helper_ach', icon:'📱', name:'群里的热心人', desc:'成了业主群里的热心人', check: g => g.flags.groupHelper },
+    { id:'renovation_advocate_ach', icon:'🏗️', name:'改造先锋', desc:'积极参与老旧小区改造方案讨论', check: g => g.flags.renovationAdvocate },
 ];
 
 // === ENDINGS === (order matters: first match wins)
