@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v5.7
+// 都市浮生记 - Game Engine v5.8
 // ============================================
 
 // === GAME STATE ===
@@ -3142,6 +3142,16 @@ const EVENTS = [
         { label:'存款特种兵', hint:'+💰 +✨', fn: g => { g.flags.savingsChallenge=true; g.flags.depositCommando=true; return{money:50000,charm:8,intel:10}; }},
         { label:'算了，钱是赚出来的', hint:'+😊 -💰', fn: g => { g.flags.savingsChallenge=true; return{mood:5,money:-3000}; }},
       ]},
+    // === v5.8 EVENTS - 阳台种菜与养植物 ===
+    { id:'balcony_garden', icon:'🌱', title:'阳台种菜',
+      body:'你开始在阳台种菜：\n\n- 番茄、黄瓜、生菜\n- 蓝莓、草莓、柠檬\n- 小葱、香菜、辣椒\n\n数据：绿植消费增长160%，种植盆栽增长1200%。\n\n有店铺"盆栽蔬菜"销量超60万件。\n\n"阳台种菜——自产自销，实现'蓝莓自由'。"\n\n"没有土地也压抑不了我的种菜基因。"\n\n你在小红书分享：《出租党必收的10款懒人蔬菜清单》，获得5000+点赞。',
+      cond: g => !g.flags.balconyGarden && g.age>=22 && g.age<=38,
+      choices:[
+        { label:'种蓝莓', hint:'-💰 +😊 +❤️', fn: g => { g.flags.balconyGarden=true; g.flags.blueberryGrower=true; return{money:-200,mood:15,health:8}; }},
+        { label:'种蔬菜', hint:'-💰 +😊 +❤️', fn: g => { g.flags.balconyGarden=true; g.flags.veggieGrower=true; return{money:-100,mood:12,health:10}; }},
+        { label:'发小红书分享', hint:'+✨ +👥 +😊', fn: g => { g.flags.balconyGarden=true; g.flags.gardenBlogger=true; return{charm:12,social:15,mood:18}; }},
+        { label:'算了，没时间打理', hint:'+😊', fn: g => { g.flags.balconyGarden=true; return{mood:3}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3386,6 +3396,8 @@ const ACHIEVEMENTS = [
     { id:'world_citizen', icon:'🌏', name:'数字游民', desc:'成为数字游民', check: g => g.flags.digitalNomad },
     // v5.7 achievements
     { id:'savings_master', icon:'💰', name:'存钱达人', desc:'完成存钱挑战', check: g => g.flags.savingsChallenge },
+    // v5.8 achievements
+    { id:'urban_farmer', icon:'🌱', name:'都市农夫', desc:'阳台种菜成功', check: g => g.flags.balconyGarden },
 ];
 
 // === ENDINGS === (order matters: first match wins)
