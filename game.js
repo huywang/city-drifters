@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v21.4
+// 都市浮生记 - Game Engine v21.5
 // ============================================
 
 // === GAME STATE ===
@@ -10173,6 +10173,87 @@ const EVENTS = [
         { label:'选了宠物酒店，自己去旅行', hint:'+😊 -💰', fn: g => { g.flags.petTravel=true; return{mood:8,money:-1000}; }},
         { label:'为了它，取消了旅行计划', hint:'+😊', fn: g => { g.flags.petTravel=true; return{mood:3}; }},
       ]},
+    // === v21.5 新增事件（咖啡文化） ===
+    { id:'coffee_awakening', icon:'☕', title:'咖啡觉醒', category:'hobby',
+      body:'你第一次喝到了一杯真正的好咖啡。\n\n不是瑞幸的9.9，不是星巴克的焦糖玛奇朵——是一家巷子里的独立咖啡店，老板亲手做的手冲。\n\n他一边冲咖啡一边给你讲：「这是埃塞俄比亚的耶加雪菲，水洗处理。你闻——有柑橘和茉莉花的香气。」\n\n你喝了一口。和你以前喝过的所有咖啡都不一样。\n\n你突然理解了为什么有人愿意为一杯咖啡花50块钱。因为你买的不是咖啡因——是一种体验。\n\n从此，你的周末多了一个固定节目：探店。\n\n「咖啡是一场审美教育。它教会你：好东西值得慢慢品。」',
+      cond: g => !g.flags.coffeeAwakening && g.age >= 22 && g.intel >= 30,
+      choices:[
+        { label:'爱上了精品咖啡，开始认真研究', hint:'+🧠 +😊', fn: g => { g.flags.coffeeAwakening=true; g.flags.coffeeLover=true; return{intel:5,mood:8}; }},
+        { label:'觉得好喝但太贵了，偶尔来一次', hint:'+😊', fn: g => { g.flags.coffeeAwakening=true; return{mood:5}; }},
+        { label:'还是9.9的瑞幸香', hint:'', fn: g => { g.flags.coffeeAwakening=true; return{mood:2}; }},
+      ]},
+    { id:'coffee_shop_work', icon:'💻', title:'咖啡店办公', category:'career',
+      body:'你发现了一个秘密：在咖啡店工作效率比在家高3倍。\n\n不是因为咖啡——是因为氛围。周围都在敲键盘的人，会传染给你一种「我也该干活了」的感觉。\n\n你找了一家安静的咖啡店，点了一杯美式，坐了一下午。\n\n你做完了积压一周的工作。\n\n老板看着你笑了：「你是程序员吧？你们这行的人都爱来我这。」\n\n你算了笔账：一杯咖啡35块，一下午的工作量——比租共享办公划算多了。\n\n从此你成了这家店的常客。你的工位是窗边第二个位置。\n\n「第三空间：不是家，不是公司——是你真正属于自己的地方。」',
+      cond: g => !g.flags.coffeeShopWork && g.age >= 23 && (g.flags.coffeeAwakening || g.intel >= 40),
+      choices:[
+        { label:'成了咖啡店常客，工作效率大幅提升', hint:'+🧠 +😊', fn: g => { g.flags.coffeeShopWork=true; g.flags.coffeeRegular=true; return{intel:5,mood:5,money:-500}; }},
+        { label:'偶尔去，享受换个环境的感觉', hint:'+😊', fn: g => { g.flags.coffeeShopWork=true; return{mood:5,money:-200}; }},
+        { label:'算了，在家喝白开水也行', hint:'', fn: g => { g.flags.coffeeShopWork=true; return{mood:-2}; }},
+      ]},
+    { id:'coffee_social', icon:'🤝', title:'咖啡社交', category:'social',
+      body:'你在咖啡店遇到一个有意思的人。\n\n他坐在你对面，看你在写代码，主动搭话：「你是做技术的？我在做一个创业项目，正好缺一个技术合伙人。」\n\n你们聊了两个小时。从技术架构聊到商业模式，从行业痛点聊到用户画像。\n\n你发现：一杯咖啡的价格，可能换来一个改变人生的机会。\n\n你加了微信。他说：「下周有空吗？我们正式聊聊。」\n\n你回家路上想：也许这就是为什么硅谷的创业故事都发生在咖啡馆。\n\n「咖啡店是最好的社交场。没有饭局的压力，没有酒局的尴尬——只有一杯咖啡和一段对话。」',
+      cond: g => g.flags.coffeeShopWork && !g.flags.coffeeSocial && g.social >= 30,
+      choices:[
+        { label:'认真聊了，发现了一个合作机会', hint:'+👥 +💰', fn: g => { g.flags.coffeeSocial=true; return{social:10,money:5000,intel:5}; }},
+        { label:'加了微信但没后续，社交就是这样', hint:'+👥', fn: g => { g.flags.coffeeSocial=true; return{social:5}; }},
+        { label:'婉拒了，你更喜欢一个人待着', hint:'', fn: g => { g.flags.coffeeSocial=true; return{mood:3}; }},
+      ]},
+    { id:'coffee_investment', icon:'💰', title:'开咖啡店的诱惑', category:'finance',
+      body:'你的一个朋友说：「我想开一家咖啡店，要不要合伙？」\n\n他说得很好听：「投资30万，两年回本。我们有稳定的供应商，选址在写字楼旁边。」\n\n你心动了。谁没有过开咖啡店的梦想呢？\n\n但你打开了小红书，搜索「开咖啡店亏钱」。结果吓了你一跳：\n- 「开了8个月，亏了40万」\n- 「咖啡店的真相：90%在亏钱」\n- 「梦想很美好，现实是每天只卖20杯」\n\n你冷静了下来。梦想和生意是两回事。\n\n一个餐饮行业的前辈告诉你：「咖啡店不是不能开——但你得先算清楚：房租、人工、原料、水电、损耗……」\n\n「开咖啡店是中国中产最常见的创业幻觉。它浪漫、优雅——也残酷。」',
+      cond: g => !g.flags.coffeeInvestment && g.money >= 50000 && g.age >= 25,
+      choices:[
+        { label:'理性分析后，决定先不投', hint:'+🧠', fn: g => { g.flags.coffeeInvestment=true; return{intel:8,mood:3}; }},
+        { label:'投了10万试水，当作交学费', hint:'-💰💰', fn: g => { g.flags.coffeeInvestment=true; g.flags.coffeeShopOwner=true; return{money:-100000,mood:5}; }},
+        { label:'婉拒了，梦想和生意要分开', hint:'+🧠 +😊', fn: g => { g.flags.coffeeInvestment=true; return{intel:5,mood:5}; }},
+      ]},
+    { id:'home_brewing', icon:'🫖', title:'在家做咖啡', category:'hobby',
+      body:'你决定自己在家做咖啡。\n\n从最简单的开始：买了一个手摇磨豆机和一个V60滤杯。总投入：200元。\n\n你跟着B站教程学了三天。第一次冲出来的咖啡——又苦又涩。\n\n你不放弃。调研磨度、调水温、调注水方式。\n\n两周后——你冲出了一杯让自己惊艳的咖啡。果酸明亮，甜感突出。你不敢相信这是自己做的。\n\n你算了一笔账：自己冲一杯精品咖啡的成本是5元（豆子+滤纸+水），而外面一杯要35-50元。\n\n你开始每天早起15分钟做咖啡。这个仪式成了你最享受的独处时光。\n\n「手冲咖啡是最好的冥想。你必须专注——水稍微一抖，味道就变了。」',
+      cond: g => g.flags.coffeeAwakening && !g.flags.homeBrewing && g.money >= 500,
+      choices:[
+        { label:'坚持在家做咖啡，省钱又有仪式感', hint:'+😊 +🧠 +💰', fn: g => { g.flags.homeBrewing=true; return{mood:8,intel:3,money:2000}; }},
+        { label:'学会了但没坚持，偶尔做做', hint:'+😊', fn: g => { g.flags.homeBrewing=true; return{mood:5,intel:2}; }},
+        { label:'太麻烦了，还是出去买吧', hint:'', fn: g => { g.flags.homeBrewing=true; return{mood:2}; }},
+      ]},
+    { id:'coffee_addiction', icon:'😵', title:'咖啡因依赖', category:'health',
+      body:'你发现自己一天喝了4杯咖啡。\n\n早上到公司先来一杯。午饭后一杯。下午犯困一杯。加班再来一杯。\n\n你开始头痛。不是困的头痛——是不喝咖啡的头痛。\n\n你查了一下：这是咖啡因戒断症状。你已经产生了依赖。\n\n你试着一天只喝一杯。结果：下午3点开始头疼，注意力无法集中，烦躁易怒。\n\n你的同事说：「你这是戒咖啡反应。慢慢减就行——别直接停。」\n\n你花了一周时间把量降到每天一杯。你发现：适量咖啡因提神，过量咖啡因毁人。\n\n「任何东西都是这样——适量是享受，过量是毒药。包括工作。」',
+      cond: g => g.flags.coffeeRegular && !g.flags.coffeeAddiction,
+      choices:[
+        { label:'成功减量，学会了适度', hint:'+❤️ +🧠', fn: g => { g.flags.coffeeAddiction=true; return{health:5,intel:3,mood:3}; }},
+        { label:'减了但很痛苦，咖啡是真的难戒', hint:'+❤️', fn: g => { g.flags.coffeeAddiction=true; return{health:3,mood:-3}; }},
+        { label:'算了，人生苦短，喝就完了', hint:'', fn: g => { g.flags.coffeeAddiction=true; return{mood:3,health:-5}; }},
+      ]},
+    { id:'tea_vs_coffee', icon:'🍵', title:'茶与咖啡之争', category:'social',
+      body:'你和朋友发生了一场争论：茶好还是咖啡好？\n\n朋友是茶道爱好者：「茶是中国文化的根。一杯好茶，可以喝一下午。咖啡？三分钟喝完就没了。」\n\n你反驳：「咖啡是全球化语言。在任何一个城市，走进一家咖啡店，你就不会迷路。」\n\n你们争了半天，最后达成了一个共识：\n- 茶适合独处和思考\n- 咖啡适合社交和工作\n- 最好的状态是：两种都会品\n\n你开始尝试在下午喝茶、早上喝咖啡。你发现：这不是选择——是生活方式的搭配。\n\n一个做餐饮的朋友说：「在中国，茶和咖啡不是竞争对手——是同事。」\n\n「文化不需要站队。好的东西，都可以成为生活的一部分。」',
+      cond: g => g.flags.coffeeAwakening && g.age >= 25 && !g.flags.teaVsCoffee,
+      choices:[
+        { label:'开始同时品茶和品咖啡，生活更丰富', hint:'+🧠 +😊', fn: g => { g.flags.teaVsCoffee=true; return{intel:5,mood:5,social:3}; }},
+        { label:'觉得各有各的好，不必争论', hint:'+🧠', fn: g => { g.flags.teaVsCoffee=true; return{intel:3,mood:3}; }},
+        { label:'还是觉得咖啡好，茶太淡了', hint:'', fn: g => { g.flags.teaVsCoffee=true; return{mood:2}; }},
+      ]},
+    { id:'latte_art', icon:'🎨', title:'学拉花', category:'hobby',
+      body:'你在短视频上看到了一个拉花视频——一杯拿铁上面画出了一只猫。\n\n你被迷住了。你买了一个奶泡机，开始学拉花。\n\n第一天：你倒出来的是一坨白色不明物体。\n第三天：勉强能看出是个心形。\n第七天：你拉出了一个歪歪扭扭的叶子。\n第三十天：你终于拉出了一朵像样的花。\n\n你把作品发到了朋友圈。你妈评论：「你是不是应该把这份耐心用在工作上？」\n\n你没回她。因为你知道：这份耐心——就是对自己最好的投资。\n\n「拉花教会你的不是技术——是「慢」的力量。在一个追求效率的世界里，愿意花30天只为了拉好一朵花——这本身就是一种奢侈。」',
+      cond: g => g.flags.homeBrewing && !g.flags.latteArt && g.money >= 300,
+      choices:[
+        { label:'坚持练习，拉花成了一门手艺', hint:'+✨ +😊', fn: g => { g.flags.latteArt=true; return{charm:8,mood:10}; }},
+        { label:'学了个大概，能唬住朋友就行', hint:'+✨', fn: g => { g.flags.latteArt=true; return{charm:5,mood:5}; }},
+        { label:'太难了，手残党放弃', hint:'', fn: g => { g.flags.latteArt=true; return{mood:-2}; }},
+      ]},
+    { id:'coffee_travel', icon:'✈️', title:'咖啡产地之旅', category:'hobby',
+      body:'你去云南旅游，顺便参观了一个咖啡庄园。\n\n你第一次看到了咖啡树。红色的咖啡果实挂满枝头，像一颗颗小樱桃。\n\n庄园主让你亲手采摘、去皮、晾晒。你才知道：从一颗咖啡豆到一杯咖啡，要经过十几道工序。\n\n你喝了一杯用你自己采摘的豆子做的咖啡。味道不算好——但意义重大。\n\n庄园主说：「中国云南的咖啡正在崛起。我们的豆子，已经被很多精品咖啡店采购了。」\n\n你买了几包云南豆带回去。每次冲的时候，你都会想起那片山。\n\n「旅行的意义不在于打卡——在于让你理解：你杯中的每一口，都有一个故事。」',
+      cond: g => g.flags.coffeeLover && !g.flags.coffeeTravel && g.money >= 5000 && g.age >= 24,
+      choices:[
+        { label:'深度体验了咖啡文化，开阔了眼界', hint:'+🧠 +😊 +💰-', fn: g => { g.flags.coffeeTravel=true; return{intel:8,mood:12,money:-4000}; }},
+        { label:'买了好豆子回来，在家也能回味', hint:'+😊 +💰-', fn: g => { g.flags.coffeeTravel=true; return{mood:8,money:-2000}; }},
+        { label:'去了但觉得没什么特别的', hint:'', fn: g => { g.flags.coffeeTravel=true; return{mood:2,money:-3000}; }},
+      ]},
+    { id:'coffee_community', icon:'🏘️', title:'咖啡社区', category:'social',
+      body:'你家楼下开了一家社区咖啡店。\n\n老板是个有意思的人：以前是大厂产品经理，35岁辞职开了这家店。\n\n他说：「我不追求翻台率——我想做的是社区客厅。」\n\n你成了常客。每天早上路过买一杯，和老板聊几句。\n\n你发现这家店成了邻居们的聚集地：\n- 退休的阿姨在这里教年轻人做手工\n- 自由职业者在这里办公\n- 妈妈带小朋友来喝果汁\n- 周末有人在这里弹吉他\n\n你突然理解了什么叫「第三空间」——不是家，不是公司，是社区的纽带。\n\n老板说：「咖啡只是借口——人和人的连接才是产品。」\n\n「最好的咖啡店不卖咖啡——卖的是归属感。」',
+      cond: g => g.flags.coffeeShopWork && !g.flags.coffeeCommunity && g.age >= 25,
+      choices:[
+        { label:'成了社区咖啡店的核心成员', hint:'+👥 +😊', fn: g => { g.flags.coffeeCommunity=true; return{social:10,mood:8}; }},
+        { label:'喜欢这里的氛围，常来常往', hint:'+👥 +😊', fn: g => { g.flags.coffeeCommunity=true; return{social:5,mood:5}; }},
+        { label:'觉得太吵了，还是喜欢独处', hint:'', fn: g => { g.flags.coffeeCommunity=true; return{mood:2}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -11123,6 +11204,12 @@ const ACHIEVEMENTS = [
     { id:'pet_blogger_ach', icon:'📸', name:'宠物博主', desc:'通过宠物内容走上了自媒体之路', check: g => g.flags.petBlogger },
     { id:'pet_devoted_ach', icon:'💕', name:'宠物至亲', desc:'对宠物倾注了全部的爱', check: g => g.flags.petDevoted && g.flags.petTherapy },
     { id:'pet_business_ach_v2', icon:'🐾', name:'宠物经济弄潮儿', desc:'在宠物行业中发现了商机', check: g => g.flags.petBusiness },
+    // === v21.5 新增成就（咖啡文化） ===
+    { id:'coffee_lover_ach', icon:'☕', name:'精品咖啡爱好者', desc:'开始认真品味精品咖啡', check: g => g.flags.coffeeLover },
+    { id:'home_barista_ach', icon:'🫖', name:'家庭咖啡师', desc:'学会了在家做手冲咖啡', check: g => g.flags.homeBrewing },
+    { id:'latte_artist_ach', icon:'🎨', name:'拉花艺术家', desc:'掌握了咖啡拉花技巧', check: g => g.flags.latteArt },
+    { id:'coffee_shop_owner_ach', icon:'🏪', name:'咖啡店老板', desc:'投资开了一家咖啡店', check: g => g.flags.coffeeShopOwner },
+    { id:'third_space_ach', icon:'🏘️', name:'第三空间探索者', desc:'找到了属于自己的第三空间', check: g => g.flags.coffeeCommunity },
 ];
 
 // === ENDINGS === (order matters: first match wins)
