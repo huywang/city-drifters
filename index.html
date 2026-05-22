@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>都市浮生记 - 漂泊人生模拟器</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+</head>
+<body>
+    <canvas id="particles"></canvas>
+
+    <!-- ===== 标题画面 ===== -->
+    <div id="screen-title" class="screen active">
+        <div class="title-container">
+            <div class="city-silhouette"></div>
+            <h1 class="game-title">
+                <span class="title-main">都市浮生记</span>
+                <span class="title-sub">漂泊人生模拟器</span>
+            </h1>
+            <p class="title-slogan">每一个在大城市漂泊的灵魂，都在寻找一个答案。</p>
+            <div class="title-buttons">
+                <button class="btn btn-primary btn-glow" onclick="showScreen('screen-create')">
+                    <span class="btn-icon">🚀</span> 开始新人生
+                </button>
+                <button class="btn btn-secondary" onclick="loadGame()" id="btn-continue">
+                    <span class="btn-icon">💾</span> 继续游戏
+                </button>
+                <button class="btn btn-ghost" onclick="showScreen('screen-about')">
+                    <span class="btn-icon">📖</span> 关于游戏
+                </button>
+            </div>
+            <div class="title-footer">
+                <span>v1.0</span> · <span>献给每一个在大城市奋斗的你</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 关于画面 ===== -->
+    <div id="screen-about" class="screen">
+        <div class="panel about-panel">
+            <h2>关于「都市浮生记」</h2>
+            <div class="about-content">
+                <p>这是一款关于<strong>中国大城市漂泊者</strong>的人生模拟游戏。</p>
+                <p>你是刚毕业的大学生，是中年失业的打工人，是从小镇来到大城市的追梦者。在北上广深杭，你将面对真实的生存挑战：996加班、房租压力、职场内卷、催婚相亲……</p>
+                <p>游戏充满了<strong>黑色幽默</strong>和<strong>网络热梗</strong>，但我们希望你在笑过之后，能感受到一点温暖——因为每一个认真生活的人，都值得被看见。</p>
+                <h3>🎮 玩法说明</h3>
+                <ul>
+                    <li>选择你的出身背景，开始你的大城市生活</li>
+                    <li>每个月你会遇到各种事件，做出你的选择</li>
+                    <li>你的选择会影响六项属性：💰金钱 ❤️健康 😊心情 🧠智力 👥人脉 ✨魅力</li>
+                    <li>不同的属性组合会导向不同的人生结局</li>
+                    <li>游戏从22岁到60岁，看你能活成什么样</li>
+                </ul>
+                <h3>🏆 结局</h3>
+                <p>游戏共有 <strong>13</strong> 种不同结局，从财务自由到流落街头，从大厂高管到回乡种地。你的每一次选择，都在书写不同的人生。</p>
+            </div>
+            <button class="btn btn-secondary" onclick="showScreen('screen-title')">← 返回</button>
+        </div>
+    </div>
+
+    <!-- ===== 角色创建 ===== -->
+    <div id="screen-create" class="screen">
+        <div class="panel create-panel">
+            <h2>🎭 选择你的出身</h2>
+            <p class="create-desc">每个人的起点不同，但大城市的入场券是一样的——一张火车票。</p>
+
+            <div id="create-step1">
+                <div class="background-grid">
+                    <div class="bg-card" onclick="selectBackground('cs')" data-bg="cs">
+                        <div class="bg-icon">💻</div>
+                        <h3>985计算机毕业</h3>
+                        <p class="bg-tag">硬核开局</p>
+                        <p class="bg-desc">卷王预备役，头发是你最宝贵的资产。毕业即巅峰，但35岁的倒计时已经开始了。</p>
+                        <div class="bg-stats">
+                            <span class="stat-up">💰+5K</span>
+                            <span class="stat-up">🧠高</span>
+                            <span class="stat-down">❤️低</span>
+                        </div>
+                    </div>
+                    <div class="bg-card" onclick="selectBackground('liberal')" data-bg="liberal">
+                        <div class="bg-icon">📚</div>
+                        <h3>文科毕业生</h3>
+                        <p class="bg-tag">困难模式</p>
+                        <p class="bg-desc">"学文科有什么用？"——这个问题你被问了100遍。但你知道，世界需要讲故事的人。</p>
+                        <div class="bg-stats">
+                            <span class="stat-down">💰负债</span>
+                            <span class="stat-up">😊高</span>
+                            <span class="stat-up">✨高</span>
+                        </div>
+                    </div>
+                    <div class="bg-card" onclick="selectBackground('town')" data-bg="town">
+                        <div class="bg-icon">🏠</div>
+                        <h3>小镇做题家</h3>
+                        <p class="bg-tag">普通模式</p>
+                        <p class="bg-desc">从小镇一路考到大城市，你以为高考是最难的，后来发现租房才是。</p>
+                        <div class="bg-stats">
+                            <span class="stat-neutral">💰3K</span>
+                            <span class="stat-up">🧠高</span>
+                            <span class="stat-down">👥低</span>
+                        </div>
+                    </div>
+                    <div class="bg-card" onclick="selectBackground('laidoff')" data-bg="laidoff">
+                        <div class="bg-icon">📦</div>
+                        <h3>中年失业者</h3>
+                        <p class="bg-tag">地狱模式</p>
+                        <p class="bg-desc">35岁，大厂毕业（被裁）。房贷、车贷、孩子、老婆，唯独没有收入。</p>
+                        <div class="bg-stats">
+                            <span class="stat-down">💰负债</span>
+                            <span class="stat-down">😊低</span>
+                            <span class="stat-up">👥高</span>
+                        </div>
+                    </div>
+                    <div class="bg-card" onclick="selectBackground('vocational')" data-bg="vocational">
+                        <div class="bg-icon">🔧</div>
+                        <h3>大专技术人</h3>
+                        <p class="bg-tag">实用主义</p>
+                        <p class="bg-desc">学历是短板，但手艺是长板。蓝领工资可能比白领高，你信吗？</p>
+                        <div class="bg-stats">
+                            <span class="stat-neutral">💰4K</span>
+                            <span class="stat-up">❤️高</span>
+                            <span class="stat-down">🧠中</span>
+                        </div>
+                    </div>
+                    <div class="bg-card" onclick="selectBackground('returnee')" data-bg="returnee">
+                        <div class="bg-icon">✈️</div>
+                        <h3>海归留学生</h3>
+                        <p class="bg-tag">高期望模式</p>
+                        <p class="bg-desc">花了几十万留学，回来月薪八千。"镀金"变成了"渡劫"。</p>
+                        <div class="bg-stats">
+                            <span class="stat-down">💰负债</span>
+                            <span class="stat-up">✨高</span>
+                            <span class="stat-up">🧠高</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="create-step2" class="hidden">
+                <h3>🏙️ 选择你的城市</h3>
+                <div class="city-grid">
+                    <div class="city-card" onclick="selectCity('beijing')" data-city="beijing">
+                        <div class="city-icon">🏛️</div>
+                        <h4>北京</h4>
+                        <p>帝都 · 政治文化中心</p>
+                        <p class="city-trait">户口最难拿，但机会最多。雾霾已好转，房价依然坚挺。</p>
+                    </div>
+                    <div class="city-card" onclick="selectCity('shanghai')" data-city="shanghai">
+                        <div class="city-icon">🌃</div>
+                        <h4>上海</h4>
+                        <p>魔都 · 国际金融城</p>
+                        <p class="city-trait">精致利己主义天堂，咖啡是续命水，加班是生活方式。</p>
+                    </div>
+                    <div class="city-card" onclick="selectCity('shenzhen')" data-city="shenzhen">
+                        <div class="city-icon">🏗️</div>
+                        <h4>深圳</h4>
+                        <p>鹏城 · 科技之城</p>
+                        <p class="city-trait">"来了就是深圳人"，平均年龄最年轻，搞钱是唯一信仰。</p>
+                    </div>
+                    <div class="city-card" onclick="selectCity('hangzhou')" data-city="hangzhou">
+                        <div class="city-icon">🍵</div>
+                        <h4>杭州</h4>
+                        <p>电商之城 · 人间天堂</p>
+                        <p class="city-trait">阿里系创业文化，直播电商圣地，房价涨得比工资快。</p>
+                    </div>
+                    <div class="city-card" onclick="selectCity('guangzhou')" data-city="guangzhou">
+                        <div class="city-icon">🍜</div>
+                        <h4>广州</h4>
+                        <p>羊城 · 千年商都</p>
+                        <p class="city-trait">生活气息最浓，早茶文化深厚，务实主义至上。</p>
+                    </div>
+                    <div class="city-card" onclick="selectCity('chengdu')" data-city="chengdu">
+                        <div class="city-icon">🐼</div>
+                        <h4>成都</h4>
+                        <p>蓉城 · 新一线顶流</p>
+                        <p class="city-trait">"少不入川"已成过去式，安逸与内卷并存的魔幻城市。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="create-step3" class="hidden">
+                <h3>👤 给自己取个名字</h3>
+                <div class="name-input-area">
+                    <input type="text" id="player-name" class="input-name" placeholder="输入你的名字" maxlength="8">
+                    <div class="name-suggestions">
+                        <span onclick="setName('张伟')">张伟</span>
+                        <span onclick="setName('李娜')">李娜</span>
+                        <span onclick="setName('王磊')">王磊</span>
+                        <span onclick="setName('刘洋')">刘洋</span>
+                        <span onclick="setName('陈静')">陈静</span>
+                        <span onclick="setName('赵鹏')">赵鹏</span>
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-glow" onclick="startGame()">
+                    <span class="btn-icon">🎬</span> 开始漂泊人生
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 主游戏界面 ===== -->
+    <div id="screen-game" class="screen">
+        <div class="game-header">
+            <div class="header-left">
+                <div class="player-info">
+                    <span class="player-name" id="hud-name">张伟</span>
+                    <span class="player-age" id="hud-age">22岁</span>
+                    <span class="player-city" id="hud-city">北京</span>
+                </div>
+                <div class="player-job" id="hud-job">待业中</div>
+            </div>
+            <div class="header-right">
+                <div class="header-date" id="hud-date">2024年1月</div>
+                <button class="btn-icon-only" onclick="toggleMenu()" title="菜单">☰</button>
+            </div>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item" title="金钱">
+                <span class="stat-icon">💰</span>
+                <div class="stat-bar-wrap">
+                    <div class="stat-bar" id="bar-money"><div class="stat-fill"></div></div>
+                    <span class="stat-val" id="val-money">¥0</span>
+                </div>
+            </div>
+            <div class="stat-item" title="健康">
+                <span class="stat-icon">❤️</span>
+                <div class="stat-bar-wrap">
+                    <div class="stat-bar" id="bar-health"><div class="stat-fill fill-health"></div></div>
+                    <span class="stat-val" id="val-health">80</span>
+                </div>
+            </div>
+            <div class="stat-item" title="心情">
+                <span class="stat-icon">😊</span>
+                <div class="stat-bar-wrap">
+                    <div class="stat-bar" id="bar-mood"><div class="stat-fill fill-mood"></div></div>
+                    <span class="stat-val" id="val-mood">70</span>
+                </div>
+            </div>
+            <div class="stat-item" title="智力">
+                <span class="stat-icon">🧠</span>
+                <div class="stat-bar-wrap">
+                    <div class="stat-bar" id="bar-intel"><div class="stat-fill fill-intel"></div></div>
+                    <span class="stat-val" id="val-intel">60</span>
+                </div>
+            </div>
+            <div class="stat-item" title="人脉">
+                <span class="stat-icon">👥</span>
+                <div class="stat-bar-wrap">
+                    <div class="stat-bar" id="bar-social"><div class="stat-fill fill-social"></div></div>
+                    <span class="stat-val" id="val-social">30</span>
+                </div>
+            </div>
+            <div class="stat-item" title="魅力">
+                <span class="stat-icon">✨</span>
+                <div class="stat-bar-wrap">
+                    <div class="stat-bar" id="bar-charm"><div class="stat-fill fill-charm"></div></div>
+                    <span class="stat-val" id="val-charm">50</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-main">
+            <div class="event-log" id="event-log"></div>
+            <div class="current-event" id="current-event"></div>
+            <div class="action-bar" id="action-bar">
+                <button class="btn-action" onclick="advanceMonth()" id="btn-advance">
+                    <span class="action-icon">⏩</span>
+                    <span class="action-text">下个月</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="side-menu" id="side-menu">
+            <div class="menu-overlay" onclick="toggleMenu()"></div>
+            <div class="menu-panel">
+                <h3>📋 菜单</h3>
+                <button class="menu-item" onclick="saveGame()">💾 保存游戏</button>
+                <button class="menu-item" onclick="showAchievements()">🏆 成就</button>
+                <button class="menu-item" onclick="showTimeline()">📜 人生轨迹</button>
+                <button class="menu-item" onclick="showScreen('screen-title'); toggleMenu()">🏠 返回标题</button>
+                <div class="menu-divider"></div>
+                <div class="menu-stats">
+                    <p>已游玩：<span id="play-months">0</span> 个月</p>
+                    <p>做出选择：<span id="total-choices">0</span> 次</p>
+                    <p>经历事件：<span id="total-events">0</span> 个</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 结局画面 ===== -->
+    <div id="screen-ending" class="screen">
+        <div class="ending-container">
+            <div class="ending-badge" id="ending-badge">🏆</div>
+            <h1 class="ending-title" id="ending-title">人生结局</h1>
+            <p class="ending-desc" id="ending-desc">你的故事结束了。</p>
+            <div class="ending-summary">
+                <h3>📊 人生总结</h3>
+                <div class="summary-grid" id="summary-grid"></div>
+            </div>
+            <div class="ending-timeline" id="ending-timeline">
+                <h3>📜 人生大事记</h3>
+                <div class="timeline-list" id="timeline-list"></div>
+            </div>
+            <div class="ending-buttons">
+                <button class="btn btn-primary btn-glow" onclick="showScreen('screen-create'); resetGame()">
+                    <span class="btn-icon">🔄</span> 重新开始
+                </button>
+                <button class="btn btn-secondary" onclick="shareEnding()">
+                    <span class="btn-icon">📤</span> 分享结局
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 成就弹窗 ===== -->
+    <div class="modal" id="modal-achievements">
+        <div class="modal-overlay" onclick="closeModal('modal-achievements')"></div>
+        <div class="modal-content">
+            <h2>🏆 成就列表</h2>
+            <div class="achievement-grid" id="achievement-grid"></div>
+            <button class="btn btn-secondary" onclick="closeModal('modal-achievements')">关闭</button>
+        </div>
+    </div>
+
+    <div class="modal" id="modal-timeline">
+        <div class="modal-overlay" onclick="closeModal('modal-timeline')"></div>
+        <div class="modal-content">
+            <h2>📜 人生轨迹</h2>
+            <div class="timeline-scroll" id="timeline-scroll"></div>
+            <button class="btn btn-secondary" onclick="closeModal('modal-timeline')">关闭</button>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        <div class="notification-content">
+            <span class="notification-icon" id="notif-icon">✅</span>
+            <span class="notification-text" id="notif-text">保存成功！</span>
+        </div>
+    </div>
+
+    <div class="stat-change" id="stat-change"></div>
+
+    <script src="game.js"></script>
+</body>
+</html>
