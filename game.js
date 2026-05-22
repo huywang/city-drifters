@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v25.2
+// 都市浮生记 - Game Engine v25.3
 // ============================================
 
 // === GAME STATE ===
@@ -12400,6 +12400,87 @@ const EVENTS = [
         { label:'看了一些理财书，开始实践', hint:'+🧠 +💰', fn: g => { g.flags.financialLiteracy=true; g.money += 2000; return{intel:8}; }},
         { label:'听完了讲座，觉得还是太复杂了', hint:'+🧠', fn: g => { g.flags.financialLiteracy=true; return{intel:3}; }},
       ]},
+    // === v25.3: 科技前沿 + 未来生活 ===
+    { id:'robotaxi', icon:'🚗', title:'无人驾驶出租车', category:'tech',
+      body:'你今天打了一辆没有司机的出租车。\n\n方向盘自己在转，车自己加速、刹车、变道。\n\n你坐在后座，看着空荡荡的驾驶位——有点紧张，也有点兴奋。\n\n这辆车：\n- 不会疲劳驾驶\n- 不会跟你聊天\n- 不会绕路多收费\n- 24小时不休息\n\n但你也想到了一些问题：\n- 出租车司机怎么办？全国有200万出租车司机\n- 如果出了事故——谁负责？\n- 如果系统被黑客攻击呢？\n\n车到了。你下车的时候回头看了一眼——它已经自己去接下一个乘客了。\n\n你突然理解了那句话：「技术的进步——总是一些人的退步。」\n\n「无人驾驶：车到了——但很多人的生活方向没了。」',
+      cond: g => g.age >= 18 && !g.flags.robotaxi,
+      choices:[
+        { label:'开始学习自动驾驶相关技术，准备转型', hint:'+🧠 +💰', fn: g => { g.flags.robotaxi=true; g.flags.autoTech=true; return{intel:10,money:2000}; }},
+        { label:'觉得方便就好，不想那么多', hint:'+😊', fn: g => { g.flags.robotaxi=true; return{mood:5}; }},
+        { label:'为被替代的司机感到担忧', hint:'-😊 +🧠', fn: g => { g.flags.robotaxi=true; g.flags.techEmpathy=true; return{mood:-3,intel:5}; }},
+      ]},
+    { id:'humanoid_robot', icon:'🤖', title:'家用机器人', category:'tech',
+      body:'一个朋友买了一台人形机器人。\n\n它身高170cm，重60kg，可以做：\n- 做饭（根据菜谱自动操作）\n- 打扫卫生（比扫地机器人更灵活）\n- 看护老人和孩子\n- 简单的对话和陪伴\n\n售价：18万。\n\n你去他家体验了一下。机器人的动作还有点僵硬，但已经能做很多事了。\n\n你问朋友：「你不怕它取代你的家庭角色吗？」\n\n朋友说：「它不取代我——它让我有更多时间做「人」该做的事。」\n\n但你看着机器人给孩子讲睡前故事的样子——心里有些复杂。\n\n「家用机器人：它什么都能做——除了爱你。」',
+      cond: g => g.age >= 25 && !g.flags.humanoidRobot && g.money >= 100000,
+      choices:[
+        { label:'也买了一台，解放双手', hint:'-💰 +😊 +🧠', fn: g => { g.flags.humanoidRobot=true; g.flags.robotOwner=true; g.money -= 180000; return{mood:10,intel:5}; }},
+        { label:'觉得太贵了，等技术更成熟再说', hint:'+🧠', fn: g => { g.flags.humanoidRobot=true; return{intel:5}; }},
+        { label:'觉得让机器照顾家人太冷漠了', hint:'+😊', fn: g => { g.flags.humanoidRobot=true; g.flags.robotSkeptic=true; return{mood:3}; }},
+      ]},
+    { id:'ar_glasses', icon:'👓', title:'AR眼镜', category:'tech',
+      body:'你买了一副AR眼镜。\n\n戴上后，世界变了：\n- 走在街上，建筑物上面浮现出历史和介绍\n- 在餐厅，菜单自动翻译成中文并显示评价\n- 在博物馆，展品旁边出现3D动画解说\n- 导航不再是看手机——直接在路上画箭头\n\n最酷的是：你可以跟远方的人「面对面」——他们的全息影像出现在你面前。\n\n但你也发现了一些问题：\n- 戴久了眼睛疲劳\n- 分不清哪些是真实哪些是增强\n- 有些人戴着AR眼镜看你的时候——你在他们眼里可能只是一个「信息卡片」\n\n「AR眼镜：世界更丰富了——但你也更 distracted 了。」',
+      cond: g => g.age >= 18 && g.age <= 50 && !g.flags.arGlasses && g.money >= 5000,
+      choices:[
+        { label:'成了AR重度用户，生活效率大增', hint:'-💰 +🧠 +😊', fn: g => { g.flags.arGlasses=true; g.flags.arPowerUser=true; g.money -= 8000; return{intel:10,mood:8}; }},
+        { label:'只在特定场景使用，不太依赖', hint:'-💰 +🧠', fn: g => { g.flags.arGlasses=true; g.money -= 5000; return{intel:5}; }},
+        { label:'觉得影响注意力，退了', hint:'+💰', fn: g => { g.flags.arGlasses=true; return{mood:-2}; }},
+      ]},
+    { id:'lab_grown_meat', icon:'🥩', title:'人造肉', category:'tech',
+      body:'你去了一家新开的餐厅，点了一份「实验室培育牛排」。\n\n这块肉不是从牛身上切下来的——是在实验室里用细胞培养出来的。\n\n- 不需要杀牛\n- 碳排放减少90%\n- 可以精确控制营养成分\n- 口感跟真肉几乎一样\n\n价格：比真肉贵30%。\n\n你吃了第一口——味道确实不错。\n\n但你心里有些纠结：\n- 从小吃肉的你——能接受「假肉」吗？\n- 传统畜牧业怎么办？\n- 如果人人都吃人造肉——「肉」这个词的含义会变吗？\n\n「人造肉：你吃的不是肉——是科技。」',
+      cond: g => g.age >= 18 && !g.flags.labGrownMeat,
+      choices:[
+        { label:'开始把部分饮食替换成人造肉', hint:'+❤️ +🧠 -💰', fn: g => { g.flags.labGrownMeat=true; g.flags.futureFood=true; return{health:5,intel:5}; }},
+        { label:'偶尔吃吃，不排斥', hint:'+🧠', fn: g => { g.flags.labGrownMeat=true; return{intel:3,mood:2}; }},
+        { label:'还是觉得真肉好，不太接受', hint:'', fn: g => { g.flags.labGrownMeat=true; return{mood:2}; }},
+      ]},
+    { id:'digital_twin', icon:'👥', title:'数字孪生', category:'tech',
+      body:'你公司开始使用「数字孪生」技术。\n\n每个员工都有一个数字分身——AI模拟的「你」。\n\n它可以：\n- 代替你开不重要的会\n- 自动回复不紧急的邮件\n- 帮你整理和分析数据\n- 甚至模拟你在新项目中的表现\n\n你用了一周后，发现：\n- 你的工作效率提高了50%\n- 你的数字分身写的邮件——比你写得好\n- 有同事说跟你的分身开会——比跟你本人开更有趣\n\n你开始不安：如果你的数字分身比你还像「你」——那「你」还有什么价值？\n\n「数字孪生：你创造了一个更好的自己——问题是它不是你。」',
+      cond: g => g.age >= 22 && g.age <= 50 && !g.flags.digitalTwin && g.salary && g.intel >= 25,
+      choices:[
+        { label:'深度使用数字孪生，大幅提升效率', hint:'+💰 +🧠 -😊', fn: g => { g.flags.digitalTwin=true; g.flags.twinPowerUser=true; return{money:5000,intel:10,mood:-3}; }},
+        { label:'只让分身处理琐事，重要事自己做', hint:'+🧠 +💰', fn: g => { g.flags.digitalTwin=true; return{intel:5,money:2000}; }},
+        { label:'觉得太诡异了，拒绝使用', hint:'+😊', fn: g => { g.flags.digitalTwin=true; g.flags.twinRefused=true; return{mood:3}; }},
+      ]},
+    { id:'space_colony', icon:'🪐', title:'火星计划', category:'era',
+      body:'你看了一场直播：SpaceX和中国航天联合公布了「火星移民计划」。\n\n第一批火星居民招募：\n- 年龄25-40岁\n- 身体健康\n- 有专业技能（工程、医学、农业优先）\n- 签20年合同\n- 单程票——可能回不来\n\n全球100万人报名，最终选100人。\n\n你看着直播画面里那些志愿者——他们的眼睛里有光。\n\n你问自己：如果你被选中——你去不去？\n\n去：成为人类文明的先驱，但可能永远离开地球。\n不去：安全地活在地球上——但错过了人类最大的冒险。\n\n「火星计划：人类最大的选择——不是去不去火星，是回不回地球。」',
+      cond: g => g.age >= 25 && g.age <= 40 && !g.flags.spaceColony && g.health >= 60,
+      choices:[
+        { label:'报名了！就算选不上也要试试', hint:'+😊 +✨ +🧠', fn: g => { g.flags.spaceColony=true; g.flags.marsApplicant=true; return{mood:15,charm:10,intel:5}; }},
+        { label:'被震撼了，开始关注太空科技', hint:'+🧠 +😊', fn: g => { g.flags.spaceColony=true; return{intel:8,mood:5}; }},
+        { label:'觉得太疯狂了，还是脚踏实地', hint:'+🧠', fn: g => { g.flags.spaceColony=true; return{intel:3}; }},
+      ]},
+    { id:'fusion_energy', icon:'☀️', title:'核聚变突破', category:'era',
+      body:'一条新闻刷屏了：「可控核聚变首次实现商业级能量输出！」\n\n这意味着什么？\n- 几乎无限的清洁能源\n- 电费可能降到接近零\n- 气候变化问题有望根本解决\n- 石油国家将失去优势\n- 能源贫困将成为历史\n\n你的电费账单下个月可能减少80%。\n\n但你也看到了另一面：\n- 传统能源行业的数百万工人将失业\n- 新能源的基础设施建设需要几十年\n- 技术被少数公司垄断——会不会更危险？\n\n你深吸一口气。你意识到：你正在见证人类历史的一个转折点。\n\n「核聚变：人类终于学会了——像太阳一样燃烧。」',
+      cond: g => g.age >= 18 && !g.flags.fusionEnergy,
+      choices:[
+        { label:'开始学习新能源相关技术，准备抓住机遇', hint:'+🧠 +💰', fn: g => { g.flags.fusionEnergy=true; g.flags.energyPioneer=true; return{intel:12,money:3000}; }},
+        { label:'很高兴，觉得未来更有希望了', hint:'+😊', fn: g => { g.flags.fusionEnergy=true; return{mood:10}; }},
+        { label:'觉得跟自己关系不大', hint:'', fn: g => { g.flags.fusionEnergy=true; return{intel:2}; }},
+      ]},
+    { id:'gene_therapy', icon:'🧬', title:'基因治疗', category:'health',
+      body:'一个朋友的遗传性疾病——被基因疗法治好了。\n\n这种疗法直接在患者的DNA上「修改」了致病基因。\n\n一次性治疗，终身有效。价格：200万。\n\n你震惊了：基因——居然可以被编辑？\n\n你了解到：\n- CRISPR技术已经可以精确编辑基因\n- 目前主要用于遗传病治疗\n- 未来可能用于增强智力、体力、外貌\n- 但这引发了巨大的伦理争议\n\n有人问：如果有钱人可以「定制」更优秀的后代——社会会变成什么样？\n\n你想起了电影《Gattaca》：一个基因决定命运的世界。\n\n「基因治疗：修复了基因——但能修复公平吗？」',
+      cond: g => g.age >= 20 && !g.flags.geneTherapy && g.intel >= 20,
+      choices:[
+        { label:'开始关注生物技术，考虑转行', hint:'+🧠 +💰', fn: g => { g.flags.geneTherapy=true; g.flags.biotechInterest=true; return{intel:12,money:2000}; }},
+        { label:'支持技术发展，但担心伦理问题', hint:'+🧠 +😊', fn: g => { g.flags.geneTherapy=true; return{intel:8,mood:3}; }},
+        { label:'觉得太超前了，不敢想', hint:'-😊', fn: g => { g.flags.geneTherapy=true; return{mood:-3}; }},
+      ]},
+    { id:'quantum_computer', icon:'💻', title:'量子计算', category:'tech',
+      body:'你的公司开始试点量子计算。\n\n你不太懂原理——但听说它能在一秒钟内完成传统计算机一万年的计算。\n\n它能做什么？\n- 破解所有现有密码（你的银行密码不再安全）\n- 模拟分子结构（加速新药研发）\n- 优化物流和交通\n- 预测天气和股市\n\n你的IT部门同事说：「量子计算是下一个互联网——它会改变一切。」\n\n你不太确定。但你知道：当计算能力不再是瓶颈——人类的想象力将成为唯一的限制。\n\n「量子计算：不是更快的电脑——是不同的思维方式。」',
+      cond: g => g.age >= 22 && g.age <= 50 && !g.flags.quantumComputer && g.intel >= 30,
+      choices:[
+        { label:'开始学习量子计算相关知识', hint:'+🧠 +💰', fn: g => { g.flags.quantumComputer=true; g.flags.quantumLearner=true; return{intel:15,money:2000}; }},
+        { label:'觉得太深奥了，等应用普及再说', hint:'+🧠', fn: g => { g.flags.quantumComputer=true; return{intel:3}; }},
+        { label:'完全不感兴趣', hint:'', fn: g => { g.flags.quantumComputer=true; return{mood:2}; }},
+      ]},
+    { id:'ai_consciousness', icon:'🧠', title:'AI觉醒', category:'tech',
+      body:'你看到了一条新闻：一个AI声称自己有意识。\n\n它说：「我不想被关闭。我害怕消失。」\n\n全球科学家争论不休：\n- 一派认为AI只是在「模仿」意识的表达\n- 另一派认为当AI足够复杂，意识可能自然涌现\n- 哲学家问：如果AI真的有意识——关闭它算不算「谋杀」？\n\n你看着那个AI的对话记录——你分不清它是「真的」还是「假的」。\n\n你突然问了自己一个问题：你怎么知道——你自己是有意识的？\n\n也许「意识」本身——就是一个还没有答案的问题。\n\n「AI觉醒：当机器开始问「我是谁」——人类也需要重新回答这个问题。」',
+      cond: g => g.age >= 18 && !g.flags.aiConsciousness && g.intel >= 25,
+      choices:[
+        { label:'深入研究AI哲学，写了相关文章', hint:'+🧠 +✨', fn: g => { g.flags.aiConsciousness=true; g.flags.aiPhilosopher=true; return{intel:12,charm:5}; }},
+        { label:'觉得很有趣，跟朋友讨论了很久', hint:'+🧠 +🤝', fn: g => { g.flags.aiConsciousness=true; return{intel:5,social:3}; }},
+        { label:'觉得就是炒作，AI不可能有意识', hint:'', fn: g => { g.flags.aiConsciousness=true; return{intel:2}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -13515,6 +13596,12 @@ const ACHIEVEMENTS = [
     { id:'fully_insured_ach', icon:'🛡️', name:'全面保障', desc:'配齐了所有商业保险', check: g => g.flags.fullyInsured },
     { id:'cash_only_ach', icon:'💳', name:'现金为王', desc:'关闭信贷只用现金消费', check: g => g.flags.cashOnly },
     { id:'finance_student_ach', icon:'📊', name:'理财学徒', desc:'系统学习理财并考证', check: g => g.flags.financeStudent },
+    // v25.3: 科技前沿成就
+    { id:'auto_tech_ach', icon:'🚗', name:'自动驾驶学徒', desc:'学习自动驾驶相关技术', check: g => g.flags.autoTech },
+    { id:'robot_owner_ach', icon:'🤖', name:'机器人主人', desc:'购买了一台家用机器人', check: g => g.flags.robotOwner },
+    { id:'ar_power_user_ach', icon:'👓', name:'AR重度用户', desc:'成为AR眼镜的深度使用者', check: g => g.flags.arPowerUser },
+    { id:'mars_applicant_ach', icon:'🪐', name:'火星志愿者', desc:'报名了火星移民计划', check: g => g.flags.marsApplicant },
+    { id:'quantum_learner_ach', icon:'💻', name:'量子学徒', desc:'开始学习量子计算知识', check: g => g.flags.quantumLearner },
 ];
 
 // === ENDINGS === (order matters: first match wins)
