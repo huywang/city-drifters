@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v31.6
+// 都市浮生记 - Game Engine v31.7
 // ============================================
 
 // === GAME STATE ===
@@ -17195,6 +17195,87 @@ const EVENTS = [
         { label:'删掉那些让你焦虑的App', hint:'+😊 +🧠', fn: g => { g.flags.selfReconcile=true; g.flags.digitalCleanse=true; return{mood:8,intel:3}; }},
         { label:'从今天起做让自己开心的事', hint:'+😊 +💪', fn: g => { g.flags.selfReconcile=true; g.flags.prioritizeJoy=true; return{mood:10,health:3}; }},
       ]},
+    // --- v31.7 城市季节与节日文化 ---
+    { id:'double_eleven_v31_7', icon:'🛒', title:'双十一理性战', category:'festival',
+      body:'双十一到了。你的购物车里有23件商品，总价4800元。\n\n你告诉自己：「这些都是我需要的。」但你心里知道——至少有一半是「凑满减」凑出来的。\n\n你在11月10日晚上守到12点，手指飞速点击。你抢到了5件，错过了3件。\n\n第二天你冷静下来，退了4件。你觉得自己在「理性消费」和「冲动购物」之间打了一场仗。\n\n你赢了？还是输了？你不确定。但你的快递已经在路上了。',
+      cond: g => g.age >= 18 && g.age <= 45 && g.money >= 2000,
+      choices:[
+        { label:'只买真正需要的', hint:'+💰 +🧠', fn: g => { g.flags.doubleElevenV31=true; g.flags.rationalShopping=true; return{money:500,intel:3}; }},
+        { label:'犒劳自己买买买', hint:'+😊 -💰', fn: g => { g.flags.doubleElevenV31=true; g.flags.splurge=true; return{mood:8,money:-3000}; }},
+        { label:'研究优惠规则省最多钱', hint:'+🧠 +💰', fn: g => { g.flags.doubleElevenV31=true; g.flags.couponMaster=true; return{intel:5,money:300}; }},
+      ]},
+    { id:'spring_festival_choice_v31_7', icon:'🧧', title:'过年怎么过', category:'festival',
+      body:'春节快到了。你面临一个选择：回家过年还是旅游过年？\n\n回家的代价：抢火车票、应对亲戚拷问、7天花掉5000块红包。\n旅游的好处：自由自在、不用应酬、拍美美的照片。\n\n你妈说：「你不回来，年还有什么意义？」\n你的朋友说：「去旅游吧，人生苦短。」\n\n你看了看机票价格，又看了看火车票。你发现——两个都很贵。',
+      cond: g => g.age >= 22 && g.age <= 40 && g.job && g.job !== '待业中',
+      choices:[
+        { label:'回家过年陪父母', hint:'+👥 +😊', fn: g => { g.flags.springFestivalChoice=true; g.flags.goHomeNewYear=true; return{social:8,mood:5,money:-3000}; }},
+        { label:'旅游过年犒劳自己', hint:'+😊 +✨', fn: g => { g.flags.springFestivalChoice=true; g.flags.travelNewYear=true; return{mood:10,charm:3,money:-4000}; }},
+        { label:'折中方案：回家3天旅游3天', hint:'+👥 +😊', fn: g => { g.flags.springFestivalChoice=true; g.flags.comboPlan=true; return{social:3,mood:5,money:-5000}; }},
+      ]},
+    { id:'mid_autumn_away_v31_7', icon:'🌕', title:'中秋异乡人', category:'festival',
+      body:'中秋节。你一个人在出租屋里吃月饼。\n\n五仁的，你最讨厌的那种。但超市打折，你买了最便宜的。\n\n你给家里打了个视频电话。你妈在包汤圆/做月饼，她说：「你要是在家就好了。」\n\n你看了看窗外——月亮很大，很圆。但你看月亮的时候，想到了一句诗：「举头望明月，低头思故乡。」\n\n你以前觉得这句诗太老套。现在你觉得——李白说的都是真的。',
+      cond: g => g.age >= 20 && g.age <= 40 && g.mood < 60,
+      choices:[
+        { label:'给自己买一盒好月饼', hint:'+😊 -💰', fn: g => { g.flags.midAutumnAway=true; g.flags.treatSelfMooncake=true; return{mood:5,money:-100}; }},
+        { label:'和同在异乡的朋友聚聚', hint:'+👥 +😊', fn: g => { g.flags.midAutumnAway=true; g.flags.festivalGathering=true; return{social:5,mood:5}; }},
+        { label:'视频陪父母看完中秋晚会', hint:'+👥 +😊', fn: g => { g.flags.midAutumnAway=true; g.flags.videoFestival=true; return{social:3,mood:5}; }},
+      ]},
+    { id:'qixi_single_v31_7', icon:'💔', title:'七夕单身狗', category:'festival',
+      body:'七夕了。你的朋友圈变成了大型秀恩爱现场。\n\n玫瑰花、烛光晚餐、转账520、情侣合照……\n\n你作为单身狗，今天最勇敢的事是——一个人去吃了火锅。\n\n服务员问：「先生/女士，对面没人吗？」你说：「是的，我一个人。」\n\n你吃完火锅，买了一杯奶茶，走在街上。到处都是情侣。\n\n你对自己说：「没关系。七夕只是一个普通的周三。」但你默默把手机调成了静音。',
+      cond: g => g.age >= 20 && g.age <= 38 && !g.flags.married,
+      choices:[
+        { label:'享受单身的自由', hint:'+😊 +🧠', fn: g => { g.flags.qixiSingle=true; g.flags.enjoySingle=true; return{mood:5,intel:3}; }},
+        { label:'和单身朋友们组局', hint:'+👥 +😊', fn: g => { g.flags.qixiSingle=true; g.flags.singleParty=true; return{social:8,mood:8}; }},
+        { label:'认真考虑脱单', hint:'+🧠 +😊', fn: g => { g.flags.qixiSingle=true; g.flags.wantRelationship=true; return{intel:3,mood:3}; }},
+      ]},
+    { id:'graduation_farewell_v31_7', icon:'🎓', title:'毕业季', category:'life',
+      body:'你毕业了。\n\n你和室友吃了散伙饭。你们喝了很多酒，哭了很多次，说了很多「以后常联系」。\n\n你们都知道——「以后常联系」的意思是「以后大概不会联系了」。\n\n你搬离了宿舍，回头看了一眼：你住了4年的地方，从今以后不再属于你。\n\n你发了一条朋友圈：「再见，我的大学。」配图是校门口的合照。\n\n5年后你会发现——你最怀念的，不是大学教了你什么，而是那些和你一起熬夜、一起哭、一起笑的人。',
+      cond: g => g.age >= 21 && g.age <= 25 && g.intel >= 50,
+      choices:[
+        { label:'珍惜最后的校园时光', hint:'+😊 +👥', fn: g => { g.flags.graduationFarewell=true; g.flags.cherishLastDays=true; return{mood:8,social:5}; }},
+        { label:'勇敢表白暗恋的人', hint:'+😊 +✨', fn: g => { g.flags.graduationFarewell=true; g.flags.confessLove=true; return{mood:10,charm:3}; }},
+        { label:'好好规划毕业后的人生', hint:'+🧠 +💰', fn: g => { g.flags.graduationFarewell=true; g.flags.planFuture=true; return{intel:5,money:300}; }},
+      ]},
+    { id:'new_semester_v31_7', icon:'📖', title:'新的开始', category:'life',
+      body:'9月1号。新的学期/新的季度开始了。\n\n你买了一个新笔记本，写了一页新的计划。你决定这个学期/季度要：早睡早起、坚持运动、学一门新技能。\n\n你觉得一切都可以重新开始。\n\n9月15号，你的新笔记本已经落灰了。你的计划还停留在第一页。\n\n但你没有放弃。你翻开笔记本，在第一页下面写了一行字：「没关系，下个月再来。」',
+      cond: g => g.age >= 18 && g.age <= 40,
+      choices:[
+        { label:'坚持执行计划哪怕只完成一半', hint:'+🧠 +💪', fn: g => { g.flags.newSemester=true; g.flags.persistPlan=true; return{intel:5,health:3}; }},
+        { label:'调整目标变得更现实', hint:'+🧠 +😊', fn: g => { g.flags.newSemester=true; g.flags.realisticGoals=true; return{intel:3,mood:5}; }},
+        { label:'放弃计划随性而活', hint:'+😊 -🧠', fn: g => { g.flags.newSemester=true; g.flags.goWithFlow=true; return{mood:5,intel:-2}; }},
+      ]},
+    { id:'new_year_countdown_v31_7', icon:'🎆', title:'跨年之夜', category:'festival',
+      body:'12月31日晚上11点。你站在人群中，等着跨年倒计时。\n\n你回想了这一年：加了多少班、赚了多少（不够花的）钱、见了几次朋友、去了几个地方。\n\n你觉得这一年——有收获也有遗憾。但总的来说，你还活着，还在努力。这就够了。\n\n倒计时开始了：10、9、8……\n\n你在心里许了一个愿。你不知道这个愿望能不能实现。但你觉得——有愿望，就有希望。\n\n新年快乐。',
+      cond: g => g.age >= 18 && g.age <= 50,
+      choices:[
+        { label:'写一份年度总结给自己', hint:'+🧠 +😊', fn: g => { g.flags.newYearCountdown=true; g.flags.annualReview=true; return{intel:5,mood:8}; }},
+        { label:'给重要的人发新年祝福', hint:'+👥 +😊', fn: g => { g.flags.newYearCountdown=true; g.flags.sendBlessings=true; return{social:5,mood:5}; }},
+        { label:'什么都不做享受当下', hint:'+😊 +💪', fn: g => { g.flags.newYearCountdown=true; g.flags.enjoyMoment=true; return{mood:8,health:2}; }},
+      ]},
+    { id:'rainy_season_home_v31_7', icon:'🌧️', title:'梅雨季宅家', category:'season',
+      body:'已经下了7天的雨了。你的衣服晾了一周还没干。\n\n你的出租屋潮湿得像水帘洞。墙角开始发霉，你的鞋子上也长了绿毛。\n\n你哪儿也去不了，只能宅在家里。你看了3部电影、2部剧、打了5把游戏。\n\n你发现——被迫宅和主动宅，是完全不同的体验。被迫宅让你焦虑，主动宅让你享受。\n\n你打开了除湿机。你觉得除湿机和你的心理健康之间，有着某种神秘的联系。',
+      cond: g => g.age >= 18 && g.age <= 45 && g.mood < 60,
+      choices:[
+        { label:'趁机学做几道新菜', hint:'+💪 +😊', fn: g => { g.flags.rainySeasonHome=true; g.flags.rainyCooking=true; return{health:5,mood:5}; }},
+        { label:'把发霉的房间彻底清理一遍', hint:'+😊 +💪', fn: g => { g.flags.rainySeasonHome=true; g.flags.deepClean=true; return{mood:5,health:3}; }},
+        { label:'窝在被子里读一本一直想读的书', hint:'+🧠 +😊', fn: g => { g.flags.rainySeasonHome=true; g.flags.rainyReading=true; return{intel:8,mood:3}; }},
+      ]},
+    { id:'heat_wave_survive_v31_7', icon:'🌡️', title:'高温40度', category:'season',
+      body:'今天40度。你的出租屋没有空调——只有一台破风扇。\n\n你躺在床上，觉得自己像铁板上的肉。你的外卖小哥迟到了30分钟，他说：「路上太热了，我差点中暑。」\n\n你打开冰箱——里面只有一瓶矿泉水和半个西瓜。\n\n你把西瓜挖着吃了，觉得这是你今天最幸福的时刻。\n\n你想：夏天最难熬的不是热——是没有空调的热。你开始认真考虑买一台空调，或者——搬到有空调的房子。',
+      cond: g => g.age >= 18 && g.age <= 40 && g.health < 70,
+      choices:[
+        { label:'咬牙买一台空调', hint:'+😊 -💰', fn: g => { g.flags.heatWaveSurvive=true; g.flags.buyAC=true; return{mood:10,money:-2000}; }},
+        { label:'白天蹭商场空调晚上回家', hint:'+💰 +😊', fn: g => { g.flags.heatWaveSurvive=true; g.flags.mallAC=true; return{money:200,mood:3}; }},
+        { label:'学会和热共处多喝水少出门', hint:'+💪 +🧠', fn: g => { g.flags.heatWaveSurvive=true; g.flags.heatAdaptation=true; return{health:3,intel:2}; }},
+      ]},
+    { id:'north_south_heat_debate_v31_7', icon:'❄️', title:'南北供暖之争', category:'season',
+      body:'冬天来了。你在北方/南方的朋友发来了一张照片。\n\n北方朋友：穿着短袖在暖气房里吃冰棍。室内温度22度。\n南方朋友：穿着羽绒服在家里打哆嗦。室内温度5度。\n\n你发现——中国的冬天，不是一个冬天。北方有暖气，南方只有「扛」。\n\n你在网上加入了南北方供暖大辩论。你打字打得手指都冷了。\n\n你最后的结论是：不管南方北方，冬天最需要的——是一碗热汤和一句暖心的话。',
+      cond: g => g.age >= 18 && g.age <= 45,
+      choices:[
+        { label:'给自己买一台电暖器', hint:'+😊 -💰', fn: g => { g.flags.northSouthHeat=true; g.flags.buyHeater=true; return{mood:5,money:-300}; }},
+        { label:'学煲一锅暖身汤', hint:'+💪 +😊', fn: g => { g.flags.northSouthHeat=true; g.flags.winterSoup=true; return{health:5,mood:5}; }},
+        { label:'约朋友吃火锅暖身', hint:'+👥 +😊', fn: g => { g.flags.northSouthHeat=true; g.flags.winterHotpot=true; return{social:5,mood:5,money:-200}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
 
@@ -18792,6 +18873,16 @@ const ACHIEVEMENTS = [
     { id:'fresh_perspective_ach', icon:'🧳', name:'新视角', desc:'旅行后获得了新的生活视角', check: g => g.flags.freshPerspective },
     { id:'quick_decide_ach', icon:'🤯', name:'果断决策者', desc:'学会了快速决策', check: g => g.flags.quickDecide },
     { id:'self_reconcile_ach', icon:'🕊️', name:'与自己和解', desc:'接受了自己是普通人', check: g => g.flags.selfReconcile },
+    // --- v31.7 季节与节日成就 ---
+    { id:'rational_shopper_ach', icon:'🛒', name:'理性买家', desc:'双十一只买了需要的', check: g => g.flags.rationalShopping },
+    { id:'combo_plan_ach', icon:'🧧', name:'两全其美', desc:'春节回家又旅游', check: g => g.flags.comboPlan },
+    { id:'festival_gathering_ach', icon:'🌕', name:'异乡团圆', desc:'中秋和异乡朋友团聚', check: g => g.flags.festivalGathering },
+    { id:'enjoy_single_ach', icon:'💔', name:'单身快乐', desc:'享受七夕单身的自由', check: g => g.flags.enjoySingle },
+    { id:'cherish_days_ach', icon:'🎓', name:'珍惜时光', desc:'珍惜了最后的校园时光', check: g => g.flags.cherishLastDays },
+    { id:'realistic_goals_ach', icon:'📖', name:'务实目标', desc:'设定了现实可行的目标', check: g => g.flags.realisticGoals },
+    { id:'annual_review_ach', icon:'🎆', name:'年度总结', desc:'写了一份年度总结给自己', check: g => g.flags.annualReview },
+    { id:'rainy_reading_ach', icon:'🌧️', name:'雨天读书', desc:'梅雨季在家读了一本好书', check: g => g.flags.rainyReading },
+    { id:'winter_soup_ach', icon:'❄️', name:'暖身暖汤', desc:'学煲了一锅暖身汤', check: g => g.flags.winterSoup },
 ];
 
 // === ENDINGS === (order matters: first match wins)
