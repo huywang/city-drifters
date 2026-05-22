@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v7.2
+// 都市浮生记 - Game Engine v7.3
 // ============================================
 
 // === GAME STATE ===
@@ -3490,6 +3490,34 @@ const EVENTS = [
         { label:'做文化传播', hint:'+💰 +✨ +🧠', fn: g => { g.flags.culturalHeritage=true; g.flags.culturePromoter=true; return{money:5000,charm:12,intel:10}; }},
         { label:'不感兴趣', hint:'+🧠', fn: g => { g.flags.culturalHeritage=true; return{intel:3}; }},
       ]},
+    // === v7.3 EVENTS - 相亲角与婚恋困境 ===
+    { id:'matchmaking_corner', icon:'💕', title:'相亲角',
+      body:'你被父母拉去了人民公园相亲角：满墙的简历，写着学历、收入、房产、户口。\n\n"相亲角——不是在相亲，而是在拍卖阶级。"\n\n你看了看条件：\n- 男方：985硕士、年薪50万、上海户口、有房有车\n- 女方：海归硕士、年薪30万、独生女、父母有退休金\n\n"66%的年轻人不愿因压力调整择偶标准，拒绝'将就婚恋'。"\n\n你被一个阿姨问："小伙子/小姑娘，你什么条件？"\n\n你尴尬地笑了笑：我的条件是——我还不想结婚。\n\n"63%的00后认为带有强目的性的相亲行为并不是首选。"\n\n但你也在思考：相亲角是父母的焦虑，还是年轻人的无奈？\n\n"婚恋市场不生产爱情，而是在批发焦虑。"',
+      cond: g => !g.flags.matchmakingCorner && g.age>=25 && g.age<=35 && !g.flags.married,
+      choices:[
+        { label:'配合父母相亲', hint:'+👥 -😊', fn: g => { g.flags.matchmakingCorner=true; g.flags.parentArranged=true; return{social:8,mood:-10}; }},
+        { label:'拒绝相亲', hint:'+😊 -👥', fn: g => { g.flags.matchmakingCorner=true; g.flags.refuseBlindDate=true; return{mood:10,social:-5}; }},
+        { label:'自己去相亲', hint:'+👥', fn: g => { g.flags.matchmakingCorner=true; g.flags.selfArranged=true; return{social:12,mood:5}; }},
+        { label:'观察人类学', hint:'+🧠 +😊', fn: g => { g.flags.matchmakingCorner=true; return{intel:8,mood:8}; }},
+      ]},
+    { id:'marriage_cost', icon:'💸', title:'结婚成本',
+      body:'你算了一笔账：在大城市结婚要花多少钱？\n\n- 婚房：300-500万（掏空两代人积蓄）\n- 婚礼：20-50万（相当于半年工资）\n- 彩礼：0-30万（农村均价30万）\n- 婚车、钻戒、蜜月：10-20万\n\n"城市婚育总成本超过200万，农村彩礼均价30万——婚姻是一场经济豪赌。"\n\n你看了看数据：\n- 40%的家庭因为结婚背负债务\n- 债务偿还周期延长至15年\n- 商业婚恋平台结婚成功率跌破3.8%\n\n"不是现在的年轻人不愿意结婚，而是现在的年轻人看明白了：在资本语境下的婚姻，没有感情可言。"\n\n你开始理解：为什么越来越多的Z世代选择"不办婚礼"，把预算用来付首付。\n\n"真正的爱情，没有支付按钮。"',
+      cond: g => !g.flags.marriageCost && g.age>=25 && g.age<=35 && g.money<100000,
+      choices:[
+        { label:'咬牙结婚', hint:'-💰💰💰 +😊 +👥', fn: g => { g.flags.marriageCost=true; g.flags.married=true; return{money:-200000,mood:20,social:15}; }},
+        { label:'简约婚礼', hint:'-💰 +😊 +✨', fn: g => { g.flags.marriageCost=true; g.flags.minimalWedding=true; return{money:-30000,mood:15,charm:10}; }},
+        { label:'不结婚', hint:'+💰 +😊', fn: g => { g.flags.marriageCost=true; g.flags.noMarriage=true; return{money:5000,mood:10}; }},
+        { label:'再等等', hint:'+🧠', fn: g => { g.flags.marriageCost=true; return{intel:5}; }},
+      ]},
+    { id:'single_economy', icon:'💍', title:'单身经济',
+      body:'你发现了一个新词：单身经济。\n\n"单身经济——一个人也要好好生活，一个人也要消费得起。"\n\n你看了看产品：\n- 一人食：小份菜、单人火锅、迷你电饭煲\n- 迷你家电：小型洗衣机、单人烤箱\n- 宠物经济：猫狗陪伴\n- 一人旅行：定制行程、拼房旅行\n\n2025年，中国单身经济规模突破4万亿元，超过2.4亿单身成年人。\n\n"都市白领在婚前的亲密朋友数量平均仅有3个。"\n\n你开始享受单身生活：\n- 一个人吃火锅\n- 一个人看电影\n- 一个人旅行\n- 养一只猫/狗\n\n"单身不是失败，而是选择——选择自由，选择独立，选择为自己而活。"\n\n但你也在思考：单身经济是解放，还是孤独的代名词？',
+      cond: g => !g.flags.singleEconomy && g.age>=22 && g.age<=35 && !g.flags.married,
+      choices:[
+        { label:'享受单身', hint:'+😊 +💰', fn: g => { g.flags.singleEconomy=true; g.flags.singleHappy=true; return{mood:15,money:3000}; }},
+        { label:'投资自己', hint:'+🧠 +✨', fn: g => { g.flags.singleEconomy=true; g.flags.selfInvestment=true; return{intel:12,charm:10,money:-5000}; }},
+        { label:'养宠物陪伴', hint:'-💰 +😊 +❤️', fn: g => { g.flags.singleEconomy=true; g.flags.hasPet=true; return{money:-3000,mood:18,health:5}; }},
+        { label:'渴望脱单', hint:'+😊 -💰', fn: g => { g.flags.singleEconomy=true; return{mood:8,money:-2000}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3800,6 +3828,10 @@ const ACHIEVEMENTS = [
     { id:'hanfu_lover', icon:'👘', name:'汉服爱好者', desc:'穿汉服', check: g => g.flags.hanfuFan },
     { id:'traditional_wedding', icon:'💒', name:'汉服婚礼', desc:'举办汉服婚礼', check: g => g.flags.hanfuWedding },
     { id:'culture_inheritor', icon:'🏛️', name:'文化传承者', desc:'学习传统文化', check: g => g.flags.culturalHeritage },
+    // v7.3 achievements
+    { id:'blind_date_survivor', icon:'💕', name:'相亲角幸存者', desc:'体验相亲角', check: g => g.flags.matchmakingCorner },
+    { id:'marriage_realist', icon:'💸', name:'婚姻现实主义者', desc:'面对结婚成本', check: g => g.flags.marriageCost },
+    { id:'single_happy', icon:'💍', name:'快乐单身族', desc:'享受单身生活', check: g => g.flags.singleHappy },
 ];
 
 // === ENDINGS === (order matters: first match wins)
