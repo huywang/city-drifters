@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v30.4
+// 都市浮生记 - Game Engine v30.5
 // ============================================
 
 // === GAME STATE ===
@@ -16304,6 +16304,87 @@ const EVENTS = [
         { label:'把粉丝转化为私域社群', hint:'+💰 +🧠', fn: g => { g.flags.fanEconomy=true; g.flags.buildCommunity=true; return{money:3000,intel:5}; }},
         { label:'不想变现只想纯粹创作', hint:'+😊 -💰', fn: g => { g.flags.fanEconomy=true; g.flags.pureCreator=true; return{mood:5,money:-1000}; }},
       ]},
+    // v30.5 事件 - 心理健康与自我成长
+    { id:'emotional_breakdown', icon:'😢', title:'情绪崩溃', category:'mental_health',
+      body:'你在某个普通的夜晚——突然「崩溃」了。\n\n起因很小：\n- 可能是「外卖洒了」\n- 可能是「地铁被挤了一下」\n- 可能是「领导的一句批评」\n- 可能「没有起因」——就是「突然」\n\n你的感受：\n- 「眼泪」止不住\n- 「胸口」像压了一块石头\n- 「呼吸」变得困难\n- 「世界」变得「灰暗」\n\n你的反思：\n- 你不是「脆弱」——你是「撑了太久」\n- 你不是「矫情」——你是「太久没有被看见」\n- 你不是「有病」——你是「太累了」\n\n「情绪崩溃」不是「软弱」——是「身体在告诉你：你已经超负荷了」。\n\n（中国有超过9500万抑郁症患者——但只有不到10%寻求过专业帮助。「情绪」不是「敌人」——是「信号」。）',
+      cond: g => g.mood <= 30 && !g.flags.emotionalBreakdown,
+      choices:[
+        { label:'允许自己崩溃一次哭个够', hint:'+😊', fn: g => { g.flags.emotionalBreakdown=true; g.flags.allowCry=true; return{mood:8}; }},
+        { label:'预约心理咨询师的号', hint:'+🧠 +😊', fn: g => { g.flags.emotionalBreakdown=true; g.flags.seekTherapy=true; return{intel:5,mood:5}; }},
+        { label:'告诉信任的人你需要帮助', hint:'+👥 +😊', fn: g => { g.flags.emotionalBreakdown=true; g.flags.reachOut=true; return{social:5,mood:5}; }},
+      ]},
+    { id:'therapy_journey_v30_5', icon:'🛋️', title:'心理咨询之旅', category:'mental_health',
+      body:'你决定试试「心理咨询」——因为你觉得「自己扛不动了」。\n\n你的顾虑：\n- 「贵」——一次500-800元，每周一次\n- 「没用」——「和陌生人聊天能有什么用？」\n- 「丢人」——「看心理医生是不是说明我有病？」\n- 「不知道说什么」——「万一很尴尬怎么办？」\n\n你的体验：\n- 第一次：「紧张」——不知道该说什么\n- 第三次：「放松」——开始愿意「打开自己」\n- 第十次：「突破」——突然理解了「为什么我会这样」\n- 第二十次：「成长」——开始「接纳自己」\n\n你的收获：\n- 「情绪」不是「问题」——是「信号」\n- 「脆弱」不是「弱点」——是「勇气」\n- 「求助」不是「软弱」——是「智慧」\n\n「心理咨询」不是「治病」——是「认识自己」。\n\n（中国心理咨询师缺口：130万人。「心理健康」不是「奢侈品」——是「必需品」。）',
+      cond: g => g.flags.seekTherapy && !g.flags.therapyJourneyV30_5,
+      choices:[
+        { label:'坚持咨询完成自我成长', hint:'+😊 +🧠', fn: g => { g.flags.therapyJourneyV30_5=true; g.flags.therapyGrowth=true; return{mood:10,intel:5}; }},
+        { label:'觉得太贵了换成自助书籍', hint:'+🧠', fn: g => { g.flags.therapyJourneyV30_5=true; g.flags.selfHelpBooks=true; return{intel:8,mood:3}; }},
+        { label:'试了几次觉得没用放弃了', hint:'-😊', fn: g => { g.flags.therapyJourneyV30_5=true; g.flags.gaveUpTherapy=true; return{mood:-3}; }},
+      ]},
+    { id:'mindfulness_practice', icon:'🧘', title:'正念冥想', category:'mental_health',
+      body:'你开始尝试「正念冥想」——因为你听说「它可以减轻焦虑」。\n\n你的开始：\n- 下载了「潮汐」APP（免费）\n- 第一次：5分钟——你觉得「好无聊」「脑子停不下来」\n- 第二次：10分钟——你开始「注意到」自己的「思绪」\n- 第三次：15分钟——你第一次「感受到」了「平静」\n\n你的变化：\n- 「焦虑」减少了——你不再「预支未来的烦恼」\n- 「专注」提高了——你可以「一次做一件事」\n- 「睡眠」变好了——你可以「放下手机」了\n- 「情绪」稳定了——你可以「观察」而不是「被控制」\n\n你的理解：\n- 「正念」不是「放空」——是「觉察」\n- 「冥想」不是「神奇」——是「练习」\n- 「平静」不是「目标」——是「副作用」\n\n「你不需要「停止思考」——你只需要「不被思考带走」。',
+      cond: g => g.age >= 22 && g.mood <= 50 && !g.flags.mindfulnessPractice,
+      choices:[
+        { label:'每天坚持10分钟冥想', hint:'+😊 +💪', fn: g => { g.flags.mindfulnessPractice=true; g.flags.dailyMindfulness=true; return{mood:8,health:5}; }},
+        { label:'偶尔做做当放松', hint:'+😊', fn: g => { g.flags.mindfulnessPractice=true; g.flags.casualMindfulness=true; return{mood:3}; }},
+        { label:'这不适合我脑子太吵了', hint:'', fn: g => { g.flags.mindfulnessPractice=true; g.flags.skipMindfulness=true; return{}; }},
+      ]},
+    { id:'toxic_positivity', icon:'😊', title:'有毒的正能量', category:'mental_health',
+      body:'你发现——身边充满了「有毒的正能量」。\n\n你听到的话：\n- 「你要乐观一点！」\n- 「想开点，没什么大不了的」\n- 「比你惨的人多了去了」\n- 「你就是想太多」\n- 「感恩吧，你拥有的已经很多了」\n\n你的感受：\n- 这些话让你「更难受」——因为你「不被允许「不开心」」\n- 你开始「假装开心」——因为你不想「让别人担心」\n- 你「压抑情绪」——因为你觉得「不开心是「错误的」」\n\n你的反思：\n- 「不开心」是「正常的」——不是「病」\n- 「负面情绪」是「信号」——不是「敌人」\n- 「强迫乐观」是「逃避」——不是「解决」\n\n「真正的「正能量」——不是「永远开心」，是「允许自己不开心」然后「慢慢好起来」。',
+      cond: g => g.mood <= 40 && g.age >= 22 && !g.flags.toxicPositivity,
+      choices:[
+        { label:'接纳自己的负面情绪', hint:'+😊 +🧠', fn: g => { g.flags.toxicPositivity=true; g.flags.acceptNegativity=true; return{mood:5,intel:5}; }},
+        { label:'远离那些只会说"想开点"的人', hint:'+😊', fn: g => { g.flags.toxicPositivity=true; g.flags.setBoundaries=true; return{mood:3}; }},
+        { label:'学会用正确的方式安慰自己和别人', hint:'+👥 +🧠', fn: g => { g.flags.toxicPositivity=true; g.flags.learnComfort=true; return{social:5,intel:3}; }},
+      ]},
+    { id:'imposter_syndrome_v30_5', icon:'🎭', title:'冒充者综合症', category:'mental_health',
+      body:'你升职了/获奖了/得到了一个机会——但你感觉自己「不配」。\n\n你的内心独白：\n- 「我只是运气好」\n- 「他们迟早会发现我「其实不行」」\n- 「别人都比我厉害」\n- 「我不应该在这里」\n\n你的行为：\n- 「过度努力」——因为你觉得「不够好」\n- 「不敢拒绝」——因为你觉得「不配」\n- 「不敢邀功」——因为你觉得「是团队的功劳」\n- 「害怕失败」——因为你觉得「失败就证明了我不行」\n\n你的认识：\n- 这种感觉叫「冒充者综合症」——「70%的人」都经历过\n- 它不是「谦虚」——是「自我否定」\n- 它不是「事实」——是「认知偏差」\n\n「你不是「冒充者」——你是「低估了自己」。',
+      cond: g => g.jobSalary >= 8000 && g.intel >= 30 && !g.flags.imposterSyndrome,
+      choices:[
+        { label:'记录自己的成就建立证据链', hint:'+😊 +🧠', fn: g => { g.flags.imposterSyndrome=true; g.flags.buildEvidence=true; return{mood:5,intel:5}; }},
+        { label:'找信任的人聊聊你的感受', hint:'+👥 +😊', fn: g => { g.flags.imposterSyndrome=true; g.flags.talkImposter=true; return{social:5,mood:5}; }},
+        { label:'接受自己就是这样的人', hint:'', fn: g => { g.flags.imposterSyndrome=true; g.flags.acceptImposter=true; return{mood:-2}; }},
+      ]},
+    { id:'self_compassion_v30_5', icon:'💕', title:'学会自我关怀', category:'mental_health',
+      body:'你开始学习「自我关怀」——因为你发现自己「对自己太苛刻了」。\n\n你以前的模式：\n- 犯错时：「我怎么这么蠢！」\n- 失败时：「我就是不行」\n- 焦虑时：「我应该更努力」\n- 疲惫时：「别人都在努力我凭什么休息」\n\n你学到的新模式：\n- 犯错时：「犯错是正常的，我可以从中学习」\n- 失败时：「失败不等于我是失败者」\n- 焦虑时：「我的感受是合理的，我需要照顾自己」\n- 疲惫时：「休息不是偷懒，是充电」\n\n你的实践：\n- 像「对待好朋友」一样「对待自己」\n- 不是「自我放纵」——是「自我接纳」\n- 不是「降低标准」——是「减少内耗」\n\n「自我关怀」不是「自私」——是「可持续的「爱自己」。\n\n（研究表明：自我关怀水平高的人——焦虑更低、幸福感更高、人际关系更好。）',
+      cond: g => g.age >= 24 && g.mood <= 50 && !g.flags.selfCompassion,
+      choices:[
+        { label:'每天对自己说一句鼓励的话', hint:'+😊 +💪', fn: g => { g.flags.selfCompassion=true; g.flags.dailyEncourage=true; return{mood:8,health:3}; }},
+        { label:'停止和别人比较专注自己', hint:'+😊 +🧠', fn: g => { g.flags.selfCompassion=true; g.flags.stopCompare=true; return{mood:5,intel:3}; }},
+        { label:'允许自己休息不内疚', hint:'+💪 +😊', fn: g => { g.flags.selfCompassion=true; g.flags.allowRest=true; return{health:5,mood:5}; }},
+      ]},
+    { id:'anxiety_management', icon:'😰', title:'焦虑管理', category:'mental_health',
+      body:'你的「焦虑」越来越频繁——你决定「正视它」。\n\n你的焦虑类型：\n- 「工作焦虑」：害怕被裁/害怕完不成KPI/害怕评价\n- 「经济焦虑」：害怕没钱/害怕失业/害怕意外\n- 「健康焦虑」：害怕生病/害怕变老/害怕死亡\n- 「社交焦虑」：害怕被拒绝/害怕出丑/害怕评价\n- 「存在焦虑」：害怕没意义/害怕浪费生命/害怕后悔\n\n你的应对策略：\n- 「认知行为」：识别「灾难化思维」——「最坏的情况真的会发生吗？」\n- 「暴露疗法」：「直面恐惧」而不是「逃避」\n- 「正念练习」：「观察焦虑」而不是「被焦虑控制」\n- 「身体放松」：「深呼吸」「渐进性放松」「运动」\n\n你的领悟：\n- 「焦虑」不是「敌人」——是「过度保护你的「警卫」」\n- 「管理焦虑」不是「消灭焦虑」——是「和焦虑共处」\n- 「焦虑」告诉你「你在乎什么」——但不需要「控制你」\n\n「焦虑不会消失——但你可以学会「不让它做你的「司机」。',
+      cond: g => g.mood <= 35 && g.age >= 22 && !g.flags.anxietyManagement,
+      choices:[
+        { label:'系统学习焦虑管理技巧', hint:'+🧠 +😊', fn: g => { g.flags.anxietyManagement=true; g.flags.systematicAnxiety=true; return{intel:8,mood:5}; }},
+        { label:'找专业心理咨询师帮助', hint:'+😊 +💰', fn: g => { g.flags.anxietyManagement=true; g.flags.professionalHelp=true; return{mood:8,money:-2000}; }},
+        { label:'通过运动和作息调整', hint:'+💪 +😊', fn: g => { g.flags.anxietyManagement=true; g.flags.lifestyleAdjust=true; return{health:8,mood:5}; }},
+      ]},
+    { id:'boundaries_learning', icon:'🚧', title:'学会说"不"', category:'mental_health',
+      body:'你意识到——你「不会拒绝」别人。\n\n你的「讨好」模式：\n- 同事加班——你「不好意思先走」\n- 朋友借钱——你「不好意思不借」\n- 家人要求——你「不好意思拒绝」\n- 陌生人推销——你「不好意思说不」\n\n你的后果：\n- 你「很累」——因为你一直在「满足别人」\n- 你「很气」——但你「气的是自己」\n- 你「失去自我」——因为你「不知道自己要什么」\n\n你的学习：\n- 「拒绝」不是「冷漠」——是「尊重自己的时间和精力」\n- 「边界」不是「墙」——是「告诉别人「怎么爱你」」\n- 「讨好」不是「善良」——是「恐惧被拒绝」\n\n你的练习：\n- 第一次说「不」：「对不起我今天有事」——心跳加速\n- 第二次说「不」：「这个我帮不了」——有点内疚\n- 第三次说「不」：「我需要考虑一下」——开始「从容」\n\n「说「不」不是「自私」——是「自爱」。\n\n（你不可能满足所有人——但你可以先「满足自己」。）',
+      cond: g => g.age >= 22 && g.mood <= 50 && !g.flags.boundariesLearning,
+      choices:[
+        { label:'从小事开始练习拒绝', hint:'+😊 +🧠', fn: g => { g.flags.boundariesLearning=true; g.flags.practiceSayingNo=true; return{mood:5,intel:5}; }},
+        { label:'和信任的人谈你的困扰', hint:'+👥 +😊', fn: g => { g.flags.boundariesLearning=true; g.flags.shareBoundaries=true; return{social:5,mood:3}; }},
+        { label:'看一些关于边界的书', hint:'+🧠', fn: g => { g.flags.boundariesLearning=true; g.flags.readBoundaries=true; return{intel:8}; }},
+      ]},
+    { id:'healing_inner_child', icon:'👶', title:'疗愈内在小孩', category:'mental_health',
+      body:'你在一次心理咨询（或自我探索）中——遇到了你的「内在小孩」。\n\n你的「内在小孩」是谁？\n- 是「童年的你」——那个「被忽视」「被批评」「被要求懂事」的你\n- 是「受伤的你」——那个「没被允许哭」「没被拥抱」「没被看见」的你\n- 是「现在的你」的「一部分」——那些「无意识的反应」「莫名的恐惧」「过度的讨好」\n\n你的觉察：\n- 「为什么我那么害怕被拒绝？」——因为「小时候被父母拒绝过」\n- 「为什么我那么需要被认可？」——因为「小时候很少被认可」\n- 「为什么我不敢表达需求？」——因为「小时候表达了也没人听」\n\n你的疗愈：\n- 「看见」——承认「那个小孩」的存在和伤痛\n- 「接纳」——不是「忘记」而是「理解」\n- 「拥抱」——给「内在小孩」他/她需要的「爱」「安全」「认可」\n- 「成长」——不是「消除伤痛」而是「带着伤痛继续前行」\n\n「疗愈」不是「回到没有受伤之前」——是「让伤口变成「力量」。\n\n（你值得被爱——不是因为你「做了什么」，是因为你「存在」。）',
+      cond: g => g.flags.therapyJourneyV30_5 && g.age >= 25 && !g.flags.healingInnerChild,
+      choices:[
+        { label:'认真面对和疗愈内在小孩', hint:'+😊 +🧠', fn: g => { g.flags.healingInnerChild=true; g.flags.deepHealing=true; return{mood:10,intel:5}; }},
+        { label:'写信给童年的自己', hint:'+😊', fn: g => { g.flags.healingInnerChild=true; g.flags.letterToChild=true; return{mood:8}; }},
+        { label:'这需要太长时间了我还没准备好', hint:'', fn: g => { g.flags.healingInnerChild=true; g.flags.notReady=true; return{mood:-2}; }},
+      ]},
+    { id:'life_meaning_quest', icon:'🌟', title:'寻找人生意义', category:'mental_health',
+      body:'你在某个深夜——问了自己一个问题：「我活着是为了什么？」\n\n你的思考：\n- 「赚钱」——赚了钱之后呢？\n- 「升职」——升了职之后呢？\n- 「结婚生子」——然后呢？\n- 「退休」——退休之后呢？\n\n你的探索：\n- 你读了《活出生命的意义》——维克多·弗兰克尔说：「意义不是「找到」的，是「创造」的」\n- 你看了很多纪录片——那些「有意义的人生」各不相同\n- 你和不同的人聊天——每个人的「意义」都不一样\n\n你的发现：\n- 「意义」不是「统一的」——是「个人的」\n- 「意义」不是「固定的」——是「流动的」\n- 「意义」不是「宏大的」——是「日常的」\n\n你的答案：\n- 「意义」可以是「创造美好的东西」\n- 「意义」可以是「帮助他人」\n- 「意义」可以是「体验人生」\n- 「意义」可以是「爱与被爱」\n\n「人生没有「标准答案」——你的「意义」由你「定义」。',
+      cond: g => g.age >= 26 && g.intel >= 30 && !g.flags.lifeMeaningQuest,
+      choices:[
+        { label:'我的意义是创造和表达', hint:'+😊 +🧠', fn: g => { g.flags.lifeMeaningQuest=true; g.flags.meaningCreate=true; return{mood:8,intel:5}; }},
+        { label:'我的意义是连接和帮助他人', hint:'+👥 +😊', fn: g => { g.flags.lifeMeaningQuest=true; g.flags.meaningConnect=true; return{social:8,mood:5}; }},
+        { label:'我的意义是体验和感受', hint:'+😊 +💪', fn: g => { g.flags.lifeMeaningQuest=true; g.flags.meaningExperience=true; return{mood:8,health:3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -17790,6 +17871,15 @@ const ACHIEVEMENTS = [
     { id:'quality_course_ach', icon:'📖', name:'良心课程', desc:'认真做了一套有价值的知识付费课程', check: g => g.flags.qualityCourse },
     { id:'redefine_creative_ach', icon:'🎨', name:'重新定义创作', desc:'重新定义了自己的创作标准不再被算法控制', check: g => g.flags.redefineCreative },
     { id:'healthy_fan_eco_ach', icon:'🤝', name:'健康粉丝经济', desc:'建立了健康的粉丝经济变现模式', check: g => g.flags.healthyFanEco },
+    // v30.5 achievements - 心理健康与自我成长
+    { id:'allow_cry_ach', icon:'😢', name:'允许脆弱', desc:'允许自己崩溃一次好好哭了一场', check: g => g.flags.allowCry },
+    { id:'therapy_growth_ach', icon:'🛋️', name:'心理咨询成长', desc:'坚持心理咨询完成了自我成长之旅', check: g => g.flags.therapyGrowth },
+    { id:'daily_mindfulness_ach', icon:'🧘', name:'正念达人', desc:'养成了每天正念冥想的好习惯', check: g => g.flags.dailyMindfulness },
+    { id:'accept_negativity_ach', icon:'🌧️', name:'接纳情绪', desc:'学会了接纳自己的负面情绪', check: g => g.flags.acceptNegativity },
+    { id:'stop_compare_ach', icon:'🌱', name:'不比较', desc:'停止和别人比较专注自己的成长', check: g => g.flags.stopCompare },
+    { id:'practice_saying_no_ach', icon:'🚧', name:'学会说不', desc:'学会了设立边界和拒绝不合理的要求', check: g => g.flags.practiceSayingNo },
+    { id:'deep_healing_ach', icon:'💕', name:'深度疗愈', desc:'认真面对和疗愈了自己的内在小孩', check: g => g.flags.deepHealing },
+    { id:'meaning_create_ach', icon:'🌟', name:'意义创造者', desc:'找到了属于自己的人生意义', check: g => g.flags.meaningCreate },
 ];
 
 // === ENDINGS === (order matters: first match wins)
