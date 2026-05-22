@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v30.2
+// 都市浮生记 - Game Engine v30.3
 // ============================================
 
 // === GAME STATE ===
@@ -16142,6 +16142,87 @@ const EVENTS = [
         { label:'副业太累影响主业了', hint:'-💪 -😊', fn: g => { g.flags.sideHustleIncome=true; g.flags.sideHustleBurnout=true; return{health:-3,mood:-3}; }},
         { label:'放弃副业主业加薪更现实', hint:'+🧠 +💰', fn: g => { g.flags.sideHustleIncome=true; g.flags.focusMainJob=true; return{intel:3,mood:3}; }},
       ]},
+    // v30.3 事件 - 职场性别与生育困境
+    { id:'pregnancy_dilemma', icon:'🤰', title:'怀孕与晋升', category:'gender_career',
+      body:'你终于等到了一个晋升机会——但你同时发现自己怀孕了。\n\n领导找你谈话：「这个项目很重要，需要你全力以赴。你的情况……要不先缓缓？」\n\n同事私下说：「怀孕了就别争了，回来位置还在就不错了。」\n\n你的HR说：「公司没有明文规定——但你要考虑团队节奏。」\n\n你面临的困境：\n- 要晋升——就得「隐瞒怀孕」或「推迟生育」\n- 要生育——就得「放弃晋升」或「接受边缘化」\n- 无论哪个选择——都有「代价」\n\n「为什么从来没有人问过一个男人：你怎么平衡事业和家庭？」\n\n（职场女性的「生育代价」——不是个人的选择，是「结构性的歧视」。）',
+      cond: g => g.age >= 25 && g.age <= 38 && g.jobSalary > 0 && !g.flags.pregnancyDilemma,
+      choices:[
+        { label:'先拿下晋升再说', hint:'+💰 -😊', fn: g => { g.flags.pregnancyDilemma=true; g.flags.prioritizeCareer=true; return{money:3000,mood:-5,charm:3}; }},
+        { label:'接受暂缓晋升安心养胎', hint:'+😊 -💰', fn: g => { g.flags.pregnancyDilemma=true; g.flags.prioritizeFamily=true; return{mood:3,health:5,money:-1000}; }},
+        { label:'和公司谈一个两全方案', hint:'+🧠', fn: g => { g.flags.pregnancyDilemma=true; g.flags.negotiateBalance=true; return{intel:5,mood:-2}; }},
+      ]},
+    { id:'maternity_return', icon:'👶', title:'产假归来', category:'gender_career',
+      body:'你休完产假回到公司——发现一切都变了。\n\n你的工位被调到了角落。你的项目被别人接手了。你的客户认了新的对接人。\n\n领导说：「你先适应一下，不着急。」\n同事说：「孩子可爱吗？多发朋友圈！」\n你打开电脑——发现自己连系统密码都忘了。\n\n你面临的「母职惩罚」：\n- 被边缘化——不是因为你「能力不行」，是因为你「不在场」了\n- 被贴标签——「妈妈」变成了你的「第一身份」，「职业人」变成了「第二身份」\n- 被隐形降薪——不是「降了工资」，是「失去了机会」\n\n你的感悟：\n- 「产假」不是「假期」——是「另一份工作」\n- 「回归职场」不是「重新开始」——是「重新证明自己」\n- 最大的挑战不是「工作本身」——是「别人的预期」\n\n「每一个产假归来的妈妈，都在打一场别人看不见的仗。」',
+      cond: g => g.flags.pregnancyDilemma && g.age >= 26 && !g.flags.maternityReturn,
+      choices:[
+        { label:'用业绩重新证明自己', hint:'+💰 +💪', fn: g => { g.flags.maternityReturn=true; g.flags.proveMyself=true; return{money:2000,intel:5,health:-3}; }},
+        { label:'接受边缘化换个轻松岗位', hint:'+😊 -💰', fn: g => { g.flags.maternityReturn=true; g.flags.acceptDownshift=true; return{mood:3,money:-1500}; }},
+        { label:'考虑辞职做全职妈妈', hint:'+😊 -💰💰', fn: g => { g.flags.maternityReturn=true; g.flags.considerFullTime=true; return{mood:5,money:-3000}; }},
+      ]},
+    { id:'workplace_gender_gap', icon:'⚖️', title:'同工不同酬', category:'gender_career',
+      body:'你在一次偶然中发现——和你同岗位、同资历的同事，工资比你高30%。\n\n你问HR，HR说：「薪资是保密的，不方便讨论。」\n你问领导，领导说：「每个人的情况不同，综合考量的。」\n你问同事，同事说：「我面试的时候谈的比较高。」\n\n你开始意识到——「薪资差异」不是因为「能力差异」，而是因为：\n- 「谈判能力」的差异——男性更敢「要价」\n- 「预期」的差异——女性被预期「不会谈价」\n- 「晋升机会」的差异——男性更容易进入「高薪层级」\n\n你的选择：\n- 去谈加薪——可能被拒，但「不谈永远不加」\n- 接受现状——「也许我真的不如他？」\n- 跳槽——「市场会给你公允的价格」\n\n「性别薪酬差距不是数字——是每一个「她」的故事。」',
+      cond: g => g.jobSalary > 0 && g.age >= 24 && !g.flags.genderGapAware,
+      choices:[
+        { label:'拿着数据去谈加薪', hint:'+💰 +🧠', fn: g => { g.flags.genderGapAware=true; g.flags.negotiatedRaise=true; return{money:2000,intel:3,charm:2}; }},
+        { label:'接受现实算了', hint:'-😊', fn: g => { g.flags.genderGapAware=true; g.flags.acceptGap=true; return{mood:-5}; }},
+        { label:'开始看外面的机会', hint:'+💰', fn: g => { g.flags.genderGapAware=true; g.flags.lookingElsewhere=true; return{money:1000,intel:2}; }},
+      ]},
+    { id:'full_time_parent_choice', icon:'🏠', title:'全职太太还是职场妈妈', category:'gender_career',
+      body:'你和伴侣认真讨论了一个问题——「要不要有人回归家庭？」\n\n你们的计算：\n- 保姆费用：8000/月\n- 你的税后收入：12000/月\n- 「净收入」：4000/月——还要搭上「全部精力」和「职业发展」\n\n你伴侣说：「要不你先回来带两年？等孩子上幼儿园你再出去？」\n你妈说：「女人嘛，孩子比事业重要。」\n你朋友说：「千万别！回来容易出去难！」\n\n你的焦虑：\n- 「全职妈妈」不是「不工作」——是「24小时无薪工作」\n- 「两年空白」不是「暂停」——是「重新开始的代价」\n- 「经济依赖」不是「被养」——是「失去议价权」\n\n「选择权」很重要——但「选择」背后的「结构性困境」更重要。\n\n（无论哪个选择——都没有错。错的是「只有一个选择」的社会。）',
+      cond: g => g.age >= 26 && g.age <= 40 && g.jobSalary > 0 && !g.flags.fullTimeParentChoice,
+      choices:[
+        { label:'回归家庭做全职妈妈/爸爸', hint:'+😊 -💰💰', fn: g => { g.flags.fullTimeParentChoice=true; g.flags.fullTimeParent=true; return{mood:5,money:-5000,social:-3}; }},
+        { label:'继续工作请保姆带孩子', hint:'+💰 -💪', fn: g => { g.flags.fullTimeParentChoice=true; g.flags.workingParent=true; return{money:2000,health:-3,mood:-2}; }},
+        { label:'折中——转兼职或远程工作', hint:'+🧠', fn: g => { g.flags.fullTimeParentChoice=true; g.flags.flexibleWork=true; return{intel:3,mood:2,money:-1000}; }},
+      ]},
+    { id:'fertility_pressure_v30_3', icon:'👵', title:'催生大战', category:'gender_career',
+      body:'每次回家——「催生」都是固定节目。\n\n你妈：「你看你表妹，孩子都会打酱油了。」\n婆婆：「我们老两口就盼着抱孙子呢。」\n亲戚：「不生孩子的人生不完整。」\n同事：「你还不生？再晚就高龄产妇了！」\n\n你内心的声音：\n- 「生孩子」是「我想要」还是「别人觉得我应该要」？\n- 「准备好」的定义是什么——「经济」还是「心理」还是「年龄」？\n- 「不生孩子」是「自私」还是「负责」？\n\n你面临的压力：\n- 「年龄焦虑」——「再不生就晚了」\n- 「关系焦虑」——「不生孩子婆媳关系怎么处」\n- 「存在焦虑」——「我的人生到底要不要有下一代」\n\n「催生」的背后——不是「关心」，是「控制」。\n\n（生不生——是你的身体，你的人生，你的选择。）',
+      cond: g => g.age >= 26 && g.age <= 38 && !g.flags.fertilityPressure && (g.flags.married || g.flags.inRelationship),
+      choices:[
+        { label:'我们确实想要孩子', hint:'+😊', fn: g => { g.flags.fertilityPressure=true; g.flags.wantsChild=true; return{mood:3,social:3}; }},
+        { label:'我们还在考虑不着急', hint:'+🧠', fn: g => { g.flags.fertilityPressure=true; g.flags.noRush=true; return{intel:3,mood:-2}; }},
+        { label:'我们决定丁克', hint:'+😊 -👥', fn: g => { g.flags.fertilityPressure=true; g.flags.choseDink=true; return{mood:5,social:-5}; }},
+      ]},
+    { id:'childcare_unequal', icon:'🧹', title:'丧偶式育儿', category:'gender_career',
+      body:'你发现——「育儿」的重担几乎全落在了你一个人身上。\n\n你的日常：\n- 早上6点起床做早餐送孩子上学\n- 上班期间还要回老师的微信、预约儿保\n- 下班后接孩子、做饭、辅导作业、洗澡哄睡\n- 晚上11点——你终于有了「自己的时间」，但你只想瘫着\n\n你的伴侣呢？\n- 「我上班也很累啊」\n- 「你让我做什么我就做什么嘛」（但从来不主动）\n- 「我周末带孩子出去玩了！」（然后发了朋友圈）\n\n你的感悟：\n- 「平等」不是「做一样的事」——是「承担一样的心理负荷」\n- 「帮忙」这个词不对——「育儿不是帮忙，是责任」\n- 「丧偶式育儿」不是夸张——是「统计数据」\n\n（中国女性平均每天做家务3.2小时，男性0.9小时。差距不是「懒惰」——是「默认设置」。）\n\n「家务不是「谁帮谁」——是「共同责任」。',
+      cond: g => g.flags.married && g.age >= 28 && !g.flags.childcareUnequal,
+      choices:[
+        { label:'和伴侣严肃谈一次分工', hint:'+😊 +🧠', fn: g => { g.flags.childcareUnequal=true; g.flags.talkedDivision=true; return{mood:5,intel:3}; }},
+        { label:'请保姆分担一部分', hint:'+😊 -💰', fn: g => { g.flags.childcareUnequal=true; g.flags.hiredHelp=true; return{mood:3,money:-3000}; }},
+        { label:'忍忍吧大家都这样', hint:'-😊 -💪', fn: g => { g.flags.childcareUnequal=true; g.flags.endureIt=true; return{mood:-5,health:-3}; }},
+      ]},
+    { id:'double_income_stress', icon:'⏰', title:'双职工的时间贫困', category:'gender_career',
+      body:'你们夫妻都是「双职工」——看起来收入不错，但你们正在经历「时间贫困」。\n\n你们的一天：\n- 6:30 起床做早餐\n- 7:30 送孩子上学\n- 8:30-18:30 上班（经常加班到19:30）\n- 19:30 接孩子（如果加班就请老人帮忙）\n- 20:00 做饭、吃饭、辅导作业\n- 22:00 哄睡、洗衣服\n- 23:00 终于「属于自己」——但你只想刷手机\n\n你们的困境：\n- 「有钱没时间」——挣了钱但没有「生活质量」\n- 「有人没陪伴」——孩子有父母，但父母「不在场」\n- 「有梦没精力」——想做副业、想学习、想旅行——但「只想睡觉」\n\n你们讨论过「要不要一个人辞职回家」——但算完账发现：\n- 一个人的收入不够覆盖「房贷+教育+生活」\n- 「时间贫困」的解药——不是「辞职」，是「系统性支持」\n\n「双职工家庭的真相：两个人上班，但没有人「在家」。',
+      cond: g => g.flags.married && g.jobSalary > 0 && g.age >= 28 && !g.flags.doubleIncomeStress,
+      choices:[
+        { label:'和伴侣制定严格的时间管理', hint:'+🧠 +💪', fn: g => { g.flags.doubleIncomeStress=true; g.flags.timeManagement=true; return{intel:5,health:3}; }},
+        { label:'请老人来帮忙带孩子', hint:'+😊 -🧠', fn: g => { g.flags.doubleIncomeStress=true; g.flags.elderHelp=true; return{mood:3,intel:-2}; }},
+        { label:'考虑换一份不用加班的工作', hint:'+💪 -💰', fn: g => { g.flags.doubleIncomeStress=true; g.flags.noOvertime=true; return{health:5,mood:3,money:-2000}; }},
+      ]},
+    { id:'career_break_dilemma', icon:'🛤️', title:'为了家庭中断事业', category:'gender_career',
+      body:'你做了一个艰难的决定——为了家庭，暂停事业。\n\n原因可能是：\n- 孩子太小没人带\n- 老人病了需要照顾\n- 伴侣工作调动需要跟随\n- 经济压力大需要全职带娃省钱\n\n你中断事业后的感受：\n- 「社交圈」急剧缩小——以前的同事朋友渐行渐远\n- 「自我价值感」下降——「我除了是妈妈/妻子，还是谁？」\n- 「经济焦虑」上升——「每一笔钱都要伸手要」\n- 「职业信心」崩塌——「我还能回去吗？」\n\n你身边的人说：\n- 「你为了家庭牺牲太大了」\n- 「你老公养你你还不知足？」\n- 「等孩子大了你再出去就好了」\n\n但你知道——「中断」不是「暂停」，是「重新开始的代价」。\n\n每一个「回归家庭」的人——都在打一场「身份重建」的仗。\n\n「家庭主妇/主夫不是「不工作」——是「没有工资的工作」。',
+      cond: g => g.age >= 28 && g.flags.married && !g.flags.careerBreakDilemma && (g.flags.considerFullTime || g.flags.fullTimeParent),
+      choices:[
+        { label:'接受这个选择开始新生活', hint:'+😊 +🧠', fn: g => { g.flags.careerBreakDilemma=true; g.flags.acceptBreak=true; return{mood:5,intel:3,money:-2000}; }},
+        { label:'寻找在家也能做的兼职', hint:'+💰 +🧠', fn: g => { g.flags.careerBreakDilemma=true; g.flags.homeWork=true; return{money:1000,intel:5}; }},
+        { label:'给自己设一个期限重新出发', hint:'+💪 +🧠', fn: g => { g.flags.careerBreakDilemma=true; g.flags.setDeadline=true; return{intel:5,health:3,mood:-2}; }},
+      ]},
+    { id:'dink_lifestyle', icon:'💑', title:'丁克夫妻', category:'gender_career',
+      body:'你和伴侣做了一个「非主流」的选择——「丁克」（Double Income No Kids）。\n\n你们的生活：\n- 两个人的收入，零个孩子的支出\n- 说走就走的旅行，想加班就加班的自由\n- 养了一只猫，猫就是「孩子」\n- 周末可以睡到自然醒\n\n但你们面对的压力：\n- 父母：「你们不要孩子我们活着还有什么意义？」\n- 亲戚：「是不是身体有什么问题？」\n- 同事：「你以后会后悔的。」\n- 自己：「我们真的不会后悔吗？」\n\n你们的选择逻辑：\n- 「生孩子」不应该被「默认」——应该是「深思熟虑」的\n- 「不生孩子」不是「自私」——是「对自己和他人负责」\n- 「人生的意义」不是「只有下一代」——可以是「很多种」\n\n「丁克不是「反叛」——是「另一种选择权」。\n\n（中国目前有超过60万丁克家庭——你不是一个人。）',
+      cond: g => g.flags.married && g.age >= 28 && !g.flags.dinkLifestyle,
+      choices:[
+        { label:'享受二人世界活在当下', hint:'+😊 +💰', fn: g => { g.flags.dinkLifestyle=true; g.flags.enjoyDink=true; return{mood:8,money:3000}; }},
+        { label:'面对压力偶尔动摇', hint:'-😊 +🧠', fn: g => { g.flags.dinkLifestyle=true; g.flags.dinkDoubt=true; return{mood:-3,intel:5}; }},
+        { label:'做志愿者把爱给更多人', hint:'+😊 +👥', fn: g => { g.flags.dinkLifestyle=true; g.flags.volunteerLove=true; return{mood:5,social:5}; }},
+      ]},
+    { id:'single_parent_struggle', icon:'💪', title:'单亲育儿', category:'gender_career',
+      body:'你成为了「单亲家长」——无论是离婚、丧偶还是主动选择。\n\n你的日常：\n- 一个人上班、一个人接孩子、一个人做饭、一个人辅导作业\n- 孩子生病的时候——你只能请假，因为你没有「backup」\n- 家长会的时候——别的家庭都是「爸妈来了」，你只有「一个人」\n- 深夜的时候——你想哭，但孩子在隔壁房间\n\n你面对的社会偏见：\n- 「单亲家庭的孩子会有心理问题」（统计上不一定）\n- 「你一个人带不好孩子的」（你在证明你带得好）\n- 「你再找一个吧」（好像单亲是「缺陷」）\n\n你的感悟：\n- 「完整的家」不是「两个人」——是「足够的爱」\n- 「单亲」不是「失败」——是「另一种勇敢」\n- 最难的不是「带孩子」——是「独自承受所有的目光」\n\n「每一个单亲家长——都是「超级英雄」。不是因为他们「无所不能」，是因为他们「没有退路」。',
+      cond: g => g.age >= 28 && !g.flags.singleParentStruggle && (g.flags.divorced || (g.flags.careerBreakDilemma && g.mood < 40)),
+      choices:[
+        { label:'咬牙坚持为孩子撑起一片天', hint:'+💪 +😊', fn: g => { g.flags.singleParentStruggle=true; g.flags.strongSingleParent=true; return{health:-3,mood:5,charm:3}; }},
+        { label:'寻求社会支持和互助群体', hint:'+👥 +🧠', fn: g => { g.flags.singleParentStruggle=true; g.flags.seekSupport=true; return{social:5,intel:3}; }},
+        { label:'允许自己脆弱也允许自己求助', hint:'+😊', fn: g => { g.flags.singleParentStruggle=true; g.flags.allowVulnerable=true; return{mood:5,health:3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -17610,6 +17691,15 @@ const ACHIEVEMENTS = [
     { id:'savings_habit_ach', icon:'💰', name:'储蓄达人', desc:'养成了定期储蓄的好习惯', check: g => g.flags.savingsHabit },
     { id:'redefined_enough_ach', icon:'🌱', name:'知足常乐', desc:'重新定义了什么是"够用"的生活', check: g => g.flags.redefinedEnough },
     { id:'sustainable_side_ach', icon:'🔄', name:'可持续副业', desc:'找到了工作与副业的平衡点', check: g => g.flags.sustainableSide },
+    // v30.3 achievements - 职场性别与生育困境
+    { id:'negotiate_balance_ach', icon:'⚖️', name:'谈判高手', desc:'在职场和家庭之间找到了自己的平衡点', check: g => g.flags.negotiateBalance },
+    { id:'prove_myself_ach', icon:'💪', name:'实力回归', desc:'产假归来用业绩重新证明了自己', check: g => g.flags.proveMyself },
+    { id:'negotiated_raise_ach', icon:'💰', name:'勇敢谈薪', desc:'为自己的价值据理力争获得了应有的回报', check: g => g.flags.negotiatedRaise },
+    { id:'talked_division_ach', icon:'🤝', name:'平等伙伴', desc:'和伴侣认真谈了一次家务和育儿分工', check: g => g.flags.talkedDivision },
+    { id:'time_management_ach', icon:'⏰', name:'时间管理大师', desc:'在双职工家庭的夹缝中找到了节奏', check: g => g.flags.timeManagement },
+    { id:'set_deadline_ach', icon:'📅', name:'重新出发', desc:'给自己设定了重返职场的期限', check: g => g.flags.setDeadline },
+    { id:'enjoy_dink_ach', icon:'💑', name:'丁克生活', desc:'选择了二人世界并享受当下', check: g => g.flags.enjoyDink },
+    { id:'allow_vulnerable_ach', icon:'💕', name:'允许脆弱', desc:'学会了允许自己脆弱也允许自己求助', check: g => g.flags.allowVulnerable },
 ];
 
 // === ENDINGS === (order matters: first match wins)
