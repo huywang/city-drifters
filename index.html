@@ -12,8 +12,18 @@
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <link rel="preload" href="game-data.js" as="script">
+    <link rel="preload" href="game.js" as="script">
 </head>
 <body>
+    <!-- 加载遮罩 -->
+    <div id="loading-overlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#0c1018;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity 0.5s;">
+        <div style="color:#e8e0d4;font-family:'Noto Sans SC',sans-serif;font-size:1.2em;margin-bottom:20px;">都市浮生记</div>
+        <div style="width:120px;height:3px;background:#1a1f2e;border-radius:2px;overflow:hidden;">
+            <div id="loading-bar" style="width:0%;height:100%;background:linear-gradient(90deg,#f0a030,#e8c060);border-radius:2px;transition:width 0.3s;"></div>
+        </div>
+        <div style="color:#666;font-family:'Noto Sans SC',sans-serif;font-size:0.8em;margin-top:12px;" id="loading-text">加载数据中...</div>
+    </div>
     <!-- 无障碍：跳过导航链接 -->
     <a href="#main-content" class="skip-link">跳到主要内容</a>
 
@@ -606,6 +616,7 @@
 
     <div class="stat-change" id="stat-change"></div>
 
-    <script src="game.js"></script>
+    <script src="game-data.js" onload="document.getElementById('loading-bar').style.width='70%';document.getElementById('loading-text').textContent='加载引擎中...';"></script>
+    <script src="game.js" onload="document.getElementById('loading-bar').style.width='100%';setTimeout(function(){var o=document.getElementById('loading-overlay');if(o){o.style.opacity='0';setTimeout(function(){o.style.display='none';},500);}},200);"></script>
 </body>
 </html>
