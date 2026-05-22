@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v26.7
+// 都市浮生记 - Game Engine v26.8
 // ============================================
 
 // === GAME STATE ===
@@ -13330,6 +13330,87 @@ const EVENTS = [
         { label:'冷静了30天，决定再试试', hint:'+🤝 +😊', fn: g => { g.flags.divorceCulture=true; g.flags.gaveAnotherChance=true; return{mood:3,social:3}; }},
         { label:'放弃了离婚，因为太麻烦了', hint:'-😊 +🧠', fn: g => { g.flags.divorceCulture=true; g.flags.tooHardToDivorce=true; return{mood:-5,intel:2}; }},
       ]},
+    // v26.8: 考公考编 + 体制内文化
+    { id:'civil_exam_prep_v26_8', icon:'📚', title:'考公备考', category:'career',
+      body:'你决定考公务员了。\n\n你买了：\n- 行测真题集（5本）\n- 申论范文集（3本）\n- 面试宝典（2本）\n- 网课（3000元）\n\n你的日常：\n- 早上7点：起床\n- 8点：做行测\n- 12点：吃饭\n- 下午：写申论\n- 晚上：看网课\n- 11点：睡觉\n\n坚持了3个月后——\n\n你的行测分数：65分（及格线70）\n你的申论分数：55分（及格线60）\n\n你发现：\n- 公务员考试——比高考还难\n- 录取率：2%\n- 竞争比：1:50\n\n你开始理解：考公——不是「找工作」——是「买彩票」。\n\n但你的父母说：「再考一年。」\n\n「考公备考：不是在准备考试——是在用青春赌一个「铁饭碗」。」',
+      cond: g => g.age >= 22 && g.age <= 35 && !g.flags.civilExamPrep && g.intel >= 30,
+      choices:[
+        { label:'全力备考一年，辞职考公', hint:'-💰 +🧠 -😊', fn: g => { g.flags.civilExamPrep=true; g.flags.fullTimeExam=true; g.money -= 5000; g.job='待业中'; g.jobSalary=0; return{intel:10,mood:-5}; }},
+        { label:'边工作边备考，每天学3小时', hint:'-😊 +🧠 +❤️', fn: g => { g.flags.civilExamPrep=true; g.flags.partTimeExam=true; return{intel:5,mood:-3,health:-2}; }},
+        { label:'看了看竞争比，放弃了', hint:'+💰 -🧠', fn: g => { g.flags.civilExamPrep=true; return{mood:3,intel:-2}; }},
+      ]},
+    { id:'civil_exam_result_v26_8', icon:'🎯', title:'考公结果', category:'career',
+      body:'公务员考试成绩出来了。\n\n你紧张地打开网站——\n\n行测：72分\n申论：68分\n总分：140分\n\n排名：第8名（招2人）\n\n你没进面试。\n\n你妈说：「差一点就考上了，再考一年吧。」\n\n你爸说：「要不……先找个工作？」\n\n你的朋友说：「别考了，跟我一起创业吧。」\n\n你看了看窗外——阳光很好。\n\n你问自己：\n- 我还要再考一年吗？\n- 一年值多少钱？\n- 如果我考不上——我的人生就完了吗？\n\n你开始理解：考公——最大的成本不是「钱」——是「时间」和「可能性」。\n\n「考公结果：不是「考上了」或「没考上」——是「你愿意为体制内付出多少人生」。」',
+      cond: g => g.flags.civilExamPrep && !g.flags.civilExamResult && g.age >= 22,
+      choices:[
+        { label:'再考一年，这次一定能考上', hint:'-💰 +🧠 -😊', fn: g => { g.flags.civilExamResult=true; g.flags.examAgain=true; g.money -= 3000; return{intel:5,mood:-5}; }},
+        { label:'接受现实，开始找工作', hint:'+💰 +😊 +🧠', fn: g => { g.flags.civilExamResult=true; g.flags.gaveUpExam=true; return{mood:3,intel:2}; }},
+        { label:'考了三年都没考上，抑郁了', hint:'-😊 -❤️ -💰', fn: g => { g.flags.civilExamResult=true; g.flags.examDepression=true; g.money -= 5000; return{mood:-15,health:-5}; }},
+      ]},
+    { id:'state_job_life', icon:'🏛️', title:'体制内生活', category:'career',
+      body:'你考上公务员了。\n\n你的工资：4500元/月。\n你的福利：\n- 五险一金（高比例）\n- 年终奖（3个月工资）\n- 食堂（5元/餐）\n- 住房补贴\n\n你的日常：\n- 早上8:30：上班\n- 上午：开会\n- 中午：食堂吃饭\n- 下午：写材料\n- 下午5:30：下班\n\n你发现：\n- 工作不累——但很无聊\n- 同事很友善——但很复杂\n- 领导很好——但「关系」很重要\n- 升职不看能力——看「资历」\n\n你开始纠结：\n- 稳定——但没挑战\n- 轻松——但没成长\n- 安全——但没自由\n\n你问自己：这就是我想要的生活吗？\n\n你朋友说：「你这是围城——外面的人想进来，里面的人想出去。」\n\n「体制内生活：不是在上班——是在用「自由」换「安全」。」',
+      cond: g => g.flags.civilServant && !g.flags.stateJobLife && g.age >= 23,
+      choices:[
+        { label:'安于现状，享受稳定的生活', hint:'+😊 +🧠', fn: g => { g.flags.stateJobLife=true; g.flags.contentCivil=true; return{mood:5,intel:2}; }},
+        { label:'开始搞副业，利用业余时间创业', hint:'+💰 +🧠 -❤️', fn: g => { g.flags.stateJobLife=true; g.flags.civilSideHustle=true; return{intel:5,health:-3}; }},
+        { label:'受不了了，辞职了', hint:'+💰 -😊 +✨', fn: g => { g.flags.stateJobLife=true; g.flags.quitCivil=true; g.job='待业中'; g.jobSalary=0; return{mood:-3,charm:5}; }},
+      ]},
+    { id:'institution_exam', icon:'📝', title:'事业编考试', category:'career',
+      body:'你决定考事业单位了。\n\n比公务员好考——\n\n你报了：某区文化馆的岗位。\n\n竞争比：1:20。\n\n你准备了：\n- 公共基础知识\n- 职业能力测验\n- 专业知识（文化管理）\n\n考完之后——你发现：\n- 比公务员简单\n- 但面试占比更大（60%）\n\n面试那天——\n\n考官问：「你为什么选择事业单位？」\n\n你说：「我想为人民服务。」\n\n考官：「……还有吗？」\n\n你想了想：「稳定。」\n\n全场笑了。\n\n你最终——考上了。\n\n工资：4000元/月。\n\n你开始理解：事业编——是「铁饭碗」的「平替」。\n\n「事业编考试：不是在找工作——是在找「不会倒闭的公司」。」',
+      cond: g => g.age >= 22 && g.age <= 35 && !g.flags.institutionExam && !g.flags.civilServant && g.intel >= 25,
+      choices:[
+        { label:'考上了事业编，开始了体制内生活', hint:'+💰 +😊 +🧠', fn: g => { g.flags.institutionExam=true; setJob(g, '事业编职员', 4000); return{mood:5,intel:3}; }},
+        { label:'面试没过，继续找工作', hint:'-😊 +🧠', fn: g => { g.flags.institutionExam=true; return{mood:-5,intel:2}; }},
+        { label:'觉得工资太低，不去了', hint:'+💰 -😊', fn: g => { g.flags.institutionExam=true; return{mood:-3}; }},
+      ]},
+    { id:'inside_outside', icon:'🔄', title:'围城心态', category:'psychology',
+      body:'你和大学同学聚会了。\n\n你在体制内——月薪4500。\n同学A在互联网大厂——月薪3万。\n同学B在创业——刚融了100万。\n同学C在国企——月薪8000。\n\n同学A说：「我好羡慕你，5点半就下班了。我每天加班到10点。」\n同学B说：「我好羡慕你，不用担心公司倒闭。」\n同学C说：「我好羡慕你，不用担心裁员。」\n\n你说：「我好羡慕你们——赚得多。」\n\n你们四个人——互相羡慕。\n\n你开始理解：\n- 每个人都在看别人有的\n- 没人在看自己有的\n- 「围城」不是关于「里面」和「外面」——是关于「不满足」\n\n你回到家——看着你的4500工资条。\n\n你想：也许——不满足——才是人生的常态。\n\n「围城心态：不是在选「里面」还是「外面」——是在学「怎么选都不后悔」。」',
+      cond: g => g.age >= 25 && !g.flags.insideOutside && (g.flags.civilServant || g.flags.stateJobLife || g.job !== '待业中'),
+      choices:[
+        { label:'想通了，不再纠结', hint:'+😊 +🧠 +✨', fn: g => { g.flags.insideOutside=true; g.flags.madePeace=true; return{mood:8,intel:5,charm:3}; }},
+        { label:'开始准备跳槽，但不知道跳去哪里', hint:'-😊 +🧠', fn: g => { g.flags.insideOutside=true; return{mood:-3,intel:3}; }},
+        { label:'开始考在职研究生，提升自己', hint:'-💰 +🧠 +✨', fn: g => { g.flags.insideOutside=true; g.flags.gradSchool=true; g.money -= 20000; return{intel:8,charm:3}; }},
+      ]},
+    { id:'guanxi_culture', icon:'🤝', title:'关系学', category:'social',
+      body:'你在体制内工作了一年了。\n\n你发现了一件事：「关系」比「能力」重要。\n\n例子：\n- 小王能力一般——但他爸是局长——他升职了\n- 小李能力很强——但没人脉——还在基层\n- 你——能力中等——关系一般——原地不动\n\n你开始学「关系学」：\n- 请领导吃饭\n- 给同事带特产\n- 参加单位的乒乓球比赛\n- 加入领导的「小圈子」\n\n你发现：\n- 你在「社交」上花的时间——比「工作」多\n- 你的「情商」——比「智商」增长快\n- 你的「朋友圈」——比「简历」有用\n\n你开始理解：在中国——「做人」比「做事」重要。\n\n但你也开始问自己：这真的是我想要的吗？\n\n「关系学：不是在学社交——是在学「如何让有权力的人喜欢你」。」',
+      cond: g => (g.flags.civilServant || g.flags.stateJobLife) && !g.flags.guanxiCulture && g.age >= 24,
+      choices:[
+        { label:'学会了关系学，开始升职', hint:'+🤝 +✨ -🧠', fn: g => { g.flags.guanxiCulture=true; g.flags.guanxiMaster=true; g.jobSalary += 1000; return{social:8,charm:5,intel:-2}; }},
+        { label:'不适应，还是靠能力说话', hint:'+🧠 -🤝', fn: g => { g.flags.guanxiCulture=true; g.flags.abilityFirst=true; return{intel:5,social:-3}; }},
+        { label:'觉得太虚伪了，开始想辞职', hint:'-😊 +🧠', fn: g => { g.flags.guanxiCulture=true; return{mood:-5,intel:3}; }},
+      ]},
+    { id:'weekend_warrior', icon:'📖', title:'周末考公人', category:'career',
+      body:'你上班了——但你没放弃考公。\n\n你的周末：\n- 周六上午：模拟考试\n- 周六下午：对答案、总结\n- 周日上午：申论练习\n- 周日下午：面试模拟\n\n你已经考了3次了：\n- 第一次：差5分\n- 第二次：差3分\n- 第三次：差1分\n\n你的同事说：「你还考啊？」\n\n你说：「再考一次。」\n\n你的存款在减少。\n你的年龄在增长。\n你的耐心在消耗。\n\n但你还是去了考场。\n\n因为你知道：\n- 考公——是你目前能看到的——唯一一条「确定」的路\n- 虽然它很远——但其他路——你看不到\n\n你开始理解：考公——不是一种选择——是一种「安全感」。\n\n「周末考公人：不是在考试——是在「赌一个确定性」。」',
+      cond: g => g.flags.civilExamPrep && g.flags.partTimeExam && !g.flags.weekendWarrior && g.age >= 23 && g.age <= 35,
+      choices:[
+        { label:'第四次终于考上了！', hint:'+💰 +😊 +🧠', fn: g => { g.flags.weekendWarrior=true; g.flags.finallyPassed=true; g.flags.civilServant=true; setJob(g, '公务员', 4500); return{mood:15,intel:5}; }},
+        { label:'又没考上，但决定继续考', hint:'-💰 -😊 +🧠', fn: g => { g.flags.weekendWarrior=true; g.money -= 2000; return{mood:-8,intel:3}; }},
+        { label:'放弃了，接受现在的自己', hint:'+😊 +🧠 +✨', fn: g => { g.flags.weekendWarrior=true; g.flags.acceptedSelf=true; return{mood:5,intel:3,charm:3}; }},
+      ]},
+    { id:'contract_worker', icon:'📋', title:'编外人员', category:'career',
+      body:'你进了体制内——但不是「编制内」。\n\n你是「编外人员」——合同工。\n\n你的工资：3000元/月。\n正式工的工资：6000元/月。\n\n你们做一样的工作。\n\n但：\n- 他们没有五险一金——你有最低档\n- 他们有年终奖——你没有\n- 他们有食堂补贴——你没有\n- 他们能升职——你不能\n\n你问领导：「我什么时候能转编？」\n\n领导说：「等机会。」\n\n你等了3年。\n\n机会还没来。\n\n你开始理解：在体制内——「编制」就是一道「身份」的墙。\n\n墙里面的人——和墙外面的人——做的是一样的——但待遇差了一倍。\n\n「编外人员：不是在打工——是在「体制的门外」等待一个可能永远不会来的「进门券」。」',
+      cond: g => g.age >= 22 && !g.flags.contractWorker && !g.flags.civilServant && g.money >= 500,
+      choices:[
+        { label:'一边做编外一边考编，两年后考上了', hint:'-💰 +😊 +🧠', fn: g => { g.flags.contractWorker=true; g.flags.passedLater=true; g.flags.civilServant=true; setJob(g, '公务员', 4500); return{mood:10,intel:5}; }},
+        { label:'做了3年编外，觉得没前途，辞职了', hint:'+💰 -😊 +🧠', fn: g => { g.flags.contractWorker=true; g.flags.leftContract=true; setJob(g, '待业中', 0); return{mood:-5,intel:3}; }},
+        { label:'接受了现实，继续做编外', hint:'-😊 -💰', fn: g => { g.flags.contractWorker=true; setJob(g, '编外人员', 3000); return{mood:-8}; }},
+      ]},
+    { id:'exam_economy', icon:'💼', title:'考公经济', category:'finance',
+      body:'你发现了一个现象：考公——已经变成了一门「生意」。\n\n你身边的考公生态：\n- 考公培训机构：收费2万/年\n- 考公网课平台：收费5000/年\n- 考公资料：500元/套\n- 考公APP会员：200元/月\n- 考公「一对一」辅导：500元/小时\n\n你算了一下：\n- 全国考公人数：300万/年\n- 平均每人花费：1万元\n- 考公经济规模：300亿/年\n\n你开始理解：考公——不只是一种「求职」——它养活了整个「产业链」。\n\n培训机构的广告语：「上岸改变人生。」\n\n你想：也许——真正「上岸」的——不是考生——是培训机构。\n\n「考公经济：不是考生在上岸——是培训机构在「收过路费」。」',
+      cond: g => g.age >= 20 && !g.flags.examEconomy && g.intel >= 20,
+      choices:[
+        { label:'花钱报了培训班，投资自己', hint:'-💰 +🧠', fn: g => { g.flags.examEconomy=true; g.flags.paidTraining=true; g.money -= 20000; return{intel:8}; }},
+        { label:'自学为主，只买最基础的资料', hint:'-💰 +🧠 +✨', fn: g => { g.flags.examEconomy=true; g.flags.selfStudy=true; g.money -= 500; return{intel:5,charm:2}; }},
+        { label:'觉得这是割韭菜，不花了', hint:'+💰 -🧠', fn: g => { g.flags.examEconomy=true; return{intel:-2}; }},
+      ]},
+    { id:'young_cadre', icon:'🌟', title:'年轻干部', category:'career',
+      body:'你在体制内工作了5年——你被提拔了。\n\n你成了「副科长」。\n\n你的工资：从4500涨到了6000。\n\n但你的压力也变了：\n- 要管人了\n- 要开会了（更多了）\n- 要写报告了（更多了）\n- 要应酬了\n\n你发现：\n- 当了「领导」——反而更不自由了\n- 你要「站队」了\n- 你要「表忠心」了\n- 你要「维护关系」了\n\n你也发现：\n- 你的同学——在大厂——已经是总监了\n- 月薪：5万\n- 你的月薪：6000\n\n你开始想：\n- 我选择了稳定——他们选择了高薪\n- 谁更幸福？\n- 谁更自由？\n\n你开始理解：年轻干部——不是在「升职」——是在「进入更精致的围城」。\n\n「年轻干部：不是「出人头地」——是「在体制内找到了一条更舒适的路」。」',
+      cond: g => (g.flags.civilServant || g.flags.stateJobLife) && g.age >= 28 && !g.flags.youngCadre && g.social >= 40,
+      choices:[
+        { label:'接受了提拔，开始了仕途', hint:'+💰 +🤝 +✨', fn: g => { g.flags.youngCadre=true; g.flags.promoted=true; g.jobSalary += 1500; return{social:5,charm:5,mood:5}; }},
+        { label:'觉得压力太大，拒绝了提拔', hint:'-🤝 +😊 +🧠', fn: g => { g.flags.youngCadre=true; g.flags.rejectedPromotion=true; return{mood:5,intel:3,social:-3}; }},
+        { label:'看到同学高薪，想辞职了', hint:'+✨ -😊 -🤝', fn: g => { g.flags.youngCadre=true; g.flags.wantToQuit=true; return{mood:-5,charm:3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -14511,6 +14592,12 @@ const ACHIEVEMENTS = [
     { id:'travel_wedding_ach', icon:'✈️', name:'旅行结婚', desc:'不办酒席选择旅行结婚', check: g => g.flags.travelWedding },
     { id:'aa_relationship_ach', icon:'💰', name:'AA恋爱', desc:'跟伴侣实行了AA制消费', check: g => g.flags.aaRelationship },
     { id:'another_chance_ach', icon:'💕', name:'再给一次机会', desc:'冷静期后决定继续婚姻', check: g => g.flags.gaveAnotherChance },
+    // v26.8: 考公考编成就
+    { id:'finally_passed_ach', icon:'🎉', name:'终于上岸', desc:'屡败屡战终于考上公务员', check: g => g.flags.finallyPassed },
+    { id:'guanxi_master_ach', icon:'🤝', name:'关系大师', desc:'在体制内学会了关系学并升职', check: g => g.flags.guanxiMaster },
+    { id:'accepted_self_ach', icon:'🌈', name:'接受自己', desc:'放弃考公接受现在的自己', check: g => g.flags.acceptedSelf },
+    { id:'ability_first_ach', icon:'💪', name:'能力优先', desc:'拒绝关系学靠能力说话', check: g => g.flags.abilityFirst },
+    { id:'young_promoted_ach', icon:'🌟', name:'年轻干部', desc:'在体制内被提拔为副科长', check: g => g.flags.promoted },
 ];
 
 // === ENDINGS === (order matters: first match wins)
