@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v5.5
+// 都市浮生记 - Game Engine v5.6
 // ============================================
 
 // === GAME STATE ===
@@ -3122,6 +3122,16 @@ const EVENTS = [
         { label:'加盟奶茶店', hint:'-💰 +💰 🎲', fn: g => { g.flags.youngEntrepreneur=true; if(Math.random()>0.5){return{money:50000,mood:20}}else{return{money:-60000,mood:-15}} }},
         { label:'算了，风险太大', hint:'+💰 +🧠', fn: g => { g.flags.youngEntrepreneur=true; return{money:5000,intel:5,mood:-3}; }},
       ]},
+    // === v5.6 EVENTS - 数字游民与远程工作 ===
+    { id:'digital_nomad', icon:'🌏', title:'数字游民',
+      body:'你辞职了，成为数字游民：\n\n- 大理（2个月）：程序员天堂，便宜又美\n- 清迈（3个月）：数字游民聚集地\n- 巴厘岛（1个月）：网络一般但环境好\n- 厦门（2个月）：国内最宜居的海滨城市\n- 成都（4个月）：美食太多，不想走\n\n月均收入：12000元（比上班少，但生活质量大幅提升）\n\n"数字游民——用互联网获取在线工作机会，不在固定地区工作。"\n\n"最大的挑战：孤独感、自律、时区问题。"\n\n"最棒的体验：想去哪就去哪的自由感。"',
+      cond: g => !g.flags.digitalNomad && g.age>=23 && g.age<=35 && g.intel>=60 && g.money>20000,
+      choices:[
+        { label:'去大理', hint:'-💰 +😊 +✨', fn: g => { g.flags.digitalNomad=true; g.flags.daliNomad=true; setJob(g,'数字游民',12000); return{money:-10000,mood:25,charm:15,intel:10}; }},
+        { label:'去清迈', hint:'-💰 +😊 +✨', fn: g => { g.flags.digitalNomad=true; g.flags.chiangMaiNomad=true; setJob(g,'数字游民',12000); return{money:-15000,mood:28,charm:18,intel:12}; }},
+        { label:'去成都', hint:'-💰 +😊 +✨', fn: g => { g.flags.digitalNomad=true; g.flags.chengduNomad=true; setJob(g,'数字游民',12000); return{money:-8000,mood:22,charm:12,intel:8}; }},
+        { label:'算了，还是上班吧', hint:'+💰 +😊', fn: g => { g.flags.digitalNomad=true; return{money:3000,mood:5}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3362,6 +3372,8 @@ const ACHIEVEMENTS = [
     { id:'rational_learner', icon:'📚', name:'理性学习者', desc:'理性看待考研', check: g => g.flags.postgradCooling },
     // v5.5 achievements
     { id:'coffee_dreamer', icon:'☕', name:'咖啡店老板', desc:'开了咖啡店', check: g => g.flags.coffeeShopOwner || g.flags.mediaEntrepreneur },
+    // v5.6 achievements
+    { id:'world_citizen', icon:'🌏', name:'数字游民', desc:'成为数字游民', check: g => g.flags.digitalNomad },
 ];
 
 // === ENDINGS === (order matters: first match wins)
