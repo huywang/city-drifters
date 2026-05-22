@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v26.8
+// 都市浮生记 - Game Engine v26.9
 // ============================================
 
 // === GAME STATE ===
@@ -13411,6 +13411,87 @@ const EVENTS = [
         { label:'觉得压力太大，拒绝了提拔', hint:'-🤝 +😊 +🧠', fn: g => { g.flags.youngCadre=true; g.flags.rejectedPromotion=true; return{mood:5,intel:3,social:-3}; }},
         { label:'看到同学高薪，想辞职了', hint:'+✨ -😊 -🤝', fn: g => { g.flags.youngCadre=true; g.flags.wantToQuit=true; return{mood:-5,charm:3}; }},
       ]},
+    // v26.9: 夜经济 + 夜市文化
+    { id:'night_market_v26_9', icon:'🏮', title:'逛夜市', category:'food',
+      body:'你去了夜市。\n\n这里：\n- 人山人海\n- 烟熏火燎\n- 叫卖声此起彼伏\n- 各种小吃摊位\n\n你吃了：\n- 烤串（10元/10串）\n- 臭豆腐（15元）\n- 烤冷面（12元）\n- 珍珠奶茶（18元）\n- 糖葫芦（8元）\n\n你花了：63元。\n\n你吃撑了。\n\n你坐在路边的塑料凳上——看着来来往往的人——\n\n你发现：\n- 有情侣在牵手\n- 有孩子在跑\n- 有老人在散步\n- 有摊贩在吆喝\n\n你突然觉得：这就是「人间烟火」。\n\n你开始理解：夜市——不是吃饭的地方——是「城市最有温度的地方」。\n\n「逛夜市：不是在吃东西——是在吃「城市的灵魂」。」',
+      cond: g => g.age >= 16 && !g.flags.nightMarket && g.money >= 50,
+      choices:[
+        { label:'爱上了夜市，每周去一次', hint:'-💰 +😊 +❤️', fn: g => { g.flags.nightMarket=true; g.flags.nightMarketRegular=true; g.money -= 300; return{mood:5,health:-2}; }},
+        { label:'吃了一次，挺开心', hint:'-💰 +😊', fn: g => { g.flags.nightMarket=true; g.money -= 63; return{mood:3}; }},
+        { label:'觉得太脏了，不敢吃', hint:'-😊 +❤️', fn: g => { g.flags.nightMarket=true; return{mood:-2,health:2}; }},
+      ]},
+    { id:'street_vendor_v26_9', icon:'🛒', title:'摆地摊', category:'career',
+      body:'你决定摆地摊了。\n\n你批发了：手机壳、数据线、小玩具。\n\n成本：500元。\n\n你选了个位置——地铁口旁边。\n\n第一个晚上：\n- 从7点摆到11点\n- 卖了：12个手机壳、3条数据线\n- 收入：85元\n- 利润：35元\n\n城管来了——\n\n你跑了。\n\n你蹲在巷子里——看着你的「货」——\n\n你开始理解：摆地摊——不是「小生意」——是「生存」。\n\n第二天你又去了。\n\n这次你学了：\n- 提前踩点（城管巡逻时间）\n- 跟其他摊主搞好关系\n- 选了一个「安全」的位置\n\n你一个月赚了：1500元。\n\n「摆地摊：不是在卖东西——是在学「最原始的商业」。」',
+      cond: g => g.age >= 18 && !g.flags.streetVendor && g.money >= 300,
+      choices:[
+        { label:'坚持摆了3个月，赚了4500', hint:'+💰 +🧠 +✨', fn: g => { g.flags.streetVendor=true; g.flags.vendorPro=true; g.money += 4500; return{intel:5,charm:3}; }},
+        { label:'摆了几天觉得太辛苦，放弃了', hint:'+💰 -😊', fn: g => { g.flags.streetVendor=true; g.money -= 200; return{mood:-3}; }},
+        { label:'被城管没收了全部货物', hint:'-💰 -😊', fn: g => { g.flags.streetVendor=true; g.money -= 500; return{mood:-8}; }},
+      ]},
+    { id:'late_night_snack_v26_9', icon:'🍜', title:'深夜食堂', category:'food',
+      body:'凌晨1点。你加完班。\n\n你走进了一家深夜面馆。\n\n这里：\n- 只有6张桌子\n- 墙上贴满了便签纸\n- 老板是个中年男人\n\n你点了一碗牛肉面（18元）。\n\n你吃面的时候——看到了便签纸上的留言：\n- 「2024.3.15，今天终于还清了房贷。——小王」\n- 「2024.5.20，她答应做我女朋友了！——阿杰」\n- 「2024.8.8，爸，我想你了。——一个在外打工的孩子」\n\n你的面来了。\n\n汤很热。面很筋道。牛肉很大块。\n\n你吃着吃着——眼眶有点热。\n\n不是因为面——是因为你觉得——在这个城市——有人在深夜——跟你一样——还没睡。\n\n你也在便签纸上写了一句话。\n\n「深夜食堂：不是在吃面——是在吃「被这座城市接纳的感觉」。」',
+      cond: g => g.age >= 20 && !g.flags.lateNightSnack && g.money >= 20,
+      choices:[
+        { label:'成了深夜食堂的常客', hint:'-💰 +😊 +❤️', fn: g => { g.flags.lateNightSnack=true; g.flags.midnightRegular=true; g.money -= 500; return{mood:5,health:-2}; }},
+        { label:'吃了一碗面，写了一张便签', hint:'-💰 +😊 +🧠', fn: g => { g.flags.lateNightSnack=true; g.money -= 18; return{mood:5,intel:2}; }},
+        { label:'吃完赶紧回家了', hint:'-💰', fn: g => { g.flags.lateNightSnack=true; g.money -= 18; return{mood:2}; }},
+      ]},
+    { id:'night_run', icon:'🏃', title:'夜跑', category:'health',
+      body:'你开始夜跑了。\n\n你的路线：小区 → 公园 → 河边 → 小区。\n\n全程：5公里。\n\n你跑的时候看到了：\n- 跳广场舞的大妈\n- 遛狗的大爷\n- 在河边弹吉他的年轻人\n- 在桥上拍照的情侣\n\n你跑完后——\n\n出了一身汗。\n\n你站在河边——看着对岸的灯光——\n\n你发现：\n- 白天的城市——是「工作」的城市\n- 夜晚的城市——是「生活」的城市\n\n你开始喜欢夜跑。\n\n不是为了减肥——是为了看到「另一个城市」。\n\n你开始理解：夜跑——不是运动——是「跟城市的约会」。\n\n「夜跑：不是在跑步——是在「用脚步丈量城市的夜晚」。」',
+      cond: g => g.age >= 18 && g.age <= 55 && !g.flags.nightRun && g.health >= 20,
+      choices:[
+        { label:'坚持夜跑，身体变好了', hint:'+❤️ +😊 +✨', fn: g => { g.flags.nightRun=true; g.flags.nightRunner=true; return{health:5,mood:5,charm:3}; }},
+        { label:'跑了几天，膝盖疼了', hint:'-❤️ +🧠', fn: g => { g.flags.nightRun=true; return{health:-3,intel:2}; }},
+        { label:'跑了一次就放弃了', hint:'+🧠', fn: g => { g.flags.nightRun=true; return{intel:2}; }},
+      ]},
+    { id:'live_house', icon:'🎸', title:'Live House', category:'hobby',
+      body:'你去了Live House。\n\n今晚演出的是一支本地乐队。\n\n你站在人群中——\n\n灯光暗了。\n\n吉他响了。\n\n鼓声响了。\n\n主唱开始唱——\n\n你发现：\n- 这里没有「座位」\n- 这里没有「观众席」\n- 每个人都站着\n- 每个人都在动\n\n你开始：\n- 跟着节奏点头\n- 跟着节奏晃身体\n- 跟着人群一起跳\n\n你出汗了。你的耳朵嗡嗡响。\n\n但你笑了。\n\n你发现：你已经很久——没有这么「活过」了。\n\n你开始理解：Live House——不是「演唱会」——是「用身体感受音乐」。\n\n「Live House：不是在看演出——是在跟音乐「肉搏」。」',
+      cond: g => g.age >= 18 && g.age <= 45 && !g.flags.liveHouse && g.money >= 100,
+      choices:[
+        { label:'爱上了Live House，每个月去', hint:'-💰 +😊 +✨ +❤️', fn: g => { g.flags.liveHouse=true; g.flags.liveHouseFan=true; g.money -= 500; return{mood:8,charm:5,health:2}; }},
+        { label:'去了一次，挺嗨的', hint:'-💰 +😊', fn: g => { g.flags.liveHouse=true; g.money -= 100; return{mood:5}; }},
+        { label:'觉得太吵了，耳朵受不了', hint:'-❤️ -😊', fn: g => { g.flags.liveHouse=true; g.money -= 100; return{health:-2,mood:-3}; }},
+      ]},
+    { id:'night_shift_v26_9', icon:'🌙', title:'上夜班', category:'career',
+      body:'你找到了一份夜班工作。\n\n便利店——夜班——11PM到7AM。\n\n时薪：25元。\n\n你的夜晚：\n- 11PM：接班，整理货架\n- 12AM：几个加班族来买泡面\n- 1AM：一个醉汉来买水\n- 2AM：一对情侣来买安全套\n- 3AM：最安静的时候\n- 4AM：环卫工人来买早餐\n- 5AM：天开始亮了\n- 6AM：上班族来了\n- 7AM：下班\n\n你走在清晨的街上——\n\n阳光很好。\n\n你发现：\n- 你看到了这个城市「别人看不到」的一面\n- 深夜的人——和白天的——不一样\n- 深夜的人——更「真」\n\n但你也很累。\n\n你开始理解：夜班——是用「健康」换「钱」。\n\n「上夜班：不是在上班——是在守护「城市睡着之后的最后一盏灯」。」',
+      cond: g => g.age >= 18 && g.age <= 40 && !g.flags.nightShift && g.money <= 10000,
+      choices:[
+        { label:'坚持上夜班，攒了一些钱', hint:'+💰 -❤️ -😊', fn: g => { g.flags.nightShift=true; g.flags.nightShiftWorker=true; setJob(g, '便利店夜班', 4500); return{health:-5,mood:-3}; }},
+        { label:'干了3个月，身体受不了了', hint:'+💰 -❤️ +🧠', fn: g => { g.flags.nightShift=true; g.money += 13500; return{health:-8,intel:3}; }},
+        { label:'干了一周就辞了', hint:'-💰 +❤️', fn: g => { g.flags.nightShift=true; g.money += 1000; return{health:-2}; }},
+      ]},
+    { id:'bar_culture', icon:'🍺', title:'酒吧社交', category:'social',
+      body:'同事带你去了酒吧。\n\n你选了一家「精酿酒吧」。\n\n你点了一杯IPA（45元）。\n\n你喝了一口——\n\n苦的。\n\n但第二口——你觉得有点「柑橘味」。\n\n第三口——你觉得「还不错」。\n\n你开始跟同事聊天：\n- 平时不说的话——现在说了\n- 平时不敢吐槽的——现在吐槽了\n- 平时藏起来的情绪——现在露出来了\n\n你发现：酒精——是最好的「社交润滑剂」。\n\n但你也发现：\n- 你花了200元\n- 你头有点晕\n- 你明天还要上班\n\n你开始理解：酒吧——不是喝酒——是「用酒精打开平时关着的门」。\n\n「酒吧社交：不是在喝酒——是在喝「勇气」。」',
+      cond: g => g.age >= 22 && !g.flags.barCulture && g.money >= 100,
+      choices:[
+        { label:'爱上了精酿，开始研究啤酒', hint:'-💰 +😊 +🧠 +🤝', fn: g => { g.flags.barCulture=true; g.flags.craftBeerFan=true; g.money -= 1000; return{mood:5,intel:3,social:5}; }},
+        { label:'去了一次，挺开心', hint:'-💰 +😊 +🤝', fn: g => { g.flags.barCulture=true; g.money -= 200; return{mood:3,social:3}; }},
+        { label:'喝多了，第二天宿醉很难受', hint:'-💰 -❤️ -😊', fn: g => { g.flags.barCulture=true; g.money -= 200; return{health:-5,mood:-3}; }},
+      ]},
+    { id:'night_bus_v26_9', icon:'🚌', title:'末班车', category:'psychology',
+      body:'你加班到了11点。\n\n你赶上了最后一班地铁。\n\n车厢里：\n- 有靠着扶杆睡着的上班族\n- 有低头刷手机的年轻人\n- 有带着耳机的学生\n- 有提着外卖的骑手\n\n你们都不说话。\n\n你们都很累。\n\n但你们都在「回家」。\n\n你看着窗外——地铁在地下穿行——你只能看到黑暗。\n\n你突然想：这个城市的地下——每天有多少人——在黑暗里——回家？\n\n你想到了你的出租屋——\n- 很小\n- 很旧\n- 但它是你的「家」\n\n你开始理解：末班车——不是交通工具——是「城市的最后一班温暖」。\n\n「末班车：不是在回家——是在确认「在这个城市——还有一个地方在等你」。」',
+      cond: g => g.age >= 20 && !g.flags.nightBus && g.job !== '待业中',
+      choices:[
+        { label:'突然想家了，给妈妈打了个电话', hint:'+😊 +❤️', fn: g => { g.flags.nightBus=true; g.flags.calledMom=true; return{mood:5,social:2}; }},
+        { label:'在地铁上写了一篇日记', hint:'+🧠 +😊', fn: g => { g.flags.nightBus=true; return{intel:3,mood:3}; }},
+        { label:'到站了，赶紧回家睡觉', hint:'+❤️', fn: g => { g.flags.nightBus=true; return{health:2}; }},
+      ]},
+    { id:'karoake_night', icon:'🎤', title:'深夜KTV', category:'hobby',
+      body:'你被朋友拉去了KTV。\n\n凌晨12点。\n\n你们开了一个包间——\n\n「午夜场」——3小时只要99元。\n\n你们唱了：\n- 周杰伦的《晴天》\n- 陈奕迅的《十年》\n- 邓紫棋的《光年之外》\n- Beyond的《海阔天空》\n\n你发现：\n- 你平时不会唱歌——但喝了酒之后——你敢了\n- 你平时不敢表白——但唱歌的时候——你敢了\n- 你平时不敢哭——但唱到《父亲》的时候——你哭了\n\n凌晨3点。\n\n你们走出KTV——\n\n街上没有人。\n\n你的声音沙哑了。\n\n但你觉得——你很久没有这么「释放」了。\n\n「深夜KTV：不是在唱歌——是在用歌声「释放」那些平时不敢说的情绪。」',
+      cond: g => g.age >= 20 && g.age <= 45 && !g.flags.karoakeNight && g.money >= 50,
+      choices:[
+        { label:'唱到了天亮，释放了很多情绪', hint:'-💰 +😊 +❤️ +🤝', fn: g => { g.flags.karoakeNight=true; g.flags.sangAllNight=true; g.money -= 200; return{mood:8,health:-3,social:3}; }},
+        { label:'唱了3小时，挺开心', hint:'-💰 +😊', fn: g => { g.flags.karoakeNight=true; g.money -= 99; return{mood:5}; }},
+        { label:'嗓子唱哑了，第二天上班声音沙哑', hint:'-❤️ -😊', fn: g => { g.flags.karoakeNight=true; g.money -= 99; return{health:-3,mood:-2}; }},
+      ]},
+    { id:'night_photography', icon:'📸', title:'夜景摄影', category:'hobby',
+      body:'你开始拍夜景了。\n\n你拿着手机——在城市的夜晚——走街串巷。\n\n你拍了：\n- 霓虹灯\n- 路灯下的行人\n- 24小时便利店的灯光\n- 深夜的出租车\n- 桥上的城市天际线\n\n你把照片发到了网上——\n\n有人评论：「你拍出了城市的孤独感。」\n\n你突然明白：夜景摄影——不是在拍「美」——是在拍「情绪」。\n\n你开始发现：\n- 白天的城市——是给别人看的\n- 夜晚的城市——是给自己的\n\n你开始理解：每一盏灯——背后都有一个故事。\n\n「夜景摄影：不是在拍照——是在记录「城市脱下伪装之后的样子」。」',
+      cond: g => g.age >= 18 && !g.flags.nightPhotography && g.intel >= 20,
+      choices:[
+        { label:'开始系统学习摄影，有了新爱好', hint:'-💰 +🧠 +✨ +😊', fn: g => { g.flags.nightPhotography=true; g.flags.photoArtist=true; g.money -= 2000; return{intel:5,charm:5,mood:5}; }},
+        { label:'拍了一些照片，挺有感觉', hint:'+🧠 +✨', fn: g => { g.flags.nightPhotography=true; return{intel:3,charm:3}; }},
+        { label:'拍了几张就回家了', hint:'+🧠', fn: g => { g.flags.nightPhotography=true; return{intel:2}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -14598,6 +14679,12 @@ const ACHIEVEMENTS = [
     { id:'accepted_self_ach', icon:'🌈', name:'接受自己', desc:'放弃考公接受现在的自己', check: g => g.flags.acceptedSelf },
     { id:'ability_first_ach', icon:'💪', name:'能力优先', desc:'拒绝关系学靠能力说话', check: g => g.flags.abilityFirst },
     { id:'young_promoted_ach', icon:'🌟', name:'年轻干部', desc:'在体制内被提拔为副科长', check: g => g.flags.promoted },
+    // v26.9: 夜经济成就
+    { id:'night_market_regular_ach', icon:'🏮', name:'夜市常客', desc:'每周逛夜市成了夜生活达人', check: g => g.flags.nightMarketRegular },
+    { id:'vendor_pro_ach', icon:'🛒', name:'地摊老板', desc:'坚持摆地摊3个月赚了第一桶金', check: g => g.flags.vendorPro },
+    { id:'midnight_regular_ach', icon:'🍜', name:'深夜食堂常客', desc:'每晚去深夜面馆找温暖', check: g => g.flags.midnightRegular },
+    { id:'night_runner_ach_v26_9', icon:'🏃', name:'夜跑达人', desc:'坚持夜跑身体变好了', check: g => g.flags.nightRunner },
+    { id:'craft_beer_fan_ach', icon:'🍺', name:'精酿爱好者', desc:'爱上了精酿啤酒开始研究', check: g => g.flags.craftBeerFan },
 ];
 
 // === ENDINGS === (order matters: first match wins)
