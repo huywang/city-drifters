@@ -1,9 +1,26 @@
 /* ============================================
-   都市浮生记 - Style System
-   Dark theme with neon accents
+   都市浮生记 - Style System v2.29
+   Dark theme with neon accents + Accessibility
    ============================================ */
 
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* 无障碍：跳过导航链接 */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--accent-primary);
+    color: white;
+    padding: 8px 16px;
+    text-decoration: none;
+    z-index: 9999;
+    font-weight: 500;
+    border-radius: 0 0 var(--radius-sm) 0;
+}
+.skip-link:focus {
+    top: 0;
+}
 
 :root {
     --bg-deep: #080c14;
@@ -96,6 +113,61 @@ body {
     overflow: hidden;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+}
+
+/* v2.29: 无障碍 - 焦点样式 */
+:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+}
+
+/* v2.29: 无障碍 - 减少动画 */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* v2.29: 移动优化 - 触摸目标 */
+@media (max-width: 768px) {
+    button {
+        min-height: 44px;
+        min-width: 44px;
+        touch-action: manipulation;
+    }
+
+    .btn {
+        padding: 14px 20px;
+        font-size: 1rem;
+    }
+
+    .bg-card,
+    .city-card {
+        padding: 18px;
+        margin-bottom: 12px;
+    }
+}
+
+/* v2.29: 高对比度模式支持 */
+@media (prefers-contrast: high) {
+    :root {
+        --text-primary: #ffffff;
+        --text-secondary: #cccccc;
+        --text-muted: #999999;
+        --bg-card: #000000;
+        --accent-primary: #00aaff;
+    }
 }
 
 #particles {

@@ -3,45 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="都市浮生记 - 一款关于中国大城市漂泊者的人生模拟游戏">
+    <meta name="theme-color" content="#0c1018">
     <title>都市浮生记 - 漂泊人生模拟器</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
 </head>
 <body>
-    <canvas id="particles"></canvas>
+    <!-- 无障碍：跳过导航链接 -->
+    <a href="#main-content" class="skip-link">跳到主要内容</a>
+
+    <canvas id="particles" aria-hidden="true"></canvas>
 
     <!-- ===== 标题画面 ===== -->
-    <div id="screen-title" class="screen active">
+    <div id="screen-title" class="screen active" role="main">
         <div class="title-container">
-            <div class="city-silhouette"></div>
+            <div class="city-silhouette" aria-hidden="true"></div>
             <h1 class="game-title">
                 <span class="title-main">都市浮生记</span>
                 <span class="title-sub">漂泊人生模拟器</span>
             </h1>
             <p class="title-slogan">每一个在大城市漂泊的灵魂，都在寻找一个答案。</p>
-            <div class="title-buttons">
-                <button class="btn btn-primary btn-glow" onclick="showScreen('screen-create')">
-                    <span class="btn-icon">🚀</span> 开始新人生
+            <nav class="title-buttons" aria-label="主菜单">
+                <button class="btn btn-primary btn-glow" onclick="showScreen('screen-create')" aria-label="开始新游戏">
+                    <span class="btn-icon" aria-hidden="true">🚀</span> 开始新人生
                 </button>
-                <button class="btn btn-secondary" onclick="showSaveMenu()" id="btn-continue">
-                    <span class="btn-icon">💾</span> 继续游戏
+                <button class="btn btn-secondary" onclick="showSaveMenu()" id="btn-continue" aria-label="继续游戏">
+                    <span class="btn-icon" aria-hidden="true">💾</span> 继续游戏
                 </button>
-                <button class="btn btn-ghost" onclick="showScreen('screen-about')">
-                    <span class="btn-icon">📖</span> 关于游戏
+                <button class="btn btn-ghost" onclick="showScreen('screen-about')" aria-label="关于游戏">
+                    <span class="btn-icon" aria-hidden="true">📖</span> 关于游戏
                 </button>
-                <button class="btn btn-ghost" onclick="showEndingGallery()">
-                    <span class="btn-icon">🏆</span> 结局图鉴
+                <button class="btn btn-ghost" onclick="showEndingGallery()" aria-label="查看结局图鉴">
+                    <span class="btn-icon" aria-hidden="true">🏆</span> 结局图鉴
                 </button>
-                <button class="btn btn-ghost" onclick="showPlaythroughStats()">
-                    <span class="btn-icon">📊</span> 游戏统计
+                <button class="btn btn-ghost" onclick="showPlaythroughStats()" aria-label="查看游戏统计">
+                    <span class="btn-icon" aria-hidden="true">📊</span> 游戏统计
                 </button>
-                <button class="btn btn-ghost" onclick="openSettings()">
-                    <span class="btn-icon">⚙️</span> 设置
+                <button class="btn btn-ghost" onclick="openSettings()" aria-label="打开设置">
+                    <span class="btn-icon" aria-hidden="true">⚙️</span> 设置
                 </button>
-            </div>
+            </nav>
             <div class="title-footer">
-                <span>v2.28</span> · <span>献给每一个在大城市奋斗的你</span>
+                <span>v2.29</span> · <span>献给每一个在大城市奋斗的你</span>
             </div>
         </div>
     </div>

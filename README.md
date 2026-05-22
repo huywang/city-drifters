@@ -99,7 +99,22 @@ python -m http.server 8080
 
 ## 📝 更新日志
 
-### v2.28 (最新)
+### v2.29 (最新)
+- **无障碍大升级**：
+  - 跳转链接（Skip Link）支持键盘用户
+  - ARIA标签覆盖所有交互元素
+  - 焦点可见样式（focus-visible）
+  - 减少动画模式（prefers-reduced-motion）
+  - 高对比度模式（prefers-contrast）
+- **移动端优化**：
+  - 44px最小触控目标
+  - touch-action: manipulation 防止双击缩放
+  - 响应式间距和字体调整
+- **SEO优化**：meta description和theme-color
+- **语义化HTML**：nav元素、main-content锚点
+- **版本号更新到v2.29**
+
+### v2.28
 - **稀有事件系统**：新增5个稀有深度事件
   - 意外遗产（50万，概率20%）
   - 人生导师（遇到70岁智者，概率30%）
