@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v4.5
+// 都市浮生记 - Game Engine v4.6
 // ============================================
 
 // === GAME STATE ===
@@ -2977,6 +2977,25 @@ const EVENTS = [
         { label:'算了，还是留在大城市', hint:'+🧠 +😊', fn: g => { g.flags.smallTownNostalgia=true; return{intel:5,mood:3}; }},
         { label:'发朋友圈感慨', hint:'+👥 +✨', fn: g => { g.flags.smallTownNostalgia=true; return{social:8,charm:5,mood:5}; }},
       ]},
+    // === v4.6 EVENTS - 松弛感与慢生活 ===
+    { id:'slow_living', icon:'🌿', title:'慢生活',
+      body:'你看到一篇文章：\n\n"快节奏时代，一些年轻人减速前行。"\n\n你开始反思：每天996，回家刷手机到凌晨，然后继续996。\n\n你决定慢下来：\n- 每天阅读30分钟\n- 周末去公园发呆\n- 学做手工、钩织\n- 关掉手机通知\n\n"慢生活不是躺平，而是听见自己内心的声音。"\n\n"在高速运转的世界里，慢，是一种稀缺的能力。"',
+      cond: g => !g.flags.slowLiving && g.age>=22 && g.age<=40 && g.health<70,
+      choices:[
+        { label:'开始慢生活实验', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.slowLiving=true; g.flags.mindfulLiving=true; return{mood:15,health:10,intel:8}; }},
+        { label:'每天阅读', hint:'+🧠 +😊', fn: g => { g.flags.slowLiving=true; g.flags.dailyReader=true; return{intel:15,mood:10}; }},
+        { label:'学做手工', hint:'+✨ +😊', fn: g => { g.flags.slowLiving=true; g.flags.handicraft=true; return{charm:10,mood:12,intel:5}; }},
+        { label:'算了，快不起来', hint:'+😊', fn: g => { g.flags.slowLiving=true; return{mood:5}; }},
+      ]},
+    { id:'dopamine_fasting', icon:'🧘', title:'多巴胺断舍离',
+      body:'你看到一个视频：\n\n"多巴胺断舍离——戒掉短视频、戒掉游戏、戒掉外卖。"\n\n你试了三天：\n- Day 1：焦虑、无聊、想刷手机\n- Day 2：平静、开始看书\n- Day 3：内心安宁、精力充沛\n\n"多巴胺断舍离不是苦行，而是重新掌控自己的大脑。"\n\n"当你不再被即时满足控制，你会发现：延迟满足才是真正的满足。"',
+      cond: g => !g.flags.dopamineFasting && g.age>=20 && g.age<=35,
+      choices:[
+        { label:'坚持一周', hint:'+🧠 +❤️ +😊', fn: g => { g.flags.dopamineFasting=true; g.flags.digitalDetox=true; return{intel:12,health:8,mood:15}; }},
+        { label:'坚持三天', hint:'+🧠 +😊', fn: g => { g.flags.dopamineFasting=true; return{intel:8,mood:10}; }},
+        { label:'试了一天，失败了', hint:'+😊 -🧠', fn: g => { g.flags.dopamineFasting=true; return{mood:3,intel:-3}; }},
+        { label:'不需要，我很有自制力', hint:'+✨', fn: g => { g.flags.dopamineFasting=true; return{charm:5,mood:5}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3192,6 +3211,9 @@ const ACHIEVEMENTS = [
     // v4.5 achievements
     { id:'dopamine_dresser', icon:'👗', name:'多巴胺穿搭师', desc:'尝试色彩穿搭', check: g => g.flags.colorfulStyle },
     { id:'town_writer', icon:'🏘️', name:'县城文学作者', desc:'写县城故事', check: g => g.flags.writer && g.flags.smallTownNostalgia },
+    // v4.6 achievements
+    { id:'slow_living_pioneer', icon:'🌿', name:'慢生活先锋', desc:'实践慢生活', check: g => g.flags.mindfulLiving || g.flags.dailyReader },
+    { id:'dopamine_detoxer', icon:'🧘', name:'多巴胺断舍离', desc:'完成多巴胺断舍离', check: g => g.flags.dopamineFasting && g.flags.digitalDetox },
 ];
 
 // === ENDINGS === (order matters: first match wins)
