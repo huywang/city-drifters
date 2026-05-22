@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v25.1
+// 都市浮生记 - Game Engine v25.2
 // ============================================
 
 // === GAME STATE ===
@@ -12319,6 +12319,87 @@ const EVENTS = [
         { label:'先试试看，不行再走', hint:'+🧠', fn: g => { g.flags.nomadReturn=true; return{intel:3,mood:3}; }},
         { label:'回来只是暂时的，还在找方向', hint:'-😊', fn: g => { g.flags.nomadReturn=true; return{mood:-5}; }},
       ]},
+    // === v25.2: 经济金融 + 投资理财 ===
+    { id:'index_fund', icon:'📈', title:'基金定投', category:'finance',
+      body:'你的同事老李，工资不高，但存款比你多。\n\n他告诉你他的秘密：「基金定投。」\n\n他的策略很简单：\n- 每月工资到账后，自动转2000到基金账户\n- 只买沪深300指数基金\n- 不看涨跌，不管市场\n- 坚持了8年\n\n他给你看了账户：累计投入19.2万，现在市值31万。\n\n年化收益约7%。不算高——但胜在稳定。\n\n他说：「投资最难的不是选对基金——是坚持不动。」\n\n你心动了。但你也知道：你能做到「每月不看账户」吗？\n\n「基金定投：时间是最好的朋友——前提是你有耐心。」',
+      cond: g => g.age >= 22 && !g.flags.indexFund && g.salary && g.money >= 5000,
+      choices:[
+        { label:'开始每月定投2000到指数基金', hint:'-💰 +💰 +🧠', fn: g => { g.flags.indexFund=true; g.flags.regularInvestor=true; g.money -= 5000; return{intel:8}; }},
+        { label:'先学习投资知识，不急着入场', hint:'+🧠', fn: g => { g.flags.indexFund=true; g.flags.investmentLearner=true; return{intel:10}; }},
+        { label:'觉得收益太低，想找更高回报的方式', hint:'+🧠', fn: g => { g.flags.indexFund=true; return{intel:3}; }},
+      ]},
+    { id:'crypto_trap', icon:'₿', title:'虚拟货币', category:'finance',
+      body:'你的大学室友小陈，靠比特币赚了一大笔。\n\n他兴奋地给你看他的账户：「当初花3万买的，现在值80万！」\n\n你看着他，五味杂陈。\n\n他说：「现在入场也不晚！下一个牛市马上来了！」\n\n你研究了一下加密货币：\n- 24小时交易，没有涨跌停\n- 一天可以涨50%，也可以跌50%\n- 很多项目是骗局\n- 政府明确说不保护虚拟币交易\n\n你犹豫了：\n- 投了——可能暴富，也可能血本无归\n- 不投——看着别人赚钱的焦虑\n\n「虚拟货币：你投的不是币——是你的贪婪。」',
+      cond: g => g.age >= 22 && g.age <= 45 && !g.flags.cryptoTrap && g.money >= 10000,
+      choices:[
+        { label:'投了5万块试试水', hint:'-💰 ±💰', fn: g => { g.flags.cryptoTrap=true; g.flags.cryptoInvestor=true; const r = Math.random(); if(r<0.3) g.money += 20000; else if(r<0.6) g.money -= 5000; else g.money -= 20000; return{intel:5}; }},
+        { label:'只投了5000块，当交学费', hint:'-💰 +🧠', fn: g => { g.flags.cryptoTrap=true; g.money -= 5000; return{intel:8}; }},
+        { label:'觉得风险太大，不碰', hint:'+🧠', fn: g => { g.flags.cryptoTrap=true; g.flags.cryptoAvoider=true; return{intel:5,mood:3}; }},
+      ]},
+    { id:'insurance_awareness', icon:'🛡️', title:'保险意识', category:'finance',
+      body:'你的一个同事得了重病。\n\n治疗费用：50万。\n\n他没有买任何商业保险。医保只报销了30%。\n\n他需要在3个月内凑出35万。\n\n他的家人开始借钱、众筹、卖房。\n\n你看着这一切，开始认真思考：保险，到底要不要买？\n\n你研究了保险产品：\n- 百万医疗险：每年300-1000元，报销大病费用\n- 重疾险：每年3000-8000元，确诊即赔\n- 意外险：每年100-300元\n- 定期寿险：每年500-2000元\n\n你算了算：全部配齐，每年要花1万元左右。\n\n贵吗？贵。但跟一场大病比起来——什么都不是。\n\n「保险：你花的每一分钱——都在保护你爱的人。」',
+      cond: g => g.age >= 25 && !g.flags.insuranceAwareness && g.salary,
+      choices:[
+        { label:'配齐了所有保险，花1万/年', hint:'-💰 +❤️ +🧠', fn: g => { g.flags.insuranceAwareness=true; g.flags.fullyInsured=true; g.money -= 10000; return{health:3,intel:8}; }},
+        { label:'只买了百万医疗+意外险', hint:'-💰 +🧠', fn: g => { g.flags.insuranceAwareness=true; g.flags.basicInsured=true; g.money -= 1000; return{intel:5}; }},
+        { label:'觉得保险就是骗人的，不买', hint:'', fn: g => { g.flags.insuranceAwareness=true; return{mood:-2}; }},
+      ]},
+    { id:'fire_movement_v25_2', icon:'🔥', title:'FIRE运动', category:'finance',
+      body:'你在网上发现了一个运动：FIRE（Financial Independence, Retire Early）。\n\n核心理念：\n- 攒够25倍年支出的钱\n- 靠4%的年化收益生活\n- 提前退休，做自己想做的事\n\n你算了算：\n- 你每月花5000元\n- 一年6万\n- 需要攒够150万\n- 靠投资收益每月拿5000\n\n你现在有多少？——5万。\n\n差145万。按你现在每月能存3000的速度——还需要40年。\n\n你沉默了。\n\n但你也看到了另一面：FIRE不是目标——是思维方式。\n\n当你知道「多少钱够了」——你才能真正开始规划。\n\n「FIRE：不是为了退休——是为了自由。」',
+      cond: g => g.age >= 22 && g.age <= 40 && !g.flags.fireMovement && g.intel >= 20,
+      choices:[
+        { label:'开始FIRE计划，大幅提高储蓄率', hint:'+💰 -😊 +🧠', fn: g => { g.flags.fireMovement=true; g.flags.firePlanner=true; g.money += 20000; return{intel:10,mood:-3}; }},
+        { label:'认同理念但不极端，适度储蓄', hint:'+💰 +🧠', fn: g => { g.flags.fireMovement=true; g.money += 8000; return{intel:5}; }},
+        { label:'觉得人生苦短不能只存钱', hint:'+😊 -💰', fn: g => { g.flags.fireMovement=true; return{mood:5}; }},
+      ]},
+    { id:'layoff_wave', icon:'📉', title:'裁员潮', category:'career',
+      body:'经济不景气。公司开始了大规模裁员。\n\n第一轮：优化了20%的人。\n\n你不在名单上。但你看到了被裁的同事：\n- 有的人哭了\n- 有的人面无表情地收拾东西\n- 有的人当场打电话找新工作\n- 有的人在群里发了一句：「祝大家前程似锦」\n\n你松了一口气——但只松了一秒。\n\n因为你不知道：下一轮会不会轮到你。\n\n你开始做「Plan B」：\n- 更新简历\n- 维护人脉\n- 存紧急备用金\n- 学新技能\n\n你在想：在这个时代——最大的稳定不是「不失业」——是「失业了也能活」。\n\n「裁员潮：工作不是你的——但能力是你的。」',
+      cond: g => g.age >= 22 && g.age <= 50 && !g.flags.layoffWave && g.salary,
+      choices:[
+        { label:'积极准备Plan B，存了6个月紧急备用金', hint:'+💰 +🧠 -😊', fn: g => { g.flags.layoffWave=true; g.flags.emergencyFund=true; g.money += 15000; return{intel:8,mood:-3}; }},
+        { label:'开始学新技能，提升自己不可替代性', hint:'+🧠 +💰', fn: g => { g.flags.layoffWave=true; g.flags.skillUpgrade=true; return{intel:10,money:2000}; }},
+        { label:'焦虑了很久，但什么也没做', hint:'-😊', fn: g => { g.flags.layoffWave=true; return{mood:-10}; }},
+      ]},
+    { id:'credit_debt', icon:'💳', title:'信贷陷阱', category:'finance',
+      body:'你打开了花呗账单。\n\n1.2万。\n\n你看了看自己买了什么：\n- 一件大衣：2000元（穿了3次）\n- 一双鞋：1500元（穿了5次）\n- 一个包：3000元（现在在角落吃灰）\n- 各种小东西：5500元（大部分已经忘了）\n\n你算了算利息：如果分期12个月，多付800元。\n\n你突然意识到：你不是在花钱——你是在「借未来的钱花现在的快乐」。\n\n而未来的你——正在为此买单。\n\n你决定：从今天开始，关闭花呗，只用现金。\n\n「信贷：你今天花的每一分钱——都是明天要还的。」',
+      cond: g => g.age >= 20 && !g.flags.creditDebt && g.money < 30000,
+      choices:[
+        { label:'关闭所有信贷工具，只用现金消费', hint:'+💰 +🧠 +😊', fn: g => { g.flags.creditDebt=true; g.flags.cashOnly=true; g.money += 3000; return{intel:8,mood:5}; }},
+        { label:'减少了信贷额度，控制消费', hint:'+💰 +🧠', fn: g => { g.flags.creditDebt=true; g.money += 1000; return{intel:5}; }},
+        { label:'分期还了，继续用', hint:'-💰', fn: g => { g.flags.creditDebt=true; g.money -= 800; return{mood:-3}; }},
+      ]},
+    { id:'personal_pension', icon:'🏦', title:'个人养老金', category:'finance',
+      body:'国家推出了个人养老金制度。\n\n你研究了规则：\n- 每年最多存12000元\n- 可以享受税收优惠（最高省5400元/年）\n- 退休后才能取\n- 可以买基金、保险、存款\n\n你觉得：这是一个好政策。但也有顾虑：\n- 钱存进去几十年不能动\n- 几十年后这笔钱还值钱吗？\n- 万一中途急用钱怎么办？\n\n你的理财顾问说：「养老金不是投资——是对冲你活得太久的风险。」\n\n你想了想：确实。你最大的风险不是钱不够——是活得比钱长。\n\n「养老金：你现在存的每一块钱——都是在照顾60岁的自己。」',
+      cond: g => g.age >= 25 && g.age <= 50 && !g.flags.personalPension && g.salary,
+      choices:[
+        { label:'顶格存了12000元/年', hint:'-💰 +💰 +🧠', fn: g => { g.flags.personalPension=true; g.flags.maxPension=true; g.money -= 12000; return{intel:8}; }},
+        { label:'先存6000元试试水', hint:'-💰 +🧠', fn: g => { g.flags.personalPension=true; g.money -= 6000; return{intel:5}; }},
+        { label:'觉得太早了，等以后再说', hint:'', fn: g => { g.flags.personalPension=true; return{mood:2}; }},
+      ]},
+    { id:'tax_optimization', icon:'📋', title:'个税优化', category:'finance',
+      body:'你在网上学到了一些合法的个税优化方法：\n\n- 专项附加扣除：租房/房贷、子女教育、赡养老人\n- 个人养老金：每年最高抵扣12000\n- 公益捐赠：可以在税前扣除\n- 继续教育：学历教育每月400元\n\n你算了算：如果你把能抵扣的都抵扣了——每年可以少交3000-8000元的税。\n\n你以前从来没有关注过这些——白白多交了好几年的税。\n\n你开始理解：赚钱是能力，省钱是智慧。\n\n「个税优化：不是逃税——是合理利用规则。」',
+      cond: g => g.age >= 22 && !g.flags.taxOptimization && g.salary && g.salary >= 8000,
+      choices:[
+        { label:'把所有能抵扣的都填了', hint:'+💰 +🧠', fn: g => { g.flags.taxOptimization=true; g.money += 5000; return{intel:8}; }},
+        { label:'填了几个主要的扣除项', hint:'+💰', fn: g => { g.flags.taxOptimization=true; g.money += 2000; return{intel:3}; }},
+        { label:'觉得太麻烦了，不折腾', hint:'', fn: g => { g.flags.taxOptimization=true; return{mood:2}; }},
+      ]},
+    { id:'side_income_stream', icon:'💵', title:'被动收入', category:'finance',
+      body:'你在网上看到一篇文章：「7种被动收入方式」。\n\n你开始研究：\n1. 指数基金分红：年化4-6%\n2. 房租收入：需要有大额资产\n3. 数字产品销售：写电子书、做模板\n4. 知识付费：做课程、做社群\n5. 广告收入：自媒体、博客\n6. 版权收入：写歌、写书\n7. 股权投资：风险高但回报大\n\n你发现：大多数「被动收入」——前期都需要大量的「主动投入」。\n\n天下没有免费的午餐。但确实有「先苦后甜」的收入模式。\n\n你决定：选一种最适合你的，开始做。\n\n「被动收入：不是不劳而获——是先劳后获。」',
+      cond: g => g.age >= 22 && !g.flags.passiveIncome && g.intel >= 25,
+      choices:[
+        { label:'开始做数字产品，建立被动收入渠道', hint:'-💰 +💰 +🧠', fn: g => { g.flags.passiveIncome=true; g.flags.digitalProduct=true; g.money -= 3000; return{intel:10,money:5000}; }},
+        { label:'选择基金分红作为被动收入来源', hint:'+💰 +🧠', fn: g => { g.flags.passiveIncome=true; g.flags.dividendInvestor=true; return{intel:5,money:2000}; }},
+        { label:'觉得不靠谱，还是好好上班', hint:'+💰', fn: g => { g.flags.passiveIncome=true; return{money:1000}; }},
+      ]},
+    { id:'financial_literacy', icon:'📊', title:'财商启蒙', category:'education',
+      body:'你参加了一个免费的理财讲座。\n\n讲师说了一句让你震惊的话：\n\n「学校教了你16年——但从来没教过你怎么管钱。」\n\n你想了想：确实。\n- 你知道勾股定理——但不知道复利公式\n- 你能背200个英语单词——但看不懂财务报表\n- 你会解微积分——但不会报税\n\n你开始自学理财知识：\n- 看了《小狗钱钱》《穷爸爸富爸爸》\n- 学了基本的财务报表分析\n- 了解了资产配置的基本原则\n\n你发现：理财不是有钱人的专利——是每个人都需要的基本技能。\n\n「财商：不是你学了多少——是你用了多少。」',
+      cond: g => g.age >= 20 && !g.flags.financialLiteracy && g.intel >= 15,
+      choices:[
+        { label:'系统学习理财，考了金融相关证书', hint:'+🧠 +💰', fn: g => { g.flags.financialLiteracy=true; g.flags.financeStudent=true; return{intel:15,money:3000}; }},
+        { label:'看了一些理财书，开始实践', hint:'+🧠 +💰', fn: g => { g.flags.financialLiteracy=true; g.money += 2000; return{intel:8}; }},
+        { label:'听完了讲座，觉得还是太复杂了', hint:'+🧠', fn: g => { g.flags.financialLiteracy=true; return{intel:3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -13428,6 +13509,12 @@ const ACHIEVEMENTS = [
     { id:'slow_lifestyle_ach', icon:'🐢', name:'慢生活实践者', desc:'彻底转向慢生活节奏', check: g => g.flags.slowLifestyle },
     { id:'low_desire_ach', icon:'🛋️', name:'低欲望生活', desc:'实践低欲望生活方式', check: g => g.flags.lowDesire },
     { id:'smart_saver_ach', icon:'📉', name:'消费降级达人', desc:'消费降级并省下钱来投资', check: g => g.flags.smartSaver },
+    // v25.2: 经济金融成就
+    { id:'regular_investor_ach', icon:'📈', name:'定投达人', desc:'开始定期基金定投', check: g => g.flags.regularInvestor },
+    { id:'fire_planner_ach', icon:'🔥', name:'FIRE计划', desc:'开始执行提前退休计划', check: g => g.flags.firePlanner },
+    { id:'fully_insured_ach', icon:'🛡️', name:'全面保障', desc:'配齐了所有商业保险', check: g => g.flags.fullyInsured },
+    { id:'cash_only_ach', icon:'💳', name:'现金为王', desc:'关闭信贷只用现金消费', check: g => g.flags.cashOnly },
+    { id:'finance_student_ach', icon:'📊', name:'理财学徒', desc:'系统学习理财并考证', check: g => g.flags.financeStudent },
 ];
 
 // === ENDINGS === (order matters: first match wins)
