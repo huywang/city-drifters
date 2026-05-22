@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v7.3
+// 都市浮生记 - Game Engine v7.4
 // ============================================
 
 // === GAME STATE ===
@@ -3490,6 +3490,34 @@ const EVENTS = [
         { label:'做文化传播', hint:'+💰 +✨ +🧠', fn: g => { g.flags.culturalHeritage=true; g.flags.culturePromoter=true; return{money:5000,charm:12,intel:10}; }},
         { label:'不感兴趣', hint:'+🧠', fn: g => { g.flags.culturalHeritage=true; return{intel:3}; }},
       ]},
+    // === v7.4 EVENTS - 延迟退休与养老焦虑 ===
+    { id:'delayed_retirement', icon:'👴', title:'延迟退休',
+      body:'2025年1月1日，《实施弹性退休制度暂行办法》正式生效。\n\n你看着新闻：男职工退休年龄逐步延至63岁，女职工分档延至55岁和58岁。\n\n"90后大概率要工作到65岁才能退休。"\n\n你算了一笔账：你现在25岁，还有40年才能退休。40年，足够你经历多少次"中年危机"？\n\n"延迟退休——年轻人眼中的'压力'，还是'新机'？"\n\n你的焦虑：\n- "刚上班就要面对延迟退休，这辈子要工作到60多岁？"\n- "能否健康工作到65岁？"\n- "老员工延迟退休，会不会挤压我的晋升空间？"\n- "上有老下有小，延迟退休让经济压力陡增"\n\n但你也在思考：职业生涯被拉长，"35岁危机"的时间节点可能随之延后。\n\n"与其被动焦虑，不如主动规划——'终身成长'才能对抗年龄焦虑。"',
+      cond: g => !g.flags.delayedRetirement && g.age>=20 && g.age<=35,
+      choices:[
+        { label:'提前规划养老金', hint:'-💰 +🧠', fn: g => { g.flags.delayedRetirement=true; g.flags.pensionPlanning=true; return{money:-5000,intel:10}; }},
+        { label:'投资健康', hint:'-💰 +❤️', fn: g => { g.flags.delayedRetirement=true; g.flags.healthInvestment=true; return{money:-3000,health:15}; }},
+        { label:'发展副业', hint:'-😊 +💰', fn: g => { g.flags.delayedRetirement=true; g.flags.sideBusiness=true; return{mood:-5,money:5000}; }},
+        { label:'焦虑但躺平', hint:'-😊 -🧠', fn: g => { g.flags.delayedRetirement=true; return{mood:-10,intel:-5}; }},
+      ]},
+    { id:'mental_health_crisis', icon:'💭', title:'心理健康危机',
+      body:'你感觉最近状态不好：失眠、焦虑、情绪低落、对什么都提不起兴趣。\n\n你做了个心理测评：抑郁风险高风险。\n\n"2025年《国民心理健康蓝皮书》显示：18-24岁青年群体抑郁水平达到峰值。"\n\n你的症状：\n- 每周情绪低落超过5天\n- 睡眠障碍，失眠或嗜睡\n- 注意力不集中，工作效率下降\n- 社交回避，不想见任何人\n\n"中国有至少三千万17岁以下的儿童青少年面临情绪或行为问题。"\n\n你开始思考：要不要去看心理咨询？\n\n但你的顾虑：\n- 心理咨询太贵（每小时300-800元）\n- 怕被说"矫情"\n- 不知道去哪里找靠谱的咨询师\n- "也许扛一扛就过去了"\n\n"抑郁不是矫情，是大脑生病了——就像感冒需要吃药，抑郁也需要专业帮助。"',
+      cond: g => !g.flags.mentalHealthCrisis && g.mood<=40 && g.age>=18 && g.age<=30,
+      choices:[
+        { label:'寻求专业帮助', hint:'-💰 +😊 +🧠', fn: g => { g.flags.mentalHealthCrisis=true; g.flags.seekHelp=true; return{money:-3000,mood:20,intel:10}; }},
+        { label:'自助调节', hint:'+🧠', fn: g => { g.flags.mentalHealthCrisis=true; g.flags.selfHelp=true; return{intel:8,mood:5}; }},
+        { label:'向朋友倾诉', hint:'+😊 +👥', fn: g => { g.flags.mentalHealthCrisis=true; g.flags.talkToFriends=true; return{mood:10,social:8}; }},
+        { label:'硬扛', hint:'-😊 -❤️', fn: g => { g.flags.mentalHealthCrisis=true; return{mood:-15,health:-10}; }},
+      ]},
+    { id:'age_35_crisis', icon:'🎂', title:'35岁危机',
+      body:'你35岁了。投简历时，你发现很多岗位写着"35岁以下"。\n\n"35岁歧视——全社会的问题，却让你一个人承受。"\n\n你的处境：\n- 投了50份简历，只收到3个面试邀请\n- HR问："您35岁了，为什么还要换工作？"\n- 面试官暗示："我们团队平均年龄28岁，怕您不适应"\n- 薪资要求被砍："您这个年龄，性价比不高"\n\n"35岁正是年富力强之时，却成了职场一道难以逾越的门槛。"\n\n你的焦虑：\n- 房贷还有20年要还\n- 孩子刚上小学，教育费用越来越高\n- 父母年纪大了，医疗支出增加\n- 存款不够失业半年\n\n"当环卫工岗位都要求'35岁以下'时，暴露的不仅是年龄歧视，更是整个社会对中年劳动者价值认知的扭曲。"\n\n"35岁不是危机，而是转折点——那些能跳出'打工者思维'，主动拥抱变化的人，终将在新的价值体系中找到自己的位置。"',
+      cond: g => !g.flags.age35Crisis && g.age>=33 && g.age<=37 && g.job!=='待业中',
+      choices:[
+        { label:'提升技能，转型', hint:'-💰 +🧠 +💪', fn: g => { g.flags.age35Crisis=true; g.flags.careerTransition=true; return{money:-5000,intel:15,charm:10}; }},
+        { label:'创业', hint:'-💰 💰 🎲', fn: g => { g.flags.age35Crisis=true; g.flags.startup=true; if(Math.random()>0.5){return{money:50000,charm:20}}else{return{money:-20000,mood:-20}} }},
+        { label:'考公考编', hint:'-💰 +🧠', fn: g => { g.flags.age35Crisis=true; g.flags.civilService=true; return{money:-3000,intel:12}; }},
+        { label:'躺平接受', hint:'-😊 -💪', fn: g => { g.flags.age35Crisis=true; return{mood:-20,health:-10}; }},
+      ]},
     // === v7.3 EVENTS - 相亲角与婚恋困境 ===
     { id:'matchmaking_corner', icon:'💕', title:'相亲角',
       body:'你被父母拉去了人民公园相亲角：满墙的简历，写着学历、收入、房产、户口。\n\n"相亲角——不是在相亲，而是在拍卖阶级。"\n\n你看了看条件：\n- 男方：985硕士、年薪50万、上海户口、有房有车\n- 女方：海归硕士、年薪30万、独生女、父母有退休金\n\n"66%的年轻人不愿因压力调整择偶标准，拒绝'将就婚恋'。"\n\n你被一个阿姨问："小伙子/小姑娘，你什么条件？"\n\n你尴尬地笑了笑：我的条件是——我还不想结婚。\n\n"63%的00后认为带有强目的性的相亲行为并不是首选。"\n\n但你也在思考：相亲角是父母的焦虑，还是年轻人的无奈？\n\n"婚恋市场不生产爱情，而是在批发焦虑。"',
@@ -3832,6 +3860,11 @@ const ACHIEVEMENTS = [
     { id:'blind_date_survivor', icon:'💕', name:'相亲角幸存者', desc:'体验相亲角', check: g => g.flags.matchmakingCorner },
     { id:'marriage_realist', icon:'💸', name:'婚姻现实主义者', desc:'面对结婚成本', check: g => g.flags.marriageCost },
     { id:'single_happy', icon:'💍', name:'快乐单身族', desc:'享受单身生活', check: g => g.flags.singleHappy },
+    // v7.4 achievements
+    { id:'pension_planner', icon:'👴', name:'养老规划师', desc:'提前规划养老金', check: g => g.flags.pensionPlanning },
+    { id:'mental_health_warrior', icon:'💭', name:'心理健康战士', desc:'寻求心理帮助', check: g => g.flags.seekHelp },
+    { id:'age_35_survivor', icon:'🎂', name:'35岁幸存者', desc:'度过35岁危机', check: g => g.flags.age35Crisis },
+    { id:'career_transformer', icon:'💪', name:'职业转型者', desc:'35岁后成功转型', check: g => g.flags.careerTransition },
 ];
 
 // === ENDINGS === (order matters: first match wins)
