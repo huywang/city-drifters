@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v12.4
+// 都市浮生记 - Game Engine v12.5
 // ============================================
 
 // === GAME STATE ===
@@ -6254,6 +6254,87 @@ const EVENTS = [
         { label:'当伴郎/伴娘', hint:'+👥 +✨', fn: g => { g.flags.friendWedding=true; return{social:10,charm:5,mood:8}; }},
         { label:'不太想去', hint:'', fn: g => { return{mood:-3,social:-3}; }},
       ]},
+    // === v12.5 2025社会热点 + 新型生活方式 ===
+    { id:'forty_five_degree', icon:'📐', title:'45度人生',
+      body:'你发了一条朋友圈：「不卷了，也不躺了。我选择45度人生。」\n\n评论区炸了：\n同事说：「你这是半卷半躺？」\n你妈说：「45度是什么角度？考试考45分？」\n你朋友说：「45度正好是仰望星空的角度。」\n\n你笑了笑。其实45度人生就是——该努力的时候努力，该摸鱼的时候摸鱼。不是放弃，是放过自己。\n\n"内卷太累，躺平太废。45度刚刚好——够得着梦想，也不委屈自己。"',
+      cond: g => g.age >= 25 && g.age <= 38 && g.mood >= 35 && g.mood <= 65,
+      choices:[
+        { label:'这就是我的态度', hint:'+😊 +🧠', fn: g => { g.flags.fortyFiveDegree=true; return{mood:10,intel:5}; }},
+        { label:'还是卷吧', hint:'+💰 -❤️', fn: g => { return{money:500,health:-3,mood:-5}; }},
+        { label:'还是躺吧', hint:'+❤️ -💰', fn: g => { return{health:5,mood:5,money:-300}; }},
+      ]},
+    { id:'splash_wealth', icon:'🤑', title:'泼天的富贵',
+      body:'你的一个短视频突然爆了——500万播放量！\n\n评论区开始有人找你做广告。一条广告报价2000块。你从来没想过，拍一个猫咪打哈欠的视频能赚这么多钱。\n\n你的同事说：「你这是泼天的富贵啊！快抓住！」\n你的老板说：「上班时间拍的？删掉。」\n\n"泼天的富贵说来就来——但你能不能接住，全看运气和胆量。"',
+      cond: g => g.age >= 22 && g.age <= 35 && g.charm >= 40 && !g.flags.splashWealth,
+      choices:[
+        { label:'辞职做自媒体', hint:'+💰💰 +✨ -🧠', fn: g => { g.flags.splashWealth=true; g.flags.influencer=true; setJob(g,'自媒体博主',8000); return{money:5000,charm:15,mood:20}; }},
+        { label:'副业先做着', hint:'+💰 +✨', fn: g => { g.flags.splashWealth=true; return{money:3000,charm:8,mood:10}; }},
+        { label:'算了太不靠谱', hint:'', fn: g => { return{mood:-5}; }},
+      ]},
+    { id:'destiny_gears', icon:'⚙️', title:'命运的齿轮开始转动',
+      body:'你在地铁上遇到了一个人。\n\n也许是一个看书的文艺青年，也许是一个穿拖鞋的亿万富翁，也许是一个跟你同名的陌生人。\n\n你们聊了几句。交换了微信。然后——你的人生轨迹开始发生了微妙的变化。\n\n也许是他介绍了一份工作，也许是她让你重新相信了爱情，也许只是一句无心的话点醒了你。\n\n"命运从来不会提前告诉你它要转弯——你只会在回头看的时候，发现那个不起眼的瞬间。"',
+      cond: g => g.age >= 24 && g.age <= 40 && !g.flags.destinyGears,
+      choices:[
+        { label:'加了微信', hint:'+👥 +✨', fn: g => { g.flags.destinyGears=true; return{social:10,charm:5,mood:8}; }},
+        { label:'聊完就散了', hint:'+🧠', fn: g => { g.flags.destinyGears=true; return{intel:5,mood:3}; }},
+        { label:'没搭话', hint:'', fn: g => { return{mood:-3}; }},
+      ]},
+    { id:'attention_seeker', icon:'🎪', title:'显眼包',
+      body:'你在公司年会上做了一件出格的事——你唱了一首rap。\n\n歌词是你自己写的，内容是把老板的口头禅全编成了押韵段子。全场爆笑。老板的脸青了三秒，然后也跟着笑了。\n\n第二天你成了公司群里的「传奇人物」。有人截图发到了微博，评论区全是：「这人是显眼包本包！」\n\n"在职场当显眼包需要勇气——也需要做好第二天被HR约谈的准备。"',
+      cond: g => g.age >= 23 && g.age <= 35 && g.charm >= 35 && g.job !== '待业中',
+      choices:[
+        { label:'我就是这么耀眼', hint:'+✨ +👥', fn: g => { g.flags.attentionSeeker=true; return{charm:12,social:8,mood:15}; }},
+        { label:'低调低调', hint:'+🧠', fn: g => { g.flags.attentionSeeker=true; return{intel:3,mood:5}; }},
+        { label:'完了要被开了', hint:'-😊', fn: g => { g.flags.attentionSeeker=true; return{mood:-8}; }},
+      ]},
+    { id:'digital_veggie', icon:'🥬', title:'电子榨菜',
+      body:'你发现自己有一个严重的毛病——吃饭的时候如果不看手机视频，就吃不下饭。\n\n你的外卖到了，你打开B站/抖音，选了半天——外卖凉了。你热了一下，继续选。\n\n你妈打电话来：「你怎么不接视频？」「妈我在吃饭。」「你不是一个人吃吗？」「对啊，我在配电子榨菜。」\n\n你妈沉默了三秒：「……菜还能看视频？」\n\n"电子榨菜不会过期，但你的胃会。"',
+      cond: g => g.age >= 20 && g.age <= 35 && !g.flags.digitalVeggie,
+      choices:[
+        { label:'这是我的生活方式', hint:'+😊 -❤️', fn: g => { g.flags.digitalVeggie=true; return{mood:5,health:-3}; }},
+        { label:'试着戒掉', hint:'+❤️ -😊', fn: g => { g.flags.digitalVeggie=true; g.flags.digitalDetox=true; return{health:5,mood:-5}; }},
+        { label:'边吃边看边学习', hint:'+🧠 -❤️', fn: g => { g.flags.digitalVeggie=true; return{intel:3,health:-2}; }},
+      ]},
+    { id:'digital_disconnect', icon:'📵', title:'数字断联',
+      body:'你做了一个大胆的决定——删掉了微信、抖音、小红书。\n\n第一天：你发现自己不知道今天发生了什么。\n第二天：你发现自己不知道该跟谁聊天。\n第三天：你发现——世界很安静，你的脑子也很安静。\n\n第七天：你重新下载了微信。因为老板在群里@你：「你怎么不回消息？」\n\n"数字断联让你自由了七天——然后工作把你拉回了现实。"',
+      cond: g => g.age >= 23 && g.age <= 40 && g.mood <= 50 && !g.flags.digitalDisconnect,
+      choices:[
+        { label:'坚持断联一周', hint:'+😊 +❤️ -👥', fn: g => { g.flags.digitalDisconnect=true; return{mood:15,health:8,social:-8}; }},
+        { label:'算了还是装回来', hint:'+👥 -😊', fn: g => { g.flags.digitalDisconnect=true; return{social:3,mood:-5}; }},
+        { label:'只保留工作软件', hint:'+💰 -😊', fn: g => { g.flags.digitalDisconnect=true; return{money:300,mood:-3}; }},
+      ]},
+    { id:'commando_travel', icon:'🎒', title:'特种兵旅游',
+      body:'你用三天两夜玩了三个城市。\n\nDay1: 凌晨坐硬座到长沙，早上吃了碗粉，爬了岳麓山，下午高铁去武汉，晚上吃了热干面。\nDay2: 早上去了黄鹤楼，中午坐动车去重庆，晚上吃了火锅。\nDay3: 早上逛了解放碑，下午飞回来上班。\n\n你的步数：日均5万步。你的花费：总共800块。你的状态：比上班还累。\n\n"特种兵旅游的精髓：用最少的钱，走最多的路，发最多的朋友圈。"',
+      cond: g => g.age >= 20 && g.age <= 30 && g.health >= 50 && !g.flags.commandoTravel,
+      choices:[
+        { label:'发朋友圈炫耀', hint:'+✨ +😊 -❤️', fn: g => { g.flags.commandoTravel=true; return{charm:8,mood:12,health:-8,money:-800}; }},
+        { label:'默默回来上班', hint:'+💰', fn: g => { g.flags.commandoTravel=true; return{mood:5,money:-800}; }},
+        { label:'决定以后慢旅行', hint:'+🧠', fn: g => { g.flags.commandoTravel=true; return{intel:5,mood:8,money:-800}; }},
+      ]},
+    { id:'slow_employment', icon:'🐌', title:'慢就业',
+      body:'毕业半年了，你还没有找工作。\n\n你妈急得每天打电话：「你看看人家小张，都进大长了！」「你看看隔壁老李的儿子，考上公务员了！」\n\n你不是不想工作——你只是不想随便找一份工作。你在想：我到底喜欢什么？我擅长什么？我这辈子要做什么？\n\n你的同学们觉得你在摆烂。但你知道：磨刀不误砍柴工。\n\n"慢就业不是不就业——是你终于有勇气问自己：这真的是我想做的事吗？"',
+      cond: g => g.age >= 22 && g.age <= 26 && g.job === '待业中' && !g.flags.slowEmployment,
+      choices:[
+        { label:'继续探索', hint:'+🧠 +😊 -💰', fn: g => { g.flags.slowEmployment=true; return{intel:8,mood:5,money:-2000}; }},
+        { label:'先随便找一份', hint:'+💰 -😊', fn: g => { g.flags.slowEmployment=true; setJob(g,'临时工',3500); return{money:1000,mood:-5}; }},
+        { label:'去考个证', hint:'+🧠 -💰', fn: g => { g.flags.slowEmployment=true; return{intel:10,money:-3000}; }},
+      ]},
+    { id:'ai_replacement_v2', icon:'🤖', title:'AI要抢你饭碗',
+      body:'公司开会宣布：引入AI工具后，部门要裁掉30%的人。\n\n你的同事小王说：「我会用AI啊，AI是我的工具。」\n你的同事小李说：「我是做创意的，AI替代不了我。」\n你的同事小张说：「我已经开始投简历了。」\n\n你看了看自己的工作内容——80%可以被AI替代。你沉默了。\n\n"AI不会淘汰所有人——但会淘汰不愿学习新东西的人。问题是，你还有多少时间学？"',
+      cond: g => g.age >= 24 && g.age <= 45 && g.job !== '待业中' && !g.flags.aiReplacement,
+      choices:[
+        { label:'赶紧学AI', hint:'+🧠 -💰', fn: g => { g.flags.aiReplacement=true; return{intel:12,mood:-5,money:-2000}; }},
+        { label:'转行做AI替代不了的', hint:'+😊 +🧠', fn: g => { g.flags.aiReplacement=true; return{mood:5,intel:5}; }},
+        { label:'假装没听见', hint:'-🧠', fn: g => { g.flags.aiReplacement=true; return{mood:-8,intel:-3}; }},
+      ]},
+    { id:'pingti_culture_v2', icon:'🏷️', title:'平替消费',
+      body:'你发现了一个新世界——平替。\n\n大牌面霜500块？平替50块，成分一模一样。品牌咖啡30一杯？便利店10块，味道差不多。设计师包包2万？工厂直销200，质量一样。\n\n你把所有东西都换成了平替。一个月下来，你省了5000块。\n\n你的朋友说：「你也太抠了吧？」\n你说：「这不叫抠——这叫消费觉醒。」\n\n"平替不是穷——是你终于明白了：贵的不一定好，好的不一定贵。"',
+      cond: g => g.age >= 22 && g.age <= 40 && g.money <= 50000 && !g.flags.pintiCulture,
+      choices:[
+        { label:'全面平替', hint:'+💰 +🧠', fn: g => { g.flags.pintiCulture=true; return{money:3000,intel:5,mood:5}; }},
+        { label:'部分平替', hint:'+💰', fn: g => { g.flags.pintiCulture=true; return{money:1500,mood:3}; }},
+        { label:'品质不能省', hint:'-💰 +✨', fn: g => { return{money:-500,charm:5}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -6798,6 +6879,17 @@ const ACHIEVEMENTS = [
     { id:'eco_warrior', icon:'♻️', name:'环保先锋', desc:'践行低碳生活', check: g => g.flags.ecoLiving },
     { id:'midnight_survivor', icon:'🆘', name:'深夜幸存者', desc:'经历了深夜急诊', check: g => g.flags.midnightCrisis },
     { id:'wedding_guest', icon:'💒', name:'婚礼常客', desc:'参加了朋友婚礼', check: g => g.flags.friendWedding },
+    // === v12.5 新增成就 ===
+    { id:'forty_five_lifer', icon:'📐', name:'45度人生', desc:'选择了不卷不躺的生活', check: g => g.flags.fortyFiveDegree },
+    { id:'splash_rich_ach', icon:'🤑', name:'泼天富贵', desc:'接住了突如其来的好运', check: g => g.flags.splashWealth },
+    { id:'destiny_turner', icon:'⚙️', name:'命运齿轮', desc:'遇到了改变命运的人', check: g => g.flags.destinyGears },
+    { id:'main_character', icon:'🎪', name:'显眼包', desc:'成了全场焦点', check: g => g.flags.attentionSeeker },
+    { id:'digital_veggie_ach', icon:'🥬', name:'电子榨菜依赖', desc:'吃饭离不开短视频', check: g => g.flags.digitalVeggie },
+    { id:'offline_warrior', icon:'📵', name:'数字断联者', desc:'主动远离社交媒体', check: g => g.flags.digitalDisconnect },
+    { id:'commando_tourist', icon:'🎒', name:'特种兵游客', desc:'三天玩了三个城市', check: g => g.flags.commandoTravel },
+    { id:'slow_worker', icon:'🐌', name:'慢就业青年', desc:'选择慢慢找工作', check: g => g.flags.slowEmployment },
+    { id:'ai_survivor_ach', icon:'🤖', name:'AI时代适应者', desc:'面对AI替代选择了学习', check: g => g.flags.aiReplacement },
+    { id:'pingti_master', icon:'🏷️', name:'平替大师', desc:'觉醒消费意识', check: g => g.flags.pintiCulture },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -6975,6 +7067,10 @@ const ENDINGS = [
     { id:'bucket_list_end', badge:'📝', title:'愿望清单', desc:'你列了一张人生愿望清单，然后开始一个一个划掉。\n\n跳伞✓ 学吉他✓ 去西藏✓ 写一本书✓ 给妈妈买金项链✓\n\n你没有完成所有的愿望——但每划掉一个，你都觉得自己真正活过。\n\n你65岁的时候，那张清单已经被折得皱巴巴的。上面有些愿望永远不会被打勾了。但也有些——是你当初做梦都没想到的。\n\n"人生不是划掉多少项——是你敢不敢写下第一项。"', cond: g => g.flags.bucketList && g.age >= 45 && g.mood >= 60 },
     { id:'eco_life_end', badge:'♻️', title:'低碳人生', desc:'你成了一个「环保怪人」。\n\n你骑自行车上班，用布袋买菜，拒绝一次性餐具，把空调温度永远设在26度。\n\n你的同事觉得你矫情。你的家人觉得你抠门。你的邻居觉得你奇怪。\n\n但你不在乎。因为你知道：一个人改变不了世界——但如果每个人都这么想，世界就永远不会改变。\n\n"环保不是苦行僧——是终于想明白了：够就好。"', cond: g => g.flags.ecoLiving && g.age >= 35 && g.mood >= 55 },
     { id:'second_chance_end', badge:'🆘', title:'第二次机会', desc:'那次深夜急诊改变了你。\n\n你辞掉了996的工作，搬到了郊区的小房子。你开始跑步、做饭、早睡早起。\n\n你的收入少了一半，但你的体检报告比十年前还好。\n\n你妈说：「你怎么越活越回去了？」\n你说：「妈，我这不是回去了——是重新开始了。」\n\n"有些觉醒需要一次濒死体验——但最好不需要。"', cond: g => g.flags.midnightCrisis && g.health >= 75 && g.mood >= 65 && g.age >= 35 },
+    // --- v12.5 NEW ENDINGS ---
+    { id:'balance_life_end', badge:'📐', title:'45度人生赢家', desc:'你既没有成为卷王，也没有彻底躺平。\n\n你活成了所有人觉得「还行」的样子：工作还行，收入还行，生活还行，身体还行。\n\n但你知道：这个「还行」是你拼了命才维持住的。\n\n你偶尔会想：如果当初再努力一点会怎样？如果当初彻底躺平会怎样？\n\n然后你笑了——45度人生没有如果，只有当下。\n\n"45度不是妥协——是在不确定的世界里，找到了自己的确定。"', cond: g => g.flags.fortyFiveDegree && g.mood >= 55 && g.age >= 30 },
+    { id:'ai_pioneer_end', badge:'🤖', title:'AI时代弄潮儿', desc:'当所有人都害怕AI抢饭碗的时候，你选择了拥抱它。\n\n你学会了用AI写代码、做PPT、分析数据、生成图片。你的效率翻了三倍，你的同事被裁了一半。\n\n你成了公司里「最会用AI的人」。猎头开始频繁联系你。\n\n你妈说：「你小时候玩电脑我就说你有出息。」\n\n"AI不会淘汰所有人——但你得确保自己不是被淘汰的那一个。"', cond: g => g.flags.aiReplacement && g.intel >= 75 && g.age >= 28 },
+    { id:'minimalist_end', badge:'🏷️', title:'平替人生', desc:'你把人生也做成了平替。\n\n大牌学历？不需要——你有真本事。高端社交？不需要——你有真朋友。豪华婚礼？不需要——你有真爱。\n\n你妈说：「你看看人家，什么都用最好的。」\n你说：「妈，我用的是最适合我的。」\n\n你过得不奢华，但很充实。不耀眼，但很踏实。\n\n"平替人生的本质不是将就——是终于分清了：什么是别人要的，什么是我需要的。"', cond: g => g.flags.pintiCulture && g.money >= 30000 && g.mood >= 60 && g.age >= 30 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
