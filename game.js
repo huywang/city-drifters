@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v29.7
+// 都市浮生记 - Game Engine v29.8
 // ============================================
 
 // === GAME STATE ===
@@ -15713,6 +15713,87 @@ const EVENTS = [
         { label:'开始主动社交对抗孤独', hint:'+👥 +💪', fn: g => { g.flags.livingAlone=true; g.flags.activeSocial=true; return{social:5,mood:3}; }},
         { label:'养个宠物陪伴自己', hint:'+😊 -💰', fn: g => { g.flags.livingAlone=true; g.flags.gotPet=true; return{mood:8,money:-2000}; }},
       ]},
+    // === v29.8 教育内卷与鸡娃焦虑 ===
+    { id:'school_district_house_v29_8', icon:'🏫', title:'学区房焦虑', category:'education',
+      body:'你有了孩子——第一个焦虑：学区房。\n\n学区房价格：\n- 普通学区：6万/平\n- 重点学区：12万/平\n- 顶级学区：20万/平\n\n你的工资：1.5万/月\n一套60平学区房：720万\n不吃不喝需要：40年\n\n你的选择：\n- 买学区房（掏空6个钱包+30年房贷）\n- 租学区房（每月1万+随时可能被赶走）\n- 上普通学校（但别人家孩子都在重点）\n\n你的父母说：「我们当年没条件也把你养大了」\n你说：「那是当年——现在不一样了」\n\n但你知道——其实你也不确定——学区房——真的值得吗？\n\n「学区房：你买的不是房子——是一张「可能有用」的入场券。」',
+      cond: g => g.flags.hasChild && g.age >= 28 && !g.flags.schoolDistrictHouse,
+      choices:[
+        { label:'掏空钱包买学区房', hint:'-💰 +😊', fn: g => { g.flags.schoolDistrictHouse=true; g.flags.boughtSchoolDistrict=true; return{money:-50000,mood:5}; }},
+        { label:'选择普通学校用心陪伴', hint:'+🧠 +😊', fn: g => { g.flags.schoolDistrictHouse=true; g.flags.qualityParenting=true; return{intel:3,mood:5}; }},
+        { label:'纠结焦虑但暂时不做决定', hint:'-😊 -🧠', fn: g => { g.flags.schoolDistrictHouse=true; g.flags.schoolAnxiety=true; return{mood:-8}; }},
+      ]},
+    { id:'extracurricular_hell', icon:'📚', title:'课外班地狱', category:'education',
+      body:'你的孩子（或你小时候）的周末：\n\n- 8:00-10:00 英语班\n- 10:30-12:00 数学思维\n- 13:00-14:30 钢琴课\n- 15:00-16:30 编程课\n- 17:00-18:30 美术班\n\n每月课外班费用：8000元\n孩子每天自由玩耍时间：0小时\n孩子的口头禅：「我好累」\n\n你问孩子：「你喜欢这些课吗？」\n孩子说：「不喜欢——但别的小朋友都在上」\n\n你不是在培养兴趣——你是在「填满时间表」。\n你害怕的不是孩子落后——是「别人家孩子在跑——你的孩子在玩」。\n\n「课外班地狱：你把孩子的童年——变成了另一个KPI。」',
+      cond: g => g.flags.hasChild && g.money >= 5000 && !g.flags.extracurricularHell,
+      choices:[
+        { label:'报满课外班不让孩子落后', hint:'-💰 -😊', fn: g => { g.flags.extracurricularHell=true; g.flags.fullSchedule=true; return{money:-8000,mood:-3}; }},
+        { label:'只选1-2个孩子真正喜欢的', hint:'+😊 +🧠', fn: g => { g.flags.extracurricularHell=true; g.flags.selectiveActivities=true; return{mood:5,intel:3}; }},
+        { label:'让孩子自己决定要不要上', hint:'+💪 +😊', fn: g => { g.flags.extracurricularHell=true; g.flags.childChoice=true; return{mood:8,charm:3}; }},
+      ]},
+    { id:'chicken_baby_parent', icon:'🐔', title:'鸡娃父母', category:'education',
+      body:'你发现自己变成了「鸡娃」父母。\n\n你的鸡娃行为：\n- 3岁：开始早教\n- 4岁：学认字+英语\n- 5岁：幼小衔接+数学思维\n- 6岁：各种兴趣班+竞赛\n- 7岁：奥数+KET/PET\n\n你的鸡娃语录：\n- 「你现在不努力以后怎么办」\n- 「别人家孩子都会了你还不会」\n- 「我这都是为了你好」\n- 「少壮不努力老大徒伤悲」\n\n直到某天——你的孩子问你：\n「爸爸/妈妈——你小时候也是这样的吗？」\n\n你愣了。因为——你小时候——最讨厌的就是被这样对待。\n\n「鸡娃父母：你在用你最讨厌的方式——教育你最爱的孩子。」',
+      cond: g => g.flags.hasChild && g.age >= 30 && !g.flags.chickenBabyParent,
+      choices:[
+        { label:'反思自己停止鸡娃', hint:'+😊 +🧠', fn: g => { g.flags.chickenBabyParent=true; g.flags.stopChickenBaby=true; return{mood:8,intel:5}; }},
+        { label:'知道不好但停不下来', hint:'-😊 +🧠', fn: g => { g.flags.chickenBabyParent=true; g.flags.cantStopChicken=true; return{mood:-5,intel:3}; }},
+        { label:'继续鸡娃因为大环境如此', hint:'-😊 -💪', fn: g => { g.flags.chickenBabyParent=true; g.flags.forcedChicken=true; return{mood:-3}; }},
+      ]},
+    { id:'tiger_mom_reflection', icon:'🐯', title:'虎妈教育回忆', category:'education',
+      body:'你突然想起了你小时候。\n\n你的妈妈（或爸爸）是这样教你的：\n- 考不到100分不许玩\n- 做错一道题打一下手心\n- 别的孩子在玩你在做题\n- 吃饭的时候听英语磁带\n- 周末从来没有自由时间\n\n当年你很恨她——现在你理解了：\n- 她是怕你「走她的老路」\n- 她觉得只有读书才能「改变命运」\n- 她不懂教育——她只知道「不读书没出路」\n\n你现在——\n- 如果成了「她」——你在重复她的方式\n- 如果不想成「她」——你在对抗整个社会\n\n「虎妈教育：她用最笨的方式——表达了最深沉的爱。」',
+      cond: g => g.age >= 25 && g.intel >= 40 && !g.flags.tigerMomReflection,
+      choices:[
+        { label:'理解父母但选择不同方式', hint:'+🧠 +😊', fn: g => { g.flags.tigerMomReflection=true; g.flags.differentParenting=true; return{intel:5,mood:5}; }},
+        { label:'开始感激当年父母的严格', hint:'+😊 +❤️', fn: g => { g.flags.tigerMomReflection=true; g.flags.gratefulStrict=true; return{mood:8,social:3}; }},
+        { label:'开始修复和父母的亲子关系', hint:'+😊 +👥', fn: g => { g.flags.tigerMomReflection=true; g.flags.repairRelationship=true; return{mood:5,social:5}; }},
+      ]},
+    { id:'credential_worship', icon:'🎓', title:'学历崇拜', category:'education',
+      body:'你发现了社会的「潜规则」：学历就是一切。\n\n学历鄙视链：\n- 清北 > 985 > 211 > 一本 > 二本 > 三本 > 专科\n- 海归 > 国内\n- 硕士 > 本科\n- 全日制 > 非全日制\n\n你投了100份简历——\n- 985学历：面试率60%\n- 二本学历：面试率10%\n\nHR的内心独白：「学历不代表能力——但我没时间一个个看能力」\n\n你的感悟：\n- 高考——不只是考试——是「阶层筛选器」\n- 学历——不只是证书——是「社会通行证」\n- 能力——很重要——但学历是「敲门砖」\n\n你不是在抱怨——你只是觉得不公平。\n\n「学历崇拜：一张纸——决定了你20年的起点——但不决定终点。」',
+      cond: g => g.age >= 22 && !g.flags.credentialWorship,
+      choices:[
+        { label:'接受现实用能力证明自己', hint:'+💪 +🧠', fn: g => { g.flags.credentialWorship=true; g.flags.proveByAbility=true; return{charm:5,intel:3}; }},
+        { label:'考研/考博提升学历', hint:'+🧠 -💰', fn: g => { g.flags.credentialWorship=true; g.flags.pursuingDegree=true; return{intel:8,money:-5000}; }},
+        { label:'觉得不公平开始焦虑', hint:'-😊 -💪', fn: g => { g.flags.credentialWorship=true; g.flags.unfairAnxiety=true; return{mood:-5}; }},
+      ]},
+    { id:'starting_line', icon:'🏁', title:'起跑线之争', category:'education',
+      body:'你在家长群里看到了这句话：\n「别人家孩子3岁就会背唐诗了，你家呢？」\n\n你的焦虑清单：\n- 别人的孩子2岁上早教\n- 别人的孩子4岁会编程\n- 别人的孩子5岁英语流利\n- 别人的孩子6岁拿奥数奖\n\n你的孩子：\n- 在公园里玩泥巴\n- 看蚂蚁搬家看了1小时\n- 画了一幅「不好看」的画\n- 说「我想当厨师」\n\n你焦虑了——但你也知道：\n- 那些「赢在起跑线」的孩子——很多在20岁就「燃尽」了\n- 起跑线很重要——但人生是「马拉松」不是「百米冲刺」\n\n「起跑线之争：不是谁跑得快——是谁能跑到最后。」',
+      cond: g => g.flags.hasChild && !g.flags.startingLine,
+      choices:[
+        { label:'让孩子按自己的节奏成长', hint:'+😊 +💪', fn: g => { g.flags.startingLine=true; g.flags.childPace=true; return{mood:8,charm:3}; }},
+        { label:'适度引导但不强迫', hint:'+🧠 +😊', fn: g => { g.flags.startingLine=true; g.flags.balancedGuide=true; return{intel:3,mood:5}; }},
+        { label:'焦虑到开始报各种班', hint:'-😊 -💰', fn: g => { g.flags.startingLine=true; g.flags.panicEnroll=true; return{mood:-5,money:-5000}; }},
+      ]},
+    { id:'education_fairness', icon:'⚖️', title:'教育公平之问', category:'education',
+      body:'你看到了一个新闻：\n「农村孩子考上清北的比例越来越低」\n\n你开始思考：\n- 城市孩子：早教+兴趣班+学区房+一对一辅导\n- 农村孩子：留守儿童+薄弱师资+无课外资源\n\n同样的高考——不同的「装备」。\n\n有人说：「高考是最公平的制度」\n有人说：「高考之前就已经不公平了」\n\n你开始理解：\n- 教育公平——不是「同一天考试」\n- 教育公平——是「同一起点准备」\n\n你无法改变制度——但你可以：\n- 如果你有能力——帮助那些资源少的孩子\n- 如果你是父母——给孩子「爱」比给「资源」更重要\n\n「教育公平：你不能选择出生——但你可以选择善良。」',
+      cond: g => g.intel >= 30 && g.age >= 22 && !g.flags.educationFairness,
+      choices:[
+        { label:'参加教育公益帮助农村孩子', hint:'+👥 +😊', fn: g => { g.flags.educationFairness=true; g.flags.eduVolunteer=true; return{social:8,mood:8}; }},
+        { label:'反思教育制度但继续生活', hint:'+🧠 -😊', fn: g => { g.flags.educationFairness=true; g.flags.systemReflection=true; return{intel:5,mood:-2}; }},
+        { label:'决定给下一代更好的条件', hint:'+💪 +🧠', fn: g => { g.flags.educationFairness=true; g.flags.betterNextGen=true; return{charm:3,intel:3}; }},
+      ]},
+    { id:'training_crash', icon:'💥', title:'教培机构暴雷', category:'education',
+      body:'你给孩子报的培训机构——跑路了。\n\n你的损失：\n- 预交学费：24000元（1年课程）\n- 机构：人去楼空\n- 维权群：200人（都没办法）\n\n你回想当初：\n- 销售：「现在报名打8折」\n- 你：「交1年能省3000」\n- 你：「这个机构口碑很好」\n- 现实：「口碑好不代表不会跑」\n\n后来国家出了「双减」政策——\n- 课外培训机构被限制\n- 学科类培训被禁止\n- 你的钱——更追不回来了\n\n你不是被机构骗了——你是被「焦虑」骗了。\n\n「教培机构暴雷：你买的不是课——是「孩子不能输」的安心感。」',
+      cond: g => g.flags.hasChild && g.money >= 10000 && !g.flags.trainingCrash,
+      choices:[
+        { label:'接受教训以后按月缴费', hint:'+🧠 +💪', fn: g => { g.flags.trainingCrash=true; g.flags.monthlyPayment=true; return{intel:5,mood:2}; }},
+        { label:'联合其他家长维权', hint:'+💪 +👥', fn: g => { g.flags.trainingCrash=true; g.flags.parentAlliance=true; return{social:5,mood:3}; }},
+        { label:'算了当交学费了', hint:'-💰 -😊', fn: g => { g.flags.trainingCrash=true; return{mood:-5,money:-24000}; }},
+      ]},
+    { id:'study_abroad_dream_v29_8', icon:'✈️', title:'留学梦', category:'education',
+      body:'你在考虑（或你父母考虑过）让你出国留学。\n\n留学的成本：\n- 学费：20-50万/年\n- 生活费：10-20万/年\n- 4年总计：120-280万\n\n留学的回报：\n- 海归光环？（正在消失）\n- 国际视野？（看个人）\n- 就业优势？（看专业和学校）\n\n你问了一个留学回来的朋友：\n「值得吗？」\n他说：「看你怎么定义值得。花了200万，工资比国内同学高2000/月。要80年才能回本。」\n\n但他说了一句让你记住的话：\n「留学最大的收获不是知识——是「一个人面对陌生世界」的能力。」\n\n「留学梦：你买的不是学历——是一段「不得不成长」的经历。」',
+      cond: g => g.age >= 18 && g.age <= 30 && g.money >= 50000 && !g.flags.studyAbroadDream,
+      choices:[
+        { label:'花钱去留学投资自己', hint:'-💰 +🧠', fn: g => { g.flags.studyAbroadDream=true; g.flags.wentAbroad=true; return{money:-80000,intel:10,charm:5}; }},
+        { label:'在国内读研性价比更高', hint:'+🧠 +💰', fn: g => { g.flags.studyAbroadDream=true; g.flags.domesticGrad=true; return{intel:5,mood:3}; }},
+        { label:'先工作攒钱以后再考虑', hint:'+💰 +🧠', fn: g => { g.flags.studyAbroadDream=true; g.flags.workFirst=true; return{money:5000,intel:2}; }},
+      ]},
+    { id:'quality_vs_exam', icon:'🤔', title:'素质教育vs应试教育', category:'education',
+      body:'你在家长会上听到两种声音：\n\n素质教育派：\n- 「孩子应该全面发展」\n- 「创造力比分数重要」\n- 「快乐童年最重要」\n- 「别把孩子变成考试机器」\n\n应试教育派：\n- 「高考看的是分数不是快乐」\n- 「素质教育是有钱人的游戏」\n- 「普通家庭只能靠分数」\n- 「没有好分数连选择的权利都没有」\n\n你发现——两边都有道理——但你只能选一边。\n\n你最终的感悟：\n- 素质教育是「理想」\n- 应试教育是「现实」\n- 最好的教育——是在现实里——尽量靠近理想\n\n「素质教育vs应试教育：不是二选一——是在夹缝中——找到平衡。」',
+      cond: g => g.flags.hasChild && g.age >= 28 && !g.flags.qualityVsExam,
+      choices:[
+        { label:'在应试框架内尽量保护孩子兴趣', hint:'+🧠 +😊', fn: g => { g.flags.qualityVsExam=true; g.flags.balancedEducation=true; return{intel:5,mood:5}; }},
+        { label:'选择国际学校走素质路线', hint:'+😊 -💰', fn: g => { g.flags.qualityVsExam=true; g.flags.internationalSchool=true; return{mood:5,money:-30000}; }},
+        { label:'全力拼分数这是唯一出路', hint:'-😊 +🧠', fn: g => { g.flags.qualityVsExam=true; g.flags.fullExamMode=true; return{mood:-3,intel:3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -17136,6 +17217,15 @@ const ACHIEVEMENTS = [
     { id:'commute_learner_ach_v29_7', icon:'🚇', name:'通勤学习者', desc:'利用通勤时间学习提升自己', check: g => g.flags.commuteLearning },
     { id:'home_mindset_ach', icon:'🏡', name:'心即是家', desc:'接受了家是一种心态不是地点', check: g => g.flags.homeIsMindset },
     { id:'solitude_lover_ach', icon:'🌙', name:'享受独处', desc:'学会了享受独居生活的自由和安静', check: g => g.flags.enjoySolitude },
+    // v29.8 achievements - 教育内卷与鸡娃焦虑
+    { id:'quality_parent_ach', icon:'🏫', name:'用心陪伴', desc:'选择普通学校但用心陪伴孩子成长', check: g => g.flags.qualityParenting },
+    { id:'selective_act_ach', icon:'📚', name:'精选教育', desc:'只给孩子报真正喜欢的课外班', check: g => g.flags.selectiveActivities },
+    { id:'stop_chicken_ach', icon:'🐔', name:'反鸡娃先锋', desc:'反思并停止了鸡娃行为', check: g => g.flags.stopChickenBaby },
+    { id:'repair_parent_ach', icon:'❤️', name:'修复关系', desc:'开始修复和父母的亲子关系', check: g => g.flags.repairRelationship },
+    { id:'prove_ability_ach', icon:'🎓', name:'实力说话', desc:'接受学历现实用能力证明自己', check: g => g.flags.proveByAbility },
+    { id:'child_pace_ach', icon:'🏁', name:'尊重节奏', desc:'让孩子按自己的节奏成长', check: g => g.flags.childPace },
+    { id:'edu_volunteer_ach', icon:'⚖️', name:'教育公平践行者', desc:'参加教育公益帮助资源少的孩子', check: g => g.flags.eduVolunteer },
+    { id:'balanced_edu_ach', icon:'🤔', name:'教育平衡术', desc:'在应试框架内尽量保护孩子兴趣', check: g => g.flags.balancedEducation },
 ];
 
 // === ENDINGS === (order matters: first match wins)
