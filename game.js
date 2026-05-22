@@ -2372,6 +2372,51 @@ const EVENTS = [
         { label:'加个微信就好', hint:'+👥', fn: g => { g.flags.mentorFound=true; return{social:5}; }},
         { label:'不太想社交', hint:'-😊', fn: g => { g.flags.mentorFound=true; return{mood:-3}; }},
       ]},
+    // === v2.38 EVENTS ===
+    { id:'ai_replacement', icon:'🤖', title:'AI来了',
+      body:'公司引进了AI工具，你的工作量减少了一半。\n\n领导说："AI是来帮你们的。"但你知道：帮你的下一步，就是替你。\n\n你开始焦虑：你的工作，5年后还存在吗？\n\n"AI不会取代所有人，但会用AI的人会取代不会用的人。"',
+      cond: g => !g.flags.aiReplacement && g.age>=25 && g.age<=45 && g.job!=='待业中' && Math.random()>0.5,
+      choices:[
+        { label:'学习AI技能', hint:'+🧠 +💰', fn: g => { g.flags.aiReplacement=true; g.flags.aiSkills=true; return{intel:12,mood:5,money:-3000}; }},
+        { label:'转行到AI替代不了的行业', hint:'+🧠 -💰', fn: g => { g.flags.aiReplacement=true; g.flags.careerChange=true; return{intel:8,mood:-5,money:-5000}; }},
+        { label:'先观望', hint:'', fn: g => { g.flags.aiReplacement=true; return{mood:-8}; }},
+        { label:'躺平接受', hint:'-🧠 +😊', fn: g => { g.flags.aiReplacement=true; g.flags.lyingFlat=true; return{intel:-5,mood:3}; }},
+      ]},
+    { id:'workplace_pua', icon:'😤', title:'职场PUA',
+      body:'你的领导开始"PUA"你：\n\n"你看看别人加班到12点，你怎么6点就走？"\n"公司给你机会是看得起你。"\n"你不满意可以走啊。"\n\n你开始怀疑：是我太矫情，还是ta太过分？\n\n"职场PUA的本质是：用道德绑架代替合理管理。"',
+      cond: g => !g.flags.workplacePUA && g.job!=='待业中' && g.age>=24 && Math.random()>0.5,
+      choices:[
+        { label:'硬刚回去', hint:'+😊 -💼', fn: g => { g.flags.workplacePUA=true; if(g.charm>=60||g.intel>=70){return{mood:15,charm:5}}else{return{mood:-10,money:-5000}} }},
+        { label:'收集证据，准备仲裁', hint:'+🧠 +💰', fn: g => { g.flags.workplacePUA=true; g.flags.laborRights=true; return{intel:5,mood:5,money:10000}; }},
+        { label:'忍气吞声', hint:'-😊 -❤️', fn: g => { g.flags.workplacePUA=true; return{mood:-15,health:-10}; }},
+        { label:'跳槽', hint:'+😊 +💰', fn: g => { g.flags.workplacePUA=true; g.jobSalary=Math.floor(g.jobSalary*1.2); return{mood:10,money:5000}; }},
+      ]},
+    { id:'year_end_review', icon:'📊', title:'年终总结',
+      body:'又到年底了。你打开日记/朋友圈，回顾这一年：\n\n- 赚了多少？\n- 成长了多少？\n- 快乐有多少？\n\n"年终总结不是给领导看的PPT，是给自己的成绩单。"',
+      cond: g => !g.flags.yearEndReview && g.month===12 && g.months>=12 && Math.random()>0.4,
+      choices:[
+        { label:'认真写总结', hint:'+🧠 +😊', fn: g => { g.flags.yearEndReview=true; return{intel:5,mood:8}; }},
+        { label:'发条朋友圈', hint:'+👥 +✨', fn: g => { g.flags.yearEndReview=true; return{social:5,charm:3,mood:5}; }},
+        { label:'算了，没什么好总结的', hint:'-😊', fn: g => { g.flags.yearEndReview=true; return{mood:-5}; }},
+      ]},
+    { id:'roommate_conflict', icon:'🏠', title:'室友矛盾',
+      body:'你和室友闹矛盾了：\n\n- ta总是很晚回家，吵醒你\n- 公共卫生从来不打扫\n- 带朋友回家不提前说\n\n你开始思考：是沟通，是忍耐，还是搬走？\n\n"室友关系是大城市最微妙的社交——你们共享空间，但不共享生活。"',
+      cond: g => !g.flags.hasHouse && !g.flags.roommateConflict && g.months>=6 && Math.random()>0.6,
+      choices:[
+        { label:'坐下来好好谈', hint:'+👥 +😊', fn: g => { g.flags.roommateConflict=true; if(g.charm>=55){return{social:8,mood:10}}else{return{social:-5,mood:-5}} }},
+        { label:'忍着，多一事不如少一事', hint:'-😊', fn: g => { g.flags.roommateConflict=true; return{mood:-10}; }},
+        { label:'搬走', hint:'-💰 +😊', fn: g => { g.flags.roommateConflict=true; g.flags.movedHouse=true; return{money:-3000,mood:8}; }},
+        { label:'发微信说清楚', hint:'+🧠', fn: g => { g.flags.roommateConflict=true; return{intel:3,mood:3,social:3}; }},
+      ]},
+    { id:'dating_app', icon:'💘', title:'交友软件',
+      body:'朋友推荐你下载了一个交友App。\n\n你左滑右滑，匹配了20个人，聊了5个，见面了1个。\n\n见面后你发现：照片和真人差距有点大，聊天和现实差距更大。\n\n"交友App让选择变多了，但让心动变难了。"',
+      cond: g => !g.flags.datingApp && !g.flags.married && g.age>=24 && g.age<=40 && Math.random()>0.5,
+      choices:[
+        { label:'继续用，扩大社交圈', hint:'+👥 +✨', fn: g => { g.flags.datingApp=true; g.relationships.partner = clamp((g.relationships.partner||20)+10,0,100); return{social:8,charm:5,mood:5}; }},
+        { label:'线下认识更靠谱', hint:'+👥', fn: g => { g.flags.datingApp=true; return{social:5,mood:3}; }},
+        { label:'算了，单身也挺好', hint:'+😊 +🧠', fn: g => { g.flags.datingApp=true; g.flags.singleHappy=true; return{mood:8,intel:3}; }},
+        { label:'充VIP看看', hint:'-💰 +👥', fn: g => { g.flags.datingApp=true; return{money:-299,social:10,mood:5}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -2507,6 +2552,12 @@ const ACHIEVEMENTS = [
     { id:'investor', icon:'📊', name:'投资者', desc:'尝试了理财投资', check: g => g.flags.investmentAdvice },
     { id:'mentee', icon:'👨‍🏫', name:'得到指点', desc:'遇到了职业导师', check: g => g.flags.mentorFound },
     { id:'freelance_win', icon:'🌟', name:'自由职业成功', desc:'自由职业获得成功', check: g => g.flags.freelanceSuccess },
+    // v2.38 achievements
+    { id:'ai_learner', icon:'🤖', name:'AI学习者', desc:'学习了AI技能', check: g => g.flags.aiSkills },
+    { id:'pua_resister', icon:'⚔️', name:'反PUA战士', desc:'勇敢反抗职场PUA', check: g => g.flags.workplacePUA && (g.flags.laborRights || g.charm>=65) },
+    { id:'year_reviewer', icon:'📊', name:'年终总结', desc:'认真回顾了自己的这一年', check: g => g.flags.yearEndReview },
+    { id:'conflict_resolver', icon:'🤝', name:'矛盾调解员', desc:'成功解决了室友矛盾', check: g => g.flags.roommateConflict && g.social>=55 },
+    { id:'dating_explorer', icon:'💘', name:'交友探索者', desc:'尝试了交友软件', check: g => g.flags.datingApp },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -2587,6 +2638,10 @@ const ENDINGS = [
     { id:'freelance_master', badge:'🌟', title:'自由职业大师', desc:'你成功转型为自由职业者。\n\n你有稳定的客户，有灵活的时间，有不错的收入。\n\n你不再需要打卡，不需要开无聊的会，不需要看老板脸色。\n\n"自由职业不是逃避工作，是选择了另一种工作方式。"', cond: g => g.flags.freelanceSuccess && g.money>=80000 && g.intel>=70 && g.mood>=65 && g.age>=30 },
     { id:'wise_investor', badge:'📈', title:'投资高手', desc:'你学会了投资的智慧。\n\n你没有暴富，但你的资产在稳步增长。你不再追涨杀跌，不再被市场情绪左右。\n\n"投资不是赌博，是用时间换取复利。"', cond: g => g.flags.investmentAdvice && g.money>=300000 && g.intel>=75 && g.age>=35 },
     { id:'mentored_success', badge:'🎓', title:'薪火相传', desc:'你遇到了贵人，也得到了贵人的指点。\n\n你从一个迷茫的年轻人，变成了一个有方向的职业人。\n\n现在，你开始指导比你更年轻的人。\n\n"最好的报答，是把得到的帮助传递下去。"', cond: g => g.flags.mentorFound && g.jobSalary>=20000 && g.social>=70 && g.intel>=75 && g.age>=32 },
+    // --- v2.38 ENDINGS ---
+    { id:'ai_pioneer', badge:'🤖', title:'AI先驱者', desc:'你没有被AI淘汰，反而成为了AI时代的主角。\n\n你学会了用AI工具，你的效率翻倍，你的竞争力增强。\n\n"未来不是AI的，是会用AI的人的。"', cond: g => g.flags.aiSkills && g.intel>=80 && g.jobSalary>=20000 && g.money>=100000 && g.age>=30 },
+    { id:'labor_hero', badge:'⚖️', title:'劳动权益捍卫者', desc:'你勇敢站出来，维护了自己的劳动权益。\n\n你拿到了应得的赔偿，你也帮助了其他人。\n\n"维权不是为了钱，是为了尊严。"', cond: g => g.flags.laborRights && g.money>=50000 && g.intel>=70 && g.social>=60 && g.age>=28 },
+    { id:'happy_single', badge:'💝', title:'快乐单身族', desc:'你没有结婚，没有恋爱，但你活得很快乐。\n\n你有自己的爱好，有自己的朋友，有自己的节奏。\n\n"单身不是失败，是选择了另一种幸福。"', cond: g => g.flags.singleHappy && !g.flags.married && g.mood>=75 && g.social>=60 && g.charm>=60 && g.age>=32 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
@@ -3217,11 +3272,11 @@ function getReplaySuggestions(endingId) {
 
 function getEndingRarity(endingId) {
     // Legendary (rare endings that require specific conditions)
-    const legendary = ['fire', 'immigration', 'executive', 'retire_abroad', 'wealthy', 'family_first', 'burnout_recovery', 'digital_nomad_senior', 'social_influencer_end', 'phoenix_rising', 'workplace_legend'];
+    const legendary = ['fire', 'immigration', 'executive', 'retire_abroad', 'wealthy', 'family_first', 'burnout_recovery', 'digital_nomad_senior', 'social_influencer_end', 'phoenix_rising', 'workplace_legend', 'ai_pioneer'];
     // Rare (hard to achieve)
-    const rare = ['settled', 'startup_end', 'influencer_end', 'digital_nomad', 'karoshi', 'jail', 'social_butterfly_end', 'health_guru', 'side_hustle_king', 'kaogong_success', 'mentor_end', 'community_builder', 'career_pivot', 'anti_fraud_hero', 'relationship_guru', 'comeback_kid', 'health_warrior', 'freelance_master'];
+    const rare = ['settled', 'startup_end', 'influencer_end', 'digital_nomad', 'karoshi', 'jail', 'social_butterfly_end', 'health_guru', 'side_hustle_king', 'kaogong_success', 'mentor_end', 'community_builder', 'career_pivot', 'anti_fraud_hero', 'relationship_guru', 'comeback_kid', 'health_warrior', 'freelance_master', 'labor_hero'];
     // Uncommon (moderately difficult)
-    const uncommon = ['hometown_hero', 'go_home', 'civil_end', 'ordinary', 'single', 'investment_guru', 'lying_flat_end', 'lonely_death', 'estranged', 'pet_parent', 'mortgage_default_end', 'kong_yiji_end', 'full_time_child_end', 'minimalist_life', 'slow_life', 'scam_victim', 'sandwich_generation', 'lonely_achiever', 'wanderer', 'slow_life_master', 'weather_survivor', 'content_king', 'balanced_life', 'side_hustle_success', 'wise_investor', 'mentored_success'];
+    const uncommon = ['hometown_hero', 'go_home', 'civil_end', 'ordinary', 'single', 'investment_guru', 'lying_flat_end', 'lonely_death', 'estranged', 'pet_parent', 'mortgage_default_end', 'kong_yiji_end', 'full_time_child_end', 'minimalist_life', 'slow_life', 'scam_victim', 'sandwich_generation', 'lonely_achiever', 'wanderer', 'slow_life_master', 'weather_survivor', 'content_king', 'balanced_life', 'side_hustle_success', 'wise_investor', 'mentored_success', 'happy_single'];
 
     if (legendary.includes(endingId)) return 'legendary';
     if (rare.includes(endingId)) return 'rare';
@@ -3405,7 +3460,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.37' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.38' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
