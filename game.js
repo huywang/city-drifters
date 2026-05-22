@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v33.2
+// 都市浮生记 - Game Engine v33.3
 // ============================================
 
 // === GAME STATE ===
@@ -18611,6 +18611,98 @@ const EVENTS = [
         { label:'跟朋友讨论了很久这个话题', hint:'+🧠 +👥', fn: g => { g.flags.genderStereotype=true; return{intel:5,social:3}; }},
         { label:'决定不给自己的孩子贴性别标签', hint:'+🧠 +😊', fn: g => { g.flags.genderStereotype=true; g.flags.noLabels=true; return{intel:5,mood:5}; }},
       ]},
+
+    // === v33.3 城市里的焦虑 ===
+    { id:'first_therapy_v33_3', icon:'🛋️', title:'第一次看心理咨询', category:'anxiety',
+      body:'你终于预约了心理咨询师。\n\n走进咨询室的时候，你的心跳加速。你躺在沙发上，盯着天花板，不知道该说什么。\n\n咨询师问：「你今天想聊些什么？」\n\n你沉默了很久，然后说：「我不知道。我只是觉得……很累。」\n\n一个小时后你走出来，眼睛有点红。你说不上来哪里变了，但你第一次觉得：承认自己不好，也没那么可怕。\n\n你在备忘录里写下咨询师的一句话：「你不需要一直很好。」',
+      cond: g => g.age >= 20 && g.mood < 50,
+      choices:[
+        { label:'哭了一场，感觉轻松了很多', hint:'+😊 +🧠', fn: g => { g.flags.firstTherapy=true; return{mood:10,intel:5}; }},
+        { label:'决定继续每周去一次', hint:'-💰 +😊', fn: g => { g.flags.firstTherapy=true; g.flags.regularTherapy=true; g.money-=800; return{mood:8,health:3}; }},
+        { label:'觉得说出来比憋着好', hint:'+😊 +👥', fn: g => { g.flags.firstTherapy=true; return{mood:5,social:3}; }},
+      ]},
+
+    { id:'burnout_v33_3', icon:'🔥', title:'职业倦怠', category:'anxiety',
+      body:'你已经连续加班两个月了。\n\n每天早上闹钟响了，你躺在床上想：「如果今天公司倒闭了该多好。」然后你觉得自己有这个想法很可怕。\n\n你打开电脑，盯着屏幕发呆。你的同事问你：「怎么了？」你说：「没事，就是突然不想干了。」\n\n你上网搜了一下「职业倦怠」，发现自己中了所有症状：情绪耗竭、去人格化、成就感降低。\n\n你想起了刚入职时的热情，觉得那个自己好像已经是另一个人了。\n\n你在招聘网站上更新了简历，但又没有投出去。你不是想换工作，你只是……累了。',
+      cond: g => g.age >= 22 && g.jobSalary > 0 && g.months >= 12,
+      choices:[
+        { label:'请了年假休息了一周', hint:'+😊 +💪', fn: g => { g.flags.burnout=true; return{mood:10,health:5}; }},
+        { label:'开始找新工作', hint:'+🧠 +😊', fn: g => { g.flags.burnout=true; g.flags.lookingForJob=true; return{intel:5,mood:3}; }},
+        { label:'觉得再撑撑就好了', hint:'-😊 -💪', fn: g => { g.flags.burnout=true; g.flags.enduredBurnout=true; return{mood:-5,health:-3}; }},
+      ]},
+
+    { id:'anxiety_attack_v33_3', icon:'😰', title:'焦虑发作', category:'anxiety',
+      body:'你正在地铁上，突然心跳加速，手心出汗，呼吸困难。\n\n你觉得地铁要窒息了。你拼命地想：「下一站就下车。」\n\n你冲出了地铁，蹲在站台的角落里。你告诉自己：「没事的，没事的。」但你控制不了自己的身体。\n\n十分钟后，你慢慢平静下来了。你查了一下，这叫「焦虑发作」或者「惊恐发作」。\n\n你突然理解了那些说「我焦虑到无法呼吸」的人——他们不是在夸张，是真的无法呼吸。\n\n你开始认真考虑去看心理医生。',
+      cond: g => g.age >= 18 && g.mood < 40,
+      choices:[
+        { label:'预约了心理科门诊', hint:'+🧠 +😊', fn: g => { g.flags.anxietyAttack=true; return{intel:5,mood:3}; }},
+        { label:'开始学习呼吸放松技巧', hint:'+💪 +🧠', fn: g => { g.flags.anxietyAttack=true; g.flags.learnedBreathing=true; return{health:5,intel:3}; }},
+        { label:'第一次真正理解了「焦虑症」', hint:'+🧠', fn: g => { g.flags.anxietyAttack=true; return{intel:8}; }},
+      ]},
+
+    { id:'insomnia_cure_v33_3', icon:'🌙', title:'失眠治疗', category:'anxiety',
+      body:'你已经失眠三个月了。\n\n每天晚上躺在床上，脑子里像放电影一样：工作上的事、人际关系、明天的计划、五年前的尴尬瞬间……\n\n你试过喝牛奶、泡脚、听白噪音、数羊。你下载了五个助眠App，买了三千块的枕头。\n\n你去了医院，医生说：「你这是焦虑性失眠。吃药可以缓解，但根本原因还是压力太大。」\n\n你拿了药，犹豫了很久。你怕依赖药物，但你更怕每天晚上数到三千只羊还是清醒着。\n\n你决定先吃药试试，同时开始调整生活节奏。',
+      cond: g => g.age >= 22 && g.health < 50,
+      choices:[
+        { label:'开始吃安眠药', hint:'+😊 -💪', fn: g => { g.flags.insomniaCure=true; g.flags.takingSleepMeds=true; return{mood:5,health:-2}; }},
+        { label:'开始每天运动来改善睡眠', hint:'+💪 +😊', fn: g => { g.flags.insomniaCure=true; g.flags.exerciseForSleep=true; return{health:8,mood:5}; }},
+        { label:'学了正念冥想来帮助入睡', hint:'+🧠 +😊', fn: g => { g.flags.insomniaCure=true; g.flags.mindfulness=true; return{intel:5,mood:5}; }},
+      ]},
+
+    { id:'social_anxiety_v33_3', icon:'🫥', title:'社交恐惧', category:'anxiety',
+      body:'公司要搞团建，你的第一反应不是开心，而是恐惧。\n\n你要跟一群不太熟的同事吃饭、玩游戏、聊天。光是想想就已经让你精疲力尽了。\n\n你开始找借口：「那天我有事。」但你又觉得自己这样不对——别人都能正常社交，为什么你不行？\n\n你在网上看到一个帖子：「社恐不是性格内向，是对社交场合有强烈的恐惧和回避。」你疯狂点头。\n\n你决定去参加团建，但给自己定了一个规则：可以提前离开，不用待到最后。\n\n到了现场，你发现自己比想象中好一些。虽然还是很累，但你没有逃。',
+      cond: g => g.age >= 20 && g.social < 40,
+      choices:[
+        { label:'参加了但提前离开了', hint:'+😊 +👥', fn: g => { g.flags.socialAnxiety=true; return{mood:3,social:3}; }},
+        { label:'硬撑到了最后', hint:'+👥 -😊', fn: g => { g.flags.socialAnxiety=true; g.flags.pushedThrough=true; return{social:5,mood:-3}; }},
+        { label:'决定接受自己的性格', hint:'+🧠 +😊', fn: g => { g.flags.socialAnxiety=true; g.flags.selfAcceptance=true; return{intel:5,mood:5}; }},
+      ]},
+
+    { id:'antidepressant_v33_3', icon:'💊', title:'抗抑郁药', category:'anxiety',
+      body:'医生给你开了抗抑郁药。\n\n你拿着处方站在药房门口，犹豫了很久。你想起网上有人说：「抗抑郁药就是让人变成没有感情的机器。」\n\n但你也知道，抑郁症不是「想开点」就能好的。就像糖尿病需要胰岛素一样，抑郁症有时候也需要药物。\n\n你拿了药，按照医嘱每天吃。前两周你头晕、恶心、嗜睡。你差点放弃了。\n\n但到了第四周，你突然发现自己早上醒来的时候不再觉得世界是灰色的了。你没有变开心，但你不再那么痛苦了。\n\n你觉得自己做了一个正确的决定。',
+      cond: g => g.age >= 22 && g.mood < 30,
+      choices:[
+        { label:'坚持吃药，情况慢慢好转', hint:'+😊 +💪', fn: g => { g.flags.antidepressant=true; return{mood:10,health:3}; }},
+        { label:'吃药的同时开始运动', hint:'+💪 +😊', fn: g => { g.flags.antidepressant=true; g.flags.exerciseForMood=true; return{health:5,mood:8}; }},
+        { label:'开始记录每天的情绪变化', hint:'+🧠 +😊', fn: g => { g.flags.antidepressant=true; g.flags.moodJournal=true; return{intel:5,mood:5}; }},
+      ]},
+
+    { id:'meditation_app_v33_3', icon:'🧘', title:'冥想App', category:'anxiety',
+      body:'你下载了一个冥想App。\n\n第一天的引导是：「闭上眼睛，关注你的呼吸。」\n\n你闭上眼睛，两秒钟后脑子里出现了：「晚饭吃什么？」「明天的PPT还没做完。」「上次开会我说了句蠢话。」\n\n你发现自己根本静不下来。你的脑子里像有一百个标签页同时打开。\n\n但你坚持了下来。每天十分钟，坚持了一个月。\n\n你不确定自己是否变得更「平静」了，但你学会了一件事：当焦虑来临的时候，不要对抗它，只是观察它。\n\n你把这个方法推荐给了三个朋友。',
+      cond: g => g.age >= 20 && g.intel > 40,
+      choices:[
+        { label:'坚持冥想了一个月', hint:'+😊 +🧠', fn: g => { g.flags.meditationApp=true; g.flags.meditationHabit=true; return{mood:8,intel:5}; }},
+        { label:'试了一周就放弃了', hint:'-😊', fn: g => { g.flags.meditationApp=true; return{mood:-3}; }},
+        { label:'把冥想推荐给了朋友', hint:'+👥 +😊', fn: g => { g.flags.meditationApp=true; return{social:5,mood:3}; }},
+      ]},
+
+    { id:'midlife_crisis_v33_3', icon:'🔄', title:'中年危机', category:'anxiety',
+      body:'你三十五岁了。\n\n你坐在车里，没有马上回家。你在想：我这辈子就这样了吗？\n\n你的同学有的当了高管，有的创了业，有的买了第二套房。而你，还在还房贷，还在挤地铁，还在为孩子的学区发愁。\n\n你照镜子，发现自己开始掉头发、长肚子、熬夜后两天才能恢复。你突然很想买一辆跑车，虽然你根本买不起。\n\n你跟老婆说了你的感受。她说：「你已经很好了。不要跟别人比。」\n\n你知道她说得对，但你还是忍不住想：如果当初做了不同的选择，现在会不会不一样？',
+      cond: g => g.age >= 35 && g.money < 200000,
+      choices:[
+        { label:'开始健身，试图找回年轻的感觉', hint:'+💪 -💰', fn: g => { g.flags.midlifeCrisis=true; g.flags.startedGym=true; g.money-=2000; return{health:8,mood:3}; }},
+        { label:'跟老婆认真谈了未来规划', hint:'+👥 +🧠', fn: g => { g.flags.midlifeCrisis=true; return{social:8,intel:5}; }},
+        { label:'决定接受自己是个普通人', hint:'+😊 +🧠', fn: g => { g.flags.midlifeCrisis=true; g.flags.acceptedOrdinary=true; return{mood:10,intel:5}; }},
+      ]},
+
+    { id:'peer_pressure_v33_3', icon:'📱', title:'同辈压力', category:'anxiety',
+      body:'你刷朋友圈，看到了这些：\n\n同学A：刚升了总监\n同学B：买了学区房\n同学C：出国旅行了\n同学D：孩子考上了重点小学\n\n你放下手机，觉得自己一事无成。\n\n你知道朋友圈都是精挑细选的「高光时刻」，每个人的生活都有你不看到的一地鸡毛。但理性归理性，你还是忍不住比较。\n\n你发了一个状态：「今天天气真好。」收到了二十个赞。你觉得这比看到别人的成功更让你舒服——至少天气对每个人都是公平的。',
+      cond: g => g.age >= 25 && g.social > 20,
+      choices:[
+        { label:'卸载了朋友圈一周', hint:'+😊 +🧠', fn: g => { g.flags.peerPressure=true; g.flags.uninstalledMoments=true; return{mood:8,intel:5}; }},
+        { label:'跟朋友聊了聊各自的真实生活', hint:'+👥 +😊', fn: g => { g.flags.peerPressure=true; return{social:8,mood:5}; }},
+        { label:'决定专注于自己的节奏', hint:'+🧠 +😊', fn: g => { g.flags.peerPressure=true; g.flags.ownPace=true; return{intel:8,mood:5}; }},
+      ]},
+
+    { id:'digital_detox_v33_3', icon:'📵', title:'数字排毒', category:'anxiety',
+      body:'你做了一个实验：周末不看手机。\n\n周六早上你醒来，习惯性地伸手摸手机——摸了个空。你把手机锁在了抽屉里。\n\n前两个小时你坐立不安，总觉得有人找你。你检查了三次抽屉，确认手机还在。\n\n下午你出门散步，没有导航，没有音乐。你听到了鸟叫、风声、邻居吵架的声音。你发现自己已经很久没有「真正听到」过这些声音了。\n\n周日晚上你打开手机，发现有47条未读消息。你一条一条看，发现没有一条是真正紧急的。\n\n你觉得这个世界并没有因为你消失两天就崩塌。也许你不需要一直在线。',
+      cond: g => g.age >= 20 && g.mood < 60,
+      choices:[
+        { label:'成功坚持了一个周末不看手机', hint:'+😊 +🧠', fn: g => { g.flags.digitalDetox=true; return{mood:10,intel:5}; }},
+        { label:'坚持了半天就放弃了', hint:'-😊', fn: g => { g.flags.digitalDetox=true; g.flags.detoxFailed=true; return{mood:-3}; }},
+        { label:'决定每周给自己一天数字断联日', hint:'+😊 +💪', fn: g => { g.flags.digitalDetox=true; g.flags.weeklyDetox=true; return{mood:8,health:3}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -20396,6 +20488,18 @@ const ACHIEVEMENTS = [
     { id:'period_pain_ach', icon:'🩸', name:'月经假倡议', desc:'为女性健康权益发声', check: g => g.flags.periodPain },
     { id:'stay_home_dad_v33_2_ach', icon:'👶', name:'全职爸爸', desc:'认识了勇敢的全职爸爸', check: g => g.flags.stayHomeDad },
     { id:'gender_stereotype_ach', icon:'🏷️', name:'撕掉标签', desc:'拒绝被性别刻板印象定义', check: g => g.flags.genderStereotype },
+
+    // --- v33.3 城市里的焦虑成就 ---
+    { id:'first_therapy_ach', icon:'🛋️', name:'勇敢的第一步', desc:'第一次走进心理咨询室', check: g => g.flags.firstTherapy },
+    { id:'burnout_ach', icon:'🔥', name:'燃尽了', desc:'经历了严重的职业倦怠', check: g => g.flags.burnout },
+    { id:'anxiety_attack_ach', icon:'😰', name:'无法呼吸', desc:'经历了第一次焦虑发作', check: g => g.flags.anxietyAttack },
+    { id:'insomnia_cure_ach', icon:'🌙', name:'终于睡着了', desc:'找到了治疗失眠的方法', check: g => g.flags.insomniaCure },
+    { id:'social_anxiety_v33_3_ach', icon:'🫥', name:'社恐日常', desc:'直面了社交恐惧', check: g => g.flags.socialAnxiety },
+    { id:'antidepressant_ach', icon:'💊', name:'接受帮助', desc:'开始服用抗抑郁药', check: g => g.flags.antidepressant },
+    { id:'meditation_app_ach', icon:'🧘', name:'十分钟平静', desc:'尝试了冥想练习', check: g => g.flags.meditationApp },
+    { id:'midlife_crisis_ach', icon:'🔄', name:'中年觉醒', desc:'面对了中年危机', check: g => g.flags.midlifeCrisis },
+    { id:'peer_pressure_ach', icon:'📱', name:'朋友圈焦虑', desc:'感受到了同辈压力的荒诞', check: g => g.flags.peerPressure },
+    { id:'digital_detox_v33_3_ach', icon:'📵', name:'数字断联', desc:'成功完成了一次数字排毒', check: g => g.flags.digitalDetox },
 ];
 
 // === ENDINGS === (order matters: first match wins)
