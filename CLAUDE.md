@@ -27,7 +27,7 @@ npx serve .
 |------|------|------|
 | `index.html` | ~60行 | 页面结构、屏幕容器、无障碍标记 |
 | `style.css` | ~1450行 | 主题（深色/浅色）、响应式、动画、无障碍样式 |
-| `game.js` | ~8200行 | 全部游戏逻辑，单文件 |
+| `game.js` | ~8600行 | 全部游戏逻辑，单文件 |
 
 ### game.js 内部结构（按代码顺序）
 
@@ -36,9 +36,9 @@ npx serve .
    - `BACKGROUNDS` — 出身背景定义（含隐藏出身）
    - `CITIES` — 6个城市及其专属事件（北京/上海/深圳/杭州/广州/成都）
    - `SURPRISE_EVENTS` — 64个突发事件
-   - `EVENTS` — 578个生活事件数组
-   - `ACHIEVEMENTS` — 384个成就
-   - `ENDINGS` — 112种结局（顺序有优先级，first match wins）
+   - `EVENTS` — 592个生活事件数组
+   - `ACHIEVEMENTS` — 392个成就
+   - `ENDINGS` — 114种结局（顺序有优先级，first match wins）
    - `TRADE_GOODS` — 8种倒卖商品
    - `RUMOR_POOL` — 24条情报/谣言
    - `DAILY_MODIFIERS` — 10种每日运势修正
