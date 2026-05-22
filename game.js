@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v29.2
+// 都市浮生记 - Game Engine v29.3
 // ============================================
 
 // === GAME STATE ===
@@ -15308,6 +15308,87 @@ const EVENTS = [
         { label:'和家人认真讨论了这个话题', hint:'+❤️ +🧠', fn: g => { g.flags.livingWill=true; g.flags.discussedEndOfLife=true; return{social:5,intel:5}; }},
         { label:'觉得太早了以后再说', hint:'+😊 -🧠', fn: g => { g.flags.livingWill=true; return{mood:2}; }},
       ]},
+    // === v29.3: 县城回流 + 小城生活 + 逃离北上广 ===
+    { id:'escape_tier1_city', icon:'🏃', title:'逃离北上广', category:'career',
+      body:'你决定离开北京/上海/深圳了。\n\n你的理由：\n- 房租：5000元/月 → 回老家只要800元\n- 通勤：每天2小时 → 骑电动车10分钟\n- 加班：996 → 朝九晚五\n- 空气：PM2.5 → 蓝天白云\n\n你的行李：\n- 5年的衣服\n- 一台电脑\n- 一个「我受够了」的决心\n\n火车开动的那一刻——\n你看着窗外的高楼——渐渐变小——\n变成了田野——变成了山——变成了你的家乡。\n\n你开始理解：逃离北上广——不是「放弃」——是「选择另一种活法」。\n\n大城市给了你「机会」——但也拿走了你的「生活」。\n\n你不是在「逃跑」——你是在「回家」。\n\n「逃离北上广：你不是在离开大城市——你是在「回到你自己」。」',
+      cond: g => g.age >= 26 && !g.flags.escapedTier1 && g.jobSalary > 0,
+      choices:[
+        { label:'回到了老家开始了新生活', hint:'+😊 +❤️ -💰', fn: g => { g.flags.escapedTier1=true; g.flags.returnedHometown=true; setJob(g, '小城打工人', Math.floor(g.jobSalary * 0.5)); return{mood:10,social:5,health:5}; }},
+        { label:'去了二线城市折中一下', hint:'+🧠 +😊', fn: g => { g.flags.escapedTier1=true; g.flags.wentTier2=true; setJob(g, '二线城市职员', Math.floor(g.jobSalary * 0.7)); return{mood:5,intel:3}; }},
+        { label:'想了想还是不敢走', hint:'-😊 +🧠', fn: g => { g.flags.escapedTier1=true; return{mood:-5,intel:3}; }},
+      ]},
+    { id:'hometown_life_cost', icon:'🏠', title:'小城的物价', category:'finance',
+      body:'你回到老家——发现物价真的很低。\n\n你的月支出对比：\n\n大城市 → 小城：\n- 房租：5000 → 800（住家里免费）\n- 餐饮：2000 → 800\n- 交通：500 → 50（电动车）\n- 社交：1000 → 300\n- 总计：8500 → 1950\n\n你每月省了：6550元\n\n但你的收入：\n- 大城市：12000元 → 净存3500\n- 小城：5000元 → 净存3050\n\n你发现：\n- 虽然「省得多」——但「存得少」\n- 小城的「天花板」也很低\n- 升职空间有限\n- 跳槽选择几乎没有\n\n你开始理解：小城生活——不是「便宜」——是「另一种贵的」。\n\n你省了「钱」——但花了「机会」。\n\n「小城物价：你以为你在省钱——其实你在「用未来的收入上限——换现在的生活成本」。」',
+      cond: g => g.flags.returnedHometown && !g.flags.hometownCost,
+      choices:[
+        { label:'享受低成本生活开始存钱', hint:'+💰 +😊', fn: g => { g.flags.hometownCost=true; g.money += 5000; return{mood:5,intel:3}; }},
+        { label:'开始利用小城优势做副业', hint:'+💰 +✨', fn: g => { g.flags.hometownCost=true; g.flags.hometownSideHustle=true; g.money += 3000; return{intel:5,charm:3}; }},
+        { label:'觉得收入太低开始焦虑', hint:'-😊 +🧠', fn: g => { g.flags.hometownCost=true; return{mood:-5,intel:3}; }},
+      ]},
+    { id:'civil_service_exam_v29_3', icon:'📋', title:'考公上岸', category:'career',
+      body:'你决定考公务员了。\n\n你的准备：\n- 买了一套教材：500元\n- 报了网课：3000元\n- 每天学习：6小时\n- 准备了：6个月\n\n考试结果：\n- 笔试：第3名\n- 面试：第2名\n- 综合排名：第2名\n- 招录人数：1人\n\n你差1名——没上岸。\n\n你的选择：\n- 再考一年\n- 考事业单位\n- 放弃去企业\n\n你开始理解：考公——不是「铁饭碗」——是「千军万马过独木桥」。\n\n你准备了6个月——别人准备了2年。\n\n你不是「不够努力」——是「竞争太激烈」。\n\n报录比：200:1。\n\n「考公上岸：你以为你在「追求稳定」——其实你在参加一场「比高考还残酷」的考试。」',
+      cond: g => g.flags.returnedHometown && !g.flags.civilServiceExam && g.age <= 35 && g.intel >= 25,
+      choices:[
+        { label:'再考一年，这次上岸了', hint:'+🧠 +✨', fn: g => { g.flags.civilServiceExam=true; g.flags.passedCivilService=true; setJob(g, '公务员', 5500); g.reputation.career += 5; return{intel:5,charm:5,mood:8}; }},
+        { label:'考上了事业单位', hint:'+🧠 +💰', fn: g => { g.flags.civilServiceExam=true; setJob(g, '事业单位职员', 4500); return{intel:3,mood:5}; }},
+        { label:'放弃了，去企业上班', hint:'+💰 -😊', fn: g => { g.flags.civilServiceExam=true; setJob(g, '小城企业职员', 4000); return{mood:-3,money:2000}; }},
+      ]},
+    { id:'hometown_social_rebuild', icon:'👥', title:'重建社交圈', category:'social',
+      body:'你回到老家——发现你的社交圈需要重建。\n\n你的「老朋友」：\n- 小李：结婚了，有孩子了，不出来了\n- 小王：去了大城市，过年才回来\n- 小张：开了个店，忙得很\n- 小陈：……你联系不上了\n\n你的「新朋友」：\n- 同事：都是本地人，聊的话题你插不上\n- 邻居：大爷大妈，问你有没有对象\n- 相亲对象：你妈介绍的\n\n你开始理解：回到老家——不是「回到过去」——是「发现过去已经不存在了」。\n\n你的「老朋友们」——已经不在「原来的位置」了。\n\n你需要「重新找到你的位置」——在一个「你已经不熟悉」的地方。\n\n「重建社交：你不是在「回到老家」——你是在「在一个陌生的熟悉地方——重新开始」。」',
+      cond: g => g.flags.returnedHometown && !g.flags.socialRebuild,
+      choices:[
+        { label:'主动联系老朋友重新建立联系', hint:'+👥 +❤️', fn: g => { g.flags.socialRebuild=true; g.flags.reconnectedFriends=true; return{social:8,mood:5}; }},
+        { label:'加入了本地的兴趣社群', hint:'+👥 +✨', fn: g => { g.flags.socialRebuild=true; g.flags.localCommunity=true; return{social:5,charm:5}; }},
+        { label:'觉得小城社交太无聊了', hint:'-😊 -👥', fn: g => { g.flags.socialRebuild=true; return{mood:-5,social:-3}; }},
+      ]},
+    { id:'guanxi_culture_v29_3', icon:'🤝', title:'小城的人情世故', category:'social',
+      body:'你回到老家——发现一切都靠「关系」。\n\n你的体验：\n- 看病：需要找人才能挂专家号\n- 孩子上学：需要找人才能进好学校\n- 办手续：需要找人才能快点\n- 找工作：需要找人才能进去\n\n你在大城市习惯了「按规则办事」\n\n但在小城——规则是「有关系的先办」。\n\n你的内心：\n- 「凭什么？我排队了2小时！」\n- 「他认识人就插队？」\n- 「这也太不公平了」\n\n你爸说：「这就是小城的规矩——你得适应。」\n\n你开始理解：小城人情世故——不是「落后」——是「另一种秩序」。\n\n大城市靠「规则」——小城靠「关系」。\n\n你不是在「批判」——你是在「重新学习一套你曾经熟悉的规则」。\n\n「人情世故：你以为你在「回到文明之外」——其实你在「回到另一种文明之中」。」',
+      cond: g => g.flags.returnedHometown && !g.flags.guanxiCulture,
+      choices:[
+        { label:'开始学习小城的社交规则', hint:'+🧠 +👥', fn: g => { g.flags.guanxiCulture=true; g.flags.learnedGuanxi=true; return{intel:5,social:5,charm:3}; }},
+        { label:'坚持按规则办事被排挤了', hint:'+✨ -👥', fn: g => { g.flags.guanxiCulture=true; return{charm:3,social:-5}; }},
+        { label:'利用大城市的经验做了改良', hint:'+🧠 +✨', fn: g => { g.flags.guanxiCulture=true; g.flags.modernizedGuanxi=true; return{intel:5,charm:5}; }},
+      ]},
+    { id:'hometown_house_price', icon:'🏡', title:'县城买房', category:'finance',
+      body:'你发现——县城的房价——真的太便宜了。\n\n对比：\n- 北京：6万/平 → 90平 = 540万\n- 县城：6000/平 → 120平 = 72万\n\n你用在大城市的首付（162万）——在县城全款买了：\n- 一套120平的房子\n- 一辆15万的车\n- 还剩50万存款\n\n你的生活质量：\n- 住：120平大房子（以前住20平合租）\n- 行：有车（以前挤地铁）\n- 吃：自己做+偶尔下馆子\n- 娱乐：周边游\n\n你开始理解：县城买房——不是「降级」——是「换了一种升级方式」。\n\n你不是在「买更小的房」——你是在「用同样的钱——过5倍的生活」。\n\n「县城房价：你以为你在「退而求其次」——其实你在「发现什么才是真正重要的」。」',
+      cond: g => g.flags.returnedHometown && !g.flags.hometownHouse && g.money >= 50000,
+      choices:[
+        { label:'全款买了大房子开始新生活', hint:'+😊 +❤️ -💰', fn: g => { g.flags.hometownHouse=true; g.flags.hasHouse=true; g.money -= 720000; return{mood:12,charm:5}; }},
+        { label:'贷款买了更好的房子', hint:'+😊 -💰', fn: g => { g.flags.hometownHouse=true; g.flags.hasHouse=true; g.money -= 300000; return{mood:8,charm:3}; }},
+        { label:'先租房观望', hint:'+🧠 +💰', fn: g => { g.flags.hometownHouse=true; return{intel:5,mood:2}; }},
+      ]},
+    { id:'reverse_culture_shock', icon:'😵', title:'反向文化冲击', category:'psychology',
+      body:'你回到老家3个月了——你发现你「不适应」了。\n\n你的「不适应」：\n- 外卖：选择只有5家（北京50家）\n- 快递：要自己去拿（北京送到门口）\n- 夜生活：10点全关门了（北京2点还有）\n- 咖啡馆：全城只有2家（北京每条街都有）\n\n你的「不适应」还有：\n- 人们说话很大声\n- 路上有人随地吐痰\n- 排队不遵守秩序\n- 红绿灯没人看\n\n你开始理解：反向文化冲击——不是「老家变差了」——是「你变了」。\n\n你在大城市待了太久——你已经被「城市化」了。\n\n你不是在「嫌弃老家」——你是在「发现你已经不属于这里了」。\n\n「反向文化冲击：你不是在「回到家乡」——你是在「发现家乡变成了异乡」。」',
+      cond: g => g.flags.returnedHometown && !g.flags.reverseCultureShock,
+      choices:[
+        { label:'接受了差异慢慢适应', hint:'+🧠 +😊', fn: g => { g.flags.reverseCultureShock=true; g.flags.adaptedToHometown=true; return{intel:5,mood:5}; }},
+        { label:'开始用大城市的方式改造老家', hint:'+✨ +🧠', fn: g => { g.flags.reverseCultureShock=true; g.flags.modernizingHometown=true; return{charm:5,intel:3}; }},
+        { label:'越来越想回大城市了', hint:'-😊 +🧠', fn: g => { g.flags.reverseCultureShock=true; g.flags.missingBigCity=true; return{mood:-8,intel:3}; }},
+      ]},
+    { id:'hometown_entrepreneur', icon:'🏪', title:'小城创业', category:'career',
+      body:'你决定在小城创业。\n\n你的创业方向：\n- 奶茶店（投资15万）\n- 社区团购（投资5万）\n- 直播带货本地特产（投资3万）\n\n你选了：奶茶店。\n\n你的选址：\n- 学校门口（学生多，消费低）\n- 商业街（人流大，房租贵）\n- 新小区（竞争少，人流少）\n\n你的第一个月：\n- 日均销售额：400元\n- 成本：250元\n- 日净利润：150元\n- 月净利润：4500元\n\n比你打工还少。\n\n你开始理解：小城创业——不是「当老板」——是「给自己打工——而且比给别人打工赚得还少」。\n\n小城的「市场小」——竞争也「不小」。\n\n你不是在「创业」——你是在「用你的积蓄——赌一个小城的未来」。\n\n「小城创业：你以为你在「自己当老板」——其实你在「给自己创造了一份低薪工作」。」',
+      cond: g => g.flags.returnedHometown && !g.flags.hometownBusiness && g.money >= 150000,
+      choices:[
+        { label:'坚持了1年终于盈利了', hint:'+💰 +✨ -😊', fn: g => { g.flags.hometownBusiness=true; g.flags.businessProfitable=true; g.money -= 150000; setJob(g, '小城创业者', 6000); return{charm:5,intel:5,mood:5}; }},
+        { label:'半年后关了店亏了10万', hint:'-💰 -😊 +🧠', fn: g => { g.flags.hometownBusiness=true; g.money -= 100000; return{mood:-8,intel:5}; }},
+        { label:'转做线上直播卖本地特产', hint:'+💰 +✨', fn: g => { g.flags.hometownBusiness=true; g.flags.onlineLocalProducts=true; g.money -= 30000; return{intel:5,charm:5}; }},
+      ]},
+    { id:'stay_or_go_back', icon:'🤔', title:'留下还是回去', category:'psychology',
+      body:'你在老家待了1年了。\n\n留下的理由：\n- 生活成本低\n- 离父母近\n- 节奏慢\n- 有大房子住\n\n回去的理由：\n- 职业发展有限\n- 社交圈小\n- 文化生活贫乏\n- 教育医疗资源差\n\n你的内心对话：\n- 「留在这里——我的孩子将来也要重新走我走过的路」\n- 「回去——我可能永远买不起房」\n- 「留在这里——我能陪父母老去」\n- 「回去——我的职业还有上升空间」\n\n你开始理解：留下还是回去——不是「选择题」——是「你的人生价值观排序」。\n\n你选的不是「城市」——是「什么样的生活更重要」。\n\n「留下还是回去：没有「正确答案」——只有「你更在乎什么」。」',
+      cond: g => g.flags.returnedHometown && !g.flags.stayOrGoBack,
+      choices:[
+        { label:'决定留下，这就是我的生活', hint:'+😊 +❤️', fn: g => { g.flags.stayOrGoBack=true; g.flags.choseToStay=true; return{mood:8,charm:3}; }},
+        { label:'决定回大城市再拼一把', hint:'+💰 +✨ -😊', fn: g => { g.flags.stayOrGoBack=true; g.flags.wentBackToCity=true; setJob(g, '重回大城市', Math.floor(g.jobSalary * 1.5)); return{mood:-3,charm:5,intel:3}; }},
+        { label:'两边都待着当双城族', hint:'+🧠 -💰', fn: g => { g.flags.stayOrGoBack=true; g.flags.dualCityLife=true; g.money -= 5000; return{intel:5,mood:3}; }},
+      ]},
+    { id:'parents_happy_you_back', icon:'❤️', title:'父母的笑', category:'family',
+      body:'你回家那天——你妈做了一桌子菜。\n\n你爸：「回来了？好，好。」（嘴上说着好，眼眶红了）\n你妈：「多吃点，在外面肯定没吃好。」\n\n你的房间——\n- 床单是你妈新换的\n- 桌上有你爱吃的水果\n- 衣柜里有你妈给你买的新衣服\n\n你开始理解：你在大城市「奋斗」的时候——\n- 你的父母——在「等你回来」\n- 你的每一通电话——他们都「存着」\n- 你的每一次回家——他们都「倒数」\n\n你不是他们的「骄傲」——你是他们的「全世界」。\n\n你回来——不是为了「省钱」——是为了「在他们还在的时候——多陪陪他们」。\n\n时间——不等人。\n\n「父母的笑：你花了10年在大城市找「幸福」——原来幸福——一直在家等你。」',
+      cond: g => g.flags.returnedHometown && !g.flags.parentsHappyBack,
+      choices:[
+        { label:'决定多花时间陪父母', hint:'+❤️ +😊', fn: g => { g.flags.parentsHappyBack=true; g.flags.qualityTimeWithParents=true; return{mood:10,social:5}; }},
+        { label:'教父母用智能设备拉近距离', hint:'+❤️ +🧠', fn: g => { g.flags.parentsHappyBack=true; g.flags.techBridgeParents=true; return{mood:5,intel:3}; }},
+        { label:'开始认真规划全家的未来', hint:'+🧠 +💰', fn: g => { g.flags.parentsHappyBack=true; g.flags.familyFuturePlan=true; return{intel:5,mood:5}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -15628,7 +15709,7 @@ const ACHIEVEMENTS = [
     { id:'pretend_worker', icon:'🎭', name:'假装上班族', desc:'体验假装上班', check: g => g.flags.pretendToWork },
     { id:'routine_keeper', icon:'💪', name:'生活节奏保持者', desc:'失业期间保持规律生活', check: g => g.flags.keepRoutine },
     // v7.6 achievements
-    { id:'hometown_entrepreneur', icon:'🏘️', name:'返乡创业者', desc:'回老家创业', check: g => g.flags.hometownEntrepreneur },
+    { id:'hometown_entrepreneur_v29_3', icon:'🏘️', name:'返乡创业者', desc:'回老家创业', check: g => g.flags.hometownEntrepreneur },
     { id:'county_civil_servant', icon:'📋', name:'县城公务员', desc:'在县城考上编制', check: g => g.flags.countyCivilServant },
     { id:'gown_remover', icon:'🎓', name:'脱下长衫者', desc:'放下学历包袱', check: g => g.flags.tookOffGown },
     { id:'gap_year_taker', icon:'🌍', name:'间隔年体验者', desc:'选择gap year', check: g => g.flags.gapYear },
@@ -16686,6 +16767,15 @@ const ACHIEVEMENTS = [
     { id:'living_will_ach', icon:'📝', name:'生前预嘱', desc:'签了生前预嘱给家人减轻负担', check: g => g.flags.signedLivingWill },
     { id:'hybrid_care_ach', icon:'🏥', name:'混合照护', desc:'选择了半居家半日间照料的折中方案', check: g => g.flags.hybridCare },
     { id:'writing_memoir_ach', icon:'📖', name:'人生记录者', desc:'退休后开始写回忆录', check: g => g.flags.writingMemoir },
+    // v29.3 achievements - 县城回流 + 小城生活
+    { id:'escape_tier1_ach', icon:'🏃', name:'逃离北上广', desc:'决定离开一线城市', check: g => g.flags.escapeTier1 },
+    { id:'civil_service_v29_ach', icon:'📋', name:'体制内的人', desc:'考上了县城公务员', check: g => g.flags.passedCivilService },
+    { id:'guanxi_master_ach_v29_3', icon:'🤝', name:'人情练达', desc:'学会了小城的社交规则', check: g => g.flags.learnedGuanxi },
+    { id:'hometown_house_ach', icon:'🏠', name:'小城安家', desc:'在老家买了房', check: g => g.flags.hometownHouse },
+    { id:'reverse_shock_ach', icon:'😵', name:'反向文化冲击', desc:'回老家反而不适应了', check: g => g.flags.reverseShock },
+    { id:'hometown_biz_ach', icon:'🏪', name:'小城创业家', desc:'在老家开了自己的店', check: g => g.flags.hometownEntrepreneur },
+    { id:'family_reunion_ach', icon:'❤️', name:'团圆', desc:'回老家陪父母度过了一段时光', check: g => g.flags.qualityTimeWithParents },
+    { id:'local_products_ach', icon:'📦', name:'家乡好物', desc:'开始做家乡特产的线上生意', check: g => g.flags.onlineLocalProducts },
 ];
 
 // === ENDINGS === (order matters: first match wins)
