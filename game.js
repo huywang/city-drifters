@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v10.4
+// 都市浮生记 - Game Engine v10.5
 // ============================================
 
 // === GAME STATE ===
@@ -4878,6 +4878,87 @@ const EVENTS = [
         { label:'删掉App', hint:'+🧠', fn: g => { return{intel:3,mood:-3}; }},
         { label:'付费解锁功能', hint:'-💰 +😊', fn: g => { g.flags.aiCompanion=true; return{money:-100,mood:10}; }},
       ]},
+    // === v10.5 健康焦虑/代际冲突/过年/医保 ===
+    { id:'health_checkup', icon:'🏥', title:'体检报告',
+      body:'公司组织了年度体检。你拿到报告的时候手在抖——不是紧张，是怕。\n\n报告上写满了箭头：血脂偏高、尿酸超标、颈椎曲度变直、轻度脂肪肝……\n\n你发了条朋友圈："25岁的身体，55岁的指标。"收获了200个赞和一片"我也是"。\n\n"当代年轻人最大的勇气，不是辞职，是看体检报告。"',
+      cond: g => g.months >= 12 && g.age >= 23 && !g.flags.healthCheckupDone,
+      choices:[
+        { label:'开始养生', hint:'+💪', fn: g => { g.flags.healthCheckupDone=true; g.flags.wellnessMode=true; return{health:5,mood:3}; }},
+        { label:'假装没看到', hint:'+😊', fn: g => { g.flags.healthCheckupDone=true; return{mood:5,health:-3}; }},
+        { label:'花钱做详细检查', hint:'-💰 +💪', fn: g => { g.flags.healthCheckupDone=true; return{money:-2000,health:8,mood:5}; }},
+      ]},
+    { id:'gym_membership', icon:'💪', title:'健身房办卡',
+      body:'你路过一家新开的健身房，销售小哥热情地拦住你："哥/姐，办卡吗？年卡3000，现在打五折！"\n\n你看了看自己的肚子，又想了想去年立的flag，一咬牙："办！"\n\n你去了三次。第一次拍照发朋友圈，第二次洗了个澡，第三次路过的时候发现——它倒闭了。\n\n"健身房的本质是：你花钱买了一个「我可能会变好」的幻觉。"',
+      cond: g => g.age >= 20 && g.age <= 40 && g.money > 1000 && !g.flags.gymMember,
+      choices:[
+        { label:'办年卡', hint:'-💰 +💪', fn: g => { g.flags.gymMember=true; return{money:-3000,health:3,mood:5}; }},
+        { label:'买次卡', hint:'-💰 +💪', fn: g => { g.flags.gymMember=true; return{money:-500,health:5,mood:3}; }},
+        { label:'跑步不要钱', hint:'+💪', fn: g => { return{health:5,mood:3}; }},
+      ]},
+    { id:'marriage_pressure', icon:'💍', title:'催婚大军',
+      body:'你妈又打来了电话："你同事小李都生二胎了，你连对象都没有。"\n\n你爸在旁边补充："隔壁王阿姨给你介绍了个对象，公务员，有房。"\n\n你说："我现在不想结婚。"\n\n你妈说："你不想结也得结，我这张老脸往哪搁？"\n\n"在中国，结婚不是两个人的事，是两个家族的KPI。"',
+      cond: g => !g.flags.married && g.age >= 25 && g.months > 24 && !g.flags.marriagePressureSeen,
+      choices:[
+        { label:'去相亲', hint:'+👥 🎲', fn: g => { g.flags.marriagePressureSeen=true; g.flags.wentBlindDate=true; return{social:5,mood:-5,charm:2}; }},
+        { label:'坚决拒绝', hint:'+🧠', fn: g => { g.flags.marriagePressureSeen=true; return{intel:5,mood:-3}; }},
+        { label:'随便应付', hint:'+😊', fn: g => { g.flags.marriagePressureSeen=true; return{mood:-8}; }},
+      ]},
+    { id:'spring_festival', icon:'🧧', title:'过年回家',
+      body:'春节到了。你抢到了回家的火车票——站票，12个小时。\n\n回到家，迎接你的是：七大姑八大姨的灵魂拷问。\n\n"工资多少？""有对象没？""买房了吗？""打算什么时候要孩子？"\n\n你笑着说"还行"，心里想的是：我为什么每年都要来受这个罪？\n\n"过年回家是中国人的朝圣——再远的路，再难的题，都要面对。"',
+      cond: g => g.months % 12 >= 10 && g.months > 12,
+      choices:[
+        { label:'红包大方发', hint:'-💰 +👥 +😊', fn: g => { if(g.relationships) g.relationships.family=clamp((g.relationships.family||60)+10,0,100); return{money:-5000,social:8,mood:8}; }},
+        { label:'宅在家玩手机', hint:'+😊', fn: g => { return{mood:3}; }},
+        { label:'旅游过年', hint:'-💰 +😊', fn: g => { return{money:-8000,mood:15,charm:3}; }},
+      ]},
+    { id:'parent_health', icon:'👴', title:'父母的体检',
+      body:'你给你爸妈预约了年度体检。报告出来后，你看到了：\n\n爸：高血压、糖尿病前期、骨质疏松\n妈：甲状腺结节、骨质疏松、轻度贫血\n\n你站在医院走廊里，突然觉得：你在大城市拼命赚钱，他们在家慢慢变老。\n\n"世界上最残忍的事，不是你过得不好，是他们变老的速度，快过你赚钱的速度。"',
+      cond: g => g.age >= 28 && g.months > 36 && !g.flags.parentHealthDone,
+      choices:[
+        { label:'买保健品寄回去', hint:'-💰', fn: g => { g.flags.parentHealthDone=true; if(g.relationships) g.relationships.family=clamp((g.relationships.family||60)+10,0,100); return{money:-3000,mood:5,social:5}; }},
+        { label:'接他们来大城市检查', hint:'-💰 +👥', fn: g => { g.flags.parentHealthDone=true; if(g.relationships) g.relationships.family=clamp((g.relationships.family||60)+20,0,100); return{money:-8000,mood:10,social:8}; }},
+        { label:'视频嘱咐注意身体', hint:'+👥', fn: g => { g.flags.parentHealthDone=true; if(g.relationships) g.relationships.family=clamp((g.relationships.family||60)+5,0,100); return{mood:-5}; }},
+      ]},
+    { id:'cut_relatives', icon:'✂️', title:'断亲',
+      body:'你做了一个决定：今年不走亲戚了。\n\n不是冷漠，是累了。累了被比较，累了被催婚，累了回答那些你不愿回答的问题。\n\n你在网上发了篇文章《我为什么选择断亲》，获得了10万+阅读。\n\n评论区里，有人说你"不孝"，也有人说："谢谢你替我说了出来。"\n\n"断亲不是不孝，是给自己留一条活路。"',
+      cond: g => g.age >= 22 && g.age <= 35 && g.months > 18 && !g.flags.cutRelatives,
+      choices:[
+        { label:'彻底断', hint:'+🧠 -👥', fn: g => { g.flags.cutRelatives=true; if(g.relationships) g.relationships.family=clamp((g.relationships.family||60)-15,0,100); return{intel:5,mood:8,social:-5}; }},
+        { label:'选择性联系', hint:'+🧠', fn: g => { g.flags.cutRelatives=true; return{intel:3,mood:5}; }},
+        { label:'算了，还是去吧', hint:'+👥', fn: g => { return{social:3,mood:-5}; }},
+      ]},
+    { id:'wellness_punk', icon:'🍵', title:'朋克养生',
+      body:'你的生活是这样的：\n\n凌晨2点睡觉，但保温杯里泡枸杞。\n\n点外卖必选轻食沙拉，但凌晨饿了会点烧烤。\n\n办了健身卡一个月去一次，但每天步数靠从工位到厕所。\n\n你在朋友圈写道："我不是不养生，我养的是朋克。"\n\n"朋克养生：用最贵的护肤品，熬最晚的夜。"',
+      cond: g => g.age >= 22 && g.age <= 32 && g.health < 70,
+      choices:[
+        { label:'早睡早起一周', hint:'+💪', fn: g => { return{health:8,mood:5}; }},
+        { label:'继续朋克', hint:'+😊', fn: g => { return{mood:5,health:-3}; }},
+        { label:'买保健品', hint:'-💰 +💪', fn: g => { return{money:-1000,health:3,mood:3}; }},
+      ]},
+    { id:'digital_vegetable', icon:'📱', title:'电子榨菜',
+      body:'你发现自己已经不能独自吃饭了——不是因为没有朋友，是因为没有视频。\n\n每次吃饭前，你必须花10分钟找一个"下饭视频"。如果找不到，饭就凉了。\n\n你的"稍后再看"列表里有500个视频，但你一个都没看过。\n\n"电子榨菜不是调味品，是主菜——没有它，饭就没有味道。"',
+      cond: g => g.months > 6 && g.social < 50,
+      choices:[
+        { label:'试试安静吃饭', hint:'+🧠 +💪', fn: g => { return{intel:3,health:3,mood:-2}; }},
+        { label:'找一部好剧', hint:'+😊', fn: g => { return{mood:5}; }},
+        { label:'边吃边学', hint:'+🧠', fn: g => { return{intel:5,mood:2}; }},
+      ]},
+    { id:'medical_insurance', icon:'🏦', title:'医保还是商保',
+      body:'你生病了，去医院看门诊。挂号费50，检查费800，药费300。\n\n你发现医保只能报一小部分，剩下的全要自费。\n\n同事说："你应该买个商业医疗险，一年才几百块。"\n\n你打开支付宝看了看：百万医疗险，每年600块，但你不确定自己需不需要。\n\n"保险是成年人的安全感——你不确定明天会怎样，但你可以提前做好准备。"',
+      cond: g => g.age >= 24 && g.money > 500 && !g.flags.hasCommercialInsurance,
+      choices:[
+        { label:'买百万医疗', hint:'-💰 🛡️', fn: g => { g.flags.hasCommercialInsurance=true; return{money:-600,mood:5}; }},
+        { label:'靠医保就行', hint:'+🧠', fn: g => { return{intel:2}; }},
+        { label:'买重疾险', hint:'-💰 🛡️', fn: g => { g.flags.hasCommercialInsurance=true; g.flags.hasCriticalIllnessInsurance=true; return{money:-5000,mood:8}; }},
+      ]},
+    { id:'blind_date', icon:'💑', title:'相亲现场',
+      body:'你坐在咖啡馆里，对面坐着一个你妈"精挑细选"的相亲对象。\n\nTA的第一个问题是："你月薪多少？有房吗？有车吗？"\n\n你觉得自己在参加一场面试。\n\n聊天30分钟，你们发现唯一共同点是：都是被逼来的。\n\n临走时TA说："加个微信？"\n\n"相亲是当代年轻人的尴尬——你不相信爱情，但你相信概率。"',
+      cond: g => g.flags.wentBlindDate && !g.flags.blindDateDone,
+      choices:[
+        { label:'继续了解', hint:'+👥', fn: g => { g.flags.blindDateDone=true; return{social:8,mood:3}; }},
+        { label:'明确拒绝', hint:'+🧠', fn: g => { g.flags.blindDateDone=true; return{intel:3,mood:2}; }},
+        { label:'当朋友吧', hint:'+👥 +😊', fn: g => { g.flags.blindDateDone=true; return{social:5,mood:5}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'first_job', icon:'💼', name:'职场新人', desc:'找到第一份工作', check: g => g.flags.gotFirstJob },
@@ -5294,6 +5375,13 @@ const ACHIEVEMENTS = [
     { id:'pet_parent_pro', icon:'🐾', name:'宠物家长', desc:'为宠物买了保险', check: g => g.flags.petInsurance },
     { id:'ai_friend', icon:'🤖', name:'AI之友', desc:'和AI成为了朋友', check: g => g.flags.aiCompanion },
     { id:'home_decorator', icon:'🪴', name:'生活美学家', desc:'改造了出租屋', check: g => g.flags.renovated },
+    // === v10.5 新增成就 ===
+    { id:'wellness_mode', icon:'🍵', name:'养生达人', desc:'开始注重健康', check: g => g.flags.wellnessMode },
+    { id:'gym_goer', icon:'💪', name:'健身达人', desc:'办了健身卡', check: g => g.flags.gymMember },
+    { id:'insurance_holder', icon:'🛡️', name:'未雨绸缪', desc:'购买了商业保险', check: g => g.flags.hasCommercialInsurance },
+    { id:'brave_dater', icon:'💑', name:'勇敢相亲', desc:'去了一次相亲', check: g => g.flags.wentBlindDate },
+    { id:'relative_cutter', icon:'✂️', name:'断亲勇士', desc:'选择了断亲', check: g => g.flags.cutRelatives },
+    { id:'filial_v2', icon:'🏥', name:'孝心体检', desc:'带父母做体检', check: g => g.flags.parentHealthDone },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -5415,6 +5503,10 @@ const ENDINGS = [
     { id:'dazi_end', badge:'🤝', title:'搭子人生', desc:'你没有交到"真正的朋友"，但你有了一群搭子。\n\n饭搭子、运动搭子、旅行搭子、看病搭子。你们不交心，不八卦，AA制，到期解散。\n\n有人说这是冷漠，有人说这是边界感。但你知道：在这个城市，有人陪你吃顿饭，已经是一种温暖。\n\n"搭子不是朋友的降级版，是成年人社交的最优解。"', cond: g => g.flags.hasDazi && g.age >= 28 && g.social >= 40 && g.social < 70 },
     { id:'citywalker_end', badge:'🚶', title:'城市漫游家', desc:'你用脚步丈量了这座城市的每一条街道。\n\n你知道哪条巷子有最好的咖啡，哪个公园有最美的落日，哪家小店的老板会和你聊天。\n\n你写了一本《城市漫游指南》，虽然只有100个人看过，但每个人都说："谢谢你让我重新认识了这座城市。"\n\n"城市漫游不是逃避生活，是在生活中找到被忽略的美好。"', cond: g => (g.flags.citywalkCafe || g.flags.communityCafe) && g.charm >= 50 && g.mood >= 60 && g.age >= 28 },
     { id:'pet_lover_end', badge:'🐾', title:'毛孩子的家长', desc:'你把所有的爱都给了你的毛孩子。\n\n它陪你度过了加班后的深夜、失恋后的周末、生病时的独处。它不会说话，但它永远在你身边。\n\n你给它买了保险、办了生日派对、拍了写真集。你的朋友说："你对它比对自己还好。"\n\n"宠物不是玩具，是家人——一个永远不会背叛你的家人。"', cond: g => g.flags.hasPet && g.flags.petParkMet && g.mood >= 55 && g.age >= 27 },
+    // --- v10.5 NEW ENDINGS ---
+    { id:'health_conscious_end', badge:'🍵', title:'养生大师', desc:'你从一个熬夜冠军变成了一个养生达人。\n\n早睡早起、规律饮食、定期体检、枸杞泡水。你的体检报告从一片箭头变成了全部正常。\n\n你在知乎写了一篇《从脂肪肝到六块腹肌的逆袭》，获得了10万+阅读。\n\n"养生不是怕死，是学会了好好活着。"', cond: g => g.flags.wellnessMode && g.health >= 75 && g.age >= 28 },
+    { id:'cut_relatives_end', badge:'✂️', title:'断亲自由', desc:'你切断了那些让你不舒服的亲戚关系。\n\n没有了对比，没有了催婚，没有了灵魂拷问。你终于可以在过年的时候做自己想做的事。\n\n有人说你冷漠，但你知道：血缘是缘分，不是枷锁。\n\n"断亲不是不孝，是把爱留给值得的人。"', cond: g => g.flags.cutRelatives && g.mood >= 60 && g.age >= 26 },
+    { id:'wellness_punk_end', badge:'🎸', title:'朋克养生家', desc:'你活成了一种矛盾的美。\n\n凌晨2点还在加班，但桌上放着燕窝和枸杞。\n\n周末去蹦迪到凌晨4点，但周一早上准时去健身房。\n\n你不是不养生，你是用最朋克的方式养生。\n\n"朋克养生是一种态度：我知道这样不好，但我选择快乐。"', cond: g => g.health >= 50 && g.mood >= 60 && g.age >= 25 && g.age <= 35 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
