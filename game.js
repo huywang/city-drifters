@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v16.0
+// 都市浮生记 - Game Engine v16.1
 // ============================================
 
 // === GAME STATE ===
@@ -8024,6 +8024,79 @@ const EVENTS = [
         { label:'偶尔出来走走', hint:'+😊 +🧠', fn: g => { g.flags.nightCity=true; return{mood:8,intel:5}; }},
         { label:'还是早点睡吧', hint:'+💪 +🧠', fn: g => { g.flags.nightCity=true; return{health:5,intel:3}; }},
       ]},
+    // === v16.1 饮食文化 + 外卖生活 + 养生饮食 ===
+    { id:'takeout_dependency', icon:'🥡', title:'外卖依赖症',
+      body:'你打开外卖App，发现这个月已经点了87次外卖了。\n\n你的外卖历史：黄焖鸡、麻辣烫、盖浇饭、炒饭、面条。你的胃已经不认识「家常菜」三个字了。\n\n你算了笔账：每个月外卖花费2000元，一年24000元。这些钱够买一台不错的笔记本电脑了。\n\n你决定自己做一顿饭。你打开冰箱——里面只有一瓶过期牛奶和半根黄瓜。\n\n你默默关上冰箱，打开了外卖App。\n\n"外卖依赖：不是不会做饭——是做饭的时间成本太高了。至少你是这么安慰自己的。"',
+      cond: g => g.age >= 20 && !g.flags.takeoutDependency,
+      choices:[
+        { label:'学做饭，减少外卖', hint:'+💪 +💰 +🧠', fn: g => { g.flags.takeoutDependency=true; g.flags.homeCook=true; return{health:10,money:2000,intel:8}; }},
+        { label:'选择健康外卖', hint:'+💪 +🧠', fn: g => { g.flags.takeoutDependency=true; g.flags.healthyTakeout=true; return{health:5,intel:5}; }},
+        { label:'继续点，人生苦短', hint:'+😊 -💪 -💰', fn: g => { g.flags.takeoutDependency=true; return{mood:5,health:-8,money:-1000}; }},
+      ]},
+    { id:'coffee_culture', icon:'☕', title:'咖啡续命',
+      body:'你今天喝了第4杯咖啡。\n\n你的手开始抖、心跳加速、胃开始泛酸。你知道不能再喝了——但你的大脑说「再来一杯」。\n\n你算了算这个月的咖啡账单：星巴克12杯（480元）、瑞幸20杯（300元）、公司免费咖啡无数杯。\n\n你的同事说：「你是用咖啡驱动的机器。」你说：「不是——我是用咖啡因维持生命的植物人。」\n\n你决定明天开始减量。明天的你喝了两杯——已经是进步了。\n\n"咖啡文化：不是在喝咖啡——是在用咖啡因偿还昨晚欠的睡眠债。"',
+      cond: g => g.age >= 22 && !g.flags.coffeeCulture,
+      choices:[
+        { label:'控制每天1杯', hint:'+💪 +💰 +🧠', fn: g => { g.flags.coffeeCulture=true; g.flags.coffeeModerator=true; return{health:5,money:500,intel:5}; }},
+        { label:'改喝茶', hint:'+💪 +🧠 +😊', fn: g => { g.flags.coffeeCulture=true; g.flags.teaDrinker=true; return{health:8,intel:5,mood:3}; }},
+        { label:'继续咖啡续命', hint:'+🧠 -💪', fn: g => { g.flags.coffeeCulture=true; return{intel:3,health:-5}; }},
+      ]},
+    { id:'milk_tea_addiction', icon:'🧋', title:'奶茶续命',
+      body:'你路过一家奶茶店。\n\n你心里说「不喝」。你的腿说「买一杯」。你的手已经打开了支付宝。\n\n你点了一杯「多肉葡萄」，少糖、去冰、加珍珠加椰果加芋圆。你喝了一口——世界美好了。\n\n你看了下热量：680大卡。相当于跑步1小时。你决定——明天再跑。\n\n你的办公桌上有5个空奶茶杯。你的同事说：「你这是开奶茶品鉴会呢？」你说：「我在做市场调研。」\n\n"奶茶：不是在喝饮料——是在用糖分给疲惫的生活加一点甜。"',
+      cond: g => g.age >= 18 && !g.flags.milkTeaAddiction,
+      choices:[
+        { label:'减少频率到每周1杯', hint:'+💪 +💰 +🧠', fn: g => { g.flags.milkTeaAddiction=true; g.flags.milkTeaController=true; return{health:5,money:300,intel:3}; }},
+        { label:'学会自己做奶茶', hint:'+🧠 +💰 +😊', fn: g => { g.flags.milkTeaAddiction=true; g.flags.diyMilkTea=true; return{intel:8,money:200,mood:5}; }},
+        { label:'快乐就好，不管了', hint:'+😊 -💪', fn: g => { g.flags.milkTeaAddiction=true; return{mood:8,health:-5}; }},
+      ]},
+    { id:'diet_anxiety', icon:'⚖️', title:'减肥焦虑',
+      body:'你站上体重秤：比上个月重了3斤。\n\n你打开手机，搜索「最快减肥方法」：生酮饮食、间歇性断食、代餐奶昔、酵素减肥、拔罐减肥……你看得眼花缭乱。\n\n你办了健身卡（第3张了）、买了蛋白粉、下载了减肥App。你第一周减了2斤，第二周反弹了3斤。\n\n你的朋友圈里有人晒出了马甲线。你看了看自己的肚子——只有一个「一块腹肌」。\n\n你终于明白：减肥最难的不是管住嘴、迈开腿——是坚持。\n\n"减肥焦虑：不是你真的胖——是你对自己的标准太苛刻了。"',
+      cond: g => g.age >= 20 && !g.flags.dietAnxiety,
+      choices:[
+        { label:'科学饮食+规律运动', hint:'+💪 +🧠 +😊', fn: g => { g.flags.dietAnxiety=true; g.flags.scientificDiet=true; return{health:15,intel:8,mood:8}; }},
+        { label:'接受自己的身体', hint:'+😊 +🧠 +💪', fn: g => { g.flags.dietAnxiety=true; g.flags.bodyPositive=true; return{mood:15,intel:5,health:5}; }},
+        { label:'尝试极端方法', hint:'-💪 -😊 +🧠', fn: g => { g.flags.dietAnxiety=true; g.flags.extremeDiet=true; return{health:-10,mood:-5,intel:3}; }},
+      ]},
+    { id:'precooked_food', icon:'🍱', title:'预制菜风波',
+      body:'你发现你常点的外卖用的都是预制菜。\n\n你在网上查了一下：料理包、速冻菜、中央厨房统一配送。你的外卖不是「厨师做的」——是「工厂生产的」。\n\n你有点失望。你觉得——外卖的灵魂应该是「锅气」，而不是「防腐剂」。\n\n但你查了查价格：一份现炒菜要35元，一份预制菜只要15元。你的钱包告诉你：预制菜也挺好吃的。\n\n你安慰自己：「至少它是熟的。」\n\n"预制菜：不是你在吃饭——是食品工业在喂你。但它便宜——这就够了。"',
+      cond: g => g.age >= 20 && !g.flags.precookedFood,
+      choices:[
+        { label:'自己做饭，吃新鲜的', hint:'+💪 +💰 +🧠', fn: g => { g.flags.precookedFood=true; g.flags.homeCook=true; return{health:10,money:1000,intel:5}; }},
+        { label:'接受现实，省钱要紧', hint:'+💰 +🧠', fn: g => { g.flags.precookedFood=true; return{money:500,intel:3}; }},
+        { label:'寻找现炒的小店', hint:'+😊 +💰', fn: g => { g.flags.precookedFood=true; g.flags.foodExplorer=true; return{mood:8,money:-500}; }},
+      ]},
+    { id:'drinking_culture', icon:'🍺', title:'酒桌文化',
+      body:'公司聚餐，你的领导说：「来，走一个。」\n\n你不能喝酒——但在中国的职场，不喝酒等于「不合群」。你硬着头皮喝了三杯白酒。\n\n你的脸红了、头昏了、胃开始翻腾。你跑去了厕所吐了一场。\n\n回来后你的领导说：「能喝！好样的！」你觉得你的胃在哭泣，但你的职场评价在上涨。\n\n第二天你宿醉到中午。你发誓再也不喝了——直到下次聚餐。\n\n"酒桌文化：不是在喝酒——是在用酒精换取信任。但你的肝不需要信任——它需要休息。"',
+      cond: g => g.age >= 22 && g.job !== '待业中' && !g.flags.drinkingCulture,
+      choices:[
+        { label:'学会拒酒', hint:'+💪 +🧠 -👥', fn: g => { g.flags.drinkingCulture=true; g.flags.alcoholRefuser=true; return{health:8,intel:5,social:-5}; }},
+        { label:'以茶代酒', hint:'+💪 +👥 +🧠', fn: g => { g.flags.drinkingCulture=true; g.flags.teaSubstitute=true; return{health:5,social:5,intel:5}; }},
+        { label:'舍命陪君子', hint:'+👥 -💪', fn: g => { g.flags.drinkingCulture=true; return{social:8,health:-12}; }},
+      ]},
+    { id:'health_porridge', icon:'🥣', title:'养生粥',
+      body:'你开始喝养生粥了。\n\n红枣枸杞粥、银耳莲子羹、山药薏米粥。你每天早上5点起来熬粥，比上班还准时。\n\n你的同事问你：「你是不是老了？」你说：「我不是老了——我是提前保养。」\n\n你的妈妈知道了很高兴：「终于不像以前那样天天吃外卖了。」她给你寄了一大箱枸杞和红枣。\n\n一个月后，你觉得自己的气色好了、精神好了、连便秘都改善了。\n\n你发了条朋友圈：「养生第一步：从一碗粥开始。」你的评论里全是：「你怎么突然变老了？」\n\n"养生粥：不是在喝粥——是在和身体和解。"',
+      cond: g => g.age >= 25 && !g.flags.healthPorridge,
+      choices:[
+        { label:'坚持每天熬粥', hint:'+💪 +😊 +🧠', fn: g => { g.flags.healthPorridge=true; g.flags.dailyPorridge=true; return{health:12,mood:8,intel:5}; }},
+        { label:'周末煲汤', hint:'+💪 +😊', fn: g => { g.flags.healthPorridge=true; g.flags.weekendSoup=true; return{health:8,mood:10}; }},
+        { label:'三天热度', hint:'+🧠', fn: g => { g.flags.healthPorridge=true; return{intel:3}; }},
+      ]},
+    { id:'food_delivery_review', icon:'⭐', title:'外卖评分',
+      body:'你今天的外卖迟到了40分钟。\n\n你打开App准备给差评。但你想了一下：骑手可能遇到了堵车、商家可能订单太多、也许他正在爬6楼给你送。\n\n你给了5星好评，写了一句：「辛苦了。」\n\n5分钟后，骑手给你回了条消息：「谢谢您的理解，祝您用餐愉快。」你看着这条消息，觉得——有时候，善良比正确更重要。\n\n"外卖评分：不是在评价食物——是在评价一个和你一样在努力生活的人。"',
+      cond: g => g.age >= 20 && !g.flags.foodDeliveryReview,
+      choices:[
+        { label:'多给好评', hint:'+😊 +👥 +✨', fn: g => { g.flags.foodDeliveryReview=true; g.flags.kindReviewer=true; return{mood:10,social:5,charm:3}; }},
+        { label:'客观评价', hint:'+🧠 +😊', fn: g => { g.flags.foodDeliveryReview=true; g.flags.fairReviewer=true; return{intel:5,mood:5}; }},
+        { label:'该差评就差评', hint:'+🧠 -👥', fn: g => { g.flags.foodDeliveryReview=true; return{intel:3,social:-3}; }},
+      ]},
+    { id:'cooking_discovery', icon:'👨‍🍳', title:'厨艺觉醒',
+      body:'你跟着B站教程做了一道红烧肉。\n\n你没想到——居然成功了！虽然颜色深了一点、糖多了一点、但味道居然还不错。\n\n你拍了张照发朋友圈。收获了100个赞和20条评论：「什么时候请我吃饭？」「你居然会做饭？」「看起来好好吃！」\n\n你的妈妈看到了，打来视频电话：「你放了几勺糖？酱油是什么牌子的？火候怎么样？」她指导了你30分钟。\n\n你突然觉得：做饭不只是一种技能——是一种连接。连接你和食材、连接你和厨房、连接你和远方教你做饭的妈妈。\n\n"厨艺觉醒：不是在做饭——是在用心生活。"',
+      cond: g => g.age >= 22 && !g.flags.cookingDiscovery,
+      choices:[
+        { label:'每周做2次饭', hint:'+💪 +😊 +💰', fn: g => { g.flags.cookingDiscovery=true; g.flags.regularCook=true; return{health:10,mood:12,money:1000}; }},
+        { label:'学做家乡菜', hint:'+😊 +👥 +🧠', fn: g => { g.flags.cookingDiscovery=true; g.flags.hometownCook=true; return{mood:15,social:5,intel:8}; }},
+        { label:'偶尔做一次', hint:'+😊 +🧠', fn: g => { g.flags.cookingDiscovery=true; return{mood:8,intel:5}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -8783,6 +8856,14 @@ const ACHIEVEMENTS = [
     { id:'frequent_mover_ach', icon:'📦', name:'搬家达人', desc:'搬了很多次家', check: g => g.flags.movingDay },
     { id:'community_builder_ach', icon:'🌻', name:'社区建设者', desc:'参与了社区花园', check: g => g.flags.communityGarden },
     { id:'city_belonger_ach', icon:'🏙️', name:'城市归属者', desc:'思考了城市归属感', check: g => g.flags.cityIdentity },
+    // === v16.1 新增成就（饮食文化） ===
+    { id:'takeout_reformer_ach', icon:'🥡', name:'外卖改革者', desc:'减少了外卖依赖', check: g => g.flags.takeoutDependency },
+    { id:'coffee_moderator_ach', icon:'☕', name:'咖啡节制者', desc:'控制了咖啡摄入', check: g => g.flags.coffeeCulture },
+    { id:'milk_tea_fan_ach', icon:'🧋', name:'奶茶爱好者', desc:'经历了奶茶续命', check: g => g.flags.milkTeaAddiction },
+    { id:'body_positive_ach', icon:'⚖️', name:'身体自信', desc:'接受了自己的身体', check: g => g.flags.dietAnxiety },
+    { id:'home_cook_ach', icon:'👨‍🍳', name:'家庭厨师', desc:'开始自己做饭', check: g => g.flags.cookingDiscovery },
+    { id:'health_porridge_ach', icon:'🥣', name:'养生达人', desc:'开始喝养生粥', check: g => g.flags.healthPorridge },
+    { id:'drinking_refuser_ach', icon:'🍺', name:'拒酒达人', desc:'学会了拒绝酒桌文化', check: g => g.flags.drinkingCulture },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -9035,6 +9116,9 @@ const ENDINGS = [
     { id:'city_root_end', badge:'🏙️', title:'城市扎根者', desc:'你终于在这个城市扎下了根。\n\n你从城中村的单间，搬到了合租房，再到自己的小家。你用7年的时间，在这个不属于你的城市里，创造了一个属于你的角落。\n\n你的阳台上种着你从社区花园移来的薄荷。你的冰箱上贴满了和邻居们的合照。你的门锁密码只有你知道——这是你的安全感。\n\n你的妈妈来看你，说：「你终于有个像样的家了。」你说：「不是因为房子——是因为我在这里有了牵挂。」\n\n"城市扎根：不是买了房——是有了不想离开的理由。"', cond: g => g.flags.cityIdentity && g.flags.rootPlanter && g.flags.communityGarden && g.mood >= 65 && g.age >= 28 },
     { id:'urban_nomad_end', badge:'🎒', title:'都市游牧者', desc:'你成了大城市里的游牧者。\n\n你搬了10次家、换了5个工作、交了无数个来了又走的朋友。你不住在一个固定的地方——但你活在每一个当下。\n\n你的行李箱里只有必需品。你不买大件家具、不养植物、不办年卡。你随时可以走——但你也随时可以留。\n\n有人说你「不稳定」。你说：「我只是不想被任何东西绑住。」\n\n"都市游牧：不是没有家——是整个世界都是家。"', cond: g => g.flags.freeDrifter && g.flags.movingDay && g.flags.nightOwl && g.mood >= 60 && g.age >= 28 },
     { id:'community_hero_end', badge:'🌟', title:'社区英雄', desc:'你成了小区里最受欢迎的人。\n\n你是业委会成员、社区花园发起人、维权群群主。你帮邻居修过水管、帮老人教过手机、帮小朋友看过作业。\n\n你的邻居们说：「自从有了你，我们小区都不一样了。」你说：「不是我让小区不一样——是我们一起让它不一样了。」\n\n你被评为了「最美社区人」。你把奖状贴在了社区公告栏里。\n\n"社区英雄：不是做了什么大事——是让身边的人觉得，住在这里真好。"', cond: g => g.flags.communityActivist && g.flags.communityGarden && g.flags.gardenLeader && g.social >= 75 && g.age >= 30 },
+    // --- v16.1 NEW ENDINGS (饮食文化) ---
+    { id:'kitchen_master_end', badge:'👨‍🍳', title:'厨房大师', desc:'你从一个外卖废人，变成了一个热爱做饭的人。\n\n你学会了红烧肉、糖醋排骨、西红柿炒蛋、酸菜鱼。你的冰箱里永远有新鲜食材。你的厨房里永远飘着香味。\n\n你的朋友们最喜欢来你家蹭饭。你笑着说：「来可以，但要帮忙洗碗。」\n\n你的妈妈说：「你终于像个大人了。」你说：「不是——我只是像个会照顾自己的人。」\n\n"厨房大师：不是厨艺多好——是愿意为自己和爱的人做一顿饭。"', cond: g => g.flags.cookingDiscovery && g.flags.homeCook && g.flags.regularCook && g.health >= 60 && g.age >= 25 },
+    { id:'healthy_living_end', badge:'🥗', title:'健康生活家', desc:'你找到了一种既健康又快乐的生活方式。\n\n你每天喝养生粥、每周做3次饭、控制咖啡和奶茶、科学饮食加规律运动。你的体重稳定了、皮肤变好了、精力充沛了。\n\n你的同事问你：「你怎么做到的？」你说：「不是自律——是爱自己。」\n\n你不再为了减肥而饿肚子、不再为了社交而喝酒、不再为了省时间而吃垃圾食品。你终于学会了——好好吃饭，是对自己最基本的尊重。\n\n"健康生活：不是苦行僧——是找到了让身体和心灵都舒服的节奏。"', cond: g => g.flags.scientificDiet && g.flags.healthPorridge && g.flags.coffeeModerator && g.health >= 70 && g.mood >= 65 && g.age >= 28 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
