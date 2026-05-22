@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v17.3
+// 都市浮生记 - Game Engine v18.0
 // ============================================
 
 // === GAME STATE ===
@@ -13,6 +13,10 @@ const G = {
     flags: {}, currentEvent: null, isEnded: false,
     // v8.0: 事件去重 - 记录最近看过的事件ID，避免重复
     recentEventIds: [],
+    // v18.0: 事件类别多样性追踪
+    recentCategories: [],
+    // v18.0: 事件资格缓存（性能优化）
+    _eligibilityCache: { age: -1, city: '', ids: null },
     // v8.0: 倒卖系统 - 背包容量5件，不同城市价格不同
     inventory: {},
     // v8.0: 连续月数追踪（用于事件链深度）
@@ -8680,6 +8684,95 @@ const EVENTS = [
         { label:'发展副业，多条退路', hint:'+💰 +😊 -💪', fn: g => { g.flags.midlifeCareerCrisis=true; g.flags.safetyNet=true; return{money:8000,mood:10,health:-5}; }},
         { label:'认命，就这样吧', hint:'+😊 -🧠 -💰', fn: g => { g.flags.midlifeCareerCrisis=true; return{mood:-10,intel:-5}; }},
       ]},
+    // === v18.0 新增事件（科技生活 + AI时代） ===
+    { id:'smart_home', icon:'🏠', title:'智能家居', category:'tech',
+      body:'你给家里装了一套智能家居系统。\n\n你的日常变了：\n- "小爱同学，开灯"\n- "小爱同学，扫地"\n- "小爱同学，关窗帘"\n- "小爱同学，放首歌"\n\n你觉得自己像钢铁侠（低配版）。直到有一天：\n- WiFi断了，你手动开了3次灯\n- 智能音箱半夜突然说话，吓了你一跳\n- 你妈来你家，不知道怎么开电视\n\n"智能家居：让你变懒了——但也让你在WiFi断的时候变傻了。"',
+      cond: g => !g.flags.smartHome && g.money > 10000,
+      choices:[
+        { label:'全屋智能改造', hint:'-💰💰 +😊 +🧠', fn: g => { g.flags.smartHome=true; g.flags.fullSmartHome=true; return{money:-25000,mood:15,intel:8}; }},
+        { label:'只装几个智能设备', hint:'-💰 +😊', fn: g => { g.flags.smartHome=true; return{money:-5000,mood:10}; }},
+        { label:'不需要，手动挺好', hint:'+💰 +💪', fn: g => { g.flags.smartHome=true; return{money:2000,health:3}; }},
+      ]},
+    { id:'ai_assistant', icon:'🤖', title:'AI助手', category:'tech',
+      body:'你开始用ChatGPT/Claude辅助工作了。\n\n你的效率提升了3倍：\n- 写邮件：5分钟变成1分钟\n- 写代码：1小时变成20分钟\n- 写方案：2天变成半天\n- 学新技能：效率翻倍\n\n你的同事问你："你怎么突然变厉害了？"\n\n你笑了笑："我只是找到了一个好帮手。"\n\n但你也有点担心：如果人人都用AI，你的优势还能维持多久？\n\n"AI不是你的替代品——是你的放大器。关键是你本身有没有东西可以被放大。"',
+      cond: g => !g.flags.aiAssistant && g.age >= 20 && g.intel > 50,
+      choices:[
+        { label:'深度使用AI，成为效率专家', hint:'+🧠 +✨ +💰', fn: g => { g.flags.aiAssistant=true; g.flags.aiPowerUser=true; return{intel:20,charm:10,money:5000}; }},
+        { label:'适度使用，保持独立思考', hint:'+🧠 +😊', fn: g => { g.flags.aiAssistant=true; g.flags.balancedAI=true; return{intel:12,mood:8}; }},
+        { label:'不用，AI写的东西没灵魂', hint:'+😊 -🧠', fn: g => { g.flags.aiAssistant=true; return{mood:5,intel:-3}; }},
+      ]},
+    { id:'digital_currency', icon:'₿', title:'数字货币', category:'tech',
+      body:'你的朋友又在吹他的比特币了："我2019年买的，现在涨了50倍。"\n\n你看了看价格：一个比特币=50万人民币。\n\n你心动了，但你又想起了2022年的崩盘：很多人一夜亏光。\n\n你的同事说："数字人民币要来了，以后可能都不用现金了。"\n\n你想了想：这个世界变化太快，你跟得上吗？\n\n"数字货币：不是投资——是在赌未来。而你，永远不知道未来什么时候来。"',
+      cond: g => !g.flags.digitalCurrency && g.age >= 20 && g.money > 20000,
+      choices:[
+        { label:'投资比特币/以太坊', hint:'🎲 -💰💰', fn: g => { g.flags.digitalCurrency=true; if(Math.random()>0.5){return{money:50000,mood:20}}else{return{money:-30000,mood:-20}} }},
+        { label:'用数字人民币', hint:'+🧠 +😊', fn: g => { g.flags.digitalCurrency=true; g.flags.digitalRMB=true; return{intel:8,mood:5}; }},
+        { label:'还是现金/支付宝最靠谱', hint:'+💰 +😊', fn: g => { g.flags.digitalCurrency=true; return{money:2000,mood:5}; }},
+      ]},
+    { id:'metaverse', icon:'🕶️', title:'元宇宙', category:'tech',
+      body:'你的同事买了个VR头显，说他在"元宇宙"里开会。\n\n你试了一下：\n- 你在虚拟办公室里和同事开会\n- 你的虚拟形象比本人好看\n- 你在虚拟世界里买了块地（花了真金白银）\n\n你摘掉头显后，发现现实世界——还是那么普通。\n\n"元宇宙：不是在创造新世界——是在逃避旧世界。但逃避有时候也需要勇气。"',
+      cond: g => !g.flags.metaverse && g.age >= 18 && g.age <= 40,
+      choices:[
+        { label:'投资元宇宙（买虚拟房产）', hint:'🎲 -💰💰', fn: g => { g.flags.metaverse=true; if(Math.random()>0.7){return{money:30000,mood:15}}else{return{money:-20000,mood:-10}} }},
+        { label:'玩玩VR游戏就好', hint:'+😊 +✨', fn: g => { g.flags.metaverse=true; g.flags.vrGamer=true; return{mood:15,charm:5}; }},
+        { label:'不感兴趣，现实更好', hint:'+💪 +😊', fn: g => { g.flags.metaverse=true; return{health:5,mood:5}; }},
+      ]},
+    { id:'genetic_testing', icon:'🧬', title:'基因检测', category:'tech',
+      body:'你做了一个基因检测（23andMe/微基因）。\n\n结果出来了：\n- 你有15%的南方少数民族血统\n- 你对乳糖不耐受\n- 你的酒精代谢能力很强\n- 你有某个疾病的易感基因（概率2%）\n- 你的生物钟类型是"夜猫子"\n\n你看着报告，觉得好像认识了一个新的自己。\n\n"基因检测：不是告诉你命运——是告诉你出厂设置。但你怎么用这个设置，取决于你自己。"',
+      cond: g => !g.flags.geneticTesting && g.age >= 20 && g.money > 3000,
+      choices:[
+        { label:'根据基因报告调整生活方式', hint:'+💪 +🧠 -💰', fn: g => { g.flags.geneticTesting=true; g.flags.geneOptimized=true; return{health:15,intel:10,money:-2000}; }},
+        { label:'当娱乐看看就好', hint:'+😊 +🧠', fn: g => { g.flags.geneticTesting=true; return{mood:10,intel:5,money:-1000}; }},
+        { label:'太贵了，不需要', hint:'+💰', fn: g => { g.flags.geneticTesting=true; return{money:1000}; }},
+      ]},
+    { id:'self_driving', icon:'🚗', title:'无人驾驶', category:'tech',
+      body:'你在深圳/北京体验了无人驾驶出租车。\n\n车子自己启动、变道、转弯、停车。你的手悬在方向盘上方，心跳有点快。\n\n10分钟后，你到了目的地。你下车的时候想：\n\n- 以后还需要考驾照吗？\n- 以后还需要买车吗？\n- 出租车司机会失业吗？\n\n"无人驾驶：不是解放双手——是解放时间。但被解放的时间，你打算用来做什么？"',
+      cond: g => !g.flags.selfDriving && g.age >= 18,
+      choices:[
+        { label:'拥抱无人驾驶生活', hint:'+😊 +🧠 +✨', fn: g => { g.flags.selfDriving=true; g.flags.autoLife=true; return{mood:12,intel:8,charm:5}; }},
+        { label:'偶尔体验就好', hint:'+😊 +🧠', fn: g => { g.flags.selfDriving=true; return{mood:8,intel:5}; }},
+        { label:'不放心，自己开车更安全', hint:'+💪 +😊', fn: g => { g.flags.selfDriving=true; return{health:3,mood:5}; }},
+      ]},
+    { id:'digital_identity', icon:'🔐', title:'数字身份', category:'tech',
+      body:'你发现你的个人信息又泄露了。\n\n你接到了5个骚扰电话、3个推销短信。有人用你的名字注册了某个网站，有人用你的照片做了假账号。\n\n你在网上搜了搜自己的名字：\n- 你的简历在某个招聘网站上公开\n- 你的电话号码被标注为"快递外卖"\n- 你的照片在某个AI训练数据集里\n\n"数字时代：你的身体在这里，但你的数据已经在全世界流浪了。"',
+      cond: g => !g.flags.digitalIdentity && g.age >= 18,
+      choices:[
+        { label:'全面清理个人信息', hint:'+🧠 +✨ -😊', fn: g => { g.flags.digitalIdentity=true; g.flags.privacyConscious=true; return{intel:12,charm:5,mood:-5}; }},
+        { label:'设置更多隐私保护', hint:'+🧠 +😊', fn: g => { g.flags.digitalIdentity=true; return{intel:8,mood:5}; }},
+        { label:'算了，反正也保护不了', hint:'+😊 -🧠', fn: g => { g.flags.digitalIdentity=true; return{mood:3,intel:-3}; }},
+      ]},
+    { id:'tech_addiction', icon:'📱', title:'科技成瘾', category:'tech',
+      body:'你的屏幕使用时间报告出来了：\n\n- 日均屏幕时间：8小时12分钟\n- 最常用App：微信(3h)、抖音(2h)、微博(1.5h)、小红书(1h)\n- 解锁手机次数：152次/天\n- 通知查看次数：300次/天\n\n你惊呆了：你醒着的时间，有50%都在看手机。\n\n你试着"数字断联"一天。结果：你感到焦虑、空虚、无聊、不安。你每隔5分钟就想看手机。\n\n"科技成瘾：不是你在使用手机——是手机在使用你。"',
+      cond: g => !g.flags.techAddiction && g.age >= 18 && g.age <= 45,
+      choices:[
+        { label:'设置屏幕使用时间限制', hint:'+💪 +😊 +🧠', fn: g => { g.flags.techAddiction=true; g.flags.digitalMinimalist=true; return{health:10,mood:12,intel:8}; }},
+        { label:'周末断网一天', hint:'+💪 +😊 +👥', fn: g => { g.flags.techAddiction=true; g.flags.weekendOffline=true; return{health:8,mood:15,social:10}; }},
+        { label:'算了，现代人离不开手机', hint:'+😊 -💪', fn: g => { g.flags.techAddiction=true; return{mood:3,health:-5}; }},
+      ]},
+    { id:'ai_art', icon:'🎨', title:'AI绘画', category:'tech',
+      body:'你试着用Midjourney/Stable Diffusion生成了一幅画。\n\n你输入了："一个在雨中撑伞的女孩，赛博朋克风格"\n\n30秒后，AI给你生成了4张图。每一张都比你画得好。\n\n你的一个设计师朋友看到后沉默了。他说："我花了10年学画画，AI 30秒就做到了。"\n\n你想安慰他，但你不知道该说什么。\n\n"AI绘画：不是在创造艺术——是在重新定义创造。问题是：当机器能做到的时候，人的创造力还有意义吗？"',
+      cond: g => !g.flags.aiArt && g.age >= 18,
+      choices:[
+        { label:'学习AI绘画，成为AI艺术家', hint:'+🧠 +✨ +😊', fn: g => { g.flags.aiArt=true; g.flags.aiArtist=true; return{intel:15,charm:12,mood:10}; }},
+        { label:'用AI辅助自己的创作', hint:'+🧠 +✨', fn: g => { g.flags.aiArt=true; g.flags.aiAssisted=true; return{intel:10,charm:8}; }},
+        { label:'坚持手绘，AI没有灵魂', hint:'+✨ +😊', fn: g => { g.flags.aiArt=true; g.flags.traditionalArtist=true; return{charm:10,mood:5}; }},
+      ]},
+    { id:'robot_delivery', icon:'🤖', title:'机器人外卖', category:'tech',
+      body:'你在小区门口看到一个送餐机器人。\n\n它方方正正的，身上写着"您的外卖到了"。它用萌萌的声音说："请扫码取餐。"\n\n你拿了外卖，机器人转身走了。你看着它的背影，突然觉得有点可爱。\n\n但你也想到了：那个送餐的外卖小哥，以后会不会被它替代？\n\n"机器人配送：不是科技的胜利——是一个时代的结束和另一个时代的开始。"',
+      cond: g => !g.flags.robotDelivery,
+      choices:[
+        { label:'觉得很方便，支持科技', hint:'+😊 +🧠 +✨', fn: g => { g.flags.robotDelivery=true; g.flags.techOptimist=true; return{mood:10,intel:5,charm:3}; }},
+        { label:'同情外卖小哥', hint:'+👥 +😊', fn: g => { g.flags.robotDelivery=true; g.flags.empathetic=true; return{social:8,mood:5}; }},
+        { label:'科技发展不可逆', hint:'+🧠 +😊', fn: g => { g.flags.robotDelivery=true; return{intel:8,mood:3}; }},
+      ]},
+    { id:'deepfake', icon:'😱', title:'AI换脸骗局', category:'tech',
+      body:'你接到了"你妈"的视频电话，她说急需用钱。\n\n你差点就转了。但你突然注意到：视频里的"你妈"眨眼频率不太对。\n\n你打了个电话确认——果然是AI换脸骗局。\n\n你吓出了一身冷汗。如果刚才你没发现呢？\n\n"AI换脸：技术没有善恶——但使用技术的人有。在这个真假难辨的时代，怀疑可能是一种保护。"',
+      cond: g => !g.flags.deepfake && g.age >= 20,
+      choices:[
+        { label:'报警并提醒家人', hint:'+👥 +🧠 +✨', fn: g => { g.flags.deepfake=true; g.flags.securityAware=true; return{social:10,intel:10,charm:5}; }},
+        { label:'发朋友圈提醒大家', hint:'+👥 +✨', fn: g => { g.flags.deepfake=true; g.flags.publicAware=true; return{social:8,charm:8}; }},
+        { label:'默默记住，以后小心', hint:'+🧠 +😊', fn: g => { g.flags.deepfake=true; return{intel:8,mood:5}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -9509,6 +9602,15 @@ const ACHIEVEMENTS = [
     { id:'network_pro_ach', icon:'🤝', name:'社交达人', desc:'成了职场社交高手', check: g => g.flags.networkPro },
     { id:'headhunted_ach_v2', icon:'📞', name:'被挖角', desc:'被猎头挖过', check: g => g.flags.headhunted },
     { id:'management_ach', icon:'👔', name:'管理层', desc:'成功转型管理岗', check: g => g.flags.managementTrack },
+    // === v18.0 新增成就（科技生活） ===
+    { id:'smart_home_ach', icon:'🏠', name:'智能生活家', desc:'装了智能家居', check: g => g.flags.smartHome },
+    { id:'ai_power_user_ach_v2', icon:'🤖', name:'AI达人', desc:'深度使用AI工具', check: g => g.flags.aiPowerUser },
+    { id:'vr_gamer_ach', icon:'🕶️', name:'VR玩家', desc:'体验了元宇宙', check: g => g.flags.vrGamer },
+    { id:'digital_minimalist_ach', icon:'📱', name:'数字极简主义者', desc:'成功控制屏幕时间', check: g => g.flags.digitalMinimalist },
+    { id:'ai_artist_ach', icon:'🎨', name:'AI艺术家', desc:'学会了AI绘画', check: g => g.flags.aiArtist },
+    { id:'security_aware_ach', icon:'🔐', name:'网络安全意识', desc:'识破了AI换脸骗局', check: g => g.flags.securityAware },
+    { id:'gene_optimized_ach', icon:'🧬', name:'基因优化者', desc:'根据基因报告调整生活', check: g => g.flags.geneOptimized },
+    { id:'tech_optimist_ach', icon:'🤖', name:'科技乐观派', desc:'拥抱科技新生活', check: g => g.flags.techOptimist },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -9785,6 +9887,9 @@ const ENDINGS = [
     // --- v17.3 职场结局 ---
     { id:'slash_master_end', badge:'⚡', title:'斜杠大师', desc:'你成了城市里最成功的斜杠青年。\n\n你是程序员/自媒体博主/自由撰稿人。你有3个收入来源，每一个都比你的主业赚得多。\n\n你的公众号有5万粉丝，你的外包客户排队等你的档期，你的被动收入已经超过了很多人的主动收入。\n\n有人说你"不务正业"，你说："我只是把别人刷抖音的时间用在了创造价值上。"\n\n"斜杠不是三心二意——是在一个不确定的世界里，给自己建多个安全网。"', cond: g => g.flags.slashCareer && g.flags.fullSlash && g.money >= 150000 && g.charm >= 60 && g.age >= 28 },
     { id:'career_pivot_end', badge:'🔄', title:'成功转型', desc:'你在中年成功完成了职业转型。\n\n你从技术岗转到了管理岗/咨询岗/培训岗。你的收入没有下降，但你不再需要每天加班到深夜。\n\n你终于明白：35岁之后的竞争力不是"能做多少活"——而是"能解决多大的问题"。\n\n你的前同事说："你是我们中转型最成功的一个。"\n\n你说："不是我厉害——是我比别人更早开始准备了。"\n\n"中年转型：不是推倒重来——是换一种方式继续前行。"', cond: g => g.flags.midlifeCareerCrisis && g.flags.managementTrack && g.money >= 150000 && g.age >= 38 },
+    // --- v18.0 科技结局 ---
+    { id:'tech_pioneer_end', badge:'🚀', title:'科技先锋', desc:'你成了AI时代的弄潮儿。\n\n你是最早拥抱AI的人之一。你用AI辅助工作、用AI创作、用AI投资、用AI管理生活。\n\n你的同事还在担心AI替代他们的时候，你已经成了那个"会用AI的人"。你的收入是同龄人的2倍，你的效率是别人的3倍。\n\n你的一个朋友说："你怎么什么都比别人快一步？"\n\n你说："不是我快——是我比别人更早开始学习。"\n\n"科技先锋：不是追赶未来——是在未来还没来的时候就准备好了。"', cond: g => g.flags.aiPowerUser && g.flags.aiArtist && g.flags.smartHome && g.intel >= 85 && g.money >= 200000 && g.age >= 28 },
+    { id:'digital_balanced_end', badge:'⚖️', title:'数字平衡者', desc:'你在数字时代找到了完美的平衡。\n\n你既不是科技恐惧者，也不是科技成瘾者。你用AI提高效率，但你坚持独立思考。你享受智能生活，但你每周给自己一天"断网日"。\n\n你的朋友们都来找你问："你怎么做到既用科技又不被科技控制的？"\n\n你说："科技是工具——工具好不好用，取决于用它的人。"\n\n"数字平衡：不是远离科技——是不让科技定义你是谁。"', cond: g => g.flags.digitalMinimalist && g.flags.balancedAI && g.mood >= 70 && g.health >= 65 && g.intel >= 70 && g.age >= 30 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
