@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v20.0
+// 都市浮生记 - Game Engine v20.1
 // ============================================
 
 // === GAME STATE ===
@@ -9509,6 +9509,87 @@ const EVENTS = [
         { label:'关注国产科技发展，学习相关技能', hint:'+🧠', fn: g => { g.flags.techSelfReliance=true; return{intel:8}; }},
         { label:'跟我行业关系不大', hint:'', fn: g => { g.flags.techSelfReliance=true; return{intel:2}; }},
       ]},
+    // === v20.1 新增事件（数字生活 + 网络文化 + 新型社交） ===
+    { id:'sticker_war', icon:'😂', title:'斗图大战', category:'social',
+      body:'你的微信群突然变成了一场斗图大战。\n\n同事发了一个「狗头」，你回了一个「裂开」，老板发了一个「尴尬」。然后整个群开始疯狂刷表情包。\n\n你发现：你手机里有5000+表情包，比你的照片还多。你的每一个情绪都有一个对应的表情包——有时候你甚至不知道该怎么表达，除非先找到合适的表情包。\n\n你的一个朋友是表情包制作者：「我做了一套表情包，下载量超过了100万次。」\n\n你问他赚钱吗？他说：「不赚，但好玩。」\n\n「表情包是这个时代的情绪词典——每个梗都是一代人的集体记忆。」',
+      cond: g => !g.flags.stickerWar && g.age >= 18 && g.age <= 35,
+      choices:[
+        { label:'成了表情包达人，开始自制表情包', hint:'+😊 +👥', fn: g => { g.flags.stickerWar=true; g.flags.stickerCreator=true; return{mood:8,social:5}; }},
+        { label:'收藏了更多表情包', hint:'+😊', fn: g => { g.flags.stickerWar=true; return{mood:5}; }},
+        { label:'不太懂这些年轻人的东西', hint:'', fn: g => { g.flags.stickerWar=true; return{mood:2}; }},
+      ]},
+    { id:'knowledge_pay_trap', icon:'💸', title:'知识付费的坑', category:'society',
+      body:'你花了3999块买了一个「职场晋升课」。\n\n课程介绍很诱人：「前大厂P9亲授，30天实现职场跃迁。」\n\n你听完了所有课程，发现：内容都是百度能搜到的。唯一的「干货」是老师反复说：「关注我公众号，获取更多干货。」\n\n你的同事说：「你也买了吧？我也买了，感觉被割韭菜了。」\n\n你在小红书上搜了一下，发现：「知识付费退款」「知识付费割韭菜」的帖子满屏都是。\n\n一个网友的评论获得了最高赞：「知识付费最大的收获，是让我学会了不再为知识付费。」\n\n「当你为知识付费的时候，你可能不是在买知识——而是在买焦虑。」',
+      cond: g => !g.flags.knowledgePayTrap && g.age >= 22 && g.money >= 10000,
+      choices:[
+        { label:'以后只买真正有价值的课程', hint:'+🧠 -💰', fn: g => { g.flags.knowledgePayTrap=true; g.flags.smartLearner=true; return{intel:5,mood:-3,money:-3999}; }},
+        { label:'申请退款', hint:'-😊', fn: g => { g.flags.knowledgePayTrap=true; g.flags.refundSeeker=true; return{mood:-5,money:-999}; }},
+        { label:'认了，当交学费', hint:'', fn: g => { g.flags.knowledgePayTrap=true; return{intel:3,mood:-2,money:-3999}; }},
+      ]},
+    { id:'cloud_pet', icon:'🐱', title:'云养猫/云养狗', category:'hobby',
+      body:'你关注了一个宠物博主——一只叫「年糕」的橘猫。\n\n你每天看年糕吃饭、睡觉、拆家、跟主人撒娇。你给它留言：「年糕今天也要开心哦！」\n\n你的同事说：「你养猫了？」你说：「云养的。」\n\n你的一个朋友说：「我云养了3只猫、2只狗、1只柯尔鸭。比真养省钱多了，而且不用担心它们生病。」\n\n你看着年糕的视频，嘴角不自觉地上扬。你发现：云养宠物的快乐是真实的——虽然年糕不认识你。\n\n但有时候你也会想：如果能真的摸一摸它，该多好。\n\n「云养宠物：是这个时代最温柔的孤独——你在屏幕这头，它在屏幕那头。」',
+      cond: g => !g.flags.cloudPet && g.age >= 18 && g.age <= 40,
+      choices:[
+        { label:'从云养变成真养，领养了一只猫', hint:'+😊 +❤️ -💰', fn: g => { g.flags.cloudPet=true; g.flags.adoptedPet=true; g.flags.hasPet=true; return{mood:15,social:5,money:-3000}; }},
+        { label:'继续云养，关注更多宠物博主', hint:'+😊', fn: g => { g.flags.cloudPet=true; g.flags.cloudPetFan=true; return{mood:8}; }},
+        { label:'看看就好', hint:'', fn: g => { g.flags.cloudPet=true; return{mood:3}; }},
+      ]},
+    { id:'live_stream_tip', icon:'💰', title:'直播打赏', category:'society',
+      body:'你点进了一个直播间——主播在唱歌，声音很好听。\n\n弹幕里有人在刷礼物：「火箭×1」「嘉年华×1」。你看了看价格——一个火箭500块，一个嘉年华3000块。\n\n你的手指动了动：要不要也刷一个？\n\n你的同事说：「我上个月打赏了2000块，主播叫我「家人们」。后来我发现，她叫所有人「家人们」。」\n\n你看着主播甜甜的笑容，突然觉得：这跟追星有什么区别？\n\n你关掉了直播。但手指还在痒。\n\n「直播打赏：花钱买快乐，还是花钱买空虚？」',
+      cond: g => !g.flags.liveStreamTip && g.age >= 18 && g.age <= 40 && g.money >= 5000,
+      choices:[
+        { label:'忍不住打赏了几百块', hint:'+😊 -💰', fn: g => { g.flags.liveStreamTip=true; g.flags.tipGiver=true; return{mood:5,money:-500}; }},
+        { label:'看了一会儿就关了，不值得', hint:'+🧠', fn: g => { g.flags.liveStreamTip=true; g.flags.rationalViewer=true; return{intel:3,mood:2}; }},
+        { label:'不感兴趣', hint:'', fn: g => { g.flags.liveStreamTip=true; return{}; }},
+      ]},
+    { id:'short_video_startup', icon:'📱', title:'短视频创业', category:'career',
+      body:'你的一个朋友辞了职，开始做短视频创业。\n\n他拍的是「办公室搞笑段子」——每天一条，坚持了3个月。粉丝从0涨到了5万。\n\n他给你看后台数据：「5万粉丝，月收入大概3000块。比上班差远了。」\n\n你问：「那你为什么还做？」\n\n他说：「因为这是我想做的事。上班的时候，我每天都在等下班。做短视频的时候，我忘了时间。」\n\n他又说：「但说实话，我已经焦虑了3个月了。每天想选题、想脚本、想拍摄，比上班还累。」\n\n「短视频创业：不是逃避上班——是用另一种方式上班。」',
+      cond: g => !g.flags.shortVideoStartup && g.age >= 22 && g.age <= 35,
+      choices:[
+        { label:'也尝试做短视频', hint:'+😊 +🧠 -💰', fn: g => { g.flags.shortVideoStartup=true; g.flags.videoCreator=true; return{mood:5,intel:5,money:-2000}; }},
+        { label:'给朋友提供支持和灵感', hint:'+👥 +😊', fn: g => { g.flags.shortVideoStartup=true; return{social:5,mood:3}; }},
+        { label:'看看就好，不适合我', hint:'', fn: g => { g.flags.shortVideoStartup=true; return{mood:2}; }},
+      ]},
+    { id:'second_hand_luxury', icon:'👜', title:'二手奢侈品', category:'finance',
+      body:'你在小红书上看到一个帖子：「月薪8000，我买了人生第一个爱马仕——二手的。」\n\n你打开闲鱼看了看：二手LV包包8000起，二手Gucci围巾2000起，二手劳力士……算了，买不起。\n\n你的同事说：「以前觉得买二手是穷人的选择，现在觉得是聪明人的选择。同样的品质，省一半的钱。」\n\n另一个同事说：「我买了个二手LV Neverfull，背了半年，转手还涨了500块。」\n\n你开始理解：奢侈品不是关于价格——是关于态度。新不新不重要，值不值才重要。\n\n「二手奢侈品：是消费主义的叛逆——用更少的钱，享受同样的品质。」',
+      cond: g => !g.flags.secondHandLuxury && g.age >= 22 && g.money >= 10000,
+      choices:[
+        { label:'开始买卖二手奢侈品', hint:'+💰 +🧠', fn: g => { g.flags.secondHandLuxury=true; g.flags.luxuryReseller=true; return{money:3000,intel:3}; }},
+        { label:'买了个二手包试试', hint:'+😊 -💰', fn: g => { g.flags.secondHandLuxury=true; return{mood:8,money:-5000}; }},
+        { label:'不感兴趣', hint:'', fn: g => { g.flags.secondHandLuxury=true; return{}; }},
+      ]},
+    { id:'wei_lu_zhu_cha', icon:'🍵', title:'围炉煮茶', category:'hobby',
+      body:'你的同事约你去「围炉煮茶」。\n\n你以为就是喝茶。结果是：一个炭炉、一壶茶、烤红薯、烤橘子、烤年糕、烤棉花糖。配上竹椅、油纸伞、红灯笼——氛围感拉满。\n\n你的同事说：「这是今年最火的社交方式。比喝酒健康，比喝咖啡有氛围，比去酒吧便宜。」\n\n你喝了一口茶——是普洱，带着炭火的烟熏味。你看着炉火，突然觉得：好久没有这样安静地坐下来跟人聊天了。\n\n你发了一条朋友圈：「围炉煮茶：成年人最好的社交，是一起发呆。」\n\n「围炉煮茶：不是在喝茶——是在找一个理由，让忙碌的自己停下来。」',
+      cond: g => !g.flags.weiLuZhuCha && g.age >= 22 && g.age <= 45,
+      choices:[
+        { label:'爱上了围炉煮茶，成了固定活动', hint:'+😊 +❤️ -💰', fn: g => { g.flags.weiLuZhuCha=true; g.flags.teaRegular=true; return{mood:12,social:8,money:-2000}; }},
+        { label:'体验不错，偶尔去一次', hint:'+😊 +👥', fn: g => { g.flags.weiLuZhuCha=true; return{mood:8,social:5}; }},
+        { label:'不太习惯，还是喜欢咖啡', hint:'', fn: g => { g.flags.weiLuZhuCha=true; return{mood:3}; }},
+      ]},
+    { id:'online_concert', icon:'🎤', title:'线上演唱会', category:'hobby',
+      body:'你喜欢的歌手开了线上演唱会——免费。\n\n你打开直播，发现同时在线人数超过500万。弹幕里全是「泪目」「青春回来了」「永远的神」。\n\n你一个人在出租屋里，举着荧光棒（其实是筷子），跟着唱了两个小时。\n\n你的室友说：「你在跟谁说话？」你说：「在跟500万人一起看演唱会。」\n\n你在弹幕里看到一条：「虽然隔着屏幕，但我们的心在一起。」\n\n你突然觉得：这比现场更有感觉——因为你知道，有500万人跟你一样，在这个晚上选择了同一首歌。\n\n「线上演唱会：隔着屏幕的共鸣，有时候比面对面的沉默更温暖。」',
+      cond: g => !g.flags.onlineConcert && g.age >= 18 && g.age <= 40,
+      choices:[
+        { label:'成了线上演唱会常客', hint:'+😊 -💰', fn: g => { g.flags.onlineConcert=true; g.flags.concertFan=true; return{mood:12,money:-200}; }},
+        { label:'看了一半就去忙别的了', hint:'', fn: g => { g.flags.onlineConcert=true; return{mood:5}; }},
+        { label:'不是我的菜', hint:'', fn: g => { g.flags.onlineConcert=true; return{}; }},
+      ]},
+    { id:'social_media_break', icon:'📵', title:'社交媒体断联', category:'psychology',
+      body:'你做了一个决定：卸载所有社交媒体一个月。\n\n微信保留（工作需要），但卸载了微博、小红书、抖音、B站。\n\n第一周：你的手不知道往哪里放。等地铁的时候、排队的时候、上厕所的时候——你的手指会自动划向那些已经不存在的App。\n\n第二周：你开始看书了。你已经3年没看完过一本书了。\n\n第三周：你发现自己不再焦虑于别人的生活。不看朋友圈，不比较，不种草。\n\n第四周：你重新下载了这些App。但你的使用习惯变了——你不再无意识地刷，而是有目的地看。\n\n你的同事说：「你最近好像变了一个人。」\n\n你说：「我只是把注意力还给了自己。」\n\n「社交媒体断联：不是逃避世界——是重新找到自己和世界的距离。」',
+      cond: g => !g.flags.socialMediaBreak && g.age >= 20 && g.age <= 40,
+      choices:[
+        { label:'坚持了一个月，改变了使用习惯', hint:'+😊 +🧠 +❤️', fn: g => { g.flags.socialMediaBreak=true; g.flags.digitalMinimalist=true; return{mood:15,intel:5,health:5}; }},
+        { label:'坚持了两周就放弃了', hint:'+😊', fn: g => { g.flags.socialMediaBreak=true; return{mood:5,intel:2}; }},
+        { label:'一天都坚持不了', hint:'', fn: g => { g.flags.socialMediaBreak=true; return{mood:-2}; }},
+      ]},
+    { id:'xhs_shopping', icon:'🛍️', title:'小红书种草', category:'society',
+      body:'你打开小红书，本来是想搜一个菜谱。结果两小时后——\n\n你种草了：一个空气炸锅、一套露营装备、一款防晒霜、一个手工皮具工具包、和一家你从没听说过的云南咖啡馆。\n\n你的购物车已经从3件变成了18件。\n\n你的同事说：「小红书最可怕的地方不是让你花钱——是让你觉得你「需要」这些东西。」\n\n你看了看购物车，开始逐件删除。空气炸锅——家里已经有了。露营装备——你上次露营是两年前。防晒霜——你还有3瓶没用完。\n\n最后你只买了那个云南咖啡豆——因为真的想尝尝。\n\n「种草与拔草：是消费主义的陷阱，也是发现好东西的方式——关键在于你能不能分得清。」',
+      cond: g => !g.flags.xhsShopping && g.age >= 18 && g.age <= 40,
+      choices:[
+        { label:'全买了，开心最重要', hint:'+😊 -💰💰', fn: g => { g.flags.xhsShopping=true; g.flags.impulseBuyer=true; return{mood:10,money:-8000}; }},
+        { label:'只买了真正需要的', hint:'+🧠 +😊', fn: g => { g.flags.xhsShopping=true; g.flags.smartShopper=true; return{intel:3,mood:5,money:-500}; }},
+        { label:'全删了，一个都没买', hint:'+🧠', fn: g => { g.flags.xhsShopping=true; g.flags.resistTemptation=true; return{intel:5,mood:3}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -10405,6 +10486,12 @@ const ACHIEVEMENTS = [
     { id:'flex_worker_ach', icon:'💼', name:'灵活就业者', desc:'拥抱了灵活就业的新生活方式', check: g => g.flags.flexWorker },
     { id:'green_pioneer_ach', icon:'🌱', name:'绿色先锋', desc:'践行低碳生活并投资了新能源', check: g => g.flags.lowCarbon && g.flags.greenInvestment },
     { id:'silver_entrepreneur_ach', icon:'🏥', name:'银发产业家', desc:'在银发经济中找到了创业机会', check: g => g.flags.silverEntrepreneur },
+    // === v20.1 新增成就（数字生活） ===
+    { id:'sticker_creator_ach', icon:'😂', name:'斗图之王', desc:'成了表情包达人和斗图高手', check: g => g.flags.stickerCreator },
+    { id:'cloud_pet_ach', icon:'🐱', name:'云养达人', desc:'从云养宠物到真正领养了一只', check: g => g.flags.cloudPet && g.flags.adoptedPet },
+    { id:'tea_regular_ach', icon:'🍵', name:'围炉煮茶', desc:'在围炉煮茶中找到了慢生活的节奏', check: g => g.flags.teaRegular },
+    { id:'digital_minimalist_ach_v2', icon:'📵', name:'数字极简主义者', desc:'成功断联社交媒体并改变了使用习惯', check: g => g.flags.digitalMinimalist },
+    { id:'smart_shopper_ach_v2', icon:'🛍️', name:'种草免疫体', desc:'在小红书种草面前保持了理性', check: g => g.flags.smartShopper || g.flags.resistTemptation },
 ];
 
 // === ENDINGS === (order matters: first match wins)
