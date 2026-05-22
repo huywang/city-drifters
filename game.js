@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v23.2
+// 都市浮生记 - Game Engine v23.3
 // ============================================
 
 // === GAME STATE ===
@@ -11428,6 +11428,87 @@ const EVENTS = [
         { label:'开始激励身边人：什么时候开始都不晚', hint:'+🤝 +😊', fn: g => { g.flags.ageJustNumber=true; g.flags.ageInspire=true; return{social:12,mood:15}; }},
         { label:'接受了变老，但拒绝变弱', hint:'+💪 +🧠', fn: g => { g.flags.ageJustNumber=true; return{health:8,intel:8,mood:10}; }},
       ]},
+    // === v23.3 新增事件（银发经济 + 老年生活 + 退休规划） ===
+    { id:'retirement_plan', icon:'🏖️', title:'退休规划', category:'finance',
+      body:'你开始认真思考退休。\n\n你50多岁了，离退休还有5-10年。你开始算账：\n\n**退休需要多少钱？**\n- 假设退休后活20年\n- 每月生活费5000元（大城市标准）\n- 总计：5000×12×20=120万\n\n**你的退休金：**\n- 社保养老金：约3000元/月\n- 缺口：2000元/月×12×20=48万\n\n**你的现有积蓄：**\n- 存款：约30万\n- 投资：约20万\n\n**缺口：约-2万（勉强够）**\n\n你开始认真规划：\n1. 增加每月储蓄\n2. 投资稳健的理财产品\n3. 考虑延迟退休\n4. 降低退休后的生活标准\n\n你的一个已退休的朋友说：「退休不是终点——是另一个开始。但这个开始需要你提前准备。」\n\n「退休规划的本质：在还能赚钱的时候，为不能赚钱的日子做准备。」',
+      cond: g => g.age >= 48 && g.age <= 58 && !g.flags.retirementPlan,
+      choices:[
+        { label:'制定了详细的退休计划', hint:'+🧠 +💰', fn: g => { g.flags.retirementPlan=true; g.flags.retirementReady=true; return{intel:12,mood:5,money:5000}; }},
+        { label:'算完之后很焦虑，开始存钱', hint:'+💰 -😊', fn: g => { g.flags.retirementPlan=true; return{money:10000,mood:-8,intel:5}; }},
+        { label:'觉得还早，以后再说', hint:'', fn: g => { g.flags.retirementPlan=true; return{mood:3}; }},
+      ]},
+    { id:'senior_university_v23_3', icon:'🎓', title:'老年大学', category:'education',
+      body:'你报名了老年大学。\n\n不是因为你老了——是因为你想学一些「没用」的东西。\n\n你选了三门课：\n- 国画入门\n- 手机摄影\n- 太极养生\n\n你的同学都是退休的叔叔阿姨。他们比你热情多了：\n- 「来来来，坐我旁边！」\n- 「老师讲得真好，你听懂了吗？」\n- 「下课一起去吃早茶！」\n\n你发现：老年大学不是教你知识——是给你一个社交场所和一个学习的理由。\n\n你的国画老师，70岁，精神矍铄。她说：「我退休后开始画画，现在开了个画展。人生什么时候开始都不晚。」\n\n你的一个同学，65岁，每天最早到教室。他说：「退休后发现时间多了，但不知道干嘛。来这里让我觉得又有目标了。」\n\n「老年大学：不是因为你学不动了——是因为你终于可以为自己而学了。」',
+      cond: g => g.age >= 50 && !g.flags.seniorUniversity,
+      choices:[
+        { label:'成了老年大学的活跃学员', hint:'+😊 +🤝', fn: g => { g.flags.seniorUniversity=true; g.flags.activeSeniorStudent=true; return{mood:15,social:12,intel:8,health:5}; }},
+        { label:'学了几门课，丰富了退休生活', hint:'+😊 +🧠', fn: g => { g.flags.seniorUniversity=true; return{mood:10,intel:8}; }},
+        { label:'去了几次，觉得不太适合自己', hint:'', fn: g => { g.flags.seniorUniversity=true; return{intel:3}; }},
+      ]},
+    { id:'silver_economy_v23_3', icon:'💰', title:'银发经济', category:'finance',
+      body:'你发现了一个巨大的市场：银发经济。\n\n数据让你震惊：\n- 中国60岁以上人口：2.8亿\n- 银发经济市场规模：7万亿\n- 预计2035年：30万亿\n\n银发经济不只是养老院和保健品：\n- 老年旅游：每年超过10亿人次\n- 老年教育：市场规模超1000亿\n- 老年社交：短视频老年用户超过1亿\n- 适老化改造：智能家居、无障碍设施\n- 老年金融：养老理财、反向抵押\n\n你开始思考：自己也是银发经济的目标用户。\n\n你买了一些适老化产品：\n- 大屏幕智能手机\n- 智能健康监测手环\n- 防滑浴室垫\n- 人体工学椅\n\n你的孩子说：「爸/妈，你还没那么老呢。」\n\n你说：「早准备总比晚准备好。」\n\n「银发经济：一个为2.8亿人服务的巨大市场——也是每个终将变老的人需要了解的领域。」',
+      cond: g => g.age >= 50 && !g.flags.silverEconomy && g.intel >= 25,
+      choices:[
+        { label:'投资了银发经济相关产业', hint:'+💰 风险', fn: g => { g.flags.silverEconomy=true; if(Math.random()<0.5){return{money:8000,intel:8};}else{return{money:-3000,intel:5};} }},
+        { label:'开始关注适老化产品，改善生活', hint:'+😊 +💪', fn: g => { g.flags.silverEconomy=true; return{mood:8,health:5,money:-2000}; }},
+        { label:'了解了趋势，但没有特别行动', hint:'+🧠', fn: g => { g.flags.silverEconomy=true; return{intel:8}; }},
+      ]},
+    { id:'health_investment_senior', icon:'🏥', title:'健康投资', category:'health',
+      body:'你开始认真对待健康——不是治病，是预防。\n\n你的健康投资策略：\n\n**身体：**\n- 每年一次全面体检（5000元）\n- 每周3次运动（太极/游泳/散步）\n- 每天30分钟冥想\n- 定期看牙医（牙齿是老年人的第二张脸）\n\n**心理：**\n- 每周和朋友聚一次\n- 保持学习新东西\n- 培养至少一个爱好\n- 定期和家人联系\n\n**经济：**\n- 购买商业医疗保险\n- 建立健康基金（每年2万）\n- 了解长期护理保险\n\n你的医生说：「你比很多年轻人还健康。」\n\n你说：「因为我把健康当作最重要的投资。」\n\n你开始理解一句话：年轻时用健康换钱，年老后用钱换健康——但聪明人从一开始就不做这笔交易。\n\n「健康投资：你在健康上花的每一块钱，都会在未来省下十块钱的医药费。」',
+      cond: g => g.age >= 45 && !g.flags.healthInvestSenior && g.money >= 10000,
+      choices:[
+        { label:'严格执行健康计划，身体状态很好', hint:'+💪💪 +😊', fn: g => { g.flags.healthInvestSenior=true; return{health:15,mood:10,money:-8000}; }},
+        { label:'做了一部分，比之前健康了一些', hint:'+💪 +😊', fn: g => { g.flags.healthInvestSenior=true; return{health:8,mood:5,money:-5000}; }},
+        { label:'知道重要，但执行得不好', hint:'+🧠', fn: g => { g.flags.healthInvestSenior=true; return{intel:5,mood:-3}; }},
+      ]},
+    { id:'grandparent_joy', icon:'👶', title:'带孙子的快乐', category:'social',
+      body:'你的孩子有了孩子。你成了爷爷/奶奶（或外公/外婆）。\n\n你的感受很复杂：\n- 开心：家里多了一个小生命\n- 紧张：不知道怎么带现在的孩子\n- 疲惫：带孙子比上班还累\n- 矛盾：想帮忙但不想失去自己的生活\n\n你和孩子讨论带娃的分工：\n- 周一到周五你帮忙带\n- 周末他们自己带\n- 不干涉教育方式（这很难）\n\n带孙子的过程中，你重新体验了做父母的快乐——但没有做父母的焦虑。\n\n你的孙子/孙女叫你一声，你的心就化了。\n\n你的一个朋友——坚决不带孙子的——说：「我不带，我的人生是我的。」\n\n你理解她。但你也觉得：带孙子虽然累，却是一种独特的幸福。\n\n「带孙子是中国老人的「第二份全职工作」——没有薪水，但有无尽的爱。」',
+      cond: g => g.age >= 50 && g.flags.hasChild && !g.flags.grandparentJoy,
+      choices:[
+        { label:'开心地帮忙带孙子，享受天伦之乐', hint:'+😊 +🤝 -💪', fn: g => { g.flags.grandparentJoy=true; g.flags.activeGrandparent=true; return{mood:15,social:8,health:-5}; }},
+        { label:'有限度地帮忙，保留自己的生活', hint:'+😊 +💪', fn: g => { g.flags.grandparentJoy=true; g.flags.balancedGrandparent=true; return{mood:10,social:5,health:3}; }},
+        { label:'选择不带，把时间留给自己', hint:'+💪 -🤝', fn: g => { g.flags.grandparentJoy=true; g.flags.selfFirstGrandparent=true; return{health:5,mood:5,social:-5}; }},
+      ]},
+    { id:'elder_travel_v23_3', icon:'🌅', title:'退休旅行', category:'hobby',
+      body:'你终于有时间旅行了——不是匆忙的周末游，是真正的慢旅行。\n\n你的退休旅行清单：\n1. 西藏——年轻时就想去，一直没去成\n2. 新疆——自驾一个月\n3. 云南——在大理住一个月\n4. 欧洲——看看那些只在书上看过的地方\n5. 日本——泡温泉看樱花\n\n你选择了云南作为第一站。你在那里住了两个月：\n- 学会了采茶\n- 认识了一群同样退休的旅伴\n- 每天看日出日落\n- 写了一本旅行日记\n\n你发现：退休后旅行的感觉和年轻时完全不同。\n\n年轻时旅行是为了拍照发朋友圈。退休后旅行是为了感受生活。\n\n你不再赶景点——你在一个地方发呆就是一天。\n\n你的旅伴说：「年轻时没时间，中年时没钱。现在终于有时间又有点钱了。」\n\n「退休旅行：不是为了到达目的地——是为了享受路上的每一刻。」',
+      cond: g => g.age >= 55 && !g.flags.elderTravel && g.money >= 20000,
+      choices:[
+        { label:'开始了漫长的退休旅行', hint:'-💰 +😊 +😊', fn: g => { g.flags.elderTravel=true; g.flags.slowTravel=true; return{mood:20,health:5,money:-15000,charm:5}; }},
+        { label:'去了几个想去的地方，满足了', hint:'-💰 +😊', fn: g => { g.flags.elderTravel=true; return{mood:12,money:-8000}; }},
+        { label:'觉得还是在家舒服', hint:'+😊', fn: g => { g.flags.elderTravel=true; return{mood:5}; }},
+      ]},
+    { id:'life_legacy', icon:'📜', title:'人生遗产', category:'psychology',
+      body:'你开始思考：你给这个世界留下了什么？\n\n不是钱——是更深层的东西。\n\n你的遗产清单：\n\n**给家人的：**\n- 你的价值观和人生经验\n- 一些照片和文字记录\n- 一段段共同度过的时光\n\n**给社会的：**\n- 你做过的工作\n- 你帮助过的人\n- 你传播的知识\n\n**给自己的：**\n- 一段无愧于心的人生\n- 一些值得回忆的时刻\n- 一些让自己骄傲的选择\n\n你开始整理你的人生记录：\n- 把照片做成相册\n- 把经验写成文字\n- 录制一些给后辈的视频\n\n你的一个孩子说：「爸/妈，你做这些干嘛？你还年轻。」\n\n你说：「不是因为老了才做——是因为想让你们以后能记住我。」\n\n「人生遗产：不是你留下了什么——是你让别人因为你的存在而变得更好。」',
+      cond: g => g.age >= 50 && !g.flags.lifeLegacy && g.intel >= 30,
+      choices:[
+        { label:'认真整理了人生记录，留给家人', hint:'+😊 +🤝', fn: g => { g.flags.lifeLegacy=true; g.flags.legacyComplete=true; return{mood:18,social:8,intel:8}; }},
+        { label:'开始写自传', hint:'+🧠 +😊', fn: g => { g.flags.lifeLegacy=true; g.flags.autobiography=true; return{intel:12,mood:10}; }},
+        { label:'觉得还没到时候，以后再说', hint:'', fn: g => { g.flags.lifeLegacy=true; return{intel:3}; }},
+      ]},
+    { id:'intergenerational_bond', icon:'👨‍👩‍👧‍👦', title:'代际和解', category:'social',
+      body:'你和你的父母——或者你的孩子——终于和解了。\n\n也许是你的父亲说了一句：「当年是我太严厉了。」\n也许是你的孩子说：「我理解你当年的不容易。」\n也许只是你们坐在一起吃了一顿饭，什么都没说，但什么都说了。\n\n代际关系是中国人最难处理的关系之一：\n- 上一代觉得下一代不孝\n- 下一代觉得上一代不理解\n- 每一代都觉得自己是对的\n- 每一代都在重复上一代的错误\n\n但你终于明白了：\n- 你的父母不是完美的——但他们尽力了\n- 你的孩子不是你的复制品——他们有自己的路\n- 你不是完美的——但你也在尽力\n\n和解不是认同——是接纳。\n\n你对你的家人说了一句从来没说过的话：「谢谢你们。谢谢你们让我成为今天的我。」\n\n「代际和解：不是谁原谅了谁——是每个人都终于理解了每个人的不容易。」',
+      cond: g => g.age >= 45 && !g.flags.intergenBond,
+      choices:[
+        { label:'和家人有了深入的交流，关系更好了', hint:'+😊 +🤝', fn: g => { g.flags.intergenBond=true; g.flags.familyReconcile=true; return{mood:20,social:10,health:5}; }},
+        { label:'努力了但还没有完全和解', hint:'+🧠', fn: g => { g.flags.intergenBond=true; return{intel:8,mood:5}; }},
+        { label:'选择保持距离，各自安好', hint:'+😊', fn: g => { g.flags.intergenBond=true; return{mood:5}; }},
+      ]},
+    { id:'aging_with_grace', icon:'🌿', title:'优雅地变老', category:'psychology',
+      body:'你不再害怕变老了。\n\n你看着镜子里的自己：\n- 头发白了很多\n- 皱纹深了\n- 体力不如从前\n- 但眼神更清澈了\n\n你终于理解了变老的好处：\n- 你不再为别人的评价焦虑\n- 你知道什么重要什么不重要\n- 你有了足够的经验来做出好的决定\n- 你学会了享受当下\n\n你的一个年轻朋友问你：「变老是什么感觉？」\n\n你说：「变老就像一本书——越到后面越精彩。前提是前面写了足够多的故事。」\n\n你的另一个朋友——一个很怕老的——说：「你怎么看起来一点也不老？」\n\n你说：「因为我不再抵抗变老了。接受了，反而轻松了。」\n\n你开始享受每一天——不是因为你还年轻，而是因为你终于知道了时间的珍贵。\n\n「优雅地变老：不是假装不老——是带着所有的皱纹和白发，依然对生活充满热爱。」',
+      cond: g => g.age >= 50 && !g.flags.agingGrace && (g.flags.ageJustNumber || g.flags.healthInvestSenior),
+      choices:[
+        { label:'活成了最好的老年榜样', hint:'+😊 +😊', fn: g => { g.flags.agingGrace=true; return{mood:20,health:8,charm:10,intel:5}; }},
+        { label:'开始教别人如何优雅地变老', hint:'+🤝 +😊', fn: g => { g.flags.agingGrace=true; g.flags.agingTeacher=true; return{social:12,mood:15,intel:8}; }},
+        { label:'接受了一切，内心很平静', hint:'+😊 +🧠', fn: g => { g.flags.agingGrace=true; return{mood:15,intel:10}; }},
+      ]},
+    { id:'final_chapter', icon:'📕', title:'人生最后的章节', category:'psychology',
+      body:'你知道，人生的最后几个章节已经开始了。\n\n不是悲伤——是接受。\n\n你开始做以前一直想做但没时间做的事：\n- 和老朋友重聚\n- 去没去过的地方\n- 吃想吃的东西\n- 对重要的人说重要的话\n\n你不再追求更多——你追求更好。\n\n你的日子变得简单而充实：\n- 早上：太极/散步/买菜\n- 上午：学习/写作/创作\n- 下午：见朋友/陪伴家人\n- 晚上：读书/看剧/早睡\n\n你的一个孩子问你：「爸/妈，你这辈子最大的遗憾是什么？」\n\n你想了很久，说：「遗憾？太多了。但如果能重来一次，我还是会做同样的选择。因为这些选择——好的和坏的——让我成为了今天的我。」\n\n你的孩子沉默了。然后他/她拥抱了你。\n\n「人生最后的章节：不是倒数——是每一页都值得细读。」',
+      cond: g => g.age >= 55 && !g.flags.finalChapter && g.mood >= 50,
+      choices:[
+        { label:'珍惜每一天，活得充实而从容', hint:'+😊 +😊', fn: g => { g.flags.finalChapter=true; return{mood:20,health:5,intel:10,charm:5}; }},
+        { label:'完成了一些一直想做的事', hint:'+😊 +🧠', fn: g => { g.flags.finalChapter=true; g.flags.bucketList=true; return{mood:18,intel:8}; }},
+        { label:'和家人度过了温暖的时光', hint:'+😊 +🤝', fn: g => { g.flags.finalChapter=true; g.flags.warmFamily=true; return{mood:20,social:10}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -12471,6 +12552,12 @@ const ACHIEVEMENTS = [
     { id:'reinvented_ach', icon:'🦋', name:'涅槃重生', desc:'经历了中年危机后蜕变成全新的自己', check: g => g.flags.reinventionStory },
     { id:'mentor_ach', icon:'👨‍🏫', name:'人生导师', desc:'成为了年轻人的导师', check: g => g.flags.companyMentor },
     { id:'age_just_number_ach', icon:'🎂', name:'年龄只是数字', desc:'活出了最好的中年状态', check: g => g.flags.ageJustNumber },
+    // === v23.3 新增成就（银发经济与老年生活） ===
+    { id:'retirement_ready_ach', icon:'🏖️', name:'退休准备好了', desc:'制定了完善的退休计划', check: g => g.flags.retirementReady },
+    { id:'senior_student_ach', icon:'🎓', name:'终身学习者', desc:'在老年大学继续学习', check: g => g.flags.activeSeniorStudent },
+    { id:'aging_grace_ach', icon:'🌿', name:'优雅老去', desc:'学会了优雅地面对衰老', check: g => g.flags.agingGrace },
+    { id:'family_reconcile_ach', icon:'👨‍👩‍👧‍👦', name:'代际和解', desc:'和家人达成了深层的理解与和解', check: g => g.flags.familyReconcile },
+    { id:'legacy_builder_ach_v23_3', icon:'📜', name:'人生传承', desc:'整理了自己的人生记录留给后人', check: g => g.flags.legacyComplete },
 ];
 
 // === ENDINGS === (order matters: first match wins)
