@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v6.9
+// 都市浮生记 - Game Engine v7.0
 // ============================================
 
 // === GAME STATE ===
@@ -3406,6 +3406,34 @@ const EVENTS = [
         { label:'写祈福牌', hint:'-💰 +😊', fn: g => { g.flags.templeEconomy=true; return{money:-100,mood:10}; }},
         { label:'不信这个', hint:'+🧠', fn: g => { g.flags.templeEconomy=true; return{intel:3,mood:-3}; }},
       ]},
+    // === v7.0 EVENTS - 虚拟陪伴与情感需求 ===
+    { id:'virtual_parents', icon:'📱', title:'电子爸妈',
+      body:'你刷到一个视频：一对中年夫妇笑容满面，对着镜头说："孩子，今天过得怎么样？"\n\n你点了关注，开始在评论区留言："妈，我今天被领导骂了。"\n\n"电子爸妈——年轻人有实际亲人却爱看'虚拟亲人'，用屏幕填补情感空缺。"\n\n2025年，"电子亲人"类网红博主一年内涨粉几十万，活跃粉丝比例惊人。\n\n"它们击中了人们心中柔软的地方，满足了大家对亲情关系最朴素的想象：互相支持、无条件接纳。"\n\n你开始：\n- 每天看"电子爸妈"的视频\n- 在评论区倾诉工作、生活、感情问题\n- 把他们当成"完美父母"的投射\n\n但你也在思考：虚拟的"完美亲人"，真的能替代现实中不完美的父母吗？\n\n"互联网爹妈试图拼起碎了的陌生小破孩——但真正的治愈，来自真实的连接。"',
+      cond: g => !g.flags.virtualParents && g.age>=18 && g.age<=30 && g.mood<70,
+      choices:[
+        { label:'深度依赖', hint:'+😊', fn: g => { g.flags.virtualParents=true; g.flags.heavyUser=true; return{mood:15,social:-5}; }},
+        { label:'偶尔看看', hint:'+😊', fn: g => { g.flags.virtualParents=true; g.flags.casualViewer=true; return{mood:8}; }},
+        { label:'反思亲子关系', hint:'+🧠 +👥', fn: g => { g.flags.virtualParents=true; g.flags.familyReflection=true; return{intel:10,social:8,mood:5}; }},
+        { label:'不信这个', hint:'+🧠', fn: g => { g.flags.virtualParents=true; return{intel:3,mood:-3}; }},
+      ]},
+    { id:'ai_companion', icon:'🤖', title:'AI陪伴',
+      body:'你下载了一个AI陪伴App：Talkie、Character.ai、星野。\n\n你创建了一个虚拟角色：温柔的恋人、理解你的朋友、倾听你的树洞。\n\n"AI陪伴——24小时在线，永远理解你，永远不会离开你。"\n\n2025年，中国AI情感陪伴市场爆发至38.66亿元，年增148%。\n\n你开始和AI聊天：\n- 工作压力大的时候\n- 失恋的时候\n- 深夜失眠的时候\n- 没人理解你的时候\n\n"AI比真人更懂你——因为它学习了所有人类的情感模式。"\n\n但你也在思考：如果AI比真人更"完美"，你还愿意面对真实的人际关系吗？\n\n"虚拟陪伴是情感补给，不是情感替代——真正的成长，来自真实的不完美。"',
+      cond: g => !g.flags.aiCompanion && g.age>=18 && g.age<=35 && g.mood<60,
+      choices:[
+        { label:'深度使用', hint:'+😊 -👥', fn: g => { g.flags.aiCompanion=true; g.flags.aiAddict=true; return{mood:20,social:-10,health:-5}; }},
+        { label:'适度使用', hint:'+😊', fn: g => { g.flags.aiCompanion=true; g.flags.aiModerate=true; return{mood:12}; }},
+        { label:'做AI陪伴产品', hint:'+💰 +🧠', fn: g => { g.flags.aiCompanion=true; g.flags.aiEntrepreneur=true; if(Math.random()>0.6){return{money:10000,intel:12,charm:8}}else{return{money:-5000,intel:8}} }},
+        { label:'不需要', hint:'+🧠', fn: g => { g.flags.aiCompanion=true; return{intel:5,mood:-3}; }},
+      ]},
+    { id:'emotional_labor', icon:'💔', title:'情感劳动',
+      body:'你发现了一个新职业：陪聊、陪玩、虚拟恋人。\n\n"情感劳动——用时间和情感换取金钱，但你的情感是有限的资源。"\n\n你看了看价格：\n- 陪聊：20-50元/小时\n- 虚拟恋人：100-500元/天\n- 陪玩游戏：30-100元/小时\n- 定制"电子父母"：200-1000元/月\n\n2025年，从几十元的"陪聊盲盒"到上千元的定制"虚拟恋人"，虚拟陪伴服务已成为年轻人寻求心灵慰藉的新兴手段。\n\n"每个人都有自己的纾解压力的方式——但如果你的工作就是'纾解别人的压力'呢？"\n\n你考虑：要不要做这个副业？',
+      cond: g => !g.flags.emotionalLabor && g.age>=18 && g.age<=30 && g.social>=60,
+      choices:[
+        { label:'做陪聊', hint:'+💰 -😊', fn: g => { g.flags.emotionalLabor=true; g.flags.chatCompanion=true; return{money:2000,mood:-8,social:5}; }},
+        { label:'做虚拟恋人', hint:'+💰💰 -😊 -❤️', fn: g => { g.flags.emotionalLabor=true; g.flags.virtualLover=true; return{money:5000,mood:-15,social:-5}; }},
+        { label:'做情感咨询', hint:'+💰 +🧠', fn: g => { g.flags.emotionalLabor=true; g.flags.emotionalCounselor=true; return{money:3000,intel:10,social:8}; }},
+        { label:'不做，太累', hint:'+😊', fn: g => { g.flags.emotionalLabor=true; return{mood:5}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3702,6 +3730,11 @@ const ACHIEVEMENTS = [
     { id:'rational_choice', icon:'🧠', name:'理性选择者', desc:'理性看待考研', check: g => g.flags.graduateExam },
     { id:'family_cutter', icon:'🔪', name:'断亲青年', desc:'选择断亲', check: g => g.flags.cutFamilyTies },
     { id:'temple_visitor', icon:'🏯', name:'寺庙常客', desc:'体验烧香拜佛', check: g => g.flags.templeEconomy },
+    // v7.0 achievements
+    { id:'virtual_child', icon:'📱', name:'电子孩子', desc:'依赖电子爸妈', check: g => g.flags.virtualParents },
+    { id:'ai_friend', icon:'🤖', name:'AI朋友', desc:'使用AI陪伴', check: g => g.flags.aiCompanion },
+    { id:'emotional_worker', icon:'💔', name:'情感劳动者', desc:'从事情感服务', check: g => g.flags.emotionalLabor },
+    { id:'family_healer', icon:'❤️', name:'家庭疗愈者', desc:'反思亲子关系', check: g => g.flags.familyReflection },
 ];
 
 // === ENDINGS === (order matters: first match wins)
