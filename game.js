@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v3.1
+// 都市浮生记 - Game Engine v3.2
 // ============================================
 
 // === GAME STATE ===
@@ -2676,6 +2676,42 @@ const EVENTS = [
         { label:'分享给同事', hint:'+👥 +😊', fn: g => { g.flags.antiPUA=true; return{social:10,mood:10}; }},
         { label:'算了，我还是配合吧', hint:'+💰 -😊', fn: g => { g.flags.antiPUA=true; return{money:1000,mood:-8}; }},
       ]},
+    // === v3.2 EVENTS - 房地产与婚恋 ===
+    { id:'unfinished_building', icon:'🏚️', title:'烂尾楼噩梦',
+      body:'你三年前买的期房，烂尾了。\n\n每个月还在还8000块的房贷，但房子连顶都没封。你去售楼处维权，看到一群同样遭遇的业主，有人哭了，有人骂了，有人沉默了。\n\n开发商说："资金链断了，我们也没办法。"\n银行说："房贷必须继续还。"\n政府说："保交楼，但需要时间。"\n\n你站在烂尾楼前，看着钢筋裸露的框架，想起了那句广告词："给你一个家。"\n\n"烂尾楼是购房者的噩梦——钱没了，房也没了，梦碎了。"',
+      cond: g => g.flags.hasHouse && !g.flags.unfinishedBuilding && g.months>=36 && Math.random()>0.7,
+      choices:[
+        { label:'维权到底', hint:'-💰 +😊', fn: g => { g.flags.unfinishedBuilding=true; return{money:-5000,mood:10,social:5}; }},
+        { label:'断供抗议', hint:'🎲 -💰💰', fn: g => { g.flags.unfinishedBuilding=true; if(Math.random()>0.6){return{money:-20000,mood:-20}}else{return{money:-50000,mood:-40}} }},
+        { label:'继续等', hint:'-😊', fn: g => { g.flags.unfinishedBuilding=true; return{mood:-15}; }},
+        { label:'租房住，慢慢等', hint:'-💰 -😊', fn: g => { g.flags.unfinishedBuilding=true; return{money:-3000,mood:-10}; }},
+      ]},
+    { id:'bride_price', icon:'💰', title:'天价彩礼',
+      body:'你要结婚了，女方家要求彩礼30万。\n\n你算了算：\n- 存款：15万\n- 父母积蓄：10万\n- 还差：5万\n\n你妈说："借点吧，娶媳妇是大事。"\n你爸说："这彩礼也太高了。"\n你对象说："这是对我父母的尊重。"\n\n你陷入了沉思：爱情真的需要用金钱来衡量吗？\n\n"彩礼是传统，但天价彩礼是绑架——绑架了爱情，也绑架了婚姻。"',
+      cond: g => g.flags.hasPartner && !g.flags.married && !g.flags.bridePrice && g.age>=25 && g.money<50000,
+      choices:[
+        { label:'借钱凑彩礼', hint:'-💰💰 +😊', fn: g => { g.flags.bridePrice=true; g.flags.married=true; return{money:-40000,mood:15,social:10}; }},
+        { label:'跟女方家谈', hint:'🎲 +🧠', fn: g => { g.flags.bridePrice=true; if(Math.random()>0.5){g.flags.married=true;return{money:-15000,mood:20,intel:5}}else{return{mood:-15}} }},
+        { label:'选择零彩礼', hint:'+💰 +✨ 🎲', fn: g => { g.flags.bridePrice=true; if(Math.random()>0.6){g.flags.married=true;return{mood:25,charm:10}}else{return{mood:-10,social:-5}} }},
+        { label:'分手，结不起', hint:'-😊', fn: g => { g.flags.bridePrice=true; g.flags.hasPartner=false; return{mood:-25}; }},
+      ]},
+    { id:'delay_marriage', icon:'💍', title:'延迟结婚',
+      body:'新闻说：2025年Q1结婚率同比下降8.2%，连续第七年下滑。\n\n你的朋友圈：\n- 小王：30岁，单身，"享受自由"\n- 小李：32岁，恋爱中，"再等等"\n- 小张：28岁，已婚，"别催了"\n\n你妈打电话来："你什么时候结婚？"\n你说："不急。"\n你妈说："再不急就来不及了。"\n\n"延迟结婚不是逃避，是对婚姻更负责。"',
+      cond: g => !g.flags.delayMarriage && !g.flags.married && g.age>=27 && g.age<=35,
+      choices:[
+        { label:'享受单身生活', hint:'+😊 +💰', fn: g => { g.flags.delayMarriage=true; return{mood:15,money:5000}; }},
+        { label:'认真找对象', hint:'+👥 +✨', fn: g => { g.flags.delayMarriage=true; return{social:10,charm:5}; }},
+        { label:'跟父母解释', hint:'+👥 +🧠', fn: g => { g.flags.delayMarriage=true; return{social:5,intel:5}; }},
+        { label:'还是听父母的', hint:'-😊 +👥', fn: g => { g.flags.delayMarriage=true; return{mood:-10,social:8}; }},
+      ]},
+    { id:'zero_bride_price', icon:'💚', title:'零彩礼婚礼',
+      body:'你参加了一个"零彩礼"婚礼。\n\n新郎说："我们的爱情不需要彩礼来证明。"\n新娘说："我要的是他这个人，不是他家的钱。"\n\n你被感动了。但你也听到有人说："这是理想主义，现实会很残酷。"\n\n"零彩礼是勇气，也是对婚姻最美好的期待。"',
+      cond: g => !g.flags.zeroBridePrice && g.age>=24 && g.age<=35,
+      choices:[
+        { label:'支持零彩礼', hint:'+✨ +😊', fn: g => { g.flags.zeroBridePrice=true; return{charm:10,mood:15}; }},
+        { label:'觉得太理想化', hint:'+🧠', fn: g => { g.flags.zeroBridePrice=true; return{intel:5}; }},
+        { label:'传播这个理念', hint:'+👥 +✨', fn: g => { g.flags.zeroBridePrice=true; return{social:8,charm:5}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -2729,6 +2765,10 @@ const ACHIEVEMENTS = [
     { id:'worker_star', icon:'📱', name:'职人网红', desc:'用上班赚下班的钱', check: g => g.flags.workerInfluencer },
     { id:'game_player', icon:'🎮', name:'职场玩家', desc:'游戏化工作', check: g => g.flags.gamifyWork },
     { id:'anti_pua_master', icon:'🛡️', name:'反PUA大师', desc:'看穿职场黑话', check: g => g.flags.antiPUA },
+    { id:'unfinished_survivor', icon:'🏚️', name:'烂尾楼幸存者', desc:'经历烂尾楼之痛', check: g => g.flags.unfinishedBuilding },
+    { id:'bride_price_warrior', icon:'💰', name:'彩礼战士', desc:'面对天价彩礼', check: g => g.flags.bridePrice },
+    { id:'delay_marriage_expert', icon:'💍', name:'延迟结婚专家', desc:'选择晚婚', check: g => g.flags.delayMarriage },
+    { id:'zero_price_supporter', icon:'💚', name:'零彩礼支持者', desc:'支持婚俗改革', check: g => g.flags.zeroBridePrice },
     { id:'photographer', icon:'📷', name:'摄影师', desc:'爱上摄影', check: g => g.flags.photographyHobby },
     { id:'viral_star', icon:'🌟', name:'网红初体验', desc:'意外走红', check: g => g.flags.viralMoment },
     { id:'freelancer', icon:'💻', name:'自由职业者', desc:'成为自由职业者', check: g => g.flags.freelancer },
