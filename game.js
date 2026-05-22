@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v31.4
+// 都市浮生记 - Game Engine v31.5
 // ============================================
 
 // === GAME STATE ===
@@ -17033,6 +17033,87 @@ const EVENTS = [
         { label:'加入骑手互助群', hint:'+👥 +🧠', fn: g => { g.flags.gigWorkerRights=true; g.flags.mutualAid=true; return{social:5,intel:3}; }},
         { label:'考虑转行找有保障的工作', hint:'+🧠 +💰', fn: g => { g.flags.gigWorkerRights=true; g.flags.seekStableJob=true; return{intel:5,mood:3}; }},
       ]},
+    // --- v31.5 中国式情感记忆 ---
+    { id:'gaokao_memory', icon:'📝', title:'高考回忆', category:'memory',
+      body:'今天是6月7号。你的朋友圈被高考刷屏了。\n\n你想起自己的高考——那年夏天的蝉鸣、教室里的倒计时、妈妈每天早上煮的鸡蛋、考完最后一科时全班人的欢呼。\n\n那时候你觉得高考是人生中最大的事。现在你发现——高考之后的人生，比高考难多了。\n\n你的高中同桌给你发了一条消息：「还记得我们那年在操场上说以后要做什么吗？」\n\n你看了看，笑了。你那时候说要当作家。现在你在做Excel。',
+      cond: g => g.age >= 22 && g.age <= 40,
+      choices:[
+        { label:'回消息聊聊那些年', hint:'+👥 +😊', fn: g => { g.flags.gaokaoMemory=true; g.flags.reconnectOldFriend=true; return{social:5,mood:5}; }},
+        { label:'翻出老照片发朋友圈', hint:'+😊 +✨', fn: g => { g.flags.gaokaoMemory=true; g.flags.nostalgia=true; return{mood:8,charm:2}; }},
+        { label:'想想现在的路是不是自己选的', hint:'+🧠', fn: g => { g.flags.gaokaoMemory=true; g.flags.lifeReflection=true; return{intel:5}; }},
+      ]},
+    { id:'childhood_snack_v31_5', icon:'🍬', title:'小卖部记忆', category:'memory',
+      body:'你在老家附近发现了一家小卖部——你小时候常去的那家。\n\n老板还认识你：「哟，长这么大了！」他递给你一包辣条：「小时候你最爱吃这个。」\n\n你买了一包，撕开吃了一口。味道和记忆中一模一样——又辣又甜又便宜。\n\n你想起小时候用5毛钱买一根冰棍，和小伙伴在巷子里追着跑的夏天。\n\n那时候你没有手机、没有wifi，但你好像比现在快乐。',
+      cond: g => g.age >= 25 && g.age <= 45 && g.mood < 65,
+      choices:[
+        { label:'买了一大堆童年零食', hint:'+😊 -💰', fn: g => { g.flags.childhoodSnack=true; g.flags.snackNostalgia=true; return{mood:10,money:-50}; }},
+        { label:'和老板聊了聊这些年的变化', hint:'+👥 +😊', fn: g => { g.flags.childhoodSnack=true; g.flags.chatWithOwner=true; return{social:3,mood:5}; }},
+        { label:'拍了一张照片发给老家的朋友', hint:'+👥 +😊', fn: g => { g.flags.childhoodSnack=true; g.flags.shareMemory=true; return{social:3,mood:5}; }},
+      ]},
+    { id:'hometown_dialect_v31_5', icon:'🗣️', title:'家乡方言', category:'memory',
+      body:'你在公司开会，全程说普通话。你的同事说：「你的口音好标准。」\n\n下班后你给妈妈打电话，一开口就是方言。你觉得——说方言的时候，你才是真正的你。\n\n你的同事听到你打电话，惊讶地说：「原来你是XX人？完全听不出来！」\n\n你不确定这是夸奖还是遗憾。\n\n你的孩子已经不会说方言了。你想教他，但他觉得「说方言很土」。',
+      cond: g => g.age >= 22 && g.age <= 45,
+      choices:[
+        { label:'坚持教孩子说方言', hint:'+👥 +🧠', fn: g => { g.flags.hometownDialect=true; g.flags.teachDialect=true; return{social:3,intel:3}; }},
+        { label:'接受方言慢慢消失', hint:'+🧠 +😊', fn: g => { g.flags.hometownDialect=true; g.flags.acceptChange=true; return{intel:3,mood:3}; }},
+        { label:'录一段方言视频留作纪念', hint:'+✨ +😊', fn: g => { g.flags.hometownDialect=true; g.flags.recordDialect=true; return{charm:5,mood:5}; }},
+      ]},
+    { id:'first_paycheck_v31_5', icon:'💵', title:'第一份工资', category:'memory',
+      body:'你发了第一份工资——3200块。\n\n你激动得手都在抖。你做的第一件事是给爸妈转了1000块。\n\n你妈说：「你自己留着用。」但你坚持转了。你爸在家族群里发了一条消息：「我儿子/女儿给我转钱了。」\n\n你做的第二件事是请最好的朋友吃了一顿饭。你们吃了火锅，花了200块。你觉得这200块花得比2000块都值。\n\n剩下的2000块，交完房租就没了。但你不觉得穷——你觉得富有。',
+      cond: g => g.age >= 20 && g.age <= 28 && g.job && g.job !== '待业中',
+      choices:[
+        { label:'请全家吃一顿大餐', hint:'+👥 +😊', fn: g => { g.flags.firstPaycheck=true; g.flags.treatFamily=true; return{social:8,mood:8,money:-500}; }},
+        { label:'给自己买一件一直想要的东西', hint:'+😊 +✨', fn: g => { g.flags.firstPaycheck=true; g.flags.rewardSelf=true; return{mood:10,charm:3,money:-800}; }},
+        { label:'存起来开始理财', hint:'+💰 +🧠', fn: g => { g.flags.firstPaycheck=true; g.flags.startSaving=true; return{money:500,intel:3}; }},
+      ]},
+    { id:'chunyun_travel_v31_5', icon:'🚄', title:'春运回家', category:'memory',
+      body:'你抢了3天的票，终于抢到了一张回家的高铁票。\n\n你提前一周开始收拾行李——给爸妈买了保健品，给侄子买了玩具，给自己带了一箱子脏衣服。\n\n高铁上人挤人，行李架满了，你抱着行李箱坐了4小时。\n\n到站的时候，你爸骑着电动车来接你。他说：「瘦了。」你说：「没有。」\n\n你坐上了电动车的后座，冷风吹过来。你抱紧了爸爸的腰，像小时候一样。',
+      cond: g => g.age >= 20 && g.age <= 40 && g.job && g.job !== '待业中',
+      choices:[
+        { label:'在家待满整个假期', hint:'+😊 +👥', fn: g => { g.flags.chunyunTravel=true; g.flags.fullHoliday=true; return{mood:10,social:5}; }},
+        { label:'帮爸妈把家里收拾一遍', hint:'+👥 +💪', fn: g => { g.flags.chunyunTravel=true; g.flags.helpParents=true; return{social:5,health:3}; }},
+        { label:'和老同学聚一聚', hint:'+👥 +😊', fn: g => { g.flags.chunyunTravel=true; g.flags.oldFriendsReunion=true; return{social:8,mood:5}; }},
+      ]},
+    { id:'old_classmate_contact_v31_5', icon:'📱', title:'老同学突然联系', category:'social',
+      body:'一个10年没联系的高中同学突然给你发了微信：「在吗？」\n\n你的第一反应是：他要借钱还是要我参加他的婚礼。\n\n结果他说：「没什么事，就是突然想起你了。你还好吗？」\n\n你们聊了一晚上。他去了另一个城市，结了婚，有了孩子。他说不快乐，但也不知道该怎么改变。\n\n你说：「我也不快乐。」\n\n你们笑了。你们发现——原来大家都不快乐，但不快乐的方式不一样。',
+      cond: g => g.age >= 25 && g.age <= 45 && g.social < 60,
+      choices:[
+        { label:'约出来见一面', hint:'+👥 +😊', fn: g => { g.flags.oldClassmateContact=true; g.flags.meetUp=true; return{social:8,mood:5}; }},
+        { label:'保持线上联系偶尔聊天', hint:'+👥 +🧠', fn: g => { g.flags.oldClassmateContact=true; g.flags.keepOnline=true; return{social:3,intel:3}; }},
+        { label:'感慨时间过得真快', hint:'+🧠 +😊', fn: g => { g.flags.oldClassmateContact=true; g.flags.timeFlies=true; return{intel:5,mood:3}; }},
+      ]},
+    { id:'late_night_diner_v31_5', icon:'🍜', title:'深夜食堂', category:'life',
+      body:'加班到11点，你路过一家深夜食堂。\n\n很小的一家店，只有6个座位。老板是个50岁的阿姨，她看了看你说：「加班到现在？」\n\n她给你端了一碗热汤面。没有菜单，她说吃什么做什么。面条是手擀的，汤是骨头熬的。\n\n你吃了一口，眼泪差点掉下来。不是因为好吃——是因为太像妈妈做的了。\n\n你付了15块钱。阿姨说：「明天别加班了，早点回家吃饭。」\n\n你点了点头。你知道明天还是会加班。',
+      cond: g => g.job && g.job!=='待业中' && g.age >= 22 && g.age <= 40 && g.mood < 55,
+      choices:[
+        { label:'成了深夜食堂的常客', hint:'+😊 +💪', fn: g => { g.flags.lateNightDiner=true; g.flags.regularCustomer=true; return{mood:8,health:3}; }},
+        { label:'和老板成了忘年之交', hint:'+👥 +😊', fn: g => { g.flags.lateNightDiner=true; g.flags.dinerFriend=true; return{social:5,mood:5}; }},
+        { label:'决定以后自己做晚饭', hint:'+💪 +💰', fn: g => { g.flags.lateNightDiner=true; g.flags.cookDinner=true; return{health:5,money:200}; }},
+      ]},
+    { id:'homesickness_v31_5', icon:'🌙', title:'异乡人的乡愁', category:'emotion',
+      body:'你在超市看到了家乡特产——一种辣酱，你从小吃到大。\n\n你拿了一瓶，看了看价格——15块，比老家贵了3倍。\n\n你买回了家，打开拌了一碗面。你吃了一口——味道对，但感觉不对。\n\n你给妈妈打了一个视频电话。她在炒菜，你看着她的背影，说：「妈，我想吃你做的菜。」\n\n她说：「过年回来妈给你做。」\n\n你挂了电话，把那碗面吃完了。面有点咸。或者不是面咸，是你的眼泪掉进去了。',
+      cond: g => g.age >= 20 && g.age <= 40 && g.mood < 55,
+      choices:[
+        { label:'计划下个月回家看看', hint:'+😊 +💰', fn: g => { g.flags.homesicknessV31=true; g.flags.planVisit=true; return{mood:8,money:-500}; }},
+        { label:'学做妈妈的拿手菜', hint:'+💪 +😊', fn: g => { g.flags.homesicknessV31=true; g.flags.learnCooking=true; return{health:3,mood:5}; }},
+        { label:'给妈妈寄了一份礼物', hint:'+👥 -💰', fn: g => { g.flags.homesicknessV31=true; g.flags.sendGift=true; return{social:5,money:-300}; }},
+      ]},
+    { id:'classmate_wedding_v31_5', icon:'💒', title:'同学婚礼', category:'social',
+      body:'你收到了大学同学的婚礼请帖。\n\n你看了看红包行情：同事200、朋友500、好朋友1000。你和他关系还行——你包了600。\n\n婚礼上，你见到了很多老同学。有人开了公司，有人当了公务员，有人已经是两个孩子的爸了。\n\n你坐在角落里吃饭，听着隔壁桌的同学聊房子、车子、孩子。\n\n你妈打电话问你：「参加婚礼了？人家都结婚了，你呢？」\n\n你挂了电话，多吃了一块蛋糕。',
+      cond: g => g.age >= 24 && g.age <= 40 && !g.flags.married,
+      choices:[
+        { label:'大方祝福享受聚会', hint:'+👥 +😊', fn: g => { g.flags.classmateWedding=true; g.flags.gracefulBlessing=true; return{social:5,mood:5,money:-600}; }},
+        { label:'和老同学交换联系方式', hint:'+👥 +✨', fn: g => { g.flags.classmateWedding=true; g.flags.networkAtWedding=true; return{social:8,charm:2,money:-600}; }},
+        { label:'开始认真考虑自己的感情', hint:'+🧠 +😊', fn: g => { g.flags.classmateWedding=true; g.flags.loveReflection=true; return{intel:5,mood:3,money:-600}; }},
+      ]},
+    { id:'night_returner_v31_5', icon:'🌃', title:'城市夜归人', category:'life',
+      body:'凌晨1点，你终于到家了。\n\n你打开门，黑暗的房间，空荡的客厅。你没有开灯，直接躺在了沙发上。\n\n你看着窗外的城市——灯火通明，车流不息。这座城市有2000万人，但此刻只有你一个人醒着。\n\n你的手机亮了——一个外卖推送：「深夜特惠，第二份半价。」\n\n你笑了笑。你不需要第二份半价——因为你只有一个人。\n\n但你打开了外卖App，点了一份炸鸡。你觉得自己值得一份深夜的快乐。',
+      cond: g => g.job && g.job!=='待业中' && g.age >= 22 && g.age <= 38 && g.mood < 55,
+      choices:[
+        { label:'吃炸鸡看一集剧再睡', hint:'+😊 -💪', fn: g => { g.flags.nightReturner=true; g.flags.midnightTreat=true; return{mood:5,health:-2}; }},
+        { label:'洗个热水澡早点睡', hint:'+💪 +😊', fn: g => { g.flags.nightReturner=true; g.flags.selfCare=true; return{health:5,mood:3}; }},
+        { label:'写一篇日记记录今天', hint:'+🧠 +😊', fn: g => { g.flags.nightReturner=true; g.flags.nightJournal=true; return{intel:5,mood:5}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
 
@@ -18608,6 +18689,17 @@ const ACHIEVEMENTS = [
     { id:'educate_parents_ach', icon:'👴', name:'反哺教育', desc:'教父母识别理财骗局', check: g => g.flags.educateParents },
     { id:'skill_retrain_ach', icon:'🏭', name:'重新出发', desc:'工厂倒闭后选择学新技术', check: g => g.flags.skillRetrain },
     { id:'mutual_aid_ach', icon:'📋', name:'互助力量', desc:'加入了灵活就业互助群', check: g => g.flags.mutualAid },
+    // --- v31.5 情感记忆成就 ---
+    { id:'nostalgia_ach', icon:'📝', name:'青春回忆', desc:'回忆了高考和青春岁月', check: g => g.flags.gaokaoMemory },
+    { id:'snack_memory_ach', icon:'🍬', name:'童年味道', desc:'重温了童年零食的记忆', check: g => g.flags.childhoodSnack },
+    { id:'dialect_keeper_ach', icon:'🗣️', name:'方言传承者', desc:'坚持传承家乡方言', check: g => g.flags.teachDialect },
+    { id:'first_pay_ach', icon:'💵', name:'第一份工资', desc:'发了第一份工资并感恩家人', check: g => g.flags.firstPaycheck },
+    { id:'chunyun_warrior_ach', icon:'🚄', name:'春运勇士', desc:'经历了春运回家之路', check: g => g.flags.chunyunTravel },
+    { id:'reconnect_ach_v31_5', icon:'📱', name:'老友重逢', desc:'和老同学重新联系上了', check: g => g.flags.oldClassmateContact },
+    { id:'diner_friend_ach', icon:'🍜', name:'深夜食堂之友', desc:'和深夜食堂老板成了朋友', check: g => g.flags.dinerFriend },
+    { id:'homesick_healer_ach', icon:'🌙', name:'乡愁疗愈', desc:'学会了在异乡安顿自己', check: g => g.flags.homesicknessV31 },
+    { id:'graceful_single_ach', icon:'💒', name:'优雅单身', desc:'参加婚礼后依然从容', check: g => g.flags.gracefulBlessing },
+    { id:'night_journal_ach', icon:'🌃', name:'深夜日记', desc:'养成了写日记的习惯', check: g => g.flags.nightJournal },
 ];
 
 // === ENDINGS === (order matters: first match wins)
