@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v33.3
+// 都市浮生记 - Game Engine v33.4
 // ============================================
 
 // === GAME STATE ===
@@ -18703,6 +18703,97 @@ const EVENTS = [
         { label:'决定每周给自己一天数字断联日', hint:'+😊 +💪', fn: g => { g.flags.digitalDetox=true; g.flags.weeklyDetox=true; return{mood:8,health:3}; }},
       ]},
 
+    // === v33.4 城市里的孤独 ===
+    { id:'living_alone_v33_4', icon:'🏠', title:'独居日常', category:'loneliness',
+      body:'你一个人住了三年。\n\n你的冰箱里永远只有一个人的份量。你买了一个小号电饭煲，因为大号的总是煮太多。你的洗发水能用八个月。\n\n你习惯了回家不用开灯，因为你知道开关在哪里。你习惯了马桶圈永远放下来。\n\n有一天你感冒了，躺在床上发高烧。你拿起手机翻了翻通讯录，不知道该打给谁。\n\n你叫了外卖，备注写了「请放门口，不用敲门」。你吃了药，睡了一整天。第二天醒来，烧退了。你觉得一个人也没什么不好的。\n\n但你还是在阳台上养了一盆绿植——至少有个活着的东西在等你回来。',
+      cond: g => g.age >= 22 && !g.flags.hasHouse && !g.flags.married,
+      choices:[
+        { label:'在阳台上养了一盆绿植', hint:'+😊', fn: g => { g.flags.livingAlone=true; g.flags.grewPlant=true; return{mood:5}; }},
+        { label:'决定养一只猫', hint:'-💰 +😊', fn: g => { g.flags.livingAlone=true; g.flags.hasPet=true; g.money-=500; return{mood:10}; }},
+        { label:'觉得一个人也挺好的', hint:'+🧠', fn: g => { g.flags.livingAlone=true; return{intel:5}; }},
+      ]},
+
+    { id:'eat_alone_v33_4', icon:'🍜', title:'一个人吃饭', category:'loneliness',
+      body:'你一个人去吃火锅。\n\n服务员问：「一位？」你点了点头。她把你领到一个靠窗的小桌，放了一个布娃娃在你对面。\n\n你点了半份牛肉、半份蔬菜。对面的布娃娃一直微笑着看你。\n\n你吃了一口，觉得味道不错。但你还是忍不住看了一眼旁边那桌——四个人在干杯，笑声很大。\n\n你吃完了，叫了买单。服务员说：「一个人吃火锅，真厉害。」你笑了笑，没说话。\n\n你走在回家的路上，觉得一个人吃饭没什么不好的。就是……有点安静。',
+      cond: g => g.age >= 20 && g.social < 50,
+      choices:[
+        { label:'吃完发了条朋友圈', hint:'+✨ +👥', fn: g => { g.flags.eatAlone=true; return{charm:3,social:3}; }},
+        { label:'觉得一个人吃饭很自在', hint:'+🧠 +😊', fn: g => { g.flags.eatAlone=true; return{intel:5,mood:3}; }},
+        { label:'约了朋友下次一起吃', hint:'+👥', fn: g => { g.flags.eatAlone=true; return{social:5}; }},
+      ]},
+
+    { id:'late_night_call_v33_4', icon:'📞', title:'深夜电话', category:'loneliness',
+      body:'凌晨两点，你突然醒了。\n\n你不知道为什么醒了。你看着天花板，觉得房间特别安静。安静得你能听到自己的心跳。\n\n你拿起手机，翻了一遍通讯录。你不知道该打给谁——父母不能打，太晚了会吓到他们。朋友不能打，人家明天还要上班。\n\n你打开了一个AI聊天机器人，说了一句：「你醒着吗？」\n\n它回复：「我一直都在。」\n\n你觉得这很荒谬，也很温暖。你跟一个AI聊了半个小时，然后睡着了。',
+      cond: g => g.age >= 20 && g.mood < 50 && g.months >= 12,
+      choices:[
+        { label:'跟AI聊了半个小时', hint:'+🧠', fn: g => { g.flags.lateNightCall=true; return{intel:3}; }},
+        { label:'第二天约了朋友出来', hint:'+👥 +😊', fn: g => { g.flags.lateNightCall=true; return{social:5,mood:5}; }},
+        { label:'给爸妈发了条消息说想他们了', hint:'+👥 +😊', fn: g => { g.flags.lateNightCall=true; return{social:3,mood:5}; }},
+      ]},
+
+    { id:'holiday_alone_v33_4', icon:'🎆', title:'节日独处', category:'loneliness',
+      body:'中秋节，你一个人过。\n\n你发了条朋友圈：「月圆人更圆。」配了一张月亮的照片。收到了三十个赞，但没人问你「怎么一个人过」。\n\n你煮了一碗速冻饺子，算是吃了团圆饭。你给爸妈打了视频电话，他们正在跟亲戚吃饭，背景很嘈杂。\n\n你妈说：「吃月饼了吗？」你说：「吃了。」其实你没吃。\n\n挂了电话，你站在阳台上看着月亮。你想：月亮也是一个人挂在天上，但它从来不抱怨。\n\n你打开了一个月饼外卖，咬了一口，觉得挺甜的。',
+      cond: g => g.age >= 22 && !g.flags.married && g.months >= 6,
+      choices:[
+        { label:'买了月饼，一个人赏月', hint:'+😊', fn: g => { g.flags.holidayAlone=true; return{mood:5}; }},
+        { label:'跟其他独居朋友组了个局', hint:'+👥 +😊', fn: g => { g.flags.holidayAlone=true; return{social:8,mood:5}; }},
+        { label:'觉得节日就是商家造的', hint:'+🧠', fn: g => { g.flags.holidayAlone=true; g.flags.holidaySkeptic=true; return{intel:5}; }},
+      ]},
+
+    { id:'homesick_v33_4', icon:'🌃', title:'异乡人的乡愁', category:'loneliness',
+      body:'你在超市里听到了一首家乡的歌。\n\n你站在货架前，突然特别想吃家乡的菜。你想起了小学门口的那家米粉店，想起了初中的那条老街，想起了高中教室窗外的夕阳。\n\n你上网搜了搜那家米粉店——已经拆了。老街也拆了。你的母校搬了新校区。\n\n你突然意识到：你想念的那个家乡，可能已经不存在了。\n\n你发了条动态：「原来乡愁不是想回去，而是发现回不去了。」\n\n收到了很多留言。原来想家的，不只是你一个人。',
+      cond: g => g.age >= 22 && g.months >= 12 && !g.flags.hasHukou,
+      choices:[
+        { label:'给老家打了电话', hint:'+👥 +😊', fn: g => { g.flags.homesick_v33=true; return{social:5,mood:5}; }},
+        { label:'写了一篇关于乡愁的文章', hint:'+✨ +🧠', fn: g => { g.flags.homesick_v33=true; g.flags.wroteHomesick=true; return{charm:8,intel:5}; }},
+        { label:'约了同乡的朋友聚了一下', hint:'+👥 +😊', fn: g => { g.flags.homesick_v33=true; return{social:8,mood:3}; }},
+      ]},
+
+    { id:'city_anonymous_v33_4', icon:'👤', title:'城市的匿名感', category:'loneliness',
+      body:'你走在街上，周围全是人，但没有一个人认识你。\n\n你想起小时候在村里，走两步就能碰到熟人，大家都叫得出你的名字。在这里，你只是一个路人甲。\n\n你在地铁上看到一个人在哭。你想递张纸巾，但你没有。你怕别人觉得你奇怪。\n\n你到了公司，同事说：「你今天穿的衣服不错。」这是你今天收到的唯一的 compliment。\n\n你觉得大城市的匿名感是一种保护——你可以做任何人，没有人会在意。但它也是一种囚禁——没有人真正认识你。',
+      cond: g => g.age >= 20 && g.social < 40,
+      choices:[
+        { label:'开始主动跟邻居打招呼', hint:'+👥 +😊', fn: g => { g.flags.cityAnonymous=true; return{social:5,mood:3}; }},
+        { label:'觉得匿名是一种自由', hint:'+🧠', fn: g => { g.flags.cityAnonymous=true; g.flags.anonymousFreedom=true; return{intel:5}; }},
+        { label:'在社交媒体上写了自己的感受', hint:'+✨ +👥', fn: g => { g.flags.cityAnonymous=true; return{charm:5,social:3}; }},
+      ]},
+
+    { id:'neighbor_stranger_v33_4', icon:'🚪', title:'邻居互不认识', category:'loneliness',
+      body:'你住了两年，不知道隔壁住的是谁。\n\n你们偶尔在电梯里碰到，互相点个头，说声「嗯」，然后各自低头看手机。\n\n有一天你家水管漏了，水渗到了隔壁。你硬着头皮去敲门。\n\n开门的是一个年轻人，跟你差不多大。他说：「没事，我家也漏过。」你们聊了几句，发现他是程序员，跟你同行业。\n\n你们加了微信。从此你们偶尔在电梯里会多说两句话。你觉得这就是大城市里的「邻居」——从一个点头之交，变成了一个微信好友。\n\n你觉得这已经很好了。',
+      cond: g => g.age >= 22 && !g.flags.hasHouse && g.months >= 12,
+      choices:[
+        { label:'跟邻居成了微信好友', hint:'+👥 +😊', fn: g => { g.flags.neighborStranger=true; return{social:5,mood:5}; }},
+        { label:'开始跟邻居一起拼单外卖', hint:'+👥 -💰', fn: g => { g.flags.neighborStranger=true; return{social:8,money:500}; }},
+        { label:'觉得大城市的邻里关系就是这样', hint:'+🧠', fn: g => { g.flags.neighborStranger=true; return{intel:5}; }},
+      ]},
+
+    { id:'solo_travel_v33_4', icon:'🎒', title:'独自旅行', category:'loneliness',
+      body:'你请了年假，一个人去了大理。\n\n你住在一个青旅，跟陌生人拼房。晚上大家坐在天台上聊天，有人弹吉他，有人讲故事。\n\n一个女生问你：「你也是一个人来的？」你说：「对。」她说：「一个人旅行的人，都是勇敢的人。」\n\n你在洱海边坐了一个下午，看着云一层一层地变化。你拍了很多照片，但不知道发给谁。\n\n你发了一条朋友圈：「一个人的风景，也很好。」\n\n你收到了一条评论：「下次一起去。」你笑了。',
+      cond: g => g.age >= 22 && g.money > 5000 && g.jobSalary > 0,
+      choices:[
+        { label:'在旅途中认识了很多朋友', hint:'+👥 +😊', fn: g => { g.flags.soloTravel=true; return{social:10,mood:10}; }},
+        { label:'享受了一个人的安静时光', hint:'+🧠 +😊', fn: g => { g.flags.soloTravel=true; return{intel:5,mood:8}; }},
+        { label:'写了旅行日记', hint:'+✨ +🧠', fn: g => { g.flags.soloTravel=true; g.flags.travelDiary=true; return{charm:8,intel:5}; }},
+      ]},
+
+    { id:'birthday_alone_v33_4', icon:'🎂', title:'一个人的生日', category:'loneliness',
+      body:'今天是你生日。\n\n你等了一天，没有人记得。你不怪他们——成年人的世界里，谁还记得别人的生日呢？\n\n你自己买了一个小蛋糕，插了一根蜡烛。你许了一个愿，但你没说出来，因为你觉得说出来就不灵了。\n\n你吃了蛋糕，觉得味道不错。你发了条朋友圈：「又长大了一岁。」配了一张蛋糕的照片。\n\n收到了很多「生日快乐」。你一条一条回复「谢谢」。\n\n你在备忘录里写：「祝自己生日快乐。谢谢你，又撑过了一年。」',
+      cond: g => g.age >= 25 && g.social < 50,
+      choices:[
+        { label:'自己给自己买了一个蛋糕', hint:'+😊', fn: g => { g.flags.birthdayAlone=true; return{mood:5}; }},
+        { label:'在朋友圈收到了很多祝福', hint:'+👥 +😊', fn: g => { g.flags.birthdayAlone=true; return{social:5,mood:8}; }},
+        { label:'决定以后记住每个朋友的生日', hint:'+👥 +🧠', fn: g => { g.flags.birthdayAlone=true; g.flags.rememberBirthdays=true; return{social:5,intel:3}; }},
+      ]},
+
+    { id:'midnight_store_v33_4', icon:'🏪', title:'深夜便利店', category:'loneliness',
+      body:'凌晨一点，你去便利店买水。\n\n店里只有你和店员。店员在玩手机，头都没抬。\n\n你拿了一瓶水，又拿了一个饭团。你犹豫了一下，又拿了一罐啤酒。\n\n你坐在便利店门口的椅子上，看着马路上偶尔经过的车。你喝了一口啤酒，觉得凉凉的。\n\n一个外卖骑手也来买水，看了你一眼，说：「还没睡？」你说：「睡不着。」他说：「我也刚下班。」\n\n你们聊了两句，然后各自走了。你觉得这就是大城市里的深夜——每个人都在各自的孤独里，偶尔相遇一下，然后又各走各的路。',
+      cond: g => g.age >= 20 && g.months >= 6,
+      choices:[
+        { label:'跟外卖骑手聊了几句', hint:'+👥 +😊', fn: g => { g.flags.midnightStore=true; return{social:5,mood:3}; }},
+        { label:'在便利店门口坐了很久', hint:'+🧠', fn: g => { g.flags.midnightStore=true; return{intel:5}; }},
+        { label:'发了条深夜动态', hint:'+✨ +👥', fn: g => { g.flags.midnightStore=true; return{charm:5,social:3}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -20500,6 +20591,18 @@ const ACHIEVEMENTS = [
     { id:'midlife_crisis_ach', icon:'🔄', name:'中年觉醒', desc:'面对了中年危机', check: g => g.flags.midlifeCrisis },
     { id:'peer_pressure_ach', icon:'📱', name:'朋友圈焦虑', desc:'感受到了同辈压力的荒诞', check: g => g.flags.peerPressure },
     { id:'digital_detox_v33_3_ach', icon:'📵', name:'数字断联', desc:'成功完成了一次数字排毒', check: g => g.flags.digitalDetox },
+
+    // --- v33.4 城市里的孤独成就 ---
+    { id:'living_alone_v33_4_ach', icon:'🏠', name:'独居生活', desc:'一个人住了很久', check: g => g.flags.livingAlone },
+    { id:'eat_alone_ach', icon:'🍜', name:'一人食', desc:'一个人吃了一顿火锅', check: g => g.flags.eatAlone },
+    { id:'late_night_call_ach', icon:'📞', name:'深夜无人', desc:'在深夜找不到一个可以打电话的人', check: g => g.flags.lateNightCall },
+    { id:'holiday_alone_ach', icon:'🎆', name:'一个人的节日', desc:'独自度过了一个传统节日', check: g => g.flags.holidayAlone },
+    { id:'homesick_v33_ach', icon:'🌃', name:'回不去的故乡', desc:'发现想念的家乡已经不存在了', check: g => g.flags.homesick_v33 },
+    { id:'city_anonymous_ach', icon:'👤', name:'城市透明人', desc:'感受了大城市的匿名感', check: g => g.flags.cityAnonymous },
+    { id:'neighbor_stranger_ach', icon:'🚪', name:'最熟悉的陌生人', desc:'终于认识了隔壁的邻居', check: g => g.flags.neighborStranger },
+    { id:'solo_travel_ach', icon:'🎒', name:'一个人的旅行', desc:'独自去旅行了一次', check: g => g.flags.soloTravel },
+    { id:'birthday_alone_v33_4_ach', icon:'🎂', name:'一个人的生日', desc:'自己给自己过了一个生日', check: g => g.flags.birthdayAlone },
+    { id:'midnight_store_ach', icon:'🏪', name:'深夜便利店', desc:'在凌晨的便利店遇到了同类', check: g => g.flags.midnightStore },
 ];
 
 // === ENDINGS === (order matters: first match wins)
