@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v29.9
+// 都市浮生记 - Game Engine v30.0
 // ============================================
 
 // === GAME STATE ===
@@ -15875,6 +15875,111 @@ const EVENTS = [
         { label:'带父母一起去旅行', hint:'+😊 -💰', fn: g => { g.flags.parentAsFriend=true; g.flags.familyTrip=true; return{mood:8,money:-5000}; }},
         { label:'记录父母的人生故事', hint:'+🧠 +😊', fn: g => { g.flags.parentAsFriend=true; g.flags.recordStories=true; return{intel:5,mood:8}; }},
       ]},
+    // === v30.0 城市探索与在地文化 ===
+    { id:'beijing_hutong_life', icon:'🏮', title:'胡同里的北京', category:'city_culture',
+      body:'你在北京租了一间胡同里的房子。\n\n胡同生活：\n- 大爷们在门口下棋\n- 大妈们在巷口聊天\n- 猫在屋顶上散步\n- 炸酱面的香味从隔壁飘来\n\n你在这里住了3个月——你发现了「另一个北京」：\n- 不是CBD的北京——是市井的北京\n- 不是996的北京——是遛鸟的北京\n- 不是房价8万的北京——是5块钱豆汁的北京\n\n胡同大爷对你说：「小伙子，别那么急——日子得慢慢过。」\n\n你第一次觉得——北京——也可以是「家」。\n\n「胡同里的北京：在帝都的缝隙里——藏着老北京的灵魂。」',
+      cond: g => g.city === 'beijing' && !g.flags.beijingHutongLife,
+      choices:[
+        { label:'融入胡同生活和大爷下棋', hint:'+😊 +👥', fn: g => { g.flags.beijingHutongLife=true; g.flags.hutongChess=true; return{mood:8,social:5}; }},
+        { label:'记录胡同文化做成自媒体', hint:'+🧠 +💰', fn: g => { g.flags.beijingHutongLife=true; g.flags.hutongContent=true; return{intel:5,charm:3}; }},
+        { label:'觉得太吵了搬回公寓', hint:'+🧠 -😊', fn: g => { g.flags.beijingHutongLife=true; return{intel:2,mood:-3}; }},
+      ]},
+    { id:'shanghai_nongtang', icon:'🏘️', title:'弄堂里的上海', category:'city_culture',
+      body:'你住进了上海的老弄堂。\n\n弄堂生活：\n- 阿姨们在弄堂里晒衣服\n- 爷叔们在老虎窗下打牌\n- 排骨年糕的香味从窗口飘出\n- 隔壁阿姨用上海话教你做菜\n\n你在这里学会了：\n- 上海话的「侬好」和「再会」\n- 生煎包怎么吃不会烫嘴\n- 石库门里的生活智慧\n- 上海人不只是「精明」——他们「讲究」\n\n弄堂阿姨说：「在上海——做人要「拎得清」。」\n\n你终于懂了——上海的精致——不是装出来的——是「活」出来的。\n\n「弄堂里的上海：魔都的灵魂——不在陆家嘴——在弄堂口。」',
+      cond: g => g.city === 'shanghai' && !g.flags.shanghaiNongtang,
+      choices:[
+        { label:'学上海话融入弄堂生活', hint:'+😊 +🧠', fn: g => { g.flags.shanghaiNongtang=true; g.flags.learnedShanghainese=true; return{mood:8,intel:3}; }},
+        { label:'用镜头记录弄堂故事', hint:'+🧠 +😊', fn: g => { g.flags.shanghaiNongtang=true; g.flags.nongtangPhotos=true; return{intel:5,charm:3}; }},
+        { label:'觉得太旧了搬去新小区', hint:'+💰 -😊', fn: g => { g.flags.shanghaiNongtang=true; return{money:-3000,mood:-3}; }},
+      ]},
+    { id:'shenzhen_innovation', icon:'💡', title:'深圳的创新脉搏', category:'city_culture',
+      body:'你在深圳感受到了这座城市的「脉动」。\n\n深圳的节奏：\n- 地铁里每个人都在看商业计划书\n- 咖啡厅里聊的都是「融资」和「赛道」\n- 华强北一个柜台就能组装一台电脑\n- 南山区的写字楼里——每层都有3个创业公司\n\n你在深圳学到的：\n- 「来了就是深圳人」——不只是口号——是态度\n- 这里没有「本地人」——所有人都是「外来者」\n- 失败不丢人——不敢开始才丢人\n- 速度就是一切——慢一步就是输\n\n你开始理解：深圳不是城市——是一个「巨大的孵化器」。\n\n「深圳的创新脉搏：这座城市——不问你从哪来——只问你想去哪。」',
+      cond: g => g.city === 'shenzhen' && !g.flags.shenzhenInnovation,
+      choices:[
+        { label:'被感染开始想自己的创业项目', hint:'+🧠 +💪', fn: g => { g.flags.shenzhenInnovation=true; g.flags.startupIdea=true; return{intel:5,charm:3}; }},
+        { label:'加入创业社群扩展人脉', hint:'+👥 +😊', fn: g => { g.flags.shenzhenInnovation=true; g.flags.startupNetwork=true; return{social:8,mood:3}; }},
+        { label:'觉得太卷了想慢下来', hint:'-😊 +🧠', fn: g => { g.flags.shenzhenInnovation=true; return{mood:-3,intel:3}; }},
+      ]},
+    { id:'hangzhou_ecommerce_v30', icon:'🛒', title:'杭州电商基因', category:'city_culture',
+      body:'你在杭州——发现这座城市被「电商」浸润了。\n\n杭州的电商文化：\n- 四季青的批发市场都在做直播\n- 九堡的每一栋楼都有直播间\n- 西湖边有人在拍短视频带货\n- 连菜市场的阿姨都有淘宝店\n\n你在杭州学到的：\n- 「流量」不只是数字——是「生存技能」\n- 每个人都在做「私域」\n- 朋友圈不只是社交——是「货架」\n- 「网红」在杭州不是贬义词——是「职业」\n\n你开始理解：杭州不只是旅游城市——它是中国电商的「心脏」。\n\n「杭州电商基因：在这座城市——每个人都可能是下一个「李佳琦」。」',
+      cond: g => g.city === 'hangzhou' && !g.flags.hangzhouEcommerce,
+      choices:[
+        { label:'学直播带货试试水', hint:'+💰 +🧠', fn: g => { g.flags.hangzhouEcommerce=true; g.flags.triedLivestream=true; return{money:2000,intel:3}; }},
+        { label:'去阿里参观感受互联网文化', hint:'+🧠 +😊', fn: g => { g.flags.hangzhouEcommerce=true; g.flags.aliVisit=true; return{intel:5,mood:3}; }},
+        { label:'杭州的美比电商更值得体验', hint:'+😊 +🧠', fn: g => { g.flags.hangzhouEcommerce=true; g.flags.westLakePeace=true; return{mood:8,health:3}; }},
+      ]},
+    { id:'guangzhou_food_paradise', icon:'🍜', title:'广州美食天堂', category:'city_culture',
+      body:'你来广州才知道——什么叫「食在广州」。\n\n你的广州美食地图：\n- 早茶：虾饺、烧卖、肠粉、凤爪\n- 夜宵：炒田螺、砂锅粥、烧烤\n- 老火汤：每天一盅汤是广州人的信仰\n- 糖水：双皮奶、杨枝甘露、龟苓膏\n\n你在广州学会了：\n- 「饮茶」不是喝茶——是「生活方式」\n- 广州人说「食咗饭未」比「你好」更常见\n- 广州人的「靓」是对食物的最高赞美\n- 在广州——吃饭是一种「仪式」\n\n广州的房东阿姨每周给你煲一盅汤：「后生仔，要饮汤啊。」\n\n你第一次觉得——在异乡——有人关心你吃得好不好。\n\n「广州美食天堂：这座城市——用一盅汤——温暖了每一个异乡人。」',
+      cond: g => g.city === 'guangzhou' && !g.flags.guangzhouFood,
+      choices:[
+        { label:'学做粤菜融入广州生活', hint:'+😊 +🧠', fn: g => { g.flags.guangzhouFood=true; g.flags.learnedCantoneseFood=true; return{mood:8,intel:3}; }},
+        { label:'做美食探店博主', hint:'+💰 +👥', fn: g => { g.flags.guangzhouFood=true; g.flags.foodBlogger=true; return{money:1000,charm:5}; }},
+        { label:'吃太多胖了10斤', hint:'+😊 -💪', fn: g => { g.flags.guangzhouFood=true; g.flags.gainedWeight=true; return{mood:5,health:-3}; }},
+      ]},
+    { id:'chengdu_slow_life', icon:'🍵', title:'成都慢生活', category:'city_culture',
+      body:'你来了成都——才知道什么叫「巴适」。\n\n成都的慢生活：\n- 茶馆里喝盖碗茶打麻将\n- 春熙路看美女（成都人的日常）\n- 火锅是社交不是吃饭\n- 「安逸」是成都人的人生追求\n\n你在成都学会了：\n- 「莫慌」——成都人的生活哲学\n- 火锅要配冰粉——这叫「平衡」\n- 熊猫是成都的「代言人」\n- 宽窄巷子不只是景点——是生活\n\n成都同事说：「你们大城市的人活得太累了——来成都歇一哈嘛。」\n\n你开始理解：成都不是在「慢」——是懂得「什么是重要的」。\n\n「成都慢生活：人生不只是赶路——还要停下来——喝一杯茶。」',
+      cond: g => g.city === 'chengdu' && !g.flags.chengduSlowLife,
+      choices:[
+        { label:'融入成都的慢生活', hint:'+😊 +💪', fn: g => { g.flags.chengduSlowLife=true; g.flags.adoptedSlowLife=true; return{mood:10,health:5}; }},
+        { label:'学打麻将融入成都社交', hint:'+👥 +😊', fn: g => { g.flags.chengduSlowLife=true; g.flags.learnedMahjong=true; return{social:8,mood:5}; }},
+        { label:'慢不下来焦虑感上来了', hint:'-😊 +🧠', fn: g => { g.flags.chengduSlowLife=true; return{mood:-3,intel:2}; }},
+      ]},
+    { id:'beijing_art_scene', icon:'🎨', title:'798的艺术灵魂', category:'city_culture',
+      body:'你去了北京798艺术区。\n\n你的感受：\n- 到处都是涂鸦和装置艺术\n- 有人在画廊里对着画发呆\n- 独立咖啡馆里都是「文青」\n- 地下乐队在livehouse演出\n\n你在798遇到了一个艺术家：\n「你觉得什么是艺术？」\n你想了很久——说：「不懂。」\n他笑了：「不懂就对了——艺术不是用来「懂」的——是用来「感受」的。」\n\n你第一次认真看了一幅画——看了10分钟。\n你看到了——你自己。\n\n「798的艺术灵魂：在大城市里——艺术不是装饰——是「灵魂的出口」。」',
+      cond: g => g.city === 'beijing' && !g.flags.beijingArtScene,
+      choices:[
+        { label:'开始看展培养艺术兴趣', hint:'+😊 +🧠', fn: g => { g.flags.beijingArtScene=true; g.flags.artInterest=true; return{mood:8,intel:5}; }},
+        { label:'买了一幅画挂在家里', hint:'+😊 -💰', fn: g => { g.flags.beijingArtScene=true; g.flags.boughtArt=true; return{mood:5,money:-2000}; }},
+        { label:'觉得艺术离自己太远', hint:'-😊 +🧠', fn: g => { g.flags.beijingArtScene=true; return{mood:-2,intel:3}; }},
+      ]},
+    { id:'shanghai_bund_dream', icon:'🌉', title:'外滩的日与夜', category:'city_culture',
+      body:'你站在外滩——看着对岸的陆家嘴。\n\n白天：\n- 游客在拍照\n- 老人在打太极\n- 外滩的建筑在阳光下很庄重\n\n夜晚：\n- 霓虹灯把对岸变成了一幅画\n- 游轮在黄浦江上缓缓移动\n- 你觉得自己站在这座城市的「心脏」\n\n你在外滩许了一个愿：\n「总有一天——我要在这座城市——扎下根来。」\n\n你不知道这个愿望会不会实现——\n但你知道——此刻的你——是认真的。\n\n「外滩的日与夜：每个站在外滩的人——都在和这座城市「对话」。」',
+      cond: g => g.city === 'shanghai' && !g.flags.shanghaiBundDream,
+      choices:[
+        { label:'把外滩当目标激励自己', hint:'+💪 +😊', fn: g => { g.flags.shanghaiBundDream=true; g.flags.bundMotivation=true; return{mood:8,charm:3}; }},
+        { label:'享受当下的上海生活', hint:'+😊 +🧠', fn: g => { g.flags.shanghaiBundDream=true; g.flags.enjoyShanghai=true; return{mood:10,intel:2}; }},
+        { label:'觉得上海太远了想回家', hint:'-😊 +🧠', fn: g => { g.flags.shanghaiBundDream=true; return{mood:-5,intel:3}; }},
+      ]},
+    { id:'shenzhen_maker_culture', icon:'🔧', title:'深圳创客文化', category:'city_culture',
+      body:'你参观了深圳的创客空间。\n\n你的见闻：\n- 有人在做无人机\n- 有人在做智能硬件\n- 有人在做机器人\n- 14岁的少年在做3D打印机\n\n你在创客空间遇到了一个硬件工程师：\n「在深圳——只要你能想到——就能做出来。」\n你：「真的？」\n他：「华强北什么零件都有。」\n\n你开始理解：深圳的魅力不是「钱」——是「可能性」。\n\n在这里——你不是「打工仔」——你是「潜在的创造者」。\n\n「深圳创客文化：这座城市相信——每个人都能「做出」点什么。」',
+      cond: g => g.city === 'shenzhen' && !g.flags.shenzhenMaker,
+      choices:[
+        { label:'参加创客马拉松', hint:'+🧠 +💪', fn: g => { g.flags.shenzhenMaker=true; g.flags.hackathon=true; return{intel:8,charm:3}; }},
+        { label:'学3D打印和Arduino', hint:'+🧠 +😊', fn: g => { g.flags.shenzhenMaker=true; g.flags.learnedHardware=true; return{intel:5,mood:5}; }},
+        { label:'觉得这些离自己太远了', hint:'-😊 +🧠', fn: g => { g.flags.shenzhenMaker=true; return{mood:-2,intel:2}; }},
+      ]},
+    { id:'hangzhou_westlake_v30', icon:'🌸', title:'西湖边的诗意', category:'city_culture',
+      body:'你在杭州的周末——去西湖散步。\n\n你看到了：\n- 断桥残雪（虽然是春天）\n- 苏堤上的跑步者\n- 湖心亭的喝茶人\n- 雷峰塔的夕照\n\n你在西湖边坐了一下午——什么都没做。\n但你感觉到了——一种久违的「平静」。\n\n你想起了苏轼的诗：「欲把西湖比西子——淡妆浓抹总相宜。」\n\n你突然理解了——为什么杭州人说「生活在杭州是一种幸福」。\n\n不是杭州完美——是杭州懂得「在快节奏里留出慢的空间」。\n\n「西湖边的诗意：不是每个城市都需要快——有些城市——需要美。」',
+      cond: g => g.city === 'hangzhou' && !g.flags.hangzhouWestlake,
+      choices:[
+        { label:'养成周末逛西湖的习惯', hint:'+😊 +💪', fn: g => { g.flags.hangzhouWestlake=true; g.flags.westlakeHabit=true; return{mood:10,health:3}; }},
+        { label:'开始写诗记录杭州的美', hint:'+🧠 +😊', fn: g => { g.flags.hangzhouWestlake=true; g.flags.writingPoetry=true; return{intel:5,mood:5}; }},
+        { label:'觉得太文艺了不习惯', hint:'-😊 +🧠', fn: g => { g.flags.hangzhouWestlake=true; return{mood:-2,intel:2}; }},
+      ]},
+    { id:'guangzhou_dimsum', icon:'🥟', title:'广州早茶文化', category:'city_culture',
+      body:'你被广州同事带去喝早茶。\n\n早茶文化：\n- 一盅两件（一壶茶+两笼点心）\n- 虾饺要现蒸的\n- 肠粉要滑嫩的\n- 凤爪要入口即化的\n\n你学会了早茶的「暗号」：\n- 叩指礼：用手指敲桌面表示「谢谢」\n- 壶盖半开：表示「加水」\n- 先给长辈倒茶：表示「尊重」\n\n广州同事说：「在广州——没有什么问题是一顿早茶解决不了的。如果有——就两顿。」\n\n你发现：早茶不是「吃饭」——是「社交」。\n在广州——关系不是谈出来的——是「吃」出来的。\n\n「广州早茶文化：在广东——「饮茶」是最温柔的社交方式。」',
+      cond: g => g.city === 'guangzhou' && !g.flags.guangzhouDimsum,
+      choices:[
+        { label:'每周和同事喝早茶建立关系', hint:'+👥 +😊', fn: g => { g.flags.guangzhouDimsum=true; g.flags.dimsumSocial=true; return{social:8,mood:5}; }},
+        { label:'学会做几种粤式点心', hint:'+🧠 +😊', fn: g => { g.flags.guangzhouDimsum=true; g.flags.learnedDimsum=true; return{intel:3,mood:5}; }},
+        { label:'觉得太费时间了', hint:'-😊 +🧠', fn: g => { g.flags.guangzhouDimsum=true; return{mood:-2,intel:2}; }},
+      ]},
+    { id:'chengdu_hotpot_diplomacy', icon:'🌶️', title:'成都火锅外交', category:'city_culture',
+      body:'你在成都——发现一切关系都可以用火锅解决。\n\n火锅外交：\n- 新同事？吃火锅\n- 谈生意？吃火锅\n- 吵架了？吃火锅\n- 分手了？还是吃火锅（一个人的）\n\n你在火锅桌上学到了成都人的社交哲学：\n- 「先吃后谈」——吃饱了再说正事\n- 「辣是热情」——不怕辣说明你靠谱\n- 「涮肉等3秒」——做任何事都要有耐心\n- 「鸳鸯锅是妥协」——不同口味也能坐在一起\n\n成都老板说：「火锅就是成都人的「会议室」。」\n\n你在成都——交了最多的朋友——都是在火锅桌上。\n\n「成都火锅外交：在成都——没有什么是一顿火锅解决不了的。」',
+      cond: g => g.city === 'chengdu' && !g.flags.chengduHotpot,
+      choices:[
+        { label:'成为火锅社交达人', hint:'+👥 +😊', fn: g => { g.flags.chengduHotpot=true; g.flags.hotpotSocial=true; return{social:8,mood:5}; }},
+        { label:'挑战超辣锅底证明勇气', hint:'+💪 +😊', fn: g => { g.flags.chengduHotpot=true; g.flags.spicyChallenge=true; return{charm:5,health:-2}; }},
+        { label:'吃辣拉肚子但很开心', hint:'+😊 -💪', fn: g => { g.flags.chengduHotpot=true; return{mood:5,health:-3}; }},
+      ]},
+    { id:'city_local_identity', icon:'🗺️', title:'城市认同感', category:'city_culture',
+      body:'你在这座城市住了好几年了——你开始有了「归属感」。\n\n你的变化：\n- 开始说当地的口头禅\n- 有了「自己的」小店和馆子\n- 给朋友推荐时会说「我们这里……」\n- 听到别人说这座城市不好会不舒服\n\n你开始理解：\n- 「故乡」不是你出生的地方——是你「选择」留下的地方\n- 你不是「漂」在这里——你是「活」在这里\n- 这座城市不完美——但它是「你的」\n\n你对朋友说：「我不想走了。」\n朋友说：「那你就不走了。」\n\n「城市认同感：不是城市选择了你——是你选择了这座城市。」',
+      cond: g => g.months >= 36 && !g.flags.cityLocalIdentity,
+      choices:[
+        { label:'把这座城市当作第二故乡', hint:'+😊 +💪', fn: g => { g.flags.cityLocalIdentity=true; g.flags.secondHometown=true; return{mood:10,charm:3}; }},
+        { label:'开始参与本地社区活动', hint:'+👥 +😊', fn: g => { g.flags.cityLocalIdentity=true; g.flags.communityActive=true; return{social:8,mood:5}; }},
+        { label:'虽然喜欢但还是想家', hint:'+🧠 -😊', fn: g => { g.flags.cityLocalIdentity=true; g.flags.mixedFeelings=true; return{intel:3,mood:-3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -17316,6 +17421,15 @@ const ACHIEVEMENTS = [
     { id:'parent_reconcile_ach', icon:'🤝', name:'亲子和解', desc:'和父母达成了一次真正的理解和和解', check: g => g.flags.newRelationship },
     { id:'accept_ordinary_ach', icon:'🏋️', name:'普通人宣言', desc:'接受了自己只是普通人放下了家族期望', check: g => g.flags.acceptOrdinary },
     { id:'parent_friend_ach', icon:'☕', name:'父母的朋友', desc:'开始把父母当朋友一样相处', check: g => g.flags.friendshipParents },
+    // v30.0 achievements - 城市探索与在地文化
+    { id:'hutong_explorer_ach', icon:'🏮', name:'胡同探索者', desc:'融入了北京胡同的市井生活', check: g => g.flags.hutongChess },
+    { id:'nongtang_insider_ach', icon:'🏘️', name:'弄堂里的人', desc:'学会了上海话融入了弄堂生活', check: g => g.flags.learnedShanghainese },
+    { id:'shenzhen_creator_ach', icon:'💡', name:'深圳创客', desc:'参加了深圳的创客马拉松', check: g => g.flags.hackathon },
+    { id:'food_blogger_ach_v30', icon:'🍜', name:'美食博主', desc:'在广州做起了美食探店博主', check: g => g.flags.foodBlogger },
+    { id:'slow_life_ach', icon:'🍵', name:'巴适生活', desc:'融入成都慢生活学会了享受当下', check: g => g.flags.adoptedSlowLife },
+    { id:'art_soul_ach', icon:'🎨', name:'艺术灵魂', desc:'在798找到了艺术的感受力', check: g => g.flags.artInterest },
+    { id:'city_local_ach', icon:'🗺️', name:'第二故乡', desc:'把生活的城市当成了第二故乡', check: g => g.flags.secondHometown },
+    { id:'hotpot_social_ach', icon:'🌶️', name:'火锅外交官', desc:'成为成都火锅桌上的社交达人', check: g => g.flags.hotpotSocial },
 ];
 
 // === ENDINGS === (order matters: first match wins)
