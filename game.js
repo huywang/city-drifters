@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v19.2
+// 都市浮生记 - Game Engine v19.3
 // ============================================
 
 // === GAME STATE ===
@@ -9307,6 +9307,87 @@ const EVENTS = [
         { label:'制定一个可行的计划', hint:'+🧠 +💰', fn: g => { g.flags.midlifePurpose=true; g.flags.feasiblePlan=true; return{intel:10,mood:10,money:5000}; }},
         { label:'接受现实，继续上班', hint:'+💰 -😊', fn: g => { g.flags.midlifePurpose=true; g.flags.acceptedReality=true; return{money:5000,mood:-5}; }},
       ]},
+    // === v19.3 新增事件（兴趣爱好 + 精神生活 + 休闲方式） ===
+    { id:'glamping', icon:'⛺', title:'精致露营', category:'hobby',
+      body:'你的朋友圈最近全是露营照片。你也心动了。\n\n你花了3000块买了：帐篷、天幕、折叠桌椅、卡式炉、露营灯、咖啡壶。\n\n你找了个周末，和朋友去了郊外。\n\n白天：搭帐篷1小时，拍照2小时，喝咖啡1小时。\n晚上：烧烤、看星星、聊到凌晨。\n\n你发现：露营的本质不是"睡在户外"——是"逃离城市24小时"。\n\n你在帐篷里听着虫鸣入睡，这可能是你这辈子睡得最香的一次。\n\n"露营：不是你热爱大自然——是你需要短暂地忘记KPI、房贷和996。"',
+      cond: g => !g.flags.glamping && g.age >= 22 && g.money > 10000,
+      choices:[
+        { label:'爱上露营，成了露营达人', hint:'+😊 +❤️ +👥 -💰', fn: g => { g.flags.glamping=true; g.flags.campingExpert=true; return{mood:18,health:8,social:10,money:-8000}; }},
+        { label:'去了一次就够了', hint:'+😊 -💰', fn: g => { g.flags.glamping=true; return{mood:10,money:-3000}; }},
+        { label:'装备买齐了但再也没去过', hint:'-💰', fn: g => { g.flags.glamping=true; g.flags.gearCollector=true; return{money:-3000,mood:-3}; }},
+      ]},
+    { id:'urban_walk', icon:'🚶', title:'城市漫步/CityWalk', category:'hobby',
+      body:'你在小红书上看到了一个新玩法：CityWalk（城市漫步）。\n\n规则很简单：选一条你没走过的街道，慢慢走，看看两边的建筑、店铺、行人。\n\n你选了老城区的一条街。你发现了：\n- 一家开了30年的旧书店\n- 一家藏在巷子里的咖啡馆\n- 一棵有200年历史的大榕树\n- 一个在街角拉二胡的老人\n\n你走了2小时，拍了50张照片。你发现：你在这个城市住了5年，但你从来没有真正"看过"它。\n\n"CityWalk不是走路——是用脚步重新认识你的城市。你以为你住在这里——其实你只是路过。"',
+      cond: g => !g.flags.urbanWalk && g.age >= 20 && g.months > 24,
+      choices:[
+        { label:'每周CityWalk一次', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.urbanWalk=true; g.flags.regularWalker=true; return{mood:12,health:8,intel:5}; }},
+        { label:'写了一篇CityWalk攻略', hint:'+✨ +🧠 +👥', fn: g => { g.flags.urbanWalk=true; g.flags.walkBlogger=true; return{charm:10,intel:5,social:8}; }},
+        { label:'走了一次，太累了', hint:'+😊', fn: g => { g.flags.urbanWalk=true; return{mood:5,health:3}; }},
+      ]},
+    { id:'pour_over_coffee', icon:'☕', title:'手冲咖啡', category:'hobby',
+      body:'你被朋友带进了"手冲咖啡"的坑。\n\n你的装备清单：\n- 手摇磨豆机：800元\n- V60滤杯+滤纸：200元\n- 手冲壶：300元\n- 电子秤（精确到0.1g）：200元\n- 温度计：50元\n- 各种豆子：每月500元\n\n你每天早上花15分钟手冲一杯咖啡。你的朋友说："直接买星巴克不好吗？"\n\n你说："手冲的过程才是重点。磨豆、闻香、注水、等待——这15分钟是我一天中最专注的时刻。"\n\n你的咖啡从"喝起来都差不多"变成了"今天这杯酸度很好，body饱满"。\n\n"手冲咖啡：不是在喝咖啡——是在练习「慢下来」的能力。当你的世界快到停不下来时，一杯手冲就是你的暂停键。"',
+      cond: g => !g.flags.pourOverCoffee && g.age >= 22 && g.money > 8000 && g.intel >= 35,
+      choices:[
+        { label:'深入研究，考了咖啡师证', hint:'+🧠 +✨ +💰', fn: g => { g.flags.pourOverCoffee=true; g.flags.coffeeExpert=true; return{intel:10,charm:8,money:-5000}; }},
+        { label:'每天一杯，成了日常仪式', hint:'+😊 +❤️', fn: g => { g.flags.pourOverCoffee=true; g.flags.dailyRitual=true; return{mood:10,health:3}; }},
+        { label:'觉得太麻烦了，回去喝速溶', hint:'+😊', fn: g => { g.flags.pourOverCoffee=true; return{mood:3}; }},
+      ]},
+    { id:'fishing_hobby', icon:'🎣', title:'钓鱼入门', category:'hobby',
+      body:'你的同事带你去钓鱼了。\n\n你以为很简单：把鱼饵挂上去，甩出去，等鱼上钩。\n\n现实：\n- 坐了一上午，一条鱼都没钓到\n- 你的同事钓了5条\n- 你被蚊子咬了10个包\n- 你的脖子晒伤了\n\n但奇怪的是：你坐在河边，听着水声，看着浮标——你的脑子空了。没有KPI、没有deadline、没有房贷。\n\n你突然理解了为什么中年男人爱钓鱼——不是因为鱼，是因为"安静"。\n\n你的同事说："钓鱼的终极目标不是鱼——是什么都不想。"\n\n"钓鱼：表面上是在等鱼上钩——实际上是在等自己安静下来。在信息爆炸的时代，「什么都不想」是一种奢侈品。"',
+      cond: g => !g.flags.fishingHobby && g.age >= 28 && g.mood < 60,
+      choices:[
+        { label:'入坑了，买了全套装备', hint:'+😊 +❤️ -💰', fn: g => { g.flags.fishingHobby=true; g.flags.fishingEnthusiast=true; return{mood:15,health:5,money:-5000}; }},
+        { label:'偶尔去，享受安静', hint:'+😊 +🧠', fn: g => { g.flags.fishingHobby=true; g.flags.casualFisher=true; return{mood:10,intel:3}; }},
+        { label:'太无聊了，不适合我', hint:'-😊', fn: g => { g.flags.fishingHobby=true; return{mood:-3}; }},
+      ]},
+    { id:'baking_hobby', icon:'🧁', title:'烘焙入门', category:'hobby',
+      body:'你在网上看了一个烘焙视频，决定试试。\n\n你的第一个作品：曲奇饼干。形状歪了，颜色深了，味道……居然还不错！\n\n你开始疯狂入坑：\n- 第2周：戚风蛋糕（塌了3次，第4次成功）\n- 第3周：肉桂卷（室友说比面包店的好吃）\n- 第4周：马卡龙（失败了8次，你理解了为什么马卡龙这么贵）\n- 第5周：酸面包（养了一罐酵种，给它取了名字叫"泡泡"）\n\n你把作品分给同事和朋友。你的朋友圈变成了"甜品店"。有人说："你应该开一家店。"\n\n"烘焙：不是在烤东西——是在练习「等待」和「精确」。面团不会因为你的着急而变快，就像生活不会因为你的焦虑而变好。"',
+      cond: g => !g.flags.bakingHobby && g.age >= 20 && g.mood < 65,
+      choices:[
+        { label:'认真学，考了烘焙证', hint:'+🧠 +✨ -💰', fn: g => { g.flags.bakingHobby=true; g.flags.certifiedBaker=true; return{intel:8,charm:8,money:-8000}; }},
+        { label:'周末烤一烤，治愈自己', hint:'+😊 +❤️', fn: g => { g.flags.bakingHobby=true; g.flags.weekendBaker=true; return{mood:12,health:3}; }},
+        { label:'给朋友做生日蛋糕', hint:'+👥 +✨ +😊', fn: g => { g.flags.bakingHobby=true; g.flags.giftBaker=true; return{social:10,charm:8,mood:10}; }},
+      ]},
+    { id:'road_trip', icon:'🚗', title:'自驾游', category:'hobby',
+      body:'你借了朋友的车/租了一辆车，开始了一次自驾游。\n\n路线：城市 → 海边小镇 → 山区 → 古镇 → 回家\n\nDay 1：你开着窗，放着歌，感觉自己像电影主角。\nDay 2：你迷路了3次，但误入了一个没在攻略上的绝美小村。\nDay 3：你在山顶看日出。你哭了——不是因为感动，是因为太美了。\nDay 4：你不想回去了。你想就这样一直开下去。\n\n你回来后发现：你的同事问你"去哪了"，你说了地名，他们一脸茫然。\n\n你说："那个地方你们不会去——因为导航搜不到。"\n\n"自驾游：最美的风景不在目的地——在你迷路的那条路上。"',
+      cond: g => !g.flags.roadTrip && g.age >= 22 && g.money > 15000,
+      choices:[
+        { label:'爱上自驾，计划下一次', hint:'+😊 +✨ -💰', fn: g => { g.flags.roadTrip=true; g.flags.roadTripLover=true; return{mood:20,charm:5,money:-8000}; }},
+        { label:'拍了好多照片，写了游记', hint:'+✨ +🧠 +👥', fn: g => { g.flags.roadTrip=true; g.flags.travelWriter=true; return{charm:10,intel:5,social:8,money:-5000}; }},
+        { label:'一次就够了，太累了', hint:'+😊 -💰', fn: g => { g.flags.roadTrip=true; return{mood:8,money:-5000}; }},
+      ]},
+    { id:'pottery', icon:'🏺', title:'陶艺体验', category:'hobby',
+      body:'你去了一家陶艺工作室。\n\n老师教你拉坯。你的手一抖，泥巴就歪了。你的手太用力，泥巴就塌了。\n\n老师说："放松。泥巴能感受到你的紧张。"\n\n你深吸一口气，放慢速度。泥巴在你手里慢慢变成了一个碗的形状——虽然有点歪，但那是你做的。\n\n烧制要等2周。你拿到的时候，发现颜色跟你想象的不一样——但你觉得比想象中更美。\n\n你用这个碗吃了第一顿饭。你觉得：饭好像更好吃了。\n\n"陶艺：不是在做一个碗——是在学习「不完美」。世界上没有两个一模一样的手工作品，就像没有两个一模一样的人生。"',
+      cond: g => !g.flags.pottery && g.age >= 20,
+      choices:[
+        { label:'报了长期课程，认真学习', hint:'+🧠 +✨ +😊 -💰', fn: g => { g.flags.pottery=true; g.flags.potteryArtist=true; return{intel:8,charm:8,mood:12,money:-5000}; }},
+        { label:'体验了一次，很治愈', hint:'+😊 +❤️', fn: g => { g.flags.pottery=true; return{mood:12,health:3}; }},
+        { label:'做了个杯子送朋友', hint:'+👥 +✨', fn: g => { g.flags.pottery=true; g.flags.handmadeGift=true; return{social:8,charm:5,mood:8}; }},
+      ]},
+    { id:'calligraphy', icon:'🖌️', title:'书法入门', category:'hobby',
+      body:'你开始练书法了。\n\n你以为很简单：拿笔，写字。结果你的第一笔"横"像蚯蚓。\n\n老师说："书法不是写字——是写心。"\n\n你每天练30分钟。一开始你烦躁，写了10分钟就想看手机。慢慢地，你能写30分钟不看手机了。\n\n3个月后，你的"永"字终于不像"水"了。\n\n你把最好的一幅作品裱起来挂在家里。你的一个朋友说："这是你写的？好厉害！"\n\n你说："不厉害——只是每天30分钟而已。"\n\n"书法：在最快的时代里，练习最慢的艺术。每一笔都不能重来——就像你的人生。"',
+      cond: g => !g.flags.calligraphy && g.age >= 22 && g.intel >= 35,
+      choices:[
+        { label:'坚持每天练习', hint:'+🧠 +😊 +✨', fn: g => { g.flags.calligraphy=true; g.flags.dailyPractice=true; return{intel:12,mood:10,charm:5}; }},
+        { label:'偶尔写写，放松身心', hint:'+😊 +❤️', fn: g => { g.flags.calligraphy=true; return{mood:10,health:3}; }},
+        { label:'太难了，放弃了', hint:'-😊', fn: g => { g.flags.calligraphy=true; return{mood:-3}; }},
+      ]},
+    { id:'yoga_practice', icon:'🧘', title:'瑜伽入门', category:'hobby',
+      body:'你开始练瑜伽了。\n\n第一节课：你弯不下去。你的身体硬得像一块木板。旁边的阿姨做得比你还好。\n\n老师说："瑜伽不是比赛。你的身体到了哪里，哪里就是对的。"\n\n你坚持了一个月。你的变化：\n- 柔韧性：从弯不下去到能摸到脚尖\n- 睡眠：从翻来覆去到躺下就睡\n- 心情：从焦虑到平静\n- 呼吸：从浅短到深长\n\n你发现：瑜伽不是运动——是一种跟自己身体和解的方式。\n\n"瑜伽：不是让你的身体变得更好——是让你跟你的身体成为朋友。"',
+      cond: g => !g.flags.yogaPractice && g.age >= 22 && g.health < 65,
+      choices:[
+        { label:'每周3次，成了习惯', hint:'+❤️ +😊 +🧠', fn: g => { g.flags.yogaPractice=true; g.flags.regularYogi=true; return{health:15,mood:12,intel:5}; }},
+        { label:'偶尔练习，感觉不错', hint:'+❤️ +😊', fn: g => { g.flags.yogaPractice=true; return{health:8,mood:8}; }},
+        { label:'不太适合我', hint:'', fn: g => { g.flags.yogaPractice=true; return{health:3}; }},
+      ]},
+    { id:'board_game_cafe', icon:'🎲', title:'桌游吧', category:'hobby',
+      body:'你的同事约你去桌游吧。\n\n你以为是"大富翁"那种。结果是：狼人杀、阿瓦隆、剧本杀、德式桌游。\n\n你玩了一晚上"卡坦岛"——一个关于资源交易的游戏。你发现自己很擅长谈判：你用2只羊换了3块砖，别人觉得亏了，但你建了两条路。\n\n你的同事说："你应该去做销售。"\n\n你发现：桌游不只是游戏——它让你看到了自己平时看不到的能力。有人天生是领导者，有人是策略家，有人是谈判高手。\n\n"桌游：是成年人的过家家——但在游戏里，你发现了真实的自己。"',
+      cond: g => !g.flags.boardGameCafe && g.age >= 20 && g.age <= 40,
+      choices:[
+        { label:'成了桌游吧常客', hint:'+👥 +🧠 +😊 -💰', fn: g => { g.flags.boardGameCafe=true; g.flags.boardGameFan=true; return{social:15,intel:5,mood:10,money:-2000}; }},
+        { label:'买了几个桌游回家跟朋友玩', hint:'+👥 +😊 -💰', fn: g => { g.flags.boardGameCafe=true; g.flags.homeGamer=true; return{social:8,mood:8,money:-500}; }},
+        { label:'太烧脑了，不适合我', hint:'', fn: g => { g.flags.boardGameCafe=true; return{mood:3}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -10188,6 +10269,12 @@ const ACHIEVEMENTS = [
     { id:'second_spring_ach', icon:'🌸', name:'第二春', desc:'在中年找到了新的热爱', check: g => g.flags.secondSpring && g.flags.passionProject },
     { id:'filial_son_ach', icon:'👴', name:'孝子贤孙', desc:'认真陪伴年迈的父母', check: g => g.flags.agingParents && (g.flags.monthlyVisits || g.flags.hiredCare) },
     { id:'purpose_finder_ach', icon:'🎯', name:'人生下半场', desc:'找到了中年后的新方向', check: g => g.flags.midlifePurpose && g.flags.startedDream },
+    // === v19.3 新增成就（兴趣爱好） ===
+    { id:'camper_ach', icon:'⛺', name:'露营达人', desc:'爱上了户外露营', check: g => g.flags.campingExpert },
+    { id:'city_explorer_ach', icon:'🚶', name:'城市探索者', desc:'用脚步重新认识了城市', check: g => g.flags.regularWalker },
+    { id:'coffee_master_ach', icon:'☕', name:'咖啡大师', desc:'在手冲咖啡中找到了平静', check: g => g.flags.pourOverCoffee && g.flags.dailyRitual },
+    { id:'zen_fisher_ach', icon:'🎣', name:'禅意钓者', desc:'在钓鱼中学会了安静', check: g => g.flags.fishingEnthusiast },
+    { id:'artist_soul_ach', icon:'🏺', name:'匠心独运', desc:'通过手工艺术找到了表达', check: g => g.flags.potteryArtist || g.flags.certifiedBaker || g.flags.calligraphy },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -10484,6 +10571,8 @@ const ENDINGS = [
     { id:'city_belonging_end', badge:'🏙️', title:'城市归属', desc:'你终于在大城市找到了归属感。\n\n你来这里的时候，什么都不懂。你不会说本地方言，不知道哪条路通向哪里，不认识任何人。\n\n但现在：你有了自己的朋友圈，知道了最好吃的那家面馆在哪里，能在地铁里闭眼换乘。你的同事不再叫你"外地人"，你的邻居会跟你打招呼。\n\n有人问你："你是哪里人？"\n\n你笑了笑说："我就是这个城市的人。"\n\n"城市归属：不是你在这里买了房——是你在这里有了故事。当这个城市的每一条街道都有你的记忆，你就属于这里了。"', cond: g => g.flags.cityIdentity && g.flags.strangerKindness && g.flags.cityFriendCircle && g.social >= 55 && g.mood >= 60 && g.months >= 60 && g.age >= 27 },
     // --- v19.2 中年生活结局 ---
     { id:'graceful_aging_end', badge:'🌿', title:'优雅老去', desc:'你学会了优雅地老去。\n\n你没有对抗衰老——你拥抱了它。你45岁开始学吉他，48岁写了第一篇文章，50岁开始画画。\n\n你的体检报告从一片红变成了基本正常。你的孩子长大了，成了你的朋友。你的伴侣跟你重新约了会。\n\n你的一个年轻同事说："你怎么看起来比30岁的人还年轻？"\n\n你说："因为我不再害怕变老了。"\n\n"优雅老去：不是不变老——是在变老的过程中，依然保持对生活的热爱。"', cond: g => g.flags.secondSpring && g.flags.healthScareMidlife && g.flags.lifestyleOverhaul && g.mood >= 65 && g.health >= 60 && g.age >= 45 },
+    // --- v19.3 兴趣爱好结局 ---
+    { id:'rich_hobby_end', badge:'🎨', title:'生活家', desc:'你成了一个真正的"生活家"。\n\n你学会了手冲咖啡、烘焙面包、陶艺拉坯、书法写字、瑜伽冥想。你的周末不是在家做手工，就是去户外露营、钓鱼、CityWalk。\n\n你的朋友圈不是晒美食、就是晒风景、不是晒作品、就是晒生活。\n\n有人问你："你怎么这么多才多艺？"\n\n你说："我不是多才多艺——我只是学会了把时间花在让自己开心的事情上。"\n\n"生活家：不是什么都做——是知道什么值得做。当你的爱好比你的烦恼多的时候，你就赢了。"', cond: g => (g.flags.campingExpert || g.flags.fishingEnthusiast) && (g.flags.pourOverCoffee || g.flags.certifiedBaker) && (g.flags.potteryArtist || g.flags.calligraphy || g.flags.regularYogi) && g.mood >= 70 && g.age >= 28 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
