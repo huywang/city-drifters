@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v30.0
+// 都市浮生记 - Game Engine v30.1
 // ============================================
 
 // === GAME STATE ===
@@ -15980,6 +15980,87 @@ const EVENTS = [
         { label:'开始参与本地社区活动', hint:'+👥 +😊', fn: g => { g.flags.cityLocalIdentity=true; g.flags.communityActive=true; return{social:8,mood:5}; }},
         { label:'虽然喜欢但还是想家', hint:'+🧠 -😊', fn: g => { g.flags.cityLocalIdentity=true; g.flags.mixedFeelings=true; return{intel:3,mood:-3}; }},
       ]},
+    // === v30.1 友情与成人社交 ===
+    { id:'friendship_fading', icon:'👋', title:'渐行渐远的朋友', category:'friendship',
+      body:'你翻了一下微信通讯录——发现很多「曾经的好朋友」已经很久没联系了。\n\n你的友情淡化过程：\n- 大学室友：毕业后还聚——现在只剩朋友圈点赞\n- 前同事：离职时说了「保持联系」——然后就没然后了\n- 发小：他回老家了——你留在了大城市\n- 闺蜜/兄弟：她/他结婚了——你们的话题越来越少\n\n你发了一条消息：「最近怎么样？」\n对方回：「挺好的你呢」\n然后——又沉默了。\n\n你不是不想联系——是不知道说什么了。\n你们不是吵架——只是「生活轨迹不同了」。\n\n「渐行渐远的朋友：不是谁变了——是你们走向了不同的方向。」',
+      cond: g => g.age >= 25 && !g.flags.friendshipFading,
+      choices:[
+        { label:'主动约一个老朋友出来见面', hint:'+👥 +😊', fn: g => { g.flags.friendshipFading=true; g.flags.reconnectFriend=true; return{social:5,mood:8}; }},
+        { label:'接受友谊淡化是常态', hint:'+🧠 +😊', fn: g => { g.flags.friendshipFading=true; g.flags.acceptFade=true; return{intel:5,mood:3}; }},
+        { label:'觉得有些伤感', hint:'-😊 +🧠', fn: g => { g.flags.friendshipFading=true; return{mood:-5,intel:2}; }},
+      ]},
+    { id:'adult_friendship_hard', icon:'🤝', title:'成年人交友有多难', category:'friendship',
+      body:'你发现——成年后交一个新朋友——比找对象还难。\n\n你的尝试：\n- 同事？——「有利益关系不敢交心」\n- 邻居？——「住了3年没说过话」\n- 健身房？——「各练各的」\n- 兴趣班？——「上完课就散了」\n- 社交APP？——「目的性太强」\n\n你终于在一个线下活动里认识了几个聊得来的人——\n但加了微信后——你们再也没见过面。\n\n你开始理解：成年人的友谊——需要「主动」+「持续」+「共同经历」。\n\n你不是没有魅力——是你没有「时间和场景」去展示魅力。\n\n「成年人交友：不是找不到人——是找不到「愿意一起浪费时间」的人。」',
+      cond: g => g.age >= 25 && g.social < 60 && !g.flags.adultFriendshipHard,
+      choices:[
+        { label:'加入一个长期兴趣社群', hint:'+👥 +😊', fn: g => { g.flags.adultFriendshipHard=true; g.flags.joinedCommunity=true; return{social:8,mood:5}; }},
+        { label:'降低社交期望享受独处', hint:'+😊 +🧠', fn: g => { g.flags.adultFriendshipHard=true; g.flags.loweredExpectations=true; return{mood:5,intel:3}; }},
+        { label:'继续尝试不放弃', hint:'+💪 +👥', fn: g => { g.flags.adultFriendshipHard=true; g.flags.persistentSocial=true; return{social:3,charm:3}; }},
+      ]},
+    { id:'classmate_reunion_v30_1', icon:'🎉', title:'同学聚会', category:'friendship',
+      body:'你收到了同学聚会的邀请。\n\n你的纠结：\n- 去？——要面对各种「灵魂拷问」\n- 不去？——又觉得错过了什么\n\n你去了。饭桌上的情况：\n- 张三：年薪百万，买了两套房\n- 李四：创业成功，公司B轮了\n- 王五：考上了公务员，已经副科了\n- 你：还在纠结下个月的房租\n\n你开始焦虑——然后你想：\n- 张三的压力：996+房贷+离婚边缘\n- 李四的压力：投资人追着要数据\n- 王五的压力：天天写材料+陪领导喝酒\n\n每个人的「光鲜」背后——都有你看不到的「苦」。\n\n「同学聚会：不是比谁过得好——是比谁「演」得好。」',
+      cond: g => g.age >= 25 && g.months >= 24 && !g.flags.classmateReunion,
+      choices:[
+        { label:'坦然面对自己的现状', hint:'+💪 +😊', fn: g => { g.flags.classmateReunion=true; g.flags.confidentPresent=true; return{mood:8,charm:5}; }},
+        { label:'找到真正交心的老同学', hint:'+👥 +😊', fn: g => { g.flags.classmateReunion=true; g.flags.reconnectClassmate=true; return{social:5,mood:5}; }},
+        { label:'聚会后更焦虑了', hint:'-😊 +🧠', fn: g => { g.flags.classmateReunion=true; g.flags.reunionAnxiety=true; return{mood:-8,intel:2}; }},
+      ]},
+    { id:'loneliness_scale', icon:'🌙', title:'孤独等级测试', category:'friendship',
+      body:'你在网上看到了一个「孤独等级表」。\n\n你的等级：\n- Level 1：一个人吃饭 ✅\n- Level 2：一个人看电影 ✅\n- Level 3：一个人逛超市 ✅\n- Level 4：一个人吃火锅 ✅\n- Level 5：一个人去游乐园 ❌\n- Level 6：一个人搬家 ✅\n- Level 7：一个人看病 ✅\n- Level 8：一个人过生日 ✅\n- Level 9：一个人过年 ❌\n- Level 10：一个人做手术 ❌\n\n你到了Level 8。\n\n你不觉得这是「悲惨」——这是「独立」。\n但你偶尔也会想：如果有人陪——会不会好一点？\n\n「孤独等级：你不是「没人陪」——你是「选择了不将就」。」',
+      cond: g => g.age >= 22 && !g.flags.married && !g.flags.lonelinessScale,
+      choices:[
+        { label:'享受独立的生活状态', hint:'+😊 +💪', fn: g => { g.flags.lonelinessScale=true; g.flags.embraceIndependence=true; return{mood:8,charm:3}; }},
+        { label:'决定主动打破孤独', hint:'+💪 +👥', fn: g => { g.flags.lonelinessScale=true; g.flags.breakLoneliness=true; return{social:5,mood:5}; }},
+        { label:'有点伤感但接受现实', hint:'+🧠 -😊', fn: g => { g.flags.lonelinessScale=true; g.flags.acceptLoneliness=true; return{intel:3,mood:-3}; }},
+      ]},
+    { id:'best_friend_distance', icon:'💕', title:'最好的朋友', category:'friendship',
+      body:'你有一个朋友——你们认识了10年以上了。\n\n你们的关系：\n- 不需要经常联系——但见面就像昨天才分开\n- 可以半夜打电话——不用担心被打扰\n- 可以说真话——不用担心被评判\n- 可以一起沉默——不会觉得尴尬\n\n你们不常见面——但你知道：\n- 你需要帮助——他/她一定在\n- 你成功了——他/她比你还开心\n- 你失败了——他/她不会嘲笑你\n\n你突然想给这个朋友打个电话。\n\n电话接通——你说：「没什么事——就想你了。」\n对方说：「我也是。」\n\n「最好的朋友：不是天天在一起——是心里一直在一起。」',
+      cond: g => g.age >= 22 && g.social >= 30 && !g.flags.bestFriendDistance,
+      choices:[
+        { label:'珍惜这份难得的友谊', hint:'+😊 +❤️', fn: g => { g.flags.bestFriendDistance=true; g.flags.cherishFriendship=true; return{mood:10,social:5}; }},
+        { label:'约个时间见面好好聚聚', hint:'+👥 +😊', fn: g => { g.flags.bestFriendDistance=true; g.flags.planMeetup=true; return{social:8,mood:8}; }},
+        { label:'感恩但也有些感伤', hint:'+🧠 -😊', fn: g => { g.flags.bestFriendDistance=true; return{intel:3,mood:3}; }},
+      ]},
+    { id:'social_battery_v30_1', icon:'🔋', title:'社交电量', category:'friendship',
+      body:'你发现了一个规律：你的「社交电量」是有限的。\n\n你的社交电量表：\n- 早上出门：100%\n- 和同事闲聊：80%\n- 开会讨论：60%\n- 午饭应酬：40%\n- 下班后聚会：20%\n- 回到家：0%\n\n你发现：\n- 有些社交「充电」——和好朋友在一起\n- 有些社交「耗电」——和不熟的人尬聊\n- 有些人让你「满血复活」\n- 有些人让你「瞬间没电」\n\n你开始学会：\n- 减少「耗电」社交\n- 增加「充电」社交\n- 给自己留出「独处充电」时间\n\n「社交电量：不是你不爱社交——是你学会了「选择」社交。」',
+      cond: g => g.age >= 22 && !g.flags.socialBattery,
+      choices:[
+        { label:'开始管理自己的社交电量', hint:'+🧠 +😊', fn: g => { g.flags.socialBattery=true; g.flags.manageSocialEnergy=true; return{intel:5,mood:5}; }},
+        { label:'减少无效社交多陪真朋友', hint:'+👥 +😊', fn: g => { g.flags.socialBattery=true; g.flags.qualityOverQuantity=true; return{social:3,mood:8}; }},
+        { label:'干脆减少社交多独处', hint:'+😊 -👥', fn: g => { g.flags.socialBattery=true; g.flags.preferSolitude=true; return{mood:5,social:-5}; }},
+      ]},
+    { id:'online_offline_friend', icon:'🌐', title:'网友变朋友', category:'friendship',
+      body:'你在网上认识了一个人——聊了很久——你们决定见面。\n\n见面之前你很紧张：\n- 万一对方是照骗？\n- 万一见面没话聊？\n- 万一线上聊得来线下尴尬？\n\n你们见了面——\n出乎意料地——很自然。\n你们聊了3小时——和线上一样——甚至更好。\n\n因为你发现：\n- 线上的深度交流——让你们跳过了「社交寒暄」\n- 你们直接进入了「真正的话题」\n- 你们已经「了解」彼此——见面只是「确认」\n\n你多了一个朋友——虽然你们是在网上认识的。\n\n「网友变朋友：友谊不在乎「在哪认识」——在乎「是否真心」。」',
+      cond: g => g.age >= 20 && g.intel >= 20 && !g.flags.onlineOfflineFriend,
+      choices:[
+        { label:'继续保持这段线上开始的友谊', hint:'+👥 +😊', fn: g => { g.flags.onlineOfflineFriend=true; g.flags.onlineToOffline=true; return{social:5,mood:8}; }},
+        { label:'发现线上和线下还是不一样', hint:'+🧠 -😊', fn: g => { g.flags.onlineOfflineFriend=true; return{intel:3,mood:-2}; }},
+        { label:'开始更开放地认识新朋友', hint:'+💪 +👥', fn: g => { g.flags.onlineOfflineFriend=true; g.flags.openToNewFriends=true; return{social:5,charm:3}; }},
+      ]},
+    { id:'solo_dining', icon:'🍽️', title:'一个人吃饭', category:'friendship',
+      body:'你今天又是一个人吃饭。\n\n你开始习惯：\n- 一个人吃火锅（服务员问「等人吗？」）\n- 一个人看电影（坐在最佳位置）\n- 一个人逛超市（想买什么买什么）\n- 一个人旅行（想走就走想停就停）\n\n你的感受：\n- 有时候觉得很自由——不用迁就任何人\n- 有时候觉得很孤独——想分享的时候没人\n- 有时候觉得很正常——「一个人」也是一种生活方式\n\n你开始理解：「一个人」不是「没有选择」——是「选择了一种方式」。\n\n一个人吃饭不丢人——丢人的是——因为怕一个人而「将就」和别人吃。\n\n「一个人吃饭：你不是「没人陪」——你是「选择了自由」。」',
+      cond: g => g.age >= 22 && !g.flags.soloDining,
+      choices:[
+        { label:'享受一个人的美食时光', hint:'+😊 +💪', fn: g => { g.flags.soloDining=true; g.flags.enjoySoloDining=true; return{mood:8,charm:2}; }},
+        { label:'开始写一个人的美食日记', hint:'+🧠 +😊', fn: g => { g.flags.soloDining=true; g.flags.foodDiary=true; return{intel:3,mood:5}; }},
+        { label:'还是想找个人一起吃', hint:'-😊 +👥', fn: g => { g.flags.soloDining=true; return{mood:-3,social:2}; }},
+      ]},
+    { id:'quality_friendship', icon:'💎', title:'高质量友谊', category:'friendship',
+      body:'你开始重新定义「好朋友」的标准。\n\n以前的标准：\n- 能一起玩\n- 能一起吃饭\n- 能一起逛街\n\n现在的标准：\n- 能听你说真话\n- 能在你需要的时候出现\n- 能理解你的沉默\n- 能接受你的缺点\n- 不会在背后说你坏话\n\n你发现——符合新标准的朋友——不超过3个。\n\n但你觉得——3个就够了。\n\n不是你的要求高了——是你知道了「什么才是真正重要的」。\n\n「高质量友谊：朋友不在于多——在于「真」。」',
+      cond: g => g.age >= 28 && !g.flags.qualityFriendship,
+      choices:[
+        { label:'珍惜那几个真正的朋友', hint:'+😊 +❤️', fn: g => { g.flags.qualityFriendship=true; g.flags.cherishQuality=true; return{mood:10,social:3}; }},
+        { label:'也让自己成为别人的好朋友', hint:'+💪 +😊', fn: g => { g.flags.qualityFriendship=true; g.flags.beGoodFriend=true; return{charm:5,mood:5}; }},
+        { label:'觉得3个朋友太少了', hint:'-😊 +👥', fn: g => { g.flags.qualityFriendship=true; return{mood:-3,social:2}; }},
+      ]},
+    { id:'friendship_maintenance', icon:'🔧', title:'友谊的维护', category:'friendship',
+      body:'你意识到——友谊和爱情一样——需要「维护」。\n\n你的友谊维护清单：\n- 定期联系（不一定要频繁）\n- 记住对方的重要日子\n- 在对方困难时主动帮忙\n- 不评判对方的选择\n- 允许对方成长变化\n\n你发现最难的是：\n- 当朋友做了你不认同的选择时——你选择「支持」而不是「说教」\n- 当朋友变得比你成功时——你选择「祝福」而不是「嫉妒」\n- 当朋友需要空间时——你选择「等待」而不是「追问」\n\n好的友谊——不是「永远一样」——是「一起变化」。\n\n「友谊的维护：不是你付出多少——是你「理解」多少。」',
+      cond: g => g.age >= 25 && g.social >= 40 && !g.flags.friendshipMaintenance,
+      choices:[
+        { label:'学会做一个更好的朋友', hint:'+💪 +😊', fn: g => { g.flags.friendshipMaintenance=true; g.flags.betterFriend=true; return{charm:5,mood:5}; }},
+        { label:'定期和好朋友深度交流', hint:'+👥 +😊', fn: g => { g.flags.friendshipMaintenance=true; g.flags.regularDeepTalk=true; return{social:5,mood:5}; }},
+        { label:'觉得维护关系太累了', hint:'-😊 -👥', fn: g => { g.flags.friendshipMaintenance=true; return{mood:-3,social:-3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -17430,6 +17511,15 @@ const ACHIEVEMENTS = [
     { id:'art_soul_ach', icon:'🎨', name:'艺术灵魂', desc:'在798找到了艺术的感受力', check: g => g.flags.artInterest },
     { id:'city_local_ach', icon:'🗺️', name:'第二故乡', desc:'把生活的城市当成了第二故乡', check: g => g.flags.secondHometown },
     { id:'hotpot_social_ach', icon:'🌶️', name:'火锅外交官', desc:'成为成都火锅桌上的社交达人', check: g => g.flags.hotpotSocial },
+    // v30.1 achievements - 友情与成人社交
+    { id:'reconnect_ach_v30_1', icon:'👋', name:'重拾友谊', desc:'主动联系了一个渐行渐远的老朋友', check: g => g.flags.reconnectFriend },
+    { id:'community_join_ach', icon:'🤝', name:'社群新人', desc:'加入了一个长期兴趣社群交到新朋友', check: g => g.flags.joinedCommunity },
+    { id:'confident_self_ach', icon:'🎉', name:'不卑不亢', desc:'在同学聚会上坦然面对自己的现状', check: g => g.flags.confidentPresent },
+    { id:'embrace_solo_ach', icon:'🌙', name:'享受独立', desc:'学会了享受一个人生活的自由', check: g => g.flags.embraceIndependence },
+    { id:'cherish_friend_ach', icon:'💕', name:'知心好友', desc:'珍惜那份跨越十年的深厚友谊', check: g => g.flags.cherishFriendship },
+    { id:'social_energy_ach', icon:'🔋', name:'社交能量管理', desc:'学会了管理自己的社交电量', check: g => g.flags.manageSocialEnergy },
+    { id:'online_to_off_ach', icon:'🌐', name:'网友奔现', desc:'把网上认识的朋友变成了现实中的朋友', check: g => g.flags.onlineToOffline },
+    { id:'quality_friend_ach', icon:'💎', name:'质量胜于数量', desc:'明白了朋友不在多而在真', check: g => g.flags.cherishQuality },
 ];
 
 // === ENDINGS === (order matters: first match wins)
