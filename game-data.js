@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v34.0
+// 都市浮生记 - 数据文件 v34.1
 // ============================================
 
 
@@ -19344,6 +19344,98 @@ const EVENTS = [
         { label:'写了一本户外运动指南', hint:'+🧠 +✨', fn: g => { g.flags.outdoorPhilosophy=true; g.flags.outdoorWriter=true; return{intel:15,charm:12,money:5000}; }},
       ]},
 
+    // ===== 播客与声音文化 (v34.1) =====
+
+    { id:'podcast_discover_v34_1', icon:'🎧', title:'播客入坑', category:'podcast',
+      body:'通勤路上，你百无聊赖地刷着手机，突然想起同事推荐的一个播客。\n\n你戴上耳机，点开了第一集。那是一个关于「在大城市如何找到自我」的访谈节目。嘉宾是一个从大厂裸辞后去大理开咖啡馆的前产品经理。\n\n你本来只是打发时间，但听着听着，你发现自己停不下来了。嘉宾说的每一句话都像是在跟你对话：「你不是不想工作，你是不想用这种方式工作。」「自由不是什么都不做，是选择做什么。」\n\n那天通勤的一个小时，你觉得特别短。\n\n从那天起，你的通勤时间变了。不再是刷短视频的垃圾时间，而是一天中最有营养的一个小时。你开始在各种场景下听播客：做饭的时候、跑步的时候、失眠的时候。\n\n你算了一下，一年下来你听了300多个小时——相当于多活了12天。',
+      cond: g => g.age >= 20 && g.intel > 30,
+      choices:[
+        { label:'成了重度播客听众', hint:'+🧠 +😊', fn: g => { g.flags.podcastFan=true; return{intel:12,mood:5}; }},
+        { label:'只听了一两个，觉得太长', hint:'+🧠', fn: g => { g.flags.podcastFan=true; return{intel:3}; }},
+        { label:'开始做播客笔记', hint:'+🧠 +✨', fn: g => { g.flags.podcastFan=true; g.flags.podcastNotes=true; return{intel:15,charm:3}; }},
+      ]},
+
+    { id:'podcast_create_v34_1', icon:'🎙️', title:'自己录播客', category:'podcast',
+      body:'听了半年播客后，你萌生了一个念头：自己做一个。\n\n你花500块买了一个入门麦克风，用手机录了第一期。主题是「一个普通打工人的日常困惑」。你紧张得声音都在抖，录了七遍才满意。\n\n你把它上传到了小宇宙。第一周，只有3个人听了。其中一个是你的好朋友，一个是你的同事（你求他听的），还有一个是陌生人。\n\n那个陌生人留了一条评论：「说的就是我。」\n\n就这一句话，让你决定继续做下去。\n\n三个月后，你有了200个订阅者。不多，但每一个都是真的在听你说话的人。有人给你发私信说：「你的声音陪我度过了最难的一段时间。」\n\n你突然理解了播客的魅力：它不是表演，是对话。你在对一个看不见的人说心里话，而那个人在某个深夜，戴着耳机，觉得终于有人懂他。',
+      cond: g => g.flags.podcastFan && g.age >= 22 && g.intel > 40,
+      choices:[
+        { label:'坚持每周更新', hint:'+✨ +👥', fn: g => { g.flags.podcastCreate=true; return{charm:12,social:8}; }},
+        { label:'录了几期就放弃了', hint:'+🧠', fn: g => { g.flags.podcastCreate=true; return{intel:3}; }},
+        { label:'开始研究音频制作技术', hint:'+🧠 +✨', fn: g => { g.flags.podcastCreate=true; g.flags.audioEngineer=true; return{intel:10,charm:5,money:-2000}; }},
+      ]},
+
+    { id:'audiobook_v34_1', icon:'📖', title:'有声书替代阅读', category:'podcast',
+      body:'你发现了一个改变习惯的事情：有声书。\n\n以前你一直想读书，但总是找不到时间。买了十本书，只翻了三本就束之高阁。直到你发现了微信读书的「听书」功能。\n\n你开始「听书」：通勤听、做饭听、睡前听。一个月下来，你居然「读」了四本书。\n\n你发现听书和看书的感觉完全不同。看书的时候你会走神、会跳页，但听书的时候你更容易沉浸——就像有人在给你讲故事。\n\n当然，有些书不适合听——需要反复思考的哲学书、需要看图表的工具书。但小说、传记、社科类的书，听的效果出奇地好。\n\n你开始给朋友推荐：「你不需要找时间读书，你只需要把刷短视频的时间换成听书。」',
+      cond: g => g.age >= 20 && g.intel > 35,
+      choices:[
+        { label:'成了有声书重度用户', hint:'+🧠 +😊', fn: g => { g.flags.audiobook=true; return{intel:12,mood:5,money:-200}; }},
+        { label:'觉得不如自己看书深入', hint:'+🧠', fn: g => { g.flags.audiobook=true; return{intel:5}; }},
+        { label:'开始录有声书给别人听', hint:'+✨ +👥', fn: g => { g.flags.audiobook=true; g.flags.audioReader=true; return{charm:10,social:5,money:3000}; }},
+      ]},
+
+    { id:'asmr_v34_1', icon:'🌙', title:'ASMR助眠', category:'podcast',
+      body:'失眠的第三个小时，你点开了一个ASMR视频。\n\n画面是一个女生对着麦克风轻声说话，然后用各种东西制造细微的声音：翻书声、敲击声、耳语声、雨声……\n\n你本来觉得这东西有点奇怪，但五分钟后，你的眼皮开始沉重。十分钟后，你睡着了。\n\n从那天起，ASMR成了你的助眠工具。你试了各种类型：人声耳语、自然环境音、敲击音、翻书音、键盘打字音。\n\n你发现最有用的是一个「图书馆环境音」的视频——有人在图书馆里录了两个小时的环境音，只有翻书声、远处的咳嗽声和偶尔的脚步声。\n\n你跟朋友说起这事，他一脸不解：「你不觉得 creepy 吗？有人在你对耳边轻声说话？」\n\n你想了想：「比起凌晨三点的焦虑，这已经是最温柔的陪伴了。」',
+      cond: g => g.age >= 18 && g.health < 60,
+      choices:[
+        { label:'成了日常助眠工具', hint:'+😊 +🧠', fn: g => { g.flags.asmrSleep=true; return{mood:8,health:5}; }},
+        { label:'觉得太奇怪了，还是吃褪黑素吧', hint:'+🧠', fn: g => { g.flags.asmrSleep=true; return{intel:3}; }},
+        { label:'开始研究声音疗愈', hint:'+✨ +🧠', fn: g => { g.flags.asmrSleep=true; g.flags.soundHealing=true; return{charm:8,intel:8}; }},
+      ]},
+
+    { id:'voice_social_v34_1', icon:'🔊', title:'语音社交', category:'podcast',
+      body:'你下载了一个语音社交App——「Clubhouse」的国产替代品。\n\n晚上九点，你进了一个房间，主题是「大城市的孤独感」。房间里有三十多个人，一个女生正在说话：\n\n「我在北京五年了，没有交到一个真正的朋友。不是因为没人对我好，而是因为每个人都太忙了，忙到没有时间去深入了解另一个人。」\n\n你被触动了。你举了手，被主持人邀请上麦。\n\n你磕磕巴巴地说了一些自己的感受。说完后，评论区出现了一排「+1」和「太真实了」。\n\n你发现了一个秘密：声音比文字更有温度，但比视频更没有压力。你不需要化妆、不需要面对镜头，只需要说话。而对方只需要听。\n\n那晚你在App里待到凌晨两点，听了六个陌生人的故事。你觉得比跟认识的人吃了一顿三小时的饭还要充实。',
+      cond: g => g.age >= 20 && g.social > 20,
+      choices:[
+        { label:'成了语音社交常客', hint:'+👥 +😊', fn: g => { g.flags.voiceSocial=true; return{social:10,mood:5}; }},
+        { label:'觉得太费时间了', hint:'+🧠', fn: g => { g.flags.voiceSocial=true; return{intel:3}; }},
+        { label:'开始自己开房间当主持人', hint:'+✨ +👥', fn: g => { g.flags.voiceSocial=true; g.flags.voiceHost=true; return{charm:12,social:12}; }},
+      ]},
+
+    { id:'podcast_community_v34_1', icon:'🤝', title:'播客听友会', category:'podcast',
+      body:'你最喜欢的播客主播办了一场线下听友会。\n\n你犹豫了很久要不要去——你一个人去，认识的人都没有。但你还是去了。\n\n场地是一个咖啡馆的二楼，来了四十多个人。你发现听友们的画像出奇地一致：25-35岁，在附近上班的白领，穿着随意，表情温和。\n\n活动环节是「分享你最喜欢的一期节目和原因」。你听到有人说：\n\n「那期讲抑郁症的节目救了我。我当时已经预约了心理咨询但又想取消，听完那期后我没有取消。」\n\n「那期讲裸辞的节目给了我勇气。当然，我裸辞后也没找到更好的工作，但我不后悔。」\n\n「那期讲和父母和解的节目，我听完给我妈打了一个电话，我们聊了两个小时。」\n\n你鼻子有点酸。原来这些声音，真的在改变一些人的生活。\n\n活动结束后，你和三个人加了微信。其中一个后来成了你最好的朋友之一。',
+      cond: g => g.flags.podcastFan && g.age >= 22,
+      choices:[
+        { label:'交到了志同道合的朋友', hint:'+👥 +😊', fn: g => { g.flags.podcastCommunity=true; return{social:12,mood:10}; }},
+        { label:'觉得线上听就好，线下太social了', hint:'+🧠 +😊', fn: g => { g.flags.podcastCommunity=true; return{intel:5,mood:5}; }},
+        { label:'开始帮忙组织听友活动', hint:'+✨ +👥', fn: g => { g.flags.podcastCommunity=true; g.flags.communityOrganizer=true; return{charm:10,social:10}; }},
+      ]},
+
+    { id:'white_noise_v34_1', icon:'🌧️', title:'白噪音生活', category:'podcast',
+      body:'你发现了一个神奇的东西：白噪音。\n\n起初是下雨天的时候，你在咖啡馆工作特别专注。后来你意识到，不是因为下雨，而是因为雨声。雨声是一种天然的白噪音，它能屏蔽掉那些让你分心的声音。\n\n你下载了一个白噪音App，开始在工作时播放各种环境音：雨声、海浪声、壁炉声、森林声、咖啡馆声。\n\n你发现不同的声音适合不同的场景：写代码的时候听雨声最专注，写文章的时候听咖啡馆声最有灵感，画画的时候听海浪声最有创意。\n\n你的同事看你戴着耳机问：「你在听什么歌？」\n\n你说：「雨。」\n\n同事以为你在开玩笑。但你是认真的。',
+      cond: g => g.age >= 18 && g.intel > 30,
+      choices:[
+        { label:'工作效率提升了30%', hint:'+🧠 +💰', fn: g => { g.flags.whiteNoise=true; return{intel:10,money:2000}; }},
+        { label:'觉得太单调了，还是听歌好', hint:'+😊', fn: g => { g.flags.whiteNoise=true; return{mood:3}; }},
+        { label:'开始自己录制城市白噪音', hint:'+✨ +🧠', fn: g => { g.flags.whiteNoise=true; g.flags.soundCollector=true; return{charm:10,intel:8}; }},
+      ]},
+
+    { id:'standup_comedy_v34_1', icon:'🎤', title:'脱口秀初体验', category:'podcast',
+      body:'你被朋友拉去了一个脱口秀开放麦。\n\n场地是酒吧的地下室，台下坐了三十多个人。台上是一个紧张到声音发抖的新人，段子冷得能冻死人。\n\n但第三个上台的人让你笑翻了。他讲的是北漂的故事：「我租的房子隔音特别差，隔壁情侣吵架我听得一清二楚。有一天他们分手了，我居然难过了一整天——我连他们叫什么都不知道。」\n\n台下所有人都笑了，因为每个人都知道那种感觉。\n\n演出结束后，你在酒吧跟朋友聊了很久。你说：「我以前觉得脱口秀就是在网上看段子，没想到现场的感觉完全不一样。」\n\n朋友说：「因为现场是活人跟活人的连接。笑声是会传染的。」\n\n你在回家的路上想：也许有一天，你也可以站上去讲讲自己的故事。毕竟，在大城市漂泊的经历，够写十个专场了。',
+      cond: g => g.age >= 20 && g.mood > 20,
+      choices:[
+        { label:'开始学写段子', hint:'+✨ +🧠', fn: g => { g.flags.standupComedy=true; return{charm:12,intel:5}; }},
+        { label:'成了脱口秀常客', hint:'+😊 +👥', fn: g => { g.flags.standupComedy=true; return{mood:10,social:8,money:-500}; }},
+        { label:'报名了开放麦——自己上台', hint:'+✨ +👥', fn: g => { g.flags.standupComedy=true; g.flags.standupPerformer=true; return{charm:15,social:10}; }},
+      ]},
+
+    { id:'sound_walk_v34_1', icon:'🎶', title:'声音漫步', category:'podcast',
+      body:'你尝试了一种新的城市探索方式：声音漫步。\n\n规则很简单：戴上耳机，但不播放任何东西。只是走。用耳朵去「看」这座城市。\n\n你从家出发，走了一个小时。你听到了：\n\n楼下早餐摊的油锅滋滋声。地铁口的报站声。公园里老人下棋时棋子落桌的「啪」声。施工工地的电钻声（这个不太好）。小学校门口孩子们放学的嬉闹声。小巷子里有人在弹吉他。\n\n你发现，当你只用耳朵去感受城市的时候，城市变得不一样了。你不再关注视觉上的「好不好看」，而是感受声音里的「有没有生活」。\n\n你录了一段十分钟的城市声音合集：早高峰的地铁报站、午后的蝉鸣、傍晚的广场舞音乐、深夜的猫叫。\n\n你把这段录音发到了网上，配文：「这是城市的呼吸。」',
+      cond: g => g.age >= 20 && g.intel > 35,
+      choices:[
+        { label:'开始定期做声音漫步', hint:'+😊 +✨', fn: g => { g.flags.soundWalk=true; return{mood:12,charm:8}; }},
+        { label:'觉得太文艺了，不适合自己', hint:'+🧠', fn: g => { g.flags.soundWalk=true; return{intel:3}; }},
+        { label:'开始做城市声音地图', hint:'+✨ +🧠', fn: g => { g.flags.soundWalk=true; g.flags.soundMap=true; return{charm:15,intel:10}; }},
+      ]},
+
+    { id:'audio_life_v34_1', icon:'🎵', title:'声音改变生活', category:'podcast',
+      body:'一年后，你回顾了一下，发现声音在不知不觉中改变了你的生活。\n\n播客让你学会了理财——你从一个「月光族」变成了每月定投的人。播客让你开始冥想——从最初的5分钟到现在的20分钟。播客让你重新思考了职业规划——你不再觉得「跳槽=不忠诚」。\n\n有声书让你一年「读」了24本书，是以前的六倍。\n\n白噪音让你的工作效率提高了30%。\n\nASMR让你不再需要安眠药。\n\n你甚至开始觉得，声音是这个时代最被低估的媒介。视频需要你的眼睛，文字需要你的双手，但声音只需要你的耳朵——而你的耳朵，几乎在任何场景下都可以使用。\n\n你在朋友圈写：\n\n「这个城市太吵了，但如果你学会选择听什么，那些好的声音会让你变成更好的人。」',
+      cond: g => g.age >= 23 && (g.flags.podcastFan || g.flags.audiobook || g.flags.whiteNoise) && g.intel > 40,
+      choices:[
+        { label:'声音成了你生活的一部分', hint:'+🧠 +😊 +✨', fn: g => { g.flags.audioLife=true; return{intel:15,mood:12,charm:10}; }},
+        { label:'开始做声音相关的自媒体', hint:'+✨ +💰', fn: g => { g.flags.audioLife=true; g.flags.audioMedia=true; return{charm:12,money:5000}; }},
+        { label:'给朋友推荐了改变你人生的播客', hint:'+👥 +😊', fn: g => { g.flags.audioLife=true; g.flags.audioEvangelist=true; return{social:10,mood:8}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -21222,6 +21314,17 @@ const ACHIEVEMENTS = [
     { id:'marathon_v34_0_ach', icon:'🏅', name:'马拉松完赛', desc:'完成了人生第一个半程马拉松', check: g => g.flags.marathon },
     { id:'skiing_v34_0_ach', icon:'⛷️', name:'雪道初体验', desc:'在雪地上摔出了勇气', check: g => g.flags.skiing },
     { id:'outdoor_philosophy_v34_0_ach', icon:'🌄', name:'户外人生', desc:'户外运动改变了你的生活', check: g => g.flags.outdoorPhilosophy },
+    // --- 播客与声音文化 (v34.1) ---
+    { id:'podcast_discover_v34_1_ach', icon:'🎧', name:'播客听众', desc:'发现了播客的世界', check: g => g.flags.podcastFan },
+    { id:'podcast_create_v34_1_ach', icon:'🎙️', name:'播客主播', desc:'开始录制自己的播客', check: g => g.flags.podcastCreate },
+    { id:'audiobook_v34_1_ach', icon:'📖', name:'听书达人', desc:'用有声书替代了阅读', check: g => g.flags.audiobook },
+    { id:'asmr_v34_1_ach', icon:'🌙', name:'声音安眠', desc:'用ASMR治好了失眠', check: g => g.flags.asmrSleep },
+    { id:'voice_social_v34_1_ach', icon:'🔊', name:'声音社交', desc:'体验了语音社交的魅力', check: g => g.flags.voiceSocial },
+    { id:'podcast_community_v34_1_ach', icon:'🤝', name:'听友一家', desc:'参加了播客线下听友会', check: g => g.flags.podcastCommunity },
+    { id:'white_noise_v34_1_ach', icon:'🌧️', name:'白噪音专注', desc:'用白噪音提高了工作效率', check: g => g.flags.whiteNoise },
+    { id:'standup_comedy_v34_1_ach', icon:'🎤', name:'开放麦', desc:'现场感受了脱口秀的笑声', check: g => g.flags.standupComedy },
+    { id:'sound_walk_v34_1_ach', icon:'🎶', name:'声音漫步', desc:'用耳朵重新认识了城市', check: g => g.flags.soundWalk },
+    { id:'audio_life_v34_1_ach', icon:'🎵', name:'声音生活', desc:'声音改变了你的生活方式', check: g => g.flags.audioLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
