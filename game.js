@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v5.6
+// 都市浮生记 - Game Engine v5.7
 // ============================================
 
 // === GAME STATE ===
@@ -3132,6 +3132,16 @@ const EVENTS = [
         { label:'去成都', hint:'-💰 +😊 +✨', fn: g => { g.flags.digitalNomad=true; g.flags.chengduNomad=true; setJob(g,'数字游民',12000); return{money:-8000,mood:22,charm:12,intel:8}; }},
         { label:'算了，还是上班吧', hint:'+💰 +😊', fn: g => { g.flags.digitalNomad=true; return{money:3000,mood:5}; }},
       ]},
+    // === v5.7 EVENTS - 年轻人存钱与理财 ===
+    { id:'savings_challenge', icon:'💰', title:'存钱挑战',
+      body:'你开始存钱：\n\n- 365天存钱表：每天存钱就画上一格\n- 12存单法：每月存一张一年期存单\n- 对赌存钱法：和朋友约定，不存就罚款\n- 找存钱搭子：互相监督\n\n"从买买买到攒攒攒——当代年轻人开始热衷存钱。"\n\n数据：64.1%的年轻人以储蓄为主要理财方式。\n\n你甚至成了"存款特种兵"：为了3.9%的年利率，坐飞机去广东存钱。\n\n"存钱不是抠门，是对未来的投资。"',
+      cond: g => !g.flags.savingsChallenge && g.age>=22 && g.age<=35 && g.money>10000,
+      choices:[
+        { label:'开始365天存钱', hint:'+💰 +😊 +🧠', fn: g => { g.flags.savingsChallenge=true; g.flags.dailySaver=true; return{money:20000,mood:15,intel:8}; }},
+        { label:'找存钱搭子', hint:'+💰 +👥 +😊', fn: g => { g.flags.savingsChallenge=true; g.flags.savingsPartner=true; return{money:15000,social:12,mood:12}; }},
+        { label:'存款特种兵', hint:'+💰 +✨', fn: g => { g.flags.savingsChallenge=true; g.flags.depositCommando=true; return{money:50000,charm:8,intel:10}; }},
+        { label:'算了，钱是赚出来的', hint:'+😊 -💰', fn: g => { g.flags.savingsChallenge=true; return{mood:5,money:-3000}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3374,6 +3384,8 @@ const ACHIEVEMENTS = [
     { id:'coffee_dreamer', icon:'☕', name:'咖啡店老板', desc:'开了咖啡店', check: g => g.flags.coffeeShopOwner || g.flags.mediaEntrepreneur },
     // v5.6 achievements
     { id:'world_citizen', icon:'🌏', name:'数字游民', desc:'成为数字游民', check: g => g.flags.digitalNomad },
+    // v5.7 achievements
+    { id:'savings_master', icon:'💰', name:'存钱达人', desc:'完成存钱挑战', check: g => g.flags.savingsChallenge },
 ];
 
 // === ENDINGS === (order matters: first match wins)
