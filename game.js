@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v10.2
+// 都市浮生记 - Game Engine v10.3
 // ============================================
 
 // === GAME STATE ===
@@ -4749,9 +4749,55 @@ const EVENTS = [
         { label:'认真做规划', hint:'+🧠 +💰', fn: g => { g.flags.hasCareerPlan=true; return{intel:10,mood:5,money:-2000}; }},
         { label:'觉得没用', hint:'+😊', fn: g => { return{mood:3,money:-2000}; }},
       ]},
+    // === v10.3 家庭/育儿事件 ===
+    { id:'having_child', icon:'👶', title:'要孩子吗',
+      body:'你和TA讨论了一个严肃的问题：要不要生孩子？\n\n你算了一笔账：从怀孕到上大学，至少需要100万。还有学区房、补习班、兴趣班……\n\n你的父母说："不生个孩子，你老了怎么办？"\n\n你心想：我老了可能都还不起房贷。',
+      cond: g => g.flags.married && g.age >= 26 && g.age <= 38 && !g.flags.hasChild,
+      choices:[
+        { label:'生！', hint:'-💰 +😊', fn: g => { g.flags.hasChild=true; return{money:-30000,mood:20,social:10,health:-5}; }},
+        { label:'再等等', hint:'+💰', fn: g => { return{mood:-3,money:5000}; }},
+        { label:'丁克也挺好', hint:'+😊 +💰', fn: g => { g.flags.dink=true; return{mood:10,money:10000}; }},
+      ]},
+    { id:'child_expenses', icon:'💸', title:'育儿开支',
+      body:'孩子出生了。你的开支暴增：奶粉、尿不湿、婴儿车、早教班……\n\n你打开购物车，发现自己已经很久没给自己买过东西了。\n\n"养娃才知道，原来自己的消费降级空间这么大。"',
+      cond: g => g.flags.hasChild && g.months > 3,
+      choices:[
+        { label:'买最好的', hint:'-💰', fn: g => { return{money:-5000,mood:8}; }},
+        { label:'够用就行', hint:'-💰', fn: g => { return{money:-2000,mood:3}; }},
+        { label:'买二手的', hint:'-💰 +🧠', fn: g => { return{money:-800,intel:2}; }},
+      ]},
+    { id:'child_education', icon:'📚', title:'教育焦虑',
+      body:'你的孩子3岁了。周围的家长都在讨论幼儿园：国际幼儿园5万/年，公立幼儿园5000/年。\n\n你看了看银行卡，又看了看"国际幼儿园"的 brochure。\n\n"教育焦虑的本质是：你怕孩子输在起跑线上。但你忘了，起跑线是别人画的。"',
+      cond: g => g.flags.hasChild && g.age >= 29 && g.money > 20000,
+      choices:[
+        { label:'国际幼儿园', hint:'-💰 +✨', fn: g => { return{money:-50000,mood:5,charm:3}; }},
+        { label:'公立幼儿园', hint:'-💰', fn: g => { return{money:-5000,mood:3}; }},
+        { label:'在家自己教', hint:'+🧠 +😊', fn: g => { return{intel:5,mood:5}; }},
+      ]},
+    { id:'parent_aging', icon:'👴', title:'父母老了',
+      body:'你妈打电话来说你爸摔了一跤，住院了。\n\n你请假飞回老家，看到病床上苍老的父亲，你突然意识到：他们在变老，而你在远方。\n\n"距离不是问题，问题是你回不去。"',
+      cond: g => g.age >= 30 && g.months > 36 && g.relationships,
+      choices:[
+        { label:'请假照顾一周', hint:'-💰 +👥', fn: g => { if(g.relationships) g.relationships.family=clamp((g.relationships.family||60)+20,0,100); return{money:-5000,mood:10,social:5}; }},
+        { label:'请护工', hint:'-💰', fn: g => { if(g.relationships) g.relationships.family=clamp((g.relationships.family||60)+5,0,100); return{money:-8000,mood:-5}; }},
+        { label:'视频问候', hint:'+👥', fn: g => { if(g.relationships) g.relationships.family=clamp((g.relationships.family||60)-5,0,100); return{mood:-10}; }},
+      ]},
+    { id:'family_reunion', icon:'🏮', title:'家庭聚会',
+      body:'中秋节，你带着家人回了老家。\n\n一家人围在一起吃月饼、看月亮。你的孩子在院子里跑来跑去，你的父母笑得合不拢嘴。\n\n那一刻你觉得：所有的辛苦都值了。\n\n"团圆是中国人的信仰——哪怕一年只有一次。"',
+      cond: g => g.flags.hasChild && g.flags.married && g.months % 12 === 9,
+      choices:[
+        { label:'多待几天', hint:'-💰 +😊 +👥', fn: g => { if(g.relationships) g.relationships.family=clamp((g.relationships.family||60)+15,0,100); return{money:-3000,mood:20,social:8}; }},
+        { label:'当天来回', hint:'-💰 +😊', fn: g => { return{money:-1000,mood:10}; }},
+      ]},
+    { id:'mid_career_review', icon:'📊', title:'中年盘点',
+      body:'你做了一个表格，盘点自己的"人生资产"：\n\n存款：够活3年\n房产：有/无\n车：有/无\n婚姻：有/无\n孩子：有/无\n健康：还行\n梦想：已忘记\n\n你看着这张表，问自己：这就是我的人生吗？',
+      cond: g => g.age >= 35 && g.months > 100,
+      choices:[
+        { label:'接受现状', hint:'+😊', fn: g => { return{mood:10,intel:3}; }},
+        { label:'重新出发', hint:'🎲', fn: g => { g.flags.midlifeRestart=true; return{mood:5,intel:5}; }},
+        { label:'写回忆录', hint:'+🧠 +✨', fn: g => { return{intel:8,charm:5,mood:8}; }},
+      ]},
 ];
-
-// === ACHIEVEMENTS ===
 const ACHIEVEMENTS = [
     { id:'first_job', icon:'💼', name:'职场新人', desc:'找到第一份工作', check: g => g.flags.gotFirstJob },
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -5153,6 +5199,12 @@ const ACHIEVEMENTS = [
     // === v10.0 新增成就 ===
     { id:'digital_nomad_ach', icon:'🌍', name:'数字游民', desc:'成为数字游民', check: g => g.flags.digitalNomad },
     { id:'minimalist_v2', icon:'🧹', name:'断舍离', desc:'完成一次断舍离', check: g => g.money > 5000 && g.mood > 70 && g.months > 24 },
+    // === v10.3 新增成就 ===
+    { id:'dink_ach', icon:'🍷', name:'丁克一族', desc:'选择不要孩子', check: g => g.flags.dink },
+    { id:'midlife_restart_ach', icon:'🔄', name:'中年重启', desc:'在35岁后重新出发', check: g => g.flags.midlifeRestart },
+    { id:'super_parent', icon:'👨‍👩‍👧‍👦', name:'超级父母', desc:'有孩子且家庭生活幸福', check: g => g.flags.hasChild && g.mood >= 70 && g.social >= 50 },
+    { id:'filial_child', icon:'🏡', name:'孝子孝女', desc:'经常关心父母', check: g => g.relationships && g.relationships.family >= 80 },
+    { id:'child_education_ach', icon:'🎒', name:'虎妈虎爸', desc:'为孩子教育投入巨大', check: g => g.flags.hasChild && g.money < 5000 && g.intel >= 60 },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -5265,6 +5317,11 @@ const ENDINGS = [
     { id:'burnout_recovery', badge:'🌱', title:'浴火重生', desc:'你经历了职业倦怠，但你挺过来了。\n\n你看心理咨询师、学冥想、换工作、重新找到生活的节奏。\n\n你比以前更懂得照顾自己，也更懂得拒绝不合理的要求。\n\n"不是所有的跌倒都叫失败，有些叫成长。"', cond: g => g.flags.sawTherapist && g.mood >= 65 && g.health >= 60 && g.age >= 30 },
     { id:'simple_life_end', badge:'🌿', title:'简单生活', desc:'你没有成为有钱人，也没有成为名人。\n\n但你学会了做饭、养花、散步、看书。你有一个小圈子的好朋友，有一只猫，有一份还行的工作。\n\n你终于明白：幸福不在于拥有多少，而在于享受当下。\n\n"简单生活不是平庸，是选择。"', cond: g => g.flags.cookingSkill && g.flags.hasPet && g.mood >= 60 && g.health >= 55 && g.age >= 32 },
     { id:'hometown_return', badge:'🏡', title:'回乡发展', desc:'你终于回到了老家。\n\n没有了大城市的繁华，也没有了大城市的压力。你在老家找了份工作，买了个小房子。\n\n你妈高兴得合不拢嘴。你爸偷偷在邻居面前炫耀："我孩子回来了。"\n\n"回家不是认输，是另一种勇敢。"', cond: g => g.flags.midlifeChange && g.money >= 20000 && g.age >= 33 && g.social >= 40 },
+    // --- v10.3 NEW ENDINGS ---
+    { id:'dink_end', badge:'🍷', title:'丁克人生', desc:'你和TA选择了不要孩子。\n\n你们把省下来的钱用来旅行、学习、享受生活。周末睡到自然醒，假期想去哪就去哪。\n\n有人说你们自私，有人说你们潇洒。但你知道，这只是你们的选择——一个不需要向任何人解释的选择。\n\n"不是所有人都需要成为父母，有些人选择成为自己。"', cond: g => g.flags.dink && g.age >= 38 && g.mood >= 60 },
+    { id:'super_parent_end', badge:'👨‍👩‍👧‍👦', title:'超级父母', desc:'你在大城市养大了一个孩子。\n\n从幼儿园到小学，从兴趣班到家长会，你在工作与家庭之间疲于奔命。\n\n但当你看到孩子画了一幅画，上面写着"爸爸/妈妈最棒"的时候——你觉得一切都值了。\n\n"父母是世上最难的职业，没有培训，没有工资，没有休假。但你甘之如饴。"', cond: g => g.flags.hasChild && g.mood >= 65 && g.age >= 35 && g.money >= -10000 },
+    { id:'midlife_restart_end', badge:'🔄', title:'中年重启', desc:'35岁之后，你选择了重新出发。\n\n可能是换了行业，可能是创了业，可能是去了新的城市。你不确定未来会怎样，但你知道：原地不动比失败更可怕。\n\n你的朋友圈签名改成了："人生没有太晚的开始。"\n\n"中年不是危机，是觉醒。"', cond: g => g.flags.midlifeRestart && g.age >= 38 && g.mood >= 55 },
+    { id:'filial_end', badge:'🏡', title:'孝子孝女', desc:'你虽然在外漂泊，但从未忘记家人。\n\n每个周末的视频电话，每次假期的回家，每月寄回去的钱和礼物。\n\n你妈在邻居面前炫耀的不是你赚了多少钱，而是："我孩子每周都给我打电话。"\n\n"孝顺不是给多少钱，是让对方知道你在乎。"', cond: g => g.relationships && g.relationships.family >= 85 && g.age >= 32 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
