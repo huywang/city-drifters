@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v32.8
+// 都市浮生记 - Game Engine v32.9
 // ============================================
 
 // === GAME STATE ===
@@ -18247,6 +18247,97 @@ const EVENTS = [
         { label:'感动了很久', hint:'+😊', fn: g => { g.flags.strangerKindness=true; return{mood:10}; }},
         { label:'发了条朋友圈记录这件事', hint:'+✨ +😊', fn: g => { g.flags.strangerKindness=true; return{charm:3,mood:5}; }},
       ]},
+
+    // === v32.9 城市的四季 ===
+    { id:'cherry_blossom_v32_9', icon:'🌸', title:'春天的樱花大道', category:'season',
+      body:'三月底，你路过那条樱花大道。\n\n一树树的樱花开得正盛，粉白色的花瓣在风中飘落，像是下了一场花瓣雨。\n\n路边挤满了拍照的人：有穿汉服的小姐姐、有推着婴儿车的年轻妈妈、有手牵手的情侣。\n\n你站在樱花树下，仰头看——阳光透过花瓣洒下来，在地上画出了斑驳的影子。\n\n你拍了一张照片。照片里是粉色的天和灰色的城市。你觉得这是这个城市最温柔的时刻。\n\n花期很短，只有一周。但这一周，整个城市都变温柔了。',
+      cond: g => g.months >= 3,
+      choices:[
+        { label:'专门请了半天假去赏花', hint:'+😊 +✨', fn: g => { g.flags.cherryBlossom=true; return{mood:10,charm:3}; }},
+        { label:'每天路过都多看几眼', hint:'+😊', fn: g => { g.flags.cherryBlossom=true; return{mood:5}; }},
+        { label:'捡了几片花瓣夹在书里', hint:'+🧠 +😊', fn: g => { g.flags.cherryBlossom=true; g.flags.keptPetals=true; return{intel:3,mood:8}; }},
+      ]},
+
+    { id:'summer_rain_v32_9', icon:'⛈️', title:'夏天的暴雨', category:'season',
+      body:'夏天的暴雨说来就来。\n\n你刚从地铁站出来，天就黑了。三秒钟后，大雨倾盆。\n\n你没带伞，站在地铁口进退两难。旁边的人都在等雨停，但看这天色，一时半会儿停不了。\n\n你咬了咬牙，冲了出去。雨打在你身上，凉飕飕的。你跑了一百米就到了公司楼下，全身湿透了。\n\n你站在大厅里，水滴从头发上滴下来。前台小姐姐递给你一包纸巾：「擦擦吧，今天好多人都是跑进来的。」\n\n你擦了擦脸，笑了。你觉得在大城市里淋一场暴雨，也算是一种人生体验。\n\n反正衣服湿了会干，但记忆不会。',
+      cond: g => g.months >= 6,
+      choices:[
+        { label:'冲进暴雨跑了回去', hint:'+💪 +😊', fn: g => { g.flags.summerRain=true; return{health:-3,mood:5}; }},
+        { label:'在地铁口等了一个小时', hint:'-😊', fn: g => { g.flags.summerRain=true; return{mood:-3}; }},
+        { label:'在路边买了把十块钱的伞', hint:'-💰 +💪', fn: g => { g.flags.summerRain=true; g.money-=10; return{health:2}; }},
+      ]},
+
+    { id:'ginkgo_road_v32_9', icon:'🍂', title:'秋天的银杏路', category:'season',
+      body:'十一月，银杏黄了。\n\n你走在那条著名的银杏路上，脚下铺满了金黄色的叶子。踩上去沙沙作响。\n\n阳光照在银杏叶上，整条路像镀了一层金。你忍不住停下来，蹲下来捡了几片最好看的叶子。\n\n路边有个老爷爷在卖糖炒栗子，你买了一袋。一边走一边剥栗子，一边踩落叶。\n\n你想：秋天是大城市里最奢侈的季节。它不长，但足够美。\n\n你把捡的银杏叶拍了照，做成了手机壁纸。你觉得这片金黄，是你在这个城市里收到的一份免费礼物。',
+      cond: g => g.months >= 12,
+      choices:[
+        { label:'收集了银杏叶做成书签', hint:'+✨ +🧠', fn: g => { g.flags.ginkgoRoad=true; g.flags.madeBookmarks=true; return{charm:5,intel:3}; }},
+        { label:'买了栗子慢慢走慢慢吃', hint:'+😊', fn: g => { g.flags.ginkgoRoad=true; g.money-=15; return{mood:8}; }},
+        { label:'拍了很多照片做成影集', hint:'+✨ +😊', fn: g => { g.flags.ginkgoRoad=true; return{charm:5,mood:5}; }},
+      ]},
+
+    { id:'winter_heating_v32_9', icon:'🔥', title:'冬天的暖气', category:'season',
+      body:'冬天来了，你第一次在北方城市过冬。\n\n你以为会很冷，结果进屋发现——暖气！二十四度的室内，你穿着短袖吃冰棍。\n\n你给南方的朋友发了张照：「外面零下十度，我在屋里穿短袖。」朋友回：「滚。」\n\n但你发现暖气也有问题：太干了。你的嘴唇裂了、皮肤起皮了、早上起来喉咙疼。\n\n你买了一台加湿器，又在床头放了一碗水。你开始理解了北方人的冬天：外面冷得要命，屋里热得要死。\n\n你站在窗户边，看着外面的雪和屋里的热气。你觉得这个反差，就是北方城市的魅力。',
+      cond: g => g.months >= 12 && g.age >= 18,
+      choices:[
+        { label:'买了加湿器适应干燥', hint:'-💰 +💪', fn: g => { g.flags.winterHeating=true; g.money-=200; return{health:3}; }},
+        { label:'穿短袖吃冰棍发了朋友圈', hint:'+✨ +😊', fn: g => { g.flags.winterHeating=true; return{charm:3,mood:5}; }},
+        { label:'开始怀念南方的湿冷', hint:'+🧠', fn: g => { g.flags.winterHeating=true; return{intel:3,mood:2}; }},
+      ]},
+
+    { id:'kite_flying_v32_9', icon:'🪁', title:'春天放风筝', category:'season',
+      body:'周末你去公园放风筝。\n\n你买了个最便宜的——十块钱的老鹰风筝。你跑了好几圈才把它放起来。\n\n风筝在天上飘啊飘，你拉着线，感觉自己又变回了小时候。\n\n旁边有个小孩的风筝线断了，风筝飞远了。小孩哭了。他爸爸说：「没事，我们再买一个。」\n\n你看着天上的风筝——有蝴蝶的、有奥特曼的、有条龙的。五颜六色地在蓝天上飘。\n\n你躺下来，看着风筝和云。你想：在大城市里，偶尔做点没有用的事情，才是最有用的。',
+      cond: g => g.age >= 18,
+      choices:[
+        { label:'在草地上躺了一下午', hint:'+😊 +💪', fn: g => { g.flags.kiteFlying=true; return{mood:10,health:3}; }},
+        { label:'跟旁边的小朋友一起放', hint:'+👥 +😊', fn: g => { g.flags.kiteFlying=true; return{social:5,mood:8}; }},
+        { label:'拍了一段视频发给爸妈', hint:'+👥 +😊', fn: g => { g.flags.kiteFlying=true; return{social:3,mood:5}; }},
+      ]},
+
+    { id:'watermelon_v32_9', icon:'🍉', title:'夏天吃西瓜', category:'season',
+      body:'大热天的，你下班路过水果摊，买了一个西瓜。\n\n回到家，你把西瓜对半切开，用勺子挖着吃。冰凉甜透的西瓜汁流到手指上，你舔了舔。\n\n你打开空调，穿着短裤背心，坐在沙发上抱着半个西瓜，用勺子一口一口地挖。\n\n电视上在放一个综艺节目，你不怎么看，就听个响。\n\n你觉得这就是夏天最幸福的事：空调+西瓜+综艺。不需要什么诗和远方，此刻就是远方。\n\n西瓜吃完了，你把瓜皮扔进垃圾桶。你的手黏糊糊的，但你的心是甜的。',
+      cond: g => g.age >= 18 && g.mood < 70,
+      choices:[
+        { label:'买了西瓜回家用勺子挖着吃', hint:'+😊 +💪', fn: g => { g.flags.watermelon=true; g.money-=20; return{mood:10,health:3}; }},
+        { label:'叫了朋友来一起吃', hint:'+👥 +😊', fn: g => { g.flags.watermelon=true; g.money-=20; return{social:5,mood:8}; }},
+        { label:'做了西瓜冰棍冻在冰箱里', hint:'+🧠 +😊', fn: g => { g.flags.watermelon=true; g.flags.madePopsicle=true; return{intel:3,mood:5}; }},
+      ]},
+
+    { id:'osmanthus_v32_9', icon:'🌼', title:'秋天的桂花香', category:'season',
+      body:'十月的某一天，你走在路上，突然闻到一股甜甜的香味。\n\n你四处看了看，发现路边的桂花树开花了。米粒大小的黄色花朵藏在绿叶之间，不起眼，但香味能飘出几十米。\n\n你深吸了一口气。这个味道让你想起了什么——是外婆家的院子。外婆家有一棵大桂花树，每年秋天都香得满院子都是。\n\n你站在桂花树下闻了很久。你想，气味是最诚实的记忆开关。一闻到这个味道，你就回到了童年。\n\n你拍了几朵桂花带回家，夹在了书里。你想把秋天留住，哪怕只是一点点。',
+      cond: g => g.months >= 12,
+      choices:[
+        { label:'给外婆打了个电话', hint:'+👥 +😊', fn: g => { g.flags.osmanthus=true; return{social:5,mood:10}; }},
+        { label:'把桂花夹在书里留住秋天', hint:'+🧠 +😊', fn: g => { g.flags.osmanthus=true; g.flags.keptFlowers=true; return{intel:3,mood:5}; }},
+        { label:'买了一瓶桂花味的香水', hint:'-💰 +✨', fn: g => { g.flags.osmanthus=true; g.money-=150; return{charm:5,mood:3}; }},
+      ]},
+
+    { id:'winter_snow_v32_9', icon:'❄️', title:'冬天下雪了', category:'season',
+      body:'早上你被室友/邻居的消息吵醒：「下雪了！！」\n\n你拉开窗帘——外面白茫茫的一片。树上、车上、屋顶上，全白了。\n\n你穿了最厚的羽绒服出了门。雪还在下，大片大片的雪花从天上飘下来，落在你的头发上、睫毛上。\n\n小区里有孩子在堆雪人、打雪仗。一个南方口音的男生兴奋地大喊：「我第一次看到雪啊！！」\n\n你蹲下来抓了一把雪，凉的。你把雪团成一个球，扔了出去。\n\n你觉得在这个城市里，下雪是最公平的事——不管你是有钱还是没钱，是本地人还是外地人，雪都一样地落在你头上。',
+      cond: g => g.months >= 12,
+      choices:[
+        { label:'堆了一个雪人拍了照', hint:'+😊 +✨', fn: g => { g.flags.winterSnow=true; return{mood:10,charm:3}; }},
+        { label:'跟朋友们打了一场雪仗', hint:'+👥 +😊', fn: g => { g.flags.winterSnow=true; return{social:8,mood:10}; }},
+        { label:'站在雪里发了一会儿呆', hint:'+🧠 +😊', fn: g => { g.flags.winterSnow=true; return{intel:3,mood:8}; }},
+      ]},
+
+    { id:'seasonal_cold_v32_9', icon:'🤧', title:'换季感冒', category:'season',
+      body:'换季了，气温从三十度掉到了十度。\n\n你还穿着短袖出门，结果晚上就开始打喷嚏了。第二天起来，喉咙疼、鼻子堵、头昏沉沉的。\n\n你翻出手机查了一下最近的医院——排队两小时。你查了外卖平台上的感冒药——比药店贵了一倍。\n\n你拖着病体去了药店，药剂师给你推荐了一堆药。你只买了最便宜的感冒冲剂。\n\n回到家，你泡了一碗药，裹着被子躺下了。你想起妈妈说的：「出门多穿点，别着凉了。」\n\n你以前觉得那是唠叨，现在觉得那是爱。\n\n你给妈妈发了条消息：「我感冒了。」她秒回：「吃药了吗？多喝热水！」',
+      cond: g => g.health < 60,
+      choices:[
+        { label:'乖乖吃药休息了一天', hint:'+💪 +😊', fn: g => { g.flags.seasonalCold=true; return{health:5,mood:3}; }},
+        { label:'硬撑着去上班了', hint:'-💪 +💰', fn: g => { g.flags.seasonalCold=true; return{health:-5,money:100}; }},
+        { label:'给妈妈打了电话撒了个娇', hint:'+👥 +😊', fn: g => { g.flags.seasonalCold=true; g.flags.calledMom2=true; return{social:5,mood:8}; }},
+      ]},
+
+    { id:'year_round_v32_9', icon:'🗓️', title:'一年四季', category:'season',
+      body:'你在整理手机相册的时候，发现了一整年的照片。\n\n春天：樱花树下的自拍。夏天：暴雨中的奔跑。秋天：银杏路上的落叶。冬天：窗上的霜花。\n\n你已经在这个城市过了整整一年了。\n\n一年前你拎着行李箱来到这里，什么都不认识。现在你有了一些朋友、一个还算稳定的工作、几个常去的小店。\n\n你给这一年的照片做了一个视频，配了一首歌。你发了朋友圈，配文：「一年了，谢谢你，这座城市。」\n\n评论区有人问：「明年还留在这里吗？」\n\n你想了想，回了句：「嗯，还在。」',
+      cond: g => g.months >= 12,
+      choices:[
+        { label:'做了一个年度回顾视频', hint:'+✨ +🧠', fn: g => { g.flags.yearRound=true; g.flags.madeVideo=true; return{charm:5,intel:5}; }},
+        { label:'决定继续留在这个城市', hint:'+🧠 +😊', fn: g => { g.flags.yearRound=true; g.flags.stayCity=true; return{intel:5,mood:8}; }},
+        { label:'给爸妈寄了一些当地特产', hint:'-💰 +👥 +😊', fn: g => { g.flags.yearRound=true; g.money-=200; return{social:5,mood:8}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -19984,6 +20075,18 @@ const ACHIEVEMENTS = [
     { id:'convenience_tacit_ach', icon:'🏪', name:'深夜泡面之交', desc:'在深夜便利店和陌生人有了默契', check: g => g.flags.convenienceTacit },
     { id:'bus_elder_ach', icon:'🚌', name:'公交故事', desc:'在公交车上听了一个老人的故事', check: g => g.flags.busElder },
     { id:'stranger_kind_ach', icon:'🤝', name:'陌生人的善意', desc:'被陌生人的帮助感动了很久', check: g => g.flags.strangerKindness },
+
+    // --- v32.9 城市的四季成就 ---
+    { id:'cherry_blossom_ach', icon:'🌸', name:'樱花季', desc:'在春天欣赏了城市的樱花', check: g => g.flags.cherryBlossom },
+    { id:'summer_rain_ach', icon:'⛈️', name:'暴雨中奔跑', desc:'在夏天的暴雨中冲了出去', check: g => g.flags.summerRain },
+    { id:'ginkgo_road_ach', icon:'🍂', name:'银杏之路', desc:'在秋天走过了金黄的银杏路', check: g => g.flags.ginkgoRoad },
+    { id:'winter_heating_ach', icon:'🔥', name:'暖气幸福', desc:'体验了北方城市冬天的暖气', check: g => g.flags.winterHeating },
+    { id:'kite_flying_ach', icon:'🪁', name:'放风筝', desc:'在春天的公园里放了风筝', check: g => g.flags.kiteFlying },
+    { id:'watermelon_ach', icon:'🍉', name:'西瓜夏天', desc:'抱着半个西瓜用勺子挖着吃', check: g => g.flags.watermelon },
+    { id:'osmanthus_ach', icon:'🌼', name:'桂花飘香', desc:'在秋天的桂花香中想起了故乡', check: g => g.flags.osmanthus },
+    { id:'winter_snow_ach', icon:'❄️', name:'初雪', desc:'在城市里迎接了第一场雪', check: g => g.flags.winterSnow },
+    { id:'seasonal_cold_ach', icon:'🤧', name:'换季感冒', desc:'在换季时感冒了并想家了', check: g => g.flags.seasonalCold },
+    { id:'year_round_ach', icon:'🗓️', name:'一年四季', desc:'在这个城市度过了完整的一年', check: g => g.flags.yearRound },
 ];
 
 // === ENDINGS === (order matters: first match wins)
