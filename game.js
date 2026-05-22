@@ -967,6 +967,103 @@ const EVENTS = [
         { label:'算了，年年都一样', hint:'-😊', fn: g => ({mood:-5}) },
         { label:'发朋友圈立flag', hint:'+✨', fn: g => ({charm:5,mood:8}) },
       ]},
+    // ===== v2.6: SKILLS & HOBBIES =====
+    { id:'gym_membership', icon:'🏋️', title:'健身卡',
+      body:'你路过一家健身房，销售小哥拦住你："哥/姐，办张健身卡吧，年卡3000，送私教体验课。"\n\n你看了看自己的肚子，又看了看镜子里的自己。\n\n你想：也许该动起来了。\n\n"健身是成年人世界里，少数付出就有回报的事。"',
+      cond: g => g.age>=23 && g.age<=45 && !g.flags.gymMember && g.health<75,
+      choices:[
+        { label:'办卡！开始健身', hint:'-💰 +❤️ +😊', fn: g => { g.flags.gymMember=true; return{money:-3000,health:15,mood:10,charm:5}; }},
+        { label:'先体验一次', hint:'+❤️', fn: g => ({health:5,mood:5}) },
+        { label:'算了，我在家做俯卧撑', hint:'+😊', fn: g => ({health:3,mood:3}) },
+      ]},
+    { id:'reading_habit', icon:'📚', title:'阅读习惯',
+      body:'你在豆瓣上看到一份"年度必读书单"：20本书，从《人类简史》到《置身事内》。\n\n你看了看自己的书架：去年买的书，一本都没翻过。\n\n你下载了微信读书，发誓今年要读完10本。\n\n"读书不是为了装，是为了不被骗。"',
+      cond: g => g.intel<70 && !g.flags.readingHabit,
+      choices:[
+        { label:'开始读书', hint:'+🧠 +😊', fn: g => { g.flags.readingHabit=true; return{intel:12,mood:8}; }},
+        { label:'买书但不读', hint:'-💰', fn: g => ({money:-500,mood:3}) },
+        { label:'听有声书', hint:'+🧠', fn: g => ({intel:8,mood:5}) },
+      ]},
+    { id:'cooking_skill', icon:'🍳', title:'学做饭',
+      body:'你算了笔账：每天外卖60块，一个月1800，一年2万。\n\n你决定学做饭。你在B站看了10个教程，买了锅碗瓢盆，开始做第一顿饭。\n\n结果：厨房差点着火，菜糊了，但你觉得很有成就感。\n\n"做饭是成年人的必修课：省钱、健康、还有发朋友圈的素材。"',
+      cond: g => g.age>=24 && !g.flags.cookingSkill && g.money<30000,
+      choices:[
+        { label:'坚持做饭', hint:'+💰 +❤️ +🧠', fn: g => { g.flags.cookingSkill=true; return{money:5000,health:10,intel:5,mood:8}; }},
+        { label:'偶尔做做', hint:'+💰 +❤️', fn: g => ({money:2000,health:5}) },
+        { label:'算了，外卖真香', hint:'+😊 -💰', fn: g => ({mood:5,money:-500}) },
+      ]},
+    { id:'gaming_addiction', icon:'🎮', title:'游戏成瘾',
+      body:'你下载了一款新游戏，本来说"就玩半小时"，结果一抬头已经凌晨3点了。\n\n你的作息变成了：上班摸鱼→下班打游戏→熬夜打游戏→第二天上班摸鱼。\n\n你的黑眼圈比熊猫还重，但你的段位从青铜升到了钻石。\n\n"游戏是逃避现实的避风港，但现实不会因为你的逃避而等你。"',
+      cond: g => g.age>=22 && g.age<=35 && g.mood<50 && !g.flags.gamingAddiction,
+      choices:[
+        { label:'继续沉迷', hint:'+😊 -❤️ -💰', fn: g => { g.flags.gamingAddiction=true; return{mood:20,health:-15,money:-2000,intel:-5}; }},
+        { label:'控制时间，每天1小时', hint:'+😊 +🧠', fn: g => { g.flags.gamingAddiction=true; return{mood:10,intel:3}; }},
+        { label:'卸载游戏', hint:'-😊 +❤️ +🧠', fn: g => ({mood:-15,health:8,intel:5}) },
+      ]},
+    { id:'photography_hobby', icon:'📷', title:'摄影爱好',
+      body:'你看到朋友圈有人发的照片特别好看，一问才知道是用手机拍的。\n\n你心动了：也许你也可以成为"朋友圈摄影大师"。\n\n你看了看银行卡：入门相机5000，好一点的1万，专业级的3万+。\n\n"摄影穷三代，单反毁一生——但你愿意。"',
+      cond: g => g.age>=25 && g.age<=40 && !g.flags.photographyHobby && g.charm>40,
+      choices:[
+        { label:'买专业设备', hint:'-💰💰 +✨ +🧠', fn: g => { g.flags.photographyHobby=true; return{money:-15000,charm:15,intel:8,mood:10}; }},
+        { label:'用手机拍', hint:'+✨ +🧠', fn: g => { g.flags.photographyHobby=true; return{charm:8,intel:5,mood:8}; }},
+        { label:'先学后期修图', hint:'+🧠 +✨', fn: g => ({intel:8,charm:5,mood:5}) },
+      ]},
+    { id:'music_learn', icon:'🎸', title:'学乐器',
+      body:'你在地铁里看到一个弹吉他的小哥，唱得特别好。你心想：要是我也会弹吉他/钢琴就好了。\n\n你打开淘宝：入门吉他800，电子琴1500，课程另算。\n\n"学乐器不是为了表演，是为了在独处的时候有个朋友。"',
+      cond: g => g.age>=22 && g.age<=35 && !g.flags.musicSkill && g.mood>40,
+      choices:[
+        { label:'学吉他', hint:'-💰 +✨ +😊', fn: g => { g.flags.musicSkill=true; return{money:-2000,charm:10,mood:12,intel:5}; }},
+        { label:'学钢琴', hint:'-💰💰 +✨ +😊', fn: g => { g.flags.musicSkill=true; return{money:-5000,charm:12,mood:15,intel:8}; }},
+        { label:'算了，听听就好', hint:'+😊', fn: g => ({mood:5}) },
+      ]},
+    // ===== v2.6: RANDOM LIFE EVENTS =====
+    { id:'lottery_win', icon:'🎰', title:'彩票中奖！',
+      body:'你随手买了一张彩票，结果——中了！\n\n不是头奖，但也有一万块。你激动得手都在抖。\n\n你开始幻想：要是中了500万该多好？辞职、旅游、买房……\n\n但你知道，彩票中奖的概率比被雷劈还低。这次是运气，下次别想了。\n\n"彩票是穷人的税，但偶尔中一次，真的很爽。"',
+      cond: g => !g.flags.lotteryWin && Math.random() > 0.95,
+      choices:[
+        { label:'存起来', hint:'+💰', fn: g => { g.flags.lotteryWin=true; return{money:10000,mood:15}; }},
+        { label:'吃顿好的庆祝', hint:'+😊 +💰', fn: g => { g.flags.lotteryWin=true; return{money:8000,mood:25,health:3}; }},
+        { label:'再买100张', hint:'🎲', fn: g => { g.flags.lotteryWin=true; if(Math.random()>0.9){return{money:50000,mood:30}}else{return{money:-500,mood:-5}} }},
+      ]},
+    { id:'phone_lost', icon:'📱', title:'手机丢了',
+      body:'你在地铁上睡着了，醒来发现手机不见了。\n\n你慌了：微信、支付宝、银行卡、照片、通讯录——全在手机里。\n\n你借了路人手机打110，又挂失了所有卡。\n\n"现代人最怕的事不是失业，是手机丢了。"',
+      cond: g => !g.flags.phoneLost && Math.random() > 0.92,
+      choices:[
+        { label:'买新手机', hint:'-💰💰 +😊', fn: g => { g.flags.phoneLost=true; return{money:-5000,mood:10}; }},
+        { label:'买二手手机', hint:'-💰', fn: g => { g.flags.phoneLost=true; return{money:-1500,mood:5}; }},
+        { label:'先用旧手机', hint:'+😊', fn: g => { g.flags.phoneLost=true; return{mood:-10}; }},
+      ]},
+    { id:'unexpected_friend', icon:'🤝', title:'意外相遇',
+      body:'你在咖啡厅里，旁边的人突然问你："这本书好看吗？"\n\n你们聊了起来，发现兴趣惊人地相似。你们加了微信，约好下次一起去看展。\n\n"大城市的友谊往往始于偶然，终于必然——但这一次，也许不一样。"',
+      cond: g => g.social<50 && !g.flags.unexpectedFriend,
+      choices:[
+        { label:'保持联系', hint:'+👥 +😊', fn: g => { g.flags.unexpectedFriend=true; return{social:15,mood:15}; }},
+        { label:'算了，萍水相逢', hint:'+🧠', fn: g => ({intel:3,mood:3}) },
+      ]},
+    { id:'traffic_accident', icon:'🚗', title:'交通事故',
+      body:'你在过马路的时候，被一辆电动车撞了。\n\n不严重，但膝盖肿了，去医院拍了片子。肇事者是个外卖小哥，他哭着说："我赔不起……"\n\n你看着他，想起了自己刚来大城市的样子。\n\n"大城市里，每个人都在赶时间，但安全才是最重要的。"',
+      cond: g => !g.flags.trafficAccident && Math.random() > 0.93,
+      choices:[
+        { label:'算了，不追究', hint:'+😊 +👥', fn: g => { g.flags.trafficAccident=true; return{health:-8,mood:5,social:5}; }},
+        { label:'让他赔医药费', hint:'+💰 -😊', fn: g => { g.flags.trafficAccident=true; return{money:500,health:-8,mood:-5}; }},
+        { label:'报警处理', hint:'+🧠', fn: g => { g.flags.trafficAccident=true; return{money:1000,health:-8,intel:3}; }},
+      ]},
+    { id:'viral_moment', icon:'🌟', title:'意外走红',
+      body:'你在地铁上随手拍的一段视频，突然在抖音火了：100万播放，1万点赞。\n\n评论区有人说："太真实了！"有人说："这不就是我吗？"\n\n你看着粉丝数从100涨到1万，心跳加速。\n\n"在这个时代，每个人都有15分钟成名的机会——你的15分钟来了。"',
+      cond: g => !g.flags.viralMoment && g.charm>50 && Math.random() > 0.9,
+      choices:[
+        { label:'趁热做自媒体', hint:'+💰 +✨ +👥', fn: g => { g.flags.viralMoment=true; g.flags.influencer=true; return{money:8000,charm:20,social:15,mood:15}; }},
+        { label:'保持低调', hint:'+🧠', fn: g => { g.flags.viralMoment=true; return{intel:5,mood:10}; }},
+        { label:'接广告赚钱', hint:'+💰 +✨', fn: g => { g.flags.viralMoment=true; return{money:15000,charm:10,mood:10}; }},
+      ]},
+    { id:'family_emergency', icon:'🚨', title:'家庭急事',
+      body:'你妈打电话来，声音很急："你爸住院了，你快回来。"\n\n你查了查机票/高铁：最近的也要6小时。你请了假，买了最近的票。\n\n在医院里，你看着病床上的父亲，突然觉得：自己在大城市拼了这么多年，到底是为了什么？\n\n"家人是你最后的退路，也是你最大的牵挂。"',
+      cond: g => g.age>=28 && !g.flags.familyEmergency && g.social>30,
+      choices:[
+        { label:'请假回家照顾', hint:'-💰 +😊 +👥', fn: g => { g.flags.familyEmergency=true; return{money:-5000,mood:15,social:10,health:5}; }},
+        { label:'寄钱回去', hint:'-💰 -😊', fn: g => { g.flags.familyEmergency=true; return{money:-10000,mood:-10}; }},
+        { label:'视频慰问', hint:'-😊', fn: g => { g.flags.familyEmergency=true; return{mood:-20,social:-5}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -996,6 +1093,12 @@ const ACHIEVEMENTS = [
     { id:'divorced', icon:'💔', name:'围城之外', desc:'离婚了', check: g => g.flags.divorced },
     { id:'parent', icon:'👶', name:'为人父母', desc:'有了孩子', check: g => g.flags.hasChild },
     { id:'lying_flat', icon:'🛋️', name:'躺平大师', desc:'选择了躺平', check: g => g.flags.lyingFlat },
+    { id:'gym_rat', icon:'🏋️', name:'健身达人', desc:'办了健身卡', check: g => g.flags.gymMember },
+    { id:'bookworm', icon:'📚', name:'书虫', desc:'养成阅读习惯', check: g => g.flags.readingHabit },
+    { id:'chef', icon:'🍳', name:'厨神', desc:'学会做饭', check: g => g.flags.cookingSkill },
+    { id:'musician', icon:'🎸', name:'音乐人', desc:'学了乐器', check: g => g.flags.musicSkill },
+    { id:'photographer', icon:'📷', name:'摄影师', desc:'爱上摄影', check: g => g.flags.photographyHobby },
+    { id:'viral_star', icon:'🌟', name:'网红初体验', desc:'意外走红', check: g => g.flags.viralMoment },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -1367,7 +1470,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.5' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.6' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
