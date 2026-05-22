@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v30.6
+// 都市浮生记 - Game Engine v30.7
 // ============================================
 
 // === GAME STATE ===
@@ -16466,6 +16466,87 @@ const EVENTS = [
         { label:'把智慧传递给年轻人', hint:'+👥 +🧠', fn: g => { g.flags.midlifeWisdom=true; g.flags.passWisdom=true; return{social:5,intel:5}; }},
         { label:'继续探索人生还有太多未知', hint:'+🧠 +😊', fn: g => { g.flags.midlifeWisdom=true; g.flags.keepExploring=true; return{intel:8,mood:5}; }},
       ]},
+    // v30.7 事件 - 消费主义反思与极简生活
+    { id:'consumerism_awakening', icon:'🛒', title:'消费主义觉醒', category:'minimalism',
+      body:'你在整理房间时——发现了一堆「买了但没用」的东西。\n\n你的「库存」：\n- 3件「还挂着标签」的衣服（每件500+）\n- 2个「只用了1次」的厨具（空气炸锅、破壁机）\n- 5本「买了但没翻过」的书\n- 10个「赠品」的杯子\n- 一箱「过期」的护肤品\n\n你的计算：\n- 这些东西加起来——超过2万\n- 你「真正用到」的——不到10%\n- 你「真正需要」的——更少\n\n你的反思：\n- 「购物」给你带来的「快乐」——只持续了「几分钟」\n- 「拥有」给你带来的「满足」——很快变成了「负担」\n- 「消费」给你的「身份感」——是「虚假的」\n\n你的觉醒：\n- 「消费主义」不是「自由选择」——是「被制造的欲望」\n- 「广告」不是在「告诉你」你需要什么——是在「制造」你的不满足\n- 「拥有更多」不等于「更幸福」\n\n「你买的东西——最终「拥有」了你。',
+      cond: g => g.money >= 5000 && g.age >= 22 && !g.flags.consumerismAwakening,
+      choices:[
+        { label:'开始断舍离清理不需要的东西', hint:'+😊 +💰', fn: g => { g.flags.consumerismAwakening=true; g.flags.startDeclutter=true; return{mood:5,money:2000}; }},
+        { label:'反思自己的消费习惯', hint:'+🧠', fn: g => { g.flags.consumerismAwakening=true; g.flags.reflectConsumption=true; return{intel:8}; }},
+        { label:'算了反正都买了就放着吧', hint:'', fn: g => { g.flags.consumerismAwakening=true; g.flags.keepStuff=true; return{mood:-2}; }},
+      ]},
+    { id:'declutter_journey', icon:'🗑️', title:'断舍离之旅', category:'minimalism',
+      body:'你开始了「断舍离」——不是「扔东西」，是「重新定义你和物品的关系」。\n\n你的原则：\n- 「断」——断绝不需要的东西进入\n- 「舍」——舍弃多余的物品\n- 「离」——脱离对物品的执念\n\n你的过程：\n- 第一天：扔了3袋衣服（轻松）\n- 第一周：清理了书架（有点心痛）\n- 第一个月：整理了储物间（很累但很爽）\n- 第三个月：你的家「空了」——但你「满了」\n\n你的收获：\n- 「空间」变大了——你可以「呼吸」了\n- 「心情」变轻了——你「不再被物品绑架」\n- 「时间」变多了——你不用「整理」了\n- 「金钱」变多了——你不再「乱买」了\n\n你的理解：\n- 「断舍离」不是「极简主义」——是「有意识的选择」\n- 「扔掉」不是「浪费」——是「释放」\n- 「少即是多」不是「口号」——是「体验」\n\n「你不需要「更多」——你只需要「刚好」。',
+      cond: g => g.flags.startDeclutter && !g.flags.declutterJourney,
+      choices:[
+        { label:'完成断舍离享受极简生活', hint:'+😊 +🧠', fn: g => { g.flags.declutterJourney=true; g.flags.completeDeclutter=true; return{mood:10,intel:5}; }},
+        { label:'只保留真正喜欢的东西', hint:'+😊', fn: g => { g.flags.declutterJourney=true; g.flags.keepFavorites=true; return{mood:5}; }},
+        { label:'断舍离太极端了我还是喜欢买买买', hint:'-😊', fn: g => { g.flags.declutterJourney=true; g.flags.giveUpDeclutter=true; return{mood:-3}; }},
+      ]},
+    { id:'digital_minimalism_v30_7', icon:'📱', title:'数字极简', category:'minimalism',
+      body:'你意识到——你的「数字生活」也需要「极简」。\n\n你的「数字负担」：\n- 手机APP：128个（常用的不到10个）\n- 微信群：37个（有内容的不到5个）\n- 未读消息：999+\n- 未读邮件：2347封\n- 收藏夹：500+条（从来没看过）\n- 照片：28000张（大部分是重复的）\n\n你的「数字焦虑」：\n- 「错过恐惧」——你害怕「错过重要信息」\n- 「通知疲劳」——你被「叮叮叮」搞到崩溃\n- 「信息过载」——你「看不完」也「记不住」\n\n你的「数字断舍离」：\n- 删掉了80%的APP\n- 退出了90%的群\n- 关闭了所有非必要通知\n- 清理了收藏夹\n- 整理了照片\n\n你的「数字极简」原则：\n- 「工具」是为你服务的——不是你是为它服务的\n- 「信息」是为你成长的——不是让你焦虑的\n- 「连接」是为你幸福的——不是让你疲惫的\n\n「你不需要「随时在线」——你需要「随时「在场」」。',
+      cond: g => g.age >= 22 && !g.flags.digitalMinimalism,
+      choices:[
+        { label:'彻底执行数字极简', hint:'+😊 +🧠', fn: g => { g.flags.digitalMinimalism=true; g.flags.fullDigitalMinimal=true; return{mood:8,intel:5}; }},
+        { label:'有选择地减少数字干扰', hint:'+😊', fn: g => { g.flags.digitalMinimalism=true; g.flags.selectiveDigital=true; return{mood:5}; }},
+        { label:'我离不开手机这不适合我', hint:'', fn: g => { g.flags.digitalMinimalism=true; g.flags.skipDigital=true; return{}; }},
+      ]},
+    { id:'anti_consumerism_v30_7', icon:'✊', title:'反消费主义', category:'minimalism',
+      body:'你开始「有意识地」抵抗「消费主义」。\n\n你的「抵抗」：\n- 双11——你「没有买东西」（而不是「买了很多便宜的东西」）\n- 逛街——你「只看买」\n- 广告——你「直接跳过」\n- 促销——你「问自己：我真的需要吗？」\n\n你的「质疑」：\n- 「为什么「新」就是「好」？」\n- 「为什么「贵」就是「值」？」\n- 「为什么「拥有」就是「成功」？」\n- 「为什么「消费」就是「快乐」？」\n\n你的「发现」：\n- 「消费主义」是一种「意识形态」——不是「自然法则」\n- 「购物」是一种「应对机制」——不是「真正的需求」\n- 「品牌」是一种「故事」——不是「身份」\n\n你的「替代」：\n- 「体验」代替「物品」——旅行/学习/关系\n- 「创造」代替「消费」——写作/画画/做饭\n- 「分享」代替「占有」——借用/交换/捐赠\n\n「消费主义」告诉你「你需要更多」——但你其实「已经够了」。',
+      cond: g => g.flags.reflectConsumption && !g.flags.antiConsumerism,
+      choices:[
+        { label:'坚持反消费主义生活方式', hint:'+😊 +💰', fn: g => { g.flags.antiConsumerism=true; g.flags.persistAntiConsumer=true; return{mood:5,money:3000}; }},
+        { label:'找到消费与节制的平衡', hint:'+🧠', fn: g => { g.flags.antiConsumerism=true; g.flags.balancedConsumption=true; return{intel:5,mood:3}; }},
+        { label:'反消费太极端了适度就好', hint:'', fn: g => { g.flags.antiConsumerism=true; g.flags.moderateConsume=true; return{}; }},
+      ]},
+    { id:'secondhand_living', icon:'♻️', title:'二手生活', category:'minimalism',
+      body:'你开始拥抱「二手生活」——不是「穷」，是「聪明」。\n\n你的「二手」清单：\n- 衣服：在「多抓鱼」买二手衣服（原价1/3）\n- 书籍：在「孔夫子」买二手书（原价1/2）\n- 家具：在「闲鱼」买二手家具（原价1/4）\n- 电子产品：买「官方翻新」（原价7折）\n- 车：买「二手车」（原价6折）\n\n你的「发现」：\n- 「二手」不是「次品」——是「别人替你试过了」\n- 「二手」不是「丢人」——是「环保」\n- 「二手」不是「穷」——是「理性」\n\n你的「感悟」：\n- 「新」不等于「好」——「适合」才是「好」\n- 「贵」不等于「值」——「使用率」才是「值」\n- 「拥有」不等于「幸福」——「满足」才是「幸福」\n\n「二手生活」不是「将就」——是「精明的选择」。\n\n（中国二手经济市场规模：2023年超过3万亿。「二手」不是「小众」——是「趋势」。）',
+      cond: g => g.age >= 22 && !g.flags.secondhandLiving,
+      choices:[
+        { label:'全面拥抱二手生活', hint:'+💰 +🧠', fn: g => { g.flags.secondhandLiving=true; g.flags.fullSecondhand=true; return{money:5000,intel:5}; }},
+        { label:'大件买二手小件可以买新的', hint:'+💰', fn: g => { g.flags.secondhandLiving=true; g.flags.mixedShopping=true; return{money:2000}; }},
+        { label:'我还是喜欢新的算了', hint:'', fn: g => { g.flags.secondhandLiving=true; g.flags.preferNew=true; return{}; }},
+      ]},
+    { id:'experience_over_things', icon:'🌍', title:'体验大于物品', category:'minimalism',
+      body:'你做了一个实验——「把钱花在体验上而不是物品上」。\n\n你的「体验」清单：\n- 一次「短途旅行」（2000元）\n- 一节「陶艺课」（200元）\n- 一场「音乐会」（300元）\n- 一次「跳伞」（1500元）\n- 一期「烹饪班」（800元）\n\n你的「发现」：\n- 「体验」的「快乐」——是「持续的」（你会「回忆」）\n- 「物品」的「快乐」——是「短暂的」（你会「适应」）\n- 「体验」让你「成长」——「物品」只是「占有」\n- 「体验」给你「故事」——「物品」只给你「灰尘」\n\n你的「理解」：\n- 「体验」是「你的」——别人拿不走\n- 「体验」会「增值」——随着时间变得「更珍贵」\n- 「体验」让你「成为」——而不是「拥有」\n\n「你的人生——是由「体验」组成的，不是由「物品」组成的。',
+      cond: g => g.age >= 22 && g.money >= 3000 && !g.flags.experienceOverThings,
+      choices:[
+        { label:'把钱更多花在体验上', hint:'+😊 +🧠', fn: g => { g.flags.experienceOverThings=true; g.flags.prioritizeExperience=true; return{mood:8,intel:5,money:-2000}; }},
+        { label:'体验和物品都要找到平衡', hint:'+🧠', fn: g => { g.flags.experienceOverThings=true; g.flags.balancedSpend=true; return{intel:3}; }},
+        { label:'我还是喜欢买东西的满足感', hint:'', fn: g => { g.flags.experienceOverThings=true; g.flags.preferThings=true; return{}; }},
+      ]},
+    { id:'minimalist_home', icon:'🏠', title:'极简之家', category:'minimalism',
+      body:'你把家变成了「极简之家」——每一样东西都有「存在的理由」。\n\n你的「极简」原则：\n- 「一进一出」——买一个新的就要淘汰一个旧的\n- 「20/20法则」——如果20分钟内能买到替代品就不需要囤\n- 「一年没用过就淘汰」——不需要的东西不占空间\n\n你的「极简之家」：\n- 客厅：只有沙发、茶几、电视（没有装饰柜、花瓶、摆件）\n- 卧室：只有床、衣柜（没有梳妆台、床头柜、装饰画）\n- 厨房：只有常用的锅碗瓢盆（没有多余的电器、餐具）\n\n你的「感受」：\n- 「空间」变大了——你「可以呼吸了」\n- 「清洁」变容易了——你「不用整理」了\n- 「心情」变平静了——你「不被视觉噪音干扰」了\n\n你的「理解」：\n- 「极简」不是「空无一物」——是「每一样都有意义」\n- 「极简」不是「苦行」——是「自由」\n- 「极简」不是「终点」——是「开始」\n\n「家」不是「仓库」——是「栖息地」。',
+      cond: g => g.flags.completeDeclutter && !g.flags.minimalistHome,
+      choices:[
+        { label:'坚持极简之家享受留白', hint:'+😊 +🧠', fn: g => { g.flags.minimalistHome=true; g.flags.persistMinimal=true; return{mood:8,intel:3}; }},
+        { label:'保持简洁但不太极端', hint:'+😊', fn: g => { g.flags.minimalistHome=true; g.flags.moderateMinimal=true; return{mood:5}; }},
+        { label:'太冷了还是要有烟火气', hint:'', fn: g => { g.flags.minimalistHome=true; g.flags.warmHome=true; return{}; }},
+      ]},
+    { id:'conscious_shopping', icon:'📋', title:'有意识的消费', category:'minimalism',
+      body:'你建立了「有意识的消费」系统——不再「冲动购物」。\n\n你的「消费规则」：\n- 「24小时规则」——想买的东西等24小时再决定\n- 「使用频率」——问自己「我会用多少次？」\n- 「替代方案」——问自己「有没有更便宜的替代品？」\n- 「真正需求」——问自己「这是「需要」还是「想要」？」\n\n你的「消费清单」：\n- 以前：「看到喜欢的就买」\n- 现在：「只买清单上的东西」\n- 以前：「打折就囤货」\n- 现在：「需要了再买」\n- 以前：「心情不好就购物」\n- 现在：「心情不好就去跑步」\n\n你的「发现」：\n- 你「真正需要」的东西——比你「以为」的少得多\n- 你「冲动购买」的东西——80%最后「后悔」\n- 你「等待」的东西——50%最后「不想买了」\n\n「消费」不是「坏事」——「无意识消费」才是。\n\n（研究表明：购物带来的快乐在3天后消退90%。「延迟满足」是「最好的省钱方法」。）',
+      cond: g => g.flags.reflectConsumption && g.age >= 22 && !g.flags.consciousShopping,
+      choices:[
+        { label:'严格执行消费规则', hint:'+💰 +🧠', fn: g => { g.flags.consciousShopping=true; g.flags.strictShopping=true; return{money:3000,intel:5}; }},
+        { label:'灵活运用不过分苛刻', hint:'+💰 +😊', fn: g => { g.flags.consciousShopping=true; g.flags.flexibleShopping=true; return{money:1500,mood:3}; }},
+        { label:'太麻烦了还是随意买吧', hint:'-💰', fn: g => { g.flags.consciousShopping=true; g.flags.casualShopping=true; return{money:-1000}; }},
+      ]},
+    { id:'sustainability_choice', icon:'🌱', title:'可持续生活', category:'minimalism',
+      body:'你开始关注「可持续生活」——因为你意识到「消费」和「环境」息息相关。\n\n你的「可持续」实践：\n- 「自带购物袋」——不用塑料袋\n- 「自带水杯」——不买瓶装水\n- 「光盘行动」——不浪费食物\n- 「公共交通」——少开车\n- 「二手物品」——减少新品消费\n\n你的「发现」：\n- 「可持续」不是「牺牲」——是「更聪明的选择」\n- 「环保」不是「道德绑架」——是「长期利益」\n- 「个人行动」看似「微小」——但「集体行动」可以「改变世界」\n\n你的「理解」：\n- 「可持续」不是「完美」——是「进步」\n- 「环保」不是「极端」——是「平衡」\n- 「每一个选择」都在「投票」——投给你想要的「未来」\n\n「你不是「拯救地球」——你是「拯救自己」。因为「地球」不需要「拯救」——它会「自我修复」。需要「拯救」的是「人类的生存环境」。',
+      cond: g => g.age >= 22 && g.intel >= 25 && !g.flags.sustainabilityChoice,
+      choices:[
+        { label:'全面践行可持续生活', hint:'+😊 +🧠', fn: g => { g.flags.sustainabilityChoice=true; g.flags.fullSustainability=true; return{mood:5,intel:5}; }},
+        { label:'从小事做起逐步改变', hint:'+😊', fn: g => { g.flags.sustainabilityChoice=true; g.flags.gradualSustainability=true; return{mood:3}; }},
+        { label:'个人的力量太渺小了', hint:'', fn: g => { g.flags.sustainabilityChoice=true; g.flags.feelHelpless=true; return{mood:-2}; }},
+      ]},
+    { id:'enough_is_enough', icon:'✋', title:'够了就是够了', category:'minimalism',
+      body:'你在某个时刻——突然觉得「够了」。\n\n「够了」什么？\n- 「够了」——追求「更多」的钱\n- 「够了」——追求「更高」的职位\n- 「够了」——追求「更好」的东西\n- 「够了」——追求「别人眼中的成功」\n\n你的「觉醒」：\n- 你「已经有的」——足够了\n- 你「已经做的」——足够了\n- 你「已经是的」——足够了\n\n你的「理解」：\n- 「知足」不是「放弃」——是「智慧」\n- 「够了」不是「懒惰」——是「清醒」\n- 「满足」不是「停滞」——是「选择」\n\n你的「选择」：\n- 不再「和别人比」\n- 不再「被广告洗脑」\n- 不再「用消费定义自己」\n\n「够了就是够了」——不是「消极」，是「自由」。',
+      cond: g => g.age >= 28 && g.money >= 10000 && !g.flags.enoughIsEnough,
+      choices:[
+        { label:'接受"够了"开始享受生活', hint:'+😊 +🧠', fn: g => { g.flags.enoughIsEnough=true; g.flags.acceptEnough=true; return{mood:10,intel:5}; }},
+        { label:'重新定义什么是"足够"', hint:'+🧠', fn: g => { g.flags.enoughIsEnough=true; g.flags.redefineEnough=true; return{intel:8}; }},
+        { label:'还不够我还需要更多', hint:'-😊', fn: g => { g.flags.enoughIsEnough=true; g.flags.stillNotEnough=true; return{mood:-3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -17970,6 +18051,15 @@ const ACHIEVEMENTS = [
     { id:'more_company_ach', icon:'👴', name:'陪伴父母', desc:'多抽时间陪伴年迈的父母', check: g => g.flags.moreCompany },
     { id:'fitness_habit_ach', icon:'🏃', name:'中年健身', desc:'在中年养成了坚持健身的好习惯', check: g => g.flags.fitnessHabit },
     { id:'accept_and_enjoy_ach', icon:'🦉', name:'中年智慧', desc:'获得了接纳自己享受当下的中年智慧', check: g => g.flags.acceptAndEnjoy },
+    // v30.7 achievements - 消费主义反思与极简生活
+    { id:'start_declutter_ach', icon:'🗑️', name:'断舍离', desc:'开始了断舍离清理不需要的东西', check: g => g.flags.startDeclutter },
+    { id:'complete_declutter_ach', icon:'✨', name:'极简生活', desc:'完成断舍离享受极简生活', check: g => g.flags.completeDeclutter },
+    { id:'full_digital_minimal_ach', icon:'📱', name:'数字极简', desc:'彻底执行了数字极简主义', check: g => g.flags.fullDigitalMinimal },
+    { id:'persist_anti_consumer_ach', icon:'✊', name:'反消费主义', desc:'坚持反消费主义生活方式', check: g => g.flags.persistAntiConsumer },
+    { id:'full_secondhand_ach', icon:'♻️', name:'二手达人', desc:'全面拥抱二手生活', check: g => g.flags.fullSecondhand },
+    { id:'prioritize_experience_ach', icon:'🌍', name:'体验优先', desc:'把钱更多花在体验而不是物品上', check: g => g.flags.prioritizeExperience },
+    { id:'persist_minimal_ach', icon:'🏠', name:'极简之家', desc:'坚持极简之家享受留白', check: g => g.flags.persistMinimal },
+    { id:'accept_enough_ach', icon:'✋', name:'知足常乐', desc:'接受了"够了就是够了"开始享受生活', check: g => g.flags.acceptEnough },
 ];
 
 // === ENDINGS === (order matters: first match wins)
