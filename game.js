@@ -1771,6 +1771,57 @@ const EVENTS = [
         { label:'辞职，gap year', hint:'+😊 +❤️ -💰💰', fn: g => { g.flags.burnoutWarning=true; g.flags.lyingFlat=true; setJob(g,'待业中',0); return{mood:30,health:20,money:-30000}; }},
         { label:'硬撑，为了房贷', hint:'-❤️ -😊', fn: g => { g.flags.burnoutWarning=true; return{health:-15,mood:-20}; }},
       ]},
+    // ===== v2.24: SEASONAL & CHAIN EVENTS =====
+    { id:'spring_festival_travel', icon:'🚄', title:'春运',
+      body:'春节到了，你要回老家。但首先，你要面对春运。\n\n火车票：抢不到\n飞机票：贵得离谱\n自驾：堵车10小时\n\n你最终选择了高铁，站票。\n\n你在人群中挤了3小时，终于到了家。你妈说："瘦了。"\n\n"春运是中国人的朝圣——再苦也要回家过年。"',
+      cond: g => (g.month===1 || g.month===2) && !g.flags.springFestivalTravel && g.age>=23,
+      choices:[
+        { label:'买黄牛票', hint:'-💰 +😊', fn: g => { g.flags.springFestivalTravel=true; return{money:-2000,mood:15}; }},
+        { label:'拼车回家', hint:'🎲 +👥', fn: g => { g.flags.springFestivalTravel=true; if(Math.random()>0.6){return{mood:10,social:8,money:-500}}else{return{mood:-10,health:-5,money:-800}} }},
+        { label:'不回去了', hint:'+💰 -👨‍👩‍👧', fn: g => { g.flags.springFestivalTravel=true; g.relationships.family = clamp((g.relationships.family||60)-15, 0, 100); return{money:3000,mood:-10}; }},
+      ]},
+    { id:'summer_heat', icon:'☀️', title:'高温预警',
+      body:'今天40度。你在外面走了10分钟，感觉自己要融化了。\n\n你的外卖小哥迟到了15分钟，他说："太热了，路上差点晕倒。"\n\n你给了他5星好评和10块钱小费。\n\n"高温下，有人在空调房里抱怨外卖慢，有人在烈日下送外卖。"',
+      cond: g => g.month>=6 && g.month<=8 && !g.flags.summerHeat,
+      choices:[
+        { label:'买空调', hint:'-💰 +❤️ +😊', fn: g => { g.flags.summerHeat=true; return{money:-5000,health:10,mood:15}; }},
+        { label:'去图书馆蹭空调', hint:'+🧠 +😊', fn: g => { g.flags.summerHeat=true; return{intel:8,mood:10}; }},
+        { label:'硬扛，心静自然凉', hint:'-❤️ +💰', fn: g => { g.flags.summerHeat=true; return{health:-8,mood:-5,money:500}; }},
+      ]},
+    { id:'autumn_melancholy', icon:'🍂', title:'秋日感伤',
+      body:'秋天到了，树叶黄了，你的心情也黄了。\n\n你看着窗外的落叶，突然觉得：时间过得好快，一年又过去了。\n\n你发了条朋友圈："秋天是离别的季节。"\n\n然后删了，觉得自己太矫情了。\n\n"秋天的忧郁是真的——但也是短暂的。"',
+      cond: g => g.month>=9 && g.month<=10 && g.mood<60 && !g.flags.autumnMelancholy,
+      choices:[
+        { label:'去赏秋，拍照', hint:'+😊 +✨', fn: g => { g.flags.autumnMelancholy=true; return{mood:15,charm:8,money:-500}; }},
+        { label:'写日记记录心情', hint:'+🧠 +😊', fn: g => { g.flags.autumnMelancholy=true; return{intel:8,mood:12}; }},
+        { label:'约朋友出来聚聚', hint:'+👥 +😊', fn: g => { g.flags.autumnMelancholy=true; g.relationships.friends = clamp((g.relationships.friends||40)+10, 0, 100); return{social:10,mood:15,money:-800}; }},
+      ]},
+    { id:'winter_depression', icon:'❄️', title:'冬季抑郁',
+      body:'冬天来了，天黑得早，你下班的时候天已经黑了。\n\n你不想出门，不想社交，只想窝在被子里刷手机。\n\n你查了一下"季节性抑郁"：冬季日照时间短，容易导致情绪低落。\n\n"冬天的冷不只是温度，还有心情。"',
+      cond: g => g.month>=11 || g.month<=1 && g.mood<55 && !g.flags.winterDepression,
+      choices:[
+        { label:'买光疗灯', hint:'-💰 +❤️ +😊', fn: g => { g.flags.winterDepression=true; return{money:-1500,health:8,mood:15}; }},
+        { label:'坚持运动', hint:'+❤️ +😊', fn: g => { g.flags.winterDepression=true; return{health:12,mood:18}; }},
+        { label:'吃火锅暖身', hint:'+😊 -💰', fn: g => { g.flags.winterDepression=true; return{mood:12,money:-300}; }},
+        { label:'硬扛，等春天', hint:'-❤️ -😊', fn: g => { g.flags.winterDepression=true; return{health:-8,mood:-12}; }},
+      ]},
+    { id:'online_shopping_addiction', icon:'🛒', title:'购物成瘾',
+      body:'你打开了淘宝/拼多多/京东，本来只想买瓶洗发水。\n\n2小时后，你的购物车里有：\n- 羽绒服（打折）\n- 蓝牙耳机（打折）\n- 零食大礼包（打折）\n- 一双鞋（虽然你已经有5双了）\n\n总计：3800元。\n\n"双十一不是购物节，是剁手节——但你不是千手观音。"',
+      cond: g => g.money>5000 && !g.flags.shoppingAddiction && (g.month===11 || g.month===6),
+      choices:[
+        { label:'全部下单！', hint:'-💰 +😊 -🧠', fn: g => { g.flags.shoppingAddiction=true; return{money:-3800,mood:15,intel:-5}; }},
+        { label:'只买必需品', hint:'+🧠 +😊', fn: g => { g.flags.shoppingAddiction=true; return{intel:8,mood:5,money:-200}; }},
+        { label:'全部删除，冷静30天', hint:'+🧠 +💰', fn: g => { g.flags.shoppingAddiction=true; g.flags.minimalist=true; return{intel:12,mood:10,money:500}; }},
+      ]},
+    { id:'friend_borrow_money', icon:'💸', title:'朋友借钱',
+      body:'你朋友找你借钱："兄弟/姐妹，借我2万，下个月还你。"\n\n你心里想：上次借他的5000还没还呢。\n\n但他说："这次是真的急用，我妈住院了。"\n\n你不知道该不该借。\n\n"借钱给朋友，可能失去朋友，也可能失去钱。"',
+      cond: g => g.money>10000 && g.relationships.friends>50 && !g.flags.friendBorrowMoney,
+      choices:[
+        { label:'借，友情无价', hint:'-💰 +👥', fn: g => { g.flags.friendBorrowMoney=true; g.relationships.friends = clamp((g.relationships.friends||40)+20, 0, 100); return{money:-20000,social:15,mood:5}; }},
+        { label:'借一半，量力而行', hint:'-💰 +👥', fn: g => { g.flags.friendBorrowMoney=true; g.relationships.friends = clamp((g.relationships.friends||40)+10, 0, 100); return{money:-10000,social:8,mood:3}; }},
+        { label:'拒绝，上次还没还', hint:'+💰 -👥', fn: g => { g.flags.friendBorrowMoney=true; g.relationships.friends = clamp((g.relationships.friends||40)-15, 0, 100); return{mood:-10,social:-8}; }},
+        { label:'转账，不用还了', hint:'-💰💰 +👥 +✨', fn: g => { g.flags.friendBorrowMoney=true; g.relationships.friends = clamp((g.relationships.friends||40)+30, 0, 100); return{money:-20000,social:20,charm:15,mood:15}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -1851,6 +1902,13 @@ const ACHIEVEMENTS = [
     { id:'digital_detoxer', icon:'📵', name:'数字排毒者', desc:'戒掉社交媒体', check: g => g.flags.socialMediaAnxiety && g.flags.digitalDetox },
     { id:'career_changer', icon:'🔄', name:'转行勇士', desc:'勇敢转行', check: g => g.flags.careerChange },
     { id:'burnout_survivor', icon:'🔥', name:'倦怠幸存者', desc:'经历过职业倦怠', check: g => g.flags.burnoutWarning },
+    // v2.24 achievements
+    { id:'spring_traveler', icon:'🚄', name:'春运勇士', desc:'经历过春运', check: g => g.flags.springFestivalTravel },
+    { id:'summer_survivor', icon:'☀️', name:'酷暑幸存者', desc:'熬过了夏天', check: g => g.flags.summerHeat },
+    { id:'autumn_poet', icon:'🍂', name:'秋日诗人', desc:'感受过秋天', check: g => g.flags.autumnMelancholy },
+    { id:'winter_warrior', icon:'❄️', name:'冬日战士', desc:'度过了冬天', check: g => g.flags.winterDepression },
+    { id:'shopaholic', icon:'🛒', name:'购物狂', desc:'经历过购物成瘾', check: g => g.flags.shoppingAddiction },
+    { id:'generous_friend', icon:'💸', name:'慷慨朋友', desc:'借过钱给朋友', check: g => g.flags.friendBorrowMoney },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -2495,7 +2553,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.23' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.24' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
