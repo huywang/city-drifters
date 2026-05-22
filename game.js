@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v29.0
+// 都市浮生记 - Game Engine v29.1
 // ============================================
 
 // === GAME STATE ===
@@ -15162,6 +15162,71 @@ const EVENTS = [
         { label:'开始写日记记录人生感悟', hint:'+🧠 +✨', fn: g => { g.flags.midlifeWisdom=true; g.flags.journaling=true; return{intel:8,charm:3}; }},
         { label:'觉得自己还有很多放不下', hint:'+🧠 -😊', fn: g => { g.flags.midlifeWisdom=true; return{intel:5,mood:-3}; }},
       ]},
+    // === v29.1: 数字游民 + 远程工作 + 地理自由 ===
+    { id:'digital_nomad_start', icon:'🌍', title:'成为数字游民', category:'career',
+      body:'你辞掉了北京的工作——决定去大理当数字游民。\n\n你的计划：\n- 远程工作：接自由职业项目\n- 住大理：月租1500元（北京5000元）\n- 生活成本：月3000元（北京8000元）\n- 每月省下：5500元\n\n你的行李：\n- 一台笔记本电脑\n- 一个背包\n- 一个「我要自由」的信念\n\n你到了大理：\n- 第一天：风景好美！\n- 第二天：网速好快！\n- 第三天：好安静！\n- 第一周：好孤独……\n\n你开始理解：数字游民——不是「自由的天堂」——是「孤独的自由」。\n\n你有了「地理自由」——但你失去了「社交归属」。\n\n你不是在「逃离大城市」——你是在「用孤独换自由」。\n\n「数字游民：你以为你在追求自由——其实你在追求「一种不需要任何人的生活方式」——但人——是需要人的。」',
+      cond: g => g.age >= 24 && !g.flags.digitalNomad && g.jobSalary >= 8000 && g.intel >= 25,
+      choices:[
+        { label:'在大理定居开始远程工作', hint:'+😊 -💰 +🧠', fn: g => { g.flags.digitalNomad=true; g.flags.settledInDali=true; setJob(g, '远程自由职业者', Math.floor(g.jobSalary * 0.8)); return{mood:8,intel:5,social:-5}; }},
+        { label:'试了一个月觉得太孤独', hint:'+🧠 -😊', fn: g => { g.flags.digitalNomad=true; g.flags.nomadTrialFailed=true; return{intel:5,mood:-3}; }},
+        { label:'只是想想，不敢真的辞职', hint:'-😊 +🧠', fn: g => { g.flags.digitalNomad=true; return{mood:-5,intel:3}; }},
+      ]},
+    { id:'remote_work_efficiency', icon:'💻', title:'远程办公效率', category:'career',
+      body:'你开始远程办公了。\n\n你的「理想日程」：\n- 8:00 起床\n- 9:00 开始工作\n- 12:00 午饭\n- 13:00 继续工作\n- 18:00 下班\n- 晚上：学习/社交\n\n你的「现实日程」：\n- 10:00 起床（闹钟响了3次）\n- 10:30 打开电脑——刷了30分钟手机\n- 12:00 叫外卖\n- 14:00 开始工作——开了个会\n- 16:00 又刷手机了\n- 20:00 发现工作没做完\n- 23:00 终于做完了\n\n你的效率对比：\n- 办公室：8小时完成\n- 远程：13小时完成\n- 效率：-40%\n\n你开始理解：远程办公——不是「在家工作」——是「在工作的地方生活」——而这两者——很难分开。\n\n「远程办公：你以为你在「自由选择工作时间」——其实你在「24小时都在工作」。」',
+      cond: g => g.flags.digitalNomad && !g.flags.remoteWorkEfficiency,
+      choices:[
+        { label:'制定了严格的时间表并执行', hint:'+🧠 +✨', fn: g => { g.flags.remoteWorkEfficiency=true; g.flags.disciplinedRemote=true; g.reputation.career += 3; return{intel:8,charm:3}; }},
+        { label:'效率低但享受慢节奏', hint:'+😊 -🧠', fn: g => { g.flags.remoteWorkEfficiency=true; return{mood:5,intel:-3}; }},
+        { label:'开始去共享办公空间', hint:'-💰 +🧠', fn: g => { g.flags.remoteWorkEfficiency=true; g.flags.coworkingSpace=true; g.money -= 800; return{intel:5,social:3}; }},
+      ]},
+    { id:'nomad_community', icon:'🏡', title:'数字游民社区', category:'social',
+      body:'你加入了一个数字游民社区。\n\n社区里的人：\n- 自由职业程序员：30人\n- 自媒体博主：15人\n- 远程设计师：10人\n- 线上教师：8人\n- 加密货币交易者：5人\n\n你们的日常：\n- 周一：社区分享会\n- 周三：技能交换\n- 周五：一起徒步\n- 周末：聚餐\n\n你交到了朋友——但这些朋友——\n- 下个月可能去泰国了\n- 下下个月可能去日本了\n- 再下个月可能回国了\n\n你开始理解：数字游民社区——不是「稳定的社交」——是「流动的友谊」。\n\n你认识了很多「有趣的人」——但你留不住「任何一个人」。\n\n「游民社区：你以为你在找归属——其实你在「练习告别」。」',
+      cond: g => g.flags.digitalNomad && !g.flags.nomadCommunity,
+      choices:[
+        { label:'深度参与社区，成了核心成员', hint:'+👥 +✨', fn: g => { g.flags.nomadCommunity=true; g.flags.communityCore=true; g.reputation.social += 5; return{social:8,charm:5}; }},
+        { label:'交到了几个好朋友但都离开了', hint:'+❤️ -😊', fn: g => { g.flags.nomadCommunity=true; return{social:5,mood:-3,charm:3}; }},
+        { label:'觉得这种社交太浅了', hint:'+🧠 -👥', fn: g => { g.flags.nomadCommunity=true; return{intel:3,social:-3}; }},
+      ]},
+    { id:'cafe_office_v29_1', icon:'☕', title:'咖啡馆办公', category:'lifestyle',
+      body:'你每天都在咖啡馆办公。\n\n你的「咖啡馆消费」：\n- 每天一杯美式：28元\n- 偶尔加个三明治：35元\n- 月消费：约1200元\n\n对比：\n- 在大理租办公室：1500元/月\n- 咖啡馆：1200元/月\n- 还多了咖啡喝\n\n你的「咖啡馆社交」：\n- 和老板熟了：免费续杯\n- 和常客熟了：偶尔聊几句\n- 你的「归属感」：来自一杯咖啡\n\n但你的问题：\n- 噪音：隔壁桌在打电话\n- WiFi：偶尔断\n- 电源：抢不到座位\n- 腰：椅子太硬\n\n你开始理解：咖啡馆办公——不是「有情调」——是「用1200元/月租一个不稳定的工位」。\n\n「咖啡馆办公：你以为你在享受自由——其实你在「花高价租一个不舒适的办公室」。」',
+      cond: g => g.flags.digitalNomad && !g.flags.cafeOffice,
+      choices:[
+        { label:'和咖啡馆老板成了朋友有了固定座位', hint:'+❤️ +👥', fn: g => { g.flags.cafeOffice=true; g.flags.cafeRegular=true; return{social:5,mood:5,charm:3}; }},
+        { label:'换了共享办公空间更专业', hint:'-💰 +🧠', fn: g => { g.flags.cafeOffice=true; g.flags.coworkingSpace=true; g.money -= 800; return{intel:5,charm:3}; }},
+        { label:'受够了，租了个小公寓当办公室', hint:'-💰 +😊', fn: g => { g.flags.cafeOffice=true; g.money -= 2000; return{mood:5,intel:3}; }},
+      ]},
+    { id:'nomad_loneliness', icon:'🌙', title:'数字游民的孤独', category:'psychology',
+      body:'你在大理的第3个月。\n\n你的日常：\n- 早上：一个人工作\n- 中午：一个人吃饭\n- 下午：一个人工作\n- 晚上：一个人看日落\n\n你的社交：\n- 微信聊天：每天30条\n- 视频通话：每周1次\n- 面对面交流：每周2-3次\n\n你开始怀念：\n- 办公室里同事的闲聊\n- 下班后和朋友的火锅\n- 周末和家人的聚餐\n\n你开始理解：数字游民——最大的成本——不是钱——是「孤独」。\n\n你的自由——是用「归属感」买的。\n\n你有了「全世界的风景」——但你没有「一个等你回家的人」。\n\n「游民孤独：你以为你在享受独处——其实你在「独自承受独处的重量」。」',
+      cond: g => g.flags.digitalNomad && !g.flags.nomadLoneliness && g.social <= 40,
+      choices:[
+        { label:'主动社交参加各种活动', hint:'+👥 +😊', fn: g => { g.flags.nomadLoneliness=true; g.flags.activeSocializing=true; return{social:8,mood:5}; }},
+        { label:'开始想回大城市了', hint:'+🧠 -😊', fn: g => { g.flags.nomadLoneliness=true; g.flags.missingCity=true; return{intel:3,mood:-5}; }},
+        { label:'学会了和孤独相处', hint:'+🧠 +😊', fn: g => { g.flags.nomadLoneliness=true; g.flags.embracedSolitude=true; return{intel:8,mood:3}; }},
+      ]},
+    { id:'return_to_city', icon:'🏙️', title:'回归城市', category:'career',
+      body:'你在大理待了1年——决定回去了。\n\n你的理由：\n- 远程工作效率太低\n- 社交太浅\n- 职业发展受限\n- 想见家人更方便\n\n回去之后：\n- 房租：从1500涨回5000\n- 生活成本：从3000涨回8000\n- 工资：涨了20%（因为经验丰富了）\n\n你的感悟：\n- 大理很好——但不适合「奋斗」\n- 城市很贵——但有「机会」\n- 自由很好——但你需要「归属」\n\n你开始理解：数字游民——不是「终点」——是「人生的一个阶段」。\n\n你体验了自由——然后选择了回来——这不是「失败」——这是「知道了自己要什么」。\n\n「回归城市：你不是在「放弃自由」——你是在「选择一种你更想要的不自由」。」',
+      cond: g => g.flags.digitalNomad && !g.flags.returnedToCity && g.age >= 26,
+      choices:[
+        { label:'回到城市找了新工作', hint:'+💰 +👥', fn: g => { g.flags.returnedToCity=true; setJob(g, '回归城市的打工人', Math.floor(g.jobSalary * 1.3)); return{social:8,mood:5,money:5000}; }},
+        { label:'在大理和城里两头跑', hint:'+🧠 -💰', fn: g => { g.flags.returnedToCity=true; g.flags.hybridLifestyle=true; g.money -= 3000; return{intel:5,mood:3}; }},
+        { label:'决定留在大理再试一年', hint:'+😊 -💰', fn: g => { g.flags.returnedToCity=true; return{mood:3,intel:3}; }},
+      ]},
+    { id:'remote_work_scam', icon:'⚠️', title:'远程工作骗局', category:'career',
+      body:'你在网上找到了一份「远程工作」。\n\n招聘信息：\n- 「数据录入员，日结200-500元」\n- 「在家工作，时间自由」\n- 「无需经验，培训后上岗」\n\n你的流程：\n- 交了299元「培训费」\n- 交了999元「软件使用费」\n- 被拉进了一个群\n\n群里：\n- 「导师」发了教程\n- 教程内容：帮人刷单\n- 本质：你在帮骗子刷单\n\n你的损失：\n- 培训费：299元\n- 软件费：999元\n- 时间：3天\n- 自尊：无价\n\n你开始理解：远程工作骗局——专骗「想要自由的人」。\n\n你的「自由渴望」——被骗子「利用」了。\n\n「远程骗局：骗子不是在骗你的钱——是在「利用你对自由的渴望」。」',
+      cond: g => g.age >= 20 && !g.flags.remoteWorkScam && g.money >= 1500,
+      choices:[
+        { label:'被骗了1298元', hint:'-💰 -🧠', fn: g => { g.flags.remoteWorkScam=true; g.money -= 1298; return{intel:-3,mood:-8}; }},
+        { label:'看到要交钱就识破了', hint:'+🧠 +😊', fn: g => { g.flags.remoteWorkScam=true; g.flags.avoidedScam=true; return{intel:5,mood:3}; }},
+        { label:'交了钱发现是骗局举报了', hint:'-💰 +✨', fn: g => { g.flags.remoteWorkScam=true; g.flags.reportedScam=true; g.money -= 1298; return{intel:3,charm:3}; }},
+      ]},
+    { id:'location_independence', icon:'🗺️', title:'地理套利', category:'finance',
+      body:'你发现了「地理套利」的秘密。\n\n你的收入：来自一线城市客户 = 月入15000元\n你的支出：住在三线城市 = 月支出3000元\n你的盈余：12000元/月 = 14.4万/年\n\n对比在一线城市：\n- 收入：15000元\n- 支出：8000元\n- 盈余：7000元/月 = 8.4万/年\n\n地理套利让你多赚了：6万/年。\n\n但你失去了：\n- 一线城市的「人脉」\n- 一线城市的「机会」\n- 一线城市的「信息差」\n\n你开始理解：地理套利——不是「赚差价的捷径」——是「用机会换储蓄」。\n\n你在三线城市「存钱」——但你在一线城市「赚钱」。\n\n你的「未来收入」——可能因为「不在一线城市」而「减少」。\n\n「地理套利：你以为你在聪明地赚钱——其实你在「用未来的机会——换现在的存款」。」',
+      cond: g => g.flags.digitalNomad && !g.flags.geoArbitrage && g.jobSalary >= 10000,
+      choices:[
+        { label:'坚持地理套利3年存了40万', hint:'+💰 +🧠', fn: g => { g.flags.geoArbitrage=true; g.money += 40000; return{intel:5,mood:3}; }},
+        { label:'觉得错过了太多机会回去了', hint:'+✨ -💰', fn: g => { g.flags.geoArbitrage=true; g.flags.missedOpportunities=true; return{charm:3,mood:-3}; }},
+        { label:'在三线城市找到了新的商业机会', hint:'+💰 +✨', fn: g => { g.flags.geoArbitrage=true; g.flags.localOpportunity=true; g.money += 20000; return{charm:5,intel:5}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -16522,6 +16587,15 @@ const ACHIEVEMENTS = [
     { id:'accepted_own_pace_ach', icon:'🕊️', name:'接受自己的节奏', desc:'不再和别人比较接受自己的人生节奏', check: g => g.flags.acceptedOwnPace },
     { id:'pursuing_dream_ach', icon:'🌟', name:'追梦不晚', desc:'50岁后终于去做了想做的事', check: g => g.flags.pursuingDream },
     { id:'regular_exercise_ach', icon:'💪', name:'运动习惯', desc:'40岁后开始规律运动保持健康', check: g => g.flags.regularExercise },
+    // v29.1: 数字游民 + 远程工作 + 地理自由
+    { id:'settled_dali_ach', icon:'🏔️', name:'大理定居', desc:'成为数字游民在大理安家', check: g => g.flags.settledInDali },
+    { id:'disciplined_remote_ach', icon:'⏰', name:'自律远程', desc:'制定并执行了严格的远程工作时间表', check: g => g.flags.disciplinedRemote },
+    { id:'community_core_ach', icon:'🏡', name:'社区核心', desc:'成为数字游民社区的核心成员', check: g => g.flags.communityCore },
+    { id:'embraced_solitude_ach', icon:'🌙', name:'与孤独和解', desc:'学会了真正享受独处', check: g => g.flags.embracedSolitude },
+    { id:'hybrid_lifestyle_ach', icon:'🔄', name:'双城生活', desc:'在大理和城市之间找到了平衡', check: g => g.flags.hybridLifestyle },
+    { id:'scam_avoided_ach', icon:'🛡️', name:'火眼金睛', desc:'识破了远程工作骗局', check: g => g.flags.avoidedScam },
+    { id:'geo_arbitrage_ach', icon:'🗺️', name:'地理套利', desc:'通过地理套利存下了一大笔钱', check: g => g.flags.geoArbitrage },
+    { id:'local_opportunity_ach', icon:'🌱', name:'小城大梦', desc:'在三线城市发现了新的商业机会', check: g => g.flags.localOpportunity },
 ];
 
 // === ENDINGS === (order matters: first match wins)
