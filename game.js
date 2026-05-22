@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v12.6
+// 都市浮生记 - Game Engine v12.7
 // ============================================
 
 // === GAME STATE ===
@@ -6416,6 +6416,87 @@ const EVENTS = [
         { label:'给爸妈买保险', hint:'+👨‍👩‍👧 -💰', fn: g => { g.flags.parentAging=true; if(g.relationships) g.relationships.family=Math.min(100,g.relationships.family+10); return{mood:3,money:-5000}; }},
         { label:'心里难受但说不出口', hint:'-😊', fn: g => { g.flags.parentAging=true; return{mood:-8}; }},
       ]},
+    // === v12.7 独居生活 + 租房故事 + 都市生存 ===
+    { id:'solo_living', icon:'🏠', title:'独居第一年',
+      body:'你搬出了合租房，开始了独居生活。\n\n第一天：你一个人吃火锅。服务员问：「就您一位？」你说：「对。」\n第三天：你忘了买卫生纸。半夜两点，你裹着浴巾跑到楼下便利店。\n第七天：你发现家里有一只蟑螂。你尖叫着给妈妈打电话。你妈说：「用拖鞋拍。」\n\n第三十天：你习惯了。一个人吃饭、一个人看电影、一个人逛超市。\n\n你开始觉得：独居不是孤独——是终于拥有了完整的自己。\n\n"独居的第一年教会你：没有人会来救你——但你可以救自己。"',
+      cond: g => g.age >= 22 && g.age <= 32 && !g.flags.soloLiving,
+      choices:[
+        { label:'享受独居', hint:'+😊 +🧠', fn: g => { g.flags.soloLiving=true; return{mood:10,intel:5}; }},
+        { label:'养只猫', hint:'+😊 -💰', fn: g => { g.flags.soloLiving=true; g.flags.hasPet=true; return{mood:12,money:-2000}; }},
+        { label:'还是想找人合租', hint:'+👥 -😊', fn: g => { return{social:5,mood:-5}; }},
+      ]},
+    { id:'rent_increase_v3', icon:'💸', title:'房东又涨租了',
+      body:'房东发微信了：「从下个月开始，房租涨500。」\n\n你：「上个月不是刚涨过吗？」\n房东：「不想住可以搬走。后面排队的人多着呢。」\n\n你算了一笔账：搬家费3000、中介费2000、押金可能拿不回来。加起来比涨租还贵。\n\n你回复了一个字：「好。」\n\n"大城市的租客没有议价权——你唯一的筹码就是搬走。但搬走的成本，比留下更高。"',
+      cond: g => g.age >= 22 && g.money <= 30000 && !g.flags.rentHikeV2,
+      choices:[
+        { label:'忍了继续住', hint:'-💰 -😊', fn: g => { g.flags.rentHikeV2=true; return{money:-500,mood:-8}; }},
+        { label:'搬家！', hint:'-💰💰 +🧠', fn: g => { g.flags.rentHikeV2=true; return{money:-5000,mood:-3,intel:3}; }},
+        { label:'找室友分摊', hint:'+👥', fn: g => { g.flags.rentHikeV2=true; return{social:5,money:-200}; }},
+      ]},
+    { id:'subway_commute', icon:'🚇', title:'地狱通勤',
+      body:'你的通勤路线：家→地铁→换乘→公交→公司。单程1小时40分钟。\n\n每天早上你被挤成相片。你的耳机被挤掉了两次。你的早餐被挤成了压缩饼干。\n\n你试过错峰出行——但你的老板不允许你错峰上班。\n\n你在地铁上看完了12本书、听完了50个播客、背完了3000个单词。\n\n"通勤是大城市给你上的第一课：你以为你在赶路，其实你在浪费生命。但如果你学会了利用这段时间——你就赢了。"',
+      cond: g => g.age >= 22 && g.job !== '待业中' && !g.flags.subwayCommute,
+      choices:[
+        { label:'利用通勤时间学习', hint:'+🧠', fn: g => { g.flags.subwayCommute=true; return{intel:8,health:-3}; }},
+        { label:'搬到公司附近', hint:'+❤️ -💰', fn: g => { g.flags.subwayCommute=true; return{health:5,mood:5,money:-5000}; }},
+        { label:'摸鱼刷手机', hint:'+😊 -🧠', fn: g => { g.flags.subwayCommute=true; return{mood:3,intel:-3}; }},
+      ]},
+    { id:'neighbor_from_hell', icon:'🔊', title:'奇葩邻居',
+      body:'你的邻居是一个神奇的存在。\n\n凌晨2点练钢琴。周末早上7点装修。每天半夜3点回家，高跟鞋敲地板像机关枪。\n\n你去敲门理论。她开门说：「我交了物业费的，有权在我家里做任何事。」\n\n你找了物业。物业说：「我们管不了。」\n你报了警。警察说：「这是民事纠纷。」\n\n你开始理解：大城市最贵的不是房子——是安静的权利。\n\n"好邻居是运气，奇葩邻居是常态。在大城市，你唯一能选的是离开的勇气。"',
+      cond: g => g.age >= 22 && !g.flags.neighborFromHell,
+      choices:[
+        { label:'买降噪耳机', hint:'-💰 +😊', fn: g => { g.flags.neighborFromHell=true; return{money:-1000,mood:5}; }},
+        { label:'录音取证维权', hint:'+🧠', fn: g => { g.flags.neighborFromHell=true; return{intel:5,mood:-5}; }},
+        { label:'以牙还牙', hint:'-👥', fn: g => { g.flags.neighborFromHell=true; return{mood:-8,social:-5}; }},
+      ]},
+    { id:'midnight_snack', icon:'🍜', title:'深夜食堂',
+      body:'加班到凌晨1点，你走出公司。\n\n街角的兰州拉面还开着灯。老板是个甘肃人，每天从早上6点干到凌晨2点。\n\n你要了一碗牛肉面。大份，加蛋。\n\n老板端上来的时候说：「小伙子/姑娘，别太拼了。」\n你说：「你也一样啊。」\n老板笑了笑：「我这是生活。你这是拼命。」\n\n你吃了那碗面。那是你在大城市吃过的最好吃的一碗面。\n\n"深夜食堂不只是吃饭的地方——是打工人互相取暖的地方。"',
+      cond: g => g.age >= 22 && g.job !== '待业中' && g.mood <= 50 && !g.flags.midnightSnack,
+      choices:[
+        { label:'成了常客', hint:'+❤️ +😊 -💰', fn: g => { g.flags.midnightSnack=true; return{health:3,mood:8,money:-100}; }},
+        { label:'跟老板聊了聊', hint:'+👥 +🧠', fn: g => { g.flags.midnightSnack=true; return{social:5,intel:3,mood:5}; }},
+        { label:'吃完赶紧回家睡', hint:'-❤️', fn: g => { g.flags.midnightSnack=true; return{mood:-3,health:-2}; }},
+      ]},
+    { id:'delivery_addiction_v2', icon:'📦', title:'外卖成瘾',
+      body:'你打开外卖App，发现本月已经点了68次外卖了。\n\n你算了算：平均每天两顿，每顿30块。一个月2000多。\n\n你的冰箱里只有三样东西：过期的牛奶、发霉的柠檬、和一瓶老干妈。\n\n你的厨艺水平：会烧开水。\n\n你妈知道了很心疼：「你天天吃外卖，身体怎么受得了？回来妈给你做饭。」\n\n你看了看自己——体重涨了10斤，脸上冒痘，大便不通。\n\n"外卖是大城市的续命神器——但续的只是今天的命，不是明天的健康。"',
+      cond: g => g.age >= 22 && g.age <= 35 && g.health <= 70 && !g.flags.deliveryAddiction,
+      choices:[
+        { label:'学做饭', hint:'+❤️ +🧠', fn: g => { g.flags.deliveryAddiction=true; g.flags.cookingSkill=true; return{health:8,intel:5,mood:5}; }},
+        { label:'点健康餐', hint:'+❤️ -💰', fn: g => { g.flags.deliveryAddiction=true; return{health:3,money:-500}; }},
+        { label:'继续外卖', hint:'-❤️', fn: g => { g.flags.deliveryAddiction=true; return{health:-5,mood:-3}; }},
+      ]},
+    { id:'apartment_hunting', icon:'🔑', title:'租房大战',
+      body:'你的房子到期了。你开始了新一轮的找房之旅。\n\n第一套：「精装修」——墙皮掉了一半，床是折叠沙发。\n第二套：「采光好」——对面是建筑工地。\n第三套：「交通便利」——地铁在头顶上跑。\n第四套：「价格实惠」——隔断间，没有窗户。\n\n你最终选了一套：离公司远但价格能接受的。你安慰自己：通勤可以学东西。\n\n"在大城市租房，你学的不是生活——是妥协。每一次搬家都是一次理想与现实的谈判。"',
+      cond: g => g.age >= 22 && g.age <= 35 && !g.flags.apartmentHunting,
+      choices:[
+        { label:'住远点省钱', hint:'+💰 -❤️', fn: g => { g.flags.apartmentHunting=true; return{money:2000,health:-3,mood:-5}; }},
+        { label:'咬牙租好的', hint:'+😊 -💰', fn: g => { g.flags.apartmentHunting=true; return{mood:10,money:-3000}; }},
+        { label:'回老家算了', hint:'+👨‍👩‍👧 -😊', fn: g => { g.flags.apartmentHunting=true; if(g.relationships) g.relationships.family=Math.min(100,g.relationships.family+5); return{mood:-8}; }},
+      ]},
+    { id:'late_night_taxi', icon:'🚕', title:'深夜打车',
+      body:'凌晨2点。你加班结束，打了一辆网约车回家。\n\n司机是一个50多岁的大叔。他放了一首老歌：《故乡的云》。\n\n你突然鼻子一酸。\n\n司机从后视镜看了你一眼：「加班啊？」\n你说：「嗯。」\n他说：「我开出租15年了。坐我车的人，有哭的，有笑的，有打电话骂人的，有喝完酒吐的。你是今晚第二个看起来很难过的。」\n\n他递给你一包纸巾。\n\n"深夜的出租车是大城市最温柔的角落——一个陌生人，一首老歌，一包纸巾。"',
+      cond: g => g.age >= 22 && g.job !== '待业中' && g.mood <= 45 && !g.flags.lateNightTaxi,
+      choices:[
+        { label:'跟他聊了聊', hint:'+😊 +🧠', fn: g => { g.flags.lateNightTaxi=true; return{mood:10,intel:3}; }},
+        { label:'安静听完那首歌', hint:'+😊', fn: g => { g.flags.lateNightTaxi=true; return{mood:8}; }},
+        { label:'假装没事', hint:'', fn: g => { g.flags.lateNightTaxi=true; return{mood:-3}; }},
+      ]},
+    { id:'weekend_solo', icon:'☕', title:'一个人的周末',
+      body:'周末了。你没有任何安排。\n\n你睡到自然醒。看了半天手机。吃了碗泡面。看了部电影。又看了部电影。\n\n你出门去咖啡店坐了一下午。旁边都是成双成对的人。你一个人占了一张四人桌。\n\n服务员问：「等人吗？」你说：「不等，就我一个。」\n\n你突然觉得：一个人的周末，可以是自由的，也可以是孤独的。区别在于——你有没有找到和自己相处的方式。\n\n"一个人的周末不是没人约——是你终于学会了：最好的陪伴是陪伴自己。"',
+      cond: g => g.age >= 22 && g.age <= 35 && g.social <= 50 && !g.flags.weekendSolo,
+      choices:[
+        { label:'享受一个人的时光', hint:'+😊 +🧠', fn: g => { g.flags.weekendSolo=true; return{mood:8,intel:5}; }},
+        { label:'主动约朋友出来', hint:'+👥 -💰', fn: g => { g.flags.weekendSolo=true; return{social:10,mood:5,money:-300}; }},
+        { label:'刷了一天手机', hint:'-🧠', fn: g => { g.flags.weekendSolo=true; return{mood:-5,intel:-3}; }},
+      ]},
+    { id:'urban_survival', icon:'🎯', title:'都市生存指南',
+      body:'你总结了一份「大城市生存指南」：\n\n1. 地铁高峰期不要穿白衬衫\n2. 便利店关东煮是性价比之王\n3. 医院挂号要凌晨5点去排队\n4. 租房先看水压再看采光\n5. 外卖备注「多放辣」不一定多放辣\n6. 永远不要和房东做朋友\n7. 下雨天打不到车是常态\n8. 周末去超市比外卖便宜\n\n你把这份指南发到了朋友圈。收获了88个赞。\n\n"生存指南不是经验——是伤疤。每一条背后都有一次教训。"',
+      cond: g => g.age >= 24 && g.months >= 12 && !g.flags.urbanSurvival,
+      choices:[
+        { label:'分享给朋友', hint:'+👥 +✨', fn: g => { g.flags.urbanSurvival=true; return{social:8,charm:5,mood:5}; }},
+        { label:'继续补充', hint:'+🧠', fn: g => { g.flags.urbanSurvival=true; return{intel:8,mood:3}; }},
+        { label:'算了太丧了', hint:'', fn: g => { return{mood:-3}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -6982,6 +7063,17 @@ const ACHIEVEMENTS = [
     { id:'hometown_taste', icon:'🍜', name:'家乡味道', desc:'想念妈妈做的菜', check: g => g.flags.hometownFood },
     { id:'parent_visit_ach', icon:'🚄', name:'爸妈来了', desc:'爸妈来看你了', check: g => g.flags.parentVisiting },
     { id:'parent_aging_ach', icon:'👴', name:'岁月不饶人', desc:'发现父母老了', check: g => g.flags.parentAging },
+    // === v12.7 新增成就 ===
+    { id:'solo_liver', icon:'🏠', name:'独居达人', desc:'开始了独居生活', check: g => g.flags.soloLiving },
+    { id:'rent_survivor', icon:'💸', name:'租房老手', desc:'经历了又一次涨租', check: g => g.flags.rentHikeV2 },
+    { id:'commuter', icon:'🚇', name:'通勤战士', desc:'征服了地狱通勤', check: g => g.flags.subwayCommute },
+    { id:'neighbor_war', icon:'🔊', name:'邻里战争', desc:'遇到了奇葩邻居', check: g => g.flags.neighborFromHell },
+    { id:'night_foodie', icon:'🍜', name:'深夜食客', desc:'找到了深夜食堂', check: g => g.flags.midnightSnack },
+    { id:'delivery_master', icon:'📦', name:'外卖专家', desc:'反思了外卖生活', check: g => g.flags.deliveryAddiction },
+    { id:'house_hunter', icon:'🔑', name:'找房达人', desc:'经历了租房大战', check: g => g.flags.apartmentHunting },
+    { id:'night_rider_v2', icon:'🚕', name:'夜归人', desc:'深夜打车回家', check: g => g.flags.lateNightTaxi },
+    { id:'weekend_alone', icon:'☕', name:'周末独行侠', desc:'学会了一个人过周末', check: g => g.flags.weekendSolo },
+    { id:'urban_guide', icon:'🎯', name:'都市生存专家', desc:'总结了生存指南', check: g => g.flags.urbanSurvival },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -7166,6 +7258,9 @@ const ENDINGS = [
     // --- v12.6 NEW ENDINGS ---
     { id:'filial_child_end', badge:'👨‍👩‍👧', title:'回家的人', desc:'你最终选择了离父母更近的地方生活。\n\n也许是一份薪水更低的工作，也许是一个不那么繁华的城市。但每个周末你都能回家吃饭。每次你妈打电话，你半小时就到。\n\n你爸终于不再只翻你的朋友圈了——他每周都能见到你。\n\n你妈逢人就说：「我孩子就在我身边。」说这话的时候，她笑得比任何时候都开心。\n\n"成功有很多种定义——但能让父母安心变老的那种，最温暖。"', cond: g => g.flags.parentAging && g.flags.parentVisiting && g.relationships && g.relationships.family >= 85 },
     { id:'homesick_end', badge:'🍜', title:'永远想家的人', desc:'你在外漂泊了十年，最终还是决定回老家。\n\n不是因为混不下去——是因为你终于想明白了：大城市的霓虹灯再亮，也照不暖你半夜想家时的那颗心。\n\n你在老家开了一家小店。你妈每天来帮你看店。你爸负责送货。\n\n收入比以前少了一半。但你终于吃得下饭了。\n\n"回家不是认输——是你终于分清了：什么是梦想，什么是生活。"', cond: g => g.flags.hometownFood && g.flags.springFestival && g.age >= 32 && g.mood < 50 },
+    // --- v12.7 NEW ENDINGS ---
+    { id:'urban_settler_end', badge:'🏠', title:'城市扎根者', desc:'你终于在大城市扎下了根。\n\n从合租到独居，从隔断间到两室一厅。你搬了7次家，换了3份工作，熬过了无数个加班的深夜。\n\n你的冰箱里终于不只有老干妈了——你自己做的红烧肉，味道快赶上你妈了。\n\n你的邻居不再吵闹了——因为你买了一套房。\n\n你站在新家的阳台上看着夜景。那些灯火里，终于有一盏是你的了。\n\n"大城市不相信眼泪——但大城市尊重坚持。"', cond: g => g.flags.soloLiving && g.flags.apartmentHunting && g.flags.urbanSurvival && g.money >= 50000 && g.age >= 30 },
+    { id:'night_city_end', badge:'🌃', title:'深夜城市人', desc:'你爱上了大城市的深夜。\n\n凌晨的兰州拉面、深夜的出租车、24小时便利店、加班后空旷的写字楼。\n\n你认识了这个城市最真实的一面——不是白天光鲜亮丽的CBD，而是深夜疲惫但温暖的街角。\n\n你成了一个「夜猫子」——不是因为不困，是因为深夜的你最像你自己。\n\n"大城市的深夜属于两种人：失眠的人和真实的人。"', cond: g => g.flags.midnightSnack && g.flags.lateNightTaxi && g.age >= 26 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
