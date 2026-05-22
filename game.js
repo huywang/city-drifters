@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v23.0
+// 都市浮生记 - Game Engine v23.1
 // ============================================
 
 // === GAME STATE ===
@@ -11266,6 +11266,87 @@ const EVENTS = [
         { label:'写了几篇文章，但不追求流量', hint:'+😊 +🧠', fn: g => { g.flags.wisdomSharing=true; return{mood:10,intel:8}; }},
         { label:'觉得自己没什么值得分享的', hint:'', fn: g => { g.flags.wisdomSharing=true; return{mood:-3}; }},
       ]},
+    // === v23.1 新增事件（国潮文化 + 新中式 + 文化自信） ===
+    { id:'guochao_discovery', icon:'🏮', title:'国潮初体验', category:'society',
+      body:'你逛了一个国潮市集。\n\n和你想象中的「土味国货」完全不同：\n- 故宫联名口红：质感不输大牌\n- 李宁「悟道」系列：设计感拉满\n- 花西子散粉：雕花工艺让人惊叹\n- 观夏香氛：东方美学的高级感\n\n你买了一双回力鞋——89块钱。穿上后你觉得：比你的Nike舒服。\n\n你的朋友说：「以前觉得国货=便宜货。现在觉得国潮=性价比+文化自信。」\n\n你看了一下数据：\n- 2023年国潮消费规模突破3万亿\n- Z世代国货消费占比超过70%\n- 「新中式」搜索量同比增长300%\n\n你开始思考：为什么年轻人开始爱上「中国风」？\n\n「国潮的本质不是爱国消费——是文化自信终于找到了表达方式。」',
+      cond: g => g.age >= 18 && g.age <= 35 && !g.flags.guochaoDiscovery,
+      choices:[
+        { label:'成了国潮爱好者，开始支持国货', hint:'-💰 +😊', fn: g => { g.flags.guochaoDiscovery=true; g.flags.guochaoFan=true; return{mood:10,charm:5,money:-500}; }},
+        { label:'买了一些尝试，觉得还不错', hint:'-💰', fn: g => { g.flags.guochaoDiscovery=true; return{mood:5,money:-200}; }},
+        { label:'觉得有些是营销噱头，理性消费', hint:'+🧠', fn: g => { g.flags.guochaoDiscovery=true; return{intel:5}; }},
+      ]},
+    { id:'hanfu_experience', icon:'👘', title:'汉服体验', category:'hobby',
+      body:'你的一个朋友邀请你一起穿汉服出去玩。\n\n「你疯了吗？穿汉服上街？」\n\n「怎么了？日本人穿和服很正常，中国人穿汉服怎么就不行了？」\n\n你犹豫了。但你的朋友已经帮你租了一套——明制汉服，配上一顶乌纱帽（开玩笑的，是一顶普通的发冠）。\n\n穿上的那一刻，你照了照镜子——\n\n你被自己惊艳到了。\n\n你们去了一个古镇拍照。路人纷纷侧目，有人夸你好看，有人问你在哪里租的。\n\n你的朋友圈炸了。\n\n你开始理解汉服运动的意义：这不是cosplay——是一种文化寻根。\n\n一个汉服爱好者对你说：「我们不是在穿古装——我们是在重新发现中国文化的美。」\n\n「汉服运动：一群年轻人用衣服找回了被遗忘的文化记忆。」',
+      cond: g => g.age >= 18 && g.age <= 35 && !g.flags.hanfuExperience && (g.flags.guochaoFan || g.charm >= 40),
+      choices:[
+        { label:'爱上了汉服，开始收藏和研究', hint:'-💰 +😊', fn: g => { g.flags.hanfuExperience=true; g.flags.hanfuFan=true; return{mood:15,charm:10,money:-800}; }},
+        { label:'觉得很有趣，偶尔穿穿', hint:'+😊', fn: g => { g.flags.hanfuExperience=true; return{mood:10,charm:5}; }},
+        { label:'觉得太张扬了，穿了一次就收起来了', hint:'', fn: g => { g.flags.hanfuExperience=true; return{mood:3}; }},
+      ]},
+    { id:'new_chinese_style', icon:'🏡', title:'新中式生活', category:'hobby',
+      body:'你开始尝试「新中式」生活方式。\n\n不是复古——是用现代的方式诠释中国传统：\n\n1. **新中式穿搭**：改良旗袍、中式盘扣上衣、棉麻长裤\n2. **新中式家居**：原木家具、插花、书法、茶道\n3. **新中式饮食**：药膳火锅、新式茶饮、节气饮食\n4. **新中式运动**：八段锦、太极、站桩\n\n你把家里重新布置了一下。朋友来做客：「你家怎么像民宿？」\n\n你说：「不是民宿——是我终于找到了自己喜欢的风格。」\n\n你的消费记录：\n- 实木茶桌：1200元\n- 汝窑茶具：680元\n- 棉麻窗帘：450元\n- 文房四宝：300元\n\n你的妈妈来你家：「你什么时候变得这么老气？」\n\n你说：「不是老气——是中国美学本来就很好。」\n\n「新中式：不是回到过去——是让过去的美活在当下。」',
+      cond: g => g.age >= 22 && g.age <= 45 && !g.flags.newChineseStyle && g.money >= 2000,
+      choices:[
+        { label:'全面拥抱新中式生活', hint:'-💰 +😊', fn: g => { g.flags.newChineseStyle=true; return{mood:12,charm:8,health:5,money:-2630}; }},
+        { label:'只学了茶道和书法', hint:'+🧠 +😊', fn: g => { g.flags.newChineseStyle=true; g.flags.teaCeremony=true; return{intel:8,mood:8,money:-500}; }},
+        { label:'觉得太刻意了，不太适合自己', hint:'', fn: g => { g.flags.newChineseStyle=true; return{intel:3}; }},
+      ]},
+    { id:'chinese_tea_culture', icon:'🍵', title:'中国茶文化', category:'hobby',
+      body:'你开始学喝茶——不是奶茶，是真正的中国茶。\n\n你的入门老师是你爸。他从柜子里翻出一饼20年的普洱：「这才是好茶。」\n\n你学到了：\n- 绿茶（龙井/碧螺春）：清新淡雅\n- 红茶（正山小种/祁红）：醇厚甘甜\n- 乌龙茶（铁观音/大红袍）：层次丰富\n- 普洱：越陈越香\n- 白茶（白毫银针）：素雅清甜\n\n你开始每天泡茶。你的工作效率反而提高了——因为泡茶的过程让你慢了下来。\n\n你的一个同事问你：「喝茶不费时间吗？」\n\n你说：「泡茶5分钟，清醒一整天。比咖啡健康多了。」\n\n你开始带茶去公司。你的工位上摆着一套旅行茶具。同事们都来蹭你的茶。\n\n「中国茶文化：不是喝茶——是在快节奏中找到慢下来的仪式。」',
+      cond: g => g.age >= 22 && !g.flags.chineseTeaCulture && (g.flags.teaCeremony || g.intel >= 30),
+      choices:[
+        { label:'成了茶道爱好者，考了茶艺师证', hint:'+🧠 +💰', fn: g => { g.flags.chineseTeaCulture=true; g.flags.teaCertified=true; return{intel:10,charm:8,mood:8,money:-2000}; }},
+        { label:'养成了每天泡茶的习惯', hint:'+😊 +💪', fn: g => { g.flags.chineseTeaCulture=true; return{mood:8,health:5,intel:3}; }},
+        { label:'了解了茶文化，但还是更喜欢咖啡', hint:'+🧠', fn: g => { g.flags.chineseTeaCulture=true; return{intel:5}; }},
+      ]},
+    { id:'domestic_brand', icon:'🏭', title:'国货替代', category:'society',
+      body:'你做了一件以前 unthinkable 的事：把大牌全换成了国货。\n\n你的替代清单：\n- 洗面奶：从SK-II换成了百雀羚\n- 手机：从iPhone换成了华为\n- 汽车：从BBA换成了比亚迪\n- 衣服：从优衣库换成了太平鸟\n- 零食：从进口换成了良品铺子\n\n你算了一下：每月省了2000块钱。\n\n但更重要的是：你真的觉得国货变好了。\n\n你的朋友质疑：「国货不就是便宜吗？质量能一样？」\n\n你说：「5年前可能是。但现在很多国货的品质已经超过进口了。比亚迪的电动车比丰田好，华为的拍照比苹果好——这不是吹的。」\n\n你开始思考：什么时候，「国产」从贬义词变成了褒义词？\n\n答案也许是：当中国消费者不再仰视西方的时候。\n\n「国货崛起不是因为爱国——是因为国货终于值得被爱了。」',
+      cond: g => g.flags.guochaoFan && !g.flags.domesticBrand,
+      choices:[
+        { label:'成了国货推荐博主', hint:'+😊 +🤝', fn: g => { g.flags.domesticBrand=true; g.flags.guochaoBlogger=true; return{mood:10,social:8,charm:5,money:2000}; }},
+        { label:'默默换成了国货，省了不少钱', hint:'+💰', fn: g => { g.flags.domesticBrand=true; return{money:2000,mood:5}; }},
+        { label:'换了一部分，有些还是习惯用进口', hint:'+🧠', fn: g => { g.flags.domesticBrand=true; return{intel:3,money:1000}; }},
+      ]},
+    { id:'calligraphy_learning', icon:'✒️', title:'学书法', category:'education',
+      body:'你报了一个书法班。\n\n老师是一位70岁的老先生。他写了60年书法，手上没有一个茧。\n\n「书法不是练字。」他说，「书法是练心。」\n\n你从最基本的横竖撇捺开始。你的手一直在抖。\n\n「不要急。」老师说，「一笔一划，慢慢来。」\n\n三个月后，你写了第一幅完整的作品：《静夜思》。\n\n虽然歪歪扭扭，但你觉得——这是你写过的最美的字。\n\n你开始理解书法的魅力：\n- 它是中国人独有的艺术形式\n- 它需要专注——写字的时候不能想别的\n- 它是一种冥想——每一笔都是一次呼吸\n\n你的老师送了你一句话：「字如其人。心正则笔正。」\n\n你把它裱了起来，挂在了书房。\n\n「书法：在一笔一划中，找到中国人的精神归宿。」',
+      cond: g => g.age >= 20 && !g.flags.calligraphyLearning && (g.flags.newChineseStyle || g.intel >= 35),
+      choices:[
+        { label:'坚持练了一年，字写得越来越好看', hint:'+🧠 +😊', fn: g => { g.flags.calligraphyLearning=true; g.flags.calligraphyMaster=true; return{intel:12,mood:10,charm:5,health:3}; }},
+        { label:'学了半年，觉得没有天赋', hint:'+🧠', fn: g => { g.flags.calligraphyLearning=true; return{intel:8,mood:3}; }},
+        { label:'把书法融入了设计工作', hint:'+💰 +🧠', fn: g => { g.flags.calligraphyLearning=true; g.flags.calligraphyDesign=true; return{intel:10,money:3000,charm:8}; }},
+      ]},
+    { id:'cultural_confidence', icon:'🇨🇳', title:'文化自信觉醒', category:'psychology',
+      body:'你看了一个纪录片：《中国》。\n\n从先秦到现代，5000年的文明浓缩在10个小时里。\n\n你被深深触动了：\n- 中国是世界上最古老的连续文明\n- 中国发明了造纸术、印刷术、火药、指南针\n- 中国的诗词、绘画、哲学是世界级的艺术\n- 中国的改革开放是人类历史上最大的减贫奇迹\n\n你开始反思：为什么我们曾经那么自卑？\n\n小时候，你觉得外国的月亮比较圆。\n长大后，你发现每个文化都有它的美和丑。\n现在，你开始欣赏自己的文化——不是盲目的自大，是真正的了解。\n\n你开始读《论语》《道德经》《孙子兵法》。你发现这些书比很多西方经典更有智慧。\n\n你对你的外国朋友说：「中国不是只有长城和熊猫——它有5000年的智慧值得你去了解。」\n\n「文化自信不是「我们比别人好」——是「我们知道自己好在哪里」。」',
+      cond: g => (g.flags.guochaoFan || g.flags.hanfuFan || g.flags.calligraphyMaster) && !g.flags.culturalConfidence && g.intel >= 25,
+      choices:[
+        { label:'开始系统地学习中国文化', hint:'+🧠 +😊', fn: g => { g.flags.culturalConfidence=true; return{intel:15,mood:12,charm:5}; }},
+        { label:'开始向身边人传播中国文化', hint:'+🤝 +😊', fn: g => { g.flags.culturalConfidence=true; g.flags.cultureAdvocate=true; return{social:10,mood:10,intel:8}; }},
+        { label:'有了更深层次的思考，但说不清楚', hint:'+🧠', fn: g => { g.flags.culturalConfidence=true; return{intel:10,mood:5}; }},
+      ]},
+    { id:'guochao_business', icon:'💼', title:'国潮创业', category:'career',
+      body:'你看到了一个商机：做国潮品牌。\n\n你的想法：把中国传统元素和现代设计结合，做年轻人喜欢的产品。\n\n你想到了几个方向：\n1. 国潮服装：汉服改良 + 街头风格\n2. 国潮食品：传统糕点 + 新式包装\n3. 国潮文创：博物馆联名 + 实用设计\n4. 国潮美妆：中草药配方 + 东方美学\n\n你做了一个市场调研：\n- 80%的Z世代愿意为国潮产品支付溢价\n- 国潮品牌融资额3年增长10倍\n- 但90%的国潮品牌活不过3年\n\n你的一个创业前辈说：「国潮是好赛道。但别做「贴标签」的国潮——要做真正有文化底蕴的品牌。」\n\n你决定：不跟风，做自己理解的「中国风」。\n\n「国潮创业的核心：不是卖爱国情怀——是卖真正的文化价值。」',
+      cond: g => g.flags.culturalConfidence && !g.flags.guochaoBiz && g.intel >= 30 && g.money >= 10000,
+      choices:[
+        { label:'投入积蓄开始创业', hint:'-💰💰 高风险', fn: g => { g.flags.guochaoBiz=true; if(Math.random()<0.4){g.flags.guochaoSuccess=true; return{money:30000,mood:20,charm:10};}else{return{money:-20000,mood:-10,intel:10};} }},
+        { label:'先做小范围测试，验证了再扩大', hint:'-💰 +🧠', fn: g => { g.flags.guochaoBiz=true; g.flags.guochaoTest=true; return{money:-5000,intel:12,mood:5}; }},
+        { label:'觉得风险太大，还是算了', hint:'+🧠', fn: g => { g.flags.guochaoBiz=true; return{intel:5}; }},
+      ]},
+    { id:'traditional_festival', icon:'🎆', title:'重新发现传统节日', category:'festival',
+      body:'你开始认真地过每一个传统节日。\n\n不是吃个粽子就算过了端午——而是真正了解每个节日的意义：\n\n- **春节**：不只是放假——是家人团聚的仪式\n- **清明**：不只是扫墓——是对先人的思念\n- **端午**：不只是粽子——是对屈原的纪念\n- **七夕**：不只是情人节——是牛郎织女的美丽传说\n- **中秋**：不只是月饼——是对团圆的期盼\n- **重阳**：不只是登高——是对老人的尊重\n\n你开始在朋友圈写每个节日的文化解读。你的朋友们说：「以前觉得传统节日无聊，被你一说觉得挺有意思的。」\n\n你的外国同事问你：「中国有多少个传统节日？」\n\n你说：「主要的有8个。但每一个都有几千年的故事。」\n\n他羡慕地说：「我们的节日只有圣诞节和感恩节。」\n\n「传统节日：一个民族的文化密码，藏在每一个节日的食物、仪式和故事里。」',
+      cond: g => g.flags.culturalConfidence && !g.flags.traditionalFestival,
+      choices:[
+        { label:'成了朋友圈里的「文化达人」', hint:'+😊 +🤝', fn: g => { g.flags.traditionalFestival=true; return{mood:12,social:8,charm:8,intel:5}; }},
+        { label:'带家人认真过了每个节日', hint:'+😊 +🤝', fn: g => { g.flags.traditionalFestival=true; return{mood:15,social:5}; }},
+        { label:'了解了但没有特别行动', hint:'+🧠', fn: g => { g.flags.traditionalFestival=true; return{intel:8,mood:3}; }},
+      ]},
+    { id:'east_west_fusion', icon:'🌏', title:'东西融合', category:'psychology',
+      body:'你思考了一个问题：中国文化自信，是不是意味着要排斥西方文化？\n\n你的答案是：不是。\n\n真正的文化自信，不是「我们不需要你」——是「我可以学习你，同时做自己」。\n\n你的生活就是东西融合的例子：\n- 早上喝咖啡，下午喝茶\n- 穿汉服参加聚会，穿西装去上班\n- 读《论语》也读尼采\n- 听京剧也听摇滚\n- 写书法也用iPad\n\n你的一个朋友说：「你到底是中国人还是西方人？」\n\n你说：「我是一个21世纪的中国人——这意味着我可以同时拥抱传统和现代、东方和西方。」\n\n你开始理解：文化的力量不在于排他——在于融合。\n\n最好的文化，是那些能够吸收其他文化精华、同时保持自己根基的文化。\n\n「文化自信的最高境界：不是「我们最厉害」——是「我们足够自信，所以可以向所有人学习」。」',
+      cond: g => g.flags.culturalConfidence && !g.flags.eastWestFusion && g.intel >= 40,
+      choices:[
+        { label:'形成了自己的「融合」生活哲学', hint:'+🧠 +😊', fn: g => { g.flags.eastWestFusion=true; return{intel:15,mood:12,charm:8}; }},
+        { label:'开始做中西文化交流的工作', hint:'+💰 +🤝', fn: g => { g.flags.eastWestFusion=true; g.flags.culturalBridge=true; return{money:5000,social:12,intel:10}; }},
+        { label:'觉得这个问题太深了，想不清楚', hint:'+🧠', fn: g => { g.flags.eastWestFusion=true; return{intel:8,mood:3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -12297,6 +12378,12 @@ const ACHIEVEMENTS = [
     { id:'novelist_ach', icon:'📝', name:'业余作家', desc:'完成了自己的第一部小说', check: g => g.flags.novelist },
     { id:'personal_brand_ach', icon:'🌟', name:'个人品牌', desc:'建立了自己的个人品牌', check: g => g.flags.personalBrand },
     { id:'life_reviewer_ach', icon:'📖', name:'人生复盘师', desc:'认真回顾了自己的人生篇章', check: g => g.flags.chapterReview },
+    // === v23.1 新增成就（国潮文化与新中式） ===
+    { id:'guochao_fan_ach_v23_1', icon:'🏮', name:'国潮爱好者', desc:'开始支持国货和国潮品牌', check: g => g.flags.guochaoFan },
+    { id:'hanfu_lover_ach', icon:'👘', name:'汉服同袍', desc:'穿上了汉服走上街头', check: g => g.flags.hanfuFan },
+    { id:'tea_master_ach', icon:'🍵', name:'茶艺师', desc:'考了茶艺师证', check: g => g.flags.teaCertified },
+    { id:'calligrapher_ach', icon:'✒️', name:'书法家', desc:'坚持练了一年书法', check: g => g.flags.calligraphyMaster },
+    { id:'culture_confident_ach', icon:'🇨🇳', name:'文化自信', desc:'形成了真正的文化自觉和自信', check: g => g.flags.culturalConfidence },
 ];
 
 // === ENDINGS === (order matters: first match wins)
