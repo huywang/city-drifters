@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v33.8
+// 都市浮生记 - Game Engine v33.9
 // ============================================
 
 // === GAME STATE ===
@@ -19159,6 +19159,98 @@ const EVENTS = [
         { label:'给每个朋友写了一封长信', hint:'+👥 +✨', fn: g => { g.flags.mbtiPhilosophy=true; g.flags.deepConnect=true; return{social:12,charm:10}; }},
       ]},
 
+    // ===== 新中式生活美学 (v33.9) =====
+
+    { id:'weilu_zhucha_v33_9', icon:'🫖', title:'围炉煮茶', category:'newchinese',
+      body:'朋友拉你去了一家「围炉煮茶」的小院。\n\n青砖灰瓦的院子里，一张矮桌上摆着炭炉、铁壶、红薯、板栗、柿子和年糕。你穿着店家提供的棉麻外套，坐在竹椅上。\n\n铁壶里的老白茶咕嘟咕嘟地冒着热气。你夹了一块烤得焦黄的年糕，蘸了点红糖，咬一口，糯叽叽的。\n\n朋友说：「这才是生活。」\n\n你发了个朋友圈，配文：「偷得浮生半日闲。」评论区全是：「在哪？求地址！」\n\n结账的时候你才知道，这一壶茶加小食，人均168。你看了看那壶喝了四遍就淡了的白茶，觉得好像也没那么贵——毕竟你买的是那个下午。',
+      cond: g => g.age >= 20 && g.money > 3000,
+      choices:[
+        { label:'觉得值得，约了下周再来', hint:'+😊 +👥', fn: g => { g.flags.weiluZhucha=true; return{mood:10,social:5,money:-168}; }},
+        { label:'觉得是智商税，但拍照好看', hint:'+✨ +🧠', fn: g => { g.flags.weiluZhucha=true; return{charm:5,intel:3,money:-168}; }},
+        { label:'买了个铁壶自己在家煮', hint:'+🧠 +😊', fn: g => { g.flags.weiluZhucha=true; g.flags.homeTea=true; return{intel:5,mood:8,money:-200}; }},
+      ]},
+
+    { id:'hanfu_v33_9', icon:'👘', title:'汉服出街', category:'newchinese',
+      body:'你终于鼓起勇气穿汉服出门了。\n\n那是一套明制的马面裙配立领衫，你在淘宝上挑了两周，还专门看了穿搭教程。\n\n出门前你在镜子前转了三圈。出门后——\n\n地铁上有个阿姨盯着你看了五分钟。公司楼下保安多看了你两眼。便利店收银员说：「小姐姐你衣服好漂亮。」\n\n到了公司，同事的反应两极分化：有人说「太美了！我也想穿！」，有人阴阳怪气：「cosplay呢？」\n\n最意外的是，你在街上遇到好几个穿汉服的同好。你们互相拍了照，加了微信。\n\n你发现了一个隐藏的世界：原来这个城市里，有这么多和你一样喜欢传统服饰的人。',
+      cond: g => g.age >= 18 && g.age <= 35 && g.charm > 30,
+      choices:[
+        { label:'开始定期参加汉服活动', hint:'+👥 +✨', fn: g => { g.flags.hanfu=true; return{social:8,charm:10}; }},
+        { label:'觉得太引人注目，收起来了', hint:'+🧠', fn: g => { g.flags.hanfu=true; return{intel:3}; }},
+        { label:'开了个汉服穿搭账号', hint:'+✨ +💰', fn: g => { g.flags.hanfu=true; g.flags.hanfuAccount=true; return{charm:12,money:2000}; }},
+      ]},
+
+    { id:'feiyi_handcraft_v33_9', icon:'🪡', title:'非遗手作体验', category:'newchinese',
+      body:'你报名了一个「非遗手作体验」课——扎染。\n\n教室里摆满了白棉布和靛蓝染缸。老师是个六十多岁的阿姨，她从云南大理来，做扎染做了四十年。\n\n她教你用橡皮筋和绳子在白布上扎出花纹，然后浸入染缸。你扎了一个「鱼鳞纹」，打开的时候——\n\n哇。蓝白相间的图案在布上绽开，像一朵从深海里浮上来的花。\n\n老师看了你的作品，说：「不错，有灵气。」\n\n你忽然觉得，在一个什么都可以批量生产的时代，用双手慢慢做一件东西的感觉，太珍贵了。\n\n你把那块布裱了框，挂在家里。每次看到它，你就想起那个下午和那股靛蓝的气味。',
+      cond: g => g.age >= 18 && g.intel > 35,
+      choices:[
+        { label:'继续学其他非遗手艺', hint:'+✨ +🧠', fn: g => { g.flags.feiyiCraft=true; return{charm:10,intel:8,money:-500}; }},
+        { label:'开始关注传统手艺人', hint:'+🧠 +😊', fn: g => { g.flags.feiyiCraft=true; return{intel:10,mood:5}; }},
+        { label:'想辞职去大理学扎染', hint:'+😊 +✨', fn: g => { g.flags.feiyiCraft=true; g.flags.dali_dream=true; return{mood:8,charm:5}; }},
+      ]},
+
+    { id:'new_chinese_fashion_v33_9', icon:'👔', title:'新中式穿搭', category:'newchinese',
+      body:'你开始迷上「新中式」穿搭。\n\n不是那种穿整套汉服上街的风格，而是更日常化的：一件改良版的立领衬衫、一条有盘扣元素的外套、一双刺绣乐福鞋。\n\n你发现这种风格很微妙——它不张扬，但总有人注意到你的细节。同事问：「你这件衣服是什么牌子的？好好看。」路人多看两眼。\n\n你开始研究各种新中式品牌：「观夏」「密扇」「盖娅传说」……价格从几百到几万不等。\n\n你也发现了一个有趣的现象：穿新中式的人，往往有一种特别的气质——不是「潮」，而是一种从容的、有文化底蕴的好看。\n\n你妈看了你的新衣服说：「这不像睡衣吗？」\n\n你叹了口气。代沟。',
+      cond: g => g.age >= 20 && g.charm > 25 && g.money > 5000,
+      choices:[
+        { label:'入坑了新中式穿搭', hint:'+✨ +💰', fn: g => { g.flags.newChineseFashion=true; return{charm:12,money:-2000}; }},
+        { label:'只买了一件当尝鲜', hint:'+✨ +😊', fn: g => { g.flags.newChineseFashion=true; return{charm:5,mood:5,money:-500}; }},
+        { label:'开始研究中国传统服饰史', hint:'+🧠 +✨', fn: g => { g.flags.newChineseFashion=true; g.flags.costumeHistory=true; return{intel:10,charm:8}; }},
+      ]},
+
+    { id:'chinese_tea_v33_9', icon:'🍵', title:'中式茶饮入门', category:'newchinese',
+      body:'你决定认真喝茶了。\n\n不是奶茶，不是茶饮料，是正经的功夫茶。你在网上买了一套盖碗、公道杯、品茗杯，还有一罐正山小种。\n\n第一次泡的时候你手忙脚乱：盖碗烫手、茶汤太浓、不知道该怎么闻香。你烫了三次手指，倒掉了两泡茶，终于泡出了一杯还算能喝的。\n\n入口是焦糖和桂圆香，回甘绵长。\n\n你开始理解为什么中国人喝了上千年的茶。不是因为好喝（虽然确实好喝），而是因为泡茶的过程本身就是一种「慢下来」的仪式。\n\n三个月后，你的茶桌上已经有了六种茶叶，你开始跟朋友推荐不同的茶配不同的点心。\n\n你爸看到你的茶具说：「你提前进入退休生活了？」',
+      cond: g => g.age >= 22 && g.intel > 30,
+      choices:[
+        { label:'开始每天泡茶，戒掉了咖啡', hint:'+🧠 +😊', fn: g => { g.flags.chineseTea=true; return{intel:8,mood:8,health:5,money:-300}; }},
+        { label:'周末才泡，平时还是喝速溶', hint:'+😊 +🧠', fn: g => { g.flags.chineseTea=true; return{mood:5,intel:3}; }},
+        { label:'考了一个茶艺师证', hint:'+✨ +🧠', fn: g => { g.flags.chineseTea=true; g.flags.teaCeremony=true; return{charm:10,intel:8,money:-2000}; }},
+      ]},
+
+    { id:'guofeng_music_v33_9', icon:'🎵', title:'国风音乐入坑', category:'newchinese',
+      body:'你在B站看到一个国风音乐的live视频，被震住了。\n\n舞台上，一个女生穿着汉服弹古筝，旁边是一个男生吹笛子。他们演奏的是一首改编的古曲《高山流水》，但加了电子音乐的底鼓和合成器。\n\n古老和现代碰撞出一种奇妙的化学反应。你听了一遍又一遍。\n\n你开始疯狂搜索国风音乐：周深、GAI的国风说唱、银临的古风歌、还有各种民乐演奏的up主。\n\n你甚至开始学竹笛。买了支298的入门笛，每天对着教程吹。邻居敲了三次墙，你终于吹出了一个完整的音。\n\n三个月后，你能吹一首完整的《茉莉花》了。虽然气息不稳，但你觉得那是你吹过最好听的音乐。',
+      cond: g => g.age >= 16 && g.mood > 20,
+      choices:[
+        { label:'继续学竹笛，加入了民乐社', hint:'+👥 +✨', fn: g => { g.flags.guofengMusic=true; return{social:8,charm:8,money:-298}; }},
+        { label:'只是听歌，没有学乐器', hint:'+😊 +🧠', fn: g => { g.flags.guofengMusic=true; return{mood:8,intel:3}; }},
+        { label:'开始自己写古风歌词', hint:'+✨ +🧠', fn: g => { g.flags.guofengMusic=true; g.flags.guofengWriter=true; return{charm:12,intel:8}; }},
+      ]},
+
+    { id:'solar_terms_v33_9', icon:'🌿', title:'跟着节气生活', category:'newchinese',
+      body:'你开始关注二十四节气了。\n\n起因是一个App提醒你「今日霜降，宜食柿子、登高望远」。你觉得挺有意思，开始每个节气都做一些「应季」的事。\n\n立春吃春饼，清明做青团，小满喝绿豆汤，大暑吃西瓜，白露喝白露茶，冬至包饺子。\n\n你甚至开始看「农历」，知道什么时候该看月亮。\n\n朋友觉得你疯了：「你一个程序员/设计师/打工人，搞得跟退休大爷似的。」\n\n但你觉得不一样了。以前你的时间是被KPI和deadline切割的，现在你的时间有了另一种节奏——跟着太阳、跟着季节、跟着大地的呼吸。\n\n你在霜降那天吃了个柿子，特别甜。你拍了一张照，没有发朋友圈。有些甜，自己知道就好。',
+      cond: g => g.age >= 22 && g.intel > 40,
+      choices:[
+        { label:'坚持了一整年的节气生活', hint:'+🧠 +😊 +✨', fn: g => { g.flags.solarTerms=true; return{intel:10,mood:12,charm:5}; }},
+        { label:'只坚持了几个重要的节气', hint:'+😊 +🧠', fn: g => { g.flags.solarTerms=true; return{mood:8,intel:5}; }},
+        { label:'开始写节气笔记', hint:'+✨ +🧠', fn: g => { g.flags.solarTerms=true; g.flags.solarNotes=true; return{charm:10,intel:8}; }},
+      ]},
+
+    { id:'calligraphy_v33_9', icon:'✍️', title:'练字静心', category:'newchinese',
+      body:'你在网上看到一句话：「焦虑的时候，就练字。」\n\n你买了一支兼毫笔、一瓶墨汁、一本《兰亭序》字帖。第一天写的时候，你的手在抖，笔画歪歪扭扭，跟字帖差了十万八千里。\n\n但你发现一件神奇的事：写毛笔字的时候，你没法想别的事。你的全部注意力都在那一笔一画上。\n\n这大概就是「心流」吧。\n\n一个月后，你的字还是不太好看，但你写字的时候不再抖了。你开始享受每一笔的过程：起笔的轻、行笔的稳、收笔的回锋。\n\n你把写得最好的一幅字裱了起来，挂在书房。写的是四个字：「难得糊涂」。\n\n你妈来你家看到后说：「你姥爷的遗物里也有一幅这个。」\n\n你鼻子一酸。有些东西，是要通过手来传承的。',
+      cond: g => g.age >= 20 && g.intel > 35,
+      choices:[
+        { label:'坚持每天练字半小时', hint:'+🧠 +😊', fn: g => { g.flags.calligraphy=true; return{intel:10,mood:10,money:-100}; }},
+        { label:'三天打鱼两天晒网', hint:'+😊', fn: g => { g.flags.calligraphy=true; return{mood:5}; }},
+        { label:'开始学篆刻', hint:'+✨ +🧠', fn: g => { g.flags.calligraphy=true; g.flags.sealCarving=true; return{charm:12,intel:8,money:-500}; }},
+      ]},
+
+    { id:'chinese_floral_v33_9', icon:'💐', title:'中式花艺', category:'newchinese',
+      body:'你路过一家花店，看到橱窗里摆着一个中式插花作品——\n\n不是西式花束那种满满当当的风格，而是一枝梅花、两片竹叶、一块太湖石，插在一个青瓷瓶里。留白很多，但每一处都是恰到好处的。\n\n你被那种「少即是多」的美打动了，报了个中式花艺课。\n\n老师说：「中式插花讲究的是意境，不是技术。你要让花有呼吸的空间。」\n\n你学了三个月，最大的收获不是学会了插花，而是学会了一种审美：留白的美、不对称的美、残缺的美。\n\n你开始觉得，日本人的侘寂美学，其实老祖宗早就玩明白了。\n\n你在家里摆了一瓶自己插的腊梅。朋友来你家说：「你家好像一个美术馆。」\n\n你笑了。你家只是一个租来的小房间，但你觉得它有了灵魂。',
+      cond: g => g.age >= 22 && g.charm > 30,
+      choices:[
+        { label:'坚持每周买花自己插', hint:'+✨ +😊', fn: g => { g.flags.chineseFloral=true; return{charm:12,mood:8,money:-200}; }},
+        { label:'学完就没再上了', hint:'+🧠 +😊', fn: g => { g.flags.chineseFloral=true; return{intel:5,mood:5}; }},
+        { label:'开始研究中国古典园林', hint:'+🧠 +✨', fn: g => { g.flags.chineseFloral=true; g.flags.gardenStudy=true; return{intel:12,charm:8}; }},
+      ]},
+
+    { id:'chinese_philosophy_v33_9', icon:'☯️', title:'中式哲学觉醒', category:'newchinese',
+      body:'你在人生低谷的时候，翻开了《道德经》。\n\n以前你觉得那是玄之又玄的东西，但这次你读到一句：\n\n「上善若水。水善利万物而不争，处众人之所恶，故几于道。」\n\n你突然觉得被击中了。水不争，但没有什么比水更强大。它可以是涓涓细流，也可以是滔天巨浪。它适应任何容器的形状，但始终保持自己的本质。\n\n你开始读更多的中国哲学：庄子的逍遥游让你觉得自由不一定要去远方，王阳明的知行合一让你反思自己说了太多做不到的话，曾国藩的家书让你重新理解了什么是「笨功夫」。\n\n你发现，原来中国哲学不是课本里那些干巴巴的考点，而是一种活着的智慧。\n\n它不告诉你答案，它教你怎么跟问题相处。\n\n你买了一本《庄子》，送给了一个正在焦虑的朋友。扉页写了一句话：「逍遥不在于无所待，而在于知所待。」',
+      cond: g => g.age >= 25 && g.intel > 45 && (g.mood < 50 || g.flags.mbtiPhilosophy),
+      choices:[
+        { label:'把中国哲学融入了日常生活', hint:'+🧠 +😊 +✨', fn: g => { g.flags.chinesePhilosophy=true; return{intel:15,mood:12,charm:10}; }},
+        { label:'开始系统研读经典', hint:'+🧠 +✨', fn: g => { g.flags.chinesePhilosophy=true; g.flags.classicReader=true; return{intel:18,charm:5}; }},
+        { label:'写了一篇读书心得发到网上', hint:'+✨ +👥', fn: g => { g.flags.chinesePhilosophy=true; g.flags.philosophyWriter=true; return{charm:12,social:8}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -21015,6 +21107,17 @@ const ACHIEVEMENTS = [
     { id:'mbti_community_v33_8_ach', icon:'🫂', name:'找到同类', desc:'加入了人格类型社群', check: g => g.flags.mbtiCommunity },
     { id:'mbti_biz_v33_8_ach', icon:'💰', name:'人格经济', desc:'见证了MBTI变成一门生意', check: g => g.flags.mbtiBiz },
     { id:'mbti_philosophy_v33_8_ach', icon:'🌊', name:'不被定义', desc:'接受了自己比任何标签都复杂', check: g => g.flags.mbtiPhilosophy },
+    // --- 新中式生活美学 (v33.9) ---
+    { id:'weilu_zhucha_v33_9_ach', icon:'🫖', name:'围炉煮茶', desc:'体验了围炉煮茶的慢生活', check: g => g.flags.weiluZhucha },
+    { id:'hanfu_v33_9_ach', icon:'👘', name:'汉服出街', desc:'鼓起勇气穿汉服出门', check: g => g.flags.hanfu },
+    { id:'feiyi_handcraft_v33_9_ach', icon:'🪡', name:'非遗传承人', desc:'体验了非遗手作课程', check: g => g.flags.feiyiCraft },
+    { id:'new_chinese_fashion_v33_9_ach', icon:'👔', name:'新中式穿搭', desc:'开始尝试新中式风格', check: g => g.flags.newChineseFashion },
+    { id:'chinese_tea_v33_9_ach', icon:'🍵', name:'茶道入门', desc:'开始认真喝功夫茶', check: g => g.flags.chineseTea },
+    { id:'guofeng_music_v33_9_ach', icon:'🎵', name:'国风入坑', desc:'爱上了国风音乐', check: g => g.flags.guofengMusic },
+    { id:'solar_terms_v33_9_ach', icon:'🌿', name:'节气生活', desc:'开始跟着二十四节气生活', check: g => g.flags.solarTerms },
+    { id:'calligraphy_v33_9_ach', icon:'✍️', name:'笔墨人生', desc:'开始练毛笔字', check: g => g.flags.calligraphy },
+    { id:'chinese_floral_v33_9_ach', icon:'💐', name:'中式花艺', desc:'学习了中式插花', check: g => g.flags.chineseFloral },
+    { id:'chinese_philosophy_v33_9_ach', icon:'☯️', name:'东方智慧', desc:'从中国传统哲学中找到了力量', check: g => g.flags.chinesePhilosophy },
 ];
 
 // === ENDINGS === (order matters: first match wins)
