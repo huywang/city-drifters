@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v28.9
+// 都市浮生记 - Game Engine v29.0
 // ============================================
 
 // === GAME STATE ===
@@ -15057,6 +15057,111 @@ const EVENTS = [
         { label:'省了钱但觉得有点孤独', hint:'+💰 -😊', fn: g => { g.flags.socialSpendingCut=true; g.money += 2000; return{mood:-5,social:-5}; }},
         { label:'还是算了，社交很重要', hint:'+👥 -💰', fn: g => { g.flags.socialSpendingCut=true; return{social:5,mood:3}; }},
       ]},
+    // === v29.0: 人生阶段系统 + 年龄里程碑 ===
+    { id:'quarter_life_crisis', icon:'🎂', title:'四分之一人生危机', category:'psychology',
+      body:'你25岁了。\n\n你开始恐慌。\n\n你的朋友圈：\n- A：刚升职，年薪30万\n- B：刚结婚，买房了\n- C：刚生了孩子\n- D：出国留学了\n\n你：\n- 月薪8000\n- 单身\n- 租房\n- 不知道自己想要什么\n\n你开始算：\n- 25岁到30岁：还有5年\n- 5年 × 12月 = 60个月\n- 60个月——你能变成什么样？\n\n你开始理解：四分之一人生危机——不是「你不够好」——是「你第一次意识到——人生是有限的」。\n\n25岁之前——你觉得「时间无限」。\n\n25岁之后——你开始「倒数」。\n\n「四分之一危机：你不是在恐慌——你是在「第一次认真对待自己的人生」。」',
+      cond: g => g.age === 25 && !g.flags.quarterLifeCrisis,
+      choices:[
+        { label:'制定了5年人生规划', hint:'+🧠 +✨', fn: g => { g.flags.quarterLifeCrisis=true; g.flags.hasFiveYearPlan=true; g.reputation.career += 3; return{intel:8,charm:3,mood:3}; }},
+        { label:'焦虑了但没行动', hint:'-😊', fn: g => { g.flags.quarterLifeCrisis=true; return{mood:-8}; }},
+        { label:'接受了现状，觉得每个人节奏不同', hint:'+😊 +🧠', fn: g => { g.flags.quarterLifeCrisis=true; g.flags.acceptedOwnPace=true; return{mood:5,intel:5}; }},
+      ]},
+    { id:'turning_thirty', icon:'🎯', title:'30岁门槛', category:'psychology',
+      body:'你30岁了。\n\n社会的「30岁清单」：\n- [ ] 有稳定的工作\n- [ ] 有房子\n- [ ] 结婚了\n- [ ] 有孩子\n- [ ] 存款50万+\n\n你的「30岁现实」：\n- [ ] 有工作（但不稳定）\n- [ ] 租房\n- [ ] 单身/恋爱中\n- [ ] 没孩子\n- [ ] 存款5万\n\n你勾了1/5。\n\n你的妈妈说：「你30了还没结婚？」\n你的同学说：「你30了还没买房？」\n你的领导说：「你30了还没升管理层？」\n\n你开始理解：30岁——不是「一个年龄」——是「一张社会考卷」。\n\n但——这张考卷——没有标准答案。\n\n你不是「交白卷」——你是在「写自己的答案」。\n\n「30岁：你以为你在「迟到」——其实你在「走自己的路」。」',
+      cond: g => g.age === 30 && !g.flags.turningThirty,
+      choices:[
+        { label:'重新评估人生优先级', hint:'+🧠 +😊', fn: g => { g.flags.turningThirty=true; g.flags.reprioritized=true; return{intel:8,mood:5,charm:3}; }},
+        { label:'加倍努力追赶社会期望', hint:'+✨ -💪 -😊', fn: g => { g.flags.turningThirty=true; g.flags.chasingSociety=true; return{charm:5,health:-5,mood:-5}; }},
+        { label:'决定走自己的路不管别人', hint:'+😊 +🧠', fn: g => { g.flags.turningThirty=true; g.flags.ownPath=true; return{mood:8,intel:5}; }},
+      ]},
+    { id:'career_plateau', icon:'📊', title:'职业高原', category:'career',
+      body:'你35岁了。你在公司干了8年。\n\n你的职级：还是那个职级。\n你的工资：8年涨了40%（通胀涨了60%）。\n你的下属：比你年轻10岁——但已经跟你平级了。\n\n你的绩效评估：\n- 去年：B+\n- 前年：B+\n- 大前年：B+\n- 永远：B+\n\n你不是「不够努力」——你是「到了天花板」。\n\n你的选择：\n- 跳槽：35岁——很多公司不招了\n- 考公：年龄限制35岁\n- 创业：没有资源\n- 躺平：不甘心\n\n你开始理解：职业高原——不是「你的问题」——是「系统的bug」。\n\n企业设计——就是「金字塔」——越往上——位置越少。\n\n你不是「停滞」——你是「到了大多数人都会到的位置」。\n\n「职业高原：你以为你在「落后」——其实你在「正常」——只是社会让你觉得「正常」是「不够」。」',
+      cond: g => g.age >= 33 && g.age <= 38 && !g.flags.careerPlateau && g.jobSalary > 0,
+      choices:[
+        { label:'发展第二曲线，培养新技能', hint:'+🧠 +✨', fn: g => { g.flags.careerPlateau=true; g.flags.secondCurve=true; g.reputation.career += 5; return{intel:8,charm:5}; }},
+        { label:'接受现实，工作只是养家糊口', hint:'+😊 +🧠', fn: g => { g.flags.careerPlateau=true; g.flags.acceptedPlateau=true; return{mood:5,intel:5}; }},
+        { label:'跳槽赌一把', hint:'+💰 -🧠', fn: g => { g.flags.careerPlateau=true; g.flags.riskyJobHop=true; setJob(g, '新公司员工', Math.floor(g.jobSalary * 1.4)); return{mood:-3,charm:3}; }},
+      ]},
+    { id:'midlife_crisis_v29_0', icon:'🏎️', title:'中年危机', category:'psychology',
+      body:'你40岁了。\n\n你某天照镜子——发现：\n- 太阳穴有白发了\n- 眼袋越来越重\n- 肚子开始凸了\n- 蹲下去膝盖咔咔响\n\n你的人生审视：\n- 事业：不上不下\n- 婚姻：不温不火（如果有的话）\n- 孩子：开始叛逆了（如果有的话）\n- 父母：开始生病了\n\n你突然想买一辆跑车。\n不是因为你喜欢——是因为你觉得「再不疯狂就老了」。\n\n你开始理解：中年危机——不是「矫情」——是「第一次直面死亡」。\n\n40岁——你开始意识到——你不是「无限的」——你是「有限的」。\n\n你的时间——不是「还有很多」——是「已经过了一半」。\n\n「中年危机：你不是在买跑车——你是在「买一种「我还活着」的感觉」。」',
+      cond: g => g.age === 40 && !g.flags.midlifeCrisis,
+      choices:[
+        { label:'开始健身，对抗衰老', hint:'+💪 +😊 -💰', fn: g => { g.flags.midlifeCrisis=true; g.flags.midlifeFitness=true; g.money -= 5000; return{health:10,mood:8}; }},
+        { label:'买了一直想买的东西，疯狂一次', hint:'-💰 +😊', fn: g => { g.flags.midlifeCrisis=true; g.flags.midlifeSplurge=true; g.money -= 30000; return{mood:10,charm:5}; }},
+        { label:'重新思考人生意义', hint:'+🧠 +😊', fn: g => { g.flags.midlifeCrisis=true; g.flags.midlifeReflection=true; return{intel:10,mood:5,charm:3}; }},
+      ]},
+    { id:'parents_getting_old', icon:'👴', title:'父母老了', category:'family',
+      body:'你妈打来电话：「你爸住院了。」\n\n你赶回老家——看到：\n- 你爸——比你上次见面——瘦了10斤\n- 你妈——白了一半的头发\n- 家里——多了很多药\n\n你的内心：\n- 你什么时候变老的？\n- 我怎么没注意到？\n- 我在大城市——他们在老家——我能做什么？\n\n你爸说：「没事，小毛病，别耽误你工作。」\n\n你知道——不是「小毛病」——是不想让你担心。\n\n你的选择：\n- 辞职回家照顾？——你也有一家老小要养\n- 请护工？——每月5000-8000元\n- 接到大城市？——他们不愿意离开老家\n- 远程关心？——你连自己都快顾不过来\n\n你开始理解：父母变老——是「每个人都会经历」但「没人准备好」的事。\n\n你在城市里「奋斗」——他们在老家「等你回来」。\n\n但你——回不去了。\n\n「父母老了：你不是不想陪——你是「在陪父母和养自己之间——你只能选一个」。」',
+      cond: g => g.age >= 35 && !g.flags.parentsGettingOld,
+      choices:[
+        { label:'请了护工，每月寄钱回家', hint:'-💰 +❤️', fn: g => { g.flags.parentsGettingOld=true; g.flags.hiredCaregiver=true; g.money -= 8000; return{mood:3,social:3,charm:3}; }},
+        { label:'每周视频电话，定期回家看', hint:'+❤️ +😊', fn: g => { g.flags.parentsGettingOld=true; g.flags.regularContact=true; return{mood:5,social:5}; }},
+        { label:'开始认真存钱准备父母养老', hint:'+💰 +🧠', fn: g => { g.flags.parentsGettingOld=true; g.flags.retirementSavingForParents=true; g.money -= 5000; return{intel:5,mood:3}; }},
+      ]},
+    { id:'empty_nest_v29', icon:'🏠', title:'空巢', category:'psychology',
+      body:'你的孩子——去上大学了。\n\n你送他到火车站——他头也不回地走了。\n\n你回到家——\n- 他的房间——空的\n- 他的书包——不在了\n- 他的拖鞋——还在门口\n\n你突然不知道该做什么了。\n\n过去18年：\n- 你的「身份」——是「XX的妈妈/爸爸」\n- 你的「日程」——围绕他转\n- 你的「人生意义」——是「把他养大」\n\n现在——他长大了——你的「身份」——没了。\n\n你开始理解：空巢——不是「孩子离开了」——是「你的角色——到期了」。\n\n你不是在「想念孩子」——你是在「想念被需要的感觉」。\n\n「空巢：你的孩子——飞走了——你的「人生第二幕」——开始了。」',
+      cond: g => g.age >= 48 && g.age <= 55 && g.flags.hasChild && !g.flags.emptyNest,
+      choices:[
+        { label:'开始发展自己的兴趣爱好', hint:'+😊 +🧠', fn: g => { g.flags.emptyNest=true; g.flags.secondActHobby=true; return{mood:8,intel:5,charm:3}; }},
+        { label:'每天给孩子打电话（孩子嫌烦）', hint:'+❤️ -😊', fn: g => { g.flags.emptyNest=true; return{mood:-5,social:3}; }},
+        { label:'重新和老伴培养感情', hint:'+❤️ +😊', fn: g => { g.flags.emptyNest=true; g.flags.rekindledMarriage=true; return{mood:8,social:5,charm:5}; }},
+      ]},
+    { id:'health_wakeup_call', icon:'🏥', title:'体检报告', category:'health',
+      body:'你拿到了今年的体检报告。\n\n异常项目：\n- 血压：偏高\n- 血糖：临界\n- 血脂：偏高\n- 尿酸：偏高\n- 肝功：ALT偏高\n- 颈椎：退行性病变\n- 视力：下降\n\n医生的话：\n- 「你这个年纪——这些指标——很正常」\n- 「但——需要注意了」\n- 「多运动，少熬夜，控制饮食」\n\n你开始理解：体检报告——不是「诊断」——是「预警」。\n\n你的身体——在用「数据」告诉你——「我快撑不住了」。\n\n40岁之前——你的身体——是「免费的」。\n40岁之后——你的身体——开始「收费了」。\n\n「体检报告：你的身体——终于开始「给你寄账单」了。」',
+      cond: g => g.age >= 38 && !g.flags.healthWakeupCall && g.health <= 60,
+      choices:[
+        { label:'开始改变生活方式', hint:'+💪 +😊', fn: g => { g.flags.healthWakeupCall=true; g.flags.changedLifestyle=true; return{health:8,mood:5}; }},
+        { label:'办了健身卡但没去几次', hint:'-💰 +🧠', fn: g => { g.flags.healthWakeupCall=true; g.money -= 3000; return{intel:3}; }},
+        { label:'焦虑了但觉得改不了', hint:'-😊 -💪', fn: g => { g.flags.healthWakeupCall=true; return{mood:-5,health:-3}; }},
+      ]},
+    { id:'age_discrimination_v29', icon:'📋', title:'35岁歧视', category:'career',
+      body:'你投了50份简历。\n\n回复：3个。\n面试：1个。\n结果：「我们需要更年轻的人。」\n\n你35岁了。\n\n在中国职场——35岁 = 「过期」。\n\n你查了一下：\n- 90%的招聘要求「35岁以下」\n- 公务员考试年龄上限：35岁\n- 大厂裁员优先裁：35岁以上的\n- 你的经验：10年——但在HR眼里 = 「太贵了」\n\n你开始理解：35岁歧视——不是「你不够好」——是「系统认为年轻人更便宜」。\n\n你不是「被淘汰」——你是「被性价比淘汰」。\n\n你的10年经验——值多少钱？\n在HR的计算里——不如一个25岁的「便宜」。\n\n「35岁歧视：你不是「老了」——你是「在中国职场——35岁就是老了」。」',
+      cond: g => g.age >= 34 && g.age <= 40 && !g.flags.ageDiscrimination,
+      choices:[
+        { label:'靠人脉内推绕开年龄筛选', hint:'+🧠 +✨', fn: g => { g.flags.ageDiscrimination=true; g.flags.networkJobSearch=true; g.reputation.career += 3; return{intel:5,charm:5}; }},
+        { label:'考虑转行或创业', hint:'+🧠 -💰', fn: g => { g.flags.ageDiscrimination=true; g.flags.consideringEntrepreneurship=true; return{intel:5,mood:-3}; }},
+        { label:'接受现实降低期望', hint:'+😊 -✨', fn: g => { g.flags.ageDiscrimination=true; g.flags.loweredCareerExpectations=true; return{mood:3,charm:-3}; }},
+      ]},
+    { id:'retirement_planning_v29_0', icon:'🏖️', title:'退休规划', category:'finance',
+      body:'你算了一下——退休需要多少钱。\n\n你的计划：\n- 退休年龄：60岁\n- 预期寿命：85岁\n- 退休后年数：25年\n- 每月生活费：5000元\n- 总计：5000 × 12 × 25 = 150万\n\n你的养老金：\n- 社保养老金：每月3000元\n- 缺口：每月2000元\n- 25年缺口总计：60万\n\n你的现状：\n- 存款：15万\n- 距退休：还有X年\n- 每月能存：2000元\n\n你开始理解：退休规划——不是「老了再说」——是「现在就要开始」。\n\n你的「养老自由」——需要150万——你现在有15万——你还需要135万。\n\n这不是「存钱」能解决的——这需要「投资」。\n\n但你不懂投资——而不懂投资的人——往往「亏得最多」。\n\n「退休规划：你以为你在规划退休——其实你在面对「你可能永远存不够」的现实。」',
+      cond: g => g.age >= 40 && !g.flags.retirementPlanning && g.jobSalary > 0,
+      choices:[
+        { label:'开始定投基金和保险', hint:'+💰 +🧠', fn: g => { g.flags.retirementPlanning=true; g.flags.startedRetirementInvesting=true; g.money -= 10000; return{intel:8,mood:3}; }},
+        { label:'算了，走一步看一步', hint:'+😊 -🧠', fn: g => { g.flags.retirementPlanning=true; return{mood:3,intel:-3}; }},
+        { label:'延迟退休到65岁', hint:'+💰 -😊', fn: g => { g.flags.retirementPlanning=true; g.flags.delayedRetirement=true; return{intel:3,mood:-5}; }},
+      ]},
+    { id:'generation_gap_v29_0', icon:'📱', title:'代际鸿沟', category:'social',
+      body:'你发现——你听不懂年轻人说话了。\n\n新词词典：\n- 「yyds」= 永远的神\n- 「绝绝子」= 太好了\n- 「摆烂」= 不努力了\n- 「内卷」= 过度竞争\n- 「躺平」= 接受现状\n- 「社恐」= 社交恐惧\n- 「DNA动了」= 被打动了\n\n你：「什么意思？」\n年轻人：「你老了。」\n\n你开始理解：代际鸿沟——不是「语言差异」——是「世界观差异」。\n\n你这代人——相信「努力就有回报」。\n\n年轻人——已经「不信了」。\n\n你不是「老了」——你是「活在一个已经过时的叙事里」。\n\n「代际鸿沟：你不是在「变老」——你是在「被时代甩在后面」——而你没有注意到。」',
+      cond: g => g.age >= 35 && !g.flags.generationGap,
+      choices:[
+        { label:'努力学习年轻人的文化', hint:'+🧠 +✨', fn: g => { g.flags.generationGap=true; g.flags.bridgeGenerationGap=true; return{intel:5,charm:5}; }},
+        { label:'觉得自己这代人的价值观更好', hint:'+😊 -🧠', fn: g => { g.flags.generationGap=true; return{mood:3,intel:-3}; }},
+        { label:'接受代际差异，各活各的', hint:'+🧠 +😊', fn: g => { g.flags.generationGap=true; g.flags.acceptedGap=true; return{intel:5,mood:3}; }},
+      ]},
+    { id:'life_review_v29_0', icon:'📖', title:'人生回顾', category:'psychology',
+      body:'你坐在阳台上——看着夕阳——开始回顾你的人生。\n\n你的「人生大事记」：\n- 出生在小城市\n- 考上大学\n- 来到大城市\n- 第一份工作\n- 第一次租房\n- 第一次恋爱（或没有）\n- 第一个转折点\n\n你开始想：\n- 「如果当初选了另一条路——我现在会怎样？」\n- 「我后悔什么？」\n- 「我骄傲什么？」\n- 「我还想做什么？」\n\n你开始理解：人生回顾——不是「老了才做的事」——是「让你看清什么重要」的事。\n\n你的后悔——不是「做错了什么」——是「错过了什么」。\n\n你的骄傲——不是「得到了什么」——是「坚持了什么」。\n\n「人生回顾：你不是在「回忆过去」——你是在「决定未来的你——要成为什么样的人」。」',
+      cond: g => g.age >= 50 && !g.flags.lifeReview,
+      choices:[
+        { label:'决定做一直没想做但没做的事', hint:'+😊 +✨', fn: g => { g.flags.lifeReview=true; g.flags.pursuingDream=true; return{mood:10,charm:5}; }},
+        { label:'觉得自己的人生还不错', hint:'+😊 +🧠', fn: g => { g.flags.lifeReview=true; g.flags.contentWithLife=true; return{mood:8,intel:5}; }},
+        { label:'有些遗憾但接受了', hint:'+🧠 +😊', fn: g => { g.flags.lifeReview=true; g.flags.acceptedRegrets=true; return{intel:8,mood:5}; }},
+      ]},
+    { id:'body_decline_40s', icon:'🦴', title:'身体开始走下坡路', category:'health',
+      body:'你发现——你的身体——不一样了。\n\n30岁的你：\n- 熬夜到3点——第二天照样上班\n- 吃火锅——不长痘\n- 喝啤酒——不肚子\n- 跑步5公里——不喘\n\n40岁的你：\n- 12点不睡——第二天废了\n- 吃火锅——第二天拉肚子\n- 喝啤酒——肚子出来了\n- 爬3层楼——喘\n\n你开始理解：身体——不是「免费的」——是「有保质期的」。\n\n30岁之前——你的身体——是「赠送的」。\n30岁之后——你的身体——是「租赁的」——每月都要「交维护费」。\n\n你开始算：\n- 健身：300元/月\n- 保健品：200元/月\n- 体检：1000元/年\n- 「维护费」：7000元/年\n\n「身体下坡：你以为你在变老——其实你的身体在「提醒你——它不是无限的」。」',
+      cond: g => g.age >= 38 && g.age <= 45 && !g.flags.bodyDecline,
+      choices:[
+        { label:'开始规律运动和体检', hint:'+💪 +😊 -💰', fn: g => { g.flags.bodyDecline=true; g.flags.regularExercise=true; g.money -= 5000; return{health:10,mood:5}; }},
+        { label:'买了各种保健品', hint:'-💰 +🧠', fn: g => { g.flags.bodyDecline=true; g.money -= 3000; return{intel:2,health:3}; }},
+        { label:'觉得还早不用太紧张', hint:'+😊 -💪', fn: g => { g.flags.bodyDecline=true; return{mood:3,health:-3}; }},
+      ]},
+    { id:'midlife_wisdom', icon:'🧠', title:'中年智慧', category:'psychology',
+      body:'你45岁了——你发现——你变「聪明」了。\n\n不是「学历」的聪明——是「活明白了」的聪明。\n\n你开始理解的事：\n- 大部分「紧急的事」——其实不急\n- 大部分「重要的人」——其实不重要\n- 大部分「必须做的事」——其实可以不做\n- 大部分「不能错过机会」——其实可以错过\n\n你开始放弃的事：\n- 讨好所有人\n- 追求完美\n- 证明自己\n- 改变别人\n\n你开始珍惜的事：\n- 健康\n- 平静\n- 真朋友\n- 好睡眠\n\n你开始理解：中年智慧——不是「知道得更多」——是「在乎得更少」。\n\n你不是在「变老」——你是在「变轻」。\n\n「中年智慧：你花了半辈子——学会了「放下」——而你发现——放下——比拿起——难多了。」',
+      cond: g => g.age >= 43 && !g.flags.midlifeWisdom,
+      choices:[
+        { label:'活得更通透了，减少了不必要的焦虑', hint:'+😊 +🧠', fn: g => { g.flags.midlifeWisdom=true; g.flags.lifeWisdom=true; return{mood:10,intel:8,charm:5}; }},
+        { label:'开始写日记记录人生感悟', hint:'+🧠 +✨', fn: g => { g.flags.midlifeWisdom=true; g.flags.journaling=true; return{intel:8,charm:3}; }},
+        { label:'觉得自己还有很多放不下', hint:'+🧠 -😊', fn: g => { g.flags.midlifeWisdom=true; return{intel:5,mood:-3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -16406,6 +16511,17 @@ const ACHIEVEMENTS = [
     { id:'thrift_expert_ach', icon:'👕', name:'二手达人', desc:'成为二手衣服消费专家', check: g => g.flags.thriftExpert },
     { id:'streamlined_social_ach', icon:'✂️', name:'社交精简', desc:'砍掉无效社交留下真朋友', check: g => g.flags.streamlinedSocial },
     { id:'real_friends_ach', icon:'❤️', name:'真朋友', desc:'用穷鬼社交筛选出了真朋友', check: g => g.flags.realFriendsRemained },
+    // v29.0: 人生阶段系统 + 年龄里程碑
+    { id:'five_year_plan_ach', icon:'📋', name:'五年规划', desc:'在25岁制定了五年人生规划', check: g => g.flags.hasFiveYearPlan },
+    { id:'own_path_ach', icon:'🛤️', name:'自己的路', desc:'30岁时选择走自己的路不管他人', check: g => g.flags.ownPath },
+    { id:'second_curve_ach', icon:'📈', name:'第二曲线', desc:'在职业高原期发展了新的技能方向', check: g => g.flags.secondCurve },
+    { id:'midlife_reflection_ach', icon:'🪞', name:'中年觉醒', desc:'40岁重新思考了人生意义', check: g => g.flags.midlifeReflection },
+    { id:'life_wisdom_ach', icon:'🧠', name:'活明白了', desc:'中年智慧觉醒减少不必要的焦虑', check: g => g.flags.lifeWisdom },
+    { id:'content_with_life_ach', icon:'🌅', name:'此生无悔', desc:'人生回顾后觉得这辈子还不错', check: g => g.flags.contentWithLife },
+    { id:'changed_lifestyle_ach', icon:'🏃', name:'生活方式改变', desc:'体检后真正改变了不健康的生活方式', check: g => g.flags.changedLifestyle },
+    { id:'accepted_own_pace_ach', icon:'🕊️', name:'接受自己的节奏', desc:'不再和别人比较接受自己的人生节奏', check: g => g.flags.acceptedOwnPace },
+    { id:'pursuing_dream_ach', icon:'🌟', name:'追梦不晚', desc:'50岁后终于去做了想做的事', check: g => g.flags.pursuingDream },
+    { id:'regular_exercise_ach', icon:'💪', name:'运动习惯', desc:'40岁后开始规律运动保持健康', check: g => g.flags.regularExercise },
 ];
 
 // === ENDINGS === (order matters: first match wins)
