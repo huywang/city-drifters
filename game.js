@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v10.6
+// 都市浮生记 - Game Engine v10.7
 // ============================================
 
 // === GAME STATE ===
@@ -5040,6 +5040,87 @@ const EVENTS = [
         { label:'偶尔接单', hint:'+💰', fn: g => { g.flags.hasSideHustle=true; return{money:1000,mood:3}; }},
         { label:'影响主业放弃', hint:'+😊', fn: g => { return{mood:-3}; }},
       ]},
+    // === v10.7 情感深度/社交软件/游戏/数字生活 ===
+    { id:'dating_app', icon:'💘', title:'社交软件',
+      body:'你下载了一个交友App。左滑右滑，你的手指都快抽筋了。\n\n终于匹配了一个人。TA的头像很好看，简介写着"喜欢旅行和美食"。\n\n你们聊了三天，从诗词歌赋聊到人生哲学。然后TA说："我其实已经结婚了。"\n\n"社交软件是当代人的许愿池——你许了愿，但实现的概率和买彩票差不多。"',
+      cond: g => !g.flags.married && g.age >= 20 && g.age <= 35 && g.social < 60,
+      choices:[
+        { label:'继续用App', hint:'+👥 🎲', fn: g => { g.flags.usedDatingApp=true; return{social:8,mood:3}; }},
+        { label:'删掉App', hint:'+🧠', fn: g => { return{intel:3,mood:-2}; }},
+        { label:'约出来见面', hint:'+👥 +✨', fn: g => { g.flags.usedDatingApp=true; return{social:10,charm:3,mood:5}; }},
+      ]},
+    { id:'long_distance', icon:'🚄', title:'异地恋',
+      body:'你开始了一段异地恋。\n\n每天视频通话，周末高铁往返。你的12306收藏夹里只有两个城市。\n\n有人说异地恋是"手机里的恋爱"。但你觉得：距离让你更珍惜每一次见面。\n\n直到有一天，TA说："我累了。"\n\n"异地恋是一场马拉松——你不确定终点在哪里，但你一直在跑。"',
+      cond: g => g.flags.married || g.flags.usedDatingApp || g.social >= 40,
+      choices:[
+        { label:'坚持', hint:'+👥 +😊', fn: g => { g.flags.longDistanceLove=true; return{mood:5,social:5}; }},
+        { label:'搬到一起', hint:'-💰 +😊', fn: g => { g.flags.longDistanceLove=true; return{money:-5000,mood:15}; }},
+        { label:'分手', hint:'+🧠 -😊', fn: g => { return{mood:-15,intel:5}; }},
+      ]},
+    { id:'breakup_event', icon:'💔', title:'分手',
+      body:'你们分手了。\n\n你删掉了聊天记录，但没有删掉电话号码。你取消了共同订阅的视频会员，但没有退掉情侣头像。\n\n你发了一条朋友圈："一个人的生活也可以很好。"\n\n然后你把手机关了，哭了一整晚。\n\n"分手不是失败，是放过。放过对方，也放过自己。"',
+      cond: g => g.flags.longDistanceLove && g.months > 24 && g.mood < 60,
+      choices:[
+        { label:'删掉一切', hint:'+🧠', fn: g => { g.flags.breakup=true; g.flags.longDistanceLove=false; return{mood:-20,intel:5}; }},
+        { label:'复合试试', hint:'+😊 🎲', fn: g => { return{mood:10}; }},
+        { label:'写一封长信', hint:'+✨ +🧠', fn: g => { g.flags.breakup=true; g.flags.longDistanceLove=false; return{mood:-10,charm:5,intel:3}; }},
+      ]},
+    { id:'game_addiction', icon:'🎮', title:'游戏沉迷',
+      body:'你开始玩一款新游戏。每天下班后你就打开电脑，进入另一个世界。\n\n在游戏里你是公会会长，有一群忠实队友。在现实里你是一个连续三天迟到的人。\n\n你的领导找你谈话了。\n\n"游戏是逃避现实的最好方式——但现实不会因为你的逃避而消失。"',
+      cond: g => g.months > 6 && g.mood < 55 && g.age <= 35,
+      choices:[
+        { label:'控制时间', hint:'+🧠 +💪', fn: g => { g.flags.gamerControlled=true; return{intel:5,health:3,mood:5}; }},
+        { label:'继续沉迷', hint:'+😊 -💪', fn: g => { g.flags.gameAddict=true; return{mood:10,health:-8}; }},
+        { label:'卸载游戏', hint:'+💪 +🧠', fn: g => { return{health:5,intel:5,mood:-5}; }},
+      ]},
+    { id:'digital_detox', icon:'📵', title:'数字戒断',
+      body:'你做了一个实验：一天不用手机。\n\n前两个小时你很焦虑，总觉得有人在找你。中午你发现：没人找你。\n\n下午你去了公园，看了两本书，和陌生人聊了天。你觉得这是你近半年来最充实的一天。\n\n"你不是离不开手机，是离不开手机带来的多巴胺。"',
+      cond: g => g.months > 12 && g.social >= 30,
+      choices:[
+        { label:'坚持一周', hint:'+🧠 +💪', fn: g => { g.flags.digitalDetox=true; return{intel:8,health:5,mood:10}; }},
+        { label:'试试一天', hint:'+🧠', fn: g => { g.flags.digitalDetox=true; return{intel:5,mood:5}; }},
+        { label:'做不到', hint:'', fn: g => { return{mood:-3}; }},
+      ]},
+    { id:'wechat_moments', icon:'📱', title:'朋友圈焦虑',
+      body:'你刷了一圈朋友圈：\n\n同事A晒了新买的保时捷。\n同学B在马尔代夫度假。\n前同事C升职成了总监。\n你最好的朋友D——TA发了一张加班的照片，配文："又是充实的一天。"\n\n你默默关掉朋友圈，打开了招聘网站。\n\n"朋友圈是别人的高光时刻，却是你的焦虑制造机。"',
+      cond: g => g.months > 6 && g.mood < 65,
+      choices:[
+        { label:'关闭朋友圈', hint:'+🧠 +😊', fn: g => { g.flags.closedMoments=true; return{intel:5,mood:8}; }},
+        { label:'发条精修自拍', hint:'+✨', fn: g => { return{charm:5,mood:3}; }},
+        { label:'继续刷', hint:'-😊', fn: g => { return{mood:-8}; }},
+      ]},
+    { id:'online_shopping', icon:'📦', title:'购物成瘾',
+      body:'你又下单了。\n\n你的购物车里永远有50+件商品。每次"双11""618"你都觉得自己赚了几千块——实际上你花了几万块。\n\n你的快递堆满了出租屋的角落。有一半你拆都没拆过。\n\n"购物是当代人的多巴胺——下单的那一刻最快乐，拆快递的那一刻最空虚。"',
+      cond: g => g.months > 6 && g.money > 3000,
+      choices:[
+        { label:'退掉不需要的', hint:'+💰 +🧠', fn: g => { return{money:2000,intel:3,mood:3}; }},
+        { label:'全部留下', hint:'+😊 -💰', fn: g => { return{money:-3000,mood:8}; }},
+        { label:'卸载购物App', hint:'+🧠', fn: g => { g.flags.shoppingDetox=true; return{intel:5,mood:5}; }},
+      ]},
+    { id:'podcast_habit', icon:'🎧', title:'播客重度用户',
+      body:'你的通勤时间变成了"学习时间"。\n\n每天上下班两小时，你听完了三档播客：一个聊商业，一个聊心理，一个聊历史。\n\n你觉得自己变聪明了——至少聊天时可以引用更多观点。\n\n但你也发现：你很少有自己的思考了。\n\n"播客是思维的快餐——营养有，但咀嚼不够。"',
+      cond: g => g.intel >= 40 && g.months > 6,
+      choices:[
+        { label:'继续听', hint:'+🧠', fn: g => { return{intel:5,mood:3}; }},
+        { label:'写听后感', hint:'+🧠 +✨', fn: g => { return{intel:8,charm:3}; }},
+        { label:'自己开一档', hint:'+✨ +👥', fn: g => { g.flags.podcaster=true; return{charm:8,social:5,mood:5}; }},
+      ]},
+    { id:'friend_drift', icon:'👥', title:'渐行渐远',
+      body:'你翻看微信通讯录，发现有些名字你已经很久没联系了。\n\n大学室友、第一份工作的同事、合租过的朋友……你们曾经无话不谈，现在只剩下朋友圈的点赞之交。\n\n你试着发了条消息："最近怎么样？"\n\n对方秒回："挺好的！你呢？"\n\n然后你们又沉默了。\n\n"成年人的友情不是被什么打败的，是被时间和距离慢慢稀释的。"',
+      cond: g => g.months > 36 && g.age >= 25,
+      choices:[
+        { label:'约出来见面', hint:'+👥 +😊', fn: g => { return{social:10,mood:10}; }},
+        { label:'接受现实', hint:'+🧠', fn: g => { return{intel:5,mood:-3}; }},
+        { label:'发条长消息', hint:'+👥 +✨', fn: g => { return{social:5,charm:3,mood:5}; }},
+      ]},
+    { id:'therapy_session', icon:'🧠', title:'心理咨询',
+      body:'你预约了一个心理咨询师。50分钟，300块。\n\n你坐在沙发上，不知道该说什么。咨询师问你："你最近有什么感受？"\n\n你说："我觉得很累。不是身体的累，是心累。"\n\n50分钟后你走出来，觉得轻松了一些——不是因为问题解决了，而是因为终于有人认真听了你说话。\n\n"心理咨询不是治病，是让你有一个安全的地方做真实的自己。"',
+      cond: g => g.mood < 45 && g.money > 500 && !g.flags.sawTherapist,
+      choices:[
+        { label:'持续咨询', hint:'-💰 +😊', fn: g => { g.flags.sawTherapist=true; return{money:-1200,mood:15,intel:5}; }},
+        { label:'试一次', hint:'-💰 +😊', fn: g => { g.flags.sawTherapist=true; return{money:-300,mood:8}; }},
+        { label:'觉得没用', hint:'', fn: g => { return{mood:-3}; }},
+      ]},
 ];
 const ACHIEVEMENTS = [
     { id:'first_job', icon:'💼', name:'职场新人', desc:'找到第一份工作', check: g => g.flags.gotFirstJob },
@@ -5472,6 +5553,14 @@ const ACHIEVEMENTS = [
     { id:'street_vendor_ach', icon:'🏪', name:'摆摊达人', desc:'尝试了夜市摆摊', check: g => g.flags.streetVendor },
     { id:'driver_ach', icon:'🚗', name:'持证上路', desc:'拿到了驾照', check: g => g.flags.hasDriversLicense },
     { id:'livestreamer_ach', icon:'📹', name:'直播新人', desc:'尝试了直播', check: g => g.flags.triedLivestream },
+    // === v10.7 新增成就 ===
+    { id:'dating_app_user', icon:'💘', name:'社交软件达人', desc:'使用了交友App', check: g => g.flags.usedDatingApp },
+    { id:'digital_detoxer', icon:'📵', name:'数字戒断', desc:'完成数字戒断', check: g => g.flags.digitalDetox },
+    { id:'gamer_controlled', icon:'🎮', name:'游戏自律', desc:'控制了游戏时间', check: g => g.flags.gamerControlled },
+    { id:'moments_closer', icon:'📱', name:'朋友圈隐身', desc:'关闭了朋友圈', check: g => g.flags.closedMoments },
+    { id:'podcaster_ach', icon:'🎧', name:'播客主播', desc:'开了自己的播客', check: g => g.flags.podcaster },
+    { id:'shopaholic_reformed', icon:'📦', name:'购物戒断', desc:'戒掉了购物瘾', check: g => g.flags.shoppingDetox },
+    { id:'therapy_goer', icon:'🧠', name:'心理勇者', desc:'尝试了心理咨询', check: g => g.flags.sawTherapist },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -5601,6 +5690,10 @@ const ENDINGS = [
     { id:'side_hustle_end', badge:'💻', title:'斜杠人生', desc:'你不只有一份工作。\n\n白天你是打工人，晚上你是自由职业者。你写文案、做PPT、翻译、设计。\n\n你的副业收入慢慢追上了主业。你在考虑：要不要辞职，全职做自由职业？\n\n"斜杠不是贪婪，是不想被一个标签定义。"', cond: g => g.flags.hasSideHustle && g.money >= 30000 && g.intel >= 60 && g.age >= 26 },
     { id:'novelist_end', badge:'✍️', title:'网文作家', desc:'你写的小说终于有人看了。\n\n从0个读者到100个，从100个到10000个。你的故事被更多人看到。\n\n有人说你写得好，有人说你写得烂。但你知道：重要的不是评价，是你一直在写。\n\n"每个作家都是从无人问津开始的——区别是你有没有坚持下去。"', cond: g => g.flags.webNovelist && g.charm >= 50 && g.intel >= 60 && g.months > 36 },
     { id:'traveler_end', badge:'✈️', title:'行走的风景', desc:'你走遍了大半个中国。\n\n从大理到丽江，从厦门到成都，从西安到拉萨。\n\n你在每个城市都留下了照片和故事。你的朋友圈是一本旅行日记。\n\n"旅行不会改变世界，但会改变看世界的你。"', cond: g => g.flags.spontaneousTrip && g.charm >= 45 && g.mood >= 60 && g.age >= 28 },
+    // --- v10.7 NEW ENDINGS ---
+    { id:'digital_minimalist', badge:'📵', title:'数字极简主义者', desc:'你学会了放下手机。\n\n你关闭了朋友圈通知，卸载了三个购物App，把屏幕时间控制在每天2小时以内。\n\n你开始有更多的时间看书、运动、和朋友面对面聊天。\n\n"放下手机不是与世界断联，是与自己重新连接。"', cond: g => g.flags.digitalDetox && g.flags.closedMoments && g.mood >= 65 && g.health >= 55 },
+    { id:'healed_heart', badge:'💚', title:'治愈之心', desc:'你经历了人生的低谷，但你走出来了。\n\n你看了心理咨询师，学会了和自己和解。你不再逃避情绪，而是面对它、理解它。\n\n你在日记里写道："我不需要完美，我只需要真实。"\n\n"治愈不是忘记伤痛，是学会带着伤痛继续前行。"', cond: g => g.flags.sawTherapist && g.mood >= 65 && g.age >= 26 },
+    { id:'podcaster_end', badge:'🎧', title:'声音的旅人', desc:'你开了一档播客。\n\n从0个听众到100个，从100个到10000个。你在麦克风前聊生活、聊工作、聊那些没人敢说的真话。\n\n有听众说："你的节目陪我度过了最难的时候。"\n\n"声音是最温暖的媒介——你听不到我的表情，但你能听到我的心。"', cond: g => g.flags.podcaster && g.charm >= 50 && g.social >= 50 && g.months > 24 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
