@@ -1405,6 +1405,61 @@ const EVENTS = [
         { label:'自学试试', hint:'+🧠', fn: g => ({intel:8,mood:3}) },
         { label:'算了，没时间', hint:'', fn: g => ({mood:-3}) },
       ]},
+    // === v2.16 CHAINED EVENTS ===
+    { id:'stray_cat', icon:'🐱', title:'流浪猫',
+      body:'你下班路上遇到一只流浪猫。它脏兮兮的，但眼睛亮晶晶的，一直蹭你的腿。\n\n你蹲下来摸了摸它，它发出满足的呼噜声。\n\n"大城市里，人和猫一样——都在寻找一个家。"',
+      cond: g => !g.flags.hasPet && g.age>=23 && g.age<=40 && Math.random()>0.5,
+      choices:[
+        { label:'带它回家', hint:'-💰 +😊', fn: g => ({money:-500,mood:20,health:5,nextEvent: g => ({
+            id:'cat_settled', icon:'🐱', title:'新室友',
+            body:'你把流浪猫带回了家。给它洗了澡，发现它其实是一只漂亮的橘猫。\n\n你给它取名"大黄"。它很快霸占了你的床、你的沙发、你的键盘。\n\n你发了条朋友圈："从此，我也是有猫的人了。"\n\n"猫是最好的室友——不吵、不闹、不借钱。"',
+            choices:[
+                { label:'买猫粮猫砂', hint:'-💰', fn: g => { g.flags.hasPet=true; return{money:-1000,mood:10}; }},
+                { label:'自制猫饭', hint:'+🧠 -💰', fn: g => { g.flags.hasPet=true; return{money:-300,mood:8,intel:3}; }},
+            ]})}),
+        },
+        { label:'给它买点吃的', hint:'-💰 +😊', fn: g => ({money:-50,mood:8}) },
+        { label:'走开，养不起自己', hint:'-😊', fn: g => ({mood:-5}) },
+      ]},
+    { id:'mystery_call', icon:'📞', title:'神秘来电',
+      body:'你接到了一个陌生号码的电话。\n\n"你好，请问是XXX吗？我们是XX公司的人力资源部，看到您的简历非常匹配我们的高级岗位……"\n\n你最近没投简历啊？难道是脉脉上有人看了你？\n\n"被猎头找上门——是能力被认可，还是信息被泄露？"',
+      cond: g => g.job!=='待业中' && g.age>=25 && g.intel>55 && g.months>12,
+      choices:[
+        { label:'听听是什么机会', hint:'🎲', fn: g => {
+            if (Math.random()>0.4) {
+                return {mood:5,intel:3,nextEvent: g => ({
+                    id:'headhunter_offer', icon:'💼', title:'猎头推荐',
+                    body:'猎头给你推荐了一个不错的机会：薪资涨幅40%，但公司刚拿到B轮，有点卷。\n\n"跳槽的最佳时机是有人挖你的时候——最差的时候也是。"',
+                    choices:[
+                        { label:'去面试看看', hint:'🎲 +💰', fn: g => { if(Math.random()>0.3){const s=Math.floor(g.jobSalary*1.4);setJob(g,getTitle(g,'senior'),s);return{money:10000,mood:15}}else{return{mood:-10}} }},
+                        { label:'算了，现在挺好', hint:'+😊', fn: g => ({mood:5}) },
+                    ]})};
+            } else {
+                return {mood:-5,nextEvent: g => ({
+                    id:'scam_call', icon:'⚠️', title:'诈骗电话',
+                    body:'对方话锋一转："您的账户存在异常，需要配合调查……"\n\n你冷笑一声：这套路太老了。\n\n"防骗第一课：凡是自称公检法的，都是骗子。"',
+                    choices:[
+                        { label:'直接挂断', hint:'+🧠', fn: g => ({intel:5,mood:5}) },
+                        { label:'调戏骗子', hint:'+😊', fn: g => ({mood:10,health:-2}) },
+                    ]})};
+            }
+        }},
+        { label:'直接挂断', hint:'+😊', fn: g => ({mood:3}) },
+      ]},
+    { id:'old_classmate', icon:'🎓', title:'老同学聚会',
+      body:'大学班长在群里发了聚会通知。你犹豫了：去的话要花钱，不去的话又怕错过人脉。\n\n"同学聚会的真相：混得好的在炫耀，混得差的在尴尬，混得一般的在装傻。"',
+      cond: g => g.age>=26 && g.age<=38 && g.months>24,
+      choices:[
+        { label:'参加聚会', hint:'-💰 +👥', fn: g => { g.relationships.friends = clamp((g.relationships.friends||40)+12, 0, 100); return{money:-800,social:10,mood:5,nextEvent: g => ({
+            id:'classmate_business', icon:'🤝', title:'合作机会',
+            body:'聚会上，一个混得不错的老同学找到你："我最近在创业，想找人合作，你有兴趣吗？"\n\n他说的项目听起来挺靠谱，但你也知道：和熟人合伙，容易伤感情。\n\n"生意场上最忌讳的事：和亲戚朋友合伙。"',
+            choices:[
+                { label:'考虑合作', hint:'🎲', fn: g => { if(Math.random()>0.5){g.flags.sideHustle=true;return{money:15000,mood:15,social:10}}else{return{money:-5000,mood:-15}} }},
+                { label:'婉拒', hint:'+😊', fn: g => ({mood:5,social:-3}) },
+            ]})};
+        }},
+        { label:'找个借口不去', hint:'+💰 -👥', fn: g => { g.relationships.friends = clamp((g.relationships.friends||40)-5, 0, 100); return{mood:-3,social:-5}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -1809,6 +1864,14 @@ function makeChoice(i) {
     updateHUD();
     if (G.health<=0 || G.mood<=0 || G.money<=-100000) triggerEnding();
     checkAchievements();
+
+    // v2.16: 事件链系统 - 某些选择触发后续事件
+    if (result.nextEvent) {
+        setTimeout(() => {
+            const nextEvent = typeof result.nextEvent === 'function' ? result.nextEvent(G) : result.nextEvent;
+            if (nextEvent) showEvent(nextEvent);
+        }, 800);
+    }
 }
 
 function showMonthlySummary() {
@@ -2049,7 +2112,7 @@ const MAX_SAVE_SLOTS = 3;
 const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
-    const saveData = { ...G, savedAt: Date.now(), version: '2.15' };
+    const saveData = { ...G, savedAt: Date.now(), version: '2.16' };
     localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
@@ -2400,6 +2463,23 @@ function toggleReduceMotion() {
     localStorage.setItem('gameSettings_reduceMotion', enabled);
 }
 
+// v2.16: 主题切换
+function toggleTheme() {
+    const isLight = document.getElementById('toggle-theme').checked;
+    document.body.classList.toggle('light-theme', isLight);
+    localStorage.setItem('gameSettings_lightTheme', isLight);
+    playSound('click');
+}
+
+function loadThemeSettings() {
+    const isLight = localStorage.getItem('gameSettings_lightTheme') === 'true';
+    if (isLight) {
+        document.body.classList.add('light-theme');
+        const toggle = document.getElementById('toggle-theme');
+        if (toggle) toggle.checked = true;
+    }
+}
+
 function exportSave() {
     const save = localStorage.getItem('cityDrifters_save');
     if (!save) { notify('没有存档可导出'); return; }
@@ -2471,6 +2551,7 @@ function loadSettings() {
 // === INIT ===
 document.addEventListener('DOMContentLoaded', () => {
     loadSettings();
+    loadThemeSettings();
     initParticles();
     initMobileSwipe();
     initKeyboardShortcuts();
