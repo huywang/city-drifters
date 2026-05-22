@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v6.5
+// 都市浮生记 - Game Engine v6.6
 // ============================================
 
 // === GAME STATE ===
@@ -3294,6 +3294,34 @@ const EVENTS = [
         { label:'放弃，找工作', hint:'+💰 +😊', fn: g => { g.flags.secondCareer=true; g.flags.backToJobMarket=true; return{money:8000,mood:10,intel:-3}; }},
         { label:'考其他编制', hint:'+🧠', fn: g => { g.flags.secondCareer=true; if(Math.random()>0.75){g.flags.civilServant=true; return{intel:8,mood:20}}else{return{intel:3,mood:-5}} }},
       ]},
+    // === v6.6 EVENTS - 副业经济与消费降级 ===
+    { id:'side_hustle', icon:'💼', title:'斜杠青年',
+      body:'你觉得光靠工资不够花，决定搞副业。\n\n你看了看选项：\n- 写稿：影评、剧评、文案，每月2000-3000元\n- 摆摊：校门口卖甜品、首饰，每晚18:30出摊\n- 代运营：帮人管小红书、抖音，每月3000-5000元\n- 拍照：汉服跟拍、景区跟拍，每单200-500元\n- 领队：周末组织飞盘、徒步、露营\n\n"斜杠青年——主业也好，副业也罢，只要能搞钱，都是通往自由的台阶。"\n\n2024年，全国945.4万年轻人在平台发布副业服务，其中"00后"占比40.8%。\n\n"没事早点睡，有空多搞钱——这届年轻人不爱聊八卦，爱聊副业。"\n\n但你也看到了问题：时间精力有限、副业影响主业、收入不稳定、没有五险一金。',
+      cond: g => !g.flags.sideHustle && g.age>=22 && g.age<=35 && g.money<50000,
+      choices:[
+        { label:'写稿变现', hint:'+💰 +🧠', fn: g => { g.flags.sideHustle=true; g.flags.writer=true; return{money:2500,intel:8,mood:5}; }},
+        { label:'摆摊创业', hint:'+💰 +✨', fn: g => { g.flags.sideHustle=true; g.flags.streetVendor=true; if(Math.random()>0.6){return{money:4000,charm:10,social:8}}else{return{money:500,mood:-5}} }},
+        { label:'技能接单', hint:'+💰 +🧠', fn: g => { g.flags.sideHustle=true; g.flags.freelancer=true; return{money:3500,intel:10,mood:8}; }},
+        { label:'太累了，不搞', hint:'+😊', fn: g => { g.flags.sideHustle=true; return{mood:5,health:3}; }},
+      ]},
+    { id:'consumption_downgrade', icon:'📉', title:'消费降级',
+      body:'你开始反思自己的消费习惯：\n\n- 以前：星巴克38元/杯 → 现在：瑞幸9.9元/杯\n- 以前：优衣库300元/件 → 现在：拼多多30元/件\n- 以前：海底捞150元/人 → 现在：沙县小吃15元/人\n- 以前：专柜护肤品 → 现在：平替国货\n\n"消费降级——不是买不起，而是不想被收割。"\n\n豆瓣"抠门女性联合会"小组突破300万成员，B站"极简生活"视频播放量破50亿次。\n\n2025年，57.2%的消费者更偏爱性价比更高的替代商品，"90后""00后"尤为明显。\n\n"曾经的'面子消费'转向'里子经济'，年轻人不再为品牌溢价买单。"\n\n但你也在思考：消费降级是真的穷了，还是消费观念升级了？',
+      cond: g => !g.flags.consumptionDowngrade && g.age>=20 && g.age<=35,
+      choices:[
+        { label:'全面降级', hint:'+💰 +🧠', fn: g => { g.flags.consumptionDowngrade=true; g.flags.frugal=true; return{money:5000,intel:8,mood:-5}; }},
+        { label:'只买平替', hint:'+💰 +😊', fn: g => { g.flags.consumptionDowngrade=true; g.flags.pingti=true; return{money:3000,mood:8}; }},
+        { label:'极简生活', hint:'+💰 +🧠 +😊', fn: g => { g.flags.consumptionDowngrade=true; g.flags.minimalist=true; return{money:8000,intel:10,mood:12}; }},
+        { label:'该花还花', hint:'-💰 +😊', fn: g => { g.flags.consumptionDowngrade=true; return{money:-2000,mood:10}; }},
+      ]},
+    { id:'pingti_culture', icon:'🔄', title:'平替文化',
+      body:'你发现了一个"平替"好物：某国货护肤品，成分和大牌一样，价格只有1/5。\n\n你发了条小红书："大牌平替，真香！"\n\n"平替文化——不是买不起大牌，而是不想交智商税。"\n\n2025年，奢侈品市场放缓，近半数消费者认为品牌价格虚高。\n\n"质价比"取代"品牌迷信"，"价值导向"消费模式成为主流。\n\n年轻人认同的"奢侈"不再等于大件消费，而是能提供"幸福感"的自我犒赏。\n\n"真正的奢侈不是标价后面的零的个数，而是让足够多的人享有超越期待的美学体验。"\n\n但你也看到了问题：平替质量参差不齐、知识产权争议、"高质仿款"的法律灰色地带。',
+      cond: g => !g.flags.pingtiCulture && g.age>=18 && g.age<=35 && g.flags.consumptionDowngrade,
+      choices:[
+        { label:'做平替测评博主', hint:'+💰 +✨ +🧠', fn: g => { g.flags.pingtiCulture=true; g.flags.reviewBlogger=true; if(Math.random()>0.5){return{money:5000,charm:15,intel:8}}else{return{money:1000,charm:8,intel:5}} }},
+        { label:'只买国货', hint:'+💰 +😊', fn: g => { g.flags.pingtiCulture=true; g.flags.domesticBrand=true; return{money:2000,mood:10}; }},
+        { label:'二手奢侈品', hint:'+✨ +😊', fn: g => { g.flags.pingtiCulture=true; g.flags.secondHand=true; return{money:-3000,charm:12,mood:8}; }},
+        { label:'还是买大牌', hint:'-💰 +✨', fn: g => { g.flags.pingtiCulture=true; return{money:-8000,charm:8,mood:5}; }},
+      ]},
 ];
 
 // === ACHIEVEMENTS ===
@@ -3567,6 +3595,12 @@ const ACHIEVEMENTS = [
     { id:'freelancer', icon:'🎨', name:'自由职业者', desc:'远程工作或自由接单', check: g => g.flags.freelancer },
     { id:'civil_service_veteran', icon:'📋', name:'考公老手', desc:'参加公务员考试', check: g => g.flags.civilServiceExam },
     { id:'persistent_examinee', icon:'🔄', name:'二战三战', desc:'多次参加考公', check: g => g.flags.secondCareer },
+    // v6.6 achievements
+    { id:'slash_youth', icon:'💼', name:'斜杠青年', desc:'开展副业', check: g => g.flags.sideHustle },
+    { id:'street_vendor', icon:'🛒', name:'摆摊达人', desc:'摆摊创业', check: g => g.flags.streetVendor },
+    { id:'frugal_master', icon:'📉', name:'消费降级大师', desc:'实践消费降级', check: g => g.flags.consumptionDowngrade },
+    { id:'minimalist', icon:'🎯', name:'极简主义者', desc:'选择极简生活', check: g => g.flags.minimalist },
+    { id:'pingti_expert', icon:'🔄', name:'平替专家', desc:'拥抱平替文化', check: g => g.flags.pingtiCulture },
 ];
 
 // === ENDINGS === (order matters: first match wins)
