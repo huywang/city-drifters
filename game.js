@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v33.6
+// 都市浮生记 - Game Engine v33.7
 // ============================================
 
 // === GAME STATE ===
@@ -18976,6 +18976,97 @@ const EVENTS = [
         { label:'觉得做没用的事才是最有用的', hint:'+🧠 +😊', fn: g => { g.flags.sutraCopying=true; return{intel:5,mood:5}; }},
       ]},
 
+    // === v33.7 City Walk与城市漫游 ===
+    { id:'city_walk_v33_7', icon:'🚶', title:'City Walk初体验', category:'citywalk',
+      body:'你第一次知道了「City Walk」这个概念。\n\n不是逛街，不是散步，是——没有目的地地在城市里走。\n\n你选了一个周末，从你住的地方出发，随便拐进了一条你从来没走过的巷子。你发现了一家开了二十年的裁缝店、一面长满青苔的老墙、一个在门口下棋的老爷爷。\n\n你拍了很多照片。你觉得你住了三年的城市，你其实根本不了解它。\n\n你走了一下午，走了15000步。你觉得这比去任何景点都值。因为景点是给别人看的，而巷子里的生活是真实的。\n\n你在小红书上发了一个「City Walk路线」的帖子，收到了200个赞。',
+      cond: g => g.age >= 20 && g.months >= 6,
+      choices:[
+        { label:'走了一个下午，拍了很多照片', hint:'+😊 +✨', fn: g => { g.flags.cityWalk=true; return{mood:10,charm:5}; }},
+        { label:'发了City Walk路线攻略', hint:'+✨ +👥', fn: g => { g.flags.cityWalk=true; g.flags.walkBlogger=true; return{charm:8,social:5}; }},
+        { label:'决定每周都来一次城市漫游', hint:'+💪 +😊', fn: g => { g.flags.cityWalk=true; g.flags.weeklyWalk=true; return{health:5,mood:8}; }},
+      ]},
+
+    { id:'park_20min_v33_7', icon:'🌳', title:'公园20分钟效应', category:'citywalk',
+      body:'你看到一篇文章说：「在公园待20分钟，就能显著降低压力激素。」\n\n你半信半疑。午饭时间你去了公司附近的公园，坐在长椅上，什么都不做。\n\n你看着树叶被风吹动，看着老人打太极，看着小孩追鸽子。你发现自己很久没有这样「什么都不做」了。\n\n20分钟后你站起来，觉得脑子确实清爽了一点。不是那种「我变开心了」的感觉，而是「我喘过气了」的感觉。\n\n你开始每天午饭后去公园坐20分钟。你的同事问你「去哪了」，你说：「去充电了。」',
+      cond: g => g.age >= 22 && g.jobSalary > 0,
+      choices:[
+        { label:'养成了每天去公园的习惯', hint:'+💪 +😊', fn: g => { g.flags.park20min=true; return{health:5,mood:8}; }},
+        { label:'在公园里写了一会儿日记', hint:'+🧠 +✨', fn: g => { g.flags.park20min=true; return{intel:5,charm:3}; }},
+        { label:'觉得这个理论确实有道理', hint:'+🧠 +😊', fn: g => { g.flags.park20min=true; return{intel:3,mood:5}; }},
+      ]},
+
+    { id:'indie_cafe_v33_7', icon:'☕', title:'独立咖啡馆', category:'citywalk',
+      body:'你在一条小巷子里发现了一家独立咖啡馆。\n\n店面很小，只有六张桌子。老板是个留着络腮胡的中年人，以前在广告公司干了十年，辞职开了这家店。\n\n你点了一杯手冲。老板跟你聊起了咖啡豆的产地、烘焙度、冲泡方式。你觉得他聊咖啡的时候眼睛在发光。\n\n你喝了一口，确实跟连锁咖啡店不一样。你说不上来哪里好，但就是觉得——这杯咖啡有「人味」。\n\n你问老板：「开咖啡馆赚钱吗？」他笑了笑：「饿不死，但自由。」\n\n你觉得「饿不死但自由」可能是你这辈子听过最理想的生活方式。',
+      cond: g => g.age >= 22 && g.intel > 30,
+      choices:[
+        { label:'成了这家店的常客', hint:'+😊 +👥', fn: g => { g.flags.indieCafe=true; return{mood:8,social:5}; }},
+        { label:'跟老板聊了很多人生', hint:'+🧠 +😊', fn: g => { g.flags.indieCafe=true; return{intel:8,mood:5}; }},
+        { label:'认真考虑了开一家小店的可能', hint:'+🧠', fn: g => { g.flags.indieCafe=true; g.flags.considerShop=true; return{intel:8}; }},
+      ]},
+
+    { id:'street_photo_v33_7', icon:'📷', title:'街头摄影', category:'citywalk',
+      body:'你买了一个二手的胶片相机，开始在街头拍照。\n\n你拍了一个在路边摊吃面的大叔、一个在公交站等车的女生、一个在墙上贴小广告的工人、一只在屋顶上晒太阳的猫。\n\n你觉得通过镜头看这个城市，跟用眼睛看不一样。你会注意到光影、构图、故事。每一个普通的瞬间都变得有意义了。\n\n你把照片冲洗出来，贴了一面墙。你朋友说：「你拍的照片比你自己好看多了。」\n\n你觉得街头摄影教会了你一件事：美不在远方，就在你家楼下。你只是以前走得太快，没有看见。',
+      cond: g => g.age >= 20 && g.intel > 35 && g.money > 2000,
+      choices:[
+        { label:'拍了很多有故事的照片', hint:'+✨ +🧠', fn: g => { g.flags.streetPhoto=true; return{charm:10,intel:5}; }},
+        { label:'在社交媒体上分享了自己的作品', hint:'+✨ +👥', fn: g => { g.flags.streetPhoto=true; return{charm:8,social:5}; }},
+        { label:'学会了用不同的眼光看世界', hint:'+🧠 +😊', fn: g => { g.flags.streetPhoto=true; return{intel:8,mood:5}; }},
+      ]},
+
+    { id:'hutong_walk_v33_7', icon:'🏘️', title:'胡同漫步', category:'citywalk',
+      body:'你在北京的胡同里走了一下午。\n\n你路过了一家门面很小的卤煮店，门口排队的全是大爷。你跟着排了，吃到了你来北京后最好吃的一碗卤煮。\n\n你路过了一家理发店，里面的理发师已经在这里剪了三十年的头发。墙上挂着从80年代到现在的照片，记录了这条胡同的变化。\n\n你看到一个老太太坐在门口择菜，你跟她聊了几句。她说：「这条胡同要拆了，住了四十年了。」\n\n你拍了一张她坐在门口的照片。你觉得你在记录一个即将消失的世界。',
+      cond: g => g.age >= 20 && g.city === 'beijing',
+      choices:[
+        { label:'吃了最正宗的卤煮', hint:'+😊 +💪', fn: g => { g.flags.hutongWalk=true; return{mood:8,health:2}; }},
+        { label:'听老人讲了胡同的故事', hint:'+🧠 +👥', fn: g => { g.flags.hutongWalk=true; return{intel:8,social:3}; }},
+        { label:'记录了即将消失的胡同', hint:'+✨ +🧠', fn: g => { g.flags.hutongWalk=true; return{charm:8,intel:5}; }},
+      ]},
+
+    { id:'wet_market_v33_7', icon:'🥬', title:'菜市场烟火气', category:'citywalk',
+      body:'你第一次去了附近小区的菜市场。\n\n以前你都是在外卖平台买菜，但你今天想「体验一下生活」。\n\n你被菜市场的热闹震住了——卖鱼的在吆喝，卖菜的大姐在跟你砍价，一个阿姨在教你怎么挑西瓜。\n\n你花30块买了一堆菜——比外卖平台便宜了一半，还新鲜。\n\n你回家做了一顿饭。你觉得用菜市场买的菜做的饭，比用外卖平台的菜做的好吃。也许是因为新鲜，也许是因为你花了时间在挑选上。\n\n你觉得菜市场是这个城市最有烟火气的地方。它让你想起了小时候跟妈妈去买菜的记忆。',
+      cond: g => g.age >= 22 && !g.flags.cookingSkill,
+      choices:[
+        { label:'买了新鲜食材回家做饭', hint:'+💪 +😊', fn: g => { g.flags.wetMarket=true; g.flags.cookingSkill=true; return{health:8,mood:5}; }},
+        { label:'跟卖菜大姐成了熟人', hint:'+👥 +😊', fn: g => { g.flags.wetMarket=true; return{social:5,mood:5}; }},
+        { label:'觉得菜市场的烟火气治愈了你', hint:'+😊 +🧠', fn: g => { g.flags.wetMarket=true; return{mood:8,intel:3}; }},
+      ]},
+
+    { id:'city_cycling_v33_7', icon:'🚲', title:'城市骑行', category:'citywalk',
+      body:'你买了一辆二手自行车，开始在城里骑行。\n\n你发现骑行的速度刚好——比走路快，比开车慢。你可以看到很多开车看不到的东西，又不会像走路那么累。\n\n你沿着河边骑了十公里，经过了三个公园、两个桥、一个废弃的工厂。你拍了一张夕阳下的河面，发了一条朋友圈。\n\n你的同事看到后说：「没想到我们城市还有这种地方。」你说：「其实就在公司两公里外，你只是没去过。」\n\n你觉得城市骑行改变了你跟这个城市的关系——从一个通勤者变成了一个探索者。',
+      cond: g => g.age >= 20 && g.health > 30,
+      choices:[
+        { label:'沿河骑了十公里', hint:'+💪 +😊', fn: g => { g.flags.cityCycling=true; return{health:10,mood:8}; }},
+        { label:'开始每周骑行通勤', hint:'+💪 -💰', fn: g => { g.flags.cityCycling=true; g.flags.bikeCommute=true; return{health:8,money:200}; }},
+        { label:'发现了城市的另一面', hint:'+🧠 +✨', fn: g => { g.flags.cityCycling=true; return{intel:5,charm:5}; }},
+      ]},
+
+    { id:'night_stroll_v33_7', icon:'🌙', title:'深夜散步', category:'citywalk',
+      body:'你失眠了，凌晨两点出门散步。\n\n凌晨的城市跟白天完全不同。街灯把一切染成暖黄色，偶尔有车经过，远处有狗在叫。\n\n你路过了一家24小时营业的面馆，进去吃了一碗面。店里只有你和一个出租车司机。他吃完了，跟你点了点头，走了。\n\n你继续走。你经过了你白天从来不注意到的小路——一条两边都是法国梧桐的小道，树叶在路灯下闪闪发光。\n\n你突然觉得这个城市在凌晨的时候才是真实的。没有游客，没有商业，只有路灯和你。\n\n你觉得失眠也不完全是坏事——至少你看到了大多数人看不到的城市。',
+      cond: g => g.age >= 20 && g.months >= 3,
+      choices:[
+        { label:'在凌晨的街头吃了一碗面', hint:'+😊 +💪', fn: g => { g.flags.nightStroll=true; return{mood:5,health:2}; }},
+        { label:'发现了白天看不到的风景', hint:'+✨ +🧠', fn: g => { g.flags.nightStroll=true; return{charm:8,intel:5}; }},
+        { label:'觉得凌晨的城市最真实', hint:'+🧠 +😊', fn: g => { g.flags.nightStroll=true; return{intel:8,mood:3}; }},
+      ]},
+
+    { id:'old_bookstore_v33_7', icon:'📚', title:'旧书店寻宝', category:'citywalk',
+      body:'你在一条老街里发现了一家旧书店。\n\n店里堆满了书，从地板到天花板。空气里有灰尘和旧纸的味道。老板坐在角落里看报纸，不招呼你。\n\n你翻了两个小时，找到了几本绝版的书：一本80年代的诗集、一本旧版的城市地图册、一本某个人在扉页写了赠言的小说。\n\n你花了50块买了五本书。你觉得这是你这辈子花得最值的50块。\n\n你看着那本诗集扉页上的赠言：「送给小兰，愿你永远有诗和远方。1987年春。」\n\n你不知道小兰是谁，但你希望她过得很好。',
+      cond: g => g.age >= 20 && g.intel > 40,
+      choices:[
+        { label:'淘到了好几本绝版书', hint:'-💰 +🧠', fn: g => { g.flags.oldBookstore=true; g.money-=50; return{intel:10}; }},
+        { label:'对旧书上的赠言故事着了迷', hint:'+🧠 +✨', fn: g => { g.flags.oldBookstore=true; return{intel:8,charm:5}; }},
+        { label:'成了这家书店的常客', hint:'+🧠 +😊', fn: g => { g.flags.oldBookstore=true; g.flags.bookstoreRegular=true; return{intel:5,mood:5}; }},
+      ]},
+
+    { id:'urban_diary_v33_7', icon:'📝', title:'城市观察日记', category:'citywalk',
+      body:'你开始写「城市观察日记」。\n\n每天记录一个你在城市里看到的小细节：今天路边的玉兰花开了、早餐摊的大叔换了一件新围裙、楼下新开了一家花店、地铁上有个小孩在背古诗。\n\n你写了一个月，发现你对这个城市的感觉变了。以前你觉得它只是你工作的地方，现在你觉得它是一个活着的、有呼吸的地方。\n\n你把日记整理成了一个小册子，打印了十份送给朋友。他们说：「你让我重新认识了这个城市。」\n\n你觉得城市漫游最大的收获不是看到了什么新东西，而是学会了「看见」——看见那些你以前走得太快而忽略的日常。',
+      cond: g => g.age >= 22 && g.intel > 45 && g.flags.cityWalk,
+      choices:[
+        { label:'坚持写了一个月的观察日记', hint:'+✨ +🧠', fn: g => { g.flags.urbanDiary=true; return{charm:10,intel:8}; }},
+        { label:'把日记送给了朋友们', hint:'+👥 +✨', fn: g => { g.flags.urbanDiary=true; return{social:8,charm:5}; }},
+        { label:'学会了看见日常的魔法', hint:'+🧠 +😊', fn: g => { g.flags.urbanDiary=true; return{intel:10,mood:8}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -20809,6 +20900,18 @@ const ACHIEVEMENTS = [
     { id:'emotional_value_ach', icon:'💎', name:'情绪价值', desc:'理解了什么是真正的情绪价值', check: g => g.flags.emotionalValue },
     { id:'pet_cafe_ach', icon:'🐱', name:'云养猫', desc:'去猫咖撸了两个小时猫', check: g => g.flags.petCafe },
     { id:'sutra_copying_ach', icon:'✍️', name:'抄经静心', desc:'通过抄经找到了内心的平静', check: g => g.flags.sutraCopying },
+
+    // --- v33.7 City Walk与城市漫游成就 ---
+    { id:'city_walk_ach', icon:'🚶', name:'城市漫步者', desc:'完成了一次City Walk', check: g => g.flags.cityWalk },
+    { id:'park_20min_ach', icon:'🌳', name:'公园充电', desc:'体验了公园20分钟效应', check: g => g.flags.park20min },
+    { id:'indie_cafe_ach', icon:'☕', name:'独立咖啡', desc:'发现了一家有人味的小咖啡馆', check: g => g.flags.indieCafe },
+    { id:'street_photo_ach', icon:'📷', name:'街头摄影师', desc:'开始用镜头记录城市', check: g => g.flags.streetPhoto },
+    { id:'hutong_walk_ach', icon:'🏘️', name:'胡同故事', desc:'在北京的胡同里听到了老故事', check: g => g.flags.hutongWalk },
+    { id:'wet_market_ach', icon:'🥬', name:'烟火气', desc:'在菜市场感受到了最真实的生活', check: g => g.flags.wetMarket },
+    { id:'city_cycling_ach', icon:'🚲', name:'城市骑行者', desc:'骑着自行车探索了城市', check: g => g.flags.cityCycling },
+    { id:'night_stroll_ach', icon:'🌙', name:'凌晨漫步', desc:'看到了凌晨两点最真实的城市', check: g => g.flags.nightStroll },
+    { id:'old_bookstore_ach', icon:'📚', name:'旧书寻宝', desc:'在旧书店淘到了有故事的书', check: g => g.flags.oldBookstore },
+    { id:'urban_diary_ach', icon:'📝', name:'城市观察者', desc:'开始记录城市的日常细节', check: g => g.flags.urbanDiary },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -23551,27 +23654,35 @@ function deleteSave(slot) {
 // === MOBILE SWIPE NAVIGATION ===
 function initMobileSwipe() {
     let touchStartX = 0;
+    let touchStartY = 0;
     let touchEndX = 0;
+    let touchEndY = 0;
 
     const gameScreen = document.getElementById('screen-game');
     if (!gameScreen) return;
 
     gameScreen.addEventListener('touchstart', (e) => {
         touchStartX = e.changedTouches[0].screenX;
+        touchStartY = e.changedTouches[0].screenY;
     }, { passive: true });
 
     gameScreen.addEventListener('touchend', (e) => {
         touchEndX = e.changedTouches[0].screenX;
+        touchEndY = e.changedTouches[0].screenY;
         handleSwipe();
     }, { passive: true });
 
     function handleSwipe() {
-        const swipeThreshold = 50;
-        const diff = touchStartX - touchEndX;
+        const swipeThreshold = 60;
+        const verticalThreshold = 40;
+        const diffX = touchStartX - touchEndX;
+        const diffY = Math.abs(touchStartY - touchEndY);
 
-        if (Math.abs(diff) < swipeThreshold) return;
+        // Ignore if vertical movement is dominant (scrolling)
+        if (diffY > verticalThreshold && diffY > Math.abs(diffX)) return;
+        if (Math.abs(diffX) < swipeThreshold) return;
 
-        if (diff > 0) {
+        if (diffX > 0) {
             // Swipe left - next month
             if (!document.getElementById('btn-advance').disabled) {
                 advanceMonth();

@@ -1,6 +1,7 @@
 /* ============================================
-   都市浮生记 - Style System v2.29
+   都市浮生记 - Style System v2.30
    Dark theme with neon accents + Accessibility
+   + Full Mobile Optimization
    ============================================ */
 
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -1433,3 +1434,323 @@ html[style*="font-size: 18px"] .modal-content {
         grid-template-columns: 1fr;
     }
 }
+
+/* ============================================
+   v33.7 - Full Mobile Optimization
+   ============================================ */
+
+/* iPhone safe area support */
+@supports (padding: env(safe-area-inset-bottom)) {
+    .game-header {
+        padding-top: calc(12px + env(safe-area-inset-top));
+        padding-left: calc(14px + env(safe-area-inset-left));
+        padding-right: calc(14px + env(safe-area-inset-right));
+    }
+    .action-bar {
+        padding-bottom: calc(14px + env(safe-area-inset-bottom));
+    }
+    .event-log {
+        padding-bottom: calc(16px + env(safe-area-inset-bottom));
+    }
+    .modal-content {
+        padding-bottom: calc(20px + env(safe-area-inset-bottom));
+    }
+    .ending-container {
+        padding-bottom: calc(30px + env(safe-area-inset-bottom));
+    }
+}
+
+/* === Mobile: 768px and below (tablet + phone) === */
+@media (max-width: 768px) {
+
+    /* Allow scrolling on mobile */
+    body { overflow-y: auto; overflow-x: hidden; }
+    .screen { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+
+    /* Title screen mobile */
+    .title-container { padding: 30px 16px; }
+    .title-main { font-size: clamp(2rem, 10vw, 3.5rem) !important; letter-spacing: 2px !important; }
+    .title-sub { font-size: 0.9rem; letter-spacing: 4px !important; }
+    .title-slogan { font-size: 0.85rem; margin-bottom: 28px !important; padding: 0 10px; }
+    .title-buttons { max-width: 100% !important; gap: 10px !important; }
+    .title-buttons .btn { padding: 14px 20px !important; font-size: 0.95rem !important; }
+    .city-silhouette { height: 80px !important; margin-bottom: 20px !important; }
+    .title-footer { margin-top: 30px !important; font-size: 0.75rem !important; }
+
+    /* Panel mobile */
+    .panel { padding: 20px 14px !important; border-radius: 16px !important; width: calc(100% - 20px) !important; max-height: 95vh; }
+
+    /* Create screen mobile */
+    .create-panel { max-width: 100% !important; }
+    .bg-card { padding: 16px !important; }
+    .bg-icon { font-size: 2rem !important; margin-bottom: 8px !important; }
+    .bg-card h3 { font-size: 1rem !important; }
+    .bg-desc { font-size: 0.82rem !important; }
+    .city-card { padding: 14px !important; }
+    .input-name { width: 100% !important; max-width: 280px !important; font-size: 1.1rem !important; padding: 14px 18px !important; }
+    .name-suggestions { gap: 6px !important; }
+    .name-suggestions span { padding: 6px 12px !important; font-size: 0.8rem !important; }
+
+    /* Game header compact */
+    .game-header { padding: 8px 12px !important; }
+    .player-name { font-size: 0.95rem !important; }
+    .player-age { font-size: 0.82rem !important; }
+    .player-city { font-size: 0.72rem !important; padding: 1px 8px !important; }
+    .player-job { font-size: 0.78rem !important; }
+    .header-date { font-size: 0.82rem !important; }
+
+    /* Stats bar compact - 3 per row on phone */
+    .stats-bar { padding: 6px 10px !important; gap: 3px 6px !important; }
+    .stat-item { min-width: 0 !important; flex: 1 1 calc(33.33% - 6px) !important; }
+    .stat-icon { font-size: 0.75rem !important; }
+    .stat-bar { height: 5px !important; }
+    .stat-val { font-size: 0.65rem !important; min-width: 24px !important; }
+
+    /* Relationships panel mobile */
+    .relationships-panel { margin: 0 10px 8px !important; border-radius: 10px !important; }
+    .relationships-header { padding: 8px 12px !important; font-size: 0.85rem !important; }
+    .relationships-content { padding: 6px 10px 10px !important; grid-template-columns: 1fr !important; gap: 6px !important; }
+    .rel-label { font-size: 0.7rem !important; }
+
+    /* Event log mobile */
+    .event-log { padding: 10px 12px !important; gap: 10px !important; }
+    .event-card { padding: 12px 14px !important; border-radius: 10px !important; }
+    .event-card-icon { font-size: 1rem !important; }
+    .event-card-title { font-size: 0.88rem !important; }
+    .event-card-body { font-size: 0.85rem !important; line-height: 1.65 !important; }
+    .event-card-date { font-size: 0.7rem !important; }
+    .event-card-result { font-size: 0.8rem !important; }
+    .stat-change-item { font-size: 0.72rem !important; padding: 1px 6px !important; }
+
+    /* Current event (active event card) */
+    .current-event { padding: 0 12px !important; }
+    .current-event .event-card { padding: 14px 16px !important; }
+    .current-event .event-card-body { font-size: 0.88rem !important; line-height: 1.7 !important; }
+
+    /* Choice buttons - bigger touch targets */
+    .choice-btn { padding: 14px 16px !important; min-height: 48px !important; font-size: 0.88rem !important; border-radius: 10px !important; }
+    .choice-label { font-size: 0.88rem !important; }
+    .choice-hint { font-size: 0.75rem !important; }
+
+    /* Activity grid mobile - 3 columns + 2 below */
+    .monthly-activity { margin: 0 10px 10px !important; padding: 12px !important; border-radius: 12px !important; }
+    .activity-label { font-size: 0.85rem !important; margin-bottom: 8px !important; }
+    .activity-grid { gap: 6px !important; }
+    .activity-btn { min-height: 64px !important; padding: 8px 4px !important; border-radius: 10px !important; }
+    .activity-btn .act-icon { font-size: 1.3rem !important; }
+    .activity-btn .act-text { font-size: 0.75rem !important; }
+    .activity-btn .act-hint { font-size: 0.6rem !important; }
+
+    /* Action bar - stack into 2 rows on small screens */
+    .action-bar { flex-wrap: wrap !important; padding: 10px 12px !important; gap: 8px !important; }
+    .btn-action { padding: 12px 8px !important; font-size: 0.85rem !important; min-height: 48px !important; border-radius: 10px !important; flex: 1 1 calc(50% - 4px) !important; }
+    .btn-action .action-icon { font-size: 1.1rem !important; }
+    .btn-action .action-text { font-size: 0.85rem !important; }
+
+    /* Side menu mobile */
+    .menu-panel { width: 280px !important; max-width: 80% !important; padding: 24px 18px !important; }
+    .menu-panel h3 { font-size: 1.2rem !important; }
+    .menu-item { padding: 14px 14px !important; font-size: 0.9rem !important; min-height: 48px !important; }
+
+    /* Modal mobile */
+    .modal-content { padding: 20px 16px !important; border-radius: 16px !important; width: calc(100% - 24px) !important; max-height: 85vh !important; }
+    .modal-content h2 { font-size: 1.2rem !important; margin-bottom: 14px !important; }
+    .achievement-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important; gap: 8px !important; }
+    .achievement-item { padding: 12px !important; }
+    .achievement-icon { font-size: 1.6rem !important; }
+    .achievement-name { font-size: 0.82rem !important; }
+    .achievement-desc { font-size: 0.7rem !important; }
+
+    /* Ending screen mobile */
+    .ending-container { padding: 24px 16px !important; max-width: 100% !important; }
+    .ending-badge { font-size: 3rem !important; margin-bottom: 12px !important; }
+    .ending-title { font-size: 1.6rem !important; }
+    .ending-desc { font-size: 0.9rem !important; margin-bottom: 20px !important; line-height: 1.7 !important; }
+    .ending-summary { padding: 16px !important; border-radius: 12px !important; }
+    .summary-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
+    .summary-value { font-size: 1.2rem !important; }
+    .summary-label { font-size: 0.72rem !important; }
+    .ending-timeline { padding: 16px !important; border-radius: 12px !important; }
+    .ending-buttons { gap: 10px !important; }
+    .ending-buttons .btn { padding: 14px 24px !important; font-size: 0.9rem !important; width: 100% !important; justify-content: center !important; }
+
+    /* Settings mobile */
+    .settings-group { margin-bottom: 18px !important; }
+    .settings-options { gap: 8px !important; }
+    .settings-btn { padding: 10px 16px !important; font-size: 0.85rem !important; min-height: 44px !important; }
+    .settings-toggle { padding: 10px 14px !important; font-size: 0.85rem !important; }
+
+    /* Save slots mobile */
+    .save-slots { gap: 12px !important; }
+    .save-slot { padding: 14px 16px !important; }
+    .slot-info { grid-template-columns: 1fr !important; gap: 4px !important; }
+    .slot-actions { gap: 6px !important; }
+    .btn-small { padding: 8px 12px !important; font-size: 0.78rem !important; min-height: 36px !important; }
+
+    /* Gallery mobile */
+    .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)) !important; gap: 8px !important; }
+    .gallery-badge { font-size: 1.5rem !important; }
+    .gallery-title { font-size: 0.75rem !important; }
+
+    /* Trade system mobile */
+    .trade-grid { grid-template-columns: 1fr !important; }
+    .trade-item { padding: 12px !important; }
+    .btn-buy, .btn-sell { padding: 8px 10px !important; font-size: 0.78rem !important; min-height: 36px !important; }
+
+    /* Daily challenge mobile */
+    .daily-challenge-bar { margin: 0 10px 8px !important; font-size: 0.8rem !important; padding: 6px 12px !important; }
+
+    /* Notification mobile */
+    .notification { top: 12px !important; right: 12px !important; left: 12px !important; }
+    .notification-content { padding: 12px 16px !important; font-size: 0.85rem !important; width: 100% !important; }
+
+    /* About screen mobile */
+    .about-content { font-size: 0.88rem !important; line-height: 1.7 !important; }
+    .about-content h3 { font-size: 1rem !important; }
+
+    /* Difficulty selector mobile */
+    .diff-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .diff-card { padding: 10px 6px !important; }
+    .diff-emoji { font-size: 1.2rem !important; }
+    .diff-name { font-size: 0.82rem !important; }
+    .diff-info { font-size: 0.68rem !important; }
+
+    /* Legacy stats mobile */
+    .legacy-stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
+/* === Mobile: 480px and below (small phones) === */
+@media (max-width: 480px) {
+
+    /* Even more compact stats - 2 per row */
+    .stats-bar { padding: 5px 8px !important; }
+    .stat-item { flex: 1 1 calc(50% - 4px) !important; }
+    .stat-icon { font-size: 0.7rem !important; }
+    .stat-val { font-size: 0.6rem !important; min-width: 20px !important; }
+
+    /* Title small phones */
+    .title-main { font-size: clamp(1.8rem, 12vw, 2.5rem) !important; }
+    .title-sub { font-size: 0.8rem !important; letter-spacing: 3px !important; }
+    .title-slogan { font-size: 0.78rem !important; }
+
+    /* Game header extra compact */
+    .player-name { font-size: 0.88rem !important; }
+    .player-info { gap: 6px !important; }
+    .header-right { gap: 8px !important; }
+    .header-date { font-size: 0.75rem !important; }
+
+    /* Event cards small phones */
+    .event-card-body { font-size: 0.82rem !important; }
+    .choice-btn { padding: 12px 14px !important; font-size: 0.82rem !important; }
+
+    /* Action bar full width buttons */
+    .btn-action { flex: 1 1 100% !important; }
+    .btn-action .action-text { font-size: 0.82rem !important; }
+
+    /* Activity buttons - show as 3+2 layout */
+    .activity-grid { grid-template-columns: repeat(3, 1fr) !important; }
+    .activity-btn { min-height: 58px !important; }
+    .activity-btn .act-text { font-size: 0.7rem !important; }
+    .activity-btn .act-icon { font-size: 1.1rem !important; }
+
+    /* Ending small phones */
+    .ending-title { font-size: 1.4rem !important; }
+    .ending-badge { font-size: 2.5rem !important; }
+    .summary-grid { grid-template-columns: 1fr 1fr !important; }
+
+    /* Create screen small phones */
+    .bg-card { padding: 14px !important; }
+    .bg-desc { font-size: 0.78rem !important; }
+    .input-name { font-size: 1rem !important; max-width: 240px !important; }
+
+    /* Modal small phones */
+    .modal-content { padding: 16px 12px !important; }
+    .modal-content h2 { font-size: 1.1rem !important; }
+
+    /* City switch small phones */
+    .city-switch-grid { grid-template-columns: 1fr !important; }
+
+    /* Stat changes small */
+    .stat-changes { gap: 4px !important; }
+    .stat-change-item { font-size: 0.68rem !important; }
+}
+
+/* === Mobile: 375px and below (iPhone SE, small devices) === */
+@media (max-width: 375px) {
+    .title-main { font-size: 1.8rem !important; }
+    .title-buttons .btn { padding: 12px 16px !important; font-size: 0.88rem !important; }
+    .stats-bar { padding: 4px 6px !important; }
+    .event-card { padding: 10px 12px !important; }
+    .choice-btn { padding: 10px 12px !important; min-height: 44px !important; }
+    .activity-btn { min-height: 52px !important; padding: 6px 2px !important; }
+    .activity-btn .act-text { font-size: 0.65rem !important; }
+    .activity-btn .act-icon { font-size: 1rem !important; }
+    .btn-action { padding: 10px 6px !important; font-size: 0.8rem !important; }
+}
+
+/* === Touch-specific improvements (all touch devices) === */
+@media (hover: none) and (pointer: coarse) {
+    /* Remove hover effects that don't work on touch */
+    .btn:hover { transform: none !important; }
+    .btn-primary:hover { box-shadow: var(--shadow-md), 0 0 20px rgba(59,130,246,0.2) !important; }
+    .bg-card:hover { transform: none !important; }
+    .city-card:hover { transform: none !important; }
+    .activity-btn:hover { transform: none !important; }
+    .choice-btn:hover { transform: none !important; box-shadow: none !important; }
+    .btn-action:hover { transform: none !important; }
+    .gallery-item:hover { transform: none !important; }
+    .city-switch-card:hover { transform: none !important; }
+
+    /* Better active states for touch */
+    .btn:active { transform: scale(0.97) !important; transition: transform 0.1s !important; }
+    .choice-btn:active { transform: scale(0.97) !important; background: rgba(59,130,246,0.15) !important; }
+    .activity-btn:active { transform: scale(0.95) !important; }
+    .btn-action:active { transform: scale(0.97) !important; }
+    .bg-card:active { transform: scale(0.98) !important; }
+    .city-card:active { transform: scale(0.98) !important; }
+
+    /* Larger touch targets */
+    button { min-height: 44px; min-width: 44px; }
+    .choice-btn { min-height: 52px; }
+    .activity-btn { min-height: 68px; }
+    .btn-action { min-height: 50px; }
+    .settings-btn { min-height: 46px; }
+    .menu-item { min-height: 50px; }
+    .name-suggestions span { min-height: 36px; display: inline-flex; align-items: center; }
+}
+
+/* === Landscape orientation on phones === */
+@media (max-height: 500px) and (orientation: landscape) {
+    .game-header { padding: 4px 12px !important; }
+    .stats-bar { padding: 4px 10px !important; }
+    .stat-item { flex: 1 1 calc(16.66% - 4px) !important; }
+    .event-log { padding: 6px 12px !important; }
+    .action-bar { padding: 6px 12px !important; }
+    .btn-action { padding: 8px !important; min-height: 40px !important; }
+    .title-container { padding: 16px !important; }
+    .city-silhouette { display: none !important; }
+    .title-slogan { margin-bottom: 16px !important; }
+    .title-footer { margin-top: 16px !important; }
+    .ending-badge { font-size: 2rem !important; }
+    .ending-title { font-size: 1.4rem !important; }
+}
+
+/* === PWA / Standalone mode === */
+@media (display-mode: standalone) {
+    body { padding-top: env(safe-area-inset-top); }
+}
+
+/* === Prevent text selection on game elements === */
+.activity-btn, .btn-action, .choice-btn, .bg-card, .city-card, .diff-card, .menu-item, .gallery-item {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* === Smooth scrolling for iOS === */
+.event-log, .ending-container, .modal-content, .panel {
+    -webkit-overflow-scrolling: touch;
+}
+
+/* === Prevent zoom on double-tap for iOS === */
+html { touch-action: manipulation; }
