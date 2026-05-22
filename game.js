@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v15.3
+// 都市浮生记 - Game Engine v16.0
 // ============================================
 
 // === GAME STATE ===
@@ -7935,6 +7935,95 @@ const EVENTS = [
         { label:'帮老板宣传', hint:'+👥 +✨', fn: g => { g.flags.localBrandDiscovery=true; g.flags.localPromoter=true; return{social:10,charm:8}; }},
         { label:'下次再来', hint:'+😊', fn: g => { g.flags.localBrandDiscovery=true; return{mood:8}; }},
       ]},
+    // === v16.0 住房问题 + 城市生活 ===
+    { id:'rental_nightmare', icon:'🏚️', title:'租房噩梦',
+      body:'你的房东突然通知你：下个月涨租500。\n\n你看了看这个20平米的隔断间：没有窗户、共用厕所、隔音约等于零。你觉得它不值3500，更不值4000。\n\n你开始找房。链家、自如、蛋壳（已暴雷）、小区门口的牛皮癣广告。你看了10套房子：8套是假的、1套太贵、1套已经租出去了。\n\n你最终找到了一个稍微好一点的：3500，有窗户，独立厕所。但离公司远了40分钟。\n\n你搬了家。你的东西只有两个行李箱。你觉得——在大城市，你的全部家当就是两个箱子和一颗还在跳的心。\n\n"租房：不是你在选房子——是房子和房东在选你。"',
+      cond: g => g.age >= 20 && !g.flags.hasHouse && !g.flags.rentalNightmare,
+      choices:[
+        { label:'学会和房东谈判', hint:'+🧠 +👥', fn: g => { g.flags.rentalNightmare=true; g.flags.negotiationSkill=true; return{intel:10,social:5}; }},
+        { label:'搬去更远的地方', hint:'+💰 -😊 -💪', fn: g => { g.flags.rentalNightmare=true; g.flags.farCommuter=true; return{money:2000,mood:-8,health:-5}; }},
+        { label:'找室友合租', hint:'+👥 +💰 -😊', fn: g => { g.flags.rentalNightmare=true; g.flags.housemateSearch=true; return{social:8,money:1500,mood:-3}; }},
+      ]},
+    { id:'housemate_conflict', icon:'🏠', title:'室友矛盾',
+      body:'你的室友又把脏碗堆在水池里三天了。\n\n你们合租了半年。前3个月还好，后3个月你发现：他的脏衣服和你的干净衣服挂在同一个衣架上、他凌晨3点打游戏喊「冲啊」、他用你的洗洁精从来不买。\n\n你在微信群里发了条：「能不能注意点公共区域卫生？」他回了个「好的」——然后又堆了三天。\n\n你面临选择：继续忍、搬走、还是摊牌。\n\n"室友矛盾：不是谁对谁错——是两个不同的生活习惯住在了同一个屋檐下。"',
+      cond: g => g.flags.housemateSearch && !g.flags.housemateConflict,
+      choices:[
+        { label:'制定室友公约', hint:'+🧠 +👥', fn: g => { g.flags.housemateConflict=true; g.flags.ruleMaker=true; return{intel:8,social:5}; }},
+        { label:'搬出去独居', hint:'-💰 +😊 +💪', fn: g => { g.flags.housemateConflict=true; g.flags.soloLover=true; return{money:-3000,mood:10,health:5}; }},
+        { label:'忍忍就过去了', hint:'+💪 -😊', fn: g => { g.flags.housemateConflict=true; return{health:3,mood:-8}; }},
+      ]},
+    { id:'property_management', icon:'🏢', title:'物业纠纷',
+      body:'你小区的物业又涨价了。\n\n停车费从每月200涨到500、电梯经常坏、绿化变成了停车位、保安从4个变成了2个。但物业费不降反升。\n\n你和邻居们组了一个维权群。300个人在群里吐槽物业。你们决定联名投诉。\n\n但投诉需要2/3业主签字。有些人怕麻烦、有些人不在本地、有些人说「算了吧」。\n\n最终签了80个人的字。物业回复：「已收到反馈，会认真研究。」然后——就没有然后了。\n\n"物业纠纷：不是你交了物业费——是物业觉得你欠他钱。"',
+      cond: g => g.age >= 25 && (g.flags.hasHouse || g.flags.rentalNightmare) && !g.flags.propertyManagement,
+      choices:[
+        { label:'继续维权', hint:'+👥 +🧠 +✨', fn: g => { g.flags.propertyManagement=true; g.flags.rightsDefender=true; return{social:12,intel:8,charm:5}; }},
+        { label:'成立业委会', hint:'+👥 +🧠 +💪', fn: g => { g.flags.propertyManagement=true; g.flags.committeeLeader=true; return{social:15,intel:10,health:3}; }},
+        { label:'算了，惹不起', hint:'+😊 -👥', fn: g => { g.flags.propertyManagement=true; return{mood:3,social:-3}; }},
+      ]},
+    { id:'home_renovation', icon:'🔨', title:'装修血泪史',
+      body:'你决定装修你的房子/改造你的出租屋。\n\n你选了「全包」——以为可以省心。结果：工期从2个月拖到4个月、瓷砖颜色不对、柜子尺寸差了5厘米、工人把你的马桶装反了。\n\n你的预算从5万变成了8万。你的耐心从满格变成了0格。\n\n你学会了装修界的真理：「没有不超预算的装修，没有不后悔的选择。」\n\n但装修完成后，你站在自己的「新家」里——你觉得一切都值了。虽然马桶方向还是不太对。\n\n"装修：不是在改造房子——是在考验你对生活的耐心和钱包的厚度。"',
+      cond: g => g.age >= 25 && !g.flags.homeRenovation,
+      choices:[
+        { label:'亲力亲为监督', hint:'+🧠 +💪 -😊', fn: g => { g.flags.homeRenovation=true; g.flags.renovated=true; g.flags.diyExpert=true; return{intel:12,health:3,mood:-5}; }},
+        { label:'找靠谱设计师', hint:'-💰 +😊 +✨', fn: g => { g.flags.homeRenovation=true; g.flags.renovated=true; return{money:-8000,mood:10,charm:5}; }},
+        { label:'简单收拾就好', hint:'+😊 +💰', fn: g => { g.flags.homeRenovation=true; g.flags.simpleRenovation=true; return{mood:5,money:2000}; }},
+      ]},
+    { id:'mortgage_pressure_v2', icon:'🏦', title:'房贷压力',
+      body:'你终于买了房。然后你发现——噩梦才刚开始。\n\n月供8500，你的工资12000。你每个月剩下的钱只够吃饭和交通。你从「月光族」变成了「月供族」。\n\n你的朋友圈从旅游美食变成了「还贷打卡」。你的消费从星巴克变成了瑞幸，从瑞幸变成了公司免费的速溶咖啡。\n\n你的同事问你：「周末去哪玩？」你说：「在家。」因为出门就要花钱。\n\n但你看着房产证上的名字，觉得——值。至少这个城市里，有一个角落是完全属于你的。\n\n"房贷：不是30年的债务——是30年的安定感。代价是你30年不敢辞职。"',
+      cond: g => g.flags.hasHouse && !g.flags.mortgagePressure,
+      choices:[
+        { label:'努力赚钱还贷', hint:'+💰 +💪 -😊', fn: g => { g.flags.mortgagePressure=true; g.flags.hardWorker=true; return{money:3000,health:3,mood:-8}; }},
+        { label:'学会理财对冲', hint:'+🧠 +💰', fn: g => { g.flags.mortgagePressure=true; g.flags.financialLearner=true; return{intel:10,money:1000}; }},
+        { label:'考虑出租一间房', hint:'+💰 +👥 -😊', fn: g => { g.flags.mortgagePressure=true; g.flags.landlord=true; return{money:3000,social:5,mood:-3}; }},
+      ]},
+    { id:'urban_village', icon:'🏘️', title:'城中村记忆',
+      body:'你住了3年的城中村要拆迁了。\n\n这里是你在大城市第一个「家」：500块一个月的单间、楼下就是大排档、隔壁就是网吧。虽然脏乱差，但有人情味。\n\n你的房东阿姨每次收租都会多给你两个苹果。楼下的大叔会帮你收快递。巷子口的煎饼摊阿姨记得你不吃香菜。\n\n拆迁后，这些人都会散落在城市的各个角落。你问煎饼摊阿姨：「你以后去哪？」她说：「不知道，哪能摆就去哪。」\n\n你在拆迁前的最后一天，买了一个煎饼——多加了一个蛋。\n\n"城中村：不是脏乱差——是无数漂泊者的第一个落脚点。拆掉的是房子，拆不掉的是记忆。"',
+      cond: g => g.age >= 20 && !g.flags.hasHouse && !g.flags.urbanVillage,
+      choices:[
+        { label:'拍下最后的照片', hint:'+😊 +🧠', fn: g => { g.flags.urbanVillage=true; g.flags.memoryKeeper=true; return{mood:12,intel:5}; }},
+        { label:'和邻居们告别', hint:'+👥 +😊', fn: g => { g.flags.urbanVillage=true; g.flags.farewellParty=true; return{social:15,mood:10}; }},
+        { label:'默默离开', hint:'-😊 +🧠', fn: g => { g.flags.urbanVillage=true; return{mood:-5,intel:8}; }},
+      ]},
+    { id:'moving_day_v2', icon:'📦', title:'搬家日记',
+      body:'你今天搬家了。\n\n这是你来大城市后第7次搬家。你的东西越来越多，但你的朋友越来越少帮你搬了。\n\n你叫了一个货拉拉。司机帮你搬了3箱东西后说：「你是第几个搬这么多次的客户了。」你说：「我数都数不过来了。」\n\n你在新家摆好东西。墙上还空着——你挂了一幅从旧家带来的照片。那是你第一次来这个城市时拍的。\n\n你看着照片里的自己，觉得：搬了这么多次家，唯一不变的是——你还在。\n\n"搬家：不是换了一个地址——是换了一种生活。但有些东西，搬到哪都带着。"',
+      cond: g => g.age >= 20 && !g.flags.movingDay,
+      choices:[
+        { label:'把新家布置得温馨', hint:'-💰 +😊 +💪', fn: g => { g.flags.movingDay=true; g.flags.homeDecorator=true; return{money:-500,mood:12,health:3}; }},
+        { label:'将就住吧', hint:'+🧠 +💰', fn: g => { g.flags.movingDay=true; return{intel:5,money:300}; }},
+        { label:'约朋友来暖房', hint:'+👥 +😊 -💰', fn: g => { g.flags.movingDay=true; g.flags.houseWarming=true; return{social:12,mood:10,money:-300}; }},
+      ]},
+    { id:'public_space_debate', icon:'🌳', title:'公共空间',
+      body:'你家楼下的公园要被改建成商场了。\n\n你在业主群里看到了这个消息。你的反应是复杂的：商场意味着更便利的购物，但也意味着少了遛弯的地方。\n\n你参加了社区听证会。开发商说：「这是城市发展的需要。」一个老人说：「我在这个公园下了20年棋。」\n\n你发现：城市的发展，总是在「新」和「旧」之间做选择。而做选择的，往往不是住在里面的人。\n\n最终方案是：公园保留一半，商场建另一半。你觉得——也许这就是最好的妥协。\n\n"公共空间：不是空地——是城市的客厅。拆掉一个公园，就是拆掉一群人的日常。"',
+      cond: g => g.age >= 25 && !g.flags.publicSpaceDebate,
+      choices:[
+        { label:'积极参与社区决策', hint:'+👥 +🧠 +✨', fn: g => { g.flags.publicSpaceDebate=true; g.flags.communityActivist=true; return{social:12,intel:10,charm:5}; }},
+        { label:'支持发展', hint:'+🧠 +💰', fn: g => { g.flags.publicSpaceDebate=true; return{intel:5,money:500}; }},
+        { label:'接受现实', hint:'+🧠 +😊', fn: g => { g.flags.publicSpaceDebate=true; return{intel:5,mood:3}; }},
+      ]},
+    { id:'city_identity', icon:'🏙️', title:'城市归属感',
+      body:'你来这个城市已经5年了。\n\n你在这里有了工作、有了朋友、有了喜欢的餐馆和咖啡馆。你知道了哪条路最堵、哪家超市最便宜、哪个公园最适合跑步。\n\n但你没有户口、没有房子、没有「本地人」的身份。每次被问「你是哪里人」，你都会愣一下。\n\n你的老家回不去了——那里没有你的工作。这个城市留不下来——这里没有你的根。\n\n你突然理解了「漂」这个字：人在水上，既不在岸上，也不在水底。\n\n"城市归属感：不是你属于这个城市——是这个城市愿不愿意接纳你。"',
+      cond: g => g.age >= 25 && !g.flags.cityIdentity,
+      choices:[
+        { label:'努力扎根', hint:'+💪 +🧠 +💰', fn: g => { g.flags.cityIdentity=true; g.flags.rootPlanter=true; return{health:5,intel:10,money:-3000}; }},
+        { label:'享受漂泊', hint:'+😊 +🧠', fn: g => { g.flags.cityIdentity=true; g.flags.freeDrifter=true; return{mood:10,intel:8}; }},
+        { label:'考虑回老家', hint:'+👥 +😊 -💰', fn: g => { g.flags.cityIdentity=true; g.flags.homeReturner=true; return{social:8,mood:5,money:-1000}; }},
+      ]},
+    { id:'community_garden_v2', icon:'🌻', title:'社区花园',
+      body:'你发现小区楼下有一块空地，有人提议把它变成社区花园。\n\n你加入了。10个邻居一起翻了土、播了种、浇了水。3个月后，你们种出了番茄、辣椒、薄荷和向日葵。\n\n每天下班路过花园，你都会看看有没有新的变化。你的邻居阿姨教你怎么修剪番茄。你的小朋友邻居每天来数向日葵长高了几厘米。\n\n你发现：种菜让你和邻居从陌生人变成了朋友。城市里的社交，有时候不需要语言——只需要一盆共同照顾的花。\n\n"社区花园：不是种菜——是在水泥地里种人情味。"',
+      cond: g => g.age >= 22 && !g.flags.communityGarden,
+      choices:[
+        { label:'成为核心成员', hint:'+👥 +😊 +💪', fn: g => { g.flags.communityGarden=true; g.flags.gardenLeader=true; return{social:15,mood:12,health:5}; }},
+        { label:'偶尔帮忙', hint:'+👥 +😊', fn: g => { g.flags.communityGarden=true; return{social:8,mood:8}; }},
+        { label:'看看就好', hint:'+🧠', fn: g => { g.flags.communityGarden=true; return{intel:5}; }},
+      ]},
+    { id:'night_city', icon:'🌃', title:'城市夜生活',
+      body:'你第一次认真逛了逛这个城市的夜晚。\n\n凌晨1点的烧烤摊、24小时便利店、通宵营业的网吧、凌晨还在送外卖的骑手。\n\n你在一个路边摊坐下，点了一碗馄饨。老板说：「年轻人，怎么这么晚？」你说：「睡不着。」他说：「来我这吃碗馄饨，就能睡着了。」\n\n你吃完了馄饨。确实——暖了胃，也就暖了心。\n\n你走回家的路上，看到这个城市的另一面：它不只是写字楼和地铁——还有深夜的温暖和凌晨的人情味。\n\n"城市夜生活：不是在熬夜——是在寻找白天找不到的温暖。"',
+      cond: g => g.age >= 20 && !g.flags.nightCity,
+      choices:[
+        { label:'成为深夜常客', hint:'+😊 +👥 +💪', fn: g => { g.flags.nightCity=true; g.flags.nightOwl=true; return{mood:10,social:8,health:-3}; }},
+        { label:'偶尔出来走走', hint:'+😊 +🧠', fn: g => { g.flags.nightCity=true; return{mood:8,intel:5}; }},
+        { label:'还是早点睡吧', hint:'+💪 +🧠', fn: g => { g.flags.nightCity=true; return{health:5,intel:3}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -8684,6 +8773,16 @@ const ACHIEVEMENTS = [
     { id:'experience_investor_ach', icon:'🎪', name:'体验投资者', desc:'投资了体验而非物品', check: g => g.flags.experienceEconomy },
     { id:'financial_learner_ach', icon:'📊', name:'理财学徒', desc:'开始学习理财', check: g => g.flags.financialAnxiety },
     { id:'local_supporter_ach', icon:'🏪', name:'宝藏猎人', desc:'发现了宝藏小店', check: g => g.flags.localBrandDiscovery },
+    // === v16.0 新增成就（住房问题） ===
+    { id:'rental_survivor_ach', icon:'🏚️', name:'租房幸存者', desc:'经历了租房噩梦', check: g => g.flags.rentalNightmare },
+    { id:'housemate_peace_ach', icon:'🏠', name:'室友和平使者', desc:'处理了室友矛盾', check: g => g.flags.housemateConflict },
+    { id:'property_fighter_ach', icon:'🏢', name:'物业斗士', desc:'面对了物业纠纷', check: g => g.flags.propertyManagement },
+    { id:'renovator_ach', icon:'🔨', name:'装修老手', desc:'经历了装修血泪', check: g => g.flags.homeRenovation },
+    { id:'mortgage_holder_ach', icon:'🏦', name:'月供族', desc:'承担了房贷压力', check: g => g.flags.mortgagePressure },
+    { id:'village_memory_ach', icon:'🏘️', name:'城中村记忆', desc:'经历了城中村拆迁', check: g => g.flags.urbanVillage },
+    { id:'frequent_mover_ach', icon:'📦', name:'搬家达人', desc:'搬了很多次家', check: g => g.flags.movingDay },
+    { id:'community_builder_ach', icon:'🌻', name:'社区建设者', desc:'参与了社区花园', check: g => g.flags.communityGarden },
+    { id:'city_belonger_ach', icon:'🏙️', name:'城市归属者', desc:'思考了城市归属感', check: g => g.flags.cityIdentity },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -8932,6 +9031,10 @@ const ENDINGS = [
     { id:'wise_consumer_end', badge:'💎', title:'智慧消费者', desc:'你从一个冲动消费者，变成了一个真正懂消费的人。\n\n你学会了理性购物、极简生活、二手交易、体验投资。你不再被广告忽悠、不再被双十一绑架、不再为了面子而消费。\n\n你的月支出从8000降到了4000，但生活质量反而提高了。因为你把钱花在了真正重要的地方：体验、健康、和爱的人在一起的时间。\n\n你的朋友问你：「你怎么做到这么省的？」你说：「我不是省——我只是知道什么值得。」\n\n"智慧消费：不是花得少——是每一分钱都花在了让自己更好的地方。"', cond: g => g.flags.minimalist && g.flags.rationalBuyer && g.flags.secondHandExpert && g.money >= 30000 && g.age >= 28 },
     { id:'experience_rich_end', badge:'🌟', title:'体验富翁', desc:'你的存款不多，但你的回忆很多。\n\n你去过很多城市、看过很多演唱会、学过冲浪和攀岩、在小巷子里发现过宝藏咖啡馆。\n\n你的朋友们最喜欢和你在一起——因为你总有故事可以讲。你的相册里没有名牌包和豪车，但有很多笑容和风景。\n\n你的一个孩子问你：「爸/妈，你年轻的时候最开心的事是什么？」你说：「去了很多地方，见了很多人，做了很多现在想起来还会笑的事。」\n\n"体验富翁：不是拥有最多的人——是经历最多的人。"', cond: g => g.flags.experienceEconomy && g.flags.localBrandDiscovery && g.flags.experienceInvestor && g.mood >= 70 && g.age >= 30 },
     { id:'financial_freedom_path_end', badge:'📈', title:'财务自由之路', desc:'你找到了属于自己的财务自由之路。\n\n你从一个理财小白，变成了一个有系统的投资者。你不再追涨杀跌、不再被K线绑架情绪。你有自己的投资策略，有自己的风险控制，有自己的长期规划。\n\n你的投资收益从亏损变成了稳定增长。你的被动收入开始覆盖基本生活开支。\n\n你的同事问你：「你财务自由了吗？」你说：「自由不是一个数字——是一种心态。我现在不焦虑了——这就是自由。」\n\n"财务自由：不是有很多钱——是不再为钱焦虑。"', cond: g => g.flags.financialLearner && g.flags.indexInvestor && g.flags.balancedConsumer && g.money >= 100000 && g.intel >= 65 && g.age >= 32 },
+    // --- v16.0 NEW ENDINGS (住房问题) ---
+    { id:'city_root_end', badge:'🏙️', title:'城市扎根者', desc:'你终于在这个城市扎下了根。\n\n你从城中村的单间，搬到了合租房，再到自己的小家。你用7年的时间，在这个不属于你的城市里，创造了一个属于你的角落。\n\n你的阳台上种着你从社区花园移来的薄荷。你的冰箱上贴满了和邻居们的合照。你的门锁密码只有你知道——这是你的安全感。\n\n你的妈妈来看你，说：「你终于有个像样的家了。」你说：「不是因为房子——是因为我在这里有了牵挂。」\n\n"城市扎根：不是买了房——是有了不想离开的理由。"', cond: g => g.flags.cityIdentity && g.flags.rootPlanter && g.flags.communityGarden && g.mood >= 65 && g.age >= 28 },
+    { id:'urban_nomad_end', badge:'🎒', title:'都市游牧者', desc:'你成了大城市里的游牧者。\n\n你搬了10次家、换了5个工作、交了无数个来了又走的朋友。你不住在一个固定的地方——但你活在每一个当下。\n\n你的行李箱里只有必需品。你不买大件家具、不养植物、不办年卡。你随时可以走——但你也随时可以留。\n\n有人说你「不稳定」。你说：「我只是不想被任何东西绑住。」\n\n"都市游牧：不是没有家——是整个世界都是家。"', cond: g => g.flags.freeDrifter && g.flags.movingDay && g.flags.nightOwl && g.mood >= 60 && g.age >= 28 },
+    { id:'community_hero_end', badge:'🌟', title:'社区英雄', desc:'你成了小区里最受欢迎的人。\n\n你是业委会成员、社区花园发起人、维权群群主。你帮邻居修过水管、帮老人教过手机、帮小朋友看过作业。\n\n你的邻居们说：「自从有了你，我们小区都不一样了。」你说：「不是我让小区不一样——是我们一起让它不一样了。」\n\n你被评为了「最美社区人」。你把奖状贴在了社区公告栏里。\n\n"社区英雄：不是做了什么大事——是让身边的人觉得，住在这里真好。"', cond: g => g.flags.communityActivist && g.flags.communityGarden && g.flags.gardenLeader && g.social >= 75 && g.age >= 30 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
