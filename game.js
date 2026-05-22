@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v31.9
+// 都市浮生记 - Game Engine v32.0
 // ============================================
 
 // === GAME STATE ===
@@ -17438,7 +17438,89 @@ const EVENTS = [
         { label:'做朋友也很好', hint:'+👥 +🧠', fn: g => { g.flags.onlineDateIRL=true; g.flags.stayFriends=true; return{social:5,intel:3}; }},
         { label:'觉得还是线上更好', hint:'+😊 -👥', fn: g => { g.flags.onlineDateIRL=true; g.flags.preferOnline=true; return{mood:3,social:-2}; }},
       ]},
+    // --- v32.0 大版本：城市隐秘角落 ---
+    { id:'midnight_taxi_driver', icon:'🚕', title:'深夜出租车', category:'city_hidden',
+      body:'凌晨2点，你打了一辆出租车回家。\n\n司机是个50岁的大叔。他一边开车一边跟你聊天：「小伙子/姑娘，这么晚才下班？」\n\n你说：「是啊。」他说：「我以前也是坐办公室的。后来公司倒闭了，就开出租了。」\n\n他说他每天开12个小时，一个月赚8000块。他的女儿刚考上大学，他每个月给她寄3000块。\n\n「累不累？」你问。「累。但她比我强。她以后不用开出租。」\n\n你下了车，回头看了一眼——他的车继续开进了夜色里。这座城市有无数个这样的夜晚，无数个这样的人。',
+      cond: g => g.job && g.job!=='待业中' && g.age >= 20 && g.age <= 40,
+      choices:[
+        { label:'多给了10块小费', hint:'+👥 -💰', fn: g => { g.flags.midnightTaxiDriver=true; g.flags.gaveTip=true; return{social:3,mood:5,money:-10}; }},
+        { label:'在车上想了很多关于人生', hint:'+🧠 +😊', fn: g => { g.flags.midnightTaxiDriver=true; g.flags.lifeThinking=true; return{intel:5,mood:3}; }},
+        { label:'决定以后不再这么晚下班', hint:'+💪 +🧠', fn: g => { g.flags.midnightTaxiDriver=true; g.flags.noMoreOvertime=true; return{health:5,intel:3}; }},
+      ]},
+    { id:'convenience_store_24h', icon:'🏪', title:'24小时便利店', category:'city_hidden',
+      body:'你加班到深夜，路过一家24小时便利店。\n\n你走进去买了一杯热咖啡和一个饭团。便利店里有3个人：一个穿西装的男人在打电话，一个穿校服的学生在写作业，一个老爷爷在吃泡面。\n\n你们4个人，谁也不认识谁，但你们在同一个深夜、同一个便利店。\n\n你觉得便利店是现代城市的「避难所」——不管你多晚来，灯都是亮的，门都是开的。\n\n你坐在窗边吃完了饭团。窗外是空荡荡的街道。你觉得这一刻很安静，很美好。',
+      cond: g => g.age >= 18 && g.age <= 50 && g.mood < 60,
+      choices:[
+        { label:'在便利店待到不想回去为止', hint:'+😊 -💪', fn: g => { g.flags.convenienceStore24h=true; g.flags.stayLate=true; return{mood:5,health:-2}; }},
+        { label:'和店员聊了几句', hint:'+👥 +😊', fn: g => { g.flags.convenienceStore24h=true; g.flags.chatClerk=true; return{social:3,mood:3}; }},
+        { label:'买完东西回家早点睡', hint:'+💪 +😊', fn: g => { g.flags.convenienceStore24h=true; g.flags.goHomeSleep=true; return{health:5,mood:3}; }},
+      ]},
+    { id:'livehouse_underground_v32', icon:'🎸', title:'地下Live House', category:'city_hidden',
+      body:'你的朋友带你去了一家地下Live House。\n\n在一个老旧商场的负一层，门口没有任何标志。你推开门——里面震耳欲聋。\n\n一支不知名的乐队在演出。台下只有30个人，但每个人都在跳、在喊、在挥洒汗水。\n\n你不认识台上的乐队，但你觉得他们的音乐很好——因为他们是为自己而唱，不是为了流量。\n\n演出结束后，主唱走下台，和每个人碰杯。他对你说：「谢谢你来看我们演出。」\n\n你觉得——这是你在大城市里离「真实」最近的一次。',
+      cond: g => g.age >= 20 && g.age <= 38 && g.mood < 60,
+      choices:[
+        { label:'成了这里的常客', hint:'+😊 +👥', fn: g => { g.flags.livehouseUnderground=true; g.flags.regularFan=true; return{mood:8,social:5}; }},
+        { label:'想学一门乐器', hint:'+🧠 +💰', fn: g => { g.flags.livehouseUnderground=true; g.flags.learnInstrument=true; return{intel:5,money:-500}; }},
+        { label:'发了一条朋友圈分享', hint:'+✨ +😊', fn: g => { g.flags.livehouseUnderground=true; g.flags.shareDiscovery=true; return{charm:3,mood:5}; }},
+      ]},
+    { id:'city_rooftop_v32', icon:'🌃', title:'城市天台', category:'city_hidden',
+      body:'你发现了一个秘密——你住的那栋楼的天台没有锁。\n\n你爬了上去。天台上只有风、星星、和远处的城市灯光。你站在那里，觉得自己是这座城市最高的人。\n\n你开始每天晚上去天台坐一会儿。你带了一罐啤酒、一个小音箱。\n\n有一天你在天台上遇到了另一个住户——一个画画的女孩/男孩。她/他在画城市夜景。\n\n你们没怎么说话，就一起看着远处的灯火。你觉得——有些陪伴不需要语言。',
+      cond: g => g.age >= 20 && g.age <= 40 && g.mood < 65,
+      choices:[
+        { label:'把天台变成你的秘密基地', hint:'+😊 +🧠', fn: g => { g.flags.cityRooftopV32=true; g.flags.secretBase=true; return{mood:8,intel:3}; }},
+        { label:'和那个画画的人成了朋友', hint:'+👥 +😊', fn: g => { g.flags.cityRooftopV32=true; g.flags.rooftopFriend=true; return{social:5,mood:5}; }},
+        { label:'在天台上做了一个重要决定', hint:'+🧠 +😊', fn: g => { g.flags.cityRooftopV32=true; g.flags.rooftopDecision=true; return{intel:5,mood:5}; }},
+      ]},
+    { id:'basement_apartment_v32', icon:'🏚️', title:'地下室', category:'city_hidden',
+      body:'你租了一间地下室。月租600块，没有窗户，没有阳光。\n\n你的床离天花板只有50厘米。你的墙壁有点潮，你的被子总是有一股霉味。\n\n你每天早上爬出地下室的时候，都会被阳光刺到眼睛。你觉得那道光——是你一天中最幸福的时刻。\n\n你的邻居也是地下室住户。你们在走廊里碰面，他笑了笑说：「又一天。」\n\n你说：「又一天。」你们都知道——不会永远这样的。',
+      cond: g => g.age >= 18 && g.age <= 30 && g.money < 20000,
+      choices:[
+        { label:'努力赚钱搬到有阳光的地方', hint:'+💰 +💪', fn: g => { g.flags.basementApartment=true; g.flags.saveAndMove=true; return{money:500,health:-3}; }},
+        { label:'把地下室布置得温馨一点', hint:'+😊 +💰', fn: g => { g.flags.basementApartment=true; g.flags.cozyBasement=true; return{mood:5,money:-200}; }},
+        { label:'和邻居互相打气', hint:'+👥 +😊', fn: g => { g.flags.basementApartment=true; g.flags.basementSolidarity=true; return{social:5,mood:3}; }},
+      ]},
+    { id:'urban_village_food_v32', icon:'🍜', title:'城中村美食', category:'city_hidden',
+      body:'你的同事带你去了城中村里的一家小馆子。\n\n没有招牌，没有菜单——老板看看你说：「今天有红烧肉和炒河粉。」\n\n你点了两样，一共18块。你吃了一口红烧肉——这是你在大城市吃过最好吃的一顿饭。\n\n老板是个50多岁的阿姨，她从四川来这座城市20年了。她说：「我的菜不漂亮，但有心意。」\n\n你吃完后说：「阿姨，我以后常来。」她笑着说：「好，下次给你多加一块肉。」',
+      cond: g => g.age >= 18 && g.age <= 45,
+      choices:[
+        { label:'成了这里的常客', hint:'+😊 +💪', fn: g => { g.flags.urbanVillageFood=true; g.flags.regularDiner=true; return{mood:8,health:3}; }},
+        { label:'跟阿姨学了一道菜', hint:'+💪 +🧠', fn: g => { g.flags.urbanVillageFood=true; g.flags.learnRecipe=true; return{health:3,intel:3}; }},
+        { label:'写了篇推荐发在网上', hint:'+✨ +👥', fn: g => { g.flags.urbanVillageFood=true; g.flags.foodReview=true; return{charm:5,social:3}; }},
+      ]},
+    { id:'old_bookstore_v32', icon:'📚', title:'旧书店', category:'city_hidden',
+      body:'你在一条老街上发现了一家旧书店。\n\n店主是个70岁的老爷爷，他在这条街开了40年的书店。书店很小，书堆到了天花板。\n\n你翻了一本二手的《活着》——扉页上有人写了一行字：「这本书陪了我10年，现在轮到你了。」\n\n你买了3本书，花了30块。老爷爷说：「书不怕旧，怕没人读。」\n\n你走出书店，觉得手里那几本旧书——比任何新买的东西都有分量。',
+      cond: g => g.age >= 20 && g.age <= 50 && g.intel >= 40,
+      choices:[
+        { label:'成了旧书店的常客', hint:'+🧠 +😊', fn: g => { g.flags.oldBookstoreV32=true; g.flags.bookworm=true; return{intel:8,mood:5}; }},
+        { label:'和老爷爷聊了一下午', hint:'+👥 +🧠', fn: g => { g.flags.oldBookstoreV32=true; g.flags.wisdomFromElder=true; return{social:5,intel:5}; }},
+        { label:'也在扉页上写了一句话', hint:'+✨ +😊', fn: g => { g.flags.oldBookstoreV32=true; g.flags.passItOn=true; return{charm:3,mood:5}; }},
+      ]},
+    { id:'park_bench_story_v32', icon:'🪑', title:'公园长椅', category:'city_hidden',
+      body:'你坐在公园的长椅上发呆。\n\n旁边坐了一个人——一个60岁的阿姨。她在喂鸽子。\n\n她说：「我每天这个时候都来。我老伴走了以后，家里太安静了。」\n\n你们聊了一个小时。她说她年轻时是一名教师，教了30年语文。她说她最喜欢的诗是「人生若只如初见」。\n\n她说：「年轻人，你要好好活着。活着就什么都会有。」\n\n你站起来告别的时候，她递给你一把鸽子食：「下次来，帮我喂它们。」',
+      cond: g => g.age >= 20 && g.age <= 45 && g.mood < 55,
+      choices:[
+        { label:'每周都来陪阿姨聊天', hint:'+👥 +😊', fn: g => { g.flags.parkBenchStory=true; g.flags.weeklyVisit=true; return{social:8,mood:8}; }},
+        { label:'被她的话触动开始珍惜生活', hint:'+😊 +🧠', fn: g => { g.flags.parkBenchStory=true; g.flags.cherishLife=true; return{mood:8,intel:5}; }},
+        { label:'写了一篇关于她的文章', hint:'+✨ +🧠', fn: g => { g.flags.parkBenchStory=true; g.flags.writeHerStory=true; return{charm:5,intel:3}; }},
+      ]},
+    { id:'hospital_corridor_v32', icon:'🏥', title:'医院走廊', category:'city_hidden',
+      body:'你在医院的走廊里坐了一整夜。\n\n不是因为你看病——是因为你的一个朋友出了车祸。\n\n走廊里有各种各样的人：有人在哭、有人在打电话、有人在吃盒饭、有人在发呆。\n\n一个男人坐在你对面，他的妻子在ICU。他说：「如果她能醒过来，我什么都愿意做。」\n\n你觉得——医院走廊是城市里最真实的地方。这里没有人装、没有人演。这里只有最原始的情感：恐惧、希望、爱。\n\n天亮了。你的朋友脱离了危险。你哭了。',
+      cond: g => g.age >= 22 && g.age <= 50 && g.social >= 30,
+      choices:[
+        { label:'更加珍惜健康和朋友', hint:'+💪 +👥', fn: g => { g.flags.hospitalCorridor=true; g.flags.cherishHealth=true; return{health:5,social:5}; }},
+        { label:'开始认真体检和运动', hint:'+💪 +🧠', fn: g => { g.flags.hospitalCorridor=true; g.flags.healthAwakening=true; return{health:8,intel:3}; }},
+        { label:'给远方的家人打了个电话', hint:'+👥 +😊', fn: g => { g.flags.hospitalCorridor=true; g.flags.callFamily=true; return{social:5,mood:5}; }},
+      ]},
+    { id:'train_station_life_v32', icon:'🚉', title:'火车站人间', category:'city_hidden',
+      body:'你在火车站候车室里等了3个小时。\n\n你看了看周围的人：一个妈妈抱着睡着的孩子，一个老人提着一大袋土特产，一对情侣在依依不舍地告别，一个民工扛着比他还大的行李。\n\n你觉得火车站是中国社会的缩影——所有人都在这里，所有人都要去某个地方。\n\n广播响了：「您的列车即将检票。」你站起来，拎起行李。\n\n你回头看了一眼候车室——下一批人已经坐在了你刚才坐的位置上。每个人都有故事，但你永远不会知道他们的结局。',
+      cond: g => g.age >= 18 && g.age <= 50,
+      choices:[
+        { label:'观察人群写了一篇随笔', hint:'+🧠 +✨', fn: g => { g.flags.trainStationLife=true; g.flags.peopleWatching=true; return{intel:5,charm:3}; }},
+        { label:'帮一个老人提了行李', hint:'+👥 +😊', fn: g => { g.flags.trainStationLife=true; g.flags.helpStranger=true; return{social:5,mood:5}; }},
+        { label:'在车上想了一些关于离别的事', hint:'+🧠 +😊', fn: g => { g.flags.trainStationLife=true; g.flags.farewellThinking=true; return{intel:5,mood:3}; }},
+      ]},
 ];
+
 const ACHIEVEMENTS = [
 
     { id:'rich', icon:'💰', name:'月入过万', desc:'月收入超过10000', check: g => g.jobSalary>=10000 },
@@ -19066,6 +19148,18 @@ const ACHIEVEMENTS = [
     { id:'buy_secondhand_ach', icon:'♻️', name:'二手生活家', desc:'开始买二手替代新品', check: g => g.flags.buySecondhand },
     { id:'unfollow_streams_ach', icon:'📺', name:'直播断舍离', desc:'取消关注了所有直播间', check: g => g.flags.unfollowStreams },
     { id:'serious_dating_ach', icon:'💕', name:'奔现成功', desc:'网友见面后开始认真交往', check: g => g.flags.seriousDating },
+
+    // --- v32.0 城市隐秘角落成就 ---
+    { id:'taxi_driver_ach', icon:'🚕', name:'深夜摆渡人', desc:'和出租车司机聊了一个通宵', check: g => g.flags.taxiDriverStory },
+    { id:'convenience_store_ach', icon:'🏪', name:'24小时便利店', desc:'在便利店度过了一个深夜', check: g => g.flags.convenienceStoreNight },
+    { id:'livehouse_ach', icon:'🎸', name:'地下音乐', desc:'去了一场地下Live House', check: g => g.flags.livehouseNight },
+    { id:'rooftop_ach', icon:'🌃', name:'城市天台', desc:'在天台上看到了城市另一面', check: g => g.flags.rooftopRevelation },
+    { id:'basement_ach', icon:'🚪', name:'地下室', desc:'住过或探访过地下室', check: g => g.flags.basementLife },
+    { id:'village_food_ach', icon:'🍜', name:'城中村美食', desc:'在城中村找到了地道美食', check: g => g.flags.villageFoodDiscovery },
+    { id:'bookstore_ach', icon:'📚', name:'旧书店', desc:'在旧书店里泡了一下午', check: g => g.flags.oldBookstoreVisit },
+    { id:'park_bench_ach', icon:'🪑', name:'公园长椅', desc:'在公园长椅上听了一个故事', check: g => g.flags.parkBenchStory },
+    { id:'hospital_ach', icon:'🏥', name:'医院走廊', desc:'在医院走廊里等待过', check: g => g.flags.hospitalCorridor },
+    { id:'train_station_ach', icon:'🚉', name:'火车站人间', desc:'在火车站观察了人生百态', check: g => g.flags.trainStationLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
