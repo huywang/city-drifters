@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v18.3
+// 都市浮生记 - Game Engine v19.0
 // ============================================
 
 // === GAME STATE ===
@@ -9024,6 +9024,127 @@ const EVENTS = [
         { label:'购买保险，对冲风险', hint:'+🧠 -💰', fn: g => { g.flags.financialAnxiety=true; g.flags.insuranceBuyer=true; return{intel:5,money:-8000,mood:5}; }},
         { label:'焦虑也没用，过好当下', hint:'+😊 +❤️', fn: g => { g.flags.financialAnxiety=true; g.flags.presentFocused=true; return{mood:12,health:5}; }},
       ]},
+    // === v19.0 新增事件（心理哲学 + 人生反思） ===
+    { id:'imposter_syndrome_v3', icon:'🎭', title:'冒名顶替综合征', category:'psychology',
+      body:'你升职了。你应该是高兴的。\n\n但你心里有个声音在说："他们搞错了。你不够格。你只是运气好。"\n\n你环顾四周：你的同事们都好厉害——学历比你好，经验比你多，说话比你自信。\n\n你觉得自己是个骗子，随时会被"揭穿"。\n\n你在网上搜索"冒名顶替综合征"：70%的人在一生中至少经历过一次。爱因斯坦也说过："我的同事对我的评价太高了。"\n\n你突然释然了：也许不是你不够好——是你太习惯低估自己了。\n\n"冒名顶替综合征：你不是骗子——你只是比你自己以为的更好。但你的大脑不这么告诉你。"',
+      cond: g => !g.flags.imposterSyndrome && g.age >= 25 && g.jobSalary >= 10000 && g.intel >= 40,
+      choices:[
+        { label:'记录自己的成就，对抗自我怀疑', hint:'+🧠 +😊', fn: g => { g.flags.imposterSyndrome=true; g.flags.achievementJournal=true; return{intel:8,mood:10}; }},
+        { label:'找导师/心理咨询师聊聊', hint:'+🧠 +❤️ -💰', fn: g => { g.flags.imposterSyndrome=true; g.flags.mentorTalk=true; return{intel:10,mood:8,money:-2000}; }},
+        { label:'算了，能混一天是一天', hint:'+😊 -🧠', fn: g => { g.flags.imposterSyndrome=true; g.flags.fakeItTillMake=true; return{mood:3}; }},
+      ]},
+    { id:'fomo', icon:'😱', title:'错过恐惧症', category:'psychology',
+      body:'你的朋友圈：\n\n- 同事A去了冰岛看极光\n- 同学B拿到了硅谷的offer\n- 朋友C买了第三套房\n- 前同事D创业融了1000万\n- 你表弟的孩子都会打酱油了\n\n而你——坐在出租屋里，吃着外卖，刷着朋友圈，越刷越焦虑。\n\n你觉得自己错过了所有好的机会。别人的人生都在前进，只有你还在原地。\n\n你关掉了朋友圈。但5分钟后你又打开了——你害怕错过新的"好事"。\n\n"FOMO（Fear of Missing Out）：你不是真的想去做那些事——你只是害怕别人在做而你没有。"',
+      cond: g => !g.flags.fomo && g.age >= 20 && g.age <= 35 && g.mood < 60,
+      choices:[
+        { label:'关掉朋友圈一个月', hint:'+🧠 +😊', fn: g => { g.flags.fomo=true; g.flags.socialMediaDetox=true; return{intel:8,mood:12}; }},
+        { label:'制定计划，开始行动', hint:'+🧠 +💰 -❤️', fn: g => { g.flags.fomo=true; g.flags.actionPlan=true; return{intel:5,mood:-3,money:3000}; }},
+        { label:'接受"错过是人生常态"', hint:'+😊 +🧠', fn: g => { g.flags.fomo=true; g.flags.acceptMissing=true; return{mood:15,intel:8}; }},
+      ]},
+    { id:'analysis_paralysis', icon:'🤯', title:'选择困难症', category:'psychology',
+      body:'你打开外卖App，准备点午饭。\n\n30分钟后——你还在纠结。你看了47家餐厅，每家都有好评差评。你想找"最好的选择"，但你发现"最好"根本不存在。\n\n最后你饿得受不了了，随便点了一家。到了之后发现：不好吃。\n\n你开始想：如果当初选了另一家会不会更好？\n\n这种"选择困难"不只发生在点外卖上：找工作、找对象、买房、选专业——你总在做选择，总在后悔。\n\n"选择困难症的本质：你不是怕选错——你是怕错过更好的。而「更好的」永远在想象中。"',
+      cond: g => !g.flags.analysisParalysis && g.age >= 18,
+      choices:[
+        { label:'练习"够好就好"哲学', hint:'+😊 +🧠', fn: g => { g.flags.analysisParalysis=true; g.flags.satisficer=true; return{mood:10,intel:5}; }},
+        { label:'限制选项：只看前3个', hint:'+🧠 +😊', fn: g => { g.flags.analysisParalysis=true; g.flags.limitedOptions=true; return{intel:8,mood:5}; }},
+        { label:'干脆让别人帮你选', hint:'+👥 -🧠', fn: g => { g.flags.analysisParalysis=true; g.flags.outsourced=true; return{social:5,mood:-3}; }},
+      ]},
+    { id:'people_pleaser', icon:'🙇', title:'讨好型人格', category:'psychology',
+      body:'你又答应了。同事让你帮忙做PPT，你本来今晚想休息的。\n\n你的口头禅是："好的""没问题""都可以""你说了算"。\n\n你害怕冲突，害怕让别人失望，害怕被拒绝。所以你总是先答应，然后后悔。\n\n你的待办清单上全是别人的事。你自己的事——学吉他、写小说、健身——永远排在最后。\n\n一个朋友说："你人真好。"\n你心里想："我不是人好——我只是不会拒绝。"\n\n你开始看一本心理学书：《被讨厌的勇气》。书上说：讨好型人格的根源是"不配得感"——你觉得自己不值得被优先考虑。\n\n"讨好型人格：你把所有人都放在你前面——直到你发现，你已经在最后面了。"',
+      cond: g => !g.flags.peoplePleaser && g.age >= 20 && g.social >= 30 && g.mood < 55,
+      choices:[
+        { label:'开始练习说"不"', hint:'+🧠 +😊 -👥', fn: g => { g.flags.peoplePleaser=true; g.flags.learnToSayNo=true; return{intel:8,mood:12,social:-5}; }},
+        { label:'做心理咨询，探索根源', hint:'+🧠 +❤️ -💰', fn: g => { g.flags.peoplePleaser=true; g.flags.therapyPleaser=true; return{intel:10,mood:8,money:-3000}; }},
+        { label:'算了，做个好人也没什么不好', hint:'+👥 -😊', fn: g => { g.flags.peoplePleaser=true; g.flags.acceptPleaser=true; return{social:5,mood:-5}; }},
+      ]},
+    { id:'existential_void', icon:'🕳️', title:'虚无感', category:'psychology',
+      body:'某个周六的下午，你躺在床上，盯着天花板。\n\n你什么也不想做。不是累了——是觉得什么都没意义。\n\n工作？为了赚钱。赚钱？为了活着。活着？为了……什么？\n\n你想了很久，想不出答案。\n\n你刷了刷手机，看了几条搞笑视频，笑了两声。然后又空虚了。\n\n你知道这种感觉有个名字：存在性虚无。哲学家说这是人类的基本困境——我们渴望意义，但宇宙不提供答案。\n\n但加缪说："必须想象西西弗斯是快乐的。"\n\n也许意义不是被找到的——而是被创造的。你不需要宇宙级别的意义，你只需要一个让你愿意起床的理由。\n\n"虚无感不是病——是你终于停止了忙碌，开始问自己：我到底为什么活着？"',
+      cond: g => !g.flags.existentialVoid && g.age >= 25 && g.mood < 50 && g.intel >= 45,
+      choices:[
+        { label:'读哲学书，直面虚无', hint:'+🧠 +😊', fn: g => { g.flags.existentialVoid=true; g.flags.philosophyReader=true; return{intel:12,mood:8}; }},
+        { label:'创造意义：开始写作/画画/做手工', hint:'+🧠 +✨ +😊', fn: g => { g.flags.existentialVoid=true; g.flags.createMeaning=true; return{intel:8,charm:8,mood:10}; }},
+        { label:'用忙碌麻痹自己', hint:'-🧠 +💰', fn: g => { g.flags.existentialVoid=true; g.flags.busyNumbing=true; return{money:3000,mood:-5,intel:-3}; }},
+      ]},
+    { id:'family_origin', icon:'🏚️', title:'原生家庭', category:'psychology',
+      body:'你在看一本心理学的书，看到了"原生家庭创伤"这个词。\n\n你想起了小时候：\n- 你考了98分，父母问："那2分扣在哪了？"\n- 你想学画画，父母说："学这个有什么用？"\n- 你交了朋友，父母说："别跟坏孩子玩。"\n- 你失败了，父母说："我早跟你说了吧。"\n\n你突然理解了：为什么你总是害怕失败、为什么你不敢表达需求、为什么你在亲密关系里总是不安。\n\n不是因为你有问题——是因为你从小接受的教育就是"你不够好"。\n\n你开始理解：原生家庭给了你起点，但不应该决定你的终点。你可以选择打破这个循环。\n\n"原生家庭：不是你选择的家——是塑造了你的家。而你花了一辈子，去重新塑造自己。"',
+      cond: g => !g.flags.familyOrigin && g.age >= 22 && g.intel >= 40,
+      choices:[
+        { label:'做家庭系统排列/心理咨询', hint:'+🧠 +❤️ -💰', fn: g => { g.flags.familyOrigin=true; g.flags.familyTherapy=true; return{intel:10,mood:8,money:-5000}; }},
+        { label:'写日记，自我疗愈', hint:'+🧠 +😊', fn: g => { g.flags.familyOrigin=true; g.flags.selfHealing=true; return{intel:8,mood:10}; }},
+        { label:'原谅父母，他们也是受害者', hint:'+❤️ +😊', fn: g => { g.flags.familyOrigin=true; g.flags.forgiveParents=true; return{mood:15,social:8}; }},
+      ]},
+    { id:'comparison_trap', icon:'⚖️', title:'比较陷阱', category:'psychology',
+      body:'你参加了一个大学同学聚会。\n\n同学A：某互联网大厂总监，年薪150万。\n同学B：海归博士，在某985当副教授。\n同学C：创二代，继承了家族企业。\n同学D：嫁了个有钱人，朋友圈全是爱马仕和马尔代夫。\n\n而你——月薪两万，住在出租屋里，单身。\n\n你笑了笑，说了句"我挺好的"。然后回家，躺在床上，辗转难眠。\n\n你知道比较是不对的。每个人有自己的节奏。但你的大脑停不下来——你开始计算自己"落后"了多少年。\n\n然后你刷到一个帖子："你不需要跟任何人比，你的对手只有昨天的自己。"\n\n你心想：这话说得好——但昨天的自己也很废物。\n\n"比较陷阱：你不是真的比别人差——你只是用别人最好的部分，对比自己最差的部分。"',
+      cond: g => !g.flags.comparisonTrap && g.age >= 25 && g.money < 200000,
+      choices:[
+        { label:'列出自己拥有的东西', hint:'+😊 +🧠', fn: g => { g.flags.comparisonTrap=true; g.flags.gratitudeList=true; return{mood:12,intel:5}; }},
+        { label:'减少社交，屏蔽朋友圈', hint:'+😊 -👥', fn: g => { g.flags.comparisonTrap=true; g.flags.socialWithdraw=true; return{mood:8,social:-8}; }},
+        { label:'化焦虑为动力，拼命努力', hint:'+💰 -❤️', fn: g => { g.flags.comparisonTrap=true; g.flags.ambitionDriven=true; return{money:8000,health:-8,mood:-5}; }},
+      ]},
+    { id:'personal_growth', icon:'🌱', title:'成长时刻', category:'psychology',
+      body:'你翻看了5年前的日记/朋友圈。\n\n5年前的你：焦虑、迷茫、不知道该做什么工作、不知道自己喜欢什么、不知道未来在哪里。\n\n5年后的你：有了一份还不错的工作、几个交心的朋友、一些拿得出手的技能、一个虽然不大但属于自己的生活。\n\n你突然意识到：你走了很远的路，但你从来没停下来看看自己走了多远。\n\n你总是盯着前面还有多远——却忘了回头看看你已经翻过了多少座山。\n\n你发了一条朋友圈："感谢过去5年的自己，虽然很辛苦，但没有放弃。"\n\n收获了很多点赞。评论区有人说："我也要加油。"有人说："你已经很棒了。"\n\n"成长不是一个瞬间——是无数个"再撑一下"的瞬间。你已经比你以为的更勇敢了。"',
+      cond: g => !g.flags.personalGrowth && g.age >= 28 && g.intel >= 50 && g.mood >= 45,
+      choices:[
+        { label:'给自己写一封信', hint:'+😊 +🧠 +❤️', fn: g => { g.flags.personalGrowth=true; g.flags.selfLetter=true; return{mood:20,intel:5}; }},
+        { label:'制定下一个5年计划', hint:'+🧠 +💰', fn: g => { g.flags.personalGrowth=true; g.flags.fiveYearPlan=true; return{intel:10,mood:8,money:5000}; }},
+        { label:'活在当下，不规划太远', hint:'+😊 +❤️', fn: g => { g.flags.personalGrowth=true; g.flags.presentLiving=true; return{mood:15,health:5}; }},
+      ]},
+    { id:'big_city_loneliness', icon:'🌃', title:'大城市孤独', category:'psychology',
+      body:'晚上11点，你站在阳台上看着城市的夜景。\n\n千万盏灯火，没有一盏是为你亮的。\n\n你的手机里有1500个微信好友，但此刻你不知道该给谁发消息。\n\n楼下有人在唱歌。你听了一会儿。你想下楼加入他们——但你没有。\n\n你来了这个城市5年了。你认识的人越来越多，但能交心的越来越少。每个人都忙，每个人都累，每个人都在自己的世界里。\n\n你想念老家。想念那些不用预约就能见面的朋友。想念妈妈做的饭。想念那条走了20年的小路。\n\n但你知道：你回不去了。你的未来在这里。\n\n"大城市的孤独：不是没有人陪你——是在千万人中，依然觉得自己是一个人在战斗。"',
+      cond: g => !g.flags.bigCityLoneliness && g.age >= 23 && g.social < 50 && !g.flags.hasHukou,
+      choices:[
+        { label:'主动建立深度关系', hint:'+👥 +😊 +❤️', fn: g => { g.flags.bigCityLoneliness=true; g.flags.deepConnections=true; return{social:15,mood:12}; }},
+        { label:'享受孤独，学会独处', hint:'+🧠 +😊', fn: g => { g.flags.bigCityLoneliness=true; g.flags.enjoySolitude=true; return{intel:10,mood:8}; }},
+        { label:'回老家看看', hint:'+❤️ +😊 -💰', fn: g => { g.flags.bigCityLoneliness=true; g.flags.wentHome=true; return{mood:15,social:5,money:-3000}; }},
+      ]},
+    { id:'work_life_balance_v2', icon:'⚖️', title:'工作生活平衡', category:'psychology',
+      body:'你的老板说："你要有主人翁精神。"\n你的HR说："我们是一个大家庭。"\n你的同事说："年轻人要多学点。"\n\n翻译一下：你要无偿加班、你要随时在线、你要牺牲个人生活。\n\n你算了一下：你每天工作12小时，通勤2小时，睡觉7小时。剩下的3小时里，你要吃饭、洗澡、做家务、社交。\n\n留给"自己"的时间：0小时。\n\n你开始问自己：工作是为了更好地生活——还是活着就是为了工作？\n\n你看了看你的银行卡余额。你看了看你的体检报告。你看了看你的朋友圈——你上一次发"快乐"相关的内容是什么时候？\n\n"工作生活平衡不是一个目标——是一种能力。一种在「不得不」和「我选择」之间找到平衡的能力。"',
+      cond: g => !g.flags.workLifeBalance && g.age >= 25 && g.job !== '待业中' && g.jobSalary >= 8000 && g.health < 60,
+      choices:[
+        { label:'严格划清工作与生活界限', hint:'+😊 +❤️ -💰', fn: g => { g.flags.workLifeBalance=true; g.flags.strictBoundaries=true; return{mood:15,health:10,money:-3000}; }},
+        { label:'跟老板谈减少工作量', hint:'🎲 +🧠', fn: g => { g.flags.workLifeBalance=true; g.flags.negotiatedHours=true; if(Math.random()>0.4){return{mood:10,health:8};}else{return{mood:-10,social:-5};} }},
+        { label:'辞职换一份轻松的工作', hint:'+😊 +❤️ -💰💰', fn: g => { g.flags.workLifeBalance=true; g.flags.downshiftedCareer=true; setJob(g,'普通职员',6000); return{mood:20,health:15,money:-10000}; }},
+      ]},
+    { id:'life_defining', icon:'🔑', title:'人生转折点', category:'psychology',
+      body:'你回顾自己的人生，发现了几个关键转折点：\n\n1. 高考：决定了你去了哪个城市\n2. 第一份工作：决定了你的职业方向\n3. 某个人：改变了你对世界的看法\n4. 某次失败：让你重新认识了自己\n\n每一个转折点看起来都像是偶然——但如果当时你做了不同的选择，你现在会在哪里？\n\n你想起了那句话："人生没有如果，只有后果和结果。"\n\n你现在正站在另一个十字路口。你会做什么选择？\n\n"人生不是被规划的——是被选择的。每一个看似微小的决定，都在塑造你的未来。"',
+      cond: g => !g.flags.lifeDefining && g.age >= 30 && g.intel >= 45,
+      choices:[
+        { label:'勇敢做一个大胆的决定', hint:'+✨ +😊 🎲', fn: g => { g.flags.lifeDefining=true; g.flags.boldDecision=true; if(Math.random()>0.4){return{mood:25,charm:10,money:10000};}else{return{mood:-10,money:-15000};} }},
+        { label:'珍惜当下，稳扎稳打', hint:'+🧠 +😊 +❤️', fn: g => { g.flags.lifeDefining=true; g.flags.steadyPath=true; return{intel:8,mood:12,health:5}; }},
+        { label:'重新审视优先级', hint:'+🧠 +❤️', fn: g => { g.flags.lifeDefining=true; g.flags.reprioritized=true; return{intel:10,mood:8}; }},
+      ]},
+    { id:'midlife_awakening_v2', icon:'🌅', title:'中年觉醒', category:'psychology',
+      body:'你35岁了。一个平常的周末，你在家里收拾东西，翻出了大学毕业时的照片。\n\n那时候的你：眼睛有光，笑容灿烂，觉得全世界都在你脚下。\n\n现在的你：眼睛有黑眼圈，笑容有疲惫，觉得全世界都在跟你作对。\n\n你问自己：这15年，我得到了什么？失去了什么？\n\n得到的：一份工作、一些技能、几个朋友、一些伤痕。\n失去的：时间、健康、激情、某些关系、某些可能性。\n\n你没有后悔。你只是突然明白了：人生不是一条直线上升的线——是一条有起有落的曲线。而你正处于一个"低谷"——或者是一个新的"起点"。\n\n"中年觉醒不是危机——是清醒。你终于看清了自己是谁，也终于可以决定：余下的时间，要怎么活。"',
+      cond: g => !g.flags.midlifeAwakening && g.age >= 35 && g.age <= 45,
+      choices:[
+        { label:'做一件年轻时不敢做的事', hint:'+✨ +😊 +❤️', fn: g => { g.flags.midlifeAwakening=true; g.flags.braveChoice=true; return{charm:10,mood:20,money:-5000}; }},
+        { label:'开始认真对待健康', hint:'+❤️ +😊', fn: g => { g.flags.midlifeAwakening=true; g.flags.healthFirst=true; return{health:20,mood:10}; }},
+        { label:'写一份人生回顾', hint:'+🧠 +😊', fn: g => { g.flags.midlifeAwakening=true; g.flags.lifeReview=true; return{intel:12,mood:15}; }},
+      ]},
+    { id:'return_hometown', icon:'🚂', title:'回乡创业', category:'psychology',
+      body:'你在老家县城看了一圈。\n\n房租：800/月（三室两厅）。\n房价：6000/㎡（你在大城市买不起一个厕所）。\n物价：一碗面8块。\n工资：3000-5000。\n\n你的发小在县城开了个奶茶店，月入8000。他每天5点下班，周末带孩子去公园。\n\n你的大学同学考上了县里的公务员，朝九晚五，从不加班。他在朋友圈晒周末钓鱼的照片。\n\n你在大城市月入2万，但996、007、通勤2小时、房租5000。你存下的钱，还不如你发小多。\n\n你想回来。但你又怕：回来之后，你的履历就"废了"。大城市的经验在县城不值钱。你的朋友圈会怎么看你？\n\n"回乡不是逃跑——是另一种勇敢。不是每个人都要在大城市证明自己。有些人选择在小地方，过好日子。"',
+      cond: g => !g.flags.returnHometown && g.age >= 28 && g.age <= 40 && g.mood < 50 && g.money > 50000,
+      choices:[
+        { label:'回老家，开个小店', hint:'+😊 +❤️ -💰', fn: g => { g.flags.returnHometown=true; g.flags.smallBusiness=true; setJob(g,'小店老板',6000); return{mood:25,health:15,social:10,money:-50000}; }},
+        { label:'回老家考公务员', hint:'+🧠 +😊', fn: g => { g.flags.returnHometown=true; g.flags.localCivilServant=true; setJob(g,'基层公务员',5000); return{intel:5,mood:15,health:10}; }},
+        { label:'算了，大城市还有机会', hint:'+💰 -😊', fn: g => { g.flags.returnHometown=true; g.flags.stayedCity=true; return{money:5000,mood:-8}; }},
+      ]},
+    { id:'therapy_journey', icon:'🛋️', title:'心理咨询', category:'psychology',
+      body:'你终于走进了心理咨询室。\n\n你一直觉得"看心理医生"是有病的人才会做的事。但你的一个朋友说："健身是锻炼身体的，咨询是锻炼心理的。"\n\n第一次咨询：你说了20分钟，哭了10分钟。咨询师什么都没说，只是听着。\n\n第5次咨询：你开始理解自己为什么会焦虑。原来跟小时候的经历有关。\n\n第10次咨询：你学会了跟自己的负面情绪相处。你不再逃避，而是面对。\n\n第20次咨询：你的焦虑没有消失，但你不再害怕它了。你知道它只是一个信号——告诉你某些事情需要被关注。\n\n你的一个朋友问你："心理咨询有用吗？"\n\n你说："它没有治好我——但它让我认识了我自己。这可能是最有价值的事。"\n\n"心理咨询：不是因为你坏了需要修——而是因为你值得被理解。"',
+      cond: g => !g.flags.therapyJourney && g.age >= 22 && g.mood < 55 && g.money > 10000,
+      choices:[
+        { label:'坚持长期咨询', hint:'+🧠 +❤️ +😊 -💰', fn: g => { g.flags.therapyJourney=true; g.flags.longTermTherapy=true; return{intel:12,mood:20,health:10,money:-20000}; }},
+        { label:'试了几次，觉得有帮助', hint:'+🧠 +😊 -💰', fn: g => { g.flags.therapyJourney=true; g.flags.shortTherapy=true; return{intel:8,mood:10,money:-5000}; }},
+        { label:'觉得不适合自己', hint:'-💰', fn: g => { g.flags.therapyJourney=true; g.flags.therapyNotForMe=true; return{mood:-3,money:-1000}; }},
+      ]},
+    { id:'self_identity', icon:'🪞', title:'自我认同', category:'psychology',
+      body:'你在深夜问自己：我是谁？\n\n你的名字——是父母给的。\n你的职业——是市场定义的。\n你的性格——是环境塑造的。\n你的梦想——是别人告诉你的。\n\n那"你"到底是谁？\n\n你发现：你花了30年成为了别人期望的样子，而不是你自己想成为的样子。\n\n你的父母希望你稳定。你的老师希望你听话。你的老板希望你高效。你的朋友希望你有趣。\n\n但没有人问过你：你想成为什么样的人？\n\n你不知道答案。这让你焦虑。但你也觉得：也许"不知道"本身就是答案——因为你还在寻找，而寻找本身就是意义。\n\n"自我认同：不是你找到了自己——而是你创造了自己。每一天，每一个选择，你都在回答：我是谁。"',
+      cond: g => !g.flags.selfIdentity && g.age >= 25 && g.intel >= 50,
+      choices:[
+        { label:'尝试新事物，探索自己', hint:'+✨ +🧠 +😊', fn: g => { g.flags.selfIdentity=true; g.flags.exploring=true; return{charm:8,intel:8,mood:10}; }},
+        { label:'接受自己，不再追求"成为谁"', hint:'+😊 +❤️', fn: g => { g.flags.selfIdentity=true; g.flags.selfAcceptance=true; return{mood:18,health:5}; }},
+        { label:'写一份"自我介绍"', hint:'+🧠', fn: g => { g.flags.selfIdentity=true; g.flags.selfReflection=true; return{intel:10,mood:5}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -9884,6 +10005,15 @@ const ACHIEVEMENTS = [
     { id:'minimalist_ach_v2', icon:'🧹', name:'极简主义者', desc:'成功践行断舍离', check: g => g.flags.extremeMinimalist },
     { id:'xianyu_master_ach', icon:'♻️', name:'闲鱼达人', desc:'在二手经济中游刃有余', check: g => g.flags.xianyuMaster },
     { id:'financial_planner_ach', icon:'📋', name:'理财规划师', desc:'建立了完善的财务规划', check: g => g.flags.financialPlan },
+    // === v19.0 新增成就（心理哲学） ===
+    { id:'imposter_healed_ach', icon:'🎭', name:'克服冒名顶替', desc:'学会了认可自己的价值', check: g => g.flags.imposterSyndrome && g.flags.achievementJournal },
+    { id:'present_moment_ach', icon:'🧘', name:'活在当下', desc:'克服了对错过的恐惧', check: g => g.flags.acceptMissing },
+    { id:'boundary_master_ach', icon:'🛡️', name:'学会说不', desc:'摆脱了讨好型人格', check: g => g.flags.learnToSayNo },
+    { id:'philosopher_ach', icon:'📖', name:'哲学家', desc:'直面了存在性虚无', check: g => g.flags.philosophyReader },
+    { id:'self_healer_ach', icon:'💚', name:'自我疗愈者', desc:'面对了原生家庭创伤', check: g => g.flags.selfHealing || g.flags.familyTherapy },
+    { id:'growth_mindset_ach', icon:'🌱', name:'成长型思维', desc:'回顾了自己的成长历程', check: g => g.flags.personalGrowth },
+    { id:'therapy_pioneer_ach', icon:'🛋️', name:'心理咨询先行者', desc:'勇敢地走进了咨询室', check: g => g.flags.longTermTherapy },
+    { id:'self_knower_ach', icon:'🪞', name:'认识自己', desc:'开始了自我认同的探索', check: g => g.flags.selfIdentity && g.flags.selfAcceptance },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -10172,6 +10302,10 @@ const ENDINGS = [
     // --- v18.3 消费文化结局 ---
     { id:'financial_wise_end', badge:'💰', title:'财务智者', desc:'你从一个月光族变成了一个懂理财的人。\n\n你还清了信用卡债务，完成了52周攒钱挑战，建立了应急基金，买了合适的保险。你的投资组合虽然不大，但稳健增长。\n\n你的同事说："你怎么不焦虑了？以前你天天说没钱。"\n\n你说："不是我有钱了——是我不再被钱控制了。"\n\n你的存款不算多，但够你活12个月。你终于有了"说不"的底气。\n\n"财务自由不是有花不完的钱——是拥有「不做什么」的自由。"', cond: g => g.flags.debtFree && g.flags.completed52Week && g.flags.financialPlan && g.money >= 100000 && g.age >= 28 },
     { id:'conscious_consumer_end_v2', badge:'🌿', title:'清醒消费者', desc:'你从一个冲动购物者变成了一个清醒的消费者。\n\n你取关了所有种草博主，精简了订阅服务，学会了断舍离。你的家里只有你真正需要的东西，你的购物车永远不超过5件。\n\n你的朋友们说："你怎么什么都不买了？"\n\n你说："不是不买——是只买值得买的。"\n\n你发现：消费降级后，你的生活质量反而提高了。因为你终于分清了"需要"和"想要"。\n\n"清醒消费：不是省钱——是不再为不需要的东西买单。"', cond: g => g.flags.shoppingDetox && g.flags.extremeMinimalist && g.flags.subCut && g.money >= 50000 && g.mood >= 65 && g.age >= 28 },
+    // --- v19.0 心理哲学结局 ---
+    { id:'inner_peace_end_v2', badge:'🧘', title:'内心平静', desc:'你找到了内心的平静。\n\n你做了心理咨询，直面了原生家庭创伤，克服冒名顶替综合征，学会了对不喜欢的事说"不"。\n\n你不再焦虑于别人的评价，不再害怕失败，不再为了讨好别人而委屈自己。\n\n你的焦虑没有消失——但你不再害怕它了。你知道它只是一个信号，不是一个命令。\n\n你的朋友说："你变了。你以前总是很焦虑。"\n\n你说："我还是会焦虑——但我学会了跟焦虑和平相处。"\n\n"内心平静不是没有问题——是终于有了面对问题的勇气。"', cond: g => g.flags.therapyJourney && g.flags.familyOrigin && (g.flags.learnToSayNo || g.flags.achievementJournal) && g.mood >= 70 && g.intel >= 60 && g.age >= 30 },
+    { id:'wise_elder_end', badge:'🌅', title:'智者', desc:'你成了朋友中的"人生导师"。\n\n你经历了大城市的漂泊、职场的起伏、感情的波折、健康的危机。你没有被打倒——你把每一次跌倒都变成了智慧。\n\n你的朋友们喜欢找你聊天：因为你从不评判，总是理解。你说的每一句话都有分量——因为那是用30年的经历换来的。\n\n一个年轻人问你："人生最重要的事是什么？"\n\n你想了想说："认识自己。接受自己。成为自己。"\n\n"智者不是知道所有答案——是知道没有标准答案。每个人的人生都是独一无二的。"', cond: g => g.flags.personalGrowth && g.flags.selfIdentity && g.flags.midlifeAwakening && g.intel >= 75 && g.mood >= 60 && g.social >= 50 && g.age >= 38 },
+    { id:'hometown_hero_end_v2', badge:'🏠', title:'小城故事', desc:'你回到了老家，在小城市找到了自己的位置。\n\n你没有在大城市买房，没有年薪百万，没有光鲜的履历。但你有：每天5点半下班的自由、周末陪父母吃饭的温暖、邻居见面打招呼的亲切。\n\n你的大城市朋友说："你不后悔吗？"\n\n你说："后悔什么？我每天睡到自然醒，有时间钓鱼、有时间陪家人、有时间做自己。这难道不是成功？"\n\n"小城市不是退路——是另一条路。不是每个人都必须在大城市证明自己。"', cond: g => g.flags.returnHometown && (g.flags.smallBusiness || g.flags.localCivilServant) && g.mood >= 70 && g.age >= 32 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
@@ -10370,6 +10504,24 @@ function advanceMonth() {
 
     G.months++; G.month++;
     if (G.month > 12) { G.month = 1; G.age++; G.year++; G.flags.springFestivalThisYear = false; }
+
+    // v19.0: 人生反思系统 - 在里程碑年龄触发回顾事件
+    if (G.month === 1 && [30,35,40,45,50].includes(G.age) && !G.flags['reflection_'+G.age]) {
+        G.flags['reflection_'+G.age] = true;
+        const milestones = [];
+        if (G.flags.hasHouse) milestones.push('在大城市买了房');
+        if (G.flags.married) milestones.push('组建了家庭');
+        if (G.flags.hasChild) milestones.push('有了孩子');
+        if (G.flags.entrepreneur) milestones.push('创过业');
+        if (G.flags.civilServant) milestones.push('考了公务员');
+        if (G.money > 200000) milestones.push('攒下了积蓄');
+        if (G.achievements.length > 20) milestones.push('收获了很多人生体验');
+        const summary = milestones.length > 0
+            ? '你回顾了自己的人生：' + milestones.join('、') + '。\n\n也许不是完美的，但这是你的人生。'
+            : '你回顾了过去的人生，似乎没有做出什么特别的选择。但你还在路上。';
+        G.eventLog.push({ age: G.age, text: `${G.age}岁生日：${summary}` });
+        G.mood = clamp(G.mood + (milestones.length >= 3 ? 10 : 5), 0, 100);
+    }
 
     // v8.0: 每月更新倒卖交易价格
     updateTradePrices();
