@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v14.1
+// 都市浮生记 - Game Engine v14.2
 // ============================================
 
 // === GAME STATE ===
@@ -527,7 +527,7 @@ const SURPRISE_EVENTS = [
       body:'你在商场等电梯的时候，突然响起了一首歌——是你高中时候最喜欢的歌。\n\n你站在那儿，听完了整首歌。你的脑海里闪过：教室、操场、那个你暗恋的人、毕业那天。\n\n你打开QQ看了看——那个人的头像是灰色的。已经离线好几年了。\n\n你笑了笑。走出商场的时候，你哼着那首歌。\n\n"音乐是时间机器——一首歌就能把你送回10年前。"',
       fn: g => ({mood: 8, intel: 2}) },
     // === v14.0 新增惊喜事件 ===
-    { id:'surprise_lucky_draw', icon:'🎰', title:'抽奖中了！', weight:1,
+    { id:'surprise_lucky_draw_v2', icon:'🎰', title:'抽奖中了！', weight:1,
       body:'你随手参加了商场的抽奖活动——居然中了一等奖！\n\n奖品是一台最新款手机，价值8000块。\n\n你激动得手都在抖。旁边的阿姨说：「年轻人运气真好，我抽了10年都没中过。」\n\n你把手机挂闲鱼了。\n\n"运气这东西——信则有，不信则...反正也不亏。"',
       fn: g => { const r = Math.random(); if (r > 0.8) { return {money: 8000, mood: 20, charm: 5}; } else { return {mood: -5}; /* 是假的 */ } } },
     { id:'surprise_celebrity', icon:'⭐', title:'偶遇明星', weight:1,
@@ -539,22 +539,22 @@ const SURPRISE_EVENTS = [
     { id:'surprise_lost_pet', icon:'🐕', title:'捡到流浪猫/狗', weight:2,
       body:'你在小区里看到一只脏兮兮的小猫/小狗，瘦得皮包骨，眼神可怜。\n\n你给它买了根火腿肠。它吃完后，蹭了蹭你的脚。\n\n你犹豫了：带回去？自己都快养不活了。不带？良心过不去。\n\n最后你把它带回了家。你的室友/对象说：「又多了一张嘴吃饭。」\n\n"收养流浪动物：你救了一条命，它治愈了你的心。"',
       fn: g => { g.flags.hasPet = true; return {mood: 12, money: -500, health: 3, social: 5}; } },
-    { id:'surprise_wifi_down', icon:'📶', title:'断网了！', weight:2,
+    { id:'surprise_wifi_down_v2', icon:'📶', title:'断网了！', weight:2,
       body:'你正在赶一个重要的deadline，突然——断网了。\n\n你重启路由器、打电话给运营商、甚至跑到楼下咖啡馆蹭网。\n\n等网恢复的时候，已经过了deadline。\n\n你发了条朋友圈：「现代人的命是WiFi给的。」收获了50个赞。\n\n"断网的恐惧：不是没网——是没网的时候你才发现自己什么都做不了。"',
       fn: g => ({mood: -10, intel: -3}) },
     { id:'surprise_compliment', icon:'😊', title:'陌生人的夸奖', weight:2,
       body:'你在地铁上，突然有个陌生人对你说：「你的衣服好好看！」\n\n你愣了一下，说了声谢谢。然后你开心了一整天。\n\n你发现：有时候，陌生人的一句夸奖，比朋友的十句安慰还管用。\n\n"被看见的感觉：原来我值得被夸奖。"',
       fn: g => ({mood: 10, charm: 5, social: 3}) },
-    { id:'surprise_power_outage', icon:'💡', title:'停电了', weight:2,
+    { id:'surprise_power_outage_v2', icon:'💡', title:'停电了', weight:2,
       body:'晚上10点，你正在赶工，突然停电了。\n\n你打开手机手电筒，发现整个小区都黑了。\n\n你点了根蜡烛，坐在窗边看着城市的夜景。突然发现：没有电的夜晚，星星特别亮。\n\n来电后，你发了条朋友圈：「偶尔停电，也挺好。」\n\n"停电的意义：让你看见被灯光遮蔽的星空。"',
       fn: g => ({mood: 5, intel: 3, health: 2}) },
     { id:'surprise_food_delivery_wrong', icon:'🍱', title:'外卖送错了', weight:3,
       body:'你点了一份宫保鸡丁，外卖小哥送来一份鱼香肉丝。\n\n你打电话给商家，商家说：「抱歉送错了，您先吃，我们再送一份。」\n\n于是你吃了两份。\n\n你摸着肚子想：这算不算因祸得福？\n\n"外卖送错：唯一一种让你吃两份还不胖的理由。（其实会胖）"',
       fn: g => ({health: -3, mood: 8, money: 0}) },
-    { id:'surprise_old_friend', icon:'👋', title:'偶遇老同学', weight:2,
+    { id:'surprise_old_friend_v2', icon:'👋', title:'偶遇老同学', weight:2,
       body:'你在街上走着，突然有人喊你的名字——是高中同学！\n\n你们聊了起来。ta现在是一家公司的CEO，年薪百万。\n\n你笑着说：「厉害啊！」心里想：当年ta成绩还没我好呢。\n\n你们加了微信，说「有空聚聚」。然后你们再也没联系过。\n\n"偶遇老同学：让你知道，人生没有标准答案。"',
       fn: g => ({mood: -5, social: 3, intel: 2}) },
-    { id:'surprise_bonus', icon:'💰', title:'意外奖金', weight:1,
+    { id:'surprise_bonus_v2', icon:'💰', title:'意外奖金', weight:1,
       body:'公司突然发了一笔奖金——说是「季度绩效奖」。\n\n你看了看金额：5000块！你激动得差点跳起来。\n\n你的同事说：「别高兴太早，下个月可能要裁员。」\n\n你把钱存了起来。不管怎样，先开心一天。\n\n"意外奖金：老板的良心发现——虽然可能只有一天。"',
       fn: g => ({money: 5000, mood: 15}) },
     { id:'surprise_social_anxiety', icon:'😰', title:'社恐发作', weight:3,
@@ -7271,6 +7271,87 @@ const EVENTS = [
         { label:'两边跑', hint:'+💰 +🧠', fn: g => { g.flags.lifeBalanceChoice=true; return{money:5000,intel:8,mood:5}; }},
         { label:'还在思考', hint:'+🧠', fn: g => { g.flags.lifeBalanceChoice=true; return{intel:10}; }},
       ]},
+    // === v14.2 宠物经济 + 宠物社交 + 养宠日常 ===
+    { id:'adopt_pet_v2', icon:'🐱', title:'领养宠物',
+      body:'你在朋友圈看到一条领养信息：一只3个月大的小橘猫，很可爱。\n\n你犹豫了：养宠物意味着责任——每天喂食、铲屎、陪玩、看病。\n\n但当你看到小猫的照片，你的心融化了。\n\n你填了领养申请表。审核很严格：需要提供房产证、收入证明、家庭照片。\n\n一周后，你接到了小猫。你给它取名「橘子」。\n\n"领养宠物：你以为你在救它，其实它在救你。"',
+      cond: g => g.age >= 25 && !g.flags.hasPet && !g.flags.adoptPet,
+      choices:[
+        { label:'精心照顾', hint:'+😊 +💰', fn: g => { g.flags.adoptPet=true; g.flags.hasPet=true; return{mood:15,money:-2000}; }},
+        { label:'佛系养宠', hint:'+😊', fn: g => { g.flags.adoptPet=true; g.flags.hasPet=true; return{mood:10,money:-500}; }},
+        { label:'放弃领养', hint:'-😊', fn: g => { g.flags.adoptPet=true; return{mood:-8}; }},
+      ]},
+    { id:'pet_medical_v2', icon:'🏥', title:'宠物看病',
+      body:'你的猫/狗突然不吃东西了，精神也不好。\n\n你带它去宠物医院。医生说：需要做全面检查，费用2000元。\n\n检查结果：轻度肠胃炎，需要输液3天，每天500元。\n\n你看着它可怜的样子，心疼得不行。你刷了信用卡。\n\n你的同事说：「给宠物花这么多钱？」你说：「它不是宠物，它是家人。」\n\n"宠物医疗：贵得让你怀疑人生，但看到它好起来——值了。"',
+      cond: g => g.flags.hasPet && !g.flags.petMedical,
+      choices:[
+        { label:'全力治疗', hint:'-💰 +😊', fn: g => { g.flags.petMedical=true; return{money:-3500,mood:10}; }},
+        { label:'买保险', hint:'-💰 +🧠', fn: g => { g.flags.petMedical=true; g.flags.petInsurance=true; return{money:-1000,intel:5,mood:5}; }},
+        { label:'自己查资料治', hint:'+🧠 -💰', fn: g => { g.flags.petMedical=true; return{intel:8,mood:-5,money:-200}; }},
+      ]},
+    { id:'pet_social_event', icon:'🐕', title:'宠物社交',
+      body:'你开始带宠物去公园遛弯。\n\n你发现：宠物是最好的社交工具。你的猫/狗和其他宠物玩耍，你和其他主人聊天。\n\n你加了5个宠物群：「XX小区铲屎官联盟」「猫奴互助会」「狗狗训练交流群」。\n\n你甚至参加了宠物聚会，认识了很多有趣的人。\n\n"宠物社交：不是你带宠物出门——是宠物带你出门。"',
+      cond: g => g.flags.hasPet && !g.flags.petSocial,
+      choices:[
+        { label:'积极参加', hint:'+👥 +😊', fn: g => { g.flags.petSocial=true; return{social:12,mood:8}; }},
+        { label:'偶尔参加', hint:'+👥', fn: g => { g.flags.petSocial=true; return{social:5,mood:5}; }},
+        { label:'宅家撸猫/狗', hint:'+😊 -👥', fn: g => { g.flags.petSocial=true; return{mood:10,social:-3}; }},
+      ]},
+    { id:'pet_economy_v2', icon:'💰', title:'宠物经济',
+      body:'你算了一下养宠物的年度开支：\n\n- 猫粮/狗粮：3000元\n- 零食玩具：1000元\n- 医疗保健：2000元\n- 美容洗澡：1200元\n- 寄养/上门：800元\n\n总计：8000元/年。\n\n你的同事说：「你这是在养一个孩子。」你说：「但它不会叛逆。」\n\n你开始研究宠物保险、宠物基金、宠物理财。\n\n"宠物经济：你以为你在养它，其实它在养你的钱包。"',
+      cond: g => g.flags.hasPet && g.age >= 26 && !g.flags.petEconomy,
+      choices:[
+        { label:'给它最好的', hint:'-💰 +😊', fn: g => { g.flags.petEconomy=true; return{money:-8000,mood:10}; }},
+        { label:'精打细算', hint:'+🧠 +💰', fn: g => { g.flags.petEconomy=true; g.flags.minimalist=true; return{intel:8,money:-3000,mood:5}; }},
+        { label:'自制猫粮/狗粮', hint:'+🧠 +💪', fn: g => { g.flags.petEconomy=true; g.flags.cookingSkill=true; return{intel:5,health:3,money:-1500}; }},
+      ]},
+    { id:'pet_companion_v2', icon:'💕', title:'宠物陪伴',
+      body:'你加班到深夜回家，打开门——你的猫/狗冲过来迎接你。\n\n它蹭你的脚，舔你的手，好像在说：「你终于回来了。」\n\n你抱着它，突然觉得：一天的疲惫都消失了。\n\n你的室友说：「你对它比对自己还好。」你说：「因为它对我的爱是无条件的。」\n\n"宠物陪伴：不是你需要它——是你们彼此需要。"',
+      cond: g => g.flags.hasPet && g.flags.petSocial && !g.flags.petCompanion,
+      choices:[
+        { label:'每天陪它2小时', hint:'+😊 +💪', fn: g => { g.flags.petCompanion=true; return{mood:15,health:5}; }},
+        { label:'周末带它出游', hint:'+😊 +✨', fn: g => { g.flags.petCompanion=true; return{mood:12,charm:5}; }},
+        { label:'工作太忙没空', hint:'-😊 -👥', fn: g => { g.flags.petCompanion=true; return{mood:-10,social:-5}; }},
+      ]},
+    { id:'pet_loss_v2', icon:'💔', title:'宠物离世',
+      body:'你的猫/狗老了。它不再像以前那样活泼，走路也很慢。\n\n医生说：它的时间不多了。\n\n你请了假，陪它度过最后的日子。你给它做了好吃的，带它去了最喜欢的公园。\n\n它在你怀里闭上了眼睛。你哭了，像个孩子。\n\n你发了条朋友圈：「谢谢你陪我这么多年。」收获了100个赞和无数安慰。\n\n"宠物离世：不是失去一个宠物——是失去一个家人。"',
+      cond: g => g.flags.petCompanion && g.age >= 30 && !g.flags.petLoss,
+      choices:[
+        { label:'好好告别', hint:'+😊 +🧠', fn: g => { g.flags.petLoss=true; return{mood:-20,intel:10}; }},
+        { label:'再养一只', hint:'+😊 -💰', fn: g => { g.flags.petLoss=true; g.flags.hasPet=true; return{mood:5,money:-3000}; }},
+        { label:'不再养了', hint:'-😊', fn: g => { g.flags.petLoss=true; g.flags.hasPet=false; return{mood:-15}; }},
+      ]},
+    { id:'pet_travel', icon:'✈️', title:'带宠物旅行',
+      body:'你想带宠物去旅行，但发现：\n\n- 飞机托运：800元+手续复杂\n- 高铁：不允许\n- 自驾：需要宠物笼\n- 酒店：90%不接受宠物\n\n你找到了一家宠物友好酒店，价格是普通酒店的2倍。\n\n你带着它出发了。它在车上很兴奋，一直看窗外。\n\n你拍了很多照片，发了朋友圈：「我和我的毛孩子。」\n\n"带宠物旅行：麻烦是麻烦——但看到它开心的样子，值了。"',
+      cond: g => g.flags.hasPet && g.flags.petCompanion && !g.flags.petTravel,
+      choices:[
+        { label:'自驾旅行', hint:'+😊 +💰', fn: g => { g.flags.petTravel=true; return{mood:15,money:-2000}; }},
+        { label:'宠物寄养', hint:'-😊 -💰', fn: g => { g.flags.petTravel=true; return{mood:-8,money:-500}; }},
+        { label:'放弃旅行', hint:'-😊', fn: g => { g.flags.petTravel=true; return{mood:-5}; }},
+      ]},
+    { id:'pet_business', icon:'🏪', title:'宠物生意',
+      body:'你发现：宠物经济是个巨大的市场。\n\n你开始研究：宠物食品、宠物用品、宠物美容、宠物寄养、宠物摄影。\n\n你算了一笔账：开一家宠物店，初期投入20万，预计18个月回本。\n\n你的家人说：「你这是不务正业。」你说：「我这是顺应趋势。」\n\n"宠物生意：不是卖萌——是一门严肃的生意。"',
+      cond: g => g.flags.petEconomy && g.age >= 28 && !g.flags.petBusiness,
+      choices:[
+        { label:'开宠物店', hint:'-💰 +✨', fn: g => { g.flags.petBusiness=true; g.flags.entrepreneur=true; return{money:-20000,charm:10,mood:8}; }},
+        { label:'做宠物博主', hint:'+✨ +🧠', fn: g => { g.flags.petBusiness=true; g.flags.contentCreator=true; return{charm:12,intel:8,mood:10}; }},
+        { label:'继续观望', hint:'+🧠', fn: g => { g.flags.petBusiness=true; return{intel:5}; }},
+      ]},
+    { id:'pet_community', icon:'🏘️', title:'宠物社区',
+      body:'你所在的小区有很多养宠物的人。你们自发组织了「宠物社区」。\n\n你们定期聚会、分享养宠经验、互相帮助照看宠物、组织宠物义诊。\n\n你成了社区的核心成员。你的邻居说：「有了宠物社区，小区都变温暖了。」\n\n你甚至推动了小区建设宠物公园。\n\n"宠物社区：不是因为宠物而聚集——是因为爱而连接。"',
+      cond: g => g.flags.petSocial && g.flags.petCompanion && !g.flags.petCommunity,
+      choices:[
+        { label:'成为组织者', hint:'+👥 +✨', fn: g => { g.flags.petCommunity=true; return{social:15,charm:8,mood:10}; }},
+        { label:'积极参与', hint:'+👥 +😊', fn: g => { g.flags.petCommunity=true; return{social:10,mood:8}; }},
+        { label:'潜水观望', hint:'+🧠', fn: g => { g.flags.petCommunity=true; return{intel:5,social:3}; }},
+      ]},
+    { id:'pet_lifestyle', icon:'🌟', title:'宠物生活方式',
+      body:'你发现：养宠物改变了你的生活方式。\n\n你开始早起遛狗/喂猫，你的生活变得规律了。\n你开始关注健康，因为你要陪它更久。\n你开始社交，因为它带你认识了很多人。\n你开始学习，因为你想给它更好的照顾。\n\n你的朋友说：「你变了。」你说：「是它改变了我。」\n\n"宠物生活方式：不是你养它——是你们一起成长。"',
+      cond: g => g.flags.petCompanion && g.flags.petCommunity && !g.flags.petLifestyle,
+      choices:[
+        { label:'享受这种生活', hint:'+😊 +💪 +👥', fn: g => { g.flags.petLifestyle=true; return{mood:15,health:8,social:10}; }},
+        { label:'分享给更多人', hint:'+✨ +👥', fn: g => { g.flags.petLifestyle=true; return{charm:10,social:8,mood:8}; }},
+        { label:'保持现状', hint:'+😊', fn: g => { g.flags.petLifestyle=true; return{mood:10}; }},
+      ]},
 ];
 
 const ACHIEVEMENTS = [
@@ -7940,6 +8021,17 @@ const ACHIEVEMENTS = [
     { id:'reverse_migrant', icon:'🔄', name:'反向迁徙者', desc:'选择了返乡生活', check: g => g.flags.reverseMigration },
     { id:'hometown_changer', icon:'🏗️', name:'家乡建设者', desc:'见证了家乡的变化', check: g => g.flags.hometownChange },
     { id:'life_balance_chooser', icon:'⚖️', name:'人生选择者', desc:'做出了人生选择', check: g => g.flags.lifeBalanceChoice },
+    // === v14.2 新增成就（宠物经济） ===
+    { id:'pet_adopter', icon:'🏠', name:'铲屎官上线', desc:'领养了一只宠物', check: g => g.flags.adoptPet },
+    { id:'pet_medical_ach', icon:'🏥', name:'宠物医疗', desc:'带宠物看了病', check: g => g.flags.petMedical },
+    { id:'pet_social_ach', icon:'🐕', name:'宠物社交', desc:'通过宠物交了朋友', check: g => g.flags.petSocial },
+    { id:'pet_economy_ach', icon:'💸', name:'宠物经济', desc:'感受到了养宠的开销', check: g => g.flags.petEconomy },
+    { id:'pet_companion_ach', icon:'🤝', name:'最佳伙伴', desc:'和宠物建立了深厚感情', check: g => g.flags.petCompanion },
+    { id:'pet_loss_ach', icon:'💔', name:'离别之痛', desc:'经历了宠物的离去', check: g => g.flags.petLoss },
+    { id:'pet_travel_ach', icon:'✈️', name:'带宠出行', desc:'带宠物去旅行', check: g => g.flags.petTravel },
+    { id:'pet_business_ach', icon:'🏪', name:'宠物创业', desc:'进入了宠物行业', check: g => g.flags.petBusiness },
+    { id:'pet_community_ach', icon:'👥', name:'宠物社群', desc:'加入了宠物社群', check: g => g.flags.petCommunity },
+    { id:'pet_lifestyle_ach', icon:'🌈', name:'宠物生活方式', desc:'宠物成为生活的一部分', check: g => g.flags.petLifestyle },
 ];
 
 // === ENDINGS === (order matters: first match wins)
@@ -8157,6 +8249,11 @@ const ENDINGS = [
     // --- v14.1 NEW ENDINGS ---
     { id:'hometown_hero_end', badge:'🏡', title:'小城之光', desc:'你回到了小城，成了当地的传奇。\n\n你在县城开了第一家精品咖啡馆/网红奶茶店/独立书店。你的店成了小城年轻人的打卡圣地。\n\n你的月收入只有8000，但你有了时间陪父母、有了精力做自己喜欢的事。\n\n你的同学说：「你是我们小城的名人。」你笑着说：「我只是想过自己想要的生活。」\n\n"返乡创业：不是退而求其次——是选择另一种精彩。"', cond: g => g.flags.countyEconomy && g.flags.hometownChange && g.mood >= 65 && g.age >= 30 },
     { id:'balanced_living_end', badge:'⚖️', title:'双城生活', desc:'你找到了大城市和小城市之间的平衡。\n\n你在大城市工作，在小城市有家。你每周往返，像候鸟一样。\n\n你享受大城市的便利，也享受小城市的安逸。你的同事说：「你活得太累了。」你说：「但我活得很完整。」\n\n"双城生活：不是两头跑——是两头都要。"', cond: g => g.flags.lifeBalanceChoice && g.flags.reverseMigration && g.mood >= 60 && g.age >= 32 },
+    // --- v14.2 NEW ENDINGS (宠物经济) ---
+    { id:'pet_empire_end', badge:'🐾', title:'宠物帝国', desc:'你从一个普通铲屎官，变成了宠物行业的创业者。\n\n你开了宠物店/做了宠物博主/成了宠物医疗顾问。你的社交媒体有10万粉丝，他们叫你「宠物界的大佬」。\n\n你的宠物已经老了，但它依然是你最初的灵感来源。你每天还是会花1小时和它待在一起。\n\n你的创业故事被当地媒体报道。标题是：「从一只流浪猫到一个宠物帝国。」\n\n"宠物创业：不是为了赚钱——是为了让更多人和动物都能被善待。"', cond: g => g.flags.petBusiness && g.flags.petLifestyle && g.money >= 50000 && g.age >= 30 },
+    { id:'pet_soulmate_end', badge:'💕', title:'灵魂伴侣', desc:'你和你的宠物，成了这个城市里最亲密的伙伴。\n\n它陪你度过了失恋、加班、失眠、孤独的每一个夜晚。它不会说话，但它知道你什么时候需要被抱着。\n\n你的朋友圈里都是它的照片。你的相册里90%是它。你的手机壁纸是它打哈欠的样子。\n\n有人说：「你太溺爱你的宠物了。」你说：「它值得。」\n\n"宠物不是宠物——是在大城市里，那个永远等你回家的家人。"', cond: g => g.flags.petCompanion && g.flags.petLifestyle && g.mood >= 70 && g.age >= 28 },
+    { id:'pet_healer_end', badge:'🌈', title:'治愈之手', desc:'你从宠物的离去中，学会了如何面对失去。\n\n你的宠物离开了这个世界。你哭了整整一周。你删掉了手机里所有的照片——然后又偷偷恢复了。\n\n你去了流浪动物收容所做志愿者。你说：「我不能再养了。」但你还是没忍住，又领养了一只。\n\n你终于明白：悲伤不是结束——是新的开始的序曲。\n\n"宠物的离去教会我们：爱过就是永远——即使它已经不在身边。"', cond: g => g.flags.petLoss && g.flags.petCommunity && g.mood >= 55 && g.age >= 30 },
+    { id:'pet_community_leader_end', badge:'👥', title:'宠物社群领袖', desc:'你从一个普通养宠人，变成了社区宠物圈的灵魂人物。\n\n你组织了遛狗团、养宠交流群、宠物义诊日。你的微信群有500个人，每天都有人在群里晒猫晒狗。\n\n你的邻居说：「自从有了你，我们小区的流浪猫都过上了好日子。」你笑着说：「那当然，它们也是社区的一份子。」\n\n你被评为「社区最美志愿者」。你把这个奖放在了宠物的玩具箱旁边。\n\n"宠物社群：不是人在社交——是宠物在帮我们找到彼此。"', cond: g => g.flags.petCommunity && g.flags.petSocial && g.social >= 70 && g.age >= 28 },
     // --- DEFAULT ---
     { id:'default', badge:'🌅', title:'平凡人生', desc:'你的故事没有惊天动地，也没有波澜壮阔。\n\n你只是一个普通人，在大城市过着普通的生活。加过班、失过业、恋过爱、失过眠。\n\n但每一个认真活着的人，都在书写自己的故事。\n\n你的故事还没有结束——因为人生，永远都有下一页。', cond: g => true },
 ];
