@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v35.9
+// 都市浮生记 - 数据文件 v36.0
 // ============================================
 
 
@@ -21063,6 +21063,88 @@ const EVENTS = [
         { label:'觉得健康就好，不追求极致', hint:'+😊 +❤️', fn: g => { g.flags.fitnessBody=true; g.flags.fitnessWisdom=true; return{mood:8,health:5,intel:5}; }},
       ]},
 
+    // === v36.0 夜市与地摊经济 ===
+    { id:'nightmarket_visit_v36_0', icon:'🏮', title:'逛夜市', category:'nightmarket',
+      body:'周末你去了本地最有名的夜市。人挤人的街道上全是叫卖声，烤串的烟雾缭绕，手机壳、袜子、手工饰品铺了一地。你突然觉得这才是城市最真实的样子。',
+      cond: g => g.age >= 18 && !g.flags.nightVisit,
+      choices:[
+        { label:'从街头吃到街尾，花了三百多', hint:'-💰 +😊 +😊', fn: g => { g.flags.nightVisit=true; g.flags.nightFoodie=true; return{money:-300,mood:10}; }},
+        { label:'只是逛逛，感受氛围', hint:'+😊 +🧠', fn: g => { g.flags.nightVisit=true; return{mood:5,intel:3}; }},
+        { label:'和摊主聊天，了解他们的生活', hint:'+🧠 +👥', fn: g => { g.flags.nightVisit=true; g.flags.nightCurious=true; return{intel:5,social:4}; }},
+      ]},
+    { id:'nightmarket_stall_v36_0', icon:'🪑', title:'第一次摆摊', category:'nightmarket',
+      body:'你在1688上进了一批手机壳，下班后去夜市支了个小摊。一晚上卖出去十几个，赚了八十多块。虽然不多，但那种自己当老板的感觉很奇妙。',
+      cond: g => g.age >= 20 && g.flags.nightVisit && !g.flags.nightStall && g.money > 500,
+      choices:[
+        { label:'决定每周都来摆摊', hint:'+💰 +😊', fn: g => { g.flags.nightStall=true; g.flags.nightRegular=true; return{money:500,mood:6}; }},
+        { label:'体验一次就够了，太累了', hint:'+🧠', fn: g => { g.flags.nightStall=true; return{money:80,intel:3}; }},
+        { label:'研究什么最好卖，准备认真做', hint:'+🧠 +💰', fn: g => { g.flags.nightStall=true; g.flags.nightSerious=true; return{money:80,intel:5,charm:3}; }},
+      ]},
+    { id:'nightmarket_food_v36_0', icon:'🍢', title:'夜市美食', category:'nightmarket',
+      body:'你发现了一家藏在夜市角落的烧烤摊，老板是个干了二十年的老师傅。烤腰子外焦里嫩，配上冰啤酒，你觉得这就是"人间烟火气，最抚凡人心"。',
+      cond: g => g.age >= 20 && g.flags.nightVisit && !g.flags.nightFood,
+      choices:[
+        { label:'成了这家烧烤摊的常客', hint:'-💰 +😊 -❤️', fn: g => { g.flags.nightFood=true; g.flags.nightRegular2=true; return{money:-200,mood:8,health:-3}; }},
+        { label:'拍了照发社交媒体，意外火了', hint:'+✨ +👥', fn: g => { g.flags.nightFood=true; g.flags.nightBlogger=true; return{charm:6,social:5}; }},
+        { label:'和老板学了烧烤手艺', hint:'+🧠 +✨', fn: g => { g.flags.nightFood=true; g.flags.nightSkill=true; return{intel:5,charm:3,mood:3}; }},
+      ]},
+    { id:'nightmarket_chengguan_v36_0', icon:'🚨', title:'城管来了', category:'nightmarket',
+      body:'你正在摆摊，突然有人喊"城管来了"。整条街瞬间鸡飞狗跳，你手忙脚乱地收摊，差点被没收货物。旁边的大叔帮你搬东西，说"习惯了，每周都来一次"。',
+      cond: g => g.age >= 20 && g.flags.nightStall && !g.flags.nightChengguan,
+      choices:[
+        { label:'去了解合法摆摊的政策', hint:'+🧠 +💰', fn: g => { g.flags.nightChengguan=true; g.flags.nightLegal=true; return{intel:5,money:-100}; }},
+        { label:'换个城管不管的地方继续摆', hint:'+💰 -😊', fn: g => { g.flags.nightChengguan=true; return{money:200,mood:-3}; }},
+        { label:'被吓到了，不敢再摆摊', hint:'-😊', fn: g => { g.flags.nightChengguan=true; g.flags.nightScared=true; return{mood:-5}; }},
+      ]},
+    { id:'nightmarket_economy_v36_0', icon:'📊', title:'地摊经济', category:'nightmarket',
+      body:'新闻说国家鼓励"地摊经济"，你们城市也划了一批合法摆摊区域。朋友圈里全是讨论摆摊的帖子，有人甚至辞职专门摆摊。你在想要不要也试试全职。',
+      cond: g => g.age >= 22 && g.flags.nightStall && !g.flags.nightEconomy && g.jobSalary > 0,
+      choices:[
+        { label:'辞了工作全职摆摊', hint:'+💰 -🧠', fn: g => { g.flags.nightEconomy=true; g.flags.nightFulltime=true; g.jobName='地摊老板'; g.jobSalary=4000; return{money:-2000,mood:5}; }},
+        { label:'白天上班晚上摆摊，双份收入', hint:'+💰 -❤️ -😊', fn: g => { g.flags.nightEconomy=true; g.flags.nightDouble=true; return{money:2000,health:-5,mood:-3}; }},
+        { label:'觉得摆摊只是体验，还是上班稳', hint:'+🧠', fn: g => { g.flags.nightEconomy=true; return{intel:3}; }},
+      ]},
+    { id:'nightmarket_social_v36_0', icon:'🤝', title:'夜市社交', category:'nightmarket',
+      body:'摆摊几个月后，你认识了旁边摊位的小哥。他白天是程序员，晚上摆摊卖手作皮具。你们成了好朋友，经常互相帮忙看摊，还一起研究选品。',
+      cond: g => g.age >= 22 && g.flags.nightRegular && !g.flags.nightSocial && g.social > 20,
+      choices:[
+        { label:'和摊友合伙租了个大摊位', hint:'-💰 +💰 +👥', fn: g => { g.flags.nightSocial=true; g.flags.nightPartner=true; return{money:-500,social:8,charm:3}; }},
+        { label:'加了摊友群，交流摆摊经验', hint:'+🧠 +👥', fn: g => { g.flags.nightSocial=true; return{intel:5,social:6}; }},
+        { label:'只是点头之交，各忙各的', hint:'+😊', fn: g => { g.flags.nightSocial=true; return{mood:2}; }},
+      ]},
+    { id:'nightmarket_business_v36_0', icon:'📈', title:'摆摊创业', category:'nightmarket',
+      body:'你的摊位越来越火，月收入竟然比工资还高。有人问你要不要一起开实体店，也有人想加盟你的模式。你发现摆摊不只是谋生，可能是创业的开始。',
+      cond: g => g.age >= 24 && g.flags.nightSocial && g.flags.nightSerious && !g.flags.nightBusiness && g.money > 10000,
+      choices:[
+        { label:'开了第一家实体小店', hint:'-💰 +✨ +💰', fn: g => { g.flags.nightBusiness=true; g.flags.nightShop=true; g.jobName='小店老板'; g.jobSalary=8000; return{money:-30000,charm:10}; }},
+        { label:'开了网店，线上线下一起卖', hint:'-💰 +💰 +🧠', fn: g => { g.flags.nightBusiness=true; g.flags.nightOnline=true; return{money:-5000,money:3000,intel:5}; }},
+        { label:'继续摆摊就好，不想压力太大', hint:'+💰 +😊', fn: g => { g.flags.nightBusiness=true; return{money:2000,mood:5}; }},
+      ]},
+    { id:'nightmarket_culture_v36_0', icon:'🎭', title:'夜市文化', category:'nightmarket',
+      body:'你开始研究夜市的历史，发现中国的地摊文化从唐宋就有。你写了一篇长文《一座城市的夜市简史》，从古代集市写到当代地摊经济，被本地公众号转载了。',
+      cond: g => g.age >= 25 && g.flags.nightBusiness && !g.flags.nightCulture && g.intel > 35,
+      choices:[
+        { label:'开始写一本关于城市烟火气的书', hint:'+💰 +✨ +🧠', fn: g => { g.flags.nightCulture=true; g.flags.nightAuthor=true; return{money:8000,charm:12,intel:8}; }},
+        { label:'做了个夜市纪录片', hint:'-💰 +✨ +👥', fn: g => { g.flags.nightCulture=true; g.flags.nightFilm=true; return{money:-5000,charm:15,social:8}; }},
+        { label:'只是自娱自乐，发在个人博客', hint:'+🧠 +😊', fn: g => { g.flags.nightCulture=true; return{intel:8,mood:5}; }},
+      ]},
+    { id:'nightmarket_midnight_v36_0', icon:'🌙', title:'深夜食堂', category:'nightmarket',
+      body:'凌晨一点，夜市收摊了。你和几个摊友去了附近一家24小时营业的面馆。热腾腾的面条端上来，大家聊着今晚的生意和明天的打算。这座城市最温暖的地方，可能就是深夜的食堂。',
+      cond: g => g.age >= 22 && g.flags.nightSocial && !g.flags.nightMidnight,
+      choices:[
+        { label:'经常深夜和摊友聚餐', hint:'-💰 +👥 +😊 -❤️', fn: g => { g.flags.nightMidnight=true; g.flags.nightCrew=true; return{money:-300,social:8,mood:6,health:-3}; }},
+        { label:'偶尔去一次，享受这种温暖', hint:'+😊 +👥', fn: g => { g.flags.nightMidnight=true; return{mood:5,social:3}; }},
+        { label:'太晚了，回去睡觉明天还要上班', hint:'+❤️', fn: g => { g.flags.nightMidnight=true; return{health:2,mood:2}; }},
+      ]},
+    { id:'nightmarket_smoke_v36_0', icon:'🔥', title:'烟火气', category:'nightmarket',
+      body:'有一天你忽然明白了，你喜欢的不是摆摊赚钱，而是夜市里那种热腾腾的烟火气。在大城市的高楼大厦间，这些小摊位是最接地气的存在。每个人的故事都写在脸上，每碗面里都有生活的味道。',
+      cond: g => g.age >= 26 && g.flags.nightMidnight && (g.flags.nightCulture || g.flags.nightBusiness) && !g.flags.nightSmoke && g.intel > 35,
+      choices:[
+        { label:'发起了"保护城市烟火气"公益活动', hint:'+✨ +👥 +🧠', fn: g => { g.flags.nightSmoke=true; g.flags.nightActivist=true; return{charm:12,social:10,intel:5}; }},
+        { label:'把夜市的故事拍成了短视频系列', hint:'+✨ +💰', fn: g => { g.flags.nightSmoke=true; g.flags.nightCreator=true; return{charm:10,money:3000}; }},
+        { label:'觉得这就是生活，不需要解释', hint:'+😊 +🧠', fn: g => { g.flags.nightSmoke=true; return{mood:10,intel:5,charm:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -23152,6 +23234,18 @@ const ACHIEVEMENTS = [
     { id:'fitness_marathon_v35_9_ach', icon:'🏅', name:'马拉松完赛', desc:'冲过了马拉松的终点线', check: g => g.flags.fitnessMarathon },
     { id:'fitness_life_v35_9_ach', icon:'🌟', name:'运动改变人生', desc:'运动彻底改变了你的生活状态', check: g => g.flags.fitnessLife },
     { id:'fitness_body_v35_9_ach', icon:'⚖️', name:'身体管理者', desc:'体检报告比实际年龄年轻五岁', check: g => g.flags.fitnessBody },
+
+    // v36.0 夜市与地摊经济
+    { id:'nightmarket_visit_v36_0_ach', icon:'🏮', name:'夜市初体验', desc:'第一次逛了城市的夜市', check: g => g.flags.nightVisit },
+    { id:'nightmarket_stall_v36_0_ach', icon:'🪑', name:'摆摊新人', desc:'支起了人生中第一个地摊', check: g => g.flags.nightStall },
+    { id:'nightmarket_food_v36_0_ach', icon:'🍢', name:'夜市美食家', desc:'找到了藏在夜市里的宝藏烧烤摊', check: g => g.flags.nightFood },
+    { id:'nightmarket_chengguan_v36_0_ach', icon:'🚨', name:'城管来了', desc:'经历了摆摊人的必修课——跑城管', check: g => g.flags.nightChengguan },
+    { id:'nightmarket_economy_v36_0_ach', icon:'📊', name:'地摊经济参与者', desc:'认真思考过摆摊作为职业的可能性', check: g => g.flags.nightEconomy },
+    { id:'nightmarket_social_v36_0_ach', icon:'🤝', name:'摊友圈', desc:'在夜市里交到了志同道合的朋友', check: g => g.flags.nightSocial },
+    { id:'nightmarket_business_v36_0_ach', icon:'📈', name:'摆摊创业者', desc:'从地摊开始了自己的创业之路', check: g => g.flags.nightBusiness },
+    { id:'nightmarket_culture_v36_0_ach', icon:'🎭', name:'夜市文化人', desc:'记录和研究了城市的夜市文化', check: g => g.flags.nightCulture },
+    { id:'nightmarket_midnight_v36_0_ach', icon:'🌙', name:'深夜食堂常客', desc:'在凌晨的面馆里感受到了城市的温暖', check: g => g.flags.nightMidnight },
+    { id:'nightmarket_smoke_v36_0_ach', icon:'🔥', name:'人间烟火气', desc:'理解了烟火气是城市最真实的底色', check: g => g.flags.nightSmoke },
 ];
 
 // === ENDINGS === (order matters: first match wins)
