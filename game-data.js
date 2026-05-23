@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v40.2
+// 都市浮生记 - 数据文件 v40.3
 // ============================================
 
 
@@ -24500,6 +24500,88 @@ const EVENTS = [
         { label:'感恩那段拼尽全力的日子', hint:'+😊 +💪', fn: g => { g.flags.kaoyanLife=true; return{mood:10,intel:5}; }},
       ]},
 
+    // === v40.3 留学与海归文化 ===
+    { id:'liuxue_decide_v40_3', icon:'✈️', title:'留学的念头', category:'liuxue',
+      body:'刷到一条留学博主的视频，看着她在国外大学校园里的日常，你心里泛起了一阵涟漪。从小到大，"出国"这个词一直离你很远——那是有钱人家的孩子才有的选项。但最近你越来越觉得，现在的生活像一潭死水，也许换个环境能看到不一样的世界。你开始认真查起了留学的事情。',
+      cond: g => g.age >= 22 && g.age <= 35 && g.intel >= 50 && !g.flags.liuxueDecide,
+      choices:[
+        { label:'开始认真准备留学申请', hint:'+🧠 -💰', fn: g => { g.flags.liuxueDecide=true; return{intel:8,money:-5000}; }},
+        { label:'算了，先看看国内的机会', hint:'+😊', fn: g => { g.flags.liuxueDecide=false; return{mood:3}; }},
+        { label:'跟家人商量一下', hint:'+❤️', fn: g => { g.flags.liuxueDecide=true; g.flags.liuxueFamilySupport=true; return{social:5}; }},
+      ]},
+    { id:'liuxue_prepare_v40_3', icon:'📖', title:'留学准备', category:'liuxue',
+      body:'你开始了漫长的留学准备之路。每天下班后还要啃雅思真题，周末泡在图书馆练口语。申请材料、推荐信、个人陈述——每一样都让人头大。中介费三万起步，雅思培训两万，考试费两千多……还没出去，钱已经像流水一样花出去了。你妈打电话来问："真的要去吗？"你说："我想试试。"',
+      cond: g => g.flags.liuxueDecide && !g.flags.liuxuePrepare,
+      choices:[
+        { label:'报了一对一雅思培训班', hint:'-💰 +🧠', fn: g => { g.flags.liuxuePrepare=true; return{money:-20000,intel:12}; }},
+        { label:'自己在家苦学，省点钱', hint:'+🧠 -😊', fn: g => { g.flags.liuxuePrepare=true; return{intel:8,mood:-5}; }},
+        { label:'找了留学中介全包服务', hint:'-💰 -💪', fn: g => { g.flags.liuxuePrepare=true; g.flags.liuxueAgency=true; return{money:-35000,mood:3}; }},
+      ]},
+    { id:'liuxue_arrive_v40_3', icon:'🌍', title:'初到异国', category:'liuxue',
+      body:'飞机降落的那一刻，你的心跳加速。走出机场，空气里是一种完全不同的味道。街上的行人说着你听不太懂的英语，超市里的东西名字全不一样，连点杯咖啡都要对着菜单比划半天。第一晚躺在出租屋的床上，听着窗外的车流声，你忽然意识到：从这一刻起，什么都要靠自己了。',
+      cond: g => g.flags.liuxuePrepare && !g.flags.liuxueArrive,
+      choices:[
+        { label:'强迫自己走出舒适区，参加新生活动', hint:'+❤️ +✨', fn: g => { g.flags.liuxueArrive=true; return{social:10,charm:5}; }},
+        { label:'在华人超市里找到了熟悉的感觉', hint:'+😊', fn: g => { g.flags.liuxueArrive=true; return{mood:5}; }},
+        { label:'第一周就在宿舍里躺了七天', hint:'-😊 -💪', fn: g => { g.flags.liuxueArrive=true; return{mood:-8,health:-3}; }},
+      ]},
+    { id:'liuxue_lonely_v40_3', icon:'😢', title:'留学孤独', category:'liuxue',
+      body:'留学三个月了，你发现最难的不是学业，而是孤独。课上小组讨论，本地同学聊得热火朝天，你插不上话。回到公寓想找人聊天，发现国内的朋友都在睡觉。刷朋友圈看到国内同学聚餐的合照，你一个人在出租屋里吃着速冻水饺。圣诞节到了，街上张灯结彩，你给妈妈打了个视频电话，她问你"吃得好不好"，你说"挺好的"，挂了电话后眼眶红了。',
+      cond: g => g.flags.liuxueArrive && !g.flags.liuxueLonely,
+      choices:[
+        { label:'开始写留学日记，记录每天的心情', hint:'+🧠 +😊', fn: g => { g.flags.liuxueLonely=true; g.flags.liuxueDiary=true; return{intel:8,mood:5}; }},
+        { label:'加入了当地华人留学生社群', hint:'+❤️', fn: g => { g.flags.liuxueLonely=true; g.flags.liuxueCommunity=true; return{social:12}; }},
+        { label:'开始频繁刷手机逃避现实', hint:'-😊 -💪', fn: g => { g.flags.liuxueLonely=true; return{mood:-10,health:-5}; }},
+      ]},
+    { id:'liuxue_parttime_v40_3', icon:'🍳', title:'留学打工', category:'liuxue',
+      body:'学费加生活费的压力太大了，你决定找份兼职。在中餐厅端盘子、在奶茶店做饮品、给国内做代购……你发现打工比上课还累。有一次在餐厅被客人投诉，老板当着所有人的面训了你一顿。那天晚上回到房间，你盯着天花板想：我花了这么多钱出来，就是为了来端盘子吗？但转念一想，至少下个月的房租有着落了。',
+      cond: g => g.flags.liuxueArrive && g.money < 50000 && !g.flags.liuxueParttime,
+      choices:[
+        { label:'在中餐厅端盘子，每小时12块', hint:'+💰 -💪', fn: g => { g.flags.liuxueParttime=true; g.flags.liuxueRestaurant=true; return{money:8000,health:-5,mood:-3}; }},
+        { label:'做代购，帮国内朋友买东西', hint:'+💰 +✨', fn: g => { g.flags.liuxueParttime=true; g.flags.liuxueDaigou=true; return{money:12000,charm:5}; }},
+        { label:'在学校图书馆找了份助教工作', hint:'+💰 +🧠', fn: g => { g.flags.liuxueParttime=true; g.flags.liuxueTA=true; return{money:6000,intel:8}; }},
+      ]},
+    { id:'liuxue_graduate_v40_3', icon:'🎓', title:'毕业抉择', category:'liuxue',
+      body:'毕业典礼上你穿着学位服拍照，笑得灿烂。但笑过之后是深深的迷茫：留下还是回国？留下的同学说这里生活节奏慢、环境好，但职业发展天花板低。回国的同学说国内机会多、发展快，但竞争压力大。你的签证还有三个月到期，必须做出决定了。站在校园的草坪上，你看着来来往往的人，觉得自己站在一个人生的十字路口。',
+      cond: g => g.flags.liuxueArrive && g.age >= 24 && !g.flags.liuxueGraduate,
+      choices:[
+        { label:'决定留下来工作，申请工签', hint:'+💰 -❤️', fn: g => { g.flags.liuxueGraduate=true; g.flags.liuxueStay=true; return{money:15000,social:-8}; }},
+        { label:'买机票回国，重新出发', hint:'+❤️ -💰', fn: g => { g.flags.liuxueGraduate=true; g.flags.liuxueReturn=true; return{social:10,money:-5000}; }},
+        { label:'先gap一年，旅行看看世界再说', hint:'+😊 -💰', fn: g => { g.flags.liuxueGraduate=true; g.flags.liuxueGap=true; return{mood:15,money:-20000}; }},
+      ]},
+    { id:'liuxue_return_v40_3', icon:'🛬', title:'海归回国', category:'liuxue',
+      body:'飞机降落在国内机场的那一刻，你深吸一口气——空气里是熟悉的味道。但很快你发现，"回来"和"回家"是两码事。朋友们的话题你接不上了，以前爱吃的东西觉得太油了，连过马路都觉得不太习惯。亲戚见面就问："国外工资多少？""有没有绿卡？""怎么不留下来？"你苦笑着解释，心里想：我到底属于哪里？',
+      cond: g => g.flags.liuxueReturn && !g.flags.liuxueReverseCultureShock,
+      choices:[
+        { label:'积极参加海归社群，找同类', hint:'+❤️ +✨', fn: g => { g.flags.liuxueReverseCultureShock=true; g.flags.liuxueHaiguiGroup=true; return{social:10,charm:5}; }},
+        { label:'先在家躺一个月再说', hint:'-💪 -💰', fn: g => { g.flags.liuxueReverseCultureShock=true; return{health:-5,mood:5,money:-8000}; }},
+        { label:'开始疯狂投简历找工作', hint:'+💰 -😊', fn: g => { g.flags.liuxueReverseCultureShock=true; g.flags.liuxueJobHunt=true; return{money:5000,mood:-5}; }},
+      ]},
+    { id:'liuxue_job_v40_3', icon:'💼', title:'海归找工作', category:'liuxue',
+      body:'你发现"海归"这个标签在国内已经不值钱了。HR问你："你的留学经历对工作有什么帮助？"你说了半天国际化视野、跨文化沟通，对方只是礼貌地点头。同学群里有人吐槽："海归变海带（待业）。"面试了十几家公司，有人觉得你太洋气不接地气，有人觉得你期望太高。直到有一天，一家做海外业务的公司说："我们需要你这样有国际经验的人。"',
+      cond: g => g.flags.liuxueReverseCultureShock && !g.flags.liuxueJob,
+      choices:[
+        { label:'接受了一份薪资一般但能用外语的工作', hint:'+💰 +✨', fn: g => { g.flags.liuxueJob=true; setJob(g,'海外业务专员',12000); return{money:5000,charm:5}; }},
+        { label:'决定考公务员，稳定最重要', hint:'+😊 -💰', fn: g => { g.flags.liuxueJob=true; g.flags.liuxueCivilExam=true; return{mood:5,money:-3000}; }},
+        { label:'用留学时学到的技能开始创业', hint:'+💰 +💪', fn: g => { g.flags.liuxueJob=true; g.flags.liuxueStartup=true; return{money:-15000,intel:10}; }},
+      ]},
+    { id:'liuxue_identity_v40_3', icon:'🪞', title:'身份认同', category:'liuxue',
+      body:'回国半年了，你还是会下意识地说"Excuse me"而不是"不好意思"。朋友聚会时有人调侃你"假洋鬼子"，你笑笑不说话。但深夜独处时你会想：出国的这几年到底改变了你什么？你看世界的方式不一样了，但你好像不再完全属于这里了。有人说这是"第三文化孩子"的宿命——永远在两个世界之间飘荡，两边都不完全属于。',
+      cond: g => g.flags.liuxueReverseCultureShock && g.age >= 26 && !g.flags.liuxueIdentity,
+      choices:[
+        { label:'开始写公众号分享留学感悟', hint:'+✨ +🧠', fn: g => { g.flags.liuxueIdentity=true; g.flags.liuxueWriter=true; return{charm:12,intel:8}; }},
+        { label:'接受了自己的"文化混血"身份', hint:'+😊 +💪', fn: g => { g.flags.liuxueIdentity=true; return{mood:15,health:5}; }},
+        { label:'计划再去国外待一段时间', hint:'-💰 +😊', fn: g => { g.flags.liuxueIdentity=true; g.flags.liuxuePlanAgain=true; return{mood:8,money:-10000}; }},
+      ]},
+    { id:'liuxue_life_v40_3', icon:'🌟', title:'留学人生', category:'liuxue',
+      body:'很多年后有人问你："留学值不值？"你想了很久。从经济上说，花了几十万学费，现在的工资要攒好几年才能回本。从职业上说，留学经历给你的加成也许没有想象中大。但你知道有些东西是算不出来的——第一次独自面对陌生世界时的勇气，在异国他乡交到第一个朋友时的感动，在深夜里学会和自己相处时的成长。留学最大的收获，也许就是那个变得更独立、更勇敢、更包容的自己。',
+      cond: g => (g.flags.liuxueJob || g.flags.liuxueIdentity) && g.age >= 28 && !g.flags.liuxueLife,
+      choices:[
+        { label:'成为留学顾问，帮更多人实现出国梦', hint:'+💰 +❤️', fn: g => { g.flags.liuxueLife=true; g.flags.liuxueConsultant=true; return{money:8000,social:10}; }},
+        { label:'写了一本关于留学经历的书', hint:'+✨ +🧠', fn: g => { g.flags.liuxueLife=true; return{charm:15,intel:10}; }},
+        { label:'感恩那段改变人生的经历', hint:'+😊 +💪', fn: g => { g.flags.liuxueLife=true; return{mood:12,health:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -27064,6 +27146,16 @@ const ACHIEVEMENTS = [
     { id:'kaoyan_retry_v40_2_ach', icon:'🔥', name:'二战勇士', desc:'跌倒了爬起来，再战一年', check: g => g.flags.kaoyanSecondTry },
     { id:'kaoyan_or_work_v40_2_ach', icon:'🤔', name:'考研还是工作', desc:'站在了人生的十字路口', check: g => g.flags.kaoyanOrWork },
     { id:'kaoyan_life_v40_2_ach', icon:'🌟', name:'考研人生', desc:'无论结果如何，这段经历塑造了更好的你', check: g => g.flags.kaoyanLife },
+    { id:'liuxue_decide_v40_3_ach', icon:'✈️', name:'留学决定', desc:'鼓起勇气做出了出国的选择', check: g => g.flags.liuxueDecide },
+    { id:'liuxue_prepare_v40_3_ach', icon:'📖', name:'留学准备', desc:'啃完了雅思真题，写完了申请材料', check: g => g.flags.liuxuePrepare },
+    { id:'liuxue_arrive_v40_3_ach', icon:'🌍', name:'初到异国', desc:'踏上了完全陌生的土地', check: g => g.flags.liuxueArrive },
+    { id:'liuxue_lonely_v40_3_ach', icon:'😢', name:'留学孤独', desc:'在异国他乡学会了和自己相处', check: g => g.flags.liuxueLonely },
+    { id:'liuxue_parttime_v40_3_ach', icon:'🍳', name:'留学打工', desc:'在端盘子和代购中体验了生活的艰辛', check: g => g.flags.liuxueParttime },
+    { id:'liuxue_graduate_v40_3_ach', icon:'🎓', name:'毕业抉择', desc:'站在了留下还是回国的十字路口', check: g => g.flags.liuxueGraduate },
+    { id:'liuxue_return_v40_3_ach', icon:'🛬', name:'海归回国', desc:'带着学位和回忆回到了祖国', check: g => g.flags.liuxueReturn },
+    { id:'liuxue_job_v40_3_ach', icon:'💼', name:'海归找工作', desc:'证明了海归不是海带', check: g => g.flags.liuxueJob },
+    { id:'liuxue_identity_v40_3_ach', icon:'🪞', name:'身份认同', desc:'在两个文化之间找到了自己的位置', check: g => g.flags.liuxueIdentity },
+    { id:'liuxue_life_v40_3_ach', icon:'🌟', name:'留学人生', desc:'留学最大的收获是那个更勇敢的自己', check: g => g.flags.liuxueLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
