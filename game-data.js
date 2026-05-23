@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v37.0
+// 都市浮生记 - 数据文件 v37.1
 // ============================================
 
 
@@ -21965,6 +21965,88 @@ const EVENTS = [
         { label:'继续生活在这座不断变化的城市里', hint:'+😊 +🧠 +❤️', fn: g => { g.flags.renewalLife=true; return{mood:12,intel:8,health:5}; }},
       ]},
 
+    // === v37.1 城市声音与听觉文化 ===
+    { id:'sound_noise_v37_1', icon:'🔊', title:'噪音困扰', category:'sound',
+      body:'你租的房子靠着大马路，每天被汽车喇叭声和广场舞音乐吵得睡不好。你开始理解为什么"安静"在大城市是一种奢侈品。耳塞用了两盒了，还是挡不住楼下的广场舞。',
+      cond: g => g.age >= 20 && !g.flags.soundNoise,
+      choices:[
+        { label:'花大价钱买了副好降噪耳机', hint:'-💰 +❤️', fn: g => { g.flags.soundNoise=true; g.flags.soundHeadphone=true; return{money:-1500,health:3}; }},
+        { label:'和楼下的大妈们交涉', hint:'+👥 +🧠', fn: g => { g.flags.soundNoise=true; return{social:3,intel:2}; }},
+        { label:'习惯了，大城市的背景音就是这样', hint:'+🧠', fn: g => { g.flags.soundNoise=true; return{intel:2,mood:-2}; }},
+      ]},
+    { id:'sound_earphone_v37_1', icon:'🎧', title:'降噪耳机', category:'sound',
+      body:'你发现降噪耳机简直是都市神器。戴上它的那一刻，整个世界安静了。你在地铁里、办公室里、咖啡馆里都戴着它。朋友说你现在像个"与世隔绝的外星人"。',
+      cond: g => g.age >= 22 && g.flags.soundHeadphone && !g.flags.soundEarphone,
+      choices:[
+        { label:'几乎全天戴着耳机', hint:'+🧠 -👥', fn: g => { g.flags.soundEarphone=true; g.flags.soundIsolate=true; return{intel:3,social:-3}; }},
+        { label:'只在需要专注时戴', hint:'+🧠 +😊', fn: g => { g.flags.soundEarphone=true; return{intel:5,mood:3}; }},
+        { label:'开始用耳机听播客和白噪音', hint:'+🧠 +❤️', fn: g => { g.flags.soundEarphone=true; g.flags.soundPodcast=true; return{intel:4,health:2}; }},
+      ]},
+    { id:'sound_morning_v37_1', icon:'🌅', title:'城市清晨', category:'sound',
+      body:'有天你失眠到凌晨四点，索性打开窗户听这座城市醒来。先是远处的扫帚声，然后是早餐摊的油锅声，接着是鸟叫，最后是远处的地铁轰鸣。你第一次发现，城市的清晨原来这么美。',
+      cond: g => g.age >= 22 && g.flags.soundNoise && !g.flags.soundMorning && g.health < 65,
+      choices:[
+        { label:'开始早起，享受清晨的宁静', hint:'+❤️ +😊', fn: g => { g.flags.soundMorning=true; g.flags.soundEarly=true; return{health:5,mood:6}; }},
+        { label:'录下了这段清晨的声音', hint:'+✨ +🧠', fn: g => { g.flags.soundMorning=true; g.flags.soundRecord=true; return{charm:3,intel:3}; }},
+        { label:'听完继续睡了', hint:'+❤️', fn: g => { g.flags.soundMorning=true; return{health:2,mood:2}; }},
+      ]},
+    { id:'sound_calling_v37_1', icon:'📢', title:'叫卖声', category:'sound',
+      body:'楼下传来"磨剪子嘞——戗菜刀——"的叫卖声，你愣了半天。在这个电商和外卖的时代，这种古老的叫卖声像从另一个时空穿越来的。你趴在窗口看了好久。',
+      cond: g => g.age >= 22 && !g.flags.soundCalling,
+      choices:[
+        { label:'跑下去找师傅磨了把刀', hint:'-💰 +😊 +🧠', fn: g => { g.flags.soundCalling=true; return{money:-15,mood:5,intel:3}; }},
+        { label:'录了视频发到社交媒体', hint:'+✨ +👥', fn: g => { g.flags.soundCalling=true; return{charm:4,social:3}; }},
+        { label:'只是静静听了一会儿', hint:'+😊 +🧠', fn: g => { g.flags.soundCalling=true; return{mood:3,intel:2}; }},
+      ]},
+    { id:'sound_night_v37_1', icon:'🌃', title:'夜晚的声音', category:'sound',
+      body:'深夜你躺在床上，仔细听这座城市夜晚的声音：远处的汽车引擎、楼上邻居的脚步声、不知哪里的猫叫、偶尔的鸣笛。每个声音背后都有一个和你一样在城市里漂泊的人。',
+      cond: g => g.age >= 23 && g.flags.soundNoise && !g.flags.soundNight && g.intel > 25,
+      choices:[
+        { label:'开始写《城市夜声》系列随笔', hint:'+🧠 +✨', fn: g => { g.flags.soundNight=true; g.flags.soundWriter=true; return{intel:8,charm:5}; }},
+        { label:'在失眠的夜里和网友聊天', hint:'+👥 -❤️', fn: g => { g.flags.soundNight=true; return{social:4,health:-2}; }},
+        { label:'学会在每个声音中找到平静', hint:'+❤️ +😊', fn: g => { g.flags.soundNight=true; return{health:3,mood:5}; }},
+      ]},
+    { id:'sound_music_v37_1', icon:'🎵', title:'街头音乐', category:'sound',
+      body:'你在地铁站口听到一个年轻人在弹吉他唱歌，唱的是《平凡之路》。你站在那听完了整首歌，往他的琴盒里放了十块钱。他抬头对你笑了笑，你觉得那个笑容值一百块。',
+      cond: g => g.age >= 22 && !g.flags.soundMusic && g.mood < 60,
+      choices:[
+        { label:'和他聊了聊，他也是北漂', hint:'+👥 +😊', fn: g => { g.flags.soundMusic=true; g.flags.soundBusker=true; return{social:5,mood:6}; }},
+        { label:'每次路过都停下来听一会儿', hint:'+😊 +❤️', fn: g => { g.flags.soundMusic=true; return{mood:5,health:2}; }},
+        { label:'拍了视频发到网上帮他宣传', hint:'+✨ +👥', fn: g => { g.flags.soundMusic=true; return{charm:4,social:3}; }},
+      ]},
+    { id:'sound_silence_v37_1', icon:'🤫', title:'寻找安静', category:'sound',
+      body:'你开始刻意寻找城市里安静的角落——图书馆、寺庙、公园深处、清晨的街道。你发现真正的安静不是没有声音，而是内心不再焦虑。你甚至开始享受某种程度的城市噪音。',
+      cond: g => g.age >= 25 && g.flags.soundNight && !g.flags.soundSilence && g.intel > 30,
+      choices:[
+        { label:'开始练习冥想和正念', hint:'+❤️ +😊 +🧠', fn: g => { g.flags.soundSilence=true; g.flags.soundMeditate=true; return{health:5,mood:8,intel:5}; }},
+        { label:'在安静的地方读书效率翻倍', hint:'+🧠 +✨', fn: g => { g.flags.soundSilence=true; return{intel:8,charm:3}; }},
+        { label:'只是找到了几个秘密的安静角落', hint:'+😊 +🧠', fn: g => { g.flags.soundSilence=true; return{mood:5,intel:3}; }},
+      ]},
+    { id:'sound_record_v37_1', icon:'🎙️', title:'声音记录', category:'sound',
+      body:'你开始用手机录下城市里各种声音：菜市场的吆喝、地铁的报站、雨打窗户、深夜的猫叫。你把这些声音做成了一段"城市声景"的音频作品，朋友听了说"好像真的在那个城市"。',
+      cond: g => g.age >= 26 && g.flags.soundSilence && g.flags.soundRecord && !g.flags.soundCapture && g.intel > 35,
+      choices:[
+        { label:'做了个"城市之声"播客节目', hint:'+✨ +💰', fn: g => { g.flags.soundCapture=true; g.flags.soundPod=true; return{charm:8,money:2000}; }},
+        { label:'把声音作品投稿给了艺术展', hint:'+✨ +🧠', fn: g => { g.flags.soundCapture=true; g.flags.soundArt=true; return{charm:6,intel:5}; }},
+        { label:'只是自己听，当作城市记忆', hint:'+😊 +🧠', fn: g => { g.flags.soundCapture=true; return{mood:6,intel:4}; }},
+      ]},
+    { id:'sound_heal_v37_1', icon:'💆', title:'声音疗愈', category:'sound',
+      body:'你发现某些声音真的有疗愈效果。雨声、风铃、远处的钢琴声……你在睡前会播放特定的白噪音，睡眠质量好了很多。你开始理解"声音疗愈"不只是营销噱头。',
+      cond: g => g.age >= 26 && g.flags.soundSilence && !g.flags.soundHeal && (g.health < 65 || g.mood < 55),
+      choices:[
+        { label:'考了个声音疗愈师证书', hint:'-💰 +✨ +🧠', fn: g => { g.flags.soundHeal=true; g.flags.soundCert=true; return{money:-5000,charm:8,intel:8}; }},
+        { label:'给朋友推荐了声音疗愈方法', hint:'+👥 +😊', fn: g => { g.flags.soundHeal=true; return{social:5,mood:5}; }},
+        { label:'只是安静地享受声音带来的平静', hint:'+❤️ +😊', fn: g => { g.flags.soundHeal=true; return{health:5,mood:8}; }},
+      ]},
+    { id:'sound_life_v37_1', icon:'🎶', title:'城市之声', category:'sound',
+      body:'你终于学会了"听"这座城市。从最初被噪音困扰，到现在能从嘈杂中分辨出每种声音的故事。城市的交响曲从未停止——汽车喇叭是快节奏的低音部，鸟叫是高音的花腔，而人声是永不缺席的主旋律。在大城市里，每个人都是这场声音交响曲的一个音符。',
+      cond: g => g.age >= 28 && g.flags.soundHeal && (g.flags.soundPod || g.flags.soundArt) && !g.flags.soundLife && g.intel > 35,
+      choices:[
+        { label:'出版了《城市声景》有声书', hint:'+💰 +✨ +🧠', fn: g => { g.flags.soundLife=true; g.flags.soundAuthor=true; return{money:6000,charm:10,intel:8}; }},
+        { label:'做了城市声音地图APP', hint:'-💰 +✨ +💰', fn: g => { g.flags.soundLife=true; g.flags.soundApp=true; return{money:-10000,charm:12,money:5000}; }},
+        { label:'继续做一个善于倾听的城市人', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.soundLife=true; return{mood:12,health:8,intel:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -24186,6 +24268,18 @@ const ACHIEVEMENTS = [
     { id:'renewal_social_v37_0_ach', icon:'🤝', name:'老街坊重聚', desc:'和以前的老街坊重新联系上了', check: g => g.flags.renewalSocial },
     { id:'renewal_document_v37_0_ach', icon:'🎥', name:'城市记录者', desc:'开始系统记录城市的变迁', check: g => g.flags.renewalDocument },
     { id:'renewal_life_v37_0_ach', icon:'🌆', name:'城市记忆', desc:'理解了你的故事也是这座城市的一部分', check: g => g.flags.renewalLife },
+
+    // v37.1 城市声音与听觉文化
+    { id:'sound_noise_v37_1_ach', icon:'🔊', name:'噪音受害者', desc:'被大城市的噪音困扰过', check: g => g.flags.soundNoise },
+    { id:'sound_earphone_v37_1_ach', icon:'🎧', name:'降噪耳机依赖', desc:'降噪耳机成了都市神器', check: g => g.flags.soundEarphone },
+    { id:'sound_morning_v37_1_ach', icon:'🌅', name:'城市清晨', desc:'听到了城市醒来的声音', check: g => g.flags.soundMorning },
+    { id:'sound_calling_v37_1_ach', icon:'📢', name:'叫卖声', desc:'听到了穿越时空的古老叫卖', check: g => g.flags.soundCalling },
+    { id:'sound_night_v37_1_ach', icon:'🌃', name:'城市夜声', desc:'在深夜仔细听了城市的声音', check: g => g.flags.soundNight },
+    { id:'sound_music_v37_1_ach', icon:'🎵', name:'街头音乐', desc:'在地铁站口被一首歌打动了', check: g => g.flags.soundMusic },
+    { id:'sound_silence_v37_1_ach', icon:'🤫', name:'寻找安静', desc:'在城市里找到了真正的安静', check: g => g.flags.soundSilence },
+    { id:'sound_record_v37_1_ach', icon:'🎙️', name:'声音记录者', desc:'录下了城市里的各种声音', check: g => g.flags.soundCapture },
+    { id:'sound_heal_v37_1_ach', icon:'💆', name:'声音疗愈', desc:'发现了声音的疗愈力量', check: g => g.flags.soundHeal },
+    { id:'sound_life_v37_1_ach', icon:'🎶', name:'城市之声', desc:'学会了聆听城市的交响曲', check: g => g.flags.soundLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
