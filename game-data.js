@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v35.6
+// 都市浮生记 - 数据文件 v35.7
 // ============================================
 
 
@@ -20807,6 +20807,98 @@ const EVENTS = [
         { label:'写了篇关于城市居住的文章', hint:'+🧠 +💰', fn: g => { g.flags.rentPhilosophy=true; g.flags.housingWriter=true; return{intel:15,money:5000,charm:12}; }},
       ]},
 
+    // ===== 城市宠物与陪伴动物 (v35.7) =====
+
+    { id:'pet_adopt_v35_7', icon:'🐱', title:'领养了一只猫', category:'petlife',
+      body:'你下班路上经过一家宠物领养中心。橱窗里有一只橘猫，一直在看着你。\n\n你走进去看了看。工作人员说：「它叫小橘，2岁，之前被主人遗弃了。」\n\n你蹲下来。小橘蹭了蹭你的手。你的心跳了一下。\n\n你犹豫了很久：养猫需要钱（猫粮、猫砂、疫苗、绝育）、需要时间、需要责任。你的房子够大吗？你能照顾好它吗？\n\n但你看着小橘的眼睛——那双眼睛里有一种你在城市里很少看到的东西：无条件的信任。\n\n你填了领养表。工作人员说：「领养费200元，包含疫苗和绝育。」\n\n你把小橘抱回家的时候，它蜷缩在你怀里，发出了「呼噜呼噜」的声音。\n\n你突然觉得：这个出租屋不再只是一个睡觉的地方了。它是「家」了。',
+      cond: g => g.age >= 20 && g.money >= 500 && !g.flags.petAdopt,
+      choices:[
+        { label:'成了尽职尽责的铲屎官', hint:'+😊 +💰', fn: g => { g.flags.petAdopt=true; g.flags.catParent=true; return{mood:15,money:-500}; }},
+        { label:'养了但有点手忙脚乱', hint:'+😊', fn: g => { g.flags.petAdopt=true; return{mood:8,money:-500}; }},
+        { label:'觉得养不了，送回去了', hint:'', fn: g => { g.flags.petAdopt=true; g.flags.petReturn=true; return{mood:-10}; }},
+      ]},
+
+    { id:'pet_daily_v35_7', icon:'🐾', title:'有宠物的日常', category:'petlife',
+      body:'你养猫/狗一个月了。你的生活发生了翻天覆地的变化：\n\n早上6点：被猫踩脸叫醒（比闹钟准）\n出门前：检查门窗、检查水碗、检查猫砂\n上班时：偷偷看家里的摄像头（猫在睡觉）\n下班后：第一时间冲回家（猫在门口等你）\n晚上：猫趴在键盘上，你只能用手机工作\n睡觉时：猫钻进了被窝，你不敢动\n\n你的支出也变了：\n- 猫粮：200元/月\n- 猫砂：50元/月\n- 零食玩具：100元/月\n- 偶尔看病：？？？\n\n你妈说：「你对猫比对自己还好。」\n\n你说：「因为它不会和我吵架。」\n\n你开始理解：养宠物不是「养一个动物」，而是「和一个生命建立连接」。',
+      cond: g => g.age >= 20 && g.flags.petAdopt && !g.flags.petDaily,
+      choices:[
+        { label:'和宠物建立了深厚的感情', hint:'+😊 +🧠', fn: g => { g.flags.petDaily=true; g.flags.petBond=true; return{mood:12,intel:5}; }},
+        { label:'觉得养宠物比想象中累', hint:'', fn: g => { g.flags.petDaily=true; return{mood:-3,money:-1000}; }},
+        { label:'开始在社交媒体上晒宠物', hint:'+✨ +👥', fn: g => { g.flags.petDaily=true; g.flags.petInfluencer=true; return{charm:10,social:8}; }},
+      ]},
+
+    { id:'pet_sick_v35_7', icon:'🏥', title:'宠物生病了', category:'petlife',
+      body:'你的猫突然不吃东西了。它的精神很差，蜷缩在角落里。\n\n你赶紧带它去了宠物医院。\n\n医生检查后说：「可能是肠胃炎。需要输液和吃药。费用大概2000元。」\n\n2000元。你犹豫了一下——这是你半个月的生活费。\n\n但你看着猫的眼睛。它在看着你，好像在说：「救救我。」\n\n你付了钱。\n\n在医院等了3个小时。猫输了液，精神好了一些。医生给了你一些药，让你回家按时喂。\n\n回家后的那个晚上，猫第一次主动蹭了你的手。你哭了。\n\n你开始理解：养宠物的代价不只是金钱和时间，还有「心」。当它生病的时候，你会比自己生病还心疼。\n\n但你也知道：这份心疼是值得的。',
+      cond: g => g.age >= 20 && g.flags.petDaily && g.money >= 1000 && !g.flags.petSick,
+      choices:[
+        { label:'花了很多钱给宠物治病', hint:'+😊 -💰', fn: g => { g.flags.petSick=true; g.flags.petCare=true; return{mood:5,money:-2000}; }},
+        { label:'开始存宠物的医疗基金', hint:'+🧠 +💰', fn: g => { g.flags.petSick=true; g.flags.petFund=true; return{intel:8,money:-2000}; }},
+        { label:'买了宠物保险', hint:'+🧠 -💰', fn: g => { g.flags.petSick=true; g.flags.petInsurance=true; return{intel:5,money:-2500}; }},
+      ]},
+
+    { id:'pet_social_v35_7', icon:'🐕', title:'遛狗社交', category:'petlife',
+      body:'如果你养的是狗——每天遛狗成了你的日常。\n\n每天早上7点和晚上8点，你带着狗去小区花园。\n\n你发现：遛狗的人之间有一种天然的默契。你们的狗在互相闻屁股的时候，你们也在互相打招呼。\n\n「你家是什么品种？」\n「柯基。你家呢？」\n「金毛。它多大了？」\n\n你通过遛狗认识了：\n- 一个退休老师（养了一只老年拉布拉多）\n- 一个年轻妈妈（带着孩子和狗一起散步）\n- 一个程序员（养了一只哈士奇，每天被拉着跑）\n\n你们建了一个遛狗群。每天早上互相叫起床：「今天遛不遛？」\n\n你开始理解：在大城市里，狗是最好的「社交破冰工具」。没有人会拒绝一只可爱的狗。',
+      cond: g => g.age >= 22 && g.flags.petAdopt && !g.flags.petSocial,
+      choices:[
+        { label:'通过遛狗交到了好朋友', hint:'+👥 +😊', fn: g => { g.flags.petSocial=true; g.flags.dogWalkerFriend=true; return{social:15,mood:10}; }},
+        { label:'偶尔和遛狗的人聊聊天', hint:'+👥', fn: g => { g.flags.petSocial=true; return{social:8,mood:5}; }},
+        { label:'遛狗太累了，特别是冬天', hint:'', fn: g => { g.flags.petSocial=true; return{mood:-3,health:-3}; }},
+      ]},
+
+    { id:'pet_cost_v35_7', icon:'💰', title:'宠物经济', category:'petlife',
+      body:'你算了一下养宠物的年花费：\n\n- 粮食：200元/月 × 12 = 2400元\n- 猫砂/用品：50元/月 × 12 = 600元\n- 疫苗/体检：500元/年\n- 看病（平均）：1500元/年\n- 零食玩具：100元/月 × 12 = 1200元\n- 宠物美容：200元/次 × 4 = 800元\n- 寄养（过年回家）：100元/天 × 7 = 700元\n\n总计：约7700元/年。\n\n你看了看自己的工资——你花在宠物上的钱比花在自己身上的还多。\n\n你开始理解为什么「宠物经济」是一个万亿市场：\n- 宠物食品、宠物医疗、宠物美容、宠物保险\n- 宠物用品、宠物寄养、宠物殡葬、宠物摄影\n- 宠物社交平台、宠物培训机构、宠物旅游\n\n中国有超过1亿只宠物。每只宠物年均花费5000-10000元。\n\n你开始思考：为什么年轻人愿意花这么多钱养宠物？\n\n也许是因为：在这个孤独的城市里，宠物是你最忠实的陪伴。',
+      cond: g => g.age >= 22 && g.flags.petDaily && !g.flags.petCost,
+      choices:[
+        { label:'觉得值得，继续好好养', hint:'+😊', fn: g => { g.flags.petCost=true; g.flags.petDevoted=true; return{mood:8,money:-3000}; }},
+        { label:'开始精打细算养宠开支', hint:'+🧠 +💰', fn: g => { g.flags.petCost=true; g.flags.smartPetOwner=true; return{intel:8,money:-1000}; }},
+        { label:'觉得太贵了，考虑减少开支', hint:'+💰', fn: g => { g.flags.petCost=true; return{mood:-5,money:-500}; }},
+      ]},
+
+    { id:'pet_comfort_v35_7', icon:'🤗', title:'宠物的安慰', category:'petlife',
+      body:'你今天在公司被领导批评了。你心情很差。\n\n你回到家，打开门。你的猫/狗冲过来迎接你。\n\n它蹭着你的腿，发出温柔的声音。你蹲下来抱住它。\n\n你不知道为什么，但你哭了。\n\n你的宠物安静地陪着你。它不问你发生了什么，不给你建议，不评判你。它只是在那里，陪着你。\n\n你抱着它坐了半个小时。你的心情慢慢好了一些。\n\n你开始理解：宠物给人的不只是陪伴，还有一种「无条件的接纳」。\n\n在人类的世界里，你需要表现好才能获得认可。你需要有钱、有地位、有能力才能被尊重。\n\n但在宠物的世界里，你只需要做你自己。不管你今天犯了什么错、不管你赚了多少钱——它都一样爱你。\n\n也许这就是为什么越来越多的年轻人选择养宠物——因为我们太需要「无条件的爱」了。',
+      cond: g => g.age >= 20 && g.flags.petDaily && g.mood < 40 && !g.flags.petComfort,
+      choices:[
+        { label:'宠物成了你最好的朋友', hint:'+😊 +✨', fn: g => { g.flags.petComfort=true; g.flags.petBestFriend=true; return{mood:15,charm:5}; }},
+        { label:'被治愈了，心情好多了', hint:'+😊', fn: g => { g.flags.petComfort=true; return{mood:12}; }},
+        { label:'觉得不能把情感全寄托在宠物身上', hint:'+🧠', fn: g => { g.flags.petComfort=true; g.flags.emotionalBalance=true; return{intel:8,mood:5}; }},
+      ]},
+
+    { id:'pet_photo_v35_7', icon:'📸', title:'宠物博主', category:'petlife',
+      body:'你的宠物太可爱了，你忍不住每天拍照片和视频。\n\n你在小红书/抖音上开了一个账号，专门发你家宠物的日常。\n\n你的第一条爆款视频：你家猫看到黄瓜被吓飞的画面。播放量：50万。\n\n你的粉丝从0涨到了5000。有人评论：「你家猫太可爱了！」\n有人评论：「看完心情好了很多。」\n有人评论：「我也想养一只。」\n\n你开始认真做内容了：\n- 宠物的一天\n- 宠物搞笑合集\n- 宠物用品测评\n- 养宠攻略\n\n3个月后你有了2万粉丝。有个宠物品牌联系你：「可以合作推广吗？一条视频500元。」\n\n你开始理解：宠物不只是你的陪伴，它还可能成为你的「事业」。',
+      cond: g => g.age >= 20 && g.flags.petDaily && g.charm > 30 && !g.flags.petPhoto,
+      choices:[
+        { label:'认真做宠物博主', hint:'+💰 +✨', fn: g => { g.flags.petPhoto=true; g.flags.petInfluencer=true; return{money:3000,charm:15,social:10}; }},
+        { label:'偶尔发发，不太在意数据', hint:'+😊', fn: g => { g.flags.petPhoto=true; return{mood:10,charm:5}; }},
+        { label:'觉得过度曝光宠物不太好', hint:'+🧠', fn: g => { g.flags.petPhoto=true; g.flags.petPrivacy=true; return{intel:5,mood:3}; }},
+      ]},
+
+    { id:'pet_holiday_v35_7', icon:'🎄', title:'过年怎么办', category:'petlife',
+      body:'过年了。你需要回老家7天。你的宠物怎么办？\n\n选项1：宠物寄养。100元/天，7天=700元。但你担心它在陌生的地方会害怕。\n选项2：请朋友来喂。免费，但朋友不一定靠谱。\n选项3：带着宠物回家。火车不让带，飞机托运要2000元，还有风险。\n选项4：自动喂食器+摄像头。500元买设备，但万一出问题呢？\n\n你最终选了寄养。你把猫送到寄养中心的时候，它看着你的眼神让你心碎了。\n\n你在老家每天都看摄像头。猫大部分时间都在角落趴着，不太吃东西。\n\n你回来接它的时候，它冲过来蹭你的手。你差点哭了。\n\n你开始理解：养宠物意味着你不再是一个人了。你做任何决定都需要考虑它。\n\n它不只是一个宠物，它是你的家人。而家人是不能被丢下的。',
+      cond: g => g.age >= 20 && g.flags.petDaily && !g.flags.petHoliday,
+      choices:[
+        { label:'决定以后过年都带宠物一起', hint:'+😊 +💰', fn: g => { g.flags.petHoliday=true; g.flags.petFamily=true; return{mood:8,money:-1000}; }},
+        { label:'找了个靠谱的宠物寄养', hint:'+🧠', fn: g => { g.flags.petHoliday=true; g.flags.petSitter=true; return{intel:5,money:-700}; }},
+        { label:'为了宠物放弃了回老家', hint:'', fn: g => { g.flags.petHoliday=true; g.flags.stayForPet=true; return{mood:-5}; }},
+      ]},
+
+    { id:'pet_aging_v35_7', icon:'🕰️', title:'宠物老了', category:'petlife',
+      body:'你的宠物已经10岁了。对于猫/狗来说，这已经是老年了。\n\n它的毛发开始变白。它的动作变慢了。它不再像以前那样蹦蹦跳跳了。\n\n你带它去做了一次全面体检。医生说：「它的肾脏功能开始下降了。这是老龄宠物的常见问题。」\n\n你问：「还能活多久？」\n\n医生说：「如果保养得好，可能还有3-5年。但你要有心理准备。」\n\n你走出医院的时候哭了。\n\n你知道：宠物的寿命比人短得多。它可能只能陪你十几年。但你已经做好了准备——在它剩下的每一天，你都会好好爱它。\n\n你开始每天多花时间陪它。给它梳毛，给它按摩，给它做好吃的。\n\n你希望：在它最后闭眼的时候，它知道——它这辈子过得很幸福。',
+      cond: g => g.age >= 25 && g.flags.petDaily && g.months >= 60 && !g.flags.petAging,
+      choices:[
+        { label:'珍惜每一天在一起的时光', hint:'+😊 +✨', fn: g => { g.flags.petAging=true; g.flags.petCherish=true; return{mood:10,charm:8}; }},
+        { label:'开始提前做心理准备', hint:'+🧠', fn: g => { g.flags.petAging=true; g.flags.petPrepare=true; return{intel:10,mood:-5}; }},
+        { label:'花了更多钱在宠物医疗上', hint:'-💰 +😊', fn: g => { g.flags.petAging=true; g.flags.petMedical=true; return{mood:5,money:-5000}; }},
+      ]},
+
+    { id:'pet_philosophy_v35_7', icon:'❤️', title:'陪伴的意义', category:'petlife',
+      body:'你回顾你和宠物的故事。\n\n从第一次领养的紧张，到日常的陪伴，到生病时的心疼，到过年时的纠结，到面对衰老的无助……\n\n你开始理解：宠物给人的，是一种最纯粹的「陪伴」。\n\n它不会评判你的工作表现，不会嫌弃你的收入，不会催你结婚生子。它只需要你在它身边，摸它的头，喂它的饭。\n\n在人类的世界里，每一种关系都有条件：友情需要互惠，爱情需要对等，亲情需要责任。\n\n但你和宠物的关系是无条件的。你爱它，它爱你。就这么简单。\n\n你在朋友圈写了一段话：\n\n「有人问我为什么养宠物。我说：因为在这个复杂的城市里，我需要一个简单的爱。\n\n它不会说「加油」，但它会在我难过的时候趴在我身边。\n它不会说「我爱你」，但它会在我回家的时候冲过来迎接我。\n\n也许这就是宠物的意义——它们用短暂的一生，教会了我们什么是「无条件的爱」。」',
+      cond: g => g.age >= 24 && g.flags.petDaily && (g.flags.petComfort || g.flags.petAging) && g.intel > 35,
+      choices:[
+        { label:'宠物改变了你的人生观', hint:'+😊 +🧠 +✨', fn: g => { g.flags.petPhilosophy=true; return{mood:18,intel:12,charm:10}; }},
+        { label:'开始做流浪动物救助志愿者', hint:'+👥 +✨', fn: g => { g.flags.petPhilosophy=true; g.flags.animalRescue=true; return{social:15,charm:12,mood:12}; }},
+        { label:'把和宠物的故事写成了书', hint:'+💰 +✨', fn: g => { g.flags.petPhilosophy=true; g.flags.petWriter=true; return{money:8000,charm:15,intel:10}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -22860,6 +22952,18 @@ const ACHIEVEMENTS = [
     { id:'rent_decorate_v35_6_ach', icon:'🎨', name:'装修之路', desc:'经历了装修的酸甜苦辣', check: g => g.flags.rentDecorate },
     { id:'rent_community_v35_6_ach', icon:'🏢', name:'小区生活', desc:'融入了小区的日常', check: g => g.flags.rentCommunity },
     { id:'rent_philosophy_v35_6_ach', icon:'🏗️', name:'房子的意义', desc:'理解了房子对漂泊者的深层含义', check: g => g.flags.rentPhilosophy },
+
+    // v35.7 城市宠物与陪伴动物
+    { id:'pet_adopt_v35_7_ach', icon:'🐱', name:'铲屎官上线', desc:'领养了一只猫，从此有了牵挂', check: g => g.flags.petAdopt },
+    { id:'pet_daily_v35_7_ach', icon:'🐾', name:'有猫有狗的日子', desc:'习惯了被宠物叫醒的早晨', check: g => g.flags.petDaily },
+    { id:'pet_sick_v35_7_ach', icon:'🏥', name:'宠物医院VIP', desc:'为宠物看病花了一个月工资', check: g => g.flags.petSick },
+    { id:'pet_social_v35_7_ach', icon:'🐕', name:'遛狗交际花', desc:'通过遛狗认识了半个小区的人', check: g => g.flags.petSocial },
+    { id:'pet_cost_v35_7_ach', icon:'💸', name:'宠物经济参与者', desc:'深刻体会到养宠物就是养了个吞金兽', check: g => g.flags.petCost },
+    { id:'pet_comfort_v35_7_ach', icon:'🤗', name:'毛孩子的治愈', desc:'在最难的时候，宠物是最好的陪伴', check: g => g.flags.petComfort },
+    { id:'pet_photo_v35_7_ach', icon:'📸', name:'宠物网红制造机', desc:'把宠物拍成了小红书爆款', check: g => g.flags.petPhoto },
+    { id:'pet_holiday_v35_7_ach', icon:'🧳', name:'春节寄养大作战', desc:'为过年回家安顿宠物操碎了心', check: g => g.flags.petHoliday },
+    { id:'pet_aging_v35_7_ach', icon:'🌅', name:'陪你慢慢变老', desc:'面对宠物衰老，学会了珍惜当下', check: g => g.flags.petAging },
+    { id:'pet_philosophy_v35_7_ach', icon:'📖', name:'陪伴的意义', desc:'从宠物身上理解了什么是无条件的爱', check: g => g.flags.petPhilosophy },
 ];
 
 // === ENDINGS === (order matters: first match wins)
