@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v37.3
+// 都市浮生记 - 数据文件 v37.4
 // ============================================
 
 
@@ -22211,6 +22211,88 @@ const EVENTS = [
         { label:'享受每一天的天气，晴雨皆是风景', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.weatherLife=true; return{mood:12,health:5,intel:5}; }},
       ]},
 
+    // === v37.4 城市光影与夜景文化 ===
+    { id:'light_neon_v37_4', icon:'🌃', title:'霓虹灯下', category:'light',
+      body:'下班后你走过商业街，霓虹灯把整条街染成了五颜六色。你忽然觉得这些灯光好美——红的像火、蓝的像海、绿的像春天。大城市虽然嘈杂，但夜晚的灯光确实让人着迷。',
+      cond: g => g.age >= 20 && !g.flags.lightNeon,
+      choices:[
+        { label:'掏出手机拍了好多照片', hint:'+✨ +😊', fn: g => { g.flags.lightNeon=true; g.flags.lightPhoto=true; return{charm:3,mood:5}; }},
+        { label:'驻足欣赏了一会儿', hint:'+😊 +🧠', fn: g => { g.flags.lightNeon=true; return{mood:4,intel:2}; }},
+        { label:'想起了老家那个只有一盏路灯的小镇', hint:'+😊 +🧠', fn: g => { g.flags.lightNeon=true; g.flags.lightNostalgia=true; return{mood:3,intel:3}; }},
+      ]},
+    { id:'light_pollution_v37_4', icon:'💡', title:'光污染', category:'light',
+      body:'你发现自己在这座城市从来没见过银河。对面写字楼的灯光彻夜亮着，广告牌刺得你睡不着。你开始理解"光污染"这个概念——城市的夜晚，其实比白天更亮。',
+      cond: g => g.age >= 22 && g.flags.lightNeon && !g.flags.lightPollution && g.intel > 25,
+      choices:[
+        { label:'买了遮光窗帘，终于能睡好了', hint:'-💰 +❤️', fn: g => { g.flags.lightPollution=true; return{money:-300,health:5}; }},
+        { label:'周末去郊外看了一次星空', hint:'+😊 +❤️', fn: g => { g.flags.lightPollution=true; g.flags.lightStars=true; return{mood:8,health:2}; }},
+        { label:'开始关注光污染议题', hint:'+🧠 +✨', fn: g => { g.flags.lightPollution=true; return{intel:5,charm:3}; }},
+      ]},
+    { id:'light_nightphoto_v37_4', icon:'📸', title:'夜景摄影', category:'light',
+      body:'你开始用手机拍城市的夜景。天桥上的车灯拖成光轨、雨夜的霓虹倒影在积水里、深夜便利店的暖光。你发现夜晚的城市和白天的完全是两个世界。',
+      cond: g => g.age >= 23 && g.flags.lightPhoto && !g.flags.lightNightPhoto && g.charm > 20,
+      choices:[
+        { label:'每天拍一张城市夜景，坚持了一年', hint:'+✨ +🧠', fn: g => { g.flags.lightNightPhoto=true; g.flags.lightDaily=true; return{charm:8,intel:5}; }},
+        { label:'偶尔拍拍，自娱自乐', hint:'+✨ +😊', fn: g => { g.flags.lightNightPhoto=true; return{charm:4,mood:4}; }},
+        { label:'把夜景照发到了摄影社区', hint:'+✨ +👥', fn: g => { g.flags.lightNightPhoto=true; g.flags.lightCommunity=true; return{charm:6,social:4}; }},
+      ]},
+    { id:'light_sunset_v37_4', icon:'🌅', title:'城市日落', category:'light',
+      body:'你在公司顶楼看到了最美的日落。整个城市被金色的光笼罩，高楼的玻璃幕墙反射着天空的颜色。你站在那里看了十分钟，觉得这座城市在某个瞬间真的很美。',
+      cond: g => g.age >= 22 && !g.flags.lightSunset && g.jobSalary > 0,
+      choices:[
+        { label:'开始追日落，去了各种高处', hint:'+😊 +✨', fn: g => { g.flags.lightSunset=true; g.flags.lightChaser=true; return{mood:8,charm:5}; }},
+        { label:'拍了一张完美的日落照片', hint:'+✨ +😊', fn: g => { g.flags.lightSunset=true; return{charm:5,mood:5}; }},
+        { label:'站在高处想了好多事情', hint:'+🧠 +😊', fn: g => { g.flags.lightSunset=true; return{intel:5,mood:3}; }},
+      ]},
+    { id:'light_window_v37_4', icon:'🪟', title:'万家灯火', category:'light',
+      body:'深夜你站在窗口往外看，对面楼里还有好多盏灯亮着。你在想每盏灯背后都有什么样的人生——有人在加班，有人在哄孩子，有人也在像你一样睡不着。万家灯火，每一盏都是一个故事。',
+      cond: g => g.age >= 25 && g.flags.lightSunset && !g.flags.lightWindow && g.intel > 30,
+      choices:[
+        { label:'开始写"万家灯火"系列小故事', hint:'+🧠 +✨', fn: g => { g.flags.lightWindow=true; g.flags.lightStories=true; return{intel:8,charm:6}; }},
+        { label:'感到了一种莫名的温暖', hint:'+😊 +❤️', fn: g => { g.flags.lightWindow=true; return{mood:6,health:2}; }},
+        { label:'觉得孤独感更强了', hint:'-😊 +🧠', fn: g => { g.flags.lightWindow=true; return{mood:-3,intel:4}; }},
+      ]},
+    { id:'light_social_v37_4', icon:'🌉', title:'夜景社交', category:'light',
+      body:'你约朋友去了城市的观景台看夜景。城市的灯火在脚下铺展开来，像一片星海。你们聊了很多平时不会聊的话题——关于未来、关于梦想、关于在大城市到底在追求什么。',
+      cond: g => g.age >= 24 && g.flags.lightNightPhoto && !g.flags.lightSocial && g.social > 25,
+      choices:[
+        { label:'成了朋友中的"夜景推荐官"', hint:'+👥 +✨', fn: g => { g.flags.lightSocial=true; g.flags.lightGuide=true; return{social:8,charm:5}; }},
+        { label:'和朋友拍了好多夜景合照', hint:'+👥 +😊', fn: g => { g.flags.lightSocial=true; return{social:5,mood:6}; }},
+        { label:'觉得夜景更适合一个人看', hint:'+🧠 +😊', fn: g => { g.flags.lightSocial=true; return{intel:3,mood:3}; }},
+      ]},
+    { id:'light_dark_v37_4', icon:'🌑', title:'寻找黑暗', category:'light',
+      body:'你参加了一次"暗夜保护"活动，去郊外远离光污染的地方看星星。当银河在头顶展开的那一刻，你差点哭出来。你已经忘了上一次看到这么多星星是什么时候了。',
+      cond: g => g.age >= 26 && g.flags.lightStars && !g.flags.lightDark && g.intel > 30,
+      choices:[
+        { label:'成了暗夜保护志愿者', hint:'+✨ +👥', fn: g => { g.flags.lightDark=true; g.flags.lightProtect=true; return{charm:8,social:6}; }},
+        { label:'决定每年至少去看一次银河', hint:'+😊 +❤️', fn: g => { g.flags.lightDark=true; return{mood:8,health:3}; }},
+        { label:'用手机拍下了银河的照片', hint:'+✨ +🧠', fn: g => { g.flags.lightDark=true; return{charm:5,intel:3}; }},
+      ]},
+    { id:'light_art_v37_4', icon:'🎆', title:'光影艺术', category:'light',
+      body:'你去看了一个灯光艺术展，艺术家用光和影创造了梦幻般的空间。你走进一间全是镜子和LED灯的房间，感觉自己站在无限的空间里。你第一次觉得光也可以是一种艺术媒介。',
+      cond: g => g.age >= 25 && g.flags.lightNightPhoto && !g.flags.lightArt && g.intel > 30,
+      choices:[
+        { label:'开始研究光影艺术创作', hint:'+🧠 +✨', fn: g => { g.flags.lightArt=true; g.flags.lightStudy=true; return{intel:8,charm:5}; }},
+        { label:'在展览里拍了超多照片', hint:'+✨ +😊', fn: g => { g.flags.lightArt=true; return{charm:5,mood:5}; }},
+        { label:'被"沉浸式体验"震撼了', hint:'+🧠 +😊', fn: g => { g.flags.lightArt=true; return{intel:5,mood:5}; }},
+      ]},
+    { id:'light_dawn_v37_4', icon:'🌄', title:'城市黎明', category:'light',
+      body:'你熬夜到凌晨四点，索性走到天台上等日出。从深蓝到浅蓝，从粉红到金色，城市在光芒中一点点苏醒。你看着第一缕阳光照在高楼的尖顶上，觉得这是你在这座城市看过的最美的画面。',
+      cond: g => g.age >= 26 && g.flags.lightSunset && g.flags.lightWindow && !g.flags.lightDawn && g.intel > 30,
+      choices:[
+        { label:'开始追日出，去了城市的各个角落', hint:'+😊 +✨ +❤️', fn: g => { g.flags.lightDawn=true; g.flags.lightDawnChaser=true; return{mood:10,charm:6,health:3}; }},
+        { label:'用手机延时摄影记录了日出全过程', hint:'+✨ +🧠', fn: g => { g.flags.lightDawn=true; return{charm:6,intel:4}; }},
+        { label:'在日出中做了一个重要的决定', hint:'+🧠 +✨', fn: g => { g.flags.lightDawn=true; g.flags.lightDecision=true; return{intel:8,charm:5}; }},
+      ]},
+    { id:'light_life_v37_4', icon:'🌟', title:'光与人生', category:'light',
+      body:'你终于理解了光对你的意义。从最初被霓虹灯惊艳，到被光污染困扰，到主动追逐日出日落和星空——光不只是物理现象，它是情绪的催化剂、记忆的载体、灵感的源泉。在大城市的光与影之间，你找到了属于自己的那个位置。',
+      cond: g => g.age >= 28 && g.flags.lightDawn && (g.flags.lightProtect || g.flags.lightStudy) && !g.flags.lightLife && g.intel > 35,
+      choices:[
+        { label:'办了一场"城市光影"主题摄影展', hint:'+✨ +👥 +💰', fn: g => { g.flags.lightLife=true; g.flags.lightExhibit=true; return{charm:12,social:8,money:3000}; }},
+        { label:'写了一本《城市光与影》的图文集', hint:'+💰 +✨ +🧠', fn: g => { g.flags.lightLife=true; g.flags.lightAuthor=true; return{money:5000,charm:10,intel:8}; }},
+        { label:'继续在城市的光影中生活', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.lightLife=true; return{mood:12,health:5,intel:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -24468,6 +24550,18 @@ const ACHIEVEMENTS = [
     { id:'weather_mood_v37_3_ach', icon:'😔', name:'天气心情', desc:'发现心情和天气高度绑定', check: g => g.flags.weatherMood },
     { id:'weather_change_v37_3_ach', icon:'🌍', name:'气候关注者', desc:'开始关注气候变化的现实影响', check: g => g.flags.weatherChange },
     { id:'weather_life_v37_3_ach', icon:'☀️', name:'天气人生', desc:'学会了在每种天气里找到自己的节奏', check: g => g.flags.weatherLife },
+
+    // v37.4 城市光影与夜景文化
+    { id:'light_neon_v37_4_ach', icon:'🌃', name:'霓虹灯下', desc:'被大城市的霓虹灯光打动了', check: g => g.flags.lightNeon },
+    { id:'light_pollution_v37_4_ach', icon:'💡', name:'光污染', desc:'发现城市里从来看不见银河', check: g => g.flags.lightPollution },
+    { id:'light_nightphoto_v37_4_ach', icon:'📸', name:'夜景摄影师', desc:'开始用镜头记录城市的夜晚', check: g => g.flags.lightNightPhoto },
+    { id:'light_sunset_v37_4_ach', icon:'🌅', name:'城市日落', desc:'在高处看到了最美的城市日落', check: g => g.flags.lightSunset },
+    { id:'light_window_v37_4_ach', icon:'🪟', name:'万家灯火', desc:'在深夜的窗口看到了无数故事', check: g => g.flags.lightWindow },
+    { id:'light_social_v37_4_ach', icon:'🌉', name:'夜景社交', desc:'和朋友在观景台上聊了很多', check: g => g.flags.lightSocial },
+    { id:'light_dark_v37_4_ach', icon:'🌑', name:'寻找黑暗', desc:'在远离城市的郊外看到了银河', check: g => g.flags.lightDark },
+    { id:'light_art_v37_4_ach', icon:'🎆', name:'光影艺术', desc:'第一次体验了灯光艺术展', check: g => g.flags.lightArt },
+    { id:'light_dawn_v37_4_ach', icon:'🌄', name:'城市黎明', desc:'在天台上等了一整夜看日出', check: g => g.flags.lightDawn },
+    { id:'light_life_v37_4_ach', icon:'🌟', name:'光与人生', desc:'在城市的光与影之间找到了自己的位置', check: g => g.flags.lightLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
