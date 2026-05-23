@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v39.5
+// 都市浮生记 - 数据文件 v39.6
 // ============================================
 
 
@@ -23988,6 +23988,79 @@ const EVENTS = [
         { label:'向每一个打工人致敬', hint:'+❤️ +😊', fn: g => { g.flags.factoryLife=true; return{mood:10,social:5}; }},
       ]},
 
+    // ═══ v39.6 殡葬与生死文化 ═══
+    { id:'funeral_first_v39_6', icon:'🕯️', title:'第一次参加葬礼', category:'funeral',
+      body:'你第一次参加了一个人的葬礼。是一位远房亲戚，七十多岁，走了。灵堂里挂着黑白照片，花圈排了两排，哀乐低沉地响着。你站在人群后面，看着亲人们跪在地上烧纸钱，哭得撕心裂肺。你不知道该做什么表情，也不知道该说什么话。那一刻你才真正意识到——死亡不是新闻里的一个词，而是每个人终将面对的现实。',
+      cond: g => g.age >= 20 && !g.flags.funeralFirst,
+      choices:[
+        { label:'安静地站在旁边，心里很沉重', hint:'+🧠', fn: g => { g.flags.funeralFirst=true; return{mood:-5,intel:5}; }},
+        { label:'第一次认真思考了生命的意义', hint:'+🧠 +💪', fn: g => { g.flags.funeralFirst=true; return{intel:8}; }},
+      ]},
+    { id:'funeral_custom_v39_6', icon:'📜', title:'丧葬习俗', category:'funeral',
+      body:'你跟着家人参加了老家的丧事，才知道中国的丧葬习俗有多复杂。停灵三天，第一天布置灵堂，第二天亲友吊唁，第三天出殡。期间要吃豆腐饭、烧纸钱、放鞭炮、磕头。每个步骤都有讲究，每个环节都不能出错。长辈说这是对逝者最后的尊重。你发现，这些看似繁琐的仪式，其实是活着的人用来消化悲伤的方式——忙碌起来，就不那么痛了。',
+      cond: g => g.flags.funeralFirst && !g.flags.funeralCustom,
+      choices:[
+        { label:'理解了传统仪式的意义', hint:'+🧠 +❤️', fn: g => { g.flags.funeralCustom=true; return{intel:8,social:3}; }},
+        { label:'觉得有些习俗可以简化', hint:'+🧠', fn: g => { g.flags.funeralCustom=true; return{intel:5}; }},
+      ]},
+    { id:'funeral_wake_v39_6', icon:'🌙', title:'守灵', category:'funeral',
+      body:'你在灵堂里守了一整夜。蜡烛不能灭，香不能断。深夜里只有你一个人，面对着逝者的遗像。你开始回忆和他的点点滴滴——小时候他给你买糖吃，上学时他问你成绩好不好，工作后他问你什么时候回来看看。你后悔的是，上一次见他已经是两年前了。你以为还有很多时间，但时间从来不等人。你在灵堂前坐了一夜，流了很多眼泪，也想了很多事情。',
+      cond: g => g.flags.funeralCustom && !g.flags.funeralWake,
+      choices:[
+        { label:'在灵堂前跟他说了一夜的话', hint:'+❤️', fn: g => { g.flags.funeralWake=true; return{mood:-8,social:3}; }},
+        { label:'决定以后多陪陪身边的人', hint:'+❤️ +💪', fn: g => { g.flags.funeralWake=true; return{mood:-5,social:5}; }},
+      ]},
+    { id:'funeral_cemetery_v39_6', icon:'🪦', title:'墓地那些事', category:'funeral',
+      body:'你去看了墓地。不看不知道，墓地比房子还贵。一块不到一平方米的墓地，最便宜的也要五六万，好位置要十几万。而且墓地只有二十年的使用权，到期了还要续费。你不禁苦笑：活着买不起房，死了买不起墓。现在有人选择海葬、树葬、花坛葬，不占地不花钱，回归自然。你开始思考：一个人死后，真的需要一块墓碑吗？也许被人记住才是最好的纪念。',
+      cond: g => g.age >= 25 && g.flags.funeralFirst && !g.flags.funeralCemetery,
+      choices:[
+        { label:'觉得海葬挺好的，回归自然', hint:'+🧠', fn: g => { g.flags.funeralCemetery=true; return{intel:8}; }},
+        { label:'还是觉得应该有一块安息之地', hint:'+❤️', fn: g => { g.flags.funeralCemetery=true; return{mood:3}; }},
+      ]},
+    { id:'funeral_money_v39_6', icon:'🤍', title:'白事红包', category:'funeral',
+      body:'参加葬礼要随白事红包，这跟喜事的红包不一样。金额必须是单数，三百、五百、一千，不能成双。信封要用白色的，上面写奠仪两个字。你第一次去的时候不懂，包了四百块，被长辈训了一顿：四谐音死，不吉利。你觉得白事的规矩比喜事还多，但也理解了——在死亡面前，人们更需要规矩来维持体面和秩序。',
+      cond: g => g.flags.funeralFirst && !g.flags.funeralMoney,
+      choices:[
+        { label:'学会了白事的礼仪规矩', hint:'+🧠', fn: g => { g.flags.funeralMoney=true; return{intel:5}; }},
+        { label:'觉得人情世故真的是一门学问', hint:'+🧠 +✨', fn: g => { g.flags.funeralMoney=true; return{intel:3,charm:3}; }},
+      ]},
+    { id:'funeral_goodbye_v39_6', icon:'👋', title:'生命的告别', category:'funeral',
+      body:'一个关系不错的朋友突然离世了。才三十多岁，加班猝死的。你接到消息的时候愣了很久，觉得不真实——上个月还一起吃过饭的人，说没就没了。追悼会上，他的妻子哭得站不起来，孩子还不懂事在追跑打闹。你站在那里，突然觉得人生好短，那些加班、焦虑、纠结，在死亡面前都不值一提。你发了条朋友圈：好好活着，比什么都重要。',
+      cond: g => g.age >= 26 && g.flags.funeralFirst && !g.flags.funeralGoodbye,
+      choices:[
+        { label:'开始重新审视自己的生活方式', hint:'+🧠 +💪', fn: g => { g.flags.funeralGoodbye=true; return{intel:10,health:5}; }},
+        { label:'请了年假，去看了想看的风景', hint:'+😊 -💰', fn: g => { g.flags.funeralGoodbye=true; return{mood:8,money:-3000}; }},
+      ]},
+    { id:'funeral_qingming_v39_6', icon:'🌿', title:'清明扫墓', category:'funeral',
+      body:'清明节你回老家扫墓了。山上长满了杂草，墓碑上落了一层灰。你弯着腰清理杂草，擦干净墓碑，摆上水果和鲜花，点上一炷香。你站在墓前，对着那块冰冷的石头说了很多话——工作上的事、生活上的事、那些不好意思当面说的心里话。风吹过来，你仿佛听到了回应。也许扫墓不是给逝者看的，是给自己一个机会，跟想念的人说说话。',
+      cond: g => g.age >= 22 && g.flags.funeralFirst && !g.flags.funeralQingming,
+      choices:[
+        { label:'在墓前说了很多心里话', hint:'+❤️', fn: g => { g.flags.funeralQingming=true; return{mood:5,social:3}; }},
+        { label:'决定每年都回来看看', hint:'+❤️ +💪', fn: g => { g.flags.funeralQingming=true; return{mood:3,health:3}; }},
+      ]},
+    { id:'funeral_philosophy_v39_6', icon:'💭', title:'生死观', category:'funeral',
+      body:'经历了身边人的离世，你开始认真思考生死的问题。你读了一些关于死亡的哲学书——海德格尔说向死而生，庄子鼓盆而歌，佛家说无常是常。你发现，每个文化都有自己的方式来面对死亡。中国人忌讳谈死，但正因为忌讳，当死亡真正来临时，总是措手不及。你觉得，与其害怕死亡，不如好好活着。活好每一天，就是对生命最大的尊重。',
+      cond: g => g.flags.funeralGoodbye && !g.flags.funeralPhilosophy,
+      choices:[
+        { label:'开始珍惜当下，不再拖延', hint:'+😊 +💪', fn: g => { g.flags.funeralPhilosophy=true; return{mood:10,health:5}; }},
+        { label:'读了一堆关于死亡的哲学书', hint:'+🧠', fn: g => { g.flags.funeralPhilosophy=true; return{intel:12}; }},
+      ]},
+    { id:'funeral_live_v39_6', icon:'🌱', title:'好好活着', category:'funeral',
+      body:'你想明白了一件事：人生最遗憾的不是没赚够钱、没买上房，而是该说的话没说、该见的人没见、该做的事没做。你开始列一份清单：想见的人、想去的地方、想做的事、想说的话。你给很久没联系的亲人打了电话，跟有过矛盾的朋友道了歉，对身边最重要的人说了我爱你。你不确定明天会怎样，但你确定今天要好好活。',
+      cond: g => g.flags.funeralPhilosophy && !g.flags.funeralLive,
+      choices:[
+        { label:'开始认真过每一天', hint:'+😊 +❤️ +💪', fn: g => { g.flags.funeralLive=true; return{mood:15,social:5,health:5}; }},
+        { label:'写了一封给未来自己的信', hint:'+✨ +🧠', fn: g => { g.flags.funeralLive=true; g.flags.futureLetter=true; return{charm:8,intel:5}; }},
+      ]},
+    { id:'funeral_life_v39_6', icon:'🌟', title:'生死人生', category:'funeral',
+      body:'你终于理解了死亡在生命中的位置。它不是敌人，不是恐惧的源头，而是生命的一部分。正因为有终点，旅程才珍贵；正因为有告别，相聚才动人。中国人说红白喜事——结婚是喜事，善终也是喜事。一个人如果能在走完这一生的时候，没有遗憾，或者至少遗憾少一些，那就是最好的人生。你希望那一天来临的时候，你可以平静地说：这一生，我尽力了，我值了。',
+      cond: g => g.flags.funeralLive && (g.flags.funeralQingming || g.flags.funeralCemetery) && !g.flags.funeralLife,
+      choices:[
+        { label:'写了一本关于中国人生死观的书', hint:'+✨ +🧠', fn: g => { g.flags.funeralLife=true; return{charm:12,intel:10}; }},
+        { label:'成为了一个临终关怀志愿者', hint:'+❤️ +✨', fn: g => { g.flags.funeralLife=true; g.flags.volunteer=true; return{social:12,charm:8}; }},
+        { label:'平静地接受生死，好好过好每一天', hint:'+😊 +💪', fn: g => { g.flags.funeralLife=true; return{mood:12,health:8}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -26476,6 +26549,17 @@ const ACHIEVEMENTS = [
     { id:'factory_quit_v39_5_ach', icon:'🏃', name:'提桶跑路', desc:'带着攒下的钱离开了工厂', check: g => g.flags.factoryQuit },
     { id:'factory_dream_v39_5_ach', icon:'⭐', name:'流水线追梦', desc:'见证了工友们在辛苦中坚持追梦', check: g => g.flags.factoryDream },
     { id:'factory_life_v39_5_ach', icon:'🌟', name:'打工人人生', desc:'理解了每一个打工人都值得被看见', check: g => g.flags.factoryLife },
+    // v39.6 殡葬与生死文化
+    { id:'funeral_first_v39_6_ach', icon:'🕯️', name:'第一次葬礼', desc:'第一次直面了死亡的现实', check: g => g.flags.funeralFirst },
+    { id:'funeral_custom_v39_6_ach', icon:'📜', name:'丧葬习俗', desc:'了解了中国传统丧葬仪式的深意', check: g => g.flags.funeralCustom },
+    { id:'funeral_wake_v39_6_ach', icon:'🌙', name:'守灵之夜', desc:'在灵堂前度过了一个不眠之夜', check: g => g.flags.funeralWake },
+    { id:'funeral_cemetery_v39_6_ach', icon:'🪦', name:'墓地沉思', desc:'思考了身后事的安排', check: g => g.flags.funeralCemetery },
+    { id:'funeral_money_v39_6_ach', icon:'🤍', name:'白事礼仪', desc:'学会了白事红包的规矩', check: g => g.flags.funeralMoney },
+    { id:'funeral_goodbye_v39_6_ach', icon:'👋', name:'猝不及防', desc:'经历了身边人突然离世的打击', check: g => g.flags.funeralGoodbye },
+    { id:'funeral_qingming_v39_6_ach', icon:'🌿', name:'清明扫墓', desc:'在墓前跟想念的人说了说话', check: g => g.flags.funeralQingming },
+    { id:'funeral_philosophy_v39_6_ach', icon:'💭', name:'向死而生', desc:'建立了自己的生死观', check: g => g.flags.funeralPhilosophy },
+    { id:'funeral_live_v39_6_ach', icon:'🌱', name:'好好活着', desc:'开始珍惜当下的每一天', check: g => g.flags.funeralLive },
+    { id:'funeral_life_v39_6_ach', icon:'🌟', name:'生死人生', desc:'理解了正因为有终点，旅程才珍贵', check: g => g.flags.funeralLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
