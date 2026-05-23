@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v37.4
+// 都市浮生记 - 数据文件 v37.5
 // ============================================
 
 
@@ -22293,6 +22293,88 @@ const EVENTS = [
         { label:'继续在城市的光影中生活', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.lightLife=true; return{mood:12,health:5,intel:5}; }},
       ]},
 
+    // === v37.5 城市手艺人与匠人精神 ===
+    { id:'artisan_cobbler_v37_5', icon:'👞', title:'修鞋匠', category:'artisan',
+      body:'你的皮鞋开胶了，在巷口找到了一个修鞋的老头。他的摊位就一张小桌子和几把工具，但手法极其熟练。三分钟修好了你的鞋，收了你十块钱。他说他在这里修了三十年鞋了。',
+      cond: g => g.age >= 20 && !g.flags.artisanCobbler,
+      choices:[
+        { label:'和他聊了聊三十年的修鞋故事', hint:'+🧠 +👥', fn: g => { g.flags.artisanCobbler=true; g.flags.artisanTalk=true; return{intel:5,social:3}; }},
+        { label:'修完鞋就走了', hint:'+💰', fn: g => { g.flags.artisanCobbler=true; return{money:-10}; }},
+        { label:'拍了一张他工作的照片', hint:'+✨', fn: g => { g.flags.artisanCobbler=true; return{charm:2,mood:2}; }},
+      ]},
+    { id:'artisan_tailor_v37_5', icon:'🧵', title:'裁缝铺', category:'artisan',
+      body:'你在老街找到了一家裁缝铺，老板娘做了一辈子衣服。你拿了件旧衬衫去改，她量体的时候一针见血地说"你左肩比右肩高半寸"。改完的衣服穿着比新的还合身。',
+      cond: g => g.age >= 22 && !g.flags.artisanTailor && g.money > 500,
+      choices:[
+        { label:'让她做了一套定制西装', hint:'-💰 +✨ +✨', fn: g => { g.flags.artisanTailor=true; g.flags.artisanSuit=true; return{money:-2000,charm:8}; }},
+        { label:'只是改了几件旧衣服', hint:'-💰 +✨', fn: g => { g.flags.artisanTailor=true; return{money:-100,charm:3}; }},
+        { label:'开始跟她学缝纫', hint:'+🧠 +✨', fn: g => { g.flags.artisanTailor=true; g.flags.artisanLearn=true; return{intel:5,charm:3}; }},
+      ]},
+    { id:'artisan_noodle_v37_5', icon:'🍜', title:'面馆老板', category:'artisan',
+      body:'你常去的面馆老板做了四十年面条。他的手工拉面比机器做的有灵魂——每一根面条都带着力度和温度。他说"做面条和做人一样，要用心"。你觉得他做面时的专注，和艺术家没什么区别。',
+      cond: g => g.age >= 22 && !g.flags.artisanNoodle && g.smellFood,
+      choices:[
+        { label:'开始跟他学做手工面', hint:'+🧠 +✨', fn: g => { g.flags.artisanNoodle=true; g.flags.artisanCook=true; return{intel:5,charm:4}; }},
+        { label:'每次来都多和他聊几句', hint:'+👥 +😊', fn: g => { g.flags.artisanNoodle=true; return{social:4,mood:4}; }},
+        { label:'默默吃了一碗面，觉得这就是匠人', hint:'+🧠 +😊', fn: g => { g.flags.artisanNoodle=true; return{intel:3,mood:4}; }},
+      ]},
+    { id:'artisan_watch_v37_5', icon:'⌚', title:'修表匠', category:'artisan',
+      body:'你爷爷的手表坏了，你在老城区找到了一家钟表修理店。老师傅戴着放大镜，用镊子小心翼翼地摆弄着细小的齿轮。他说修表要"心静手稳"，这门手艺现在年轻人都不愿意学了。',
+      cond: g => g.age >= 24 && !g.flags.artisanWatch && g.intel > 25,
+      choices:[
+        { label:'请他修好了爷爷的手表', hint:'-💰 +😊 +✨', fn: g => { g.flags.artisanWatch=true; g.flags.artisanHeritage=true; return{money:-200,mood:6,charm:3}; }},
+        { label:'和他聊了很久，了解了钟表的历史', hint:'+🧠 +👥', fn: g => { g.flags.artisanWatch=true; return{intel:6,social:3}; }},
+        { label:'觉得这种手艺消失太可惜了', hint:'+🧠 -😊', fn: g => { g.flags.artisanWatch=true; return{intel:4,mood:-2}; }},
+      ]},
+    { id:'artisan_social_v37_5', icon:'🤝', title:'手艺人社交', category:'artisan',
+      body:'你开始有意识地认识城市里的各种手艺人——修鞋的、裁缝、修表的、做面的、磨刀的、修自行车的。每个人都有自己的绝活和故事，他们是大城市里最容易被忽略的人。',
+      cond: g => g.age >= 25 && (g.flags.artisanCobbler || g.flags.artisanTailor) && !g.flags.artisanSocial && g.social > 25,
+      choices:[
+        { label:'开始记录每个手艺人的故事', hint:'+🧠 +✨ +👥', fn: g => { g.flags.artisanSocial=true; g.flags.artisanRecord=true; return{intel:6,charm:5,social:4}; }},
+        { label:'经常去照顾他们的生意', hint:'-💰 +👥 +😊', fn: g => { g.flags.artisanSocial=true; return{money:-300,social:6,mood:4}; }},
+        { label:'只是心里默默敬佩他们', hint:'+🧠', fn: g => { g.flags.artisanSocial=true; return{intel:3}; }},
+      ]},
+    { id:'artisan_dying_v37_5', icon:'📉', title:'消失的手艺', category:'artisan',
+      body:'你发现巷口的修鞋摊不见了，老街的裁缝铺也关门了。城市在更新，但那些需要时间沉淀的手艺正在消失。你在想：当最后一个修鞋匠退休的时候，谁来修我们的鞋？',
+      cond: g => g.age >= 26 && g.flags.artisanSocial && !g.flags.artisanDying && g.intel > 30,
+      choices:[
+        { label:'开始做一个"城市手艺人档案"项目', hint:'+🧠 +✨', fn: g => { g.flags.artisanDying=true; g.flags.artisanArchive=true; return{intel:8,charm:5}; }},
+        { label:'呼吁大家关注和支持本地手艺人', hint:'+✨ +👥', fn: g => { g.flags.artisanDying=true; return{charm:5,social:4}; }},
+        { label:'感慨时代变了，但也无能为力', hint:'+🧠 -😊', fn: g => { g.flags.artisanDying=true; return{intel:3,mood:-3}; }},
+      ]},
+    { id:'artisan_learn_v37_5', icon:'🔨', title:'学一门手艺', category:'artisan',
+      body:'你开始跟一个老木匠学木工。每个周末去他的工作室，从刨木头开始学起。你的第一件作品是个歪歪扭扭的木凳子，但拿着它的时候你有一种前所未有的成就感——这是你亲手做的。',
+      cond: g => g.age >= 25 && g.flags.artisanSocial && !g.flags.artisanCraft && g.intel > 30 && g.money > 3000,
+      choices:[
+        { label:'认真学了半年，做出了像样的家具', hint:'-💰 +✨ +🧠', fn: g => { g.flags.artisanCraft=true; g.flags.artisanSkilled=true; return{money:-3000,charm:8,intel:8}; }},
+        { label:'学了几次就放弃了，太难了', hint:'+🧠', fn: g => { g.flags.artisanCraft=true; return{intel:3,mood:2}; }},
+        { label:'把手工作品送给了朋友', hint:'+👥 +✨', fn: g => { g.flags.artisanCraft=true; return{social:5,charm:4}; }},
+      ]},
+    { id:'artisan_digital_v37_5', icon:'📱', title:'数字匠人', category:'artisan',
+      body:'你开始思考：在数字时代，"匠人精神"意味着什么？也许写代码也可以是手艺活，做设计也可以是匠人。你开始在本职工作中追求极致，不再只是"完成任务"。',
+      cond: g => g.age >= 27 && g.flags.artisanCraft && !g.flags.artisanDigital && g.intel > 35 && g.jobSalary > 0,
+      choices:[
+        { label:'在工作中践行匠人精神，得到认可', hint:'+💰 +✨ +🧠', fn: g => { g.flags.artisanDigital=true; g.flags.artisanWork=true; return{money:5000,charm:6,intel:5}; }},
+        { label:'开了一门"数字时代的手艺"课程', hint:'+💰 +✨', fn: g => { g.flags.artisanDigital=true; g.flags.artisanTeach=true; return{money:3000,charm:5}; }},
+        { label:'只是默默在工作中更加精益求精', hint:'+🧠 +✨', fn: g => { g.flags.artisanDigital=true; return{intel:6,charm:3}; }},
+      ]},
+    { id:'artisan_community_v37_5', icon:'🏘️', title:'手艺人社区', category:'artisan',
+      body:'你在网上发起了一个"城市手艺人地图"项目，把你知道的所有手艺人的位置标注出来。没想到很多人响应，不断有新的手艺人被添加进来。你发现城市里的手艺人比你以为的多得多。',
+      cond: g => g.age >= 28 && g.flags.artisanDying && (g.flags.artisanArchive || g.flags.artisanRecord) && !g.flags.artisanCommunity && g.social > 30,
+      choices:[
+        { label:'把项目做成了公益平台', hint:'+✨ +👥 +🧠', fn: g => { g.flags.artisanCommunity=true; g.flags.artisanPlatform=true; return{charm:10,social:10,intel:5}; }},
+        { label:'组织了一次手艺人市集', hint:'+👥 +✨ -💰', fn: g => { g.flags.artisanCommunity=true; return{social:8,charm:6,money:-1000}; }},
+        { label:'只是维护好这个社区', hint:'+👥 +🧠', fn: g => { g.flags.artisanCommunity=true; return{social:5,intel:3}; }},
+      ]},
+    { id:'artisan_life_v37_5', icon:'🌟', title:'匠人人生', category:'artisan',
+      body:'你终于理解了"匠人精神"的本质——不是做一件多么了不起的事，而是在一件普通的事情上投入足够的时间和心血。修鞋、做面、写代码、画画，都是一样的。在大城市里，每个认真做事的人都是匠人。你自己也是。',
+      cond: g => g.age >= 30 && g.flags.artisanCommunity && (g.flags.artisanPlatform || g.flags.artisanWork) && !g.flags.artisanLife && g.intel > 40,
+      choices:[
+        { label:'出版了《城市匠人志》', hint:'+💰 +✨ +🧠', fn: g => { g.flags.artisanLife=true; g.flags.artisanAuthor=true; return{money:8000,charm:12,intel:10}; }},
+        { label:'开了一家"手艺人咖啡馆"', hint:'-💰 +✨ +💰', fn: g => { g.flags.artisanLife=true; g.flags.artisanCafe=true; g.jobName='手艺人咖啡馆老板'; g.jobSalary=12000; return{money:-40000,charm:10}; }},
+        { label:'继续做一个认真对待生活的匠人', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.artisanLife=true; return{mood:12,health:5,intel:8}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -24562,6 +24644,18 @@ const ACHIEVEMENTS = [
     { id:'light_art_v37_4_ach', icon:'🎆', name:'光影艺术', desc:'第一次体验了灯光艺术展', check: g => g.flags.lightArt },
     { id:'light_dawn_v37_4_ach', icon:'🌄', name:'城市黎明', desc:'在天台上等了一整夜看日出', check: g => g.flags.lightDawn },
     { id:'light_life_v37_4_ach', icon:'🌟', name:'光与人生', desc:'在城市的光与影之间找到了自己的位置', check: g => g.flags.lightLife },
+
+    // v37.5 城市手艺人与匠人精神
+    { id:'artisan_cobbler_v37_5_ach', icon:'👞', name:'修鞋匠', desc:'认识了巷口修了三十年的老师傅', check: g => g.flags.artisanCobbler },
+    { id:'artisan_tailor_v37_5_ach', icon:'🧵', name:'裁缝铺', desc:'找到了手艺精湛的裁缝老板娘', check: g => g.flags.artisanTailor },
+    { id:'artisan_noodle_v37_5_ach', icon:'🍜', name:'面馆匠人', desc:'吃到了做了四十年的手工拉面', check: g => g.flags.artisanNoodle },
+    { id:'artisan_watch_v37_5_ach', icon:'⌚', name:'修表匠', desc:'见识了修钟表的老手艺', check: g => g.flags.artisanWatch },
+    { id:'artisan_social_v37_5_ach', icon:'🤝', name:'手艺人朋友', desc:'认识了城市里各种手艺人', check: g => g.flags.artisanSocial },
+    { id:'artisan_dying_v37_5_ach', icon:'📉', name:'消失的手艺', desc:'开始关注正在消失的传统手艺', check: g => g.flags.artisanDying },
+    { id:'artisan_craft_v37_5_ach', icon:'🔨', name:'学一门手艺', desc:'亲手做出了第一件手工作品', check: g => g.flags.artisanCraft },
+    { id:'artisan_digital_v37_5_ach', icon:'📱', name:'数字匠人', desc:'在数字时代践行了匠人精神', check: g => g.flags.artisanDigital },
+    { id:'artisan_community_v37_5_ach', icon:'🏘️', name:'手艺人社区', desc:'建立了一个城市手艺人网络', check: g => g.flags.artisanCommunity },
+    { id:'artisan_life_v37_5_ach', icon:'🌟', name:'匠人人生', desc:'理解了认真做事的人都是匠人', check: g => g.flags.artisanLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
