@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v35.2
+// 都市浮生记 - 数据文件 v35.3
 // ============================================
 
 
@@ -20448,6 +20448,98 @@ const EVENTS = [
         { label:'写了一篇关于彩票经济的文章', hint:'+🧠 +💰', fn: g => { g.flags.lotteryPhilosophy=true; g.flags.lotteryWriter=true; return{intel:12,money:5000,charm:10}; }},
       ]},
 
+    // ===== 国潮与新国货消费 (v35.3) =====
+
+    { id:'guochao_first_v35_3', icon:'🇨🇳', title:'第一次买国潮', category:'guochao',
+      body:'你路过一家李宁门店，被橱窗里的设计吸引了。\n\n不是以前的那种「土味运动风」，而是一种全新的、融合了中国传统文化元素的设计——\n\n一件卫衣上绣着仙鹤和祥云，但剪裁是现代的街头风格。\n\n你走进去试了试。穿上之后你对着镜子看了半天——居然很好看。\n\n价格：699元。比耐克阿迪便宜，但比以前的李宁贵了很多。\n\n你犹豫了一下，还是买了。\n\n穿到公司的时候同事问：「这什么牌子？好看。」\n\n你说：「李宁。」\n\n同事惊讶了：「李宁现在这么潮了？」\n\n你开始理解：「国潮」不是爱国情怀的绑架消费，而是中国设计真的变好看了。',
+      cond: g => g.age >= 18 && g.money >= 1000 && !g.flags.guochaoFirst,
+      choices:[
+        { label:'爱上了国潮品牌', hint:'+✨ -💰', fn: g => { g.flags.guochaoFirst=true; g.flags.guochaoFan=true; return{charm:10,mood:8,money:-699}; }},
+        { label:'偶尔买一件，看质量', hint:'+✨', fn: g => { g.flags.guochaoFirst=true; return{charm:5,mood:5,money:-699}; }},
+        { label:'觉得溢价太高，不值', hint:'', fn: g => { g.flags.guochaoFirst=true; g.flags.rationalGuochao=true; return{intel:3}; }},
+      ]},
+
+    { id:'guochao_cosmetics_v35_3', icon:'💄', title:'国货美妆', category:'guochao',
+      body:'你的闺蜜/朋友推荐了一个国货美妆品牌：「完美日记」或「花西子」。\n\n「比大牌便宜一半，效果差不多。」她说。\n\n你半信半疑地买了一支口红——89元（大牌要280元）。\n\n试了一下——颜色确实好看。质地也不错。\n\n你又买了一个眼影盘——129元。包装是中国风的浮雕设计，精致到你不忍心用。\n\n你在小红书上搜了测评，发现很多博主都在推国货美妆。\n\n评论区有人说是「国货之光」，有人说是「营销割韭菜」。\n\n你觉得：不管是不是营销，如果产品真的好、价格真的便宜，那就是好东西。\n\n消费者用脚投票，比任何广告都有效。',
+      cond: g => g.age >= 18 && g.charm > 20 && !g.flags.guochaoCosmetics,
+      choices:[
+        { label:'成了国货美妆粉丝', hint:'+✨ +😊', fn: g => { g.flags.guochaoCosmetics=true; g.flags.domesticBeauty=true; return{charm:10,mood:8,money:-300}; }},
+        { label:'觉得还行，混着用', hint:'+✨', fn: g => { g.flags.guochaoCosmetics=true; return{charm:5,mood:3,money:-200}; }},
+        { label:'还是觉得大牌更靠谱', hint:'', fn: g => { g.flags.guochaoCosmetics=true; return{mood:-2}; }},
+      ]},
+
+    { id:'guochao_food_v35_3', icon:'🧋', title:'国货饮品', category:'guochao',
+      body:'你发现你爱喝的饮品全是国货：\n\n- 蜜雪冰城：柠檬水4元，冰淇淋2元（「你爱我我爱你蜜雪冰城甜蜜蜜」）\n- 元气森林：0糖0脂0卡（虽然被质疑「伪健康」）\n- 瑞幸咖啡：9.9一杯的生椰拿铁\n- 茶颜悦色：只有长沙才有（你为它专门去了长沙）\n- 喜茶：虽然贵但确实好喝\n\n你算了一下：你每个月在饮品上花500元。\n\n你妈说：「你们年轻人怎么这么爱喝饮料？白开水不好吗？」\n\n你说：「妈你不懂，这不是饮料，是情绪价值。」\n\n一杯9.9的瑞幸，能让你在上班路上多笑5分钟。这5分钟，值了。\n\n你开始思考：国货饮品的崛起不是偶然——它们更了解中国人的口味，价格更亲民，营销更接地气。',
+      cond: g => g.age >= 18 && !g.flags.guochaoFood,
+      choices:[
+        { label:'成了国货饮品的忠实粉丝', hint:'+😊', fn: g => { g.flags.guochaoFood=true; g.flags.domesticDrinks=true; return{mood:8,money:-500}; }},
+        { label:'什么都喝，不挑品牌', hint:'+😊', fn: g => { g.flags.guochaoFood=true; return{mood:5,money:-300}; }},
+        { label:'开始减少饮品消费', hint:'+💰 +🏥', fn: g => { g.flags.guochaoFood=true; g.flags.drinkLess=true; return{health:5,money:200}; }},
+      ]},
+
+    { id:'guochao_tech_v35_3', icon:'📱', title:'国产数码', category:'guochao',
+      body:'你换手机了。以前你一直用iPhone，但这次你选了华为/小米。\n\n原因很简单：\n1. 国产手机拍照确实好（尤其是夜景和自拍）\n2. 系统更本土化（微信双开、应用分身）\n3. 价格比iPhone便宜一半\n4. 快充太香了（30分钟充满 vs iPhone的2小时）\n\n你用了两周后的感受：\n- 优点：快充真快、拍照真好、系统真方便\n- 缺点：有些App优化不如iOS、二手保值率低\n\n你的果粉朋友说：「你怎么不用iPhone了？」\n\n你说：「因为我不需要用一万块的手机来证明什么了。」\n\n你开始理解：国货的崛起不只是产品变好了，更是消费者的自信变强了——不再盲目崇拜国际品牌。',
+      cond: g => g.age >= 20 && g.money >= 3000 && !g.flags.guochaoTech,
+      choices:[
+        { label:'全面转向国产品牌', hint:'+✨ +💰', fn: g => { g.flags.guochaoTech=true; g.flags.domesticTech=true; return{charm:8,money:-3000}; }},
+        { label:'手机换国产，其他还是用大牌', hint:'+✨', fn: g => { g.flags.guochaoTech=true; return{charm:5,money:-3000}; }},
+        { label:'用了一段时间又换回了iPhone', hint:'-💰', fn: g => { g.flags.guochaoTech=true; return{mood:-3,money:-3000}; }},
+      ]},
+
+    { id:'guochao_hanfu_v35_3', icon:'👘', title:'国潮汉服', category:'guochao',
+      body:'你在抖音上看到了一个汉服变装视频——一个普通女生穿上汉服后美得像仙女。\n\n你心动了。你在淘宝上搜了搜——汉服从100元到10000元都有。\n\n你买了一套300元的「日常汉服」——可以在日常穿，不会太夸张。\n\n到货后你穿上试了试。你对着镜子转了一圈——裙摆飘起来的时候，你觉得自己像古代的小姐姐。\n\n你穿着汉服去了公园。有人找你拍照：「小姐姐好好看！」\n\n你也看到了一些异样的目光——有人觉得穿汉服上街很奇怪。\n\n但你觉得：穿自己喜欢的衣服，不需要别人的认可。\n\n汉服文化的复兴不是「穿越」，而是在现代社会里找到一种属于自己的美。',
+      cond: g => g.age >= 18 && g.charm > 25 && !g.flags.guochaoHanfu,
+      choices:[
+        { label:'成了汉服爱好者', hint:'+✨ +😊', fn: g => { g.flags.guochaoHanfu=true; g.flags.hanfuFan=true; return{charm:15,mood:12,money:-500}; }},
+        { label:'偶尔穿穿，当拍照用', hint:'+✨', fn: g => { g.flags.guochaoHanfu=true; return{charm:8,mood:5,money:-300}; }},
+        { label:'觉得不日常，退了', hint:'', fn: g => { g.flags.guochaoHanfu=true; return{mood:-3}; }},
+      ]},
+
+    { id:'guochao_ip_v35_3', icon:'🎨', title:'国潮IP联名', category:'guochao',
+      body:'你发现了一个有趣的现象：国潮品牌开始和传统文化IP联名了。\n\n- 故宫 × 彩妆：口红壳子是故宫的藻井纹样\n- 敦煌 × 运动鞋：鞋面印着飞天壁画\n- 三星堆 × 盲盒：青铜面具变成了潮玩\n- 河南博物院 × 考古盲盒：自己挖「文物」\n\n你买了一个河南博物院的考古盲盒——50元。你需要用小铲子从土块里挖出「文物」。\n\n你挖了30分钟，挖出了一个迷你版的「青铜鼎」。\n\n你觉得这比任何潮玩都有意思——因为你在「挖」的过程中体验到了考古的乐趣。\n\n你开始理解：国潮不只是「中国制造」，更是「中国文化」的输出。年轻人买国潮，不只是因为爱国，而是因为这些东西真的有趣、好看、好玩。',
+      cond: g => g.age >= 18 && g.flags.guochaoFirst && !g.flags.guochaoIP,
+      choices:[
+        { label:'开始收集国潮联名', hint:'+✨ -💰', fn: g => { g.flags.guochaoIP=true; g.flags.ipCollector=true; return{charm:10,mood:10,money:-500}; }},
+        { label:'偶尔买一个，觉得有趣', hint:'+😊', fn: g => { g.flags.guochaoIP=true; return{mood:8,money:-100}; }},
+        { label:'觉得联名溢价太高', hint:'+🧠', fn: g => { g.flags.guochaoIP=true; g.flags.rationalGuochao=true; return{intel:5}; }},
+      ]},
+
+    { id:'guochao_debate_v35_3', icon:'🤔', title:'国潮争议', category:'guochao',
+      body:'你在网上看到了一场关于国潮的争论。\n\n正方：「国潮是中国品牌的崛起，是文化自信的体现。」\n反方：「国潮就是打着爱国旗号割韭菜，很多产品质量并不好。」\n\n你仔细想了想，两边都有道理。\n\n有些国潮品牌确实是用心做产品，设计和质量都不输国际品牌。\n\n但也有一些品牌只是贴了个「国潮」标签，把普通的衣服/鞋子涨价3倍卖。\n\n还有更极端的——有人因为你不买国潮就说你「不爱国」。\n\n你觉得：消费不应该被道德绑架。好的东西自然会被人认可，不需要用「爱国」来绑架消费者。\n\n你在评论区写了一条：「支持国货是因为它们真的好，而不是因为我不买就不爱国。」',
+      cond: g => g.age >= 20 && g.flags.guochaoFirst && g.intel > 35 && !g.flags.guochaoDebate,
+      choices:[
+        { label:'理性支持，好就买不好就不买', hint:'+🧠', fn: g => { g.flags.guochaoDebate=true; g.flags.rationalGuochao=true; return{intel:10,mood:5}; }},
+        { label:'坚定支持国潮', hint:'+✨', fn: g => { g.flags.guochaoDebate=true; g.flags.guochaoSupporter=true; return{charm:5,mood:3}; }},
+        { label:'被负面评价影响，减少了购买', hint:'', fn: g => { g.flags.guochaoDebate=true; return{mood:-5}; }},
+      ]},
+
+    { id:'guochao_brand_v35_3', icon:'🏭', title:'国货工厂', category:'guochao',
+      body:'你的一个朋友在国货工厂工作。他带你参观了他们的生产线。\n\n你看到了：\n- 全自动化生产线（比你想象的先进得多）\n- 严格的质检流程（每一件产品都要过5道检验）\n- 仓库里堆满了待发往全国各地的货物\n\n你朋友说：「很多国际大牌也是在我们这里代工的。同样的品质，贴上不同的标签，价格差10倍。」\n\n你震惊了：「真的？」\n\n「真的。你用的那个XX（国际品牌），就是我们做的。我们给他们的出厂价是50元，他们卖500。」\n\n你开始理解：国货的崛起不是「山寨变正品」，而是「中国制造的觉醒」。\n\n中国不缺好的制造能力，缺的是品牌能力和讲故事的能力。而现在，新一代的国货品牌正在补上这一课。',
+      cond: g => g.age >= 22 && g.flags.guochaoFirst && g.intel > 35 && !g.flags.guochaoBrand,
+      choices:[
+        { label:'开始关注国货背后的供应链', hint:'+🧠', fn: g => { g.flags.guochaoBrand=true; g.flags.supplyChainFan=true; return{intel:12,mood:8}; }},
+        { label:'被震撼了，决定多支持国货', hint:'+✨ +😊', fn: g => { g.flags.guochaoBrand=true; return{charm:8,mood:8}; }},
+        { label:'觉得代工和自有品牌还是不一样', hint:'+🧠', fn: g => { g.flags.guochaoBrand=true; g.flags.rationalGuochao=true; return{intel:8}; }},
+      ]},
+
+    { id:'guochao_culture_v35_3', icon:'🏮', title:'文化自信', category:'guochao',
+      body:'你参加了一个「国潮市集」——一个集合了各种国潮品牌的线下活动。\n\n你看到了：\n- 融合剪纸艺术的时装\n- 以中药为灵感的香水\n- 用活字印刷制作的文具\n- 以青花瓷为设计元素的咖啡杯\n- 以传统点心为灵感的现代甜品\n\n你发现：这些设计师不是在「复制」传统，而是在「重新诠释」传统。\n\n他们把几千年的文化变成了现代人愿意用的产品。\n\n你和一位设计师聊了聊。她说：「我做这些不是为了复古，而是为了让年轻人知道——中国文化不缺美，缺的是被看见的机会。」\n\n你突然有一种自豪感——不是盲目的「中国最棒」，而是一种深层文化认同感。\n\n你开始理解：国潮的本质不是消费，而是文化觉醒。',
+      cond: g => g.age >= 22 && g.flags.guochaoFirst && (g.flags.guochaoIP || g.flags.guochaoBrand) && g.intel > 35,
+      choices:[
+        { label:'对中国文化有了新的理解', hint:'+🧠 +✨', fn: g => { g.flags.guochaoCulture=true; return{intel:15,charm:12,mood:12}; }},
+        { label:'开始学习一门传统手艺', hint:'+🧠 +✨', fn: g => { g.flags.guochaoCulture=true; g.flags.traditionalCraft=true; return{intel:18,charm:15,money:-2000}; }},
+        { label:'写了篇关于国潮的反思文章', hint:'+🧠 +💰', fn: g => { g.flags.guochaoCulture=true; g.flags.guochaoWriter=true; return{intel:12,money:3000,charm:10}; }},
+      ]},
+
+    { id:'guochao_philosophy_v35_3', icon:'🌏', title:'国潮的反思', category:'guochao',
+      body:'你回顾自己这一年和国潮的关系。\n\n从第一次买李宁的惊喜，到国货美妆的体验，到国产数码的转变，到考古盲盒的乐趣……\n\n你开始思考：国潮对你来说意味着什么？\n\n是爱国？有一点。是性价比？也是。是文化认同？更是。\n\n但你也看到了一些问题：\n- 有些品牌打着「国潮」的旗号涨价，但品质没有跟上\n- 有些消费者买国潮只是因为「爱国」而不是因为「好」\n- 国潮的热度可能会过去，真正能留下来的品牌有多少？\n\n你觉得：国潮最好的状态是——不需要「国潮」这个标签。\n\n当一个中国品牌不需要靠「国」字来卖货，而是靠产品本身赢得消费者的时候，那才是真正的成功。\n\n你在朋友圈写了一段话：\n\n「希望有一天，我们买国货不是因为爱国，而是因为它真的好。而那时候，全世界都会来买。」',
+      cond: g => g.age >= 23 && g.flags.guochaoFirst && g.flags.guochaoCulture && g.intel > 40,
+      choices:[
+        { label:'理性消费，不被标签绑架', hint:'+🧠 +✨', fn: g => { g.flags.guochaoPhilosophy=true; return{intel:15,charm:10,mood:10}; }},
+        { label:'开始做一个国货品牌', hint:'+💰 +✨', fn: g => { g.flags.guochaoPhilosophy=true; g.flags.guochaoFounder=true; return{charm:15,money:-20000}; }},
+        { label:'把对国潮的理解做成内容', hint:'+🧠 +💰', fn: g => { g.flags.guochaoPhilosophy=true; g.flags.guochaoInfluencer=true; return{intel:12,charm:12,money:5000}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -22458,6 +22550,17 @@ const ACHIEVEMENTS = [
     { id:'lottery_reality_v35_2_ach', icon:'📊', name:'彩票经济学', desc:'理性分析了彩票的概率和本质', check: g => g.flags.lotteryReality },
     { id:'lottery_nearmiss_v35_2_ach', icon:'😱', name:'差一点就中了', desc:'经历了与大奖擦肩而过', check: g => g.flags.lotteryNearMiss },
     { id:'lottery_philosophy_v35_2_ach', icon:'🎲', name:'希望的价格', desc:'理解了彩票对普通人的真正意义', check: g => g.flags.lotteryPhilosophy },
+    // v35.3 国潮与新国货消费
+    { id:'guochao_first_v35_3_ach', icon:'🇨🇳', name:'国潮初体验', desc:'第一次购买了国潮品牌', check: g => g.flags.guochaoFirst },
+    { id:'guochao_cosmetics_v35_3_ach', icon:'💄', name:'国货美妆', desc:'尝试了国产美妆品牌', check: g => g.flags.guochaoCosmetics },
+    { id:'guochao_food_v35_3_ach', icon:'🧋', name:'国货饮品达人', desc:'发现了国产饮品的魅力', check: g => g.flags.guochaoFood },
+    { id:'guochao_tech_v35_3_ach', icon:'📱', name:'国产数码', desc:'开始使用国产数码产品', check: g => g.flags.guochaoTech },
+    { id:'guochao_hanfu_v35_3_ach', icon:'👘', name:'国潮汉服', desc:'穿上了日常汉服出街', check: g => g.flags.guochaoHanfu },
+    { id:'guochao_ip_v35_3_ach', icon:'🎨', name:'国潮联名收藏', desc:'收集了传统文化IP联名产品', check: g => g.flags.guochaoIP },
+    { id:'guochao_debate_v35_3_ach', icon:'🤔', name:'国潮思辨', desc:'理性思考了国潮消费的争议', check: g => g.flags.guochaoDebate },
+    { id:'guochao_brand_v35_3_ach', icon:'🏭', name:'国货探秘', desc:'了解了国货背后的供应链', check: g => g.flags.guochaoBrand },
+    { id:'guochao_culture_v35_3_ach', icon:'🏮', name:'文化自信', desc:'在国潮中感受到了文化认同', check: g => g.flags.guochaoCulture },
+    { id:'guochao_philosophy_v35_3_ach', icon:'🌏', name:'国潮的反思', desc:'对国潮消费有了深层的理解', check: g => g.flags.guochaoPhilosophy },
 ];
 
 // === ENDINGS === (order matters: first match wins)
