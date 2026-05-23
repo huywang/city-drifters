@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v34.5
+// 都市浮生记 - 数据文件 v34.6
 // ============================================
 
 
@@ -19804,6 +19804,98 @@ const EVENTS = [
         { label:'开始给深夜还在工作的人送食物', hint:'+👥 +😊', fn: g => { g.flags.nightFoodPhilosophy=true; g.flags.foodAngel=true; return{social:12,mood:10}; }},
       ]},
 
+    // ===== 短视频与自媒体经济 (v34.6) =====
+
+    { id:'short_video_start_v34_6', icon:'📱', title:'开始拍短视频', category:'selfmedia',
+      body:'你决定开始拍短视频了。\n\n不是为了当网红，只是觉得你在大城市的生活值得被记录。你用手机拍了一条「北漂的一天」：早上七点挤地铁、中午吃15块的盒饭、晚上加班到九点、回家路上买了一串糖葫芦。\n\n你把视频剪了一晚上，配上了一段文字：「不是每一天都精彩，但每一天都是真的。」\n\n发出去后，你紧张地刷新了一晚上。播放量：47。点赞：3（其中一个是你妈）。\n\n你有点失望，但也没放弃。\n\n第二周你又拍了一条：「月薪5000在北京怎么活」。这次播放量破万了。评论区有人说：「太真实了」「我也在这样活着」。\n\n你突然觉得，原来真实的生活比任何精心策划的内容都有力量。',
+      cond: g => g.age >= 20 && g.age <= 35,
+      choices:[
+        { label:'坚持每周更新', hint:'+✨ +🧠', fn: g => { g.flags.shortVideoStart=true; return{charm:10,intel:5}; }},
+        { label:'拍了几条就放弃了', hint:'+🧠', fn: g => { g.flags.shortVideoStart=true; return{intel:3}; }},
+        { label:'开始研究短视频运营', hint:'+🧠 +✨', fn: g => { g.flags.shortVideoStart=true; g.flags.videoStrategy=true; return{intel:12,charm:5}; }},
+      ]},
+
+    { id:'viral_video_v34_6', icon:'🔥', title:'视频爆了', category:'selfmedia',
+      body:'你的一条视频突然爆了。\n\n那条视频是你随手拍的：下班路上你看到一个外卖骑手在雨中摔倒，外卖洒了一地。他坐在地上愣了几秒，然后爬起来，重新把外卖装好，一瘸一拐地继续送。\n\n你拍了下来，配了一句话：「成年人的崩溃，是在雨里静默的三秒。」\n\n第二天早上你醒来，手机震个不停。播放量：800万。点赞：120万。评论：5万条。\n\n你懵了。你不知道该高兴还是该难过。你拍的是一条真实的生活，但现在它被几百万人消费了。\n\n有人评论说：「看哭了。」有人说：「太真实了。」也有人说：「你在消费苦难。」\n\n你不知道该怎么回复。你只是想记录一下你看到的东西。\n\n但你知道，从这条视频开始，你的生活可能要变了。',
+      cond: g => g.flags.shortVideoStart && g.age >= 20,
+      choices:[
+        { label:'趁热度继续创作', hint:'+✨ +💰 +👥', fn: g => { g.flags.viralVideo=true; return{charm:15,money:10000,social:12}; }},
+        { label:'觉得被关注很不舒服', hint:'+🧠 +😊', fn: g => { g.flags.viralVideo=true; return{intel:8,mood:5}; }},
+        { label:'开始思考内容的边界', hint:'+🧠 +✨', fn: g => { g.flags.viralVideo=true; g.flags.contentEthics=true; return{intel:15,charm:8}; }},
+      ]},
+
+    { id:'selfmedia_income_v34_6', icon:'💰', title:'自媒体收入', category:'selfmedia',
+      body:'你开始收到自媒体收入了。\n\n第一条广告：一个手机壳品牌，给你3000块，让你在视频里展示他们的产品。你犹豫了很久——你一直拍的是真实生活，接广告会不会让你的内容变味？\n\n你接了。毕竟3000块是你半个月的房租。\n\n你小心翼翼地把广告植入了一条日常视频里。粉丝反应还行，没有人骂你。\n\n从那以后，你每个月能接到两三条广告。好的时候月入过万，不好的时候一分没有。\n\n你开始理解自媒体的规则：流量就是钱，但流量不稳定。你可能今天有十万播放，明天就只有一百。\n\n你把自媒体收入当副业，不当主业。因为你知道，一旦你把它当主业，你就会被数据绑架。\n\n但说实话，看到银行卡里多出来的那几千块，你还是会偷偷笑一下。',
+      cond: g => g.flags.shortVideoStart && g.age >= 20,
+      choices:[
+        { label:'把自媒体当成稳定副业', hint:'+💰 +🧠', fn: g => { g.flags.selfmediaIncome=true; return{money:8000,intel:5}; }},
+        { label:'拒绝所有广告，保持纯粹', hint:'+✨ +🧠', fn: g => { g.flags.selfmediaIncome=true; g.flags.pureContent=true; return{charm:10,intel:8}; }},
+        { label:'辞职全职做自媒体', hint:'+✨ +💰', fn: g => { g.flags.selfmediaIncome=true; g.flags.fulltimeCreator=true; setJob(g,'自媒体创作者',8000); return{charm:12,money:5000}; }},
+      ]},
+
+    { id:'creator_burnout_v34_6', icon:'😵', title:'创作倦怠', category:'selfmedia',
+      body:'你开始不想拍视频了。\n\n不是因为累，而是因为你发现自己变了。以前你拍视频是因为想表达，现在你拍视频是因为算法要你表达。\n\n你开始研究什么内容容易火：冲突、反转、情绪化、争议性。你的视频越来越「好看」，但你觉得它们越来越不像你。\n\n你停更了两周。评论区有人问：「怎么不更新了？」也有人说：「过气了吧。」\n\n你看着这些评论，不知道该笑还是该哭。\n\n一个做自媒体的朋友跟你说：「每个创作者都会经历这个阶段。要么你找到真正想做的内容，要么你被数据吞噬。」\n\n你想了很久，决定回到最初的出发点：只拍你觉得值得拍的东西，不管流量。\n\n你发了一条视频，没有滤镜、没有BGM、没有剪辑，就是你坐在镜头前说了一段话：\n\n「我不想再讨好算法了。我只想做我自己。」',
+      cond: g => g.flags.viralVideo && g.flags.selfmediaIncome && g.age >= 22,
+      choices:[
+        { label:'坚持做自己，哪怕没流量', hint:'+✨ +🧠 +😊', fn: g => { g.flags.creatorBurnout=true; return{charm:12,intel:10,mood:8}; }},
+        { label:'暂时停更，休息一段时间', hint:'+😊 +🧠', fn: g => { g.flags.creatorBurnout=true; return{mood:10,intel:5}; }},
+        { label:'转型做深度内容', hint:'+🧠 +✨', fn: g => { g.flags.creatorBurnout=true; g.flags.deepContent=true; return{intel:15,charm:10}; }},
+      ]},
+
+    { id:'live_stream_v34_6', icon:'📡', title:'第一次直播', category:'selfmedia',
+      body:'你鼓起勇气开了第一次直播。\n\n你紧张得手心出汗。开播后，直播间只有三个人。你尴尬地说了句「大家好」，然后不知道说什么了。\n\n一个观众打字：「主播是哪里人？」你说了你的城市。另一个观众说：「我也是！」你们开始聊天。\n\n慢慢地，直播间有了十几个人。你开始讲你在大城市的故事：怎么找工作、怎么省钱、怎么在深夜想家。观众开始分享他们的故事。\n\n两个小时过去了。你觉得这是你做过的最真实的一次「内容创作」——因为它没有脚本，没有剪辑，只有你和一群陌生人之间的实时连接。\n\n直播结束后，你的嗓子哑了，但你觉得特别充实。\n\n后台数据显示：最高同时在线42人，收到打赏58块。\n\n58块钱不算什么，但42个人同时在听你说话——这让你觉得你的故事是有价值的。',
+      cond: g => g.flags.shortVideoStart && g.age >= 20 && g.social > 25,
+      choices:[
+        { label:'开始定期直播', hint:'+👥 +✨', fn: g => { g.flags.liveStream=true; return{social:10,charm:8,money:2000}; }},
+        { label:'太紧张了，不想再播', hint:'+🧠', fn: g => { g.flags.liveStream=true; return{intel:3}; }},
+        { label:'把直播内容剪成短视频', hint:'+✨ +🧠', fn: g => { g.flags.liveStream=true; g.flags.liveClip=true; return{charm:10,intel:8,money:3000}; }},
+      ]},
+
+    { id:'fan_community_v34_6', icon:'💬', title:'粉丝社群', category:'selfmedia',
+      body:'你建了一个粉丝微信群。\n\n本来只是想把活跃的粉丝聚在一起，结果群里很快就有了一百多人。你发现你的粉丝画像很统一：20-30岁，在大城市打拼，收入不高但有梦想。\n\n群里每天都很活跃：有人分享工作机会，有人吐槽老板，有人深夜emo求安慰，有人分享自己做的饭。\n\n你开始觉得这个群不只是「粉丝群」，而是一个「同路人社区」。你们因为你的视频聚在一起，但聚在一起后发现彼此有这么多共同点。\n\n一个粉丝在群里说：「我以前觉得在大城市只有我一个人在挣扎，现在发现大家都在。」\n\n你看到这句话的时候，鼻子一酸。\n\n你觉得这可能是你做自媒体最有价值的事——不是赚了多少广告费，而是让一群孤独的人找到了彼此。',
+      cond: g => g.flags.shortVideoStart && g.age >= 22,
+      choices:[
+        { label:'认真运营粉丝社群', hint:'+👥 +✨', fn: g => { g.flags.fanCommunity=true; return{social:12,charm:8}; }},
+        { label:'觉得管群太累了', hint:'+🧠', fn: g => { g.flags.fanCommunity=true; return{intel:3}; }},
+        { label:'把社群变成了互助平台', hint:'+✨ +👥', fn: g => { g.flags.fanCommunity=true; g.flags.mutualAid=true; return{charm:12,social:12}; }},
+      ]},
+
+    { id:'content_plagiarism_v34_6', icon:'😤', title:'被抄袭了', category:'selfmedia',
+      body:'你发现有人抄袭了你的视频。\n\n一个粉丝私信你：「你的视频被人搬走了，还打了他自己的水印。」\n\n你点进去一看，确实是你上周发的那条，连文案都一模一样。对方的粉丝比你多十倍。\n\n你举报了，但平台说「无法判定抄袭」。你私信对方，对方不理你。你在评论区留言，对方把你拉黑了。\n\n你气得一晚上没睡着。你花了一周时间拍的内容，被别人一分钟就偷走了。\n\n一个做自媒体的前辈跟你说：「被抄袭是每个创作者的必经之路。重要的是你能持续产出，抄袭者只能偷你的过去，偷不了你的未来。」\n\n你决定不被这件事影响。你继续拍你的内容，而且拍得更好。\n\n因为你知道：能被偷走的是内容，偷不走的是你这个人。',
+      cond: g => g.flags.shortVideoStart && g.age >= 20,
+      choices:[
+        { label:'化愤怒为动力，拍出更好的内容', hint:'+✨ +🧠', fn: g => { g.flags.contentPlagiarism=true; return{charm:10,intel:8}; }},
+        { label:'心灰意冷，想停更', hint:'+🧠', fn: g => { g.flags.contentPlagiarism=true; return{intel:5,mood:-5}; }},
+        { label:'开始学习版权保护知识', hint:'+🧠 +✨', fn: g => { g.flags.contentPlagiarism=true; g.flags.copyrightAware=true; return{intel:12,charm:5}; }},
+      ]},
+
+    { id:'data_anxiety_v34_6', icon:'📊', title:'数据焦虑', category:'selfmedia',
+      body:'你开始被数据控制了。\n\n每天醒来第一件事是看昨天的播放量。每条视频发出去后你会刷新后台十几次。播放量高的时候你兴奋，低的时候你焦虑。\n\n你开始研究算法：什么时间发容易火？什么标题容易点？什么封面容易看？\n\n你的内容变得越来越「数据友好」，但你觉得它们越来越「灵魂稀少」。\n\n你妈打电话来问你最近怎么样，你说：「挺好的。」但其实你正在为一条播放量只有200的视频焦虑。\n\n你妈说：「你不是在拍视频吗？有没有人看啊？」\n\n你沉默了。\n\n一个做心理咨询师的朋友说：「你这不是在做内容，你是在用数据喂养你的自尊。当你把自我价值建立在播放量上的时候，你就永远无法自由。」\n\n你知道她说得对。但你知道归知道，做到归做到。',
+      cond: g => g.flags.selfmediaIncome && g.age >= 22,
+      choices:[
+        { label:'开始有意识地减少看数据', hint:'+🧠 +😊', fn: g => { g.flags.dataAnxiety=true; return{intel:10,mood:8}; }},
+        { label:'继续优化数据，毕竟要吃饭', hint:'+💰 +🧠', fn: g => { g.flags.dataAnxiety=true; return{money:3000,intel:5,mood:-3}; }},
+        { label:'开始做「反数据」的实验内容', hint:'+✨ +🧠', fn: g => { g.flags.dataAnxiety=true; g.flags.antiAlgorithm=true; return{charm:12,intel:10}; }},
+      ]},
+
+    { id:'brand_collab_v34_6', icon:'🤝', title:'品牌合作', category:'selfmedia',
+      body:'一个知名品牌找你合作了。\n\n对方是一家国产运动品牌，他们看中了你的「普通人生活」定位，想让你拍一条「普通人的运动日常」。\n\n报价：一条视频15000块。\n\n你激动得手都在抖。15000块，比你两个月的工资还多。\n\n你花了一周时间准备脚本、拍摄、剪辑。对方改了三版才通过。最终上线的效果很好，评论区有人说：「这个广告拍得好真诚。」\n\n你开始意识到，好的品牌合作不是「恰饭」，而是双赢。品牌得到曝光，你得到收入，观众得到好内容。\n\n从那以后，你每个月都能接到品牌合作。你给自己定了一个规矩：只接你真正用过的、认可的品牌。\n\n你的粉丝数量没有暴涨，但你的商业价值在稳步增长。因为你「真实」——这是这个时代最稀缺的品质。',
+      cond: g => g.flags.selfmediaIncome && g.flags.viralVideo && g.age >= 22,
+      choices:[
+        { label:'成了品牌的长期合作伙伴', hint:'+💰 +✨', fn: g => { g.flags.brandCollab=true; return{money:15000,charm:12}; }},
+        { label:'只接认可的品牌，拒绝了很多', hint:'+✨ +🧠', fn: g => { g.flags.brandCollab=true; g.flags.selective=true; return{charm:10,intel:8,money:8000}; }},
+        { label:'开始做自己的品牌', hint:'+💰 +✨', fn: g => { g.flags.brandCollab=true; g.flags.ownBrand=true; return{money:-20000,charm:15}; }},
+      ]},
+
+    { id:'selfmedia_philosophy_v34_6', icon:'🌟', title:'自媒体的意义', category:'selfmedia',
+      body:'做了一年自媒体后，你回顾这段旅程。\n\n你的粉丝数：3万。不算多，但每一个都是真实的。\n\n你的收入：广告+打赏+带货，一年下来赚了8万。不算多，但它是你「做自己」赚来的。\n\n你的收获：你认识了来自全国各地的朋友，你帮助了一些人（有人说你的视频让他们不再觉得孤独），你也成长了很多（从不敢面对镜头到能自如地表达）。\n\n但你也失去了一些东西：时间（一年拍了200条视频）、隐私（你的生活变成了公共内容）、还有一些朋友（有人说你「变了」）。\n\n你开始思考：自媒体对你来说到底是什么？是职业？是爱好？还是一种生活方式？\n\n你最终的答案是：自媒体是你和这个世界对话的方式。\n\n你在最新一条视频里说：\n\n「我不确定我做自媒体是成功了还是失败了。但我知道一件事——这一年我活得很真实，而真实，就是最大的成功。」',
+      cond: g => g.age >= 23 && g.flags.shortVideoStart && (g.flags.viralVideo || g.flags.selfmediaIncome) && g.intel > 40,
+      choices:[
+        { label:'找到了自媒体的意义', hint:'+😊 +✨ +🧠', fn: g => { g.flags.selfmediaPhilosophy=true; return{mood:15,charm:15,intel:12}; }},
+        { label:'决定把自媒体经验和专业技能结合', hint:'+🧠 +💰', fn: g => { g.flags.selfmediaPhilosophy=true; g.flags.professionalCreator=true; return{intel:15,money:10000}; }},
+        { label:'开始教别人做自媒体', hint:'+👥 +✨', fn: g => { g.flags.selfmediaPhilosophy=true; g.flags.creatorMentor=true; return{social:12,charm:12,money:5000}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -21737,6 +21829,17 @@ const ACHIEVEMENTS = [
     { id:'drinking_buddy_v34_5_ach', icon:'🍺', name:'深夜酒友', desc:'在小酒馆交到了朋友', check: g => g.flags.drinkingBuddy },
     { id:'night_snack_v34_5_ach', icon:'🧋', name:'深夜奶茶', desc:'抵挡不住深夜奶茶的诱惑', check: g => g.flags.nightSnack },
     { id:'night_food_philosophy_v34_5_ach', icon:'🌃', name:'深夜治愈', desc:'在深夜的烟火气中找到了城市的温柔', check: g => g.flags.nightFoodPhilosophy },
+    // v34.6 短视频与自媒体经济
+    { id:'short_video_start_v34_6_ach', icon:'📱', name:'短视频新人', desc:'开始了短视频创作之路', check: g => g.flags.shortVideoStart },
+    { id:'viral_video_v34_6_ach', icon:'🔥', name:'一夜爆红', desc:'一条视频意外火了', check: g => g.flags.viralVideo },
+    { id:'selfmedia_income_v34_6_ach', icon:'💰', name:'自媒体变现', desc:'靠自媒体赚到了第一笔钱', check: g => g.flags.selfmediaIncome },
+    { id:'creator_burnout_v34_6_ach', icon:'😵', name:'创作者倦怠', desc:'体会到了持续创作的压力和疲惫', check: g => g.flags.creatorBurnout },
+    { id:'live_stream_v34_6_ach', icon:'🎬', name:'直播初体验', desc:'第一次开直播，紧张又兴奋', check: g => g.flags.liveStream },
+    { id:'fan_community_v34_6_ach', icon:'👥', name:'粉丝社群', desc:'建立了自己的粉丝社群', check: g => g.flags.fanCommunity },
+    { id:'content_plagiarism_v34_6_ach', icon:'😤', name:'被抄袭了', desc:'发现自己的内容被人抄袭', check: g => g.flags.contentPlagiarism },
+    { id:'data_anxiety_v34_6_ach', icon:'📊', name:'数据焦虑', desc:'开始为播放量和粉丝数焦虑', check: g => g.flags.dataAnxiety },
+    { id:'brand_collab_v34_6_ach', icon:'🤝', name:'品牌合作', desc:'接到了第一个品牌合作', check: g => g.flags.brandCollab },
+    { id:'selfmedia_philosophy_v34_6_ach', icon:'🌟', name:'自媒体的意义', desc:'找到了自己做自媒体的真正意义', check: g => g.flags.selfmediaPhilosophy },
 ];
 
 // === ENDINGS === (order matters: first match wins)
