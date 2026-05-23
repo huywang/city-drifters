@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v36.0
+// 都市浮生记 - 数据文件 v36.1
 // ============================================
 
 
@@ -21145,6 +21145,88 @@ const EVENTS = [
         { label:'觉得这就是生活，不需要解释', hint:'+😊 +🧠', fn: g => { g.flags.nightSmoke=true; return{mood:10,intel:5,charm:5}; }},
       ]},
 
+    // === v36.1 露营与户外文化 ===
+    { id:'camping_first_v36_1', icon:'⛺', title:'第一次露营', category:'camping',
+      body:'朋友拉你周末去郊外露营。你在帐篷里躺了一晚上，听着虫鸣和风声，看到了城市里永远看不到的星空。早上被鸟叫醒的时候，你觉得整个人都重启了。',
+      cond: g => g.age >= 20 && g.age <= 45 && !g.flags.campingFirst,
+      choices:[
+        { label:'太喜欢了，决定入坑', hint:'+😊 +✨', fn: g => { g.flags.campingFirst=true; g.flags.campingFan=true; return{mood:10,charm:3}; }},
+        { label:'体验不错，但蚊子太多了', hint:'+😊', fn: g => { g.flags.campingFirst=true; return{mood:5}; }},
+        { label:'睡了一晚腰酸背痛，不适合我', hint:'-😊', fn: g => { g.flags.campingFirst=true; g.flags.campingHate=true; return{mood:-3,health:-2}; }},
+      ]},
+    { id:'camping_gear_v36_1', icon:'🎒', title:'装备党', category:'camping',
+      body:'你开始研究露营装备，发现一个帐篷就能从两百到两万。你在小红书上看了无数测评，入了天幕、折叠椅、卡式炉、营地车，装备花了将近一万块。',
+      cond: g => g.age >= 22 && g.flags.campingFirst && !g.flags.campingGear && g.money > 10000,
+      choices:[
+        { label:'一步到位买最贵的', hint:'-💰 +✨', fn: g => { g.flags.campingGear=true; g.flags.campingPro=true; return{money:-15000,charm:5}; }},
+        { label:'买性价比最高的', hint:'-💰 +🧠', fn: g => { g.flags.campingGear=true; return{money:-5000,intel:3}; }},
+        { label:'买二手装备试试水', hint:'-💰', fn: g => { g.flags.campingGear=true; g.flags.campingUsed=true; return{money:-2000}; }},
+      ]},
+    { id:'camping_glamping_v36_1', icon:'🏕️', title:'精致露营', category:'camping',
+      body:'你发现了一种叫"Glamping"的露营方式——不用自己搭帐篷，营地什么都有，还有手冲咖啡和牛排。虽然一晚上要一千多，但朋友圈的照片确实很好看。',
+      cond: g => g.age >= 23 && g.flags.campingFirst && !g.flags.campingGlamping && g.money > 5000,
+      choices:[
+        { label:'带朋友去体验了一次', hint:'-💰 +😊 +👥', fn: g => { g.flags.campingGlamping=true; return{money:-1500,mood:8,social:5}; }},
+        { label:'觉得这不是真正的露营', hint:'+🧠', fn: g => { g.flags.campingGlamping=true; g.flags.campingPure=true; return{intel:3,mood:2}; }},
+        { label:'拍了超多照片发朋友圈', hint:'+✨ +👥', fn: g => { g.flags.campingGlamping=true; g.flags.campingShow=true; return{charm:6,social:4}; }},
+      ]},
+    { id:'camping_hiking_v36_1', icon:'🥾', title:'徒步入门', category:'camping',
+      body:'你报了个周末徒步团，走了一条十公里的山野路线。爬到山顶的时候看到了整座城市的全景，你忽然觉得在大城市里纠结的那些事，放在天地之间好像也没那么大。',
+      cond: g => g.age >= 22 && g.flags.campingFirst && !g.flags.campingHiking && g.health > 40,
+      choices:[
+        { label:'爱上了徒步，每月至少一次', hint:'+❤️ +😊', fn: g => { g.flags.campingHiking=true; g.flags.campingHiker=true; return{health:6,mood:8}; }},
+        { label:'膝盖有点不舒服，要注意了', hint:'+🧠 -❤️', fn: g => { g.flags.campingHiking=true; return{intel:3,health:-3}; }},
+        { label:'走完一次就够了', hint:'+🧠', fn: g => { g.flags.campingHiking=true; return{intel:2,mood:3}; }},
+      ]},
+    { id:'camping_van_v36_1', icon:'🚐', title:'房车梦想', category:'camping',
+      body:'你在B站看了一个房车旅行的vlog，博主开着改装的房车环游中国。你开始幻想辞职开房车去旅行，但看了看银行卡余额和每月的房贷，默默关上了视频。',
+      cond: g => g.age >= 25 && (g.flags.campingFan || g.flags.campingHiker) && !g.flags.campingVan && g.money > 20000,
+      choices:[
+        { label:'租了辆房车体验一周', hint:'-💰 +😊 +✨', fn: g => { g.flags.campingVan=true; g.flags.campingRoad=true; return{money:-8000,mood:12,charm:5}; }},
+        { label:'把房车梦存进了梦想清单', hint:'+😊 +🧠', fn: g => { g.flags.campingVan=true; return{mood:5,intel:3}; }},
+        { label:'开始攒钱，认真研究房车', hint:'-💰 +🧠', fn: g => { g.flags.campingVan=true; g.flags.campingSave=true; return{money:-500,intel:5}; }},
+      ]},
+    { id:'camping_social_v36_1', icon:'👫', title:'户外社交', category:'camping',
+      body:'你在户外群里认识了一群志同道合的伙伴。周末一起露营、徒步，晚上围着篝火聊天。你发现户外社交比城市里的饭局真诚得多，大家卸下了面具，只做自己。',
+      cond: g => g.age >= 23 && g.flags.campingHiking && !g.flags.campingSocial && g.social > 20,
+      choices:[
+        { label:'成了户外群的组织者', hint:'+👥 +✨', fn: g => { g.flags.campingSocial=true; g.flags.campingLeader=true; return{social:12,charm:8}; }},
+        { label:'交到了几个户外好友', hint:'+👥 +😊', fn: g => { g.flags.campingSocial=true; return{social:8,mood:5}; }},
+        { label:'更喜欢一个人走进山野', hint:'+🧠 +❤️', fn: g => { g.flags.campingSocial=true; g.flags.campingSolo=true; return{intel:5,mood:5}; }},
+      ]},
+    { id:'camping_cost_v36_1', icon:'💳', title:'户外开销', category:'camping',
+      body:'你算了一下今年在户外装备和出行上花了多少钱——将近三万块。朋友说你这钱够去趟东南亚了，但你觉得在山里看一次日出，比什么都值。',
+      cond: g => g.age >= 24 && g.flags.campingGear && !g.flags.campingCost && g.money < 50000,
+      choices:[
+        { label:'开始接户外品牌的推广', hint:'+💰 +✨', fn: g => { g.flags.campingCost=true; g.flags.campingSponsor=true; return{money:5000,charm:6}; }},
+        { label:'减少不必要的装备购买', hint:'+💰 +🧠', fn: g => { g.flags.campingCost=true; return{money:2000,intel:3}; }},
+        { label:'钱花了就花了，开心最重要', hint:'+😊 -💰', fn: g => { g.flags.campingCost=true; return{mood:5,money:-1000}; }},
+      ]},
+    { id:'camping_nature_v36_1', icon:'🌲', title:'亲近自然', category:'camping',
+      body:'你开始学会辨认不同的树、听鸟叫分辨鸟的种类、看云预测天气。城市里长大的你，终于在三十岁后开始真正认识自然。朋友说你现在说话越来越像个"山里人"。',
+      cond: g => g.age >= 25 && g.flags.campingHiker && (g.flags.campingSocial || g.flags.campingSolo) && !g.flags.campingNature && g.intel > 30,
+      choices:[
+        { label:'考了户外领队证', hint:'+🧠 +✨ +💰', fn: g => { g.flags.campingNature=true; g.flags.campingGuide=true; return{intel:10,charm:8,money:2000}; }},
+        { label:'开始做自然观察笔记', hint:'+🧠 +😊', fn: g => { g.flags.campingNature=true; return{intel:8,mood:6}; }},
+        { label:'只是享受在山里的感觉', hint:'+❤️ +😊', fn: g => { g.flags.campingNature=true; return{health:5,mood:8}; }},
+      ]},
+    { id:'camping_escape_v36_1', icon:'🏔️', title:'逃离城市', category:'camping',
+      body:'工作压力最大的那个月，你请了年假独自去了山里露营五天。没有信号、没有邮件、没有deadline。你发现自己好久没有这么平静过了，只是看着篝火发呆就很满足。',
+      cond: g => g.age >= 26 && g.flags.campingNature && !g.flags.campingEscape && (g.mood < 50 || g.health < 55),
+      choices:[
+        { label:'回来后辞了职，gap一年', hint:'+😊 -💰', fn: g => { g.flags.campingEscape=true; g.flags.campingGap=true; g.jobName='无业'; g.jobSalary=0; return{mood:15,money:-10000}; }},
+        { label:'充电回来后工作效率更高了', hint:'+🧠 +😊', fn: g => { g.flags.campingEscape=true; return{intel:8,mood:8}; }},
+        { label:'开始考虑搬到郊区住', hint:'+🧠 +❤️', fn: g => { g.flags.campingEscape=true; g.flags.campingSuburb=true; return{intel:5,health:3}; }},
+      ]},
+    { id:'camping_life_v36_1', icon:'🌄', title:'户外人生', category:'camping',
+      body:'回望这几年的户外经历，从第一次在帐篷里睡不着，到现在能在暴雨中淡定煮咖啡。户外教会了你很多——接受不确定性、敬畏自然、活在当下。大城市的喧嚣和山野的宁静，都是你人生的一部分。',
+      cond: g => g.age >= 28 && g.flags.campingEscape && (g.flags.campingGuide || g.flags.campingGap) && !g.flags.campingLife && g.intel > 35,
+      choices:[
+        { label:'开了一家户外装备店', hint:'-💰 +✨ +💰', fn: g => { g.flags.campingLife=true; g.flags.campingShop=true; g.jobName='户外店主'; g.jobSalary=10000; return{money:-50000,charm:10}; }},
+        { label:'写了一本关于户外生活的书', hint:'+💰 +✨ +🧠', fn: g => { g.flags.campingLife=true; g.flags.campingWriter=true; return{money:8000,charm:12,intel:10}; }},
+        { label:'找到了城市与山野的平衡', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.campingLife=true; return{mood:12,health:8,intel:8}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -23246,6 +23328,18 @@ const ACHIEVEMENTS = [
     { id:'nightmarket_culture_v36_0_ach', icon:'🎭', name:'夜市文化人', desc:'记录和研究了城市的夜市文化', check: g => g.flags.nightCulture },
     { id:'nightmarket_midnight_v36_0_ach', icon:'🌙', name:'深夜食堂常客', desc:'在凌晨的面馆里感受到了城市的温暖', check: g => g.flags.nightMidnight },
     { id:'nightmarket_smoke_v36_0_ach', icon:'🔥', name:'人间烟火气', desc:'理解了烟火气是城市最真实的底色', check: g => g.flags.nightSmoke },
+
+    // v36.1 露营与户外文化
+    { id:'camping_first_v36_1_ach', icon:'⛺', name:'露营初体验', desc:'第一次在帐篷里过了一夜', check: g => g.flags.campingFirst },
+    { id:'camping_gear_v36_1_ach', icon:'🎒', name:'装备党', desc:'入了一整套露营装备', check: g => g.flags.campingGear },
+    { id:'camping_glamping_v36_1_ach', icon:'🏕️', name:'精致露营', desc:'体验了Glamping的奢华露营', check: g => g.flags.campingGlamping },
+    { id:'camping_hiking_v36_1_ach', icon:'🥾', name:'徒步新手', desc:'完成了第一次山野徒步', check: g => g.flags.campingHiking },
+    { id:'camping_van_v36_1_ach', icon:'🚐', name:'房车梦', desc:'开始幻想开着房车环游中国', check: g => g.flags.campingVan },
+    { id:'camping_social_v36_1_ach', icon:'👫', name:'户外社交', desc:'在户外圈找到了志同道合的伙伴', check: g => g.flags.campingSocial },
+    { id:'camping_cost_v36_1_ach', icon:'💳', name:'户外账单', desc:'算了一下户外花费，有点肉疼', check: g => g.flags.campingCost },
+    { id:'camping_nature_v36_1_ach', icon:'🌲', name:'自然观察者', desc:'学会了认识大自然的语言', check: g => g.flags.campingNature },
+    { id:'camping_escape_v36_1_ach', icon:'🏔️', name:'逃离城市', desc:'在山野中找到了内心的平静', check: g => g.flags.campingEscape },
+    { id:'camping_life_v36_1_ach', icon:'🌄', name:'户外人生', desc:'找到了城市与山野的平衡', check: g => g.flags.campingLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
