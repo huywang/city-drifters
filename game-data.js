@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v39.8
+// 都市浮生记 - 数据文件 v39.9
 // ============================================
 
 
@@ -24207,6 +24207,79 @@ const EVENTS = [
         { label:'永远保持一颗出发的心', hint:'+😊 +🧠', fn: g => { g.flags.travelLife=true; return{mood:10,intel:5}; }},
       ]},
 
+    // ═══ v39.9 同学会与社交文化 ═══
+    { id:'reunion_invite_v39_9', icon:'📱', title:'同学聚会', category:'reunion',
+      body:'大学同学群里有人提议搞一次毕业十周年聚会。你犹豫了——去还是不去？去吧，怕被问工资多少、买房没、结婚了没。不去吧，又怕错过见老朋友的机会。最后你还是去了。到了酒店一看，三十多个人来了二十个。有人开了公司，有人考了公务员，有人还在换工作。大家见面先拥抱，然后开始互相打量：谁胖了，谁秃了，谁看起来混得最好。',
+      cond: g => g.age >= 28 && !g.flags.reunionInvite,
+      choices:[
+        { label:'开开心心地去了', hint:'+😊 +❤️', fn: g => { g.flags.reunionInvite=true; return{mood:5,social:5}; }},
+        { label:'硬着头皮去了，全程尴尬', hint:'-😊', fn: g => { g.flags.reunionInvite=true; g.flags.reunionAwkward=true; return{mood:-3}; }},
+      ]},
+    { id:'reunion_compare_v39_9', icon:'👔', title:'攀比暗战', category:'reunion',
+      body:'饭桌上，话题很快就转到了收入和房子上。一个同学说他年薪五十万，另一个说他刚在浦东买了房，还有一个说他公司准备上市了。你默默吃着菜，不知道该说什么。后来一个同学喝多了，拉着你的手说：兄弟，别听他们吹，我在群里看到的，真正混得好的都不会来参加同学会的。你觉得他说得有道理——越是炫耀的人，可能越焦虑。',
+      cond: g => g.flags.reunionInvite && !g.flags.reunionCompare,
+      choices:[
+        { label:'觉得同学会变味了', hint:'-😊 +🧠', fn: g => { g.flags.reunionCompare=true; return{mood:-5,intel:5}; }},
+        { label:'不在意这些，跟聊得来的同学多喝几杯', hint:'+😊 +❤️', fn: g => { g.flags.reunionCompare=true; return{mood:5,social:5}; }},
+      ]},
+    { id:'reunion_awkward_v39_9', icon:'😬', title:'尴尬重逢', category:'reunion',
+      body:'你在聚会上遇到了大学时的前女友或前男友。气氛一度非常尴尬。你们礼貌性地打了个招呼，然后各自跟别人聊天。但你发现你们在偷偷看对方。后来在洗手间门口碰到了，她说：你现在挺好的吧？你说：还行，你呢？然后两个人都笑了。原来时间真的能冲淡一切。你们加回了微信，虽然不会再有什么，但至少不再是陌生人。',
+      cond: g => g.flags.reunionInvite && g.age >= 28 && !g.flags.reunionEx,
+      choices:[
+        { label:'释然了，时间治愈了一切', hint:'+😊 +🧠', fn: g => { g.flags.reunionEx=true; return{mood:8,intel:3}; }},
+        { label:'心里还是有点五味杂陈', hint:'-😊', fn: g => { g.flags.reunionEx=true; return{mood:-3}; }},
+      ]},
+    { id:'reunion_aa_v39_9', icon:'💳', title:'AA制', category:'reunion',
+      body:'聚会结束要结账了。有人提议AA制，每个人两百块。但有人说：谁组织谁请客。还有人说：混得好的请。场面一度很尴尬。最后还是一个混得最好的同学站出来说：今天我请了，下次你们请。你觉得同学会的费用问题是最微妙的——太贵了有人去不起，太便宜了有人看不上，AA吧有人觉得掉面子。一顿饭吃出了人情世故的百般滋味。',
+      cond: g => g.flags.reunionInvite && !g.flags.reunionAA,
+      choices:[
+        { label:'主动掏钱请了大家', hint:'-💰 +❤️', fn: g => { g.flags.reunionAA=true; return{money:-3000,social:8}; }},
+        { label:'默默AA了自己的那份', hint:'+🧠', fn: g => { g.flags.reunionAA=true; return{money:-200}; }},
+      ]},
+    { id:'reunion_organizer_v39_9', icon:'🎤', title:'聚会组织者', category:'reunion',
+      body:'你发现每次同学聚会，都有一个人在默默张罗——联系场地、通知时间、安排座位、照顾每个人的口味。这次是一个叫小陈的同学。他在老家开了一家餐馆，虽然不是最有钱的，但最热心。他说：我组织聚会不是为了面子，就是想让大家见一面。少一个人就少一份热闹。你觉得每个班都需要一个小陈这样的人——不计较得失，只希望大家能聚一聚。',
+      cond: g => g.flags.reunionInvite && !g.flags.reunionOrganizer,
+      choices:[
+        { label:'被组织者的付出感动了', hint:'+❤️', fn: g => { g.flags.reunionOrganizer=true; return{social:5,mood:5}; }},
+        { label:'主动帮忙张罗了下次聚会', hint:'+❤️ +✨', fn: g => { g.flags.reunionOrganizer=true; g.flags.reunionHelp=true; return{social:8,charm:3}; }},
+      ]},
+    { id:'reunion_change_v39_9', icon:'🔄', title:'时间改变一切', category:'reunion',
+      body:'十年前的班长现在是个快递员，十年前成绩最差的那个现在开了三家公司。十年前最沉默的女生现在是个脱口秀演员，十年前最调皮的小伙子现在是个小学老师。你发现人生真的不能用起点来判断终点。每个人都在走自己的路，有些路看起来光鲜但很辛苦，有些路看起来普通但很幸福。同学聚会最大的收获不是攀比，而是看到人生的无限可能。',
+      cond: g => g.flags.reunionCompare && !g.flags.reunionChange,
+      choices:[
+        { label:'对人生有了新的理解', hint:'+🧠 +😊', fn: g => { g.flags.reunionChange=true; return{intel:10,mood:5}; }},
+        { label:'跟几个老同学深聊了很久', hint:'+❤️', fn: g => { g.flags.reunionChange=true; return{social:8}; }},
+      ]},
+    { id:'reunion_skip_v39_9', icon:'🚫', title:'不想去', category:'reunion',
+      body:'又有同学聚会了，这次你决定不去。你在群里说那天有事，其实你只是不想面对那些比较和尴尬。你一个人窝在家里，看着朋友圈里同学们晒聚会的照片。有人举着酒杯笑得灿烂，有人在KTV里唱歌，有人在合影里比剪刀手。你有一瞬间的失落，但更多的是释然。你不需要通过同学会来证明自己过得好。你的日子，你自己知道就好。',
+      cond: g => g.age >= 30 && (g.flags.reunionInvite || g.flags.reunionCompare) && !g.flags.reunionSkip,
+      choices:[
+        { label:'学会了拒绝不必要的社交', hint:'+💪 +🧠', fn: g => { g.flags.reunionSkip=true; return{mood:5,intel:5}; }},
+        { label:'虽然没去，但给好朋友发了消息', hint:'+❤️', fn: g => { g.flags.reunionSkip=true; return{social:3}; }},
+      ]},
+    { id:'reunion_reconnect_v39_9', icon:'🤝', title:'旧友重逢', category:'reunion',
+      body:'在同学聚会上，你重新联系上了一个曾经很要好的朋友。大学的时候你们形影不离，但毕业后各奔东西，慢慢就断了联系。这次见面你们聊了三个小时，从大学趣事聊到现在的生活。你惊讶地发现，虽然十年没见，但你们还是能像以前一样开玩笑、互相吐槽。原来真正的友谊不需要天天联系，只需要在重逢的时候，一切都还是老样子。',
+      cond: g => g.flags.reunionInvite && !g.flags.reunionReconnect,
+      choices:[
+        { label:'重新开始了定期联系', hint:'+❤️ +😊', fn: g => { g.flags.reunionReconnect=true; return{social:10,mood:8}; }},
+        { label:'约了下个月单独见面', hint:'+❤️', fn: g => { g.flags.reunionReconnect=true; return{social:8,mood:5}; }},
+      ]},
+    { id:'reunion_moments_v39_9', icon:'📷', title:'朋友圈里的同学', category:'reunion',
+      body:'你翻了翻同学们的朋友圈。有人天天晒娃，有人天天晒美食，有人天天发鸡汤，有人已经半年没更新了。你发现朋友圈是一个人生活的橱窗——有人精心装修，有人从来不开放。但你也知道，朋友圈里展示的不一定是真实的。那个天天晒幸福的同学可能正在闹离婚，那个从来不发朋友圈的同学可能过得最幸福。你不再通过朋友圈判断别人的生活了。',
+      cond: g => g.flags.reunionInvite && !g.flags.reunionMoments,
+      choices:[
+        { label:'开始减少刷朋友圈的时间', hint:'+🧠 +💪', fn: g => { g.flags.reunionMoments=true; return{intel:5,health:3}; }},
+        { label:'给每个同学的朋友圈都点了赞', hint:'+❤️', fn: g => { g.flags.reunionMoments=true; return{social:5}; }},
+      ]},
+    { id:'reunion_life_v39_9', icon:'🌟', title:'同学会人生', category:'reunion',
+      body:'你终于理解了同学会的意义。它不是攀比的战场，不是尴尬的社交，而是一面镜子——通过它你能看到时间的流逝、人生的变迁和友谊的珍贵。十年后、二十年后，大家的人生差距会越来越大，但在那间教室里度过的青春是一样的。同学聚会最打动人的不是谁混得最好，而是有人还记得你当年做过的那些傻事。你希望不管过多少年，大家还能聚在一起，互相调侃，互相祝福。',
+      cond: g => g.flags.reunionChange && (g.flags.reunionReconnect || g.flags.reunionOrganizer) && !g.flags.reunionLife,
+      choices:[
+        { label:'主动组织了下次同学聚会', hint:'+❤️ +✨', fn: g => { g.flags.reunionLife=true; g.flags.reunionOrganize=true; return{social:12,charm:5}; }},
+        { label:'做了一个同学会的纪念相册', hint:'+✨ +❤️', fn: g => { g.flags.reunionLife=true; g.flags.reunionAlbum=true; return{charm:10,social:5}; }},
+        { label:'珍惜每一次相聚的机会', hint:'+😊 +❤️', fn: g => { g.flags.reunionLife=true; return{mood:10,social:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -26728,6 +26801,17 @@ const ACHIEVEMENTS = [
     { id:'travel_souvenir_v39_8_ach', icon:'🎁', name:'旅途收藏', desc:'收集了旅途中最珍贵的纪念品', check: g => g.flags.travelSouvenir },
     { id:'travel_find_v39_8_ach', icon:'🧭', name:'旅途顿悟', desc:'在旅行中找到了内心的答案', check: g => g.flags.travelFind },
     { id:'travel_life_v39_8_ach', icon:'🌟', name:'旅行人生', desc:'永远保持一颗出发的心', check: g => g.flags.travelLife },
+    // v39.9 同学会与社交文化
+    { id:'reunion_invite_v39_9_ach', icon:'📱', name:'同学聚会', desc:'参加了毕业多年后的同学聚会', check: g => g.flags.reunionInvite },
+    { id:'reunion_compare_v39_9_ach', icon:'👔', name:'攀比暗战', desc:'见识了同学会上的明争暗斗', check: g => g.flags.reunionCompare },
+    { id:'reunion_ex_v39_9_ach', icon:'😬', name:'尴尬重逢', desc:'在聚会上遇到了前任', check: g => g.flags.reunionEx },
+    { id:'reunion_aa_v39_9_ach', icon:'💳', name:'买单之争', desc:'体验了同学会结账的微妙时刻', check: g => g.flags.reunionAA },
+    { id:'reunion_organizer_v39_9_ach', icon:'🎤', name:'幕后功臣', desc:'认识了默默张罗聚会的组织者', check: g => g.flags.reunionOrganizer },
+    { id:'reunion_change_v39_9_ach', icon:'🔄', name:'物是人非', desc:'看到十年后同学们截然不同的人生轨迹', check: g => g.flags.reunionChange },
+    { id:'reunion_skip_v39_9_ach', icon:'🚫', name:'学会拒绝', desc:'选择了不去参加同学聚会', check: g => g.flags.reunionSkip },
+    { id:'reunion_reconnect_v39_9_ach', icon:'🤝', name:'旧友重逢', desc:'在同学会上找回了失联多年的好友', check: g => g.flags.reunionReconnect },
+    { id:'reunion_moments_v39_9_ach', icon:'📷', name:'朋友圈百态', desc:'通过朋友圈看到了同学们的真实生活', check: g => g.flags.reunionMoments },
+    { id:'reunion_life_v39_9_ach', icon:'🌟', name:'同学会人生', desc:'理解了友谊不需要天天联系，只需要重逢时一切如旧', check: g => g.flags.reunionLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
