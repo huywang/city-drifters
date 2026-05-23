@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v40.1
+// 都市浮生记 - 数据文件 v40.2
 // ============================================
 
 
@@ -24427,6 +24427,79 @@ const EVENTS = [
         { label:'在自己的小家里认真生活', hint:'+😊 +❤️', fn: g => { g.flags.realestateLife=true; return{mood:12,social:5}; }},
       ]},
 
+    // ═══ v40.2 考研与二战文化 ═══
+    { id:'kaoyan_decide_v40_2', icon:'📖', title:'考研决定', category:'kaoyan',
+      body:'你决定考研了。也许是对现在的工作不满意，也许是想换一个专业方向，也许只是不想那么早进入社会。你在网上查了目标院校的分数线，买了全套复习资料，在图书馆占了一个固定座位。从这一天起，你的人生进入了一个新的阶段——一个充满未知但也充满希望的阶段。你在朋友圈发了一条：从今天起，请叫我考研人。',
+      cond: g => g.age >= 21 && g.age <= 30 && g.intel >= 30 && !g.flags.kaoyanDecide,
+      choices:[
+        { label:'信心满满地开始了备考', hint:'+😊 +🧠', fn: g => { g.flags.kaoyanDecide=true; return{mood:5,intel:5}; }},
+        { label:'一边工作一边备考，压力很大', hint:'-😊 +💪', fn: g => { g.flags.kaoyanDecide=true; g.flags.kaoyanWork=true; return{health:-3,intel:3}; }},
+      ]},
+    { id:'kaoyan_prep_v40_2', icon:'📚', title:'备考日常', category:'kaoyan',
+      body:'考研的日子枯燥而充实。每天早上七点到图书馆，晚上十点闭馆才离开。英语单词背了又忘，政治选择题做了又做，数学题算到怀疑人生，专业课的笔记抄了三遍。你认识了一群同样考研的人——你们在走廊里背政治，在楼梯间吃盒饭，在深夜互相打气。你觉得这段日子虽然辛苦，但可能是你这辈子最专注做一件事的时候。',
+      cond: g => g.flags.kaoyanDecide && !g.flags.kaoyanPrep,
+      choices:[
+        { label:'每天学十个小时以上，拼命了', hint:'+🧠 -💪', fn: g => { g.flags.kaoyanPrep=true; return{intel:12,health:-5}; }},
+        { label:'保持节奏，该学学该放松放松', hint:'+🧠 +💪', fn: g => { g.flags.kaoyanPrep=true; return{intel:8,health:3}; }},
+      ]},
+    { id:'kaoyan_anxiety_v40_2', icon:'😰', title:'考研焦虑', category:'kaoyan',
+      body:'离考试还有两个月，你开始焦虑了。模拟题的正确率忽高忽低，有时候一道题卡了半小时，你会突然觉得考不上了。你在考研群里看到别人晒进度，有人政治已经刷了三遍，有人英语真题做了五套。你觉得自己落后了。深夜失眠的时候，你会想：如果考不上怎么办？这一年不是白费了吗？室友说：焦虑是正常的，每个考研人都会经历。你深吸一口气，继续翻开书。',
+      cond: g => g.flags.kaoyanPrep && !g.flags.kaoyanAnxiety,
+      choices:[
+        { label:'焦虑到失眠，但咬牙坚持', hint:'+💪 -😊', fn: g => { g.flags.kaoyanAnxiety=true; return{health:-5,mood:-5}; }},
+        { label:'学会了管理焦虑，心态越来越好', hint:'+🧠 +😊', fn: g => { g.flags.kaoyanAnxiety=true; return{intel:5,mood:3}; }},
+      ]},
+    { id:'kaoyan_exam_v40_2', icon:'✏️', title:'考场风云', category:'kaoyan',
+      body:'终于到了考试的那天。你六点到考场，门口已经排了长队。进了考场你发现，旁边的女生在哭，后面的男生在抖。第一场政治，你发挥得还行。第二场英语，阅读理解比平时难。下午数学考完你差点崩溃——有两道大题完全没思路。最后一场专业课，你拼尽全力写满了答题纸。走出考场的那一刻，你不管结果如何，先哭了——不是因为考得好或坏，而是这一年的压力终于可以释放了。',
+      cond: g => g.flags.kaoyanAnxiety && !g.flags.kaoyanExam,
+      choices:[
+        { label:'感觉发挥得还可以', hint:'+😊', fn: g => { g.flags.kaoyanExam=true; return{mood:8}; }},
+        { label:'数学考砸了，心凉了半截', hint:'-😊', fn: g => { g.flags.kaoyanExam=true; g.flags.kaoyanMathFail=true; return{mood:-8}; }},
+      ]},
+    { id:'kaoyan_wait_v40_2', icon:'⏳', title:'等成绩', category:'kaoyan',
+      body:'考完到出成绩有两个月，这是最煎熬的等待。你每天都忍不住去刷考研论坛，看各种预测分数线的帖子。有人说今年题难分数线会降，有人说报考人数多了分数线会涨。你把自己的答案对了一遍又一遍，估了一个不高不低的分数。你不知道这个分数够不够。你妈打电话问考得怎么样，你说还行，其实心里一点底都没有。等待的每一天都像在坐过山车。',
+      cond: g => g.flags.kaoyanExam && !g.flags.kaoyanWait,
+      choices:[
+        { label:'焦虑地等，每天都在刷论坛', hint:'-😊 +🧠', fn: g => { g.flags.kaoyanWait=true; return{mood:-5}; }},
+        { label:'佛系等待，先找工作做两手准备', hint:'+🧠 +💪', fn: g => { g.flags.kaoyanWait=true; g.flags.kaoyanPlanB=true; return{intel:5,mood:3}; }},
+      ]},
+    { id:'kaoyan_pass_v40_2', icon:'🎉', title:'上岸了', category:'kaoyan',
+      body:'成绩出来了——你过了！总分超了分数线二十分，单科都过了线。你激动得在宿舍跳了起来，室友们纷纷恭喜。你第一时间给爸妈打了电话，你妈在电话那头哭了。你发了条朋友圈：上岸了！下面几百个赞。你觉得这一年的辛苦、焦虑、失眠都值了。你终于可以走进那个梦想的校园，开始一段新的旅程。你暗暗发誓：读研期间一定要好好珍惜这来之不易的机会。',
+      cond: g => g.flags.kaoyanWait && g.intel >= 50 && !g.flags.kaoyanPass,
+      choices:[
+        { label:'激动得一夜没睡', hint:'+😊 +✨', fn: g => { g.flags.kaoyanPass=true; return{mood:15,charm:5}; }},
+        { label:'开始规划读研的生活', hint:'+🧠', fn: g => { g.flags.kaoyanPass=true; return{intel:8}; }},
+      ]},
+    { id:'kaoyan_fail_v40_2', icon:'😢', title:'考研失败', category:'kaoyan',
+      body:'成绩出来了——你没过线。差了十五分。你看着屏幕上的数字，脑子一片空白。你关上门，一个人坐了很久。你想起了那些在图书馆熬夜的日子，想起了走廊里背书的声音，想起了那些放弃的周末和推掉的聚会。一年时间，换来这个结果。你觉得不甘心，但又不知道该怎么办。室友说：考研不是唯一的路，你还有很多选择。你知道他说得对，但此刻你就是很难过。',
+      cond: g => g.flags.kaoyanWait && g.intel < 50 && !g.flags.kaoyanFail,
+      choices:[
+        { label:'大哭了一场，然后重新开始', hint:'+💪', fn: g => { g.flags.kaoyanFail=true; return{mood:-10,health:-3}; }},
+        { label:'决定二战，再来一年', hint:'+💪 +🧠', fn: g => { g.flags.kaoyanFail=true; g.flags.kaoyanRetry=true; return{mood:-5,intel:3}; }},
+      ]},
+    { id:'kaoyan_retry_v40_2', icon:'🔥', title:'二战', category:'kaoyan',
+      body:'你决定再考一年。二战的压力比一战大多了——你已经没有应届生的身份了，也没有了学校的环境。你租了一间小房子，每天在家复习。最难受的是看到同学都在工作或读研，只有你还在原地踏步。你妈打电话来问：今年有把握吗？你说有，但其实心里比去年还没底。但你告诉自己：选择了就不要后悔，拼了这一年，不管结果如何，至少对得起自己。',
+      cond: g => g.flags.kaoyanFail && g.flags.kaoyanRetry && !g.flags.kaoyanSecondTry,
+      choices:[
+        { label:'这次更加自律了，效率比一战高', hint:'+🧠 +💪', fn: g => { g.flags.kaoyanSecondTry=true; return{intel:10,health:3}; }},
+        { label:'压力太大了，有时候会崩溃', hint:'-😊 +💪', fn: g => { g.flags.kaoyanSecondTry=true; return{mood:-8,intel:5}; }},
+      ]},
+    { id:'kaoyan_or_work_v40_2', icon:'🤔', title:'考研还是工作', category:'kaoyan',
+      body:'你在考研和工作之间纠结了很久。考研的好处是能提升学历、换专业方向、延缓就业压力；坏处是时间成本高、不一定能找到更好的工作。工作的好处是能赚钱、积累经验、早点独立；坏处是可能学历不够以后发展受限。你问了很多人：学长说考研值，同事说工作经验更重要，父母说随便你自己。你发现这个问题没有标准答案——每个人的路都不一样，关键是选一条然后坚定地走下去。',
+      cond: g => g.age >= 22 && (g.flags.kaoyanFail || g.flags.kaoyanDecide) && !g.flags.kaoyanOrWork,
+      choices:[
+        { label:'选择了继续考研，赌一把', hint:'+💪 +🧠', fn: g => { g.flags.kaoyanOrWork=true; return{intel:5}; }},
+        { label:'选择了先工作，以后再说', hint:'+💰 +💪', fn: g => { g.flags.kaoyanOrWork=true; return{money:3000,health:3}; }},
+      ]},
+    { id:'kaoyan_life_v40_2', icon:'🌟', title:'考研人生', category:'kaoyan',
+      body:'很多年后你回忆起考研的日子，觉得那是人生中一段特别的经历。不是因为考研本身有多重要，而是因为那是你第一次为了一个目标拼尽全力。在图书馆里度过的日日夜夜，在走廊里背书的清晨黄昏，在深夜里崩溃又重新振作的时刻——这些都塑造了你。你终于明白：考研只是人生中的一个选择，不是唯一的出路。但为了梦想不顾一切的那股劲头，是你这辈子最宝贵的财富。',
+      cond: g => (g.flags.kaoyanPass || g.flags.kaoyanSecondTry || g.flags.kaoyanOrWork) && g.age >= 26 && !g.flags.kaoyanLife,
+      choices:[
+        { label:'写了一篇关于考研经历的长文', hint:'+✨ +🧠', fn: g => { g.flags.kaoyanLife=true; return{charm:12,intel:8}; }},
+        { label:'成了考研辅导老师，帮助更多人上岸', hint:'+✨ +❤️', fn: g => { g.flags.kaoyanLife=true; g.flags.kaoyanTutor=true; return{charm:10,social:8}; }},
+        { label:'感恩那段拼尽全力的日子', hint:'+😊 +💪', fn: g => { g.flags.kaoyanLife=true; return{mood:10,intel:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -26981,6 +27054,16 @@ const ACHIEVEMENTS = [
     { id:'realestate_stress_v40_1_ach', icon:'😰', name:'房贷焦虑', desc:'感受到了三十年房贷的压力', check: g => g.flags.realestateStress },
     { id:'realestate_keys_v40_1_ach', icon:'🔑', name:'终于有家了', desc:'拿到了属于自己的房子钥匙', check: g => g.flags.realestateKeys },
     { id:'realestate_life_v40_1_ach', icon:'🌟', name:'买房人生', desc:'理解了房子是安全感，更是归属感', check: g => g.flags.realestateLife },
+    { id:'kaoyan_decide_v40_2_ach', icon:'📚', name:'考研决定', desc:'做出了考研这个改变命运的选择', check: g => g.flags.kaoyanDecide },
+    { id:'kaoyan_prep_v40_2_ach', icon:'✍️', name:'备考日常', desc:'经历了图书馆占座和熬夜刷题的日子', check: g => g.flags.kaoyanPrep },
+    { id:'kaoyan_anxiety_v40_2_ach', icon:'😰', name:'考研焦虑', desc:'在焦虑和崩溃的边缘反复横跳', check: g => g.flags.kaoyanAnxiety },
+    { id:'kaoyan_exam_v40_2_ach', icon:'📝', name:'考场风云', desc:'走进了那个决定命运的考场', check: g => g.flags.kaoyanExam },
+    { id:'kaoyan_wait_v40_2_ach', icon:'⏳', name:'等成绩', desc:'体验了刷成绩页面刷到手指发抖的紧张', check: g => g.flags.kaoyanWait },
+    { id:'kaoyan_pass_v40_2_ach', icon:'🎉', name:'上岸了', desc:'功夫不负有心人，终于考上研究生', check: g => g.flags.kaoyanPass },
+    { id:'kaoyan_fail_v40_2_ach', icon:'💔', name:'考研失败', desc:'不是所有努力都有回报，这就是人生', check: g => g.flags.kaoyanFail },
+    { id:'kaoyan_retry_v40_2_ach', icon:'🔥', name:'二战勇士', desc:'跌倒了爬起来，再战一年', check: g => g.flags.kaoyanSecondTry },
+    { id:'kaoyan_or_work_v40_2_ach', icon:'🤔', name:'考研还是工作', desc:'站在了人生的十字路口', check: g => g.flags.kaoyanOrWork },
+    { id:'kaoyan_life_v40_2_ach', icon:'🌟', name:'考研人生', desc:'无论结果如何，这段经历塑造了更好的你', check: g => g.flags.kaoyanLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
