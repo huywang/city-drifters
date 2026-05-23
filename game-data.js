@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v34.4
+// 都市浮生记 - 数据文件 v34.5
 // ============================================
 
 
@@ -19712,6 +19712,98 @@ const EVENTS = [
         { label:'给正在考公的朋友一些建议', hint:'+👥 +😊', fn: g => { g.flags.govPhilosophy=true; return{social:10,mood:8}; }},
       ]},
 
+    // ===== 深夜食堂与夜经济 (v34.5) =====
+
+    { id:'late_night_noodle_v34_5', icon:'🍜', title:'深夜面馆', category:'nightfood',
+      body:'加班到凌晨一点，你拖着疲惫的身体走出公司。\n\n街角有一家面馆还亮着灯。你推门进去，里面只有两桌客人：一对中年夫妻在吃面，一个穿工装的年轻人在喝啤酒。\n\n你点了一碗牛肉面。老板是个五十多岁的大叔，手脚麻利，十分钟就端上来了。\n\n汤是现熬的，面是手擀的，牛肉炖得软烂。你吃了一口，突然觉得鼻子一酸。\n\n不是因为好吃（虽然确实好吃），而是因为这碗面让你想起了妈妈做的饭。\n\n老板看你一个人，多给你加了一个卤蛋：「加班辛苦了，多吃点。」\n\n你说了声谢谢，把面和蛋吃得干干净净。\n\n结账的时候，一碗面加一个蛋：18块。你觉得这是这个月花得最值的18块。',
+      cond: g => g.age >= 20 && g.jobSalary > 0,
+      choices:[
+        { label:'成了这家面馆的常客', hint:'+😊 +🧠', fn: g => { g.flags.lateNightNoodle=true; return{mood:10,intel:3}; }},
+        { label:'吃完就走了，没有再来', hint:'+🧠', fn: g => { g.flags.lateNightNoodle=true; return{intel:3}; }},
+        { label:'和老板成了朋友', hint:'+👥 +✨', fn: g => { g.flags.lateNightNoodle=true; g.flags.noodleShopFriend=true; return{social:10,charm:5}; }},
+      ]},
+
+    { id:'bbq_stall_v34_5', icon:'🍢', title:'深夜烧烤摊', category:'nightfood',
+      body:'周五晚上十一点，你和同事去了公司附近的烧烤摊。\n\n露天的塑料桌椅，炭火上滋滋冒油的肉串，冰镇的雪花啤酒。这就是大城市的深夜食堂。\n\n你们点了五十串羊肉串、二十串板筋、十串鸡翅、几个烤茄子、两盘毛豆。啤酒要了一箱。\n\n吃着吃着，大家开始聊平时不敢聊的话题：谁想辞职了、谁被领导针对了、谁在偷偷面试了。\n\n一个平时很安静的同事喝了几杯后说：「我其实不想干这行了。我想回老家开个烧烤店。」\n\n你们笑了，然后沉默了。因为你们知道，他说的是真的。\n\n凌晨两点，你们散了。你走在空旷的马路上，打了一个带着孜然味的嗝。\n\n你觉得这就是大城市的魅力——深夜的烧烤摊，是所有人的树洞。',
+      cond: g => g.age >= 20 && g.age <= 35 && g.social > 20,
+      choices:[
+        { label:'成了烧烤摊的VIP', hint:'+😊 +👥 -💰', fn: g => { g.flags.bbqStall=true; return{mood:10,social:8,money:-200}; }},
+        { label:'吃了一次觉得太油了', hint:'+🧠', fn: g => { g.flags.bbqStall=true; return{intel:3}; }},
+        { label:'开始研究深夜美食地图', hint:'+✨ +🧠', fn: g => { g.flags.bbqStall=true; g.flags.foodExplorer=true; return{charm:10,intel:5}; }},
+      ]},
+
+    { id:'convenience_store_v34_5', icon:'🏪', title:'便利店深夜', category:'nightfood',
+      body:'凌晨三点的便利店，是你最熟悉的地方之一。\n\n你下了夜班走进来，自动门「叮咚」一声。灯光明亮得不像深夜，冷气吹得你打了个寒颤。\n\n你拿了个饭团、一杯热关东煮、一罐啤酒。坐在窗边的吧台椅上，看着窗外空旷的街道。\n\n便利店里还有几个人：一个穿校服的男生在写作业（凌晨三点？），一个穿护士服的女生在吃泡面，一个戴耳机的年轻人在看手机。\n\n你们互不认识，但你们共享着同一个深夜。\n\n你觉得便利店有一种奇特的温暖：它24小时为你敞开，不管你什么时候来，灯都是亮的，东西都是热的。\n\n你吃完走出便利店，回头看了一眼那盏永远亮着的灯。\n\n「谢谢你，」你在心里说，「在这个城市的深夜，至少还有你。」',
+      cond: g => g.age >= 18,
+      choices:[
+        { label:'便利店成了深夜的避风港', hint:'+😊 +🧠', fn: g => { g.flags.convenienceStore=true; return{mood:8,intel:5}; }},
+        { label:'买了东西就走了', hint:'+🧠', fn: g => { g.flags.convenienceStore=true; return{intel:3}; }},
+        { label:'开始在便利店写深夜日记', hint:'+✨ +🧠', fn: g => { g.flags.convenienceStore=true; g.flags.convenienceDiary=true; return{charm:10,intel:8}; }},
+      ]},
+
+    { id:'night_market_v34_5', icon:'🏮', title:'夜市逛吃', category:'nightfood',
+      body:'周末晚上，你去了城里有名的夜市。\n\n几百米的街道两旁摆满了摊位：烤冷面、臭豆腐、糖葫芦、麻辣烫、煎饼果子、章鱼小丸子、鸡蛋仔、鲜榨果汁……空气中弥漫着各种食物的香气，你的口水止不住。\n\n你一边走一边吃：先来一份烤冷面，再来几串烤鱿鱼，然后是一碗冰粉。你吃了六七个摊位，花了不到一百块。\n\n夜市上的人形形色色：穿拖鞋的大叔、约会的情侣、带着小孩的一家三口、拿着自拍杆的网红、还有穿着睡衣就出来的附近居民。\n\n你在一个套圈的摊位前停了下来。十块钱五个圈，你一个也没套中。但你觉得很开心。\n\n回去的路上你发了一条朋友圈：「夜市的快乐，是100块钱就能吃饱的快乐。」\n\n你妈评论：「少吃点地沟油。」',
+      cond: g => g.age >= 18 && g.money > 1000,
+      choices:[
+        { label:'成了夜市常客，吃了个遍', hint:'+😊 +✨', fn: g => { g.flags.nightMarket=true; return{mood:12,charm:5}; }},
+        { label:'觉得太吵了，不太喜欢', hint:'+🧠', fn: g => { g.flags.nightMarket=true; return{intel:3}; }},
+        { label:'开始在夜市摆摊', hint:'+💰 +✨', fn: g => { g.flags.nightMarket=true; g.flags.nightVendor=true; return{money:5000,charm:8,social:8}; }},
+      ]},
+
+    { id:'home_cooking_v34_5', icon:'🍳', title:'深夜做饭', category:'nightfood',
+      body:'你开始了一个新习惯：深夜做饭。\n\n不是那种正经的烹饪，而是随性的、治愈的做饭。下班回家已经九点了，你打开冰箱看看有什么食材——两个鸡蛋、半棵白菜、一把挂面。\n\n你煮了一碗面，卧了一个荷包蛋，撒了点葱花。简单到不能再简单。\n\n但你端着碗坐在餐桌前的那一刻，突然觉得特别满足。\n\n你发现深夜做饭有一种魔力：它让你从一天的疲惫中「切换」出来。切菜的声音、油锅的滋滋声、蒸汽升腾的画面——这些感官体验让你的大脑从工作模式中解脱出来。\n\n你开始研究各种简单的深夜食谱：番茄鸡蛋面、酸辣土豆丝、葱油拌面、蛋炒饭、紫菜蛋花汤。\n\n你的厨艺从「能吃」进步到了「好吃」。朋友来你家吃了一次饭说：「你应该去开个深夜食堂。」\n\n你笑了。也许将来真的会。',
+      cond: g => g.age >= 22 && g.health > 30,
+      choices:[
+        { label:'厨艺突飞猛进', hint:'+✨ +😊', fn: g => { g.flags.homeCooking=true; return{charm:12,mood:10,health:5}; }},
+        { label:'做了几天就懒了', hint:'+🧠', fn: g => { g.flags.homeCooking=true; return{intel:3}; }},
+        { label:'开始拍做饭视频发网上', hint:'+✨ +👥', fn: g => { g.flags.homeCooking=true; g.flags.cookingBlogger=true; return{charm:10,social:8,money:3000}; }},
+      ]},
+
+    { id:'late_night_delivery_v34_5', icon:'🛵', title:'外卖骑手的深夜', category:'nightfood',
+      body:'凌晨一点，你点了一份外卖。\n\n下单后你看了一眼预计送达时间：35分钟。你觉得有点久，但也没催。\n\n35分钟后，外卖到了。骑手是个年轻人，满头大汗，说了句「不好意思晚了，路上爆胎了」。\n\n你看了看他的工牌——他今天已经送了47单了。\n\n你说：「没事，注意安全。」他愣了一下，然后笑了笑：「谢谢。」\n\n你关上门，看着那份还冒着热气的外卖，突然觉得有点愧疚。你在深夜最舒服的时候，有人在深夜最辛苦地工作。\n\n你打开外卖App，给他打赏了5块钱，写了一条评论：「骑手辛苦了，五星好评。」\n\n你不知道这5块钱和一条评论能不能让他觉得温暖一点，但你觉得至少你可以做一个善良的人。\n\n深夜的城市里，有多少人在为你看不见的辛苦奔波着。',
+      cond: g => g.age >= 20 && g.money > 2000,
+      choices:[
+        { label:'开始关注外卖骑手的权益', hint:'+🧠 +✨', fn: g => { g.flags.deliveryRider=true; return{intel:10,charm:8}; }},
+        { label:'减少了深夜点外卖的次数', hint:'+🧠 +😊', fn: g => { g.flags.deliveryRider=true; return{intel:5,mood:5}; }},
+        { label:'给骑手写了一封感谢信', hint:'+✨ +👥', fn: g => { g.flags.deliveryRider=true; g.flags.riderLetter=true; return{charm:12,social:5}; }},
+      ]},
+
+    { id:'food_street_v34_5', icon:'🥘', title:'美食街探店', category:'nightfood',
+      body:'你发现了一条隐藏在城市深处的美食街。\n\n没有网红装修，没有精致摆盘，只有最朴实的烟火气。每家店都开了十年以上，招牌被油烟熏得发黄，但排队的人从街头排到街尾。\n\n你进了一家看起来最破的店，点了一份招牌猪脚饭。端上来的时候你惊呆了：满满一大碗饭，上面铺着炖得入味的猪脚，淋上酱汁，配上一碟酸菜。\n\n15块钱。\n\n你吃了一口——天哪。猪脚软糯，酱汁浓郁，酸菜解腻。这比你吃过的任何一家网红餐厅都好吃。\n\n老板是个六十多岁的阿姨，做了三十年猪脚饭。她说：「没有秘方，就是时间。每天炖六个小时，少一分钟都不行。」\n\n你把这家店推荐给了所有朋友。它成了你的「秘密基地」——每当你在城市里觉得孤独的时候，就去吃一碗猪脚饭，然后觉得世界还没那么糟。',
+      cond: g => g.age >= 20 && g.intel > 25,
+      choices:[
+        { label:'成了美食街的常客', hint:'+😊 +✨', fn: g => { g.flags.foodStreet=true; return{mood:12,charm:5}; }},
+        { label:'开始写美食探店笔记', hint:'+✨ +🧠', fn: g => { g.flags.foodStreet=true; g.flags.foodWriter=true; return{charm:12,intel:5}; }},
+        { label:'和老板阿姨成了忘年交', hint:'+👥 +😊', fn: g => { g.flags.foodStreet=true; g.flags.foodStreetFriend=true; return{social:10,mood:8}; }},
+      ]},
+
+    { id:'drinking_buddy_v34_5', icon:'🍺', title:'深夜酒友', category:'nightfood',
+      body:'你在楼下的小酒馆认识了一个人。\n\n那天你一个人去喝酒，坐在吧台。旁边也是一个人在喝。你们对视了一眼，他举起杯子：「一个人？」\n\n你点了点头。他叫了一杯酒推过来：「请你。」\n\n你们聊了起来。他是个从深圳来的程序员，刚被裁员，来这个城市散心。你在一家广告公司做策划，最近也在考虑要不要换工作。\n\n两个在深夜独自喝酒的陌生人，因为一杯酒成了朋友。\n\n从那以后，你们偶尔会在周末的深夜去那家小酒馆坐坐。不谈工作，不谈未来，只是喝酒聊天。\n\n你觉得这种关系很奇妙——你们不是那种天天联系的朋友，但你们知道，在某个深夜，如果你需要一个人陪你喝酒，对方会在那里。\n\n「敬深夜，」你们碰了碰杯，「敬孤独。」',
+      cond: g => g.age >= 22 && g.age <= 35 && g.mood < 60,
+      choices:[
+        { label:'交到了一个深夜酒友', hint:'+👥 +😊', fn: g => { g.flags.drinkingBuddy=true; return{social:12,mood:10}; }},
+        { label:'喝了几次就淡了', hint:'+🧠', fn: g => { g.flags.drinkingBuddy=true; return{intel:3}; }},
+        { label:'一起开了个小酒馆', hint:'+💰 +✨', fn: g => { g.flags.drinkingBuddy=true; g.flags.openBar=true; return{money:-30000,charm:10,social:10}; }},
+      ]},
+
+    { id:'night_snack_v34_5', icon:'🧋', title:'深夜奶茶', category:'nightfood',
+      body:'晚上十一点，你在被窝里刷手机，突然想喝奶茶。\n\n你打开外卖App，搜了一圈——大部分奶茶店都关门了。但你发现有一家24小时营业的奶茶店。\n\n你犹豫了五分钟：这个点喝奶茶，热量得多高啊？明天肯定长胖。\n\n但你的手指比你的大脑快。等你反应过来的时候，已经下单了。\n\n二十分钟后，一杯冰的杨枝甘露到了。你插进吸管，吸了一大口——\n\n天哪。芒果的甜、椰奶的香、西米的Q弹。你觉得所有的罪恶感都值了。\n\n你发了条朋友圈：「深夜的奶茶，是大人的安慰剂。」\n\n评论区瞬间炸了：「别诱惑我！」「已经下单了」「热量什么的明天再说」\n\n你躺在床上，喝着奶茶，看着评论，觉得深夜的快乐就是这么简单。\n\n当然，第二天早上你看到体重秤的时候，就不这么想了。',
+      cond: g => g.age >= 18 && g.age <= 30,
+      choices:[
+        { label:'成了深夜奶茶的忠实粉丝', hint:'+😊', fn: g => { g.flags.nightSnack=true; return{mood:10,health:-3}; }},
+        { label:'喝完觉得太甜了，以后少喝', hint:'+🧠 +😊', fn: g => { g.flags.nightSnack=true; return{intel:5,mood:3}; }},
+        { label:'开始研究自己做奶茶', hint:'+✨ +🧠', fn: g => { g.flags.nightSnack=true; g.flags.milkTeaDIY=true; return{charm:8,intel:5}; }},
+      ]},
+
+    { id:'night_food_philosophy_v34_5', icon:'🌃', title:'深夜的治愈', category:'nightfood',
+      body:'你渐渐发现了一件事：深夜的食物有一种白天没有的味道。\n\n白天你吃饭是为了活着，深夜你吃饭是为了治愈。\n\n一碗深夜的面，比任何米其林餐厅的料理都温暖。一杯凌晨的啤酒，比任何心理咨询师的话都管用。一份深夜的外卖，是加班到崩溃时唯一的光。\n\n你开始理解为什么有那么多人爱深夜出去吃东西——不是因为饿，是因为需要一个「出口」。\n\n白天你是公司的螺丝钉，深夜在烧烤摊上你是你自己。白天你是别人的下属，深夜在面馆里你是那个被老板多给一个卤蛋的幸运儿。\n\n食物不会评判你。它不会因为你的工资低、房子小、还没对象就对你区别对待。它只是安安静静地冒着热气，等你来吃。\n\n你在日记里写：\n\n「大城市最深的温柔，藏在深夜的烟火气里。那些凌晨还亮着灯的店，是这座城市给漂泊者的拥抱。」',
+      cond: g => g.age >= 22 && (g.flags.lateNightNoodle || g.flags.bbqStall || g.flags.convenienceStore || g.flags.homeCooking || g.flags.foodStreet) && g.mood > 20,
+      choices:[
+        { label:'深夜的烟火气治愈了你', hint:'+😊 +✨ +🧠', fn: g => { g.flags.nightFoodPhilosophy=true; return{mood:15,charm:12,intel:8}; }},
+        { label:'开始写深夜美食专栏', hint:'+✨ +💰', fn: g => { g.flags.nightFoodPhilosophy=true; g.flags.nightFoodWriter=true; return{charm:15,money:5000}; }},
+        { label:'开始给深夜还在工作的人送食物', hint:'+👥 +😊', fn: g => { g.flags.nightFoodPhilosophy=true; g.flags.foodAngel=true; return{social:12,mood:10}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -21634,6 +21726,17 @@ const ACHIEVEMENTS = [
     { id:'gov_reform_v34_4_ach', icon:'🔄', name:'机构改革', desc:'经历了机构改革的风波', check: g => g.flags.govReform },
     { id:'gov_quit_v34_4_ach', icon:'🚪', name:'走出围城', desc:'离开了体制', check: g => g.flags.govQuit },
     { id:'gov_philosophy_v34_4_ach', icon:'🏛️', name:'体制思考', desc:'对体制内外都有了深刻理解', check: g => g.flags.govPhilosophy },
+    // --- 深夜食堂与夜经济 (v34.5) ---
+    { id:'late_night_noodle_v34_5_ach', icon:'🍜', name:'深夜面馆', desc:'在凌晨的面馆找到了温暖', check: g => g.flags.lateNightNoodle },
+    { id:'bbq_stall_v34_5_ach', icon:'🍢', name:'烧烤摊树洞', desc:'在深夜烧烤摊说出了心里话', check: g => g.flags.bbqStall },
+    { id:'convenience_store_v34_5_ach', icon:'🏪', name:'便利店之光', desc:'在深夜便利店感受到了温暖', check: g => g.flags.convenienceStore },
+    { id:'night_market_v34_5_ach', icon:'🏮', name:'夜市烟火', desc:'在夜市找到了最朴实的快乐', check: g => g.flags.nightMarket },
+    { id:'home_cooking_v34_5_ach', icon:'🍳', name:'深夜厨神', desc:'养成了深夜做饭的习惯', check: g => g.flags.homeCooking },
+    { id:'late_night_delivery_v34_5_ach', icon:'🛵', name:'五星好评', desc:'给深夜外卖骑手写了好评', check: g => g.flags.deliveryRider },
+    { id:'food_street_v34_5_ach', icon:'🥘', name:'美食街探店', desc:'发现了隐藏的美食街', check: g => g.flags.foodStreet },
+    { id:'drinking_buddy_v34_5_ach', icon:'🍺', name:'深夜酒友', desc:'在小酒馆交到了朋友', check: g => g.flags.drinkingBuddy },
+    { id:'night_snack_v34_5_ach', icon:'🧋', name:'深夜奶茶', desc:'抵挡不住深夜奶茶的诱惑', check: g => g.flags.nightSnack },
+    { id:'night_food_philosophy_v34_5_ach', icon:'🌃', name:'深夜治愈', desc:'在深夜的烟火气中找到了城市的温柔', check: g => g.flags.nightFoodPhilosophy },
 ];
 
 // === ENDINGS === (order matters: first match wins)
