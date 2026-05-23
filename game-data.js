@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v34.9
+// 都市浮生记 - 数据文件 v35.0
 // ============================================
 
 
@@ -20172,6 +20172,98 @@ const EVENTS = [
         { label:'把佛系心态融入生活', hint:'+😊 +🏥', fn: g => { g.flags.templePhilosophy=true; g.flags.balancedLife=true; return{mood:15,health:10}; }},
       ]},
 
+    // ===== City Walk与城市漫游 (v35.0) =====
+
+    { id:'citywalk_first_v35_0', icon:'🚶', title:'第一次City Walk', category:'citywalk',
+      body:'你在小红书上看到了一个新词：City Walk。\n\n翻译过来就是「城市漫步」——不设目的地，在城市里随便走走，发现那些平时不会注意的东西。\n\n你觉得这听起来很傻：「我每天都在走路啊，上下班、买菜、取快递。」\n\n但你还是试了一下。\n\n你选了一条从没走过的路。路上你发现了：\n- 一家藏在巷子里的咖啡馆（门面只有一米宽）\n- 一面涂鸦墙（不知道是谁画的，很好看）\n- 一棵巨大的梧桐树（树下有个老人在下棋）\n- 一家二手书店（门口写着「书比人长寿」）\n\n你走了2个小时，拍了20张照片。\n\n你突然觉得：你在这个城市住了3年，但好像从来不了解它。',
+      cond: g => g.age >= 20 && !g.flags.citywalkFirst,
+      choices:[
+        { label:'爱上了City Walk，每周都走', hint:'+😊 +🏥', fn: g => { g.flags.citywalkFirst=true; g.flags.citywalkFan=true; return{mood:12,health:8,charm:5}; }},
+        { label:'偶尔走走，当放松', hint:'+😊', fn: g => { g.flags.citywalkFirst=true; return{mood:8,health:3}; }},
+        { label:'觉得就是散步，没什么特别的', hint:'', fn: g => { g.flags.citywalkFirst=true; return{mood:2}; }},
+      ]},
+
+    { id:'citywalk_cafe_v35_0', icon:'☕', title:'巷子里的咖啡馆', category:'citywalk',
+      body:'你在City Walk的时候发现了一家没有招牌的咖啡馆。\n\n门口只有一盆绿植和一把旧椅子。你推门进去——里面很小，只有6个座位。\n\n老板是个40岁的男人，以前在大厂做产品经理。35岁被裁后开了这家店。\n\n「为什么开咖啡馆？」你问。\n\n「因为我不想再给别人打工了。虽然赚得少，但每天都很开心。」\n\n你点了一杯手冲咖啡——48元。比连锁的贵，但喝起来确实不一样。\n\n老板说：「我选的豆子是云南的，一个叫小凹的庄园。你尝尝，有柑橘和蜂蜜的味道。」\n\n你喝了第一口——确实有。\n\n你在店里坐了一个下午。老板和你聊了很多：关于咖啡、关于生活、关于「做自己」这件事。\n\n走的时候你说：「下次还来。」\n\n他说：「随时欢迎。」',
+      cond: g => g.age >= 22 && g.flags.citywalkFirst && !g.flags.citywalkCafe,
+      choices:[
+        { label:'成了常客，和老板成了朋友', hint:'+👥 +😊', fn: g => { g.flags.citywalkCafe=true; g.flags.cafeFriend=true; return{mood:10,social:10,money:-200}; }},
+        { label:'偶尔来坐坐', hint:'+😊', fn: g => { g.flags.citywalkCafe=true; return{mood:8,money:-100}; }},
+        { label:'太贵了，还是喝瑞幸', hint:'', fn: g => { g.flags.citywalkCafe=true; return{mood:0}; }},
+      ]},
+
+    { id:'citywalk_map_v35_0', icon:'🗺️', title:'City Walk路线', category:'citywalk',
+      body:'你开始认真规划City Walk路线了。\n\n你在小红书上研究了各种攻略，画了自己的「城市漫游地图」：\n\n路线1「文艺路线」：独立书店 → 咖啡馆 → 美术馆 → 二手唱片店\n路线2「美食路线」：早餐摊 → 面馆 → 甜品店 → 夜市\n路线3「建筑路线」：老洋房 → 教堂 → 民国建筑 → 创意园区\n路线4「自然路线」：公园 → 河边 → 植物园 → 山顶观景台\n\n你每条路线都走了一遍，拍了很多照片，写了详细的攻略发在小红书上。\n\n你的攻略获得了500个赞。有人评论：「原来我们城市还有这么多好玩的地方！」\n\n你开始理解：City Walk不是「走路」，而是「重新发现你所在的城市」。',
+      cond: g => g.age >= 20 && g.flags.citywalkFirst && g.intel > 30 && !g.flags.citywalkMap,
+      choices:[
+        { label:'成了City Walk博主', hint:'+✨ +💰', fn: g => { g.flags.citywalkMap=true; g.flags.citywalkBlogger=true; return{charm:12,money:2000,social:8}; }},
+        { label:'自己享受，不太分享', hint:'+😊', fn: g => { g.flags.citywalkMap=true; return{mood:10,intel:8}; }},
+        { label:'组织了一个City Walk社群', hint:'+👥 +✨', fn: g => { g.flags.citywalkMap=true; g.flags.citywalkCommunity=true; return{social:15,charm:10}; }},
+      ]},
+
+    { id:'citywalk_history_v35_0', icon:'🏛️', title:'城市的历史', category:'citywalk',
+      body:'你City Walk走到了一条老街。街道两旁是民国时期的建筑，有些已经破败了。\n\n你看到一栋老房子门口有一块牌子：「XX故居，建于1928年。」\n\n你走进去看了看——是一个小型博物馆。免费参观。\n\n里面展示着这座城市100年前的样子：老照片、旧报纸、民国时期的家具。\n\n你看到一张老照片：这条街在1930年代的样子。那时候这里是富人区，有咖啡馆、舞厅、电影院。\n\n现在这条街变成了菜市场和小商品市场。\n\n你在留言本上写了一句话：「城市在变，但故事还在。」\n\n你开始理解：每一座城市都有很多层。你平时看到的只是最外面的一层。City Walk就是剥开这些层，看到城市真正的样子。',
+      cond: g => g.age >= 22 && g.flags.citywalkFirst && g.intel > 35 && !g.flags.citywalkHistory,
+      choices:[
+        { label:'开始研究城市历史', hint:'+🧠', fn: g => { g.flags.citywalkHistory=true; g.flags.urbanHistorian=true; return{intel:15,mood:8}; }},
+        { label:'拍了很多老建筑的照片', hint:'+✨', fn: g => { g.flags.citywalkHistory=true; return{charm:8,mood:8}; }},
+        { label:'觉得旧的不如新的', hint:'', fn: g => { g.flags.citywalkHistory=true; return{mood:-2}; }},
+      ]},
+
+    { id:'citywalk_night_v35_0', icon:'🌙', title:'夜间City Walk', category:'citywalk',
+      body:'你试了一次夜间City Walk。\n\n晚上9点出门。街上的人比白天少很多。路灯把影子拉得很长。\n\n你走过了一条白天从没注意过的小路。路边有几家小酒馆，暖黄色的灯光从窗户里透出来。\n\n你走进了一家只有5个座位的鸡尾酒吧。调酒师是个年轻女生，穿着白衬衫，很专注地摇着雪克壶。\n\n「有什么推荐？」你问。\n\n「你今天心情怎么样？」\n\n「还行，有点累。」\n\n她给你调了一杯叫「晚安城市」的鸡尾酒。喝起来有点苦，但回味是甜的。\n\n「为什么叫这个名字？」\n\n「因为每个在城市里打拼的人，都值得对自己说一声晚安。」\n\n你喝完那杯酒，走出酒吧。夜晚的城市很安静，但不孤独。',
+      cond: g => g.age >= 22 && g.flags.citywalkFirst && !g.flags.citywalkNight,
+      choices:[
+        { label:'爱上了夜间漫步', hint:'+😊 +✨', fn: g => { g.flags.citywalkNight=true; g.flags.nightWalker=true; return{mood:12,charm:8,money:-80}; }},
+        { label:'偶尔夜间走走', hint:'+😊', fn: g => { g.flags.citywalkNight=true; return{mood:8,money:-80}; }},
+        { label:'晚上不安全，不去了', hint:'', fn: g => { g.flags.citywalkNight=true; return{mood:-3}; }},
+      ]},
+
+    { id:'citywalk_photo_v35_0', icon:'📷', title:'街拍达人', category:'citywalk',
+      body:'你City Walk的时候开始认真拍照了。\n\n不是自拍，而是拍这座城市：\n- 清晨的菜市场（热气腾腾的包子铺）\n- 午后的公园（打太极拳的老人）\n- 傍晚的天桥（堵车的尾灯汇成一条红色的河）\n- 深夜的便利店（一个人的背影）\n\n你把照片发在小红书上，取名叫「城市碎片」。\n\n没想到反响很好。有人说：「你的照片让我看到了城市的美。」\n有人说：「原来我们城市这么好看。」\n有人说：「你拍的那家包子铺我从小吃到大，谢谢你记录下来。」\n\n你的粉丝从0涨到了3000。有个本地杂志联系你：想登你的照片。\n\n你开始理解：拍照不是为了展示，而是为了「看见」。',
+      cond: g => g.age >= 20 && g.flags.citywalkFirst && g.charm > 30 && !g.flags.citywalkPhoto,
+      choices:[
+        { label:'继续拍，记录城市的美', hint:'+✨ +💰', fn: g => { g.flags.citywalkPhoto=true; g.flags.streetPhotographer=true; return{charm:15,money:3000,mood:10}; }},
+        { label:'纯粹爱好，不太在意粉丝', hint:'+😊', fn: g => { g.flags.citywalkPhoto=true; return{mood:12,charm:8}; }},
+        { label:'觉得手机拍不出好照片，买了相机', hint:'-💰 +✨', fn: g => { g.flags.citywalkPhoto=true; g.flags.cameraBuyer=true; return{charm:10,money:-5000}; }},
+      ]},
+
+    { id:'citywalk_group_v35_0', icon:'👥', title:'City Walk组织', category:'citywalk',
+      body:'你在社交平台上发了一个帖子：「这周六下午，一起City Walk吗？路线：老城南→秦淮河→创意园区。免费参加。」\n\n你本来以为没人会来。结果来了12个人。\n\n有大学生、有上班族、有退休阿姨、还有一个外国留学生。\n\n你们沿着路线走了3个小时。每到一个有趣的地方就停下来拍照、聊天。\n\n退休阿姨给大家讲了这条街的故事：「我小时候就住在这里，那时候这条路还是土路……」\n\n外国留学生用蹩脚的中文说：「我在中国3年了，第一次发现这个城市这么美。」\n\n走完之后你们一起吃了个饭（AA制）。大家互加了微信。\n\n有个女生说：「这是我今年最开心的一个下午。」\n\n你觉得：这也许就是City Walk的意义——不是走路，而是「和陌生人一起发现城市的美」。',
+      cond: g => g.age >= 22 && g.flags.citywalkFirst && g.social > 35 && !g.flags.citywalkGroup,
+      choices:[
+        { label:'定期组织，成了社群领袖', hint:'+👥 +✨', fn: g => { g.flags.citywalkGroup=true; g.flags.communityLeader=true; return{social:15,charm:12,mood:10}; }},
+        { label:'偶尔组织一次', hint:'+👥 +😊', fn: g => { g.flags.citywalkGroup=true; return{social:10,mood:8}; }},
+        { label:'人太多了，还是一个人走舒服', hint:'', fn: g => { g.flags.citywalkGroup=true; return{mood:-2,social:-3}; }},
+      ]},
+
+    { id:'citywalk_rain_v35_0', icon:'🌧️', title:'雨中的城市', category:'citywalk',
+      body:'下雨了。你本来打算今天City Walk，但犹豫要不要取消。\n\n你最终还是出了门。\n\n雨中的城市和晴天完全不同：\n- 地面变成了镜子，倒映着霓虹灯\n- 人们撑着五颜六色的伞，像移动的花朵\n- 路边的树叶在雨中闪着光\n- 空气中有一种湿润的、清新的味道\n\n你走进了一家书店的屋檐下躲雨。旁边站着一个也在躲雨的男生。\n\n「你也出来散步？」他问。\n\n「对，下雨了也没回去。」\n\n「我也是。雨中走路很舒服。」\n\n你们聊了一会儿。他是个程序员，周末唯一的爱好就是City Walk。\n\n雨停后你们一起走了一段路。分别的时候他说了句：「下雨天出门的人，运气不会太差。」\n\n你笑了。你觉得这是你听过最奇怪的搭讪。',
+      cond: g => g.age >= 20 && g.flags.citywalkFirst && !g.flags.citywalkRain,
+      choices:[
+        { label:'爱上了雨天的城市', hint:'+😊 +✨', fn: g => { g.flags.citywalkRain=true; g.flags.rainLover=true; return{mood:12,charm:8}; }},
+        { label:'和那个男生/女生成了朋友', hint:'+👥', fn: g => { g.flags.citywalkRain=true; g.flags.rainFriend=true; return{social:10,mood:8}; }},
+        { label:'淋了雨，感冒了', hint:'-🏥', fn: g => { g.flags.citywalkRain=true; return{health:-8,mood:-5}; }},
+      ]},
+
+    { id:'citywalk_commerce_v35_0', icon:'💰', title:'City Walk的商业化', category:'citywalk',
+      body:'你发现City Walk变味了。\n\n一开始它是免费的、自由的、随性的。但现在：\n- 有人卖City Walk课程：「城市漫步指南，299元/人」\n- 有人组织收费City Walk：「深度文化体验，198元/次」\n- 咖啡馆门口写着：「City Walk必打卡」\n- 小红书上到处都是：「XX城市City Walk攻略｜保姆级教程」\n\n你看到一条评论：「City Walk不就是散步吗？怎么还要花钱学？」\n\n你觉得这个人说得有道理。但你也理解：在消费主义时代，任何东西都会被商业化。\n\n问题不是City Walk变了，而是你对它的态度。\n\n你是为了「走路」而走路，还是为了「打卡」而走路？\n\n你决定：放下手机，不带攻略，随便走走。走到哪里算哪里。\n\n这才是City Walk最初的样子。',
+      cond: g => g.age >= 22 && g.flags.citywalkFirst && (g.flags.citywalkMap || g.flags.citywalkPhoto) && !g.flags.citywalkCommerce,
+      choices:[
+        { label:'回归初心，简单地走走', hint:'+😊 +🧠', fn: g => { g.flags.citywalkCommerce=true; g.flags.pureWalker=true; return{mood:10,intel:8}; }},
+        { label:'也开了个City Walk付费团', hint:'+💰 +👥', fn: g => { g.flags.citywalkCommerce=true; g.flags.citywalkGuide=true; return{money:5000,social:10}; }},
+        { label:'觉得被商业化了，不想走了', hint:'', fn: g => { g.flags.citywalkCommerce=true; return{mood:-5}; }},
+      ]},
+
+    { id:'citywalk_philosophy_v35_0', icon:'🌆', title:'走路的人', category:'citywalk',
+      body:'你回顾自己的City Walk经历。\n\n从第一次随便走走，到发现巷子里的咖啡馆，到规划路线，到拍照片，到组织活动……\n\n你开始理解：City Walk不是一种运动，而是一种生活态度。\n\n在这个追求效率的时代，「没有目的地地走路」本身就是一种反叛。\n\n你不需要打卡，不需要发朋友圈，不需要写攻略。你只需要——走。\n\n用脚去丈量这座城市，用眼睛去发现美，用耳朵去听声音，用鼻子去闻气味。\n\n你想起一句话：「一个城市最美的不是它的建筑，而是走在里面的人。」\n\n你决定以后每个月都给自己一天时间，什么都不做，就是在城市里走走。\n\n因为在这座城市打拼的你，值得拥有「慢下来」的权利。',
+      cond: g => g.age >= 22 && g.flags.citywalkFirst && g.flags.citywalkCommerce && g.intel > 35,
+      choices:[
+        { label:'走路就是我的冥想', hint:'+😊 +🏥 +✨', fn: g => { g.flags.citywalkPhilosophy=true; return{mood:18,health:12,charm:10}; }},
+        { label:'开始写城市观察日记', hint:'+🧠 +✨', fn: g => { g.flags.citywalkPhilosophy=true; g.flags.urbanWriter=true; return{intel:15,charm:12,money:2000}; }},
+        { label:'把City Walk变成了生活方式', hint:'+😊 +🏥', fn: g => { g.flags.citywalkPhilosophy=true; g.flags.slowLife=true; return{mood:15,health:15}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -22149,6 +22241,17 @@ const ACHIEVEMENTS = [
     { id:'temple_buddha_v34_9_ach', icon:'🧑‍💼', name:'佛系上班族', desc:'用佛系心态面对工作', check: g => g.flags.templeBuddha },
     { id:'temple_online_v34_9_ach', icon:'📱', name:'电子木鱼', desc:'开始敲电子木鱼积功德', check: g => g.flags.templeOnline },
     { id:'temple_philosophy_v34_9_ach', icon:'☯️', name:'佛系的真谛', desc:'理解了佛系生活的真正含义', check: g => g.flags.templePhilosophy },
+    // v35.0 City Walk与城市漫游
+    { id:'citywalk_first_v35_0_ach', icon:'🚶', name:'City Walk初体验', desc:'第一次尝试在城市里漫无目的地走走', check: g => g.flags.citywalkFirst },
+    { id:'citywalk_cafe_v35_0_ach', icon:'☕', name:'巷子里的咖啡馆', desc:'发现了一家隐藏的咖啡馆', check: g => g.flags.citywalkCafe },
+    { id:'citywalk_map_v35_0_ach', icon:'🗺️', name:'城市漫游地图', desc:'规划了自己的City Walk路线', check: g => g.flags.citywalkMap },
+    { id:'citywalk_history_v35_0_ach', icon:'🏛️', name:'城市考古', desc:'发现了城市的历史层', check: g => g.flags.citywalkHistory },
+    { id:'citywalk_night_v35_0_ach', icon:'🌙', name:'夜间漫步', desc:'体验了夜晚城市的不同面貌', check: g => g.flags.citywalkNight },
+    { id:'citywalk_photo_v35_0_ach', icon:'📷', name:'街拍达人', desc:'用镜头记录了城市的美', check: g => g.flags.citywalkPhoto },
+    { id:'citywalk_group_v35_0_ach', icon:'👥', name:'City Walk组织者', desc:'组织了一次城市漫步活动', check: g => g.flags.citywalkGroup },
+    { id:'citywalk_rain_v35_0_ach', icon:'🌧️', name:'雨中的城市', desc:'在雨中漫步发现了不同的美', check: g => g.flags.citywalkRain },
+    { id:'citywalk_commerce_v35_0_ach', icon:'💰', name:'反消费主义漫步', desc:'在商业化浪潮中保持了走路的初心', check: g => g.flags.citywalkCommerce },
+    { id:'citywalk_philosophy_v35_0_ach', icon:'🌆', name:'走路的人', desc:'把City Walk变成了一种生活态度', check: g => g.flags.citywalkPhilosophy },
 ];
 
 // === ENDINGS === (order matters: first match wins)
