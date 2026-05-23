@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v37.7
+// 都市浮生记 - 数据文件 v37.8
 // ============================================
 
 
@@ -22541,6 +22541,89 @@ const EVENTS = [
         { label:'继续做一个懂生活的泡澡人', hint:'+😊 +💪 +🧠', fn: g => { g.flags.bathLife=true; return{mood:12,health:5,intel:5}; }},
       ]},
 
+    // === v37.8 棋牌室与麻将社交 ===
+    { id:'mahjong_first_v37_8', icon:'🀄', title:'第一次打麻将', category:'mahjong',
+      body:'过年回家，亲戚拉你凑一桌。"不会？没关系，教你！"二舅一边摸牌一边讲解规则，你完全听不懂什么叫"碰""杠""听牌"。三小时后你输了200块，但你觉得挺有意思。二舅拍着你说："打麻将是社交的基本功，学好了走遍天下都不怕。"',
+      cond: g => !g.flags.mahjongFirst && g.age >= 18,
+      choices:[
+        { label:'认真学，下次过年要赢回来', hint:'+🧠 +😊', fn: g => { g.flags.mahjongFirst=true; return{intel:5,mood:5}; }},
+        { label:'觉得太复杂了不想学了', hint:'+😅', fn: g => { g.flags.mahjongFirst=true; return{mood:2}; }},
+      ]},
+
+    { id:'mahjong_family_v37_8', icon:'👨‍👩‍👧‍👦', title:'家庭麻将夜', category:'mahjong',
+      body:'每周六晚上，你家有了固定节目：全家打麻将。你妈牌技最好，一边打一边数落你爸："你这个臭手，又放炮了！"你爸乐呵呵地说："让让你妈，她一周就指着这个开心呢。"你们打的不大，输赢也就几十块，但笑声从没有断过。原来幸福就是一桌子人，热热闹闹的。',
+      cond: g => g.flags.mahjongFirst && !g.flags.mahjongFamily,
+      choices:[
+        { label:'每周都回家陪爸妈打麻将', hint:'+❤️ +😊', fn: g => { g.flags.mahjongFamily=true; return{mood:8,social:5}; }},
+        { label:'给家里买了一台全自动麻将桌', hint:'-💰 +❤️', fn: g => { g.flags.mahjongFamily=true; return{money:-3000,mood:5,social:5}; }},
+      ]},
+
+    { id:'mahjong_friends_v37_8', icon:'🤝', title:'周末麻将局', category:'mahjong',
+      body:'同事组了个周末麻将群，每周五下班后凑一桌。"不打大的，就是图个乐呵。"你们在棋牌室租了个包间，叫了外卖，一边搓麻将一边吐槽工作。小李说："这比去酒吧有意思多了，又省钱又社交。"渐渐地，你发现很多工作中的问题，在牌桌上反而好商量了。',
+      cond: g => g.flags.mahjongFirst && !g.flags.mahjongFriends && g.salary > 0,
+      choices:[
+        { label:'成了麻将局的固定成员', hint:'+🤝 +😊', fn: g => { g.flags.mahjongFriends=true; g.flags.mahjongRegular=true; return{social:8,mood:5}; }},
+        { label:'偶尔参加，怕影响休息', hint:'+🧠', fn: g => { g.flags.mahjongFriends=true; return{intel:3,social:3}; }},
+      ]},
+
+    { id:'mahjong_business_v37_8', icon:'💼', title:'麻将桌上的生意经', category:'mahjong',
+      body:'前辈带你参加了一个"高端局"，牌桌上都是做生意的人。"记住，麻将桌上不谈生意，但要让人记住你这个人。"你发现这些老板打牌时特别观察人——你怎么出牌、输了什么表情、赢了怎么对待别人。一场牌局下来，一个老板主动加了你微信："小伙子不错，改天聊聊。"',
+      cond: g => g.flags.mahjongFirst && g.salary > 0 && !g.flags.mahjongBusiness && g.social > 25,
+      choices:[
+        { label:'开始把麻将当社交工具', hint:'+💰 +🤝', fn: g => { g.flags.mahjongBusiness=true; return{money:3000,social:10}; }},
+        { label:'觉得这样太功利了', hint:'+🧠', fn: g => { g.flags.mahjongBusiness=true; return{intel:5}; }},
+      ]},
+
+    { id:'mahjong_gambling_v37_8', icon:'💸', title:'赌局诱惑', category:'mahjong',
+      body:'朋友拉你去"打大的"。"小打小闹有什么意思？"一晚上你赢了一万多。心跳加速，兴奋得睡不着。第二周又去，输了八千。第三周想翻本，又输了。朋友看你脸色不对："兄弟，娱乐和赌博就一线之隔。你要收得回来。"你看着手里的牌，第一次觉得麻将不那么好玩了。',
+      cond: g => g.flags.mahjongFirst && !g.flags.mahjongGambling && g.money > 10000,
+      choices:[
+        { label:'及时止损，再也不打大的了', hint:'+🧠 +😊', fn: g => { g.flags.mahjongGambling=true; g.flags.mahjongWise=true; return{intel:8,mood:3}; }},
+        { label:'再打几次想把输的赢回来', hint:'-💰 -😊', fn: g => { g.flags.mahjongGambling=true; g.flags.mahjongAddicted=true; return{money:-8000,mood:-8}; }},
+        { label:'从此不碰麻将了', hint:'+🧠 -🤝', fn: g => { g.flags.mahjongGambling=true; g.flags.mahjongQuit=true; return{intel:5,social:-5}; }},
+      ]},
+
+    { id:'mahjong_room_v37_8', icon:'🏠', title:'棋牌室老板', category:'mahjong',
+      body:'小区楼下的棋牌室老板老赵要回老家了。"这个店转让给你，设备齐全，客源稳定。"你算了算，一个月能赚个七八千。朋友劝你："你又不是失业，开个棋牌室算副业？"但你想起那些深夜在牌桌上聊人生的人——棋牌室不只是打牌的地方，是很多人的第三空间。',
+      cond: g => g.flags.mahjongFirst && g.money > 20000 && !g.flags.mahjongRoom && g.age >= 25,
+      choices:[
+        { label:'盘下棋牌室，当起了老板', hint:'-💰 +💰 +🤝', fn: g => { g.flags.mahjongRoom=true; g.flags.mahjongOwner=true; return{money:-15000,social:10,mood:5}; }},
+        { label:'算了，投资别的不熟的领域', hint:'+🧠', fn: g => { g.flags.mahjongRoom=true; return{intel:3}; }},
+      ]},
+
+    { id:'mahjong_contest_v37_8', icon:'🏆', title:'麻将大赛', category:'mahjong',
+      body:'社区举办了第一届"邻里杯"麻将大赛，报名人数超出预期。你一路过关斩将杀入决赛。对手是一个看起来普普通通的大妈，但她的牌技出神入化。"年轻人，我打了四十年麻将了。"大妈笑着说。最终你拿了亚军，但赢得了全场掌声。社区书记给你颁了个奖杯："友谊第一，比赛第二！"',
+      cond: g => g.flags.mahjongRegular && !g.flags.mahjongContest && g.age >= 22,
+      choices:[
+        { label:'报名参加了市级麻将联赛', hint:'+✨ +🧠', fn: g => { g.flags.mahjongContest=true; g.flags.mahjongLeague=true; return{charm:8,intel:5}; }},
+        { label:'开心就好，不争名次', hint:'+😊 +🤝', fn: g => { g.flags.mahjongContest=true; return{mood:8,social:5}; }},
+      ]},
+
+    { id:'mahjong_online_v37_8', icon:'📱', title:'线上麻将', category:'mahjong',
+      body:'出差途中无聊，下载了一个线上麻将APP。没想到一打就停不下来——等高铁打、开会偷着打、睡前还要来两把。系统给你匹配了一个日本玩家，你们虽然语言不通，但麻将规则相通。"Mahjong is universal,"你在聊天框打了一行英文。对方回了个👍。',
+      cond: g => g.flags.mahjongFirst && !g.flags.mahjongOnline,
+      choices:[
+        { label:'线上打上了段位赛', hint:'+🧠 -💪', fn: g => { g.flags.mahjongOnline=true; g.flags.mahjongRank=true; return{intel:5,health:-3}; }},
+        { label:'卸载了，还是线下打着有意思', hint:'+😊 +🤝', fn: g => { g.flags.mahjongOnline=true; return{mood:5,social:3}; }},
+      ]},
+
+    { id:'mahjong_culture_v37_8', icon:'📖', title:'麻将与国民性', category:'mahjong',
+      body:'你读了一本关于麻将文化的书，才真正理解了这个游戏的深意。麻将是中国人处世哲学的缩影：讲究"和"（胡牌）、讲究运气、讲究察言观色、讲究取舍。牌品如人品——一个人怎么打牌，就怎么做人。"小赌怡情，大赌伤身"，中国人把中庸之道刻在了144张牌里。',
+      cond: g => g.flags.mahjongFirst && !g.flags.mahjongCulture && g.intel > 30 && g.age >= 24,
+      choices:[
+        { label:'开始研究各种地方麻将规则', hint:'+🧠 +✨', fn: g => { g.flags.mahjongCulture=true; g.flags.mahjongScholar=true; return{intel:10,charm:5}; }},
+        { label:'写了一篇《麻将与中国人的社交哲学》', hint:'+✨ +🧠', fn: g => { g.flags.mahjongCulture=true; g.flags.mahjongAuthor=true; return{charm:8,intel:8}; }},
+      ]},
+
+    { id:'mahjong_life_v37_8', icon:'🌟', title:'麻将人生', category:'mahjong',
+      body:'打了这么多年麻将，你终于悟了：人生就是一局麻将。你永远不知道下一张摸什么牌（运气），但你可以决定怎么出牌（选择）。有时候一手烂牌也能胡（逆袭），有时候好牌也会放炮（翻车）。最重要的是——不管输赢，和谁一起打才最重要。牌桌上的人情冷暖，比什么社交课都管用。',
+      cond: g => g.age >= 30 && g.flags.mahjongFirst && (g.flags.mahjongRegular || g.flags.mahjongBusiness) && (g.flags.mahjongCulture || g.flags.mahjongContest) && !g.flags.mahjongLife,
+      choices:[
+        { label:'办了一个"以牌会友"的社区俱乐部', hint:'-💰 +❤️ +🤝', fn: g => { g.flags.mahjongLife=true; g.flags.mahjongClub=true; return{money:-5000,mood:15,social:12}; }},
+        { label:'成了朋友圈里的麻将文化推广人', hint:'+✨ +🧠', fn: g => { g.flags.mahjongLife=true; return{charm:10,intel:8,social:5}; }},
+        { label:'继续做一个享受牌局的普通人', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.mahjongLife=true; return{mood:12,social:5,intel:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -24842,6 +24925,16 @@ const ACHIEVEMENTS = [
     { id:'bath_membership_v37_7_ach', icon:'💳', name:'泡澡会员', desc:'成了洗浴中心的会员', check: g => g.flags.bathMembership },
     { id:'bath_old_v37_7_ach', icon:'🏚️', name:'最后的澡堂', desc:'见证了老澡堂的最后时光', check: g => g.flags.bathOld },
     { id:'bath_life_v37_7_ach', icon:'🌟', name:'洗浴人生', desc:'理解了泡澡也是一种生活哲学', check: g => g.flags.bathLife },
+    { id:'mahjong_first_v37_8_ach', icon:'🀄', name:'初入牌局', desc:'第一次学会了打麻将', check: g => g.flags.mahjongFirst },
+    { id:'mahjong_family_v37_8_ach', icon:'👨‍👩‍👧‍👦', name:'家庭牌局', desc:'和家人一起打麻将度周末', check: g => g.flags.mahjongFamily },
+    { id:'mahjong_friends_v37_8_ach', icon:'🤝', name:'牌友如云', desc:'有了固定的周末麻将局', check: g => g.flags.mahjongFriends },
+    { id:'mahjong_business_v37_8_ach', icon:'💼', name:'以牌会商', desc:'在麻将桌上拓展了人脉', check: g => g.flags.mahjongBusiness },
+    { id:'mahjong_gambling_v37_8_ach', icon:'💸', name:'赌局警醒', desc:'经历了赌局的诱惑与反思', check: g => g.flags.mahjongGambling },
+    { id:'mahjong_room_v37_8_ach', icon:'🏠', name:'棋牌室老板', desc:'拥有了一间棋牌室', check: g => g.flags.mahjongRoom },
+    { id:'mahjong_contest_v37_8_ach', icon:'🏆', name:'牌桌争锋', desc:'参加了社区麻将大赛', check: g => g.flags.mahjongContest },
+    { id:'mahjong_online_v37_8_ach', icon:'📱', name:'指尖麻将', desc:'体验了线上麻将的世界', check: g => g.flags.mahjongOnline },
+    { id:'mahjong_culture_v37_8_ach', icon:'📖', name:'麻将学者', desc:'理解了麻将背后的文化哲学', check: g => g.flags.mahjongCulture },
+    { id:'mahjong_life_v37_8_ach', icon:'🌟', name:'麻将人生', desc:'悟出了人生如牌局的道理', check: g => g.flags.mahjongLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
