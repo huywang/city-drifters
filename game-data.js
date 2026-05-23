@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v38.6
+// 都市浮生记 - 数据文件 v38.7
 // ============================================
 
 
@@ -23291,6 +23291,88 @@ const EVENTS = [
         { label:'继续做一个享受旧物的生活家', hint:'+😊 +✨ +🧠', fn: g => { g.flags.fleaLife=true; return{mood:12,charm:5,intel:5}; }},
       ]},
 
+    // === v38.7 网约车与代驾文化 ===
+    { id:'ride_first_v38_7', icon:'🚗', title:'第一次打网约车', category:'ride',
+      body:'你刚来这座城市的时候，不知道公交线路，叫了一辆网约车。司机是个话多的大哥："第一次来这个城市吧？我跟你讲，这地方好着呢。"一路上他给你介绍了哪里的房子便宜、哪里的饭馆好吃、哪里适合年轻人。你到目的地的时候，觉得这座城市好像没那么陌生了。"谢谢师傅！"你下车的时候真心说了这句话。',
+      cond: g => !g.flags.rideFirst && g.age >= 18,
+      choices:[
+        { label:'给司机打了五星好评', hint:'+😊 +🤝', fn: g => { g.flags.rideFirst=true; return{mood:5,social:3}; }},
+        { label:'默默下车，心里记住了那些推荐', hint:'+🧠', fn: g => { g.flags.rideFirst=true; return{intel:5}; }},
+      ]},
+
+    { id:'ride_regular_v38_7', icon:'📱', title:'网约车常客', category:'ride',
+      body:'你发现打网约车比挤地铁舒服多了。上班打车、下班打车、周末出去也打车。"本月打车消费1800元"——看到账单你吓了一跳。朋友说："你这是打车成瘾了。"你算了算，如果每天打两次车，一个月确实不便宜。但你看了看地铁里的人挤人，再看看网约车的后座……算了，享受是要花钱的。',
+      cond: g => g.flags.rideFirst && !g.flags.rideRegular && g.salary > 0,
+      choices:[
+        { label:'控制打车频率，改为地铁+打车结合', hint:'+🧠 +💰', fn: g => { g.flags.rideRegular=true; g.flags.rideSmart=true; return{intel:5,money:1000}; }},
+        { label:'继续打，人生苦短不能亏待自己', hint:'-💰 +😊', fn: g => { g.flags.rideRegular=true; return{money:-1800,mood:5}; }},
+      ]},
+
+    { id:'ride_late_v38_7', icon:'🌙', title:'深夜网约车', category:'ride',
+      body:'凌晨一点从公司出来，叫了一辆网约车。司机是个中年女性，车里放着轻音乐。"这么晚下班啊？"她问。你点头。"我老公也是，每天加班到十二点。"她说。"你为什么这么晚还跑车？""多跑一单是一单，孩子在读大学。"你看着后视镜里她疲惫但温和的脸，突然觉得：每个深夜还在工作的人，都有自己的故事。',
+      cond: g => g.flags.rideFirst && !g.flags.rideLate && g.age >= 20,
+      choices:[
+        { label:'多给了司机一个红包', hint:'-💰 +❤️', fn: g => { g.flags.rideLate=true; return{money:-50,mood:5}; }},
+        { label:'安静地听她讲完故事', hint:'+🧠 +❤️', fn: g => { g.flags.rideLate=true; return{intel:3,mood:3}; }},
+      ]},
+
+    { id:'ride_driver_v38_7', icon:'🗣️', title:'网约车司机的哲学', category:'ride',
+      body:'你遇到过一个特别能聊的司机。"我以前是做互联网的，"他说，"35岁被裁了，现在开网约车。"你问后不后悔，他说："互联网是别人给我定的KPI，开网约车是我给自己定的目标。今天赚够了就回家陪老婆孩子。"他指了指仪表盘上贴的照片："这是我闺女画的，她说爸爸是开大汽车的。"',
+      cond: g => g.flags.rideFirst && !g.flags.rideDriver && g.age >= 22 && g.intel > 20,
+      choices:[
+        { label:'和他交换了联系方式', hint:'+🤝 +🧠', fn: g => { g.flags.rideDriver=true; g.flags.rideContact=true; return{social:5,intel:5}; }},
+        { label:'在心里默默祝福他', hint:'+❤️ +🧠', fn: g => { g.flags.rideDriver=true; return{mood:5,intel:3}; }},
+      ]},
+
+    { id:'ride_surge_v38_7', icon:'💸', title:'加价风暴', category:'ride',
+      body:'暴雨天你叫了一辆网约车，系统显示"加价2.5倍"。平时20块的路变成了50块。"爱打不打，"系统仿佛在说。你在雨中站了十分钟，终于叫到了。司机说："这种天气出来跑车的都是真勇士。"你深以为然——加价虽然肉疼，但暴雨中有人来接你，也是一种温暖。',
+      cond: g => g.flags.rideFirst && !g.flags.rideSurge,
+      choices:[
+        { label:'打车！淋雨不值得', hint:'-💰 +😊', fn: g => { g.flags.rideSurge=true; return{money:-30,mood:5}; }},
+        { label:'等雨停了再走', hint:'+🧠 +💪', fn: g => { g.flags.rideSurge=true; g.flags.rideWait=true; return{intel:3,health:-2}; }},
+      ]},
+
+    { id:'ride_daijia_v38_7', icon:'🚙', title:'叫代驾', category:'ride',
+      body:'公司聚餐喝多了，叫了代驾。一个穿着荧光马甲的年轻人骑着折叠电动车来了。"哥，你坐好，我帮你开。"你迷迷糊糊坐在后座，看着自己的车在夜色中穿行。到了家你问："你这么晚跑代驾不累吗？"他说："白天上班，晚上跑代驾，多赚点钱准备结婚。"你看着他骑着电动车消失在夜色中，觉得每个人都在为生活拼尽全力。',
+      cond: g => g.flags.rideFirst && !g.flags.rideDaijia && g.age >= 22 && g.salary > 0,
+      choices:[
+        { label:'给代驾小费表示感谢', hint:'-💰 +❤️', fn: g => { g.flags.rideDaijia=true; return{money:-50,mood:5}; }},
+        { label:'决定以后少喝酒', hint:'+💪 +🧠', fn: g => { g.flags.rideDaijia=true; g.flags.rideLessDrink=true; return{health:5,intel:3}; }},
+      ]},
+
+    { id:'ride_safety_v38_7', icon:'🛡️', title:'网约车安全', category:'ride',
+      body:'新闻又报了网约车安全事故，你妈打电话来："你以后别打网约车了，太危险了。"你打开APP看了看安全功能：行程分享、紧急联系人、全程录音。"妈，现在的网约车比以前安全多了。"但你还是把行程分享设置给了家人。安全这件事，不只是自己的事，也是让爱你的人放心。',
+      cond: g => g.flags.rideFirst && !g.flags.rideSafety && g.age >= 20,
+      choices:[
+        { label:'认真设置了紧急联系人和行程分享', hint:'+🧠 +❤️', fn: g => { g.flags.rideSafety=true; return{intel:5,social:3}; }},
+        { label:'觉得没什么大不了的', hint:'+😅', fn: g => { g.flags.rideSafety=true; return{mood:2}; }},
+      ]},
+
+    { id:'ride_share_v38_7', icon:'👥', title:'拼车奇遇', category:'ride',
+      body:'你叫了一辆拼车，和另一个乘客一起坐。对方是个和你差不多大的年轻人，你们聊了起来。"你也是做互联网的啊？""是啊，你也是加班到现在？"你们交换了名片，发现他在一家你很感兴趣的公司。"我们公司在招人，你要不要试试？"一次偶然的拼车，可能改变你的职业方向。',
+      cond: g => g.flags.rideFirst && !g.flags.rideShare && g.salary > 0 && g.social > 15,
+      choices:[
+        { label:'加了微信，后续保持联系', hint:'+🤝 +✨', fn: g => { g.flags.rideShare=true; g.flags.rideNetwork=true; return{social:8,charm:5}; }},
+        { label:'客气地点了点头，各奔东西', hint:'+😊', fn: g => { g.flags.rideShare=true; return{mood:3}; }},
+      ]},
+
+    { id:'ride_parttime_v38_7', icon:'🚕', title:'兼职跑网约车', category:'ride',
+      body:'你发现周末跑网约车可以赚外快。注册了账号，第一个周末跑了八个小时，赚了400块。"比加班划算，"你想。但跑了几个周末后你发现：长时间开车腰疼，遇到刁难乘客要忍，平台抽成越来越高。"哪行都不容易，"你跟朋友吐槽。"但至少我能自己选择什么时候开始、什么时候结束。"',
+      cond: g => g.flags.rideFirst && !g.flags.rideParttime && g.age >= 22 && g.money > 5000,
+      choices:[
+        { label:'坚持跑了一段时间', hint:'+💰 +💪 -😊', fn: g => { g.flags.rideParttime=true; return{money:5000,health:-3,mood:-2}; }},
+        { label:'试了两周就放弃了', hint:'+🧠 +😅', fn: g => { g.flags.rideParttime=true; g.flags.rideQuit=true; return{intel:3,mood:3}; }},
+      ]},
+
+    { id:'ride_life_v38_7', icon:'🌟', title:'车轮上的人生', category:'ride',
+      body:'你终于理解了网约车和代驾对这座城市的意义。它们不只是交通工具——它们是35岁被裁程序员的过渡，是单亲妈妈的生计，是大学生的兼职，是深夜加班者的归宿。每一辆网约车的背后，都有一个在努力生活的人。而你，作为乘客或司机，都在这辆车上驶向自己的目的地。人生就像一趟网约车：你不知道下一位乘客是谁，也不知道路会不会堵，但只要还在路上，就有希望。',
+      cond: g => g.age >= 28 && g.flags.rideFirst && (g.flags.rideLate || g.flags.rideDriver) && (g.flags.rideParttime || g.flags.rideDaijia) && !g.flags.rideLife,
+      choices:[
+        { label:'做了一期《网约车司机的一天》纪录短片', hint:'+✨ +🧠', fn: g => { g.flags.rideLife=true; g.flags.rideFilm=true; return{charm:12,intel:8}; }},
+        { label:'发起了一个"温暖乘客"的公益活动', hint:'+❤️ +🤝', fn: g => { g.flags.rideLife=true; g.flags.rideCharity=true; return{social:10,mood:10}; }},
+        { label:'继续做一个珍惜每一趟车的乘客', hint:'+😊 +🧠 +❤️', fn: g => { g.flags.rideLife=true; return{mood:12,intel:5,social:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -25682,6 +25764,16 @@ const ACHIEVEMENTS = [
     { id:'flea_fake_v38_6_ach', icon:'🚫', name:'火眼金睛', desc:'经历了假货风波学会了鉴定', check: g => g.flags.fleaFake },
     { id:'flea_dying_v38_6_ach', icon:'📉', name:'最后集市', desc:'见证了旧货市场的最后时光', check: g => g.flags.fleaDying },
     { id:'flea_life_v38_6_ach', icon:'🌟', name:'旧物人生', desc:'理解了旧物是对抗遗忘的方式', check: g => g.flags.fleaLife },
+    { id:'ride_first_v38_7_ach', icon:'🚗', name:'初次叫车', desc:'第一次使用了网约车', check: g => g.flags.rideFirst },
+    { id:'ride_regular_v38_7_ach', icon:'📱', name:'打车达人', desc:'成了网约车的常客', check: g => g.flags.rideRegular },
+    { id:'ride_late_v38_7_ach', icon:'🌙', name:'深夜乘客', desc:'在深夜遇到了有故事的司机', check: g => g.flags.rideLate },
+    { id:'ride_driver_v38_7_ach', icon:'🗣️', name:'司机哲学', desc:'从网约车司机那里听到了人生智慧', check: g => g.flags.rideDriver },
+    { id:'ride_surge_v38_7_ach', icon:'💸', name:'加价之痛', desc:'经历了暴雨天的疯狂加价', check: g => g.flags.rideSurge },
+    { id:'ride_daijia_v38_7_ach', icon:'🚙', name:'代驾之夜', desc:'深夜叫了一次代驾', check: g => g.flags.rideDaijia },
+    { id:'ride_safety_v38_7_ach', icon:'🛡️', name:'安全意识', desc:'开始重视网约车的安全设置', check: g => g.flags.rideSafety },
+    { id:'ride_share_v38_7_ach', icon:'👥', name:'拼车奇遇', desc:'在拼车中遇到了意想不到的人', check: g => g.flags.rideShare },
+    { id:'ride_parttime_v38_7_ach', icon:'🚕', name:'兼职司机', desc:'亲自体验了跑网约车的辛苦', check: g => g.flags.rideParttime },
+    { id:'ride_life_v38_7_ach', icon:'🌟', name:'车轮人生', desc:'理解了每辆车背后都有一个努力生活的人', check: g => g.flags.rideLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
