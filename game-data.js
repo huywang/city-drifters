@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v39.1
+// 都市浮生记 - 数据文件 v39.2
 // ============================================
 
 
@@ -23687,6 +23687,85 @@ const EVENTS = [
         { label:'继续做一个热爱生活的菜市场常客', hint:'+😊 +❤️', fn: g => { g.flags.marketLife=true; return{mood:10,social:5,health:5}; }},
       ]},
 
+    // ═══ v39.2 保险推销与理赔文化 ═══
+    { id:'insurance_pushy_v39_2', icon:'📞', title:'保险推销', category:'insurance',
+      body:'一个自称是你小学同学的人加了你微信，寒暄了三分钟后直奔主题：你有没有考虑过给自己买一份保险？你委婉地拒绝了。但接下来的一个月，她每隔几天就发一条消息：你看新闻了吗？又有人猝死了！你现在的收入万一断了怎么办？你爸妈老了谁照顾？你开始怀疑她是不是真的关心你，还是只把你当成一个潜在客户。最后你屏蔽了她的朋友圈。',
+      cond: g => g.age >= 22 && g.money >= 3000 && !g.flags.insurancePushy,
+      choices:[
+        { label:'碍于面子买了一份意外险', hint:'-💰', fn: g => { g.flags.insurancePushy=true; g.flags.insuranceBasic=true; return{money:-2000,mood:-3}; }},
+        { label:'果断拒绝，不需要保险', hint:'+💪', fn: g => { g.flags.insurancePushy=true; return{mood:3}; }},
+        { label:'认真研究了一下保险', hint:'+🧠', fn: g => { g.flags.insurancePushy=true; g.flags.insuranceResearch=true; return{intel:5}; }},
+      ]},
+    { id:'insurance_types_v39_2', icon:'📋', title:'险种迷宫', category:'insurance',
+      body:'你花了一个周末研究保险，结果越看越迷糊。重疾险、医疗险、意外险、寿险、年金险——每种都有几十款产品，条款比法律文件还难懂。重疾险说确诊即赔，但细看有一百种疾病的定义；医疗险说百万报销，但免赔额、自费药、既往症一堆限制；年金险说养老无忧，但算下来年化收益还不如余额宝。你觉得保险公司的精算师一定是全世界最聪明的人——因为普通人根本算不过他们。',
+      cond: g => (g.flags.insuranceResearch || g.flags.insuranceBasic) && !g.flags.insuranceTypes,
+      choices:[
+        { label:'找了一个独立保险经纪人咨询', hint:'+🧠 -💰', fn: g => { g.flags.insuranceTypes=true; g.flags.insuranceBroker=true; return{intel:8,money:-200}; }},
+        { label:'在网上看了几十篇攻略终于搞明白了', hint:'+🧠', fn: g => { g.flags.insuranceTypes=true; return{intel:10}; }},
+        { label:'太复杂了，先放一放', hint:'-🧠', fn: g => { g.flags.insuranceTypes=true; return{intel:-3}; }},
+      ]},
+    { id:'insurance_claim_v39_2', icon:'😤', title:'理赔之难', category:'insurance',
+      body:'同事老王住院了，花了三万多。他买了商业医疗险，本以为能报销大部分，结果保险公司以既往症为由拒赔了。老王气得不行：投保的时候你们什么都不问，理赔的时候什么都查！后来他找了律师，折腾了半年才拿到赔偿。你在旁边看着这一切，开始思考保险到底值不值得买。老王说了一句让你印象深刻的话：保险就是晴天送伞，雨天收伞。',
+      cond: g => g.age >= 25 && (g.flags.insuranceBasic || g.flags.insuranceTypes) && !g.flags.insuranceClaim,
+      choices:[
+        { label:'帮老王整理了理赔材料', hint:'+❤️ +🧠', fn: g => { g.flags.insuranceClaim=true; return{social:8,intel:5}; }},
+        { label:'重新审视了自己的保险配置', hint:'+🧠', fn: g => { g.flags.insuranceClaim=true; g.flags.insuranceReview=true; return{intel:8}; }},
+        { label:'对保险彻底失去了信心', hint:'-😊', fn: g => { g.flags.insuranceClaim=true; return{mood:-5}; }},
+      ]},
+    { id:'insurance_social_v39_2', icon:'🏥', title:'社保与商保', category:'insurance',
+      body:'你第一次认真看了看自己的社保。五险一金——养老、医疗、失业、工伤、生育保险，加上住房公积金。每个月工资条上扣掉将近百分之三十，拿到手的远没有合同上写的那么多。同事说：社保只是保底的，真出了大事还得靠商保。你算了算，医保报销有封顶线，自费药不报，大病面前还是得自己掏腰包。原来在中国，安全感是要花钱买的。',
+      cond: g => g.jobSalary >= 3000 && !g.flags.insuranceSocial,
+      choices:[
+        { label:'在社保基础上加了一份百万医疗险', hint:'-💰 +💪', fn: g => { g.flags.insuranceSocial=true; g.flags.insuranceMedical=true; return{money:-1500,health:3}; }},
+        { label:'觉得社保够用了', hint:'+💰', fn: g => { g.flags.insuranceSocial=true; return{mood:3}; }},
+      ]},
+    { id:'insurance_family_v39_2', icon:'👩‍💼', title:'家人卖保险', category:'insurance',
+      body:'你小姨去年开始做保险了。过年聚会的时候，她拉着你聊了两个小时保险产品。她说她刚入行就被要求先给自己和家人买，已经花了好几万了。你妈偷偷跟你说：你小姨的业绩全靠亲戚朋友，现在大家见到她都绕着走。你觉得挺心酸的——保险行业的金字塔结构，底层的人靠消耗人脉为生，顶层的人赚得盆满钵满。小姨很努力，但这个行业配不上她的努力。',
+      cond: g => g.age >= 23 && !g.flags.insuranceFamily,
+      choices:[
+        { label:'照顾小姨的业绩买了一份', hint:'-💰 +❤️', fn: g => { g.flags.insuranceFamily=true; return{money:-3000,social:5}; }},
+        { label:'委婉拒绝，但帮小姨介绍了其他客户', hint:'+❤️ +✨', fn: g => { g.flags.insuranceFamily=true; return{social:8,charm:3}; }},
+        { label:'直接拒绝了，不想被人情绑架', hint:'+💪', fn: g => { g.flags.insuranceFamily=true; return{mood:-3}; }},
+      ]},
+    { id:'insurance_group_v39_2', icon:'🏢', title:'团险福利', category:'insurance',
+      body:'公司HR通知说今年给员工买了团体补充医疗保险，看病可以额外报销。你之前不知道这个福利，去年的体检费都自己掏的。HR说：很多同事都不知道公司有这个福利。你翻了一下手册，除了补充医疗，还有团体意外险和团体重疾险。虽然保额不高，但聊胜于无。你觉得在大公司打工的一个好处就是——有些保障你不用自己操心。',
+      cond: g => g.jobSalary >= 5000 && g.age >= 24 && !g.flags.insuranceGroup,
+      choices:[
+        { label:'赶紧去报销了之前自费的体检', hint:'+💰', fn: g => { g.flags.insuranceGroup=true; return{money:500,mood:5}; }},
+        { label:'认真研究了所有团险条款', hint:'+🧠', fn: g => { g.flags.insuranceGroup=true; return{intel:8}; }},
+      ]},
+    { id:'insurance_medical_v39_2', icon:'💊', title:'医保迷宫', category:'insurance',
+      body:'你生病去了一次三甲医院，才搞明白医保有多复杂。挂号费医保不报，进口药不报，某些检查不报，超过起付线才开始报，报销比例还分门诊和住院。护士告诉你：这个药医保能报，但效果差一些；那个药效果好，但要自费。你在病床前做了一道人生选择题——要效果还是要省钱。最后你选了自费药，多花了两千块。健康面前，没有人是理性的。',
+      cond: g => g.age >= 22 && g.health <= 55 && !g.flags.insuranceMed,
+      choices:[
+        { label:'健康比钱重要，选了最好的方案', hint:'-💰 +💪', fn: g => { g.flags.insuranceMed=true; return{money:-2000,health:8}; }},
+        { label:'能报的都报，自费的不选', hint:'+💰 -💪', fn: g => { g.flags.insuranceMed=true; return{money:500,health:-3}; }},
+      ]},
+    { id:'insurance_pension_v39_2', icon:'👴', title:'养老金焦虑', category:'insurance',
+      body:'你算了一笔账：按照现在的社保缴费，退休后每月大概能领三四千块。在一线城市，这点钱可能连房租都不够。你开始理解为什么那么多人在买商业养老保险了。但商业年金险的条款太复杂了——有的说60岁开始领，有的说保证领取20年，有的说IRR只有百分之二点几。你突然觉得，养老这个问题离你很远，但又不得不开始想了。',
+      cond: g => g.age >= 28 && g.money >= 5000 && !g.flags.insurancePension,
+      choices:[
+        { label:'开始定投养老基金', hint:'-💰 +🧠', fn: g => { g.flags.insurancePension=true; g.flags.pensionFund=true; return{money:-3000,intel:5}; }},
+        { label:'觉得还早，先过好当下', hint:'+😊', fn: g => { g.flags.insurancePension=true; return{mood:5}; }},
+        { label:'给父母加了一份养老保险', hint:'-💰 +❤️', fn: g => { g.flags.insurancePension=true; g.flags.parentsPension=true; return{money:-5000,social:5}; }},
+      ]},
+    { id:'insurance_need_v39_2', icon:'🏥', title:'有保险真好', category:'insurance',
+      body:'你或身边的人经历了一次意外或大病，这时候才发现保险的重要性。如果是之前买了保险的人，至少在经济上不用太担心。而没买的人，一场病就能让一个家庭回到解放前。你听说有人因为没买重疾险，治病的钱全靠众筹和借钱。你也听说有人买了保险，确诊当天就拿到了理赔款，安安心心治病。保险这个东西，你希望永远用不上，但需要的时候必须得有。',
+      cond: g => g.age >= 26 && (g.flags.insuranceBasic || g.flags.insuranceMedical || g.flags.insuranceTypes) && !g.flags.insuranceNeed,
+      choices:[
+        { label:'庆幸自己有保险，心里踏实了很多', hint:'+😊', fn: g => { g.flags.insuranceNeed=true; return{mood:10}; }},
+        { label:'后悔没早点买够保障', hint:'-😊 +🧠', fn: g => { g.flags.insuranceNeed=true; g.flags.insuranceRegret=true; return{mood:-5,intel:5}; }},
+        { label:'开始给全家配置保险', hint:'-💰 +❤️', fn: g => { g.flags.insuranceNeed=true; g.flags.insuranceFullFamily=true; return{money:-8000,social:5}; }},
+      ]},
+    { id:'insurance_life_v39_2', icon:'🌟', title:'保险人生', category:'insurance',
+      body:'你终于理解了保险的本质——它不是赚钱的工具，而是一种对不确定性的敬畏。每个月花一点钱买一份安心，买的不是理赔款，而是半夜不用担心家里出事的睡眠。当然，保险行业有很多坑：推销过度、条款复杂、理赔困难。但保险的理念是对的：人无远虑，必有近忧。在这个充满不确定的时代，学会用保险给自己和家人兜底，也是一种成年人的智慧。',
+      cond: g => g.flags.insuranceNeed && (g.flags.insurancePension || g.flags.insuranceSocial) && !g.flags.insuranceLife,
+      choices:[
+        { label:'成了一个保险科普博主', hint:'+✨ +🧠', fn: g => { g.flags.insuranceLife=true; return{charm:12,intel:8}; }},
+        { label:'帮全家人做了完善的保险规划', hint:'+❤️ +💪', fn: g => { g.flags.insuranceLife=true; return{social:8,health:5}; }},
+        { label:'用保险思维重新规划了人生', hint:'+🧠 +😊', fn: g => { g.flags.insuranceLife=true; return{intel:10,mood:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -26131,6 +26210,17 @@ const ACHIEVEMENTS = [
     { id:'market_mom_v39_1_ach', icon:'👩', name:'妈妈的生活智慧', desc:'被妈妈在菜市场里的精明折服了', check: g => g.flags.marketMom },
     { id:'market_convert_v39_1_ach', icon:'🔄', name:'菜市场信徒', desc:'从不去菜市场变成了天天去', check: g => g.flags.marketConvert },
     { id:'market_life_v39_1_ach', icon:'🌟', name:'菜市场人生', desc:'理解了菜市场就是活着的人间', check: g => g.flags.marketLife },
+    // v39.2 保险推销与理赔文化
+    { id:'insurance_pushy_v39_2_ach', icon:'📞', name:'被推销了', desc:'经历了保险推销员的热情攻势', check: g => g.flags.insurancePushy },
+    { id:'insurance_types_v39_2_ach', icon:'📋', name:'险种研究生', desc:'搞明白了各种保险的区别', check: g => g.flags.insuranceTypes },
+    { id:'insurance_claim_v39_2_ach', icon:'😤', name:'理赔不易', desc:'见证了保险理赔的艰难过程', check: g => g.flags.insuranceClaim },
+    { id:'insurance_social_v39_2_ach', icon:'🏥', name:'社保入门', desc:'搞清楚了五险一金是怎么回事', check: g => g.flags.insuranceSocial },
+    { id:'insurance_family_v39_2_ach', icon:'👩‍💼', name:'家人卖保险', desc:'经历了家人做保险的尴尬', check: g => g.flags.insuranceFamily },
+    { id:'insurance_group_v39_2_ach', icon:'🏢', name:'团险福利', desc:'发现了公司隐藏的保险福利', check: g => g.flags.insuranceGroup },
+    { id:'insurance_med_v39_2_ach', icon:'💊', name:'医保迷宫', desc:'在医院里体验了医保的复杂', check: g => g.flags.insuranceMed },
+    { id:'insurance_pension_v39_2_ach', icon:'👴', name:'养老焦虑', desc:'开始为退休后的生活担忧了', check: g => g.flags.insurancePension },
+    { id:'insurance_need_v39_2_ach', icon:'🛡️', name:'有保险真好', desc:'在关键时刻体会到了保险的价值', check: g => g.flags.insuranceNeed },
+    { id:'insurance_life_v39_2_ach', icon:'🌟', name:'保险人生', desc:'学会用保险给自己和家人兜底', check: g => g.flags.insuranceLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
