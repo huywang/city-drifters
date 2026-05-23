@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v36.2
+// 都市浮生记 - 数据文件 v36.3
 // ============================================
 
 
@@ -21309,6 +21309,88 @@ const EVENTS = [
         { label:'只是继续做一个热爱文化的人', hint:'+😊 +🧠 +❤️', fn: g => { g.flags.museumLife=true; return{mood:12,intel:10,health:5}; }},
       ]},
 
+    // === v36.3 城市交通与通勤文化 ===
+    { id:'transit_subway_v36_3', icon:'🚇', title:'地铁通勤', category:'transit',
+      body:'你每天挤地铁上班，早高峰的地铁像一个巨大的沙丁鱼罐头。你学会了在拥挤中看手机、听播客，甚至闭眼补觉。地铁里的每个人都在赶自己的路，但你们共享着同一种疲惫。',
+      cond: g => g.age >= 20 && g.jobSalary > 0 && !g.flags.transitSubway,
+      choices:[
+        { label:'买了降噪耳机，通勤变成学习时间', hint:'-💰 +🧠', fn: g => { g.flags.transitSubway=true; g.flags.transitLearn=true; return{money:-800,intel:5}; }},
+        { label:'错峰出行，早起半小时', hint:'+❤️ +😊', fn: g => { g.flags.transitSubway=true; g.flags.transitEarly=true; return{health:3,mood:3}; }},
+        { label:'认命了，这就是大城市', hint:'+🧠', fn: g => { g.flags.transitSubway=true; return{intel:2,mood:-2}; }},
+      ]},
+    { id:'transit_bike_v36_3', icon:'🚲', title:'共享单车', category:'transit',
+      body:'你开始骑共享单车上班，三公里的路程只需要十五分钟。风吹过脸上的感觉比挤地铁好太多了。只是下雨天和冬天就比较痛苦。',
+      cond: g => g.age >= 20 && g.flags.transitSubway && !g.flags.transitBike && g.health > 40,
+      choices:[
+        { label:'每天骑车上下班，省了地铁费', hint:'+💰 +❤️', fn: g => { g.flags.transitBike=true; g.flags.transitRider=true; return{money:200,health:5}; }},
+        { label:'天气好就骑，天气差就坐地铁', hint:'+😊', fn: g => { g.flags.transitBike=true; return{mood:4}; }},
+        { label:'骑了两个月买了辆自己的自行车', hint:'-💰 +❤️ +✨', fn: g => { g.flags.transitBike=true; g.flags.transitOwn=true; return{money:-3000,health:6,charm:3}; }},
+      ]},
+    { id:'transit_scooter_v36_3', icon:'🛵', title:'电动车通勤', category:'transit',
+      body:'你花了三千块买了辆电动车。从此通勤时间从四十分钟缩短到十五分钟，再也不用挤地铁了。只是冬天骑车冻得鼻涕直流，夏天又被晒成黑炭。',
+      cond: g => g.age >= 22 && g.jobSalary > 0 && !g.flags.transitScooter && g.money > 3000,
+      choices:[
+        { label:'骑电动车成了日常，风雨无阻', hint:'+😊 +❤️ -❤️', fn: g => { g.flags.transitScooter=true; g.flags.transitAllWeather=true; return{mood:5,health:-2}; }},
+        { label:'只在不冷不热的季节骑', hint:'+😊', fn: g => { g.flags.transitScooter=true; return{mood:3}; }},
+        { label:'被交警抓了没戴头盔，罚了五十', hint:'-💰 +🧠', fn: g => { g.flags.transitScooter=true; return{money:-50,intel:2}; }},
+      ]},
+    { id:'transit_traffic_v36_3', icon:'🚗', title:'堵车人生', category:'transit',
+      body:'你打了辆车，结果在高架上堵了一个小时。你看着窗外一动不动的车流，听着司机吐槽"每天都这样"。你在后座上回完了所有邮件，刷完了三个短视频，车还没动。',
+      cond: g => g.age >= 22 && g.flags.transitSubway && !g.flags.transitTraffic,
+      choices:[
+        { label:'从此能坐地铁就绝不打车', hint:'+💰 +🧠', fn: g => { g.flags.transitTraffic=true; return{money:50,intel:2}; }},
+        { label:'堵车时听了个播客，还挺有收获', hint:'+🧠 +😊', fn: g => { g.flags.transitTraffic=true; return{intel:4,mood:2}; }},
+        { label:'和出租车司机聊了一路', hint:'+👥 +🧠', fn: g => { g.flags.transitTraffic=true; g.flags.transitChat=true; return{social:3,intel:3}; }},
+      ]},
+    { id:'transit_commute_v36_3', icon:'⏰', title:'通勤两小时', category:'transit',
+      body:'你算了一下每天通勤的时间：单程一小时，一天两小时，一年大约五百小时。相当于整整二十天在路上。你开始认真考虑要不要搬到公司附近，但那边房租贵了一倍。',
+      cond: g => g.age >= 23 && g.flags.transitSubway && !g.flags.transitCommute && g.jobSalary > 0,
+      choices:[
+        { label:'搬到公司附近，房租多了一千', hint:'-💰 +😊 +❤️', fn: g => { g.flags.transitCommute=true; g.flags.transitMove=true; return{money:-1000,mood:8,health:3}; }},
+        { label:'接受通勤，把时间变成学习时间', hint:'+🧠', fn: g => { g.flags.transitCommute=true; return{intel:5,mood:-2}; }},
+        { label:'开始找离家近的工作', hint:'+🧠 +✨', fn: g => { g.flags.transitCommute=true; g.flags.transitJobHunt=true; return{intel:3,charm:2}; }},
+      ]},
+    { id:'transit_taxi_v36_3', icon:'🌃', title:'深夜打车', category:'transit',
+      body:'加班到凌晨一点，你叫了辆网约车回家。空旷的马路上只有你和司机，他放着你没听过的老歌。你们没说话，但那种深夜城市里两个陌生人共享一段路程的感觉，有种说不出的温暖。',
+      cond: g => g.age >= 22 && g.jobSalary > 0 && !g.flags.transitTaxi && (g.mood < 55 || g.health < 60),
+      choices:[
+        { label:'和司机聊了聊，他也是加班到现在', hint:'+👥 +😊', fn: g => { g.flags.transitTaxi=true; return{social:3,mood:5}; }},
+        { label:'在后座上偷偷哭了', hint:'+😊', fn: g => { g.flags.transitTaxi=true; g.flags.transitCry=true; return{mood:3}; }},
+        { label:'看着窗外的城市夜景发了条朋友圈', hint:'+✨', fn: g => { g.flags.transitTaxi=true; return{charm:3,mood:2}; }},
+      ]},
+    { id:'transit_cost_v36_3', icon:'💳', title:'交通开销', category:'transit',
+      body:'你算了算每月交通费：地铁卡三百、打车两百、共享单车月卡十五，加上偶尔的停车费，一个月将近六百块。同事说他一年交通费能买张机票了。',
+      cond: g => g.age >= 22 && g.flags.transitCommute && !g.flags.transitCost && g.money < 30000,
+      choices:[
+        { label:'开始精打细算交通开支', hint:'+💰 +🧠', fn: g => { g.flags.transitCost=true; return{money:300,intel:2}; }},
+        { label:'觉得方便就行，不在乎这点钱', hint:'+😊', fn: g => { g.flags.transitCost=true; return{mood:2}; }},
+        { label:'申请了公司的交通补贴', hint:'+💰', fn: g => { g.flags.transitCost=true; g.flags.transitSubsidy=true; return{money:500}; }},
+      ]},
+    { id:'transit_social_v36_3', icon:'👋', title:'通勤社交', category:'transit',
+      body:'你发现每天坐同一班地铁的人总是差不多那几张脸。有天你鼓起勇气和旁边的大哥打了个招呼，聊了聊才知道他是同行业的，你们交换了名片。',
+      cond: g => g.age >= 23 && g.flags.transitSubway && !g.flags.transitSocial && g.social > 20,
+      choices:[
+        { label:'成了通勤搭子，每天一起上下班', hint:'+👥 +😊', fn: g => { g.flags.transitSocial=true; g.flags.transitBuddy=true; return{social:8,mood:5}; }},
+        { label:'加了微信偶尔聊聊', hint:'+👥', fn: g => { g.flags.transitSocial=true; return{social:4}; }},
+        { label:'打完招呼就没下文了', hint:'+🧠', fn: g => { g.flags.transitSocial=true; return{intel:2}; }},
+      ]},
+    { id:'transit_change_v36_3', icon:'🔄', title:'通勤改变', category:'transit',
+      body:'城市新修了地铁线路，你的通勤时间从一小时缩短到了半小时。你忽然多出来的每天一小时，开始用来学画画。你没想到一条地铁线竟然改变了你的生活方式。',
+      cond: g => g.age >= 24 && g.flags.transitCommute && !g.flags.transitChange && g.intel > 30,
+      choices:[
+        { label:'用省下的时间学了新技能', hint:'+🧠 +✨', fn: g => { g.flags.transitChange=true; g.flags.transitSkill=true; return{intel:8,charm:5}; }},
+        { label:'多睡半小时，幸福感大增', hint:'+❤️ +😊', fn: g => { g.flags.transitChange=true; return{health:5,mood:6}; }},
+        { label:'开始骑车探索城市的不同角落', hint:'+😊 +❤️', fn: g => { g.flags.transitChange=true; return{mood:5,health:3}; }},
+      ]},
+    { id:'transit_life_v36_3', icon:'🛤️', title:'在路上', category:'transit',
+      body:'你开始觉得通勤不只是浪费时间。在地铁上你读完了十几本书，在公交上你听完了几十个播客，在骑车的时候你想清楚了很多事情。大城市里的每一段路，都是你人生的一部分。',
+      cond: g => g.age >= 26 && g.flags.transitChange && (g.flags.transitLearn || g.flags.transitSkill) && !g.flags.transitLife && g.intel > 35,
+      choices:[
+        { label:'写了一本关于城市通勤的随笔集', hint:'+💰 +✨ +🧠', fn: g => { g.flags.transitLife=true; g.flags.transitWriter=true; return{money:3000,charm:10,intel:8}; }},
+        { label:'开始用通勤时间做副业', hint:'+💰 +🧠', fn: g => { g.flags.transitLife=true; return{money:2000,intel:5}; }},
+        { label:'享受每一段在路上的时光', hint:'+😊 +🧠', fn: g => { g.flags.transitLife=true; return{mood:10,intel:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -23434,6 +23516,18 @@ const ACHIEVEMENTS = [
     { id:'museum_deep_v36_2_ach', icon:'🔍', name:'深度观展者', desc:'从打卡式看展进化到了深度研究', check: g => g.flags.museumDeep },
     { id:'museum_create_v36_2_ach', icon:'✏️', name:'艺术创作者', desc:'从观众变成了创作者', check: g => g.flags.museumCreate },
     { id:'museum_life_v36_2_ach', icon:'🌟', name:'文化人生', desc:'在大城市找到了属于自己的精神角落', check: g => g.flags.museumLife },
+
+    // v36.3 城市交通与通勤文化
+    { id:'transit_subway_v36_3_ach', icon:'🚇', name:'地铁常客', desc:'每天在地铁里度过通勤时光', check: g => g.flags.transitSubway },
+    { id:'transit_bike_v36_3_ach', icon:'🚲', name:'骑行通勤', desc:'开始骑共享单车上班', check: g => g.flags.transitBike },
+    { id:'transit_scooter_v36_3_ach', icon:'🛵', name:'电动车骑士', desc:'骑着电动车穿梭在城市里', check: g => g.flags.transitScooter },
+    { id:'transit_traffic_v36_3_ach', icon:'🚗', name:'堵车达人', desc:'在高架上堵了一个小时', check: g => g.flags.transitTraffic },
+    { id:'transit_commute_v36_3_ach', icon:'⏰', name:'通勤两小时', desc:'每天花两小时在路上', check: g => g.flags.transitCommute },
+    { id:'transit_taxi_v36_3_ach', icon:'🌃', name:'深夜打车', desc:'凌晨坐在出租车里看城市夜景', check: g => g.flags.transitTaxi },
+    { id:'transit_cost_v36_3_ach', icon:'💳', name:'交通账单', desc:'认真算过每月交通开销', check: g => g.flags.transitCost },
+    { id:'transit_social_v36_3_ach', icon:'👋', name:'通勤搭子', desc:'在通勤路上交到了朋友', check: g => g.flags.transitSocial },
+    { id:'transit_change_v36_3_ach', icon:'🔄', name:'通勤改变', desc:'一条新线路改变了你的生活节奏', check: g => g.flags.transitChange },
+    { id:'transit_life_v36_3_ach', icon:'🛤️', name:'在路上', desc:'学会了享受每一段在路上的时光', check: g => g.flags.transitLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
