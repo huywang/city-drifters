@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v39.4
+// 都市浮生记 - 数据文件 v39.5
 // ============================================
 
 
@@ -23915,6 +23915,79 @@ const EVENTS = [
         { label:'祝福每一对新人，也祝福自己', hint:'+😊 +❤️', fn: g => { g.flags.weddingLife=true; return{mood:10,social:5}; }},
       ]},
 
+    // ═══ v39.5 工厂与打工人文化 ═══
+    { id:'factory_enter_v39_5', icon:'🏭', title:'进厂打工', category:'factory',
+      body:'你决定先去工厂过渡一下。在工业区门口，各种招工广告贴满了围墙：电子厂招普工，包吃包住，月薪四千五。你跟着一个中介走进了厂区，填了表格，做了体检，第二天就上班了。穿上蓝色工服的那一刻，你觉得自己像是变成了流水线上的一个零件。但你告诉自己：这只是暂时的。在工厂里，每个人都说这只是暂时的。',
+      cond: g => g.age >= 18 && g.money <= 3000 && !g.flags.factoryEnter,
+      choices:[
+        { label:'既来之则安之，先干着', hint:'+💪', fn: g => { g.flags.factoryEnter=true; setJob(g,'工厂普工',4500); return{mood:-3}; }},
+        { label:'心里不是滋味，但必须生存', hint:'+🧠', fn: g => { g.flags.factoryEnter=true; setJob(g,'工厂普工',4500); return{intel:3}; }},
+      ]},
+    { id:'factory_line_v39_5', icon:'⚙️', title:'流水线', category:'factory',
+      body:'你被分配到了组装线。你的工作是在一块电路板上插十二个零件，每天重复这个动作八千次。旁边工位的大姐已经在这里干了五年，手上的速度快得看不清。她告诉你：刚开始会手疼，习惯就好了。第一天下来，你的手指肿了，腰也直不起来。但你看着大姐淡定的样子，突然明白了什么叫熟能生巧。流水线不需要天才，只需要能坚持的人。',
+      cond: g => g.flags.factoryEnter && !g.flags.factoryLine,
+      choices:[
+        { label:'咬牙坚持，一周后适应了', hint:'+💪', fn: g => { g.flags.factoryLine=true; return{health:-5,mood:-3}; }},
+        { label:'开始思考这样的人生值不值得', hint:'+🧠', fn: g => { g.flags.factoryLine=true; return{intel:5}; }},
+      ]},
+    { id:'factory_overtime_v39_5', icon:'⏰', title:'加班日常', category:'factory',
+      body:'工厂的底薪只有两千三，想拿到四千五全靠加班。每天早上八点上班，晚上九点下班，中间只有吃饭时间休息。周六也要加班，一个月只休四天。加班费按一点五倍算，一个小时的加班费是十二块。你算了一下，你每天用十三个小时换一百五十块钱。但如果不加班，根本活不下去。你终于理解了什么叫用时间换钱——在工厂里，时间就是最廉价的资源。',
+      cond: g => g.flags.factoryLine && !g.flags.factoryOvertime,
+      choices:[
+        { label:'拼命加班，这个月多赚了一千', hint:'+💰 -💪', fn: g => { g.flags.factoryOvertime=true; return{money:1000,health:-8}; }},
+        { label:'身体最重要，不加那么多班', hint:'+💪 -💰', fn: g => { g.flags.factoryOvertime=true; return{health:3,money:-300}; }},
+      ]},
+    { id:'factory_dorm_v39_5', icon:'🛏️', title:'工厂宿舍', category:'factory',
+      body:'你住进了工厂宿舍，八人间，上下铺，没有空调只有一个吊扇。夏天热得睡不着，冬天又冷得要命。室友们来自五湖四海——有云南的、贵州的、河南的、湖南的。晚上熄灯后，大家躺在各自的床上聊天，聊家乡、聊女朋友、聊以后想干什么。有人说攒够钱就回去开个小店，有人说要学一门技术不再进厂。你听着听着就睡着了，梦里回到了家。',
+      cond: g => g.flags.factoryEnter && !g.flags.factoryDorm,
+      choices:[
+        { label:'和室友们成了好兄弟', hint:'+❤️ +😊', fn: g => { g.flags.factoryDorm=true; return{social:8,mood:5}; }},
+        { label:'独来独往，戴着耳机活在自己的世界里', hint:'+🧠', fn: g => { g.flags.factoryDorm=true; return{intel:3}; }},
+      ]},
+    { id:'factory_love_v39_5', icon:'💕', title:'工厂爱情', category:'factory',
+      body:'你在工厂里遇到了一个女孩，她在隔壁的包装线上。每天中午吃饭的时候，你们会在食堂碰到。慢慢地你们开始一起吃饭，一起散步，一起在厂区的小卖部买冰棍。工厂里的爱情很简单——不需要送花送礼物，有个人陪你说话就是最大的温暖。但你也知道，如果有一天你们中的一个离开了工厂，这段感情可能就散了。工厂留不住人，也留不住爱情。',
+      cond: g => g.flags.factoryDorm && g.age >= 19 && !g.flags.factoryLove,
+      choices:[
+        { label:'珍惜当下的每一天', hint:'+❤️ +😊', fn: g => { g.flags.factoryLove=true; return{mood:10,social:5}; }},
+        { label:'不敢投入太多，怕离别', hint:'-😊', fn: g => { g.flags.factoryLove=true; return{mood:-3}; }},
+      ]},
+    { id:'factory_payday_v39_5', icon:'💰', title:'发工资', category:'factory',
+      body:'每月十五号是发工资的日子。这天早上，整个工厂的气氛都不一样了——大家走路都带风。你看着工资条：底薪两千三，加班费一千八，全勤奖两百，扣掉社保和住宿，到手四千出头。你立刻转了两千给家里，留了一千五存起来，剩下的五百是这个月的生活费。发工资那天晚上，厂区门口的小饭馆生意特别好，大家点上几个菜，喝两瓶啤酒，算是犒劳自己一个月的辛苦。',
+      cond: g => g.flags.factoryOvertime && !g.flags.factoryPayday,
+      choices:[
+        { label:'和工友们去搓了一顿', hint:'+😊 -💰', fn: g => { g.flags.factoryPayday=true; return{mood:8,money:-200}; }},
+        { label:'存好每一分钱，为离开做准备', hint:'+💰 +🧠', fn: g => { g.flags.factoryPayday=true; return{money:300,intel:3}; }},
+      ]},
+    { id:'factory_dignity_v39_5', icon:'✊', title:'打工人的尊严', category:'factory',
+      body:'线长是一个比你小两岁的小伙子，但对工人特别凶。今天他又骂了你旁边的工友：手脚这么慢，是不是不想干了？你看不下去了，站出来说：大家都是来赚钱的，你尊重一下人行不行？线长愣了一下，没再说话。后来工友偷偷跟你说：谢谢你，但别太出头，小心被穿小鞋。你觉得打工人的尊严不是别人给的，是自己争的。',
+      cond: g => g.flags.factoryLine && g.age >= 20 && !g.flags.factoryDignity,
+      choices:[
+        { label:'开始了解劳动法，帮工友们维权', hint:'+✨ +🧠', fn: g => { g.flags.factoryDignity=true; return{charm:8,intel:5}; }},
+        { label:'不再出头，但心里记住了这件事', hint:'+🧠', fn: g => { g.flags.factoryDignity=true; return{intel:5}; }},
+      ]},
+    { id:'factory_quit_v39_5', icon:'🏃', title:'提桶跑路', category:'factory',
+      body:'工厂里有个说法叫提桶跑路——收拾好一个桶（用来装生活用品），头也不回地离开。你在这里干了半年，攒了一点钱，终于决定离开了。走的那天很平静，你把工服交还给了人事部，跟几个关系好的工友道了别。走出厂区大门的那一刻，你深深吸了一口气——自由的空气真好。但你心里也清楚，外面的世界未必比工厂好，但至少你有选择的权利了。',
+      cond: g => g.flags.factoryPayday && g.money >= 5000 && !g.flags.factoryQuit,
+      choices:[
+        { label:'带着攒下的钱离开了', hint:'+😊 +💪', fn: g => { g.flags.factoryQuit=true; setJob(g,'无业',0); return{mood:10,health:5}; }},
+        { label:'有些舍不得这里的朋友', hint:'+❤️ -😊', fn: g => { g.flags.factoryQuit=true; setJob(g,'无业',0); return{mood:-3,social:-5}; }},
+      ]},
+    { id:'factory_dream_v39_5', icon:'⭐', title:'工厂里的梦想', category:'factory',
+      body:'在工厂里，你遇到了很多有梦想的人。有个工友白天在流水线上干活，晚上自学编程，他说以后要当程序员。有个大姐四十多了，还在自考大专，为了给儿子做榜样。有个小伙子存了两年的钱，就为了去学厨师。你觉得工厂最让人敬佩的不是那些留下来的人，而是那些一边做着最辛苦的工作，一边为未来默默准备的人。梦想不分高低，在流水线上追梦的人同样值得尊重。',
+      cond: g => (g.flags.factoryDorm || g.flags.factoryDignity) && !g.flags.factoryDream,
+      choices:[
+        { label:'被工友们的坚持打动了', hint:'+😊 +🧠', fn: g => { g.flags.factoryDream=true; return{mood:8,intel:5}; }},
+        { label:'也开始利用下班时间学习新技能', hint:'+🧠 +💪', fn: g => { g.flags.factoryDream=true; g.flags.factoryStudy=true; return{intel:10,health:-3}; }},
+      ]},
+    { id:'factory_life_v39_5', icon:'🌟', title:'打工人人生', category:'factory',
+      body:'很多年后，你偶尔还会想起在工厂的日子。那是你人生中最辛苦、也最纯粹的一段时间。每天的目标很简单：上班、吃饭、睡觉、攒钱。没有办公室政治，没有KPI考核，只有一条永不停歇的流水线。你从工厂里学到了一件事——劳动本身就是有尊严的，不管是坐在写字楼里还是站在流水线旁。中国有将近三亿产业工人，他们用双手制造了这个世界工厂的奇迹。每一个打工人，都值得被看见。',
+      cond: g => (g.flags.factoryQuit || g.flags.factoryDream) && g.age >= 25 && !g.flags.factoryLife,
+      choices:[
+        { label:'拍了一部关于工厂打工人的纪录片', hint:'+✨ +🧠', fn: g => { g.flags.factoryLife=true; return{charm:12,intel:8}; }},
+        { label:'写了一本《流水线上的中国》', hint:'+✨ +🧠', fn: g => { g.flags.factoryLife=true; g.flags.factoryBook=true; return{charm:10,intel:10}; }},
+        { label:'向每一个打工人致敬', hint:'+❤️ +😊', fn: g => { g.flags.factoryLife=true; return{mood:10,social:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -26392,6 +26465,17 @@ const ACHIEVEMENTS = [
     { id:'wedding_flash_v39_4_ach', icon:'⚡', name:'闪婚见证', desc:'见证了朋友三个月就结婚的爱情', check: g => g.flags.weddingFlash },
     { id:'wedding_drama_v39_4_ach', icon:'🎭', name:'婚礼名场面', desc:'见识了婚礼上的各种戏剧性时刻', check: g => g.flags.weddingDrama },
     { id:'wedding_life_v39_4_ach', icon:'🌟', name:'婚礼人生', desc:'理解了婚礼不只是仪式，更是两个家庭的结合', check: g => g.flags.weddingLife },
+    // v39.5 工厂与打工人文化
+    { id:'factory_enter_v39_5_ach', icon:'🏭', name:'进厂打工', desc:'穿上工服走进了工厂大门', check: g => g.flags.factoryEnter },
+    { id:'factory_line_v39_5_ach', icon:'⚙️', name:'流水线新手', desc:'体验了流水线上重复劳动的辛苦', check: g => g.flags.factoryLine },
+    { id:'factory_overtime_v39_5_ach', icon:'⏰', name:'加班战士', desc:'为了生存拼命加班', check: g => g.flags.factoryOvertime },
+    { id:'factory_dorm_v39_5_ach', icon:'🛏️', name:'宿舍生活', desc:'在八人间的工厂宿舍里交到了朋友', check: g => g.flags.factoryDorm },
+    { id:'factory_love_v39_5_ach', icon:'💕', name:'工厂爱情', desc:'在工厂里遇到了心动的人', check: g => g.flags.factoryLove },
+    { id:'factory_payday_v39_5_ach', icon:'💰', name:'发工资了', desc:'拿到了辛苦一个月换来的工资', check: g => g.flags.factoryPayday },
+    { id:'factory_dignity_v39_5_ach', icon:'✊', name:'打工人尊严', desc:'为工友争取了应有的尊重', check: g => g.flags.factoryDignity },
+    { id:'factory_quit_v39_5_ach', icon:'🏃', name:'提桶跑路', desc:'带着攒下的钱离开了工厂', check: g => g.flags.factoryQuit },
+    { id:'factory_dream_v39_5_ach', icon:'⭐', name:'流水线追梦', desc:'见证了工友们在辛苦中坚持追梦', check: g => g.flags.factoryDream },
+    { id:'factory_life_v39_5_ach', icon:'🌟', name:'打工人人生', desc:'理解了每一个打工人都值得被看见', check: g => g.flags.factoryLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
