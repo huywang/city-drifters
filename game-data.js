@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v39.7
+// 都市浮生记 - 数据文件 v39.8
 // ============================================
 
 
@@ -24134,6 +24134,79 @@ const EVENTS = [
         { label:'更加珍惜健康和身边的每一个人', hint:'+😊 +❤️ +💪', fn: g => { g.flags.hospitalLife=true; return{mood:10,social:5,health:5}; }},
       ]},
 
+    // ═══ v39.8 旅游与穷游文化 ═══
+    { id:'travel_first_v39_8', icon:'✈️', title:'第一次旅行', category:'travel',
+      body:'你攒了三个月的钱，决定给自己一次旅行。这是你第一次一个人出远门。在火车站买了张硬座票，坐了十几个小时到了目的地。出了站你深吸一口气——这里的空气跟家里不一样。你住进了最便宜的旅馆，吃着路边的盒饭，但心里特别兴奋。原来世界这么大，原来除了上班和加班，生活还可以是这个样子。',
+      cond: g => g.age >= 20 && g.money >= 2000 && !g.flags.travelFirst,
+      choices:[
+        { label:'激动得一晚上没睡着', hint:'+😊', fn: g => { g.flags.travelFirst=true; return{mood:12}; }},
+        { label:'开始规划接下来要去的地方', hint:'+🧠', fn: g => { g.flags.travelFirst=true; return{intel:5}; }},
+      ]},
+    { id:'travel_group_v39_8', icon:'🚌', title:'跟团游', category:'travel',
+      body:'你参加了一个便宜的跟团游，五百块钱三天两夜。导游带着三十多个人坐大巴，每天五点起床，赶场子一样逛景点。每个景点只给二十分钟拍照时间，然后就去购物店。导游说：这个玉镯子原价八千，今天只要八百！你知道是坑，但碍于面子还是买了一个。回程的路上你算了一下，购物花的钱比团费还多。跟团游的教训：便宜没好货。',
+      cond: g => g.flags.travelFirst && !g.flags.travelGroup,
+      choices:[
+        { label:'被坑了不少钱，发誓再也不跟团了', hint:'-💰 +🧠', fn: g => { g.flags.travelGroup=true; return{money:-1500,intel:5}; }},
+        { label:'虽然坑多，但认识了几个有趣的团友', hint:'+❤️', fn: g => { g.flags.travelGroup=true; return{social:5,money:-1000}; }},
+      ]},
+    { id:'travel_budget_v39_8', icon:'🎒', title:'穷游', category:'travel',
+      body:'你决定穷游一次。坐最便宜的硬座，住最便宜的青旅，吃最便宜的盒饭。你把每天的预算控制在五十块以内。在大理，你在洱海边搭了个帐篷，看了一整夜的星星。在成都，你在人民公园喝了一碗五块钱的盖碗茶，听了一下午的评书。在西安，你在城墙上骑了一圈自行车，夕阳把古城染成了金色。你发现，旅行的快乐从来不取决于花了多少钱。',
+      cond: g => g.flags.travelFirst && g.money <= 5000 && !g.flags.travelBudget,
+      choices:[
+        { label:'穷游让你看到了不一样的世界', hint:'+😊 +🧠', fn: g => { g.flags.travelBudget=true; return{mood:10,intel:5}; }},
+        { label:'虽然省了钱，但有些地方没去成', hint:'-😊', fn: g => { g.flags.travelBudget=true; return{mood:-3}; }},
+      ]},
+    { id:'travel_hostel_v39_8', icon:'🏠', title:'青年旅舍', category:'travel',
+      body:'你住进了一家青年旅舍，一个床位三十块钱。八人间的上下铺，跟大学宿舍差不多。但气氛完全不一样——客厅里坐满了来自全国各地甚至国外的旅行者。有个辞职环游中国的程序员，有个靠画画为生的自由艺术家，有个刚从西藏骑行回来的大学生。大家晚上一起做饭、聊天、打牌，第二天各奔东西。你在留言本上写了一句话：希望我们都能在想去的时候出发。',
+      cond: g => g.flags.travelBudget && !g.flags.travelHostel,
+      choices:[
+        { label:'在青旅交到了天南地北的朋友', hint:'+❤️ +😊', fn: g => { g.flags.travelHostel=true; return{social:10,mood:5}; }},
+        { label:'被那些勇敢追梦的人感染了', hint:'+💪 +🧠', fn: g => { g.flags.travelHostel=true; return{mood:8,intel:5}; }},
+      ]},
+    { id:'travel_checkin_v39_8', icon:'📸', title:'旅行打卡', category:'travel',
+      body:'你发现旅行的一个重要动力是——发朋友圈。每到一个景点，你第一时间拍照打卡。构图、滤镜、文案，每一步都精心打磨。朋友们的点赞让你觉得这趟旅行值了。但你有时候也在想：如果没有朋友圈，你还会来这里吗？有一个景点，你排了两个小时的队就为了拍一张照片，但到了那里你发现——肉眼看到的比任何照片都美。你默默放下了手机，用眼睛记住了这一刻。',
+      cond: g => g.flags.travelFirst && !g.flags.travelCheckin,
+      choices:[
+        { label:'学会了用眼睛而不是镜头记录旅行', hint:'+🧠 +😊', fn: g => { g.flags.travelCheckin=true; return{intel:8,mood:5}; }},
+        { label:'成了一个旅行博主，粉丝越来越多', hint:'+✨ +💰', fn: g => { g.flags.travelCheckin=true; g.flags.travelBlogger=true; return{charm:10,money:500}; }},
+      ]},
+    { id:'travel_spontaneous_v39_8', icon:'🗺️', title:'说走就走', category:'travel',
+      body:'有一天你加完班，打开地图，看到了一个从没听过的地名。你查了一下火车票，明天有一趟。你犹豫了三秒，订了票。第二天你出现在了那个小城市——没有攻略，没有计划，就一个人。你在街上随便走，随便吃，随便看。这种毫无目的的旅行反而让你觉得最自由。你终于理解了那句话：旅行最好的状态，是在一个陌生的地方发现一种久违的感动。',
+      cond: g => g.flags.travelBudget && g.age >= 22 && !g.flags.travelSpontaneous,
+      choices:[
+        { label:'这是你最难忘的一次旅行', hint:'+😊 +🧠', fn: g => { g.flags.travelSpontaneous=true; return{mood:12,intel:5}; }},
+        { label:'在小城市里发现了意想不到的美', hint:'+✨', fn: g => { g.flags.travelSpontaneous=true; return{charm:5,mood:5}; }},
+      ]},
+    { id:'travel_accident_v39_8', icon:'😱', title:'旅途意外', category:'travel',
+      body:'旅行不总是一帆风顺的。有一次你在大山里迷了路，手机没信号，走了两个小时才找到公路。有一次你被出租车司机宰了一百多块。有一次你到了酒店发现跟网上图片完全不一样。还有一次你吃坏了肚子，在旅馆里躺了两天。但多年后回忆起来，这些意外反而成了最有趣的故事。旅途中的意外，是生活给你的彩蛋——虽然当时觉得糟，但事后都变成了笑谈。',
+      cond: g => g.flags.travelSpontaneous && !g.flags.travelAccident,
+      choices:[
+        { label:'旅途的意外让你变得更从容了', hint:'+🧠 +💪', fn: g => { g.flags.travelAccident=true; return{intel:8,health:3}; }},
+        { label:'把这些经历写成了搞笑游记', hint:'+✨', fn: g => { g.flags.travelAccident=true; g.flags.travelDiary=true; return{charm:8}; }},
+      ]},
+    { id:'travel_souvenir_v39_8', icon:'🎁', title:'旅行纪念品', category:'travel',
+      body:'你的房间里堆满了旅行带回来的纪念品。丽江的手鼓、敦煌的飞天书签、桂林的山水画、厦门的贝壳、大理的扎染围巾。每一件都带着一段回忆。但你发现最有意义的纪念品不是买来的，而是捡来的——一片银杏叶、一块海边的石头、一张在火车上画的速写、一个陌生人送你的明信片。这些不值钱的东西，反而是你最珍惜的。',
+      cond: g => g.flags.travelCheckin && g.flags.travelBudget && !g.flags.travelSouvenir,
+      choices:[
+        { label:'开始收集每次旅行的车票和门票', hint:'+✨ +🧠', fn: g => { g.flags.travelSouvenir=true; return{charm:5,intel:3}; }},
+        { label:'最有意义的纪念品是一段友谊', hint:'+❤️', fn: g => { g.flags.travelSouvenir=true; return{social:8}; }},
+      ]},
+    { id:'travel_find_v39_8', icon:'🧭', title:'在旅行中找自己', category:'travel',
+      body:'有人说旅行是为了找自己，你觉得这话有点矫情。但经历了几次旅行后，你发现确实如此。在陌生的环境里，你不用扮演任何角色——不是员工，不是子女，不是朋友，只是你自己。你在青海湖边想清楚了一个困扰你很久的问题。你在黄山的山顶做了一个决定。你在一个不知名的小镇，第一次觉得内心平静。也许旅行的意义不在于去了哪里，而在于出发后你终于有时间跟自己对话。',
+      cond: g => g.flags.travelSpontaneous && g.flags.travelAccident && !g.flags.travelFind,
+      choices:[
+        { label:'在旅途中做了一个重要的人生决定', hint:'+🧠 +💪', fn: g => { g.flags.travelFind=true; return{intel:10,mood:8}; }},
+        { label:'学会了跟自己独处', hint:'+😊 +🧠', fn: g => { g.flags.travelFind=true; return{mood:10,intel:5}; }},
+      ]},
+    { id:'travel_life_v39_8', icon:'🌟', title:'旅行人生', category:'travel',
+      body:'你终于理解了旅行对生活的意义。它不是逃避，而是充电；不是挥霍，而是投资——投资在见识、回忆和成长上。你不需要去多远的地方，不需要花多少钱，只需要有一颗愿意出发的心。每一次旅行都让你变得更丰富一点：见过雪山的人更懂敬畏，看过大海的人更懂包容，走过沙漠的人更懂珍惜。世界那么大，人生那么短，趁还走得动，多出去看看吧。',
+      cond: g => g.flags.travelFind && (g.flags.travelHostel || g.flags.travelSouvenir) && !g.flags.travelLife,
+      choices:[
+        { label:'出版了一本旅行散文集', hint:'+✨ +🧠', fn: g => { g.flags.travelLife=true; return{charm:12,intel:8}; }},
+        { label:'开始了数字游民的生活方式', hint:'+✨ +💰', fn: g => { g.flags.travelLife=true; g.flags.digitalNomad=true; return{charm:8,money:2000}; }},
+        { label:'永远保持一颗出发的心', hint:'+😊 +🧠', fn: g => { g.flags.travelLife=true; return{mood:10,intel:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -26644,6 +26717,17 @@ const ACHIEVEMENTS = [
     { id:'hospital_discharge_v39_7_ach', icon:'🎉', name:'终于出院', desc:'迎来了家人康复出院的那一天', check: g => g.flags.hospitalDischarge },
     { id:'hospital_companion_v39_7_ach', icon:'🤝', name:'陪诊师', desc:'了解了一个温暖的新兴职业', check: g => g.flags.hospitalCompanion },
     { id:'hospital_life_v39_7_ach', icon:'🌟', name:'医院人生', desc:'在医院里看到了人性最真实的一面', check: g => g.flags.hospitalLife },
+    // v39.8 旅游与穷游文化
+    { id:'travel_first_v39_8_ach', icon:'✈️', name:'第一次远行', desc:'第一次独自出远门旅行', check: g => g.flags.travelFirst },
+    { id:'travel_group_v39_8_ach', icon:'🚌', name:'跟团游教训', desc:'体验了跟团游的各种坑', check: g => g.flags.travelGroup },
+    { id:'travel_budget_v39_8_ach', icon:'🎒', name:'穷游达人', desc:'用最少的钱走了最远的路', check: g => g.flags.travelBudget },
+    { id:'travel_hostel_v39_8_ach', icon:'🏠', name:'青旅故事', desc:'在青年旅舍遇到了有趣的旅伴', check: g => g.flags.travelHostel },
+    { id:'travel_checkin_v39_8_ach', icon:'📸', name:'打卡达人', desc:'学会了用眼睛而不是镜头记录旅行', check: g => g.flags.travelCheckin },
+    { id:'travel_spontaneous_v39_8_ach', icon:'🗺️', name:'说走就走', desc:'体验了一次毫无计划的自由旅行', check: g => g.flags.travelSpontaneous },
+    { id:'travel_accident_v39_8_ach', icon:'😱', name:'旅途插曲', desc:'经历了旅行中的意外和坎坷', check: g => g.flags.travelAccident },
+    { id:'travel_souvenir_v39_8_ach', icon:'🎁', name:'旅途收藏', desc:'收集了旅途中最珍贵的纪念品', check: g => g.flags.travelSouvenir },
+    { id:'travel_find_v39_8_ach', icon:'🧭', name:'旅途顿悟', desc:'在旅行中找到了内心的答案', check: g => g.flags.travelFind },
+    { id:'travel_life_v39_8_ach', icon:'🌟', name:'旅行人生', desc:'永远保持一颗出发的心', check: g => g.flags.travelLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
