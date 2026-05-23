@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v35.3
+// 都市浮生记 - 数据文件 v35.4
 // ============================================
 
 
@@ -20540,6 +20540,98 @@ const EVENTS = [
         { label:'把对国潮的理解做成内容', hint:'+🧠 +💰', fn: g => { g.flags.guochaoPhilosophy=true; g.flags.guochaoInfluencer=true; return{intel:12,charm:12,money:5000}; }},
       ]},
 
+    // ===== 二手经济与闲鱼文化 (v35.4) =====
+
+    { id:'xianyu_first_v35_4', icon:'🐟', title:'第一次用闲鱼', category:'xianyu',
+      body:'你搬家的时候发现了很多不用的东西：\n- 一台落灰的Kindle\n- 三件没穿过的衣服\n- 一双只穿过一次的鞋\n- 一套全新的锅具（朋友送的，但你从不做饭）\n\n你决定挂在闲鱼上卖。\n\n你拍了照片、写了描述、标了价格。Kindle标了300元（原价800）。\n\n第一天没人问。第二天有人问：「Kindle还在吗？能便宜点吗？200行不行？」\n\n你纠结了一下：「250，包邮。」\n\n对方秒回：「成交！」\n\n你发了快递。3天后对方确认收货，你收到了250元。\n\n你看着账户里多出的250元，有一种奇怪的满足感——比发工资还开心。因为这些钱是「废物利用」赚来的。\n\n你开始理解：闲鱼的乐趣不在于卖多少钱，而在于「让闲置物品找到新主人」的感觉。',
+      cond: g => g.age >= 18 && !g.flags.xianyuFirst,
+      choices:[
+        { label:'开始疯狂清理闲置物品', hint:'+💰 +😊', fn: g => { g.flags.xianyuFirst=true; g.flags.xianyuSeller=true; return{money:800,mood:10}; }},
+        { label:'偶尔卖卖，不急', hint:'+💰', fn: g => { g.flags.xianyuFirst=true; return{money:300,mood:5}; }},
+        { label:'觉得太麻烦了，不如扔掉', hint:'', fn: g => { g.flags.xianyuFirst=true; return{mood:-3}; }},
+      ]},
+
+    { id:'xianyu_buy_v35_4', icon:'🛒', title:'闲鱼捡漏', category:'xianyu',
+      body:'你在闲鱼上看到了一个「捡漏」——一台Switch游戏机，原价2000元，卖家只卖800元。\n\n你赶紧联系了卖家。对方说：「买来玩了两个月，不玩了。配件齐全，95新。」\n\n你约了线下交易（闲鱼建议贵重物品面交）。\n\n见面后你检查了机器——确实是95新，配件齐全，还送了你3个游戏卡带。\n\n你开心得不行。800块买了一台Switch+3个游戏，太赚了。\n\n你问卖家：「为什么不玩了？」\n\n卖家说：「加班太多了，没时间玩。」\n\n你心里想：原来别人的「断舍离」是我的「捡漏」。\n\n你开始理解：二手经济让物品「流动」起来了。一个人不需要的东西，可能是另一个人梦寐以求的。',
+      cond: g => g.age >= 18 && g.flags.xianyuFirst && !g.flags.xianyuBuy,
+      choices:[
+        { label:'开始在闲鱼上买东西', hint:'+😊 +💰', fn: g => { g.flags.xianyuBuy=true; g.flags.xianyuBuyer=true; return{mood:12,money:-800}; }},
+        { label:'偶尔捡漏，不常买', hint:'+😊', fn: g => { g.flags.xianyuBuy=true; return{mood:8,money:-800}; }},
+        { label:'担心买到假货，不太敢买', hint:'', fn: g => { g.flags.xianyuBuy=true; return{mood:0}; }},
+      ]},
+
+    { id:'xianyu_battle_v35_4', icon:'⚔️', title:'闲鱼砍价', category:'xianyu',
+      body:'你在闲鱼上卖一件衣服。标价200元。\n\n买家A：「100元卖不卖？」\n你：「不行，太低了。最低180。」\n买家A：「120，不然算了。」\n你：「150，最后一口价。」\n买家A：「好吧。」\n\n买家B：「能包邮吗？」\n你：「已经包邮了。」\n买家B：「能送个小礼物吗？」\n你：「……」\n\n买家C：「在吗在吗在吗？？」（然后消失了）\n\n买家D：「我看了下淘宝同款才卖150，你凭什么卖200？」\n你：「那你去买淘宝的吧。」\n\n你发现：闲鱼上卖东西就像一场社交大冒险。你需要学会谈判、学会拒绝、学会面对各种奇葩买家。\n\n但你也学会了一个道理：每一件闲置物品都有一个「对的人」在等它。你只是在帮它找到那个人。',
+      cond: g => g.age >= 18 && g.flags.xianyuFirst && !g.flags.xianyuBattle,
+      choices:[
+        { label:'练就了一身砍价本领', hint:'+🧠 +👥', fn: g => { g.flags.xianyuBattle=true; g.flags.negotiator=true; return{intel:8,social:8,mood:5}; }},
+        { label:'太烦了，改一口价不议价', hint:'+😊', fn: g => { g.flags.xianyuBattle=true; return{mood:3,money:200}; }},
+        { label:'被气到了，不想卖了', hint:'', fn: g => { g.flags.xianyuBattle=true; return{mood:-8}; }},
+      ]},
+
+    { id:'xianyu_scams_v35_4', icon:'⚠️', title:'闲鱼踩坑', category:'xianyu',
+      body:'你在闲鱼上买了一个「全新未拆封」的耳机。卖家说：「公司年会抽奖中的，不需要。」\n\n你收到货后打开一看——盒子是拆过的，耳机上有明显的指纹和划痕。\n\n你在闲鱼上申请退款。卖家说：「发货前就是这样的，你自己弄坏的吧？」\n\n你提交了证据（开箱视频），平台介入了。3天后平台判你赢了，你收到了退款。\n\n但你花了3天时间和卖家扯皮。你觉得：为了200块钱，不值得。\n\n你开始总结闲鱼防骗指南：\n1. 一定要拍开箱视频\n2. 贵重物品一定面交\n3. 看卖家的评价和信用分\n4. 价格太低的大概率是骗子\n\n你学到了一课：便宜没好货，这句话在二手市场尤其适用。',
+      cond: g => g.age >= 18 && g.flags.xianyuBuy && !g.flags.xianyuScams,
+      choices:[
+        { label:'吸取教训，更加谨慎了', hint:'+🧠', fn: g => { g.flags.xianyuScams=true; g.flags.carefulBuyer=true; return{intel:10,mood:-5}; }},
+        { label:'觉得闲鱼水太深，不买了', hint:'', fn: g => { g.flags.xianyuScams=true; return{mood:-10}; }},
+        { label:'维权成功了，很有成就感', hint:'+🧠 +😊', fn: g => { g.flags.xianyuScams=true; g.flags.rightsDefender=true; return{intel:8,mood:5}; }},
+      ]},
+
+    { id:'xianyu_story_v35_4', icon:'📖', title:'闲鱼故事', category:'xianyu',
+      body:'你在闲鱼上卖一本书——《百年孤独》。你在描述里写：「这本书陪我度过了最难的一段时光。」\n\n有个买家留言了：「我也正在经历一段很难的时光。能便宜点吗？」\n\n你说：「送你吧。希望这本书也能陪你度过难关。」\n\n买家收到后给你发了一条很长的私信：\n「谢谢你的书。我最近失业了，每天在家很焦虑。看到你的书里夹着一张书签，上面写着「一切都会好的」。我不知道是你写的还是上一个主人写的，但看到那句话的时候我哭了。」\n\n你确实写过那张书签。那是你半年前写给自己的。\n\n你在闲鱼上卖过很多东西，但这是你最有意义的一次交易。\n\n因为你卖出的不是一件物品，而是一份温暖。',
+      cond: g => g.age >= 20 && g.flags.xianyuFirst && g.intel > 30 && !g.flags.xianyuStory,
+      choices:[
+        { label:'开始在描述里写物品背后的故事', hint:'+✨ +👥', fn: g => { g.flags.xianyuStory=true; g.flags.storySeller=true; return{mood:15,charm:10,social:8}; }},
+        { label:'被感动了，决定多做好事', hint:'+😊', fn: g => { g.flags.xianyuStory=true; return{mood:12}; }},
+        { label:'觉得太矫情了，不想参与', hint:'', fn: g => { g.flags.xianyuStory=true; return{mood:-3}; }},
+      ]},
+
+    { id:'xianyu_flip_v35_4', icon:'🔄', title:'闲鱼倒卖', category:'xianyu',
+      body:'你发现了一个赚钱的方法：闲鱼倒卖。\n\n你的操作：\n1. 在拼多多/1688上找低价商品\n2. 在闲鱼上以稍高的价格卖\n3. 赚差价\n\n比如一个手机壳，1688进价5元，闲鱼卖15元。利润10元。\n\n你一开始卖手机壳，一个月卖了50个，赚了500元。\n\n然后你开始卖数据线、手机支架、收纳盒……你的月利润涨到了2000元。\n\n但你也发现了一些问题：\n- 退货率高（二手买家更挑剔）\n- 竞争大（很多人在做同样的事）\n- 平台规则越来越严（限制发布数量）\n\n你开始思考：这算不算一种创业？虽然赚的不多，但你学会了选品、定价、客服、物流。\n\n也许闲鱼不只是二手平台，而是一个「微型创业」的入口。',
+      cond: g => g.age >= 20 && g.flags.xianyuFirst && g.intel > 35 && !g.flags.xianyuFlip,
+      choices:[
+        { label:'认真做闲鱼生意，月入2000', hint:'+💰 +🧠', fn: g => { g.flags.xianyuFlip=true; g.flags.xianyuEntrepreneur=true; return{money:2000,intel:10}; }},
+        { label:'偶尔倒卖，赚个零花钱', hint:'+💰', fn: g => { g.flags.xianyuFlip=true; return{money:500,mood:3}; }},
+        { label:'觉得太累了，不做了', hint:'', fn: g => { g.flags.xianyuFlip=true; return{mood:-5}; }},
+      ]},
+
+    { id:'xianyu_minimal_v35_4', icon:'📦', title:'断舍离', category:'xianyu',
+      body:'你在闲鱼上卖东西的过程中，开始反思自己的消费习惯。\n\n你看了看自己的房间：\n- 衣柜里有30件衣服，但你只穿5件\n- 书架上有100本书，但你只读了20本\n- 抽屉里有各种数据线、充电器、配件——你都不知道是哪个设备的\n\n你开始「断舍离」：不需要的东西全部挂闲鱼。\n\n一个月后你卖了50件物品，赚了3000元。你的房间变得干净整洁。\n\n你发现：当你拥有的东西变少的时候，你的焦虑也变少了。\n\n你开始改变消费习惯：买之前先问自己「我真的需要吗？」「如果不要了能卖多少钱？」\n\n你从「买买买」变成了「断舍离」。从「消费主义」变成了「极简主义」。\n\n你终于理解了那句话：「拥有的越少，自由越多。」',
+      cond: g => g.age >= 22 && g.flags.xianyuFirst && g.flags.xianyuSeller && !g.flags.xianyuMinimal,
+      choices:[
+        { label:'成了极简主义者', hint:'+😊 +🧠', fn: g => { g.flags.xianyuMinimal=true; g.flags.minimalist=true; return{mood:15,intel:10,money:1000}; }},
+        { label:'减少了冲动消费', hint:'+💰 +🧠', fn: g => { g.flags.xianyuMinimal=true; g.flags.smartShopper=true; return{money:2000,intel:8}; }},
+        { label:'断舍离太痛苦了，做不到', hint:'', fn: g => { g.flags.xianyuMinimal=true; return{mood:-5}; }},
+      ]},
+
+    { id:'xianyu_weird_v35_4', icon:'🤣', title:'奇葩卖家', category:'xianyu',
+      body:'你在闲鱼上看到了各种奇葩商品：\n\n1. 「卖我的前男友，99新，脾气有点大，不太会哄人，价格面议。」（已售出）\n2. 「卖一节课：如何优雅地摸鱼。学费50元，包教包会。」\n3. 「卖我的运气。最近考试全过了，把我的运气卖给你。10元。」\n4. 「陪聊服务。20元/小时，可以骂你老板。」\n5. 「卖我的脂肪。如果技术允许的话。」\n\n你在评论区和卖家聊了半天，笑到肚子疼。\n\n你发现：闲鱼不只是交易平台，还是一个「社交娱乐平台」。人们在这里不只是买卖，更是在分享生活的趣味。\n\n你也发了一条：「卖我的周一。原价8小时，现价0元，谁要谁拿走。」\n\n收到了50个「我想要」。',
+      cond: g => g.age >= 18 && g.flags.xianyuFirst && !g.flags.xianyuWeird,
+      choices:[
+        { label:'开始在闲鱼上找乐子', hint:'+😊 +👥', fn: g => { g.flags.xianyuWeird=true; g.flags.funSeller=true; return{mood:12,social:8}; }},
+        { label:'觉得闲鱼太有趣了', hint:'+😊', fn: g => { g.flags.xianyuWeird=true; return{mood:8}; }},
+        { label:'觉得太不正经了', hint:'', fn: g => { g.flags.xianyuWeird=true; return{mood:-2}; }},
+      ]},
+
+    { id:'xianyu_community_v35_4', icon:'🏘️', title:'鱼塘社区', category:'xianyu',
+      body:'你发现闲鱼有个功能叫「鱼塘」——类似于本地社区。你可以加入附近的鱼塘，和邻居们交换物品。\n\n你加入了你所在小区的鱼塘。\n\n里面的人各种各样：\n- 有人送自制的蛋糕（「做多了，谁来拿」）\n- 有人借电钻（「用一下午就还」）\n- 有人送孩子的旧玩具（「8成新，免费送」）\n- 有人求推荐装修师傅\n\n你在鱼塘里送了一盆多肉植物。一个阿姨来拿了，还送了你一把她种的葱。\n\n你们聊了一会儿。阿姨说：「我们小区住了5年，终于通过这个认识了几个邻居。」\n\n你开始理解：二手经济的本质不只是「省钱」和「赚钱」，更是「重新连接人与人」。',
+      cond: g => g.age >= 22 && g.flags.xianyuFirst && !g.flags.xianyuCommunity,
+      choices:[
+        { label:'成了鱼塘的活跃成员', hint:'+👥 +😊', fn: g => { g.flags.xianyuCommunity=true; g.flags.communityActive=true; return{social:12,mood:10}; }},
+        { label:'偶尔逛逛，不常互动', hint:'+👥', fn: g => { g.flags.xianyuCommunity=true; return{social:5,mood:5}; }},
+        { label:'觉得太吵了，退出了', hint:'', fn: g => { g.flags.xianyuCommunity=true; return{mood:-3}; }},
+      ]},
+
+    { id:'xianyu_philosophy_v35_4', icon:'♻️', title:'物品的第二次生命', category:'xianyu',
+      body:'你回顾自己和闲鱼的故事。\n\n从第一次卖出Kindle的兴奋，到捡漏买到Switch，到被坑后维权，到倒卖赚零花钱，到断舍离……\n\n你开始理解：二手经济的意义远不止「买卖」。\n\n它让物品有了「第二次生命」——一件你以为不需要的东西，可能是另一个人的宝贝。\n\n它让消费变得更理性——你不再冲动购物，因为你知道买了也可能卖不掉。\n\n它让城市变得更温暖——通过鱼塘，你认识了以前从不认识的邻居。\n\n它让资源变得更高效——中国每年有数万亿的闲置物品，二手经济让这些资源重新流动。\n\n你在朋友圈写了一段话：\n\n「每一件物品都有它的归宿。闲鱼做的事情，就是帮它们找到那个对的人。就像人生一样——你不需要拥有所有东西，你只需要在对的时间遇到对的东西。」',
+      cond: g => g.age >= 22 && g.flags.xianyuFirst && (g.flags.xianyuMinimal || g.flags.xianyuCommunity) && g.intel > 35,
+      choices:[
+        { label:'二手生活成了生活方式', hint:'+😊 +🧠 +💰', fn: g => { g.flags.xianyuPhilosophy=true; return{mood:15,intel:12,money:2000}; }},
+        { label:'开始做二手经济的自媒体', hint:'+✨ +💰', fn: g => { g.flags.xianyuPhilosophy=true; g.flags.xianyuInfluencer=true; return{charm:12,money:5000}; }},
+        { label:'开了自己的二手小店', hint:'+💰 +👥', fn: g => { g.flags.xianyuPhilosophy=true; g.flags.xianyuShop=true; return{money:-5000,social:15,charm:10}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -22561,6 +22653,17 @@ const ACHIEVEMENTS = [
     { id:'guochao_brand_v35_3_ach', icon:'🏭', name:'国货探秘', desc:'了解了国货背后的供应链', check: g => g.flags.guochaoBrand },
     { id:'guochao_culture_v35_3_ach', icon:'🏮', name:'文化自信', desc:'在国潮中感受到了文化认同', check: g => g.flags.guochaoCulture },
     { id:'guochao_philosophy_v35_3_ach', icon:'🌏', name:'国潮的反思', desc:'对国潮消费有了深层的理解', check: g => g.flags.guochaoPhilosophy },
+    // v35.4 二手经济与闲鱼文化
+    { id:'xianyu_first_v35_4_ach', icon:'🐟', name:'闲鱼初体验', desc:'第一次在闲鱼上卖出了东西', check: g => g.flags.xianyuFirst },
+    { id:'xianyu_buy_v35_4_ach', icon:'🛒', name:'闲鱼捡漏', desc:'在闲鱼上买到了超值的东西', check: g => g.flags.xianyuBuy },
+    { id:'xianyu_battle_v35_4_ach', icon:'⚔️', name:'砍价大师', desc:'在闲鱼上练就了砍价本领', check: g => g.flags.xianyuBattle },
+    { id:'xianyu_scams_v35_4_ach', icon:'⚠️', name:'闲鱼踩坑', desc:'在二手交易中遇到了骗子', check: g => g.flags.xianyuScams },
+    { id:'xianyu_story_v35_4_ach', icon:'📖', name:'闲鱼暖心', desc:'在闲鱼上遇到了一个温暖的故事', check: g => g.flags.xianyuStory },
+    { id:'xianyu_flip_v35_4_ach', icon:'🔄', name:'闲鱼倒爷', desc:'发现了闲鱼倒卖的商机', check: g => g.flags.xianyuFlip },
+    { id:'xianyu_minimal_v35_4_ach', icon:'📦', name:'断舍离', desc:'通过闲鱼实现了物品的断舍离', check: g => g.flags.xianyuMinimal },
+    { id:'xianyu_weird_v35_4_ach', icon:'🤣', name:'闲鱼段子手', desc:'在闲鱼上看到了各种奇葩商品', check: g => g.flags.xianyuWeird },
+    { id:'xianyu_community_v35_4_ach', icon:'🏘️', name:'鱼塘社区', desc:'通过闲鱼认识了邻居们', check: g => g.flags.xianyuCommunity },
+    { id:'xianyu_philosophy_v35_4_ach', icon:'♻️', name:'物品的第二次生命', desc:'理解了二手经济的深层意义', check: g => g.flags.xianyuPhilosophy },
 ];
 
 // === ENDINGS === (order matters: first match wins)
