@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v35.0
+// 都市浮生记 - 数据文件 v35.1
 // ============================================
 
 
@@ -20264,6 +20264,98 @@ const EVENTS = [
         { label:'把City Walk变成了生活方式', hint:'+😊 +🏥', fn: g => { g.flags.citywalkPhilosophy=true; g.flags.slowLife=true; return{mood:15,health:15}; }},
       ]},
 
+    // ===== 剧本杀与沉浸式娱乐 (v35.1) =====
+
+    { id:'jubensha_first_v35_1', icon:'🔍', title:'第一次剧本杀', category:'jubensha',
+      body:'朋友拉你去玩剧本杀。你不太想去——觉得一群成年人玩角色扮演很幼稚。\n\n但你还是去了。因为朋友说：「差一个人，你凑个数。」\n\n你拿到的角色是「张教授」——一个大学历史系教授，涉嫌谋杀他的学生。\n\n你一开始很尴尬，不知道怎么演。但当你开始读剧本的时候，你被故事吸引了。\n\n你的「学生」在论文中发现了你的学术造假，威胁要举报你。你为了保住职位……\n\n「不！我没有杀他！」你突然大声说。全桌人都看着你。\n\n你入戏了。\n\n接下来的4个小时，你完全忘了自己是谁。你推理、争辩、撒谎、哭。\n\n游戏结束后你对朋友说：「下周还来。」',
+      cond: g => g.age >= 18 && g.age < 40 && !g.flags.jubenshaFirst,
+      choices:[
+        { label:'爱上了剧本杀，成了常客', hint:'+😊 +👥', fn: g => { g.flags.jubenshaFirst=true; g.flags.jubenshaFan=true; return{mood:12,social:10,intel:5}; }},
+        { label:'偶尔玩玩，当社交活动', hint:'+👥', fn: g => { g.flags.jubenshaFirst=true; return{mood:8,social:5}; }},
+        { label:'觉得太累了，不适合自己', hint:'', fn: g => { g.flags.jubenshaFirst=true; return{mood:-3}; }},
+      ]},
+
+    { id:'jubensha_emotion_v35_1', icon:'😢', title:'情感本', category:'jubensha',
+      body:'你这次选了一个「情感本」——不是推理破案，而是讲一个感人的故事。\n\n你的角色是一个阿尔茨海默症患者的女儿。剧本里你每天去看望「爸爸」，但他已经不记得你了。\n\n游戏进行到一半的时候，DM（主持人）放了一段录音——是「爸爸」在清醒时录给你的：\n\n「女儿，爸爸可能很快就会忘记你了。但你要知道，你永远是爸爸最骄傲孩子……」\n\n你哭了。全桌人都哭了。\n\n你想起自己的爸爸——你们已经很久没打电话了。\n\n游戏结束后你给爸爸打了个电话。你爸接起来：「怎么了？是不是缺钱了？」\n\n你说：「没有，就是想你了。」\n\n你爸沉默了三秒：「……哦。」\n\n你知道他不擅长表达，但你听到了他声音里的颤抖。',
+      cond: g => g.age >= 20 && g.flags.jubenshaFirst && !g.flags.jubenshaEmotion,
+      choices:[
+        { label:'被打动了，开始玩更多情感本', hint:'+😊 +🧠', fn: g => { g.flags.jubenshaEmotion=true; g.flags.emotionFan=true; return{mood:15,intel:8}; }},
+        { label:'哭得很厉害，但不想再哭了', hint:'+😊', fn: g => { g.flags.jubenshaEmotion=true; return{mood:10}; }},
+        { label:'觉得太假了，不喜欢', hint:'', fn: g => { g.flags.jubenshaEmotion=true; return{mood:-5}; }},
+      ]},
+
+    { id:'jubensha_horror_v35_1', icon:'👻', title:'恐怖本', category:'jubensha',
+      body:'你和朋友挑战了一个「恐怖本」。\n\nDM提前说了：「这个本有NPC吓人环节，如果受不了可以喊「安全词」暂停。」\n\n你们在一个漆黑的房间里，只有蜡烛照明。DM用低沉的声音讲着故事：\n\n「你们来到了一栋废弃的医院。传说这里在1980年代发生过一起医疗事故……」\n\n突然——门「砰」地打开了。一个穿着白大褂、满脸是血的NPC冲进来。\n\n你的朋友尖叫了。你也差点叫出来。\n\n接下来的3个小时你们在恐惧中推理。每次有声音你们都会跳起来。\n\n最后真相大白的时候，你发现：恐怖的不是鬼，而是人心。\n\n走出剧本杀店的时候是晚上10点。你走在街上，总觉得身后有人跟着你。\n\n你加快脚步，到家后锁了三道门。',
+      cond: g => g.age >= 18 && g.flags.jubenshaFirst && !g.flags.jubenshaHorror,
+      choices:[
+        { label:'太刺激了！还想再玩', hint:'+😊', fn: g => { g.flags.jubenshaHorror=true; g.flags.horrorFan=true; return{mood:12,money:-128}; }},
+        { label:'吓到了，短期内不想再玩', hint:'', fn: g => { g.flags.jubenshaHorror=true; return{mood:-5,money:-128}; }},
+        { label:'全程闭眼，什么都不知道', hint:'+👥', fn: g => { g.flags.jubenshaHorror=true; return{mood:3,social:5,money:-128}; }},
+      ]},
+
+    { id:'jubensha_dm_v35_1', icon:'🎭', title:'当DM', category:'jubensha',
+      body:'玩了20多次剧本杀后，DM问你：「你想不想自己带本？」\n\n你犹豫了——带本意味着要准备很久，要记住所有线索，要控制节奏。\n\n但你还是答应了。\n\n你花了两周时间准备。你把剧本读了5遍，画了关系图，设计了互动环节。\n\n第一次带本很紧张。你忘了两次台词，还搞混了一个线索。\n\n但玩家们很宽容：「新手DM都这样，你已经很不错了。」\n\n第二次带本好多了。你开始享受「讲故事」的感觉——看着玩家从困惑到恍然大悟的表情。\n\n你带本一个月赚了3000元（每场300-500元）。\n\n你发现：剧本杀不只是娱乐，它是一门「讲故事」的艺术。',
+      cond: g => g.age >= 20 && g.flags.jubenshaFirst && g.intel > 40 && !g.flags.jubenshaDM,
+      choices:[
+        { label:'成了签约DM，每周带本', hint:'+💰 +👥', fn: g => { g.flags.jubenshaDM=true; g.flags.proDM=true; return{money:3000,social:10,charm:8}; }},
+        { label:'偶尔带本，主要还是玩', hint:'+💰 +😊', fn: g => { g.flags.jubenshaDM=true; return{money:1500,mood:8}; }},
+        { label:'太累了，还是当玩家好', hint:'', fn: g => { g.flags.jubenshaDM=true; return{mood:-3}; }},
+      ]},
+
+    { id:'jubensha_escape_v35_1', icon:'🔐', title:'密室逃脱', category:'jubensha',
+      body:'你试了另一种沉浸式娱乐——密室逃脱。\n\n你和3个朋友组了队，选了一个「古墓探险」主题的密室。\n\n进去后你发现：这不只是找钥匙开门。整个房间布置得像真的古墓，有机关、有暗格、有谜题。\n\n你的朋友A擅长数学，解开了密码锁。你的朋友B观察力强，找到了隐藏的线索。\n\n你负责「统筹」——把所有人的发现串起来，推理出最终答案。\n\n时间只剩5分钟的时候，你们终于找到了最后一把钥匙。你颤抖着手插进锁孔——门开了！\n\n你们欢呼着冲出来。\n\n工作人员说：「你们是全组最快通关的，用时55分钟。」\n\n你发现：密室逃脱的乐趣不在于「逃出来」，而在于「和朋友一起解决问题」的过程。',
+      cond: g => g.age >= 18 && !g.flags.jubenshaEscape,
+      choices:[
+        { label:'成了密室达人，挑战高难度', hint:'+🧠 +👥', fn: g => { g.flags.jubenshaEscape=true; g.flags.escapeFan=true; return{intel:10,social:8,mood:10}; }},
+        { label:'体验不错，偶尔玩玩', hint:'+😊', fn: g => { g.flags.jubenshaEscape=true; return{mood:8,social:5}; }},
+        { label:'太紧张了，不喜欢', hint:'', fn: g => { g.flags.jubenshaEscape=true; return{mood:-5}; }},
+      ]},
+
+    { id:'jubensha_immersive_v35_1', icon:'🎬', title:'沉浸式剧场', category:'jubensha',
+      body:'你发现了一种更高级的沉浸式体验——沉浸式剧场。\n\n不是坐在观众席看戏，而是走进剧场，和演员一起「生活」在那个故事里。\n\n你参加的是一个「老上海」主题。你穿上了旗袍/长衫，走进了一栋1930年代风格的小洋楼。\n\n演员们在演一个谍战故事。你可以跟着不同的角色，看到不同的故事线。\n\n你跟着一个「女特工」走了一个小时。她在你耳边说：「帮我传递情报，不要让那个人看到。」\n\n你紧张得手心出汗。你知道这只是戏，但你的心跳真的加速了。\n\n结束后你花了480元。很贵，但你觉得这是你在城市里最独特的一次体验。\n\n你开始理解：沉浸式体验的本质是——「暂时成为另一个人，活在另一个世界里」。',
+      cond: g => g.age >= 22 && (g.flags.jubenshaFirst || g.flags.jubenshaEscape) && g.money >= 1000 && !g.flags.jubenshaImmersive,
+      choices:[
+        { label:'爱上了沉浸式体验', hint:'+😊 +✨', fn: g => { g.flags.jubenshaImmersive=true; g.flags.immersiveFan=true; return{mood:15,charm:10,money:-480}; }},
+        { label:'体验很好，但太贵了', hint:'+😊', fn: g => { g.flags.jubenshaImmersive=true; return{mood:10,money:-480}; }},
+        { label:'不太理解这种形式', hint:'', fn: g => { g.flags.jubenshaImmersive=true; return{mood:-3,money:-480}; }},
+      ]},
+
+    { id:'jubensha_social_v35_1', icon:'🤝', title:'剧本杀社交', category:'jubensha',
+      body:'你发现剧本杀是最好的社交方式。\n\n不像KTV那么尴尬（不用唱歌），不像饭局那么无聊（有话题聊），不像喝酒那么伤身。\n\n你在剧本杀里认识了很多人：\n- 一个做律师的小哥（推理超强，每次都能破案）\n- 一个做设计师的小姐姐（情感本每次都哭）\n- 一个大学生（恐怖本全程躲在桌子底下）\n- 一个退休阿姨（比年轻人还会演）\n\n你们组了一个固定车队，每周五晚上玩一次。\n\n你发现：在剧本杀里你看到的是一个人最「真实」的一面。因为他们不是在「演」角色，而是在「暴露」自己——推理的方式、撒谎的表情、面对选择时的犹豫。\n\n你比以前更了解他们了。',
+      cond: g => g.age >= 20 && g.flags.jubenshaFirst && g.social > 30 && !g.flags.jubenshaSocial,
+      choices:[
+        { label:'成了固定车队的一员', hint:'+👥 +😊', fn: g => { g.flags.jubenshaSocial=true; g.flags.fixedTeam=true; return{social:15,mood:10}; }},
+        { label:'偶尔组队，不固定', hint:'+👥', fn: g => { g.flags.jubenshaSocial=true; return{social:8,mood:5}; }},
+        { label:'发现有人很会演戏，觉得害怕', hint:'', fn: g => { g.flags.jubenshaSocial=true; return{mood:-3,intel:5}; }},
+      ]},
+
+    { id:'jubensha_cost_v35_1', icon:'💸', title:'剧本杀开销', category:'jubensha',
+      body:'你算了一下自己在剧本杀上花了多少钱。\n\n过去一年：\n- 普通本：30次 × 80元 = 2400元\n- 情感本：10次 × 120元 = 1200元\n- 恐怖本：5次 × 128元 = 640元\n- 沉浸式剧场：3次 × 480元 = 1440元\n- 密室逃脱：8次 × 100元 = 800元\n- 零食饮料：约500元\n\n总计：6980元。\n\n你盯着这个数字看了很久。7000块，够你交一个月房租了。\n\n你开始犹豫：是不是该减少频率了？\n\n但你也算了算：\n- 你交到了5个好朋友（无价）\n- 你哭了10次笑了100次（无价）\n- 你暂时忘了工作的烦恼（无价）\n\n你决定：不减了。7000块买到365天的快乐，性价比很高。',
+      cond: g => g.age >= 20 && g.flags.jubenshaFirst && g.flags.jubenshaSocial && !g.flags.jubenshaCost,
+      choices:[
+        { label:'继续玩，快乐最重要', hint:'+😊 -💰', fn: g => { g.flags.jubenshaCost=true; g.flags.happySpender=true; return{mood:8,money:-2000}; }},
+        { label:'减少频率，每个月玩一次', hint:'+💰', fn: g => { g.flags.jubenshaCost=true; g.flags.budgetPlayer=true; return{mood:0,money:-500}; }},
+        { label:'自己写剧本赚钱', hint:'+💰 +🧠', fn: g => { g.flags.jubenshaCost=true; g.flags.scriptWriter=true; return{money:5000,intel:10}; }},
+      ]},
+
+    { id:'jubensha_write_v35_1', icon:'✍️', title:'写剧本', category:'jubensha',
+      body:'你玩了几十次剧本杀后，觉得自己也能写一个。\n\n你开始构思：一个发生在现代都市的故事，关于「身份」和「选择」。\n\n你花了3个月写完了第一个剧本。5个角色，4小时时长，3个结局。\n\n你请朋友试玩了一次。反馈是：\n- 「故事很好，但有些线索不够清晰」\n- 「情感线很感人，我哭了」\n- 「推理部分可以再难一点」\n\n你修改了两次，然后投稿给了一个剧本杀发行商。\n\n一个月后你收到了回复：「我们决定发行你的剧本。稿费：8000元+后续分成。」\n\n你激动得差点跳起来。这是你第一次靠「创作」赚到钱。\n\n你开始理解：剧本杀不只是娱乐，它是一个「人人都能讲故事」的时代产物。',
+      cond: g => g.age >= 22 && g.flags.jubenshaFirst && g.intel > 45 && !g.flags.jubenshaWrite,
+      choices:[
+        { label:'继续写剧本，成了职业编剧', hint:'+💰 +🧠 +✨', fn: g => { g.flags.jubenshaWrite=true; g.flags.proWriter=true; return{money:8000,intel:15,charm:12}; }},
+        { label:'写了一个就不写了，太累了', hint:'+💰', fn: g => { g.flags.jubenshaWrite=true; return{money:8000,mood:5}; }},
+        { label:'纯粹爱好，不太在意收入', hint:'+😊', fn: g => { g.flags.jubenshaWrite=true; g.flags.hobbyWriter=true; return{mood:12,intel:10}; }},
+      ]},
+
+    { id:'jubensha_philosophy_v35_1', icon:'🎪', title:'另一种人生', category:'jubensha',
+      body:'你回顾自己和剧本杀的关系。\n\n从第一次尴尬地念台词，到入戏到忘记自己，到当DM讲故事，到自己写剧本……\n\n你开始思考：为什么年轻人这么爱剧本杀？\n\n也许是因为：在现实中，你只有一个身份、一种人生、一条路。\n\n但在剧本杀里，你可以是教授、特工、侦探、凶手、受害者。你可以体验不同的人生，做不同的选择。\n\n每次游戏结束，你都会有一种奇怪的感觉：「我回来了。」\n\n从另一个人生回来，回到你的日常。但你发现自己不一样了——你变得更理解别人了，因为你「活」过了不同的人生。\n\n你在最新一个剧本的扉页写了一句话：\n\n「每个人都在演自己的剧本。问题是——你是作者，还是角色？」',
+      cond: g => g.age >= 22 && g.flags.jubenshaFirst && (g.flags.jubenshaDM || g.flags.jubenshaWrite) && g.intel > 40,
+      choices:[
+        { label:'剧本杀让我更理解人生', hint:'+🧠 +✨', fn: g => { g.flags.jubenshaPhilosophy=true; return{intel:18,mood:12,charm:10}; }},
+        { label:'开了自己的剧本杀店', hint:'+💰 +👥', fn: g => { g.flags.jubenshaPhilosophy=true; g.flags.shopOwner=true; return{money:-30000,social:15,charm:12}; }},
+        { label:'把人生当成一场剧本杀', hint:'+😊 +✨', fn: g => { g.flags.jubenshaPhilosophy=true; g.flags.lifeIsGame=true; return{mood:20,charm:15}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -22252,6 +22344,17 @@ const ACHIEVEMENTS = [
     { id:'citywalk_rain_v35_0_ach', icon:'🌧️', name:'雨中的城市', desc:'在雨中漫步发现了不同的美', check: g => g.flags.citywalkRain },
     { id:'citywalk_commerce_v35_0_ach', icon:'💰', name:'反消费主义漫步', desc:'在商业化浪潮中保持了走路的初心', check: g => g.flags.citywalkCommerce },
     { id:'citywalk_philosophy_v35_0_ach', icon:'🌆', name:'走路的人', desc:'把City Walk变成了一种生活态度', check: g => g.flags.citywalkPhilosophy },
+    // v35.1 剧本杀与沉浸式娱乐
+    { id:'jubensha_first_v35_1_ach', icon:'🔍', name:'剧本杀初体验', desc:'第一次沉浸在角色扮演的世界里', check: g => g.flags.jubenshaFirst },
+    { id:'jubensha_emotion_v35_1_ach', icon:'😢', name:'情感本', desc:'在剧本杀里被一个故事深深打动', check: g => g.flags.jubenshaEmotion },
+    { id:'jubensha_horror_v35_1_ach', icon:'👻', name:'恐怖本挑战', desc:'挑战了恐怖主题剧本杀', check: g => g.flags.jubenshaHorror },
+    { id:'jubensha_dm_v35_1_ach', icon:'🎭', name:'剧本杀DM', desc:'从玩家变成了主持人', check: g => g.flags.jubenshaDM },
+    { id:'jubensha_escape_v35_1_ach', icon:'🔐', name:'密室逃脱', desc:'成功从密室中逃了出来', check: g => g.flags.jubenshaEscape },
+    { id:'jubensha_immersive_v35_1_ach', icon:'🎬', name:'沉浸式剧场', desc:'体验了沉浸式戏剧的魅力', check: g => g.flags.jubenshaImmersive },
+    { id:'jubensha_social_v35_1_ach', icon:'🤝', name:'剧本杀社交', desc:'通过剧本杀交到了一群好朋友', check: g => g.flags.jubenshaSocial },
+    { id:'jubensha_cost_v35_1_ach', icon:'💸', name:'剧本杀账单', desc:'算了一下自己在剧本杀上花了多少钱', check: g => g.flags.jubenshaCost },
+    { id:'jubensha_write_v35_1_ach', icon:'✍️', name:'剧本杀作者', desc:'自己写了一个剧本', check: g => g.flags.jubenshaWrite },
+    { id:'jubensha_philosophy_v35_1_ach', icon:'🎪', name:'另一种人生', desc:'理解了剧本杀对年轻人的意义', check: g => g.flags.jubenshaPhilosophy },
 ];
 
 // === ENDINGS === (order matters: first match wins)
