@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v38.8
+// 都市浮生记 - 数据文件 v38.9
 // ============================================
 
 
@@ -23456,6 +23456,88 @@ const EVENTS = [
         { label:'继续做一个负责任的好邻居', hint:'+😊 +🤝 +❤️', fn: g => { g.flags.hoaLife=true; return{mood:12,social:8,health:3}; }},
       ]},
 
+    // === v38.9 火车站与春运文化 ===
+    { id:'station_first_v38_9', icon:'🚉', title:'到达一座城', category:'station',
+      body:'你拖着行李箱走出火车站，第一次看到这座城市的名字。站前广场人山人海，出租车排着长队，公交车站挤满了人。一个大叔问："要不要住旅馆？便宜！"你摇摇头，打开手机导航。火车站是一个城市的门面——它迎接每一个到来的人，也送别每一个离开的人。你的城市故事，从这个站台开始。',
+      cond: g => !g.flags.stationFirst && g.age >= 18,
+      choices:[
+        { label:'在站前广场拍了一张照留念', hint:'+😊 +✨', fn: g => { g.flags.stationFirst=true; return{mood:8,charm:3}; }},
+        { label:'直奔目的地，没时间感慨', hint:'+💪 +🧠', fn: g => { g.flags.stationFirst=true; return{health:3,intel:3}; }},
+      ]},
+
+    { id:'station_ticket_v38_9', icon:'🎫', title:'抢票大战', category:'station',
+      body:'春节回家，你提前一个月开始抢票。12306一到开售时间就卡死，你连刷了十分钟终于看到了"有票"。手速飞快地填好信息、验证码、提交——"排队中，请稍候。"等了五分钟，显示"很遗憾，您选择的车次已无余票。"你崩溃了。朋友说："试试候补吧。"你候补了三天，终于在出发前两天补到了票。抢票这件事，让你理解了什么叫"中国速度"。',
+      cond: g => g.flags.stationFirst && !g.flags.stationTicket && g.age >= 18,
+      choices:[
+        { label:'学会了各种抢票技巧', hint:'+🧠 +💪', fn: g => { g.flags.stationTicket=true; g.flags.stationExpert=true; return{intel:8,health:3}; }},
+        { label:'花钱找了代购帮抢', hint:'-💰 +😊', fn: g => { g.flags.stationTicket=true; return{money:-100,mood:5}; }},
+      ]},
+
+    { id:'station_wait_v38_9', icon:'⏳', title:'候车室众生相', category:'station',
+      body:'你提前三小时到了火车站，在候车室里等待。对面一家三口在吃泡面，旁边一个农民工大哥躺在行李箱上睡觉，一个学生在看书，一对情侣在依依不舍地告别。广播不断播报着车次信息，显示屏上的数字不停跳动。候车室就像一个流动的社会——每个人都有自己的目的地，但此刻你们在同一个空间里短暂交汇。',
+      cond: g => g.flags.stationFirst && !g.flags.stationWait && g.age >= 18,
+      choices:[
+        { label:'和旁边的旅客聊了起来', hint:'+🤝 +😊', fn: g => { g.flags.stationWait=true; return{social:5,mood:5}; }},
+        { label:'戴上耳机，沉浸在自己的世界', hint:'+🧠 +😊', fn: g => { g.flags.stationWait=true; return{intel:3,mood:5}; }},
+      ]},
+
+    { id:'station_rush_v38_9', icon:'🏃', title:'春运大潮', category:'station',
+      body:'春运的火车站简直是人间奇观。你被人流推着往前走，脚都不用自己动。安检排了四十分钟，进站又排了二十分钟。"请不要在通道内停留！"工作人员拿着喇叭喊。你看到有人扛着比自己还大的蛇皮袋，有人怀里抱着活鸡，有人在站台上追着火车跑。"这就是中国人的回家路，"你发了条朋友圈，配文是："春运，全世界最大规模的人口迁徙。"',
+      cond: g => g.flags.stationTicket && !g.flags.stationRush && g.age >= 18,
+      choices:[
+        { label:'拍了一组春运纪实照片', hint:'+✨ +🧠', fn: g => { g.flags.stationRush=true; g.flags.stationPhoto=true; return{charm:8,intel:5}; }},
+        { label:'默默挤在人群中，想着到家的那一刻', hint:'+❤️ +😊', fn: g => { g.flags.stationRush=true; return{mood:5,social:3}; }},
+      ]},
+
+    { id:'station_worker_v38_9', icon:'👷', title:'火车站的工作人员', category:'station',
+      body:'你注意到了一个清洁工阿姨，她不停地在候车室里扫地。"阿姨，您过年不回家吗？"你问。"我们都习惯了，春运最忙，走不开。"她说。"我儿子在老家跟着他奶奶，等忙完这阵子就回去看他。"你看着她弯着腰扫地的背影，突然觉得：春运回家的人很幸福，但送别人回家的人更伟大。',
+      cond: g => g.flags.stationFirst && !g.flags.stationWorker && g.age >= 20,
+      choices:[
+        { label:'给阿姨买了一瓶水和零食', hint:'-💰 +❤️', fn: g => { g.flags.stationWorker=true; return{money:-20,mood:8}; }},
+        { label:'在心里默默感谢所有春运工作者', hint:'+🧠 +❤️', fn: g => { g.flags.stationWorker=true; return{intel:5,mood:5}; }},
+      ]},
+
+    { id:'station_board_v38_9', icon:'🚄', title:'检票上车', category:'station',
+      body:'广播响了："乘坐G1234次列车的旅客，请到6号检票口检票进站。"你拿起行李排队，心跳加速。检票、过闸机、下楼梯、上站台。你找到了自己的车厢和座位，把行李塞进行李架。坐下来那一刻，你长出了一口气——终于要回家了。窗外的站台慢慢后退，列车开始加速。你戴上耳机，听着歌，看着窗外的风景从城市变成田野。',
+      cond: g => g.flags.stationWait && !g.flags.stationBoard,
+      choices:[
+        { label:'给爸妈发了条消息"上车了"', hint:'+❤️ +😊', fn: g => { g.flags.stationBoard=true; return{mood:8,social:3}; }},
+        { label:'靠在窗边享受旅途', hint:'+😊 +💪', fn: g => { g.flags.stationBoard=true; return{mood:5,health:3}; }},
+      ]},
+
+    { id:'station_train_v38_9', icon:'🚅', title:'火车上的故事', category:'station',
+      body:'对面的大叔从背包里掏出一副扑克牌："打牌吗？"你犹豫了一下答应了。四个陌生人围着小桌打起了升级，聊着各自的家乡。大叔是工地包工头，旁边的大学生刚考完研，你对面的大姐是回老家看父母的。"火车上认识的朋友最真诚，"大叔说，"因为大家都不装了，反正下了车谁也不认识谁。"但你加了他们的微信——有些缘分，值得延续。',
+      cond: g => g.flags.stationBoard && !g.flags.stationTrain && g.social > 15,
+      choices:[
+        { label:'和他们打了一路扑克', hint:'+🤝 +😊', fn: g => { g.flags.stationTrain=true; return{social:8,mood:8}; }},
+        { label:'安静听他们聊天', hint:'+🧠 +😊', fn: g => { g.flags.stationTrain=true; return{intel:5,mood:5}; }},
+      ]},
+
+    { id:'station_arrive_v38_9', icon:'🏠', title:'到站了', category:'station',
+      body:'列车广播："前方到站——XX站。"你站起来拿行李，心跳又加速了。走出车厢的那一刻，熟悉的空气扑面而来。出站口，你远远看到了爸妈的身影。你妈在踮着脚张望，你爸举着手机拍照。"在这呢！"你妈看到你挥着手跑过来。你抱住了她，闻到了她身上洗衣液的味道。"瘦了，"你妈摸着你的脸说。你在火车站被迎接，也在火车站被爱。',
+      cond: g => g.flags.stationBoard && !g.flags.stationArrive && g.age >= 20,
+      choices:[
+        { label:'抱住了爸妈，眼眶有点红', hint:'+❤️ +😊', fn: g => { g.flags.stationArrive=true; return{mood:15,social:5}; }},
+        { label:'笑着说"我回来了"', hint:'+😊 +❤️', fn: g => { g.flags.stationArrive=true; return{mood:12,social:3}; }},
+      ]},
+
+    { id:'station_meet_v38_9', icon:'🤝', title:'火车站接人', category:'station',
+      body:'你在火车站等一个朋友。出站口人潮涌动，你举着手机不停刷新消息。"我出来了！你在哪？"你看到了他——比上次见胖了十斤。"兄弟！"你们拥抱了一下。"走，带你去吃好吃的。"你拉着他往外走。火车站是重逢的地方——每一次接站都是一次小型庆祝，庆祝你们又能见到彼此。',
+      cond: g => g.flags.stationFirst && !g.flags.stationMeet && g.social > 20 && g.age >= 20,
+      choices:[
+        { label:'请朋友吃了一顿大餐', hint:'-💰 +❤️ +🤝', fn: g => { g.flags.stationMeet=true; return{money:-300,mood:8,social:8}; }},
+        { label:'带朋友直接回家做饭', hint:'+❤️ +🤝', fn: g => { g.flags.stationMeet=true; return{mood:8,social:5}; }},
+      ]},
+
+    { id:'station_life_v38_9', icon:'🌟', title:'站台人生', category:'station',
+      body:'你终于理解了火车站对中国人的意义。它不只是交通枢纽——它是梦想的起点和终点，是离别和重逢的见证者。每年春运，几十亿人次在路上奔波，为的就是回家吃一顿年夜饭。站台上有无数种表情：离别的泪水、重逢的拥抱、等待的焦虑、出发的期待。人生就是一趟列车，有人上车有人下车，但每一段旅程都值得珍惜。而火车站，永远在那里等你——不管你从哪里来，要到哪里去。',
+      cond: g => g.age >= 28 && g.flags.stationFirst && (g.flags.stationRush || g.flags.stationTrain) && (g.flags.stationArrive || g.flags.stationMeet) && !g.flags.stationLife,
+      choices:[
+        { label:'拍了一部关于火车站的纪录片', hint:'+✨ +🧠', fn: g => { g.flags.stationLife=true; g.flags.stationDoc=true; return{charm:12,intel:8}; }},
+        { label:'写了一本《站台上的中国人》', hint:'+✨ +🧠', fn: g => { g.flags.stationLife=true; g.flags.stationAuthor=true; return{charm:10,intel:10}; }},
+        { label:'继续做一个珍惜每段旅程的旅人', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.stationLife=true; return{mood:12,social:5,intel:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -25867,6 +25949,17 @@ const ACHIEVEMENTS = [
     { id:'hoa_noise_v38_8_ach', icon:'🔊', name:'睦邻之道', desc:'用智慧解决了邻里噪音问题', check: g => g.flags.hoaNoise },
     { id:'hoa_package_v38_8_ach', icon:'📦', name:'最后一百米', desc:'经历了快递最后一百米的难题', check: g => g.flags.hoaPackage },
     { id:'hoa_life_v38_8_ach', icon:'🌟', name:'小区人生', desc:'理解了好的小区是业主一起建出来的', check: g => g.flags.hoaLife },
+    // v38.9 火车站与春运文化
+    { id:'station_first_v38_9_ach', icon:'🚉', name:'到达一座城', desc:'提着行李箱，第一次踏上这座城市的土地', check: g => g.flags.stationFirst },
+    { id:'station_ticket_v38_9_ach', icon:'🎫', name:'抢票达人', desc:'体验过春运抢票的疯狂', check: g => g.flags.stationTicket },
+    { id:'station_wait_v38_9_ach', icon:'💺', name:'候车室众生相', desc:'在候车室里看尽了人间百态', check: g => g.flags.stationWait },
+    { id:'station_rush_v38_9_ach', icon:'🏃', name:'春运弄潮儿', desc:'在春运大潮中杀出一条血路', check: g => g.flags.stationRush },
+    { id:'station_worker_v38_9_ach', icon:'👷', name:'幕后英雄', desc:'看见了火车站工作人员的辛苦', check: g => g.flags.stationWorker },
+    { id:'station_board_v38_9_ach', icon:'🚄', name:'检票上车', desc:'在最后一刻挤上了列车', check: g => g.flags.stationBoard },
+    { id:'station_train_v38_9_ach', icon:'🛤️', name:'火车上的故事', desc:'在旅途中遇见了有趣的人', check: g => g.flags.stationTrain },
+    { id:'station_arrive_v38_9_ach', icon:'🏁', name:'到站了', desc:'终于回到了魂牵梦萦的家乡', check: g => g.flags.stationArrive },
+    { id:'station_meet_v38_9_ach', icon:'🫂', name:'久别重逢', desc:'在出站口等到了想见的人', check: g => g.flags.stationMeet },
+    { id:'station_life_v38_9_ach', icon:'🌟', name:'站台人生', desc:'明白人生就是一趟列车，有人上有人下', check: g => g.flags.stationLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
