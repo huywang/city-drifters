@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v34.7
+// 都市浮生记 - 数据文件 v34.8
 // ============================================
 
 
@@ -19988,6 +19988,98 @@ const EVENTS = [
         { label:'写了一篇关于搭子文化的文章', hint:'+🧠 +✨', fn: g => { g.flags.daziPhilosophy=true; g.flags.daziWriter=true; return{intel:15,charm:12,money:2000}; }},
       ]},
 
+    // ===== 演唱会经济与追星文化 (v34.8) =====
+
+    { id:'concert_first_v34_8', icon:'🎤', title:'人生第一场演唱会', category:'concert',
+      body:'你喜欢的歌手要开演唱会了！\n\n你抢票抢了3天，终于抢到了一张看台票——880元。\n\n演唱会那天你提前2小时到了场馆。场馆外全是人，有卖荧光棒的、卖周边的、还有举着灯牌等偶像的粉丝。\n\n灯光暗下来的那一刻，全场尖叫。你的偶像从舞台下方升上来，唱着那首你单曲循环了1000遍的歌。\n\n你哭了。旁边的人也在哭。\n\n你突然理解了为什么人们愿意花几千块钱看一场演唱会——因为你买的不是音乐，是一段「我和偶像在同一个空间里」的记忆。\n\n散场后你在地铁口站了很久。你知道：从明天开始，又要回到日常的琐碎里了。\n\n但至少今晚，你是幸福的。',
+      cond: g => g.age >= 18 && g.money >= 2000 && !g.flags.concertFirst,
+      choices:[
+        { label:'成了铁粉，开始追巡演', hint:'+😊 -💰', fn: g => { g.flags.concertFirst=true; g.flags.concertFan=true; return{mood:20,money:-880}; }},
+        { label:'体验一次就够了', hint:'+😊', fn: g => { g.flags.concertFirst=true; return{mood:12,money:-880}; }},
+        { label:'开始存钱买内场票', hint:'-💰', fn: g => { g.flags.concertFirst=true; g.flags.concertUpgrade=true; return{mood:10,money:-880}; }},
+      ]},
+
+    { id:'concert_scalper_v34_8', icon:'🎫', title:'黄牛票', category:'concert',
+      body:'你最喜欢的乐队要来你的城市开演唱会。\n\n你设了5个闹钟，找了3个朋友帮你一起抢。结果——秒没。\n\n你在二手平台上看到黄牛票：原价680的内场票，卖3800。\n\n你犹豫了。3800元，是你半个月的房租。\n\n但这是你最喜欢的乐队。他们上次来你的城市还是5年前。也许这是最后一次了。\n\n你咬了咬牙，买了。\n\n演唱会上你站在内场第三排。主唱朝你的方向看了一眼——当然不是看你，但你觉得他看了。\n\n你觉得3800值了。\n\n但第二天你看了看银行卡余额，又觉得不太值了。',
+      cond: g => g.age >= 18 && g.flags.concertFirst && g.money >= 5000 && !g.flags.concertScalper,
+      choices:[
+        { label:'买了黄牛票，值了', hint:'+😊 -💰', fn: g => { g.flags.concertScalper=true; g.flags.scalperBuyer=true; return{mood:18,money:-3800}; }},
+        { label:'太贵了，忍痛放弃', hint:'', fn: g => { g.flags.concertScalper=true; return{mood:-8}; }},
+        { label:'开始学抢票技术', hint:'+🧠', fn: g => { g.flags.concertScalper=true; g.flags.ticketSkill=true; return{intel:5,mood:-5}; }},
+      ]},
+
+    { id:'concert_fan_v34_8', icon:'💕', title:'粉丝后援会', category:'concert',
+      body:'你加入了偶像的粉丝后援会。\n\n后援会里什么人都有：\n- 有每天做数据打榜的「数据女工」\n- 有专门修图剪视频的「产出太太」\n- 有组织应援活动的「站姐」\n- 有负责反黑举报的「反黑组」\n\n你被分配到了「宣传组」，负责在社交媒体上发偶像的美照。\n\n你每天花2小时做数据：转发、评论、点赞、打榜。你甚至买了5张专辑（虽然你只需要1张）。\n\n后援会的姐姐说：「我们家哥哥的销量不能输给别人家！」\n\n你开始怀疑：你是在追星，还是在打工？\n\n但当你看到偶像在演唱会上说「谢谢我的粉丝们」的时候，你觉得一切都值了。\n\n……大概吧。',
+      cond: g => g.age >= 18 && g.age < 35 && g.flags.concertFirst && !g.flags.concertFanClub,
+      choices:[
+        { label:'成了核心粉丝，每天打榜', hint:'+✨ -💰', fn: g => { g.flags.concertFanClub=true; g.flags.coreFan=true; return{mood:8,charm:5,money:-2000}; }},
+        { label:'佛系追星，开心就好', hint:'+😊', fn: g => { g.flags.concertFanClub=true; g.flags.casualFan=true; return{mood:10,social:5}; }},
+        { label:'发现太累了，退出了', hint:'', fn: g => { g.flags.concertFanClub=true; return{mood:-5,social:-3}; }},
+      ]},
+
+    { id:'concert_idol_v34_8', icon:'😱', title:'偶像塌房了', category:'concert',
+      body:'你追了两年的偶像被爆出了丑闻。\n\n热搜第一。评论区炸了。\n\n有人说：「我就知道他不是好人。」\n有人说：「取关了。」\n有人说：「我的青春结束了。」\n\n你看着手机，不知道该说什么。你为他花了多少钱？买专辑、买周边、买演唱会门票——加起来至少有两万了。\n\n你为他做了多少数据？每天转发、评论、打榜——两年下来至少上千小时。\n\n你看着房间里贴的海报，不知道该不该撕掉。\n\n你的朋友圈有人发了条：「追星追到最后，追了个寂寞。」\n\n你点了个赞，然后又取消了。',
+      cond: g => g.age >= 18 && g.flags.concertFanClub && !g.flags.idolCollapse,
+      choices:[
+        { label:'脱粉了，把海报撕了', hint:'', fn: g => { g.flags.idolCollapse=true; g.flags.fanLeft=true; return{mood:-15,social:-5}; }},
+        { label:'继续支持，人无完人', hint:'+😊', fn: g => { g.flags.idolCollapse=true; g.flags.loyalFan=true; return{mood:-5}; }},
+        { label:'反思自己为什么需要偶像', hint:'+🧠', fn: g => { g.flags.idolCollapse=true; g.flags.fanReflection=true; return{intel:10,mood:-8}; }},
+      ]},
+
+    { id:'concert_road_v34_8', icon:'🚌', title:'追星之旅', category:'concert',
+      body:'你的偶像在另一个城市开演唱会。你决定：去！\n\n你买了最便宜的火车票（硬座，12小时），订了最便宜的青旅（6人间）。\n\n到了那个城市，你直奔场馆。场馆外已经排了很长的队。\n\n你认识了一个同样从外地来的女生。她叫小月，为了这场演唱会请了3天假，从成都坐了16小时的火车来。\n\n你们一起排队、一起买周边、一起在场馆外等了4个小时。\n\n演唱会结束后你们在青旅聊了一整夜——聊偶像、聊音乐、聊各自的生活。\n\n小月说：「我觉得追星最好的部分不是演唱会，是认识了你们这些人。」\n\n你深以为然。\n\n回去的火车上你算了一下：车票+住宿+门票+周边=花了2800元。\n\n但你觉得：你赚到了一段友情和一个永远不会忘记的周末。',
+      cond: g => g.age >= 18 && g.flags.concertFirst && g.money >= 3000 && !g.flags.concertRoad,
+      choices:[
+        { label:'和小月成了好朋友', hint:'+👥 +😊', fn: g => { g.flags.concertRoad=true; g.flags.fanFriend=true; return{mood:15,social:12,money:-2800}; }},
+        { label:'旅途愉快，回来后保持联系', hint:'+😊 +👥', fn: g => { g.flags.concertRoad=true; return{mood:12,social:5,money:-2800}; }},
+        { label:'太累了，决定以后只看本地的', hint:'', fn: g => { g.flags.concertRoad=true; return{mood:5,money:-2800,health:-5}; }},
+      ]},
+
+    { id:'concert_merch_v34_8', icon:'🛍️', title:'周边经济', category:'concert',
+      body:'你发现自己不知不觉已经成了「周边收集者」。\n\n你的书架上摆着：\n- 3张专辑（含限定版）\n- 5本写真集\n- 2件应援服\n- 1个签名海报（花了800元）\n- 无数小卡、明信片、贴纸\n\n你的钱包告诉你：你已经花了12000元在周边上了。\n\n你妈来你房间看了一眼：「你这些纸片值多少钱？」\n\n你说：「妈你不懂，这是信仰。」\n\n你妈说：「信仰能当饭吃吗？」\n\n你沉默了。\n\n但你看着那些周边，每一样都让你想起某一场演唱会、某一个瞬间、某一次心跳加速。\n\n也许信仰不能当饭吃，但它能让你在吃泡面的时候，嘴角是上扬的。',
+      cond: g => g.age >= 18 && g.flags.concertFirst && g.money >= 3000 && !g.flags.concertMerch,
+      choices:[
+        { label:'继续收集，这是我的爱好', hint:'+😊 -💰', fn: g => { g.flags.concertMerch=true; g.flags.merchCollector=true; return{mood:8,money:-5000,charm:5}; }},
+        { label:'开始闲鱼出二手回血', hint:'+💰', fn: g => { g.flags.concertMerch=true; g.flags.merchSeller=true; return{money:3000,mood:-3}; }},
+        { label:'反思消费习惯，以后理性购买', hint:'+🧠', fn: g => { g.flags.concertMerch=true; g.flags.rationalFan=true; return{intel:8,mood:-2}; }},
+      ]},
+
+    { id:'concert_local_v34_8', icon:'🎵', title:'Live House', category:'concert',
+      body:'你发现了一个比演唱会更酷的东西——Live House。\n\n一个朋友的乐队在本地的Live House演出，门票只要80元。你去了。\n\n场地不大，大概能容纳200人。但氛围和演唱会完全不同——\n\n乐队就在你面前3米的地方。你能看到吉他手的手指在弦上滑动，能看到鼓手额头上的汗珠。\n\n主唱唱到一半跳下了舞台，在人群里唱歌。有人撞了你一下，你差点摔倒，但你笑了。\n\n演出结束后，乐队成员就在门口喝酒。你走过去说：「刚才那首歌真好听。」\n\n吉他手笑着说：「谢谢，下一场还来吗？」\n\n你说：「来！」\n\n你发现：在这个城市里，最好的文化体验不一定是花几千块看大明星，而是花80块支持本地的独立音乐人。',
+      cond: g => g.age >= 20 && !g.flags.concertLocal,
+      choices:[
+        { label:'成了Live House常客', hint:'+😊 +👥', fn: g => { g.flags.concertLocal=true; g.flags.livehouseFan=true; return{mood:12,social:10,charm:5}; }},
+        { label:'偶尔去一次，支持独立音乐', hint:'+😊', fn: g => { g.flags.concertLocal=true; return{mood:8,social:3}; }},
+        { label:'太吵了，还是喜欢大型演唱会', hint:'', fn: g => { g.flags.concertLocal=true; return{mood:0}; }},
+      ]},
+
+    { id:'concert_festival_v34_8', icon:'🎪', title:'音乐节', category:'concert',
+      body:'草莓音乐节来了！你买了两日通票——1280元。\n\n现场比你想象的还大。5个舞台，几十个乐队，几万人。\n\n你在最大的舞台前占了一个位置，等了3个小时等压轴乐队。\n\n等待的时候你和旁边的人聊了起来——一个从上海来的男生，每年去10个音乐节。\n\n「你为什么这么喜欢音乐节？」你问。\n\n「因为这里没有人问你是做什么的、赚多少钱、有没有房。你只是一个听歌的人。」\n\n压轴乐队上场了。全场几万人一起合唱。你跟着唱，唱到声音嘶哑。\n\n那天晚上你躺在草地上看星星。旁边是刚认识的朋友，耳朵里还有音乐的余韵。\n\n你觉得：这大概就是「活着」的感觉。',
+      cond: g => g.age >= 18 && g.money >= 2000 && !g.flags.concertFestival,
+      choices:[
+        { label:'爱上了音乐节，计划下一个', hint:'+😊 +👥', fn: g => { g.flags.concertFestival=true; g.flags.festivalFan=true; return{mood:20,social:12,money:-1280}; }},
+        { label:'体验很好，但太累了', hint:'+😊', fn: g => { g.flags.concertFestival=true; return{mood:12,money:-1280,health:-5}; }},
+        { label:'人太多了，体验不太好', hint:'', fn: g => { g.flags.concertFestival=true; return{mood:-3,money:-1280}; }},
+      ]},
+
+    { id:'concert_philosophy_v34_8', icon:'🎶', title:'音乐与人生', category:'concert',
+      body:'你回顾自己和音乐的关系。\n\n你从什么时候开始听音乐的？大概是初中。那时候你用MP3听周杰伦，觉得全世界都在和你作对，只有音乐懂你。\n\n高中你用音乐对抗高考的压力。每天晚自习后戴着耳机走回家，听的是五月天。\n\n大学你开始听更多类型的音乐：民谣、摇滚、电子、爵士。你发现音乐不只是旋律，还是一种世界观。\n\n工作后你听音乐的时间越来越少了。但每次听到那些老歌，你还是会想起那些时光。\n\n你开始理解：演唱会经济的本质不是「看偶像」，而是「和过去的自己重逢」。\n\n每一首歌都是一段记忆。每一场演唱会都是一次时光旅行。\n\n你打开了音乐App，创建了一个歌单：「我的人生原声带」。\n\n你把那些陪你度过人生重要时刻的歌，一首一首地加了进去。',
+      cond: g => g.age >= 22 && g.flags.concertFirst && (g.flags.concertFestival || g.flags.concertLocal) && g.intel > 35,
+      choices:[
+        { label:'音乐是我生命中最重要的事', hint:'+😊 +✨', fn: g => { g.flags.concertPhilosophy=true; return{mood:15,charm:12,intel:8}; }},
+        { label:'开始学一种乐器', hint:'+🧠 +✨', fn: g => { g.flags.concertPhilosophy=true; g.flags.learnInstrument=true; return{intel:15,charm:10,money:-2000}; }},
+        { label:'写了一篇关于演唱会经济的文章', hint:'+🧠 +💰', fn: g => { g.flags.concertPhilosophy=true; g.flags.musicWriter=true; return{intel:12,money:3000,charm:8}; }},
+      ]},
+
+    { id:'concert_solo_v34_8', icon:'🎧', title:'一个人的演唱会', category:'concert',
+      body:'你想看一场演唱会，但没有人陪你去。\n\n你犹豫了很久：一个人去演唱会，会不会很奇怪？\n\n你最终还是去了。\n\n你一个人坐在看台上。左边是一对情侣，右边是一群闺蜜。只有你是一个人。\n\n但当音乐响起的时候，你发现——一个人看演唱会，其实也很好。\n\n你不需要照顾别人的情绪，不需要等人一起去洗手间，不需要假装喜欢别人的偶像。\n\n你只需要闭上眼睛，听音乐。\n\n演唱会结束后你一个人走在回家的路上。耳机里放着刚才听到的歌。\n\n你在朋友圈发了条：「一个人看演唱会。不是孤独，是自由。」\n\n有人评论：「你是不是没有朋友？」\n\n你没回复。你知道他们不懂。',
+      cond: g => g.age >= 20 && g.social < 40 && !g.flags.concertSolo && g.money >= 1500,
+      choices:[
+        { label:'享受一个人的音乐世界', hint:'+😊 +✨', fn: g => { g.flags.concertSolo=true; g.flags.soloFan=true; return{mood:12,charm:8,money:-800}; }},
+        { label:'下次还是找个人一起去吧', hint:'+👥', fn: g => { g.flags.concertSolo=true; return{mood:5,social:3,money:-800}; }},
+        { label:'其实挺孤独的', hint:'', fn: g => { g.flags.concertSolo=true; return{mood:-5,money:-800}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -21943,6 +22035,17 @@ const ACHIEVEMENTS = [
     { id:'dazi_lost_v34_7_ach', icon:'💔', name:'搭子散了', desc:'发现搭子们一个一个消失了', check: g => g.flags.daziLost },
     { id:'dazi_economy_v34_7_ach', icon:'💰', name:'搭子经济', desc:'发现了陪伴也能成为一门生意', check: g => g.flags.daziEconomy },
     { id:'dazi_philosophy_v34_7_ach', icon:'🤔', name:'搭子的意义', desc:'思考了搭子文化的深层含义', check: g => g.flags.daziPhilosophy },
+    // v34.8 演唱会经济与追星文化
+    { id:'concert_first_v34_8_ach', icon:'🎤', name:'人生第一场演唱会', desc:'终于看到了偶像的现场演出', check: g => g.flags.concertFirst },
+    { id:'concert_scalper_v34_8_ach', icon:'🎫', name:'黄牛票', desc:'为了看演唱会买了黄牛票', check: g => g.flags.concertScalper },
+    { id:'concert_fan_v34_8_ach', icon:'💕', name:'粉丝后援会', desc:'加入了偶像的粉丝后援会', check: g => g.flags.concertFanClub },
+    { id:'concert_idol_v34_8_ach', icon:'😱', name:'偶像塌房了', desc:'经历了偶像的公关危机', check: g => g.flags.idolCollapse },
+    { id:'concert_road_v34_8_ach', icon:'🚌', name:'追星之旅', desc:'为了演唱会去了另一个城市', check: g => g.flags.concertRoad },
+    { id:'concert_merch_v34_8_ach', icon:'🛍️', name:'周边收集者', desc:'收集了大量偶像周边', check: g => g.flags.concertMerch },
+    { id:'concert_local_v34_8_ach', icon:'🎵', name:'Live House常客', desc:'发现了独立音乐的魅力', check: g => g.flags.concertLocal },
+    { id:'concert_festival_v34_8_ach', icon:'🎪', name:'音乐节达人', desc:'在音乐节上找到了自由', check: g => g.flags.concertFestival },
+    { id:'concert_philosophy_v34_8_ach', icon:'🎶', name:'音乐与人生', desc:'理解了音乐对人生的意义', check: g => g.flags.concertPhilosophy },
+    { id:'concert_solo_v34_8_ach', icon:'🎧', name:'一个人的演唱会', desc:'独自享受了一场音乐盛宴', check: g => g.flags.concertSolo },
 ];
 
 // === ENDINGS === (order matters: first match wins)
