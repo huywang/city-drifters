@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v39.3
+// 都市浮生记 - 数据文件 v39.4
 // ============================================
 
 
@@ -23840,6 +23840,81 @@ const EVENTS = [
         { label:'继续做一个关心底层普通人的城市人', hint:'+😊 +❤️', fn: g => { g.flags.vendorLife=true; return{mood:8,social:5}; }},
       ]},
 
+    // ═══ v39.4 婚礼与随礼文化 ═══
+    { id:'wedding_invite_v39_4', icon:'💌', title:'红色炸弹', category:'wedding',
+      body:'国庆七天假，你收到了五张婚礼请柬。大学室友、高中同学、前同事、现同事的表妹、一个只在朋友圈点赞的网友。你算了一下，按最低标准每份随五百，五场婚礼就是两千五。你的国庆假期和钱包同时被掏空了。更惨的是，其中三场婚礼在同一天，你只能选择性地参加。你开始理解为什么有人把请柬叫做红色炸弹——每一封都是对你钱包的精准打击。',
+      cond: g => g.age >= 24 && g.money >= 2000 && !g.flags.weddingInvite,
+      choices:[
+        { label:'全部参加，一个月工资没了', hint:'-💰 +❤️', fn: g => { g.flags.weddingInvite=true; return{money:-2500,social:5}; }},
+        { label:'只参加了关系最好的那场', hint:'-💰', fn: g => { g.flags.weddingInvite=true; return{money:-500,mood:3}; }},
+        { label:'装没看到，假装出差了', hint:'+💰 -😊', fn: g => { g.flags.weddingInvite=true; g.flags.weddingAvoid=true; return{money:0,mood:-5}; }},
+      ]},
+    { id:'wedding_money_v39_4', icon:'🧧', title:'随礼金额', category:'wedding',
+      body:'参加婚礼最纠结的就是随多少钱。你拿着红包在酒店门口犹豫了半天。随少了丢人，随多了心疼。同事说有个潜规则：普通同事五百，好朋友一千，闺蜜兄弟两千起步。但你还得考虑——对方将来会不会还礼？如果你还没结婚，这笔钱可能就打水漂了。你最终随了八百，不多不少。后来听说另一个同事随了两千，你又开始纠结自己是不是随少了。',
+      cond: g => g.flags.weddingInvite && !g.flags.weddingMoney,
+      choices:[
+        { label:'研究出了一套随礼公式', hint:'+🧠', fn: g => { g.flags.weddingMoney=true; return{intel:8}; }},
+        { label:'觉得随礼文化太累了', hint:'-😊', fn: g => { g.flags.weddingMoney=true; return{mood:-3}; }},
+      ]},
+    { id:'wedding_compare_v39_4', icon:'🏨', title:'婚宴攀比', category:'wedding',
+      body:'你参加了两场婚礼，差距大得惊人。一场在五星级酒店，三十桌，每桌八千块，请了专业司仪和乐队，新娘穿了四套礼服。另一场在小饭馆，十桌，每桌一千五，请了个亲戚当司仪，新娘就穿了一件红裙子。但有意思的是，小饭馆那场笑声更多，大家吃得更开心。你开始思考：婚礼到底是给谁办的？是给新人自己，还是给来宾，还是给面子？',
+      cond: g => g.flags.weddingMoney && g.age >= 25 && !g.flags.weddingCompare,
+      choices:[
+        { label:'觉得婚礼简单点更好', hint:'+🧠 +😊', fn: g => { g.flags.weddingCompare=true; return{intel:5,mood:5}; }},
+        { label:'暗暗给自己定了一个婚礼预算', hint:'+💰', fn: g => { g.flags.weddingCompare=true; return{intel:3}; }},
+      ]},
+    { id:'wedding_single_v39_4', icon:'😅', title:'未婚尴尬', category:'wedding',
+      body:'在婚礼上，你被安排坐在了单身桌。周围都是和你一样没结婚的人，大家面面相觑。一个大妈走过来对你说：你怎么还没对象啊？要不我给你介绍一个？另一个亲戚说：你同学都结婚了，你抓紧啊。你觉得参加婚礼最大的尴尬不是随礼，而是被催婚。你低头猛吃，假装没听见。散场的时候，你妈打来电话：今天谁结婚？你什么时候也办一个？',
+      cond: g => g.flags.weddingInvite && g.age >= 26 && !g.flags.weddingSingle,
+      choices:[
+        { label:'被催婚催得焦虑了', hint:'-😊', fn: g => { g.flags.weddingSingle=true; return{mood:-5}; }},
+        { label:'坦然面对，结婚不结婚是自己的事', hint:'+💪 +🧠', fn: g => { g.flags.weddingSingle=true; return{mood:3,intel:5}; }},
+      ]},
+    { id:'wedding_plan_v39_4', icon:'💍', title:'婚礼策划', category:'wedding',
+      body:'你或你的朋友终于要结婚了，开始策划婚礼。不策划不知道，一策划吓一跳——场地、婚纱、摄影、化妆、司仪、婚车、花艺、请柬、喜糖，每一项都是钱。你算了一下，最便宜的方案也要七八万。而网上那些梦幻婚礼动辄几十万。你开始理解为什么越来越多人选择旅拍和旅行结婚了——既省钱又自在。但长辈们不答应：不办婚礼，亲戚朋友怎么看？',
+      cond: g => g.age >= 25 && g.money >= 10000 && !g.flags.weddingPlan,
+      choices:[
+        { label:'坚持旅行结婚，简单自在', hint:'+😊 +💰', fn: g => { g.flags.weddingPlan=true; g.flags.weddingTravel=true; return{mood:10,money:-15000}; }},
+        { label:'按长辈的意思办了一场传统婚礼', hint:'-💰 +❤️', fn: g => { g.flags.weddingPlan=true; g.flags.weddingTraditional=true; return{money:-80000,social:10}; }},
+        { label:'折中方案，小范围请了至亲好友', hint:'-💰 +😊', fn: g => { g.flags.weddingPlan=true; return{money:-30000,mood:5,social:5}; }},
+      ]},
+    { id:'wedding_classmate_v39_4', icon:'👰', title:'同学婚礼', category:'wedding',
+      body:'大学最好的朋友结婚了，你被邀请做伴郎或伴娘。婚礼前夜你们在酒店聊天，回忆大学四年的点点滴滴。从宿舍打游戏到一起吃食堂，从翘课到考前通宵复习。现在你们中的一个要结婚了，你突然觉得时间过得真快。婚礼上你致辞的时候差点哭了：兄弟/姐妹，你一定要幸福。你随了一个大红包——这不是钱的事，是你们之间那些年的情谊。',
+      cond: g => g.flags.weddingInvite && g.age >= 25 && !g.flags.weddingClassmate,
+      choices:[
+        { label:'致辞的时候哭了', hint:'+❤️', fn: g => { g.flags.weddingClassmate=true; return{social:10,mood:8}; }},
+        { label:'做了一个回忆视频送给新人', hint:'+✨ +❤️', fn: g => { g.flags.weddingClassmate=true; g.flags.weddingVideo=true; return{charm:8,social:5}; }},
+      ]},
+    { id:'wedding_math_v39_4', icon:'🧮', title:'份子钱的学问', category:'wedding',
+      body:'你开始记账了，专门记随礼的收支。参加婚礼这么多年，你随出去的钱已经有好几万了。等你结婚的时候，能收回多少？你发现了一个残酷的现实——有些人你随了礼，但你们后来就断了联系，他根本不会来参加你的婚礼。份子钱本质上是一种社交投资，但投资有风险，有些注定血本无归。你决定以后只给真正在乎的人随礼，不再为了面子充大方。',
+      cond: g => g.flags.weddingMoney && g.age >= 27 && !g.flags.weddingMath,
+      choices:[
+        { label:'开始理性对待随礼', hint:'+🧠 +💰', fn: g => { g.flags.weddingMath=true; return{intel:8,money:500}; }},
+        { label:'觉得人情世故不能太计较', hint:'+❤️', fn: g => { g.flags.weddingMath=true; return{social:5}; }},
+      ]},
+    { id:'wedding_flash_v39_4', icon:'⚡', title:'闪婚', category:'wedding',
+      body:'你的一个朋友认识三个月就结婚了。你觉得太快了，但他说：遇到对的人，一天都不嫌多。婚礼很仓促，请柬都是临时印的，场地也订不到好的。但两个人笑得特别开心。一年后你听说他们过得很幸福，你开始反思：婚姻的质量真的跟恋爱时长有关系吗？也许有些人就是一见如故，有些人就是日久生情，关键是两个人是否真的适合彼此。',
+      cond: g => g.age >= 24 && g.flags.weddingInvite && !g.flags.weddingFlash,
+      choices:[
+        { label:'被他们的爱情打动了', hint:'+❤️ +😊', fn: g => { g.flags.weddingFlash=true; return{mood:8,social:3}; }},
+        { label:'觉得还是应该慎重', hint:'+🧠', fn: g => { g.flags.weddingFlash=true; return{intel:5}; }},
+      ]},
+    { id:'wedding_drama_v39_4', icon:'🎭', title:'婚礼那些事', category:'wedding',
+      body:'参加了这么多婚礼，你见识了各种名场面。有一场婚礼上新郎的前女友突然出现，新娘当场哭了。有一场婚礼上两个家庭因为彩礼吵了起来，喜宴差点变成战场。还有一场婚礼司仪太能说，敬酒环节拖了两个小时，来宾都饿得不行。最搞笑的是一场婚礼上，新郎紧张得把誓词念错了，说成了我愿意娶你的妈妈。全场爆笑，新娘红了脸。',
+      cond: g => g.flags.weddingInvite && (g.flags.weddingClassmate || g.flags.weddingCompare) && !g.flags.weddingDrama,
+      choices:[
+        { label:'婚礼简直是人类行为的万花筒', hint:'+🧠', fn: g => { g.flags.weddingDrama=true; return{intel:5,mood:5}; }},
+        { label:'把这些故事写成了段子', hint:'+✨', fn: g => { g.flags.weddingDrama=true; g.flags.weddingJokes=true; return{charm:8}; }},
+      ]},
+    { id:'wedding_life_v39_4', icon:'🌟', title:'婚礼人生', category:'wedding',
+      body:'你终于理解了婚礼对中国人的意义。它不只是两个人的事——它是两个家庭的结合，是一段社交关系的重新洗牌，是一个人从单身到成家的仪式。当然，婚礼文化有很多让人不舒服的地方：攀比、催婚、红色炸弹、面子工程。但抛开这些，婚礼的本质是美好的——两个人在亲朋好友面前许下承诺，开始一段新的人生。你希望每个人的婚礼都是因为爱情，而不是因为到了年纪。',
+      cond: g => (g.flags.weddingPlan || g.flags.weddingClassmate) && (g.flags.weddingDrama || g.flags.weddingMath) && !g.flags.weddingLife,
+      choices:[
+        { label:'写了一篇关于中国婚礼文化的深度文章', hint:'+✨ +🧠', fn: g => { g.flags.weddingLife=true; return{charm:12,intel:8}; }},
+        { label:'办了一场只属于两个人的简单婚礼', hint:'+😊 +❤️', fn: g => { g.flags.weddingLife=true; return{mood:12,social:5}; }},
+        { label:'祝福每一对新人，也祝福自己', hint:'+😊 +❤️', fn: g => { g.flags.weddingLife=true; return{mood:10,social:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -26306,6 +26381,17 @@ const ACHIEVEMENTS = [
     { id:'vendor_economy_v39_3_ach', icon:'📈', name:'地摊经济', desc:'见证了地摊经济从火爆到冷清', check: g => g.flags.vendorEconomy },
     { id:'vendor_confiscate_v39_3_ach', icon:'😢', name:'底层之痛', desc:'目睹了摊贩被没收家当的心酸', check: g => g.flags.vendorConfiscate },
     { id:'vendor_life_v39_3_ach', icon:'🌟', name:'路边摊人生', desc:'理解了每个摊位背后都是一个家庭的生存抗争', check: g => g.flags.vendorLife },
+    // v39.4 婚礼与随礼文化
+    { id:'wedding_invite_v39_4_ach', icon:'💌', name:'红色炸弹', desc:'被密集的婚礼请柬轰炸了一个月', check: g => g.flags.weddingInvite },
+    { id:'wedding_money_v39_4_ach', icon:'🧧', name:'随礼纠结', desc:'为随多少钱纠结了半天', check: g => g.flags.weddingMoney },
+    { id:'wedding_compare_v39_4_ach', icon:'🏨', name:'婚宴百态', desc:'见识了不同档次婚礼的巨大差距', check: g => g.flags.weddingCompare },
+    { id:'wedding_single_v39_4_ach', icon:'😅', name:'被催婚了', desc:'在婚礼上被亲戚催婚了', check: g => g.flags.weddingSingle },
+    { id:'wedding_plan_v39_4_ach', icon:'💍', name:'婚礼策划', desc:'亲身体验了策划婚礼的繁琐', check: g => g.flags.weddingPlan },
+    { id:'wedding_classmate_v39_4_ach', icon:'👰', name:'最好的朋友结婚了', desc:'在同学婚礼上回忆了青春', check: g => g.flags.weddingClassmate },
+    { id:'wedding_math_v39_4_ach', icon:'🧮', name:'份子钱账本', desc:'算清了多年来随礼的收支', check: g => g.flags.weddingMath },
+    { id:'wedding_flash_v39_4_ach', icon:'⚡', name:'闪婚见证', desc:'见证了朋友三个月就结婚的爱情', check: g => g.flags.weddingFlash },
+    { id:'wedding_drama_v39_4_ach', icon:'🎭', name:'婚礼名场面', desc:'见识了婚礼上的各种戏剧性时刻', check: g => g.flags.weddingDrama },
+    { id:'wedding_life_v39_4_ach', icon:'🌟', name:'婚礼人生', desc:'理解了婚礼不只是仪式，更是两个家庭的结合', check: g => g.flags.weddingLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
