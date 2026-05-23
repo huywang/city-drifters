@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v36.3
+// 都市浮生记 - 数据文件 v36.4
 // ============================================
 
 
@@ -21391,6 +21391,88 @@ const EVENTS = [
         { label:'享受每一段在路上的时光', hint:'+😊 +🧠', fn: g => { g.flags.transitLife=true; return{mood:10,intel:5}; }},
       ]},
 
+    // === v36.4 脱口秀与喜剧文化 ===
+    { id:'comedy_first_v36_4', icon:'🎤', title:'第一次看脱口秀', category:'comedy',
+      body:'朋友拉你去看了场线下脱口秀。小剧场里坐了一百多人，演员一个接一个上台讲段子。有个演员讲了段"北漂租房"的故事，全场笑到拍大腿——因为太真实了。',
+      cond: g => g.age >= 20 && !g.flags.comedyFirst,
+      choices:[
+        { label:'笑到肚子疼，从此入了坑', hint:'+😊 +😊', fn: g => { g.flags.comedyFirst=true; g.flags.comedyFan=true; return{mood:12}; }},
+        { label:'觉得还行，但没有想象中好笑', hint:'+🧠', fn: g => { g.flags.comedyFirst=true; return{intel:2,mood:3}; }},
+        { label:'觉得有个演员讲得特别像自己的经历', hint:'+🧠 +😊', fn: g => { g.flags.comedyFirst=true; g.flags.comedyRelate=true; return{intel:3,mood:8}; }},
+      ]},
+    { id:'comedy_club_v36_4', icon:'🎭', title:'喜剧俱乐部', category:'comedy',
+      body:'你成了本地喜剧俱乐部的常客，每个月至少去看两场。你发现好的脱口秀不只是搞笑，而是在笑声里藏着对生活的观察和思考。你开始理解"喜剧的内核是悲剧"这句话。',
+      cond: g => g.age >= 22 && g.flags.comedyFirst && !g.flags.comedyClub && g.money > 3000,
+      choices:[
+        { label:'办了俱乐部年卡', hint:'-💰 +😊 +🧠', fn: g => { g.flags.comedyClub=true; g.flags.comedyMember=true; return{money:-2400,mood:8,intel:5}; }},
+        { label:'只挑有名的演员场次去看', hint:'-💰 +😊', fn: g => { g.flags.comedyClub=true; return{money:-500,mood:5}; }},
+        { label:'开始研究不同演员的风格', hint:'+🧠 +✨', fn: g => { g.flags.comedyClub=true; g.flags.comedyStudy=true; return{intel:6,charm:3}; }},
+      ]},
+    { id:'comedy_open_mic_v36_4', icon:'🎙️', title:'开放麦', category:'comedy',
+      body:'俱乐部有开放麦环节，任何人都可以上台讲五分钟。你犹豫了很久，终于报名了。站在台上的那一刻，灯光刺眼，台下黑压压的，你紧张到忘词。',
+      cond: g => g.age >= 22 && g.flags.comedyClub && !g.flags.comedyOpenMic && g.charm > 20,
+      choices:[
+        { label:'硬着头皮讲完了，收获了一个爆笑点', hint:'+✨ +😊', fn: g => { g.flags.comedyOpenMic=true; g.flags.comedySurvive=true; return{charm:6,mood:8}; }},
+        { label:'讲到一半实在紧张就下来了', hint:'-😊 +🧠', fn: g => { g.flags.comedyOpenMic=true; return{mood:-3,intel:3}; }},
+        { label:'准备充分，讲得很成功', hint:'+✨ +👥 +😊', fn: g => { g.flags.comedyOpenMic=true; g.flags.comedyTalent=true; return{charm:8,social:5,mood:10}; }},
+      ]},
+    { id:'comedy_write_v36_4', icon:'✍️', title:'写段子', category:'comedy',
+      body:'你开始在日常生活中积累素材，把遇到的奇葩事写成段子。你的笔记本上全是各种观察："地铁上有个大叔的手机铃声是新闻联播""合租室友的冰箱里有一罐2019年的老干妈"。',
+      cond: g => g.age >= 23 && g.flags.comedyOpenMic && !g.flags.comedyWrite && g.intel > 30,
+      choices:[
+        { label:'每天写三个段子，坚持了半年', hint:'+🧠 +✨', fn: g => { g.flags.comedyWrite=true; g.flags.comedyDaily=true; return{intel:8,charm:5}; }},
+        { label:'偶尔写写，质量比数量重要', hint:'+🧠 +😊', fn: g => { g.flags.comedyWrite=true; return{intel:5,mood:3}; }},
+        { label:'发现自己更擅长观察而非创作', hint:'+🧠', fn: g => { g.flags.comedyWrite=true; return{intel:4}; }},
+      ]},
+    { id:'comedy_social_v36_4', icon:'🤣', title:'喜剧社交', category:'comedy',
+      body:'你在喜剧俱乐部认识了一群有趣的人——有程序员、有外卖骑手、有全职妈妈，他们白天做着普通的工作，晚上在台上讲着自己的人生。你发现喜剧圈的人反而最懂生活的苦。',
+      cond: g => g.age >= 23 && g.flags.comedyOpenMic && !g.flags.comedySocial && g.social > 20,
+      choices:[
+        { label:'成了喜剧圈的核心社交人物', hint:'+👥 +✨', fn: g => { g.flags.comedySocial=true; g.flags.comedyCore=true; return{social:10,charm:8}; }},
+        { label:'和几个喜剧演员成了好朋友', hint:'+👥 +😊', fn: g => { g.flags.comedySocial=true; return{social:8,mood:5}; }},
+        { label:'只是看演出时打个招呼', hint:'+👥', fn: g => { g.flags.comedySocial=true; return{social:3}; }},
+      ]},
+    { id:'comedy_fail_v36_4', icon:'😅', title:'冷场了', category:'comedy',
+      body:'你精心准备了五分钟的段子，结果上台后一个都没响。台下安静得能听到空调的嗡嗡声。你觉得这是人生中最漫长的五分钟。但前辈说"每个喜剧演员都有过冷场，这才是开始"。',
+      cond: g => g.age >= 23 && g.flags.comedyWrite && !g.flags.comedyFail,
+      choices:[
+        { label:'反思段子的问题，重新打磨', hint:'+🧠 +✨', fn: g => { g.flags.comedyFail=true; g.flags.comedyPolish=true; return{intel:8,charm:3}; }},
+        { label:'很受打击，好一段时间不敢上台', hint:'-😊', fn: g => { g.flags.comedyFail=true; return{mood:-8}; }},
+        { label:'把冷场的经历写成了新段子', hint:'+✨ +😊', fn: g => { g.flags.comedyFail=true; g.flags.comedyMeta=true; return{charm:6,mood:5}; }},
+      ]},
+    { id:'comedy_cost_v36_4', icon:'🎫', title:'看演出开销', category:'comedy',
+      body:'你算了下今年看脱口秀花的钱：门票、周边、交通，加起来有五千多。朋友说你这是"为快乐买单"，但你觉得这些段子给你的人生启发比很多书都多。',
+      cond: g => g.age >= 23 && g.flags.comedyClub && !g.flags.comedyCost && g.money < 30000,
+      choices:[
+        { label:'开始做一些喜剧相关的兼职', hint:'+💰 +✨', fn: g => { g.flags.comedyCost=true; g.flags.comedySidejob=true; return{money:3000,charm:5}; }},
+        { label:'减少看演出频率，精选场次', hint:'+💰 +🧠', fn: g => { g.flags.comedyCost=true; return{money:1000,intel:2}; }},
+        { label:'快乐无价，继续买', hint:'+😊 -💰', fn: g => { g.flags.comedyCost=true; return{mood:5,money:-1000}; }},
+      ]},
+    { id:'comedy_online_v36_4', icon:'📱', title:'线上爆红', category:'comedy',
+      body:'你把在开放麦讲的一段关于"大城市租房"的段子录成视频发到B站，没想到播放量突破了十万。评论区全在说"太真实了""这不就是我吗"。你收到了几个喜剧节目的邀请。',
+      cond: g => g.age >= 24 && g.flags.comedyFail && g.flags.comedyPolish && !g.flags.comedyOnline && g.charm > 30,
+      choices:[
+        { label:'参加了线上脱口秀节目', hint:'+✨ +💰 +👥', fn: g => { g.flags.comedyOnline=true; g.flags.comedyShow=true; return{charm:12,money:5000,social:8}; }},
+        { label:'继续在线下打磨，不急着出名', hint:'+🧠 +✨', fn: g => { g.flags.comedyOnline=true; g.flags.comedyPatient=true; return{intel:6,charm:5}; }},
+        { label:'趁热打铁做起了短视频博主', hint:'+💰 +✨', fn: g => { g.flags.comedyOnline=true; g.flags.comedyVlogger=true; return{money:3000,charm:8}; }},
+      ]},
+    { id:'comedy_life_v36_4', icon:'🌟', title:'喜剧人生', category:'comedy',
+      body:'你发现学了喜剧之后，你面对困难的方式变了。以前加班会崩溃，现在你会想"这是个好素材"。以前被房东坑了会哭，现在你会想"这个段子能响"。幽默成了你对抗生活的一种武器。',
+      cond: g => g.age >= 26 && g.flags.comedyOnline && (g.flags.comedyShow || g.flags.comedyPatient) && !g.flags.comedyLife && g.intel > 35,
+      choices:[
+        { label:'办了个人专场演出', hint:'+✨ +💰 +😊', fn: g => { g.flags.comedyLife=true; g.flags.comedySpecial=true; return{charm:15,money:8000,mood:12}; }},
+        { label:'成了喜剧俱乐部的驻场演员', hint:'+💰 +✨ +👥', fn: g => { g.flags.comedyLife=true; g.flags.comedyResident=true; g.jobName='脱口秀演员'; g.jobSalary=12000; return{charm:10,social:8}; }},
+        { label:'只是把幽默融入了日常生活', hint:'+😊 +🧠 +❤️', fn: g => { g.flags.comedyLife=true; return{mood:12,intel:8,health:5}; }},
+      ]},
+    { id:'comedy_humor_v36_4', icon:'💡', title:'幽默的力量', category:'comedy',
+      body:'你在公司的年会上讲了段脱口秀，全场笑翻了。领导说"没想到你还有这手"，同事们纷纷加你微信。你忽然发现，幽默感在职场和社交中是一种被严重低估的超能力。',
+      cond: g => g.age >= 27 && g.flags.comedyLife && !g.flags.comedyHumor && g.jobSalary > 0 && g.charm > 35,
+      choices:[
+        { label:'开始在商务场合用幽默化解尴尬', hint:'+✨ +👥 +💰', fn: g => { g.flags.comedyHumor=true; g.flags.comedyBusiness=true; return{charm:10,social:8,money:3000}; }},
+        { label:'开了个职场幽默沟通的付费课程', hint:'+💰 +✨', fn: g => { g.flags.comedyHumor=true; g.flags.comedyCourse=true; return{money:8000,charm:8}; }},
+        { label:'享受用笑声连接每个人的感觉', hint:'+😊 +👥 +❤️', fn: g => { g.flags.comedyHumor=true; return{mood:10,social:10,health:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -23528,6 +23610,18 @@ const ACHIEVEMENTS = [
     { id:'transit_social_v36_3_ach', icon:'👋', name:'通勤搭子', desc:'在通勤路上交到了朋友', check: g => g.flags.transitSocial },
     { id:'transit_change_v36_3_ach', icon:'🔄', name:'通勤改变', desc:'一条新线路改变了你的生活节奏', check: g => g.flags.transitChange },
     { id:'transit_life_v36_3_ach', icon:'🛤️', name:'在路上', desc:'学会了享受每一段在路上的时光', check: g => g.flags.transitLife },
+
+    // v36.4 脱口秀与喜剧文化
+    { id:'comedy_first_v36_4_ach', icon:'🎤', name:'脱口秀入坑', desc:'第一次看了线下脱口秀', check: g => g.flags.comedyFirst },
+    { id:'comedy_club_v36_4_ach', icon:'🎭', name:'喜剧常客', desc:'成了喜剧俱乐部的常客', check: g => g.flags.comedyClub },
+    { id:'comedy_open_mic_v36_4_ach', icon:'🎙️', name:'开放麦勇者', desc:'鼓起勇气站上了开放麦的舞台', check: g => g.flags.comedyOpenMic },
+    { id:'comedy_write_v36_4_ach', icon:'✍️', name:'段子手', desc:'开始把生活写成段子', check: g => g.flags.comedyWrite },
+    { id:'comedy_social_v36_4_ach', icon:'🤣', name:'喜剧圈中人', desc:'在喜剧圈交到了志同道合的朋友', check: g => g.flags.comedySocial },
+    { id:'comedy_fail_v36_4_ach', icon:'😅', name:'冷场勇士', desc:'经历了每个喜剧演员的必修课——冷场', check: g => g.flags.comedyFail },
+    { id:'comedy_cost_v36_4_ach', icon:'🎫', name:'快乐买单', desc:'为喜剧花了不少钱但觉得值', check: g => g.flags.comedyCost },
+    { id:'comedy_online_v36_4_ach', icon:'📱', name:'线上爆红', desc:'段子在网上火了', check: g => g.flags.comedyOnline },
+    { id:'comedy_life_v36_4_ach', icon:'🌟', name:'喜剧人生', desc:'幽默成了你对抗生活的武器', check: g => g.flags.comedyLife },
+    { id:'comedy_humor_v36_4_ach', icon:'💡', name:'幽默超能力', desc:'发现幽默感是一种被低估的超能力', check: g => g.flags.comedyHumor },
 ];
 
 // === ENDINGS === (order matters: first match wins)
