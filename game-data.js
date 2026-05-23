@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v35.1
+// 都市浮生记 - 数据文件 v35.2
 // ============================================
 
 
@@ -20356,6 +20356,98 @@ const EVENTS = [
         { label:'把人生当成一场剧本杀', hint:'+😊 +✨', fn: g => { g.flags.jubenshaPhilosophy=true; g.flags.lifeIsGame=true; return{mood:20,charm:15}; }},
       ]},
 
+    // ===== 彩票经济与暴富幻想 (v35.2) =====
+
+    { id:'lottery_first_v35_2', icon:'🎰', title:'第一次买彩票', category:'lottery',
+      body:'你路过一家彩票站。门口写着：「本站已中出大奖500万！」\n\n你从来没买过彩票。你觉得这是「智商税」。\n\n但今天你不知道为什么走了进去。\n\n「来一张刮刮乐吧。」你说。\n\n你选了一张「好运十倍」——20元。你刮开第一个数字——没中。第二个——没中。第三个——50元！\n\n你中了50元！你赚了30元！\n\n你兴奋得像个孩子。虽然你知道50元不算什么，但那种「意外之财」的感觉太爽了。\n\n你又买了3张——全没中。亏了40元。\n\n你走出彩票站，心情复杂。但你知道：你还会再来的。',
+      cond: g => g.age >= 18 && !g.flags.lotteryFirst,
+      choices:[
+        { label:'开始定期买刮刮乐', hint:'+😊', fn: g => { g.flags.lotteryFirst=true; g.flags.scratchFan=true; return{mood:8,money:-30}; }},
+        { label:'偶尔买一张，碰碰运气', hint:'+😊', fn: g => { g.flags.lotteryFirst=true; return{mood:5,money:-20}; }},
+        { label:'觉得是智商税，不买了', hint:'+🧠', fn: g => { g.flags.lotteryFirst=true; g.flags.rationalLottery=true; return{intel:3}; }},
+      ]},
+
+    { id:'lottery_double_v35_2', icon:'🎫', title:'双色球', category:'lottery',
+      body:'你开始买双色球了。每周二、周四、周日开奖。\n\n你选了6个红球+1个蓝球。号码是你的生日+手机号后几位。\n\n开奖那天你紧张地盯着手机。\n\n第一个号码——没中。\n第二个号码——没中。\n第三个号码——中了！\n第四个号码——没中。\n第五个号码——中了！\n第六个号码——没中。\n蓝球——没中。\n\n你中了2个红球。奖金：5元。\n\n你花了4元买了2注，赚了1元。\n\n你觉得：这比上班有意思多了。\n\n但你同事说：「双色球中奖概率是1/1700万。你被雷劈的概率都比中大奖高。」\n\n你说：「我知道。但我买的是2块钱的幻想。」',
+      cond: g => g.age >= 18 && g.flags.lotteryFirst && !g.flags.lotteryDouble,
+      choices:[
+        { label:'开始每期都买', hint:'+😊 -💰', fn: g => { g.flags.lotteryDouble=true; g.flags.regularBuyer=true; return{mood:5,money:-50}; }},
+        { label:'偶尔买一注，买个念想', hint:'+😊', fn: g => { g.flags.lotteryDouble=true; return{mood:3,money:-10}; }},
+        { label:'算了算概率，决定不买了', hint:'+🧠', fn: g => { g.flags.lotteryDouble=true; g.flags.rationalLottery=true; return{intel:5}; }},
+      ]},
+
+    { id:'lottery_dream_v35_2', icon:'💭', title:'暴富幻想', category:'lottery',
+      body:'你在上班路上又经过那家彩票站。\n\n你开始做白日梦：「如果我中了500万，我会做什么？」\n\n你的幻想清单：\n1. 先辞职——甩一封「老子不干了」的邮件\n2. 买一套房——不用太大，两居室就行\n3. 给爸妈打200万——让他们别干活了\n4. 环游世界——先去日本，再去欧洲\n5. 开一家咖啡馆——不为了赚钱，就为了好玩\n6. 剩下的存起来——吃利息生活\n\n你算了一下：500万，好像也不太够。\n\n在这个城市，500万买完房就只剩200万了。200万吃利息，一年也就10万。\n\n你突然意识到：即使中了500万，你也不可能真的「躺平」。\n\n也许这就是为什么有钱人还在工作——因为钱永远不够。',
+      cond: g => g.age >= 20 && g.flags.lotteryFirst && !g.flags.lotteryDream,
+      choices:[
+        { label:'享受幻想的过程', hint:'+😊', fn: g => { g.flags.lotteryDream=true; return{mood:8}; }},
+        { label:'开始认真规划财务', hint:'+🧠 +💰', fn: g => { g.flags.lotteryDream=true; g.flags.financialPlan=true; return{intel:10,money:2000}; }},
+        { label:'幻想结束后更焦虑了', hint:'', fn: g => { g.flags.lotteryDream=true; return{mood:-8}; }},
+      ]},
+
+    { id:'lottery_win_v35_2', icon:'🎉', title:'中奖了', category:'lottery',
+      body:'你在刮刮乐上中了一个大奖——2000元！\n\n你不敢相信。你刮了三遍确认：真的中了。\n\n你冲出彩票站，在街上差点跳起来。\n\n你发了条朋友圈：「今天运气爆棚！刮刮乐中了2000！」\n\n评论区炸了：\n- 「请客！」（10个人说）\n- 「分我一半」（5个人说）\n- 「你之前花了多少买彩票？」（1个理性的人说）\n\n你算了算：过去一年你大概花了1500元买彩票。这次中了2000，净赚500。\n\n但你发现了一个有趣的现象：中奖后的快乐只持续了一天。第二天你就觉得2000块也就那样了。\n\n也许人追求的不是「中奖」，而是「可能中奖」的那种期待感。',
+      cond: g => g.age >= 18 && (g.flags.lotteryFirst || g.flags.lotteryDouble) && !g.flags.lotteryWin,
+      choices:[
+        { label:'请朋友吃了一顿', hint:'+👥 +😊', fn: g => { g.flags.lotteryWin=true; g.flags.generous=true; return{social:12,mood:15,money:1500}; }},
+        { label:'存起来了', hint:'+💰', fn: g => { g.flags.lotteryWin=true; return{money:2000,mood:10}; }},
+        { label:'用奖金买了更多彩票', hint:'', fn: g => { g.flags.lotteryWin=true; g.flags.lotteryAddict=true; return{mood:5}; }},
+      ]},
+
+    { id:'lottery_addict_v35_2', icon:'😰', title:'彩票上瘾', category:'lottery',
+      body:'你发现自己有点上瘾了。\n\n每天上班前你都会路过彩票站，买两张刮刮乐。有时候中午午休也会去买。\n\n你算了一下过去三个月的开支：\n- 刮刮乐：每天40元 × 90天 = 3600元\n- 双色球：每周30元 × 12周 = 360元\n- 大乐透：每周20元 × 12周 = 240元\n\n总计：4200元。你中了多少？850元。\n\n净亏损：3350元。\n\n你知道这不对。但你控制不住自己。每次经过彩票站，你都会想：「也许这次能中呢？」\n\n你的同事发现了：「你最近怎么老往彩票站跑？」\n\n你说：「就买个乐子。」\n\n但你知道：这不是乐子了。这是一种「合法赌博」。',
+      cond: g => g.age >= 20 && g.flags.lotteryWin && g.flags.scratchFan && !g.flags.lotteryAddict,
+      choices:[
+        { label:'控制住了，设定每月预算', hint:'+🧠', fn: g => { g.flags.lotteryAddict=true; g.flags.budgetLottery=true; return{intel:10,mood:-5,money:-500}; }},
+        { label:'继续买，控制不住', hint:'-💰', fn: g => { g.flags.lotteryAddict=true; g.flags.lotteryProblem=true; return{mood:-10,money:-3000}; }},
+        { label:'彻底戒了，再也不买了', hint:'+🧠 +💰', fn: g => { g.flags.lotteryAddict=true; g.flags.lotteryQuit=true; return{intel:8,mood:-3}; }},
+      ]},
+
+    { id:'lottery_group_v35_2', icon:'👥', title:'合买彩票', category:'lottery',
+      body:'你的同事提议：「我们一起合买彩票吧！每个人出20块，中奖了平分。」\n\n你觉得挺有意思。10个人合买，每人20元，一共200元。\n\n你们选了20组号码。\n\n开奖那天——你们中了！不是头奖，但是三等奖：3000元。\n\n每个人分了300元。虽然不多，但那种「一起中奖」的感觉很好。\n\n你们在办公室里欢呼，老板进来问：「什么事这么高兴？」\n\n你们说：「没什么。」\n\n老板走了之后你们偷偷又合买了一期。\n\n你发现：合买彩票的乐趣不在于中奖，而在于「一群人一起做梦」的感觉。',
+      cond: g => g.age >= 20 && g.flags.lotteryFirst && g.jobSalary > 0 && !g.flags.lotteryGroup,
+      choices:[
+        { label:'继续合买，成了团建项目', hint:'+👥 +😊', fn: g => { g.flags.lotteryGroup=true; g.flags.groupBuyer=true; return{social:10,mood:10,money:280}; }},
+        { label:'合买了几次，没意思了', hint:'', fn: g => { g.flags.lotteryGroup=true; return{social:3,mood:3}; }},
+        { label:'中了钱后分配不均，闹矛盾了', hint:'-👥', fn: g => { g.flags.lotteryGroup=true; g.flags.groupConflict=true; return{social:-8,mood:-5}; }},
+      ]},
+
+    { id:'lottery_temple_v35_2', icon:'🏛️', title:'求财神', category:'lottery',
+      body:'你发现一个有趣的现象：每到彩票开奖日，寺庙的财神殿就特别热闹。\n\n你也去了。你在财神像前许了个愿：「保佑我中大奖。」\n\n你旁边的大爷也在拜。你问他：「您买彩票吗？」\n\n大爷说：「买了20年了。每期都买，从来没中过大的。」\n\n「那您为什么还买？」\n\n「不买就没有希望。买了至少有3天的盼头。」\n\n你突然理解了：彩票不只是赌博，它是一种「廉价的希望」。\n\n2块钱买的不是中奖的概率，而是「万一中了呢」的3天幻想时间。\n\n在这个什么都贵的城市，2块钱能买到3天的快乐，已经很便宜了。',
+      cond: g => g.age >= 22 && g.flags.lotteryFirst && g.flags.templeFirst && !g.flags.lotteryTemple,
+      choices:[
+        { label:'理解了彩票的本质', hint:'+🧠', fn: g => { g.flags.lotteryTemple=true; g.flags.understandLottery=true; return{intel:10,mood:5}; }},
+        { label:'和大爷成了彩友', hint:'+👥', fn: g => { g.flags.lotteryTemple=true; g.flags.lotteryFriend=true; return{social:8,mood:8}; }},
+        { label:'觉得太荒诞了', hint:'', fn: g => { g.flags.lotteryTemple=true; return{mood:-3,intel:5}; }},
+      ]},
+
+    { id:'lottery_reality_v35_2', icon:'📊', title:'彩票经济学', category:'lottery',
+      body:'你算了一笔账：\n\n中国彩票年收入超过5000亿元。其中约50%作为奖金返还，约35%用于公益，约15%是运营费用。\n\n也就是说，每花2块钱买彩票，你只能期望拿回1块钱。\n\n从经济学角度看，彩票是「穷人税」——越穷的人越买，因为他们觉得这是唯一能「翻盘」的机会。\n\n你查了一下数据：\n- 买彩票最多的人群：月收入3000-5000元\n- 中奖概率：双色球头奖1/17,721,088\n- 被雷劈的概率：1/1,000,000（比中头奖高17倍）\n\n你把这些数据发到了朋友圈。评论区分成两派：\n- 「你说的都对，但我还是要买」\n- 「终于有人说了真话」\n\n你开始理解：人不是不知道概率，而是愿意为那一点点可能性付费。',
+      cond: g => g.age >= 22 && g.flags.lotteryFirst && g.intel > 40 && !g.flags.lotteryReality,
+      choices:[
+        { label:'理性看待，偶尔买一张', hint:'+🧠', fn: g => { g.flags.lotteryReality=true; g.flags.rationalBuyer=true; return{intel:12,mood:5}; }},
+        { label:'完全不买了', hint:'+💰 +🧠', fn: g => { g.flags.lotteryReality=true; g.flags.lotteryQuit=true; return{intel:8,money:500}; }},
+        { label:'知道归知道，买还是要买', hint:'', fn: g => { g.flags.lotteryReality=true; return{mood:0,money:-100}; }},
+      ]},
+
+    { id:'lottery_nearmiss_v35_2', icon:'😱', title:'差一点就中了', category:'lottery',
+      body:'你买了一张100元的刮刮乐。你刮开了第一个区域——「头奖100万」。\n\n你的号码是：37、52、89。\n\n中奖号码是：37、52、90。\n\n差一个数字。就差一个数字！\n\n你盯着那个「90」看了很久。如果是89，你现在就是百万富翁了。\n\n你开始胡思乱想：\n- 如果中了100万，你会先做什么？\n- 如果你换一家彩票站买呢？\n- 如果你选了另一张呢？\n\n你理性上知道：这是「差一点效应」——赌博设计者故意让号码很接近，让你产生「下次一定能中」的错觉。\n\n但你的感性告诉你：也许下次真的能中。\n\n你看了看钱包。还有200块。你犹豫了。',
+      cond: g => g.age >= 18 && g.flags.lotteryFirst && !g.flags.lotteryNearMiss,
+      choices:[
+        { label:'忍住了，没继续买', hint:'+🧠', fn: g => { g.flags.lotteryNearMiss=true; g.flags.selfControl=true; return{intel:10,mood:-5}; }},
+        { label:'又买了3张，全没中', hint:'-💰', fn: g => { g.flags.lotteryNearMiss=true; g.flags.lotteryAddict=true; return{mood:-10,money:-300}; }},
+        { label:'把这张彩票裱起来了', hint:'+😊', fn: g => { g.flags.lotteryNearMiss=true; return{mood:5,money:-100}; }},
+      ]},
+
+    { id:'lottery_philosophy_v35_2', icon:'🎲', title:'希望的价格', category:'lottery',
+      body:'你回顾自己和彩票的关系。\n\n从第一次好奇地买刮刮乐，到中了一次小奖，到差点上瘾，到理性分析……\n\n你开始理解：彩票不是赌博，而是一种「情感消费」。\n\n你花2块钱买的不是中奖的概率，而是：\n- 3天的「万一中了」的幻想时间\n- 和朋友一起选号的社交体验\n- 开奖时的紧张和刺激\n- 以及那万万分之一的「改变命运」的可能\n\n有人说彩票是「穷人税」。你觉得这个说法太傲慢了。\n\n在这个阶层固化的社会里，很多人觉得努力工作也不一定能改变命运。那为什么不花2块钱试试运气呢？\n\n至少，2块钱的幻想比2000块的焦虑便宜多了。\n\n你在朋友圈写了一段话：\n\n「彩票是这个时代最便宜的希望。2块钱，你就能拥有一个梦。问题是——你愿意为梦付费吗？」',
+      cond: g => g.age >= 22 && g.flags.lotteryFirst && (g.flags.lotteryReality || g.flags.lotteryAddict) && g.intel > 40,
+      choices:[
+        { label:'理性买彩票，当娱乐消费', hint:'+🧠 +😊', fn: g => { g.flags.lotteryPhilosophy=true; g.flags.rationalBuyer=true; return{intel:12,mood:10}; }},
+        { label:'不买了，把希望放在自己身上', hint:'+🧠 +💰', fn: g => { g.flags.lotteryPhilosophy=true; g.flags.selfMade=true; return{intel:15,money:3000}; }},
+        { label:'写了一篇关于彩票经济的文章', hint:'+🧠 +💰', fn: g => { g.flags.lotteryPhilosophy=true; g.flags.lotteryWriter=true; return{intel:12,money:5000,charm:10}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -22355,6 +22447,17 @@ const ACHIEVEMENTS = [
     { id:'jubensha_cost_v35_1_ach', icon:'💸', name:'剧本杀账单', desc:'算了一下自己在剧本杀上花了多少钱', check: g => g.flags.jubenshaCost },
     { id:'jubensha_write_v35_1_ach', icon:'✍️', name:'剧本杀作者', desc:'自己写了一个剧本', check: g => g.flags.jubenshaWrite },
     { id:'jubensha_philosophy_v35_1_ach', icon:'🎪', name:'另一种人生', desc:'理解了剧本杀对年轻人的意义', check: g => g.flags.jubenshaPhilosophy },
+    // v35.2 彩票经济与暴富幻想
+    { id:'lottery_first_v35_2_ach', icon:'🎰', name:'彩票初体验', desc:'第一次买了彩票', check: g => g.flags.lotteryFirst },
+    { id:'lottery_double_v35_2_ach', icon:'🎫', name:'双色球玩家', desc:'开始买双色球了', check: g => g.flags.lotteryDouble },
+    { id:'lottery_dream_v35_2_ach', icon:'💭', name:'暴富白日梦', desc:'幻想中了500万要做什么', check: g => g.flags.lotteryDream },
+    { id:'lottery_win_v35_2_ach', icon:'🎉', name:'中奖了！', desc:'在彩票上中了一笔奖金', check: g => g.flags.lotteryWin },
+    { id:'lottery_addict_v35_2_ach', icon:'😰', name:'彩票上瘾', desc:'发现自己对彩票有些上瘾了', check: g => g.flags.lotteryAddict },
+    { id:'lottery_group_v35_2_ach', icon:'👥', name:'合买彩票', desc:'和同事一起合买了彩票', check: g => g.flags.lotteryGroup },
+    { id:'lottery_temple_v35_2_ach', icon:'🏛️', name:'求财神', desc:'去寺庙拜了财神求中奖', check: g => g.flags.lotteryTemple },
+    { id:'lottery_reality_v35_2_ach', icon:'📊', name:'彩票经济学', desc:'理性分析了彩票的概率和本质', check: g => g.flags.lotteryReality },
+    { id:'lottery_nearmiss_v35_2_ach', icon:'😱', name:'差一点就中了', desc:'经历了与大奖擦肩而过', check: g => g.flags.lotteryNearMiss },
+    { id:'lottery_philosophy_v35_2_ach', icon:'🎲', name:'希望的价格', desc:'理解了彩票对普通人的真正意义', check: g => g.flags.lotteryPhilosophy },
 ];
 
 // === ENDINGS === (order matters: first match wins)
