@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v36.6
+// 都市浮生记 - 数据文件 v36.7
 // ============================================
 
 
@@ -21637,6 +21637,88 @@ const EVENTS = [
         { label:'找到适合自己的风格就足够了', hint:'+😊 +✨ +🧠', fn: g => { g.flags.hairLife=true; return{mood:10,charm:8,intel:5}; }},
       ]},
 
+    // === v36.7 快递与外卖文化 ===
+    { id:'delivery_first_v36_7', icon:'📦', title:'拆快递的快乐', category:'delivery',
+      body:'你在网上买了一个小东西，两天后收到了快递。拆开包裹的那一刻，有种莫名的满足感。你理解了为什么有人说"拆快递是大人的圣诞节"。',
+      cond: g => g.age >= 18 && !g.flags.deliveryFirst,
+      choices:[
+        { label:'又下单了三件"需要的"东西', hint:'-💰 +😊', fn: g => { g.flags.deliveryFirst=true; g.flags.deliveryMore=true; return{money:-300,mood:5}; }},
+        { label:'只买了真正需要的，理性消费', hint:'+🧠', fn: g => { g.flags.deliveryFirst=true; return{intel:2,mood:3}; }},
+        { label:'开始关注各种促销活动', hint:'+😊 -💰', fn: g => { g.flags.deliveryFirst=true; g.flags.deliveryDeals=true; return{mood:3,money:-100}; }},
+      ]},
+    { id:'delivery_addict_v36_7', icon:'🛒', title:'网购成瘾', category:'delivery',
+      body:'你发现自己几乎每天都在收快递。快递站的大哥都认识你了，说"你又来了"。你的出租屋堆满了各种快递盒，有些东西买回来连包装都没拆。',
+      cond: g => g.age >= 20 && g.flags.deliveryFirst && !g.flags.deliveryAddict && g.money > 1000,
+      choices:[
+        { label:'卸载了购物APP，强制戒断', hint:'+💰 +🧠', fn: g => { g.flags.deliveryAddict=true; g.flags.deliveryDetox=true; return{money:1000,intel:3}; }},
+        { label:'给自己设了每月网购上限', hint:'+💰 +🧠', fn: g => { g.flags.deliveryAddict=true; return{money:500,intel:2}; }},
+        { label:'觉得购物是唯一的快乐，继续买', hint:'+😊 -💰', fn: g => { g.flags.deliveryAddict=true; g.flags.deliveryNoStop=true; return{mood:3,money:-2000}; }},
+      ]},
+    { id:'delivery_takeout_v36_7', icon:'🍱', title:'外卖依赖', category:'delivery',
+      body:'你打开外卖APP发现这个月已经点了四十五次外卖了。冰箱里的菜全过期了，厨房的锅落了一层灰。你已经不记得上次自己做晚饭是什么时候了。',
+      cond: g => g.age >= 20 && g.jobSalary > 0 && !g.flags.deliveryTakeout && g.health < 70,
+      choices:[
+        { label:'试着周末自己做饭', hint:'+❤️ +💰', fn: g => { g.flags.deliveryTakeout=true; g.flags.deliveryCook=true; return{health:5,money:300}; }},
+        { label:'觉得方便就好，时间比钱重要', hint:'+😊 -❤️', fn: g => { g.flags.deliveryTakeout=true; return{mood:3,health:-3}; }},
+        { label:'开始点更贵更健康的外卖', hint:'-💰 +❤️', fn: g => { g.flags.deliveryTakeout=true; g.flags.deliveryPremium=true; return{money:-500,health:2}; }},
+      ]},
+    { id:'delivery_rider_v36_7', icon:'🏍️', title:'外卖骑手', category:'delivery',
+      body:'下暴雨的那天，你点了份外卖。骑手迟到了二十分钟，你开门看到他浑身湿透，连声说"对不起"。你忽然觉得手里的外卖不只是食物，是另一个人在风雨中奔波的结果。',
+      cond: g => g.age >= 20 && g.flags.deliveryTakeout && !g.flags.deliveryRider,
+      choices:[
+        { label:'给了他五星好评和红包打赏', hint:'-💰 +😊 +✨', fn: g => { g.flags.deliveryRider=true; g.flags.deliveryKind=true; return{money:-10,mood:5,charm:3}; }},
+        { label:'开始关注骑手群体的权益', hint:'+🧠 +✨', fn: g => { g.flags.deliveryRider=true; g.flags.deliveryAware=true; return{intel:5,charm:3}; }},
+        { label:'以后下雨天不点外卖了', hint:'+🧠 +😊', fn: g => { g.flags.deliveryRider=true; return{intel:3,mood:3}; }},
+      ]},
+    { id:'delivery_cost_v36_7', icon:'💳', title:'便利的代价', category:'delivery',
+      body:'你算了一下每月在快递和外卖上的花费：网购两千、外卖一千五、快递费一百……加起来三千五，占了你工资的三分之一。便利的生活是有代价的。',
+      cond: g => g.age >= 22 && g.flags.deliveryAddict && g.flags.deliveryTakeout && !g.flags.deliveryCost && g.money < 20000,
+      choices:[
+        { label:'制定了严格的消费计划', hint:'+💰 +🧠', fn: g => { g.flags.deliveryCost=true; g.flags.deliveryPlan=true; return{money:2000,intel:3}; }},
+        { label:'减少点外卖频率，学做饭', hint:'+💰 +❤️', fn: g => { g.flags.deliveryCost=true; g.flags.deliveryReduce=true; return{money:1000,health:3}; }},
+        { label:'赚得不够就赚更多', hint:'+🧠', fn: g => { g.flags.deliveryCost=true; return{intel:2}; }},
+      ]},
+    { id:'delivery_social_v36_7', icon:'📱', title:'快递社交', category:'delivery',
+      body:'你和快递站的大姐成了熟人，每次去取件她都跟你聊天。她说她儿子也在这个城市打工，每天送几百个快递，一个月赚八千但累得腰都直不起来。你开始理解这个城市的另一面。',
+      cond: g => g.age >= 22 && g.flags.deliveryAddict && !g.flags.deliverySocial && g.social > 20,
+      choices:[
+        { label:'帮快递站大姐的儿子介绍了更好的工作', hint:'+👥 +✨', fn: g => { g.flags.deliverySocial=true; g.flags.deliveryHelp=true; return{social:8,charm:5}; }},
+        { label:'开始关注物流行业的打工人', hint:'+🧠 +✨', fn: g => { g.flags.deliverySocial=true; return{intel:5,charm:3}; }},
+        { label:'只是偶尔聊几句', hint:'+👥', fn: g => { g.flags.deliverySocial=true; return{social:3}; }},
+      ]},
+    { id:'delivery_waste_v36_7', icon:'🗑️', title:'包装垃圾', category:'delivery',
+      body:'你看着门口堆成山的快递盒和外卖餐盒，突然有了负罪感。你算了一下，你一个人一年产生的快递包装垃圾大概能填满一个房间。环保离你好远，但垃圾离你好近。',
+      cond: g => g.age >= 23 && g.flags.deliveryAddict && !g.flags.deliveryWaste && g.intel > 25,
+      choices:[
+        { label:'开始回收快递盒，减少一次性用品', hint:'+🧠 +✨', fn: g => { g.flags.deliveryWaste=true; g.flags.deliveryGreen=true; return{intel:5,charm:3}; }},
+        { label:'减少不必要的网购', hint:'+💰 +🧠', fn: g => { g.flags.deliveryWaste=true; return{money:800,intel:3}; }},
+        { label:'知道不好但还是很难改变', hint:'-😊', fn: g => { g.flags.deliveryWaste=true; return{mood:-2}; }},
+      ]},
+    { id:'delivery_fail_v36_7', icon:'❌', title:'快递丢了', category:'delivery',
+      body:'你等了一周的重要快递显示"已签收"，但你根本没收到。你联系了快递公司、卖家、快递员，三方踢皮球。你在投诉电话上等了四十分钟，气得差点摔手机。',
+      cond: g => g.age >= 20 && g.flags.deliveryFirst && !g.flags.deliveryFail,
+      choices:[
+        { label:'坚持投诉到底，最终获得了赔偿', hint:'+💰 +🧠', fn: g => { g.flags.deliveryFail=true; g.flags.deliveryFight=true; return{money:200,intel:3}; }},
+        { label:'算了，重新买一个', hint:'-💰 +😊', fn: g => { g.flags.deliveryFail=true; return{money:-200,mood:-2}; }},
+        { label:'开始在社交媒体曝光快递公司', hint:'+✨ +👥', fn: g => { g.flags.deliveryFail=true; g.flags.deliveryExpose=true; return{charm:3,social:3}; }},
+      ]},
+    { id:'delivery_cook_v36_7', icon:'🍳', title:'开始做饭', category:'delivery',
+      body:'你决定减少外卖，开始学做饭。第一次做的西红柿炒鸡蛋居然还不错。你在厨房里忙了一个小时，但吃着热腾腾的饭菜时，觉得比任何外卖都满足。',
+      cond: g => g.age >= 22 && g.flags.deliveryTakeout && !g.flags.deliveryCook2 && (g.flags.deliveryReduce || g.flags.deliveryCook),
+      choices:[
+        { label:'开始每天自己做饭带便当', hint:'+❤️ +💰 -😊', fn: g => { g.flags.deliveryCook2=true; g.flags.deliveryBento=true; return{health:8,money:500,mood:-2}; }},
+        { label:'周末做饭，工作日还是外卖', hint:'+❤️ +😊', fn: g => { g.flags.deliveryCook2=true; return{health:4,mood:4}; }},
+        { label:'学了几个拿手菜，请朋友来家里吃', hint:'+👥 +😊 +✨', fn: g => { g.flags.deliveryCook2=true; g.flags.deliveryHost=true; return{social:6,mood:6,charm:4}; }},
+      ]},
+    { id:'delivery_life_v36_7', icon:'⚖️', title:'便利与代价', category:'delivery',
+      body:'你开始思考，大城市里无处不在的"便利"到底意味着什么。快递和外卖让生活变得轻松，但也让你失去了很多——做饭的能力、等待的耐心、对劳动者的理解。真正的便利，也许不是什么都送到家门口。',
+      cond: g => g.age >= 26 && g.flags.deliveryCook2 && (g.flags.deliveryGreen || g.flags.deliveryAware) && !g.flags.deliveryLife && g.intel > 35,
+      choices:[
+        { label:'开始做一个关于城市便利文化的自媒体', hint:'+✨ +💰 +🧠', fn: g => { g.flags.deliveryLife=true; g.flags.deliveryMedia=true; return{charm:10,money:3000,intel:8}; }},
+        { label:'找到便利和自立的平衡点', hint:'+😊 +🧠 +❤️', fn: g => { g.flags.deliveryLife=true; return{mood:10,intel:8,health:5}; }},
+        { label:'把省下来的时间和钱用来体验生活', hint:'+😊 +✨', fn: g => { g.flags.deliveryLife=true; return{mood:8,charm:6}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -23810,6 +23892,18 @@ const ACHIEVEMENTS = [
     { id:'hair_image_v36_6_ach', icon:'🪞', name:'形象焦虑', desc:'开始在意发际线和白发', check: g => g.flags.hairImage },
     { id:'hair_change_v36_6_ach', icon:'🔄', name:'形象蜕变', desc:'认真管理形象一年后整个人都变了', check: g => g.flags.hairChange },
     { id:'hair_life_v36_6_ach', icon:'💫', name:'面子工程', desc:'学会了形象管理其实是自我认知', check: g => g.flags.hairLife },
+
+    // v36.7 快递与外卖文化
+    { id:'delivery_first_v36_7_ach', icon:'📦', name:'拆快递的快乐', desc:'体验了拆快递是大人的圣诞节', check: g => g.flags.deliveryFirst },
+    { id:'delivery_addict_v36_7_ach', icon:'🛒', name:'网购成瘾', desc:'快递站的人都认识你了', check: g => g.flags.deliveryAddict },
+    { id:'delivery_takeout_v36_7_ach', icon:'🍱', name:'外卖依赖症', desc:'一个月点了四十五次外卖', check: g => g.flags.deliveryTakeout },
+    { id:'delivery_rider_v36_7_ach', icon:'🏍️', name:'外卖背后的人', desc:'开始关注风雨中奔波的骑手', check: g => g.flags.deliveryRider },
+    { id:'delivery_cost_v36_7_ach', icon:'💳', name:'便利的代价', desc:'发现每月快递外卖占工资三分之一', check: g => g.flags.deliveryCost },
+    { id:'delivery_social_v36_7_ach', icon:'📱', name:'快递站社交', desc:'和快递站的人成了熟人', check: g => g.flags.deliverySocial },
+    { id:'delivery_waste_v36_7_ach', icon:'🗑️', name:'包装反思', desc:'看着堆积如山的快递盒有了负罪感', check: g => g.flags.deliveryWaste },
+    { id:'delivery_fail_v36_7_ach', icon:'❌', name:'快递丢了', desc:'经历了快递被签收却没收到的绝望', check: g => g.flags.deliveryFail },
+    { id:'delivery_cook_v36_7_ach', icon:'🍳', name:'自己做饭', desc:'决定减少外卖开始学做饭', check: g => g.flags.deliveryCook2 },
+    { id:'delivery_life_v36_7_ach', icon:'⚖️', name:'便利与代价', desc:'思考了城市便利生活背后的代价', check: g => g.flags.deliveryLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
