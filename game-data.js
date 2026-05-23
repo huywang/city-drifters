@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v40.3
+// 都市浮生记 - 数据文件 v40.4
 // ============================================
 
 
@@ -24582,6 +24582,88 @@ const EVENTS = [
         { label:'感恩那段改变人生的经历', hint:'+😊 +💪', fn: g => { g.flags.liuxueLife=true; return{mood:12,health:5}; }},
       ]},
 
+    // === v40.4 电竞与游戏人生 ===
+    { id:'esport_discover_v40_4', icon:'🖥️', title:'网吧岁月', category:'esport',
+      body:'大学的时候室友拉你去网吧，你一坐就是一通宵。从CS到英雄联盟，从DOTA到王者荣耀，你发现自己好像找到了一个新世界。游戏里你可以是任何人，可以赢，可以carry全场，那种快感比上课有意思多了。你妈打电话来问你在干嘛，你说"在学习"，然后继续排位。',
+      cond: g => g.age >= 18 && g.age <= 30 && !g.flags.esportDiscover,
+      choices:[
+        { label:'从此爱上了游戏，每天至少打三小时', hint:'+😊 -🧠', fn: g => { g.flags.esportDiscover=true; g.flags.esportHeavy=true; return{mood:10,intel:-5}; }},
+        { label:'偶尔玩玩，主要还是学习', hint:'+😊 +🧠', fn: g => { g.flags.esportDiscover=true; return{mood:5,intel:3}; }},
+        { label:'觉得游戏浪费时间，没怎么碰', hint:'+🧠', fn: g => { g.flags.esportDiscover=true; g.flags.esportRarely=true; return{intel:5}; }},
+      ]},
+    { id:'esport_addict_v40_4', icon:'🎮', title:'游戏成瘾', category:'esport',
+      body:'你开始分不清白天和黑夜。凌晨三点还在排位，早上闹钟响了根本起不来。你的外卖盒子堆成了小山，可乐罐子铺满了桌面。你的段位从黄金打到钻石，但你的绩点从3.5掉到了2.1。你的黑眼圈越来越重，你的朋友越来越少。你告诉自己"再打一把就睡"，但你知道这是骗自己。',
+      cond: g => g.flags.esportHeavy && !g.flags.esportAddict,
+      choices:[
+        { label:'继续沉迷，反正已经这样了', hint:'+😊 -💪 -🧠', fn: g => { g.flags.esportAddict=true; return{mood:5,health:-10,intel:-8}; }},
+        { label:'意识到问题，开始控制游戏时间', hint:'+💪 +🧠', fn: g => { g.flags.esportAddict=true; g.flags.esportControl=true; return{health:5,intel:5}; }},
+        { label:'花钱买了个防沉迷软件锁电脑', hint:'-💰 +💪', fn: g => { g.flags.esportAddict=true; g.flags.esportLock=true; return{money:-500,health:3}; }},
+      ]},
+    { id:'esport_ranked_v40_4', icon:'🏆', title:'上分之路', category:'esport',
+      body:'你开始了疯狂的上分之路。每一局都认真打，研究版本更新、看职业选手的直播、复盘自己的每一场操作。你的段位终于打到了大师，在朋友里已经算顶尖水平了。有人说"你这么厉害怎么不去打职业"，你心里一动。但你也知道，真正打职业的人和你打游戏完全是两回事。',
+      cond: g => (g.flags.esportDiscover || g.flags.esportControl) && !g.flags.esportRanked,
+      choices:[
+        { label:'开始系统性地训练，目标是上王者', hint:'+✨ -💪', fn: g => { g.flags.esportRanked=true; g.flags.esportKing=true; return{charm:10,health:-5}; }},
+        { label:'享受游戏就好，不执着于段位', hint:'+😊', fn: g => { g.flags.esportRanked=true; return{mood:8}; }},
+        { label:'开始研究游戏策略，发现自己逻辑能力变强了', hint:'+🧠', fn: g => { g.flags.esportRanked=true; g.flags.esportStrategy=true; return{intel:8}; }},
+      ]},
+    { id:'esport_team_v40_4', icon:'👥', title:'组队开黑', category:'esport',
+      body:'你和几个朋友组了个固定队，每天晚上八点开黑成了固定节目。你们配合越来越默契，谁打野谁辅助，谁先手谁收割，一个眼神就能懂。打完了一起在语音里吹牛，聊着游戏里的骚操作笑到肚子疼。你发现游戏最快乐的部分不是赢，而是和兄弟一起赢。这些在虚拟世界并肩作战的人，成了你现实中最好的朋友。',
+      cond: g => g.flags.esportDiscover && !g.flags.esportTeam,
+      choices:[
+        { label:'成了队伍的核心，大家都听你指挥', hint:'+❤️ +✨', fn: g => { g.flags.esportTeam=true; g.flags.esportLeader=true; return{social:12,charm:8}; }},
+        { label:'享受和大家一起玩的快乐', hint:'+❤️ +😊', fn: g => { g.flags.esportTeam=true; return{social:10,mood:8}; }},
+        { label:'觉得太花时间了，慢慢减少了开黑频率', hint:'+🧠 -❤️', fn: g => { g.flags.esportTeam=true; return{intel:5,social:-3}; }},
+      ]},
+    { id:'esport_dream_v40_4', icon:'⭐', title:'电竞梦', category:'esport',
+      body:'你开始认真考虑把电竞当职业。看了很多职业选手的纪录片，你觉得自己的水平也许真的可以试试。你查了查青训营的要求——每天训练12小时以上，淘汰率95%以上。你妈听到你要"打游戏当工作"差点没背过气去。但你心里有个声音在说：如果现在不试，以后一定会后悔。',
+      cond: g => g.flags.esportKing && g.age <= 25 && !g.flags.esportDream,
+      choices:[
+        { label:'报名参加了青训选拔', hint:'+💪 -💰', fn: g => { g.flags.esportDream=true; g.flags.esportTrial=true; return{health:-5,money:-3000}; }},
+        { label:'开始做游戏直播，走另一条路', hint:'+✨ +💰', fn: g => { g.flags.esportDream=true; g.flags.esportStreamer=true; return{charm:10,money:3000}; }},
+        { label:'还是算了，把游戏当爱好就好', hint:'+😊', fn: g => { g.flags.esportDream=true; g.flags.esportHobby=true; return{mood:5}; }},
+      ]},
+    { id:'esport_tournament_v40_4', icon:'🏅', title:'业余比赛', category:'esport',
+      body:'你报名参加了城市业余电竞联赛。虽然是业余比赛，但大家都很认真。赛前训练、战术分析、团队配合——一样都不少。比赛当天你紧张得手心出汗，第一局输了大家都有点丧，但你鼓励队友"稳住，我们能赢"。最终你们拿了第三名，虽然没夺冠，但领奖的那一刻你觉得所有的训练都值了。',
+      cond: g => (g.flags.esportTeam || g.flags.esportTrial) && !g.flags.esportTournament,
+      choices:[
+        { label:'拿了奖金，信心大增', hint:'+💰 +✨', fn: g => { g.flags.esportTournament=true; return{money:5000,charm:8}; }},
+        { label:'虽然没有名次，但认识了很多朋友', hint:'+❤️', fn: g => { g.flags.esportTournament=true; return{social:12}; }},
+        { label:'发现了自己的不足，回来继续练', hint:'+💪 +🧠', fn: g => { g.flags.esportTournament=true; return{health:3,intel:5}; }},
+      ]},
+    { id:'esport_career_v40_4', icon:'💻', title:'电竞职业', category:'esport',
+      body:'你把游戏变成了职业——也许不是职业选手，但你找到了和游戏相关的工作。你成了一个小有名气的主播，或者成了游戏公司的策划，或者做了电竞赛事解说。你的收入比你想象的要好，你终于可以对质疑你的人说：打游戏也能养活自己。但你偶尔也会怀念当初纯粹为了快乐而打游戏的日子。',
+      cond: g => (g.flags.esportStreamer || g.flags.esportTrial) && g.age >= 24 && !g.flags.esportCareer,
+      choices:[
+        { label:'成了游戏主播，粉丝越来越多', hint:'+💰 +✨', fn: g => { g.flags.esportCareer=true; g.flags.esportFamousStreamer=true; setJob(g,'游戏主播',15000); return{money:10000,charm:12}; }},
+        { label:'进了游戏公司做策划', hint:'+💰 +🧠', fn: g => { g.flags.esportCareer=true; setJob(g,'游戏策划',13000); return{money:8000,intel:8}; }},
+        { label:'做了电竞赛事解说和分析师', hint:'+💰 +✨', fn: g => { g.flags.esportCareer=true; setJob(g,'电竞解说',12000); return{money:7000,charm:10}; }},
+      ]},
+    { id:'esport_quit_v40_4', icon:'🚫', title:'戒游戏', category:'esport',
+      body:'你终于决定戒掉游戏。也许是因为工作太忙没时间，也许是因为对象不喜欢你整天打游戏，也许只是突然觉得：游戏里的成就再多，也换不来现实中的任何东西。卸载游戏的那天晚上你有点空虚，手不知道往哪里放。但第二天你睡到了自然醒，精神前所未有的好。你发现：原来一天有这么多时间可以做别的事情。',
+      cond: g => (g.flags.esportAddict || g.flags.esportHeavy) && g.age >= 25 && !g.flags.esportQuit,
+      choices:[
+        { label:'把游戏时间用来学编程', hint:'+🧠 +💰', fn: g => { g.flags.esportQuit=true; g.flags.esportToCode=true; return{intel:15,money:5000}; }},
+        { label:'开始健身，把精力发泄在跑步机上', hint:'+💪 +😊', fn: g => { g.flags.esportQuit=true; g.flags.esportToGym=true; return{health:15,mood:8}; }},
+        { label:'用这些时间修复了和朋友家人的关系', hint:'+❤️ +😊', fn: g => { g.flags.esportQuit=true; return{social:12,mood:10}; }},
+      ]},
+    { id:'esport_nostalgia_v40_4', icon:'💭', title:'游戏青春', category:'esport',
+      body:'偶然听到一首老歌，你想起了那些年打过的游戏。想起了大学宿舍里五个人开黑的日子，想起了在网吧通宵打副本的疯狂，想起了第一次拿到MVP时的激动，想起了那些因为游戏认识后来成了一辈子朋友的人。你打开游戏，发现好友列表里大部分人的最后登录时间都是"3年前""5年前"。你笑了笑，退出游戏，但心里暖暖的。',
+      cond: g => g.flags.esportTeam && g.age >= 28 && !g.flags.esportNostalgia,
+      choices:[
+        { label:'组织了一次老队友线上重聚', hint:'+❤️ +😊', fn: g => { g.flags.esportNostalgia=true; return{social:10,mood:12}; }},
+        { label:'写了一篇"我的游戏青春"的文章', hint:'+✨ +🧠', fn: g => { g.flags.esportNostalgia=true; g.flags.esportWriter=true; return{charm:10,intel:5}; }},
+        { label:'默默怀念，继续向前走', hint:'+😊', fn: g => { g.flags.esportNostalgia=true; return{mood:8}; }},
+      ]},
+    { id:'esport_life_v40_4', icon:'🌟', title:'游戏人生', category:'esport',
+      body:'有人说游戏是浪费时间，有人说游戏毁了年轻人。但你觉得，游戏教会了你很多东西——团队协作、策略思维、快速决策、承受失败。你见过凌晨四点还在练习操作的职业选手，也见过因为游戏找到人生方向的普通人。游戏不是逃避现实的工具，它本身就是你人生的一部分。多年后你回头看，那些和游戏有关的日子，也是你认真活过的证据。',
+      cond: g => (g.flags.esportCareer || g.flags.esportNostalgia || g.flags.esportQuit) && g.age >= 30 && !g.flags.esportLife,
+      choices:[
+        { label:'投资了一支业余电竞战队', hint:'+💰 +✨', fn: g => { g.flags.esportLife=true; g.flags.esportInvestor=true; return{money:-20000,charm:12}; }},
+        { label:'成了游戏行业的资深从业者', hint:'+💰 +🧠', fn: g => { g.flags.esportLife=true; return{money:15000,intel:10}; }},
+        { label:'感恩游戏带来的一切，继续热爱', hint:'+😊 +❤️', fn: g => { g.flags.esportLife=true; return{mood:12,social:8}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -27156,6 +27238,16 @@ const ACHIEVEMENTS = [
     { id:'liuxue_job_v40_3_ach', icon:'💼', name:'海归找工作', desc:'证明了海归不是海带', check: g => g.flags.liuxueJob },
     { id:'liuxue_identity_v40_3_ach', icon:'🪞', name:'身份认同', desc:'在两个文化之间找到了自己的位置', check: g => g.flags.liuxueIdentity },
     { id:'liuxue_life_v40_3_ach', icon:'🌟', name:'留学人生', desc:'留学最大的收获是那个更勇敢的自己', check: g => g.flags.liuxueLife },
+    { id:'esport_discover_v40_4_ach', icon:'🖥️', name:'网吧岁月', desc:'在网吧里度过了青春最疯狂的时光', check: g => g.flags.esportDiscover },
+    { id:'esport_addict_v40_4_ach', icon:'🎮', name:'游戏成瘾', desc:'分不清白天和黑夜的上分日子', check: g => g.flags.esportAddict },
+    { id:'esport_ranked_v40_4_ach', icon:'🏆', name:'上分之路', desc:'从青铜打到王者的执着', check: g => g.flags.esportRanked },
+    { id:'esport_team_v40_4_ach', icon:'👥', name:'组队开黑', desc:'找到了并肩作战的好兄弟', check: g => g.flags.esportTeam },
+    { id:'esport_dream_v40_4_ach', icon:'⭐', name:'电竞梦', desc:'认真考虑过把游戏变成职业', check: g => g.flags.esportDream },
+    { id:'esport_tournament_v40_4_ach', icon:'🏅', name:'业余比赛', desc:'在赛场上证明了自己的实力', check: g => g.flags.esportTournament },
+    { id:'esport_career_v40_4_ach', icon:'💻', name:'电竞职业', desc:'把热爱变成了饭碗', check: g => g.flags.esportCareer },
+    { id:'esport_quit_v40_4_ach', icon:'🚫', name:'戒游戏', desc:'放下鼠标，重新拥抱真实世界', check: g => g.flags.esportQuit },
+    { id:'esport_nostalgia_v40_4_ach', icon:'💭', name:'游戏青春', desc:'那些年一起开黑的日子', check: g => g.flags.esportNostalgia },
+    { id:'esport_life_v40_4_ach', icon:'🌟', name:'游戏人生', desc:'游戏也是认真活过的人生证据', check: g => g.flags.esportLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
