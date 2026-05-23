@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v38.2
+// 都市浮生记 - 数据文件 v38.3
 // ============================================
 
 
@@ -22960,6 +22960,90 @@ const EVENTS = [
         { label:'继续做一个享受台球的普通人', hint:'+😊 +🧠 +❤️', fn: g => { g.flags.billiardLife=true; return{mood:12,intel:5,social:5}; }},
       ]},
 
+    // === v38.3 搬家与漂泊文化 ===
+    { id:'move_first_v38_3', icon:'📦', title:'第一次搬家', category:'move',
+      body:'你拖着两个行李箱和三个纸箱，从大学宿舍搬到了第一间出租屋。六楼没有电梯，你搬了三趟。房间很小，一张床一张桌子，窗户对着隔壁楼的墙壁。但这是你在大城市里的第一个"家"。你把行李箱打开，把衣服一件件挂起来，突然有点想哭——不是难过，是一种"我真的开始了"的激动。',
+      cond: g => !g.flags.moveFirst && g.age >= 18,
+      choices:[
+        { label:'买了一束花放在窗台上', hint:'-💰 +😊', fn: g => { g.flags.moveFirst=true; return{money:-30,mood:10}; }},
+        { label:'给爸妈打了个电话报平安', hint:'+❤️ +😊', fn: g => { g.flags.moveFirst=true; return{mood:5,social:5}; }},
+      ]},
+
+    { id:'move_frequent_v38_3', icon:'🔄', title:'搬家常态', category:'move',
+      body:'这已经是你今年第三次搬家了。涨房租、室友换人、地铁太远——每次都有理由。你已经练就了一身搬家本领：半小时打包全部家当，叫货拉拉比叫外卖还熟练。朋友说："你是不是对住的地方没感情？"你说："不是没感情，是不敢有感情——因为随时可能要走。"',
+      cond: g => g.flags.moveFirst && !g.flags.moveFrequent && g.age >= 20,
+      choices:[
+        { label:'学会精简物品，只带必需品', hint:'+🧠 +💪', fn: g => { g.flags.moveFrequent=true; g.flags.moveMinimal=true; return{intel:5,health:3}; }},
+        { label:'每次搬家都扔一堆东西', hint:'-💰 +😊', fn: g => { g.flags.moveFrequent=true; return{money:-200,mood:5}; }},
+      ]},
+
+    { id:'move_find_v38_3', icon:'🔍', title:'找房血泪史', category:'move',
+      body:'你在各种APP上看了两百套房，实际看了二十套。"精装修"其实是墙刷了白漆，"南北通透"其实是窗户关不严，"近地铁"其实是骑车十五分钟。中介带你看了一个"性价比最高"的房子——一楼，没窗户，但确实便宜。你终于找到了一个勉强能接受的，签完合同才发现隔壁在装修。',
+      cond: g => g.flags.moveFirst && !g.flags.moveFind && g.age >= 19,
+      choices:[
+        { label:'成了找房专家，帮朋友避坑', hint:'+🤝 +🧠', fn: g => { g.flags.moveFind=true; g.flags.moveExpert=true; return{social:5,intel:8}; }},
+        { label:'咬牙签了，能住就行', hint:'+😅 -💰', fn: g => { g.flags.moveFind=true; return{mood:-3,money:-200}; }},
+      ]},
+
+    { id:'move_landlord_v38_3', icon:'👔', title:'奇葩房东', category:'move',
+      body:'你的房东每个月都来"检查"一次，其实就是在你的房间里转一圈，翻翻冰箱，看看你是不是养了宠物。"我的房子不能有划痕。"他说。你搬走的时候，他以"墙面有污渍"为由扣了你两个月押金。你拍了照片据理力争，他说："你去告我啊。"你第一次理解了什么叫"租客是弱势群体"。',
+      cond: g => g.flags.moveFirst && !g.flags.moveLandlord && g.age >= 20,
+      choices:[
+        { label:'拍照取证，通过平台维权', hint:'+🧠 +😤', fn: g => { g.flags.moveLandlord=true; g.flags.moveRight=true; return{intel:5,mood:-3}; }},
+        { label:'算了，吃一堑长一智', hint:'+🧠 -💰', fn: g => { g.flags.moveLandlord=true; return{intel:8,money:-3000}; }},
+      ]},
+
+    { id:'move_alone_v38_3', icon:'🚶', title:'一个人搬家', category:'move',
+      body:'这次没人帮忙，你一个人搬家。叫了货拉拉，自己打包、搬运、收拾。司机看你一个人搬得辛苦，帮你搭了把手。"一个人在外面不容易吧？"他问。你笑了笑没说话。到了新家，你把最后一箱东西放好，坐在地板上吃了一碗泡面。窗外是陌生的街道，但你觉得：一个人也可以过得很好。',
+      cond: g => g.flags.moveFirst && !g.flags.moveAlone && g.age >= 21,
+      choices:[
+        { label:'享受独处的自由', hint:'+😊 +🧠', fn: g => { g.flags.moveAlone=true; return{mood:8,intel:5}; }},
+        { label:'给朋友发了条消息说"搬完了"', hint:'+🤝 +❤️', fn: g => { g.flags.moveAlone=true; return{social:5,mood:5}; }},
+      ]},
+
+    { id:'move_tired_v38_3', icon:'😩', title:'搬家疲劳', category:'move',
+      body:'又收到房东的涨租通知，涨了500。你看着银行卡余额，开始计算：搬家费+押金+中介费+误工费，至少花一万。但不搬的话，每月多500，一年就是6000。你陷入了"搬家悖论"：搬也花钱，不搬也花钱。朋友说："这就是在大城市租房的原罪——你永远在给房东打工。"',
+      cond: g => g.flags.moveFrequent && !g.flags.moveTired && g.money > 5000,
+      choices:[
+        { label:'不搬了，接受涨价', hint:'-💰 +😩', fn: g => { g.flags.moveTired=true; return{money:-500,mood:-3}; }},
+        { label:'搬！找更便宜的地方', hint:'-💰 +💪', fn: g => { g.flags.moveTired=true; g.flags.moveAgain=true; return{money:-8000,health:-3}; }},
+        { label:'开始认真考虑买房', hint:'+🧠 +😰', fn: g => { g.flags.moveTired=true; g.flags.moveBuyThink=true; return{intel:5,mood:-5}; }},
+      ]},
+
+    { id:'move_conflict_v38_3', icon:'⚔️', title:'搬家引发的矛盾', category:'move',
+      body:'你要搬走了，室友很不高兴："你走了房租就变成我一个人承担了！"你说："这不怪我，是你要续租的啊。"室友说："我们当初说好一起住到合同结束的。"你们大吵了一架。搬家那天，室友一句话都没说。你在货拉拉上看着远去的小区，心里五味杂陈：在大城市，连告别都来不及好好说。',
+      cond: g => g.flags.moveFirst && !g.flags.moveConflict && g.age >= 20 && g.social > 15,
+      choices:[
+        { label:'主动道歉，请室友吃顿饭', hint:'-💰 +🤝 +❤️', fn: g => { g.flags.moveConflict=true; return{money:-300,social:5,mood:5}; }},
+        { label:'各走各路，大城市就是这样', hint:'+🧠 -🤝', fn: g => { g.flags.moveConflict=true; return{intel:5,social:-3}; }},
+      ]},
+
+    { id:'move_stay_v38_3', icon:'🤔', title:'去留抉择', category:'move',
+      body:'你在大城市漂了好几年了。爸妈说："回来吧，老家也有机会。"朋友说："留下来，再坚持一下。"你站在出租屋的窗前，看着城市的灯火。留下来意味着继续租房、加班、挤地铁；回去意味着安稳、熟悉、但也可能是一眼望到头的人生。你在日记本上写了一行字："这座城市，值得我留下来吗？"',
+      cond: g => g.flags.moveFrequent && !g.flags.moveStay && g.age >= 25,
+      choices:[
+        { label:'决定留下来，继续漂', hint:'+💪 +😊', fn: g => { g.flags.moveStay=true; g.flags.moveStayCity=true; return{health:3,mood:5}; }},
+        { label:'决定回老家，换一种活法', hint:'+❤️ +😊', fn: g => { g.flags.moveStay=true; g.flags.moveGoHome=true; return{mood:8,social:5}; }},
+        { label:'给自己一个期限：再试一年', hint:'+🧠 +💪', fn: g => { g.flags.moveStay=true; g.flags.moveDeadline=true; return{intel:5,health:3}; }},
+      ]},
+
+    { id:'move_away_v38_3', icon:'🚂', title:'离开一座城', category:'move',
+      body:'你决定离开这座城市了。退租、卖家具、注销各种账户。最后一天你去吃了最喜欢的面馆，老板说："下次来还给你加蛋。"你在火车站回头看了一眼——这座城市给了你成长、眼泪、和无数深夜里的孤独。你不知道下一座城市会怎样，但你知道：离开不是逃避，是另一种勇敢。',
+      cond: g => g.flags.moveStay && g.flags.moveGoHome && !g.flags.moveAway && g.age >= 25,
+      choices:[
+        { label:'头也不回地上了火车', hint:'+💪 +🧠', fn: g => { g.flags.moveAway=true; return{health:5,intel:5}; }},
+        { label:'在火车站犹豫了很久', hint:'+😢 +🧠', fn: g => { g.flags.moveAway=true; return{mood:-5,intel:8}; }},
+      ]},
+
+    { id:'move_home_v38_3', icon:'🌟', title:'什么是家', category:'move',
+      body:'搬了这么多次家，你终于想明白了：家不是一个地址，不是一个房子，是一种感觉。是你推开门有人等你，是冰箱里有你爱吃的东西，是书架上有你读过的书，是窗台上有你养活的植物。在大城市漂泊的人，要学会自己给自己一个"家"。因为心安处即是家，不管你在哪里。',
+      cond: g => g.age >= 28 && g.flags.moveFrequent && (g.flags.moveAlone || g.flags.moveConflict) && (g.flags.moveStay || g.flags.moveAway) && !g.flags.moveHome,
+      choices:[
+        { label:'在新城市安了一个温馨的小家', hint:'-💰 +❤️ +😊', fn: g => { g.flags.moveHome=true; return{money:-5000,mood:15,social:5}; }},
+        { label:'写了一篇《搬家指南》帮助后来者', hint:'+✨ +🧠', fn: g => { g.flags.moveHome=true; g.flags.moveGuide=true; return{charm:10,intel:8}; }},
+        { label:'继续做一个快乐的漂泊者', hint:'+😊 +💪 +🧠', fn: g => { g.flags.moveHome=true; return{mood:12,health:5,intel:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -25311,6 +25395,16 @@ const ACHIEVEMENTS = [
     { id:'billiard_old_v38_2_ach', icon:'🏚️', name:'最后一杆', desc:'见证了老台球厅的最后时光', check: g => g.flags.billiardOld },
     { id:'billiard_teach_v38_2_ach', icon:'📚', name:'球桌传承', desc:'开始教别人打台球', check: g => g.flags.billiardTeach },
     { id:'billiard_life_v38_2_ach', icon:'🌟', name:'台球人生', desc:'悟出了打球如做人的道理', check: g => g.flags.billiardLife },
+    { id:'move_first_v38_3_ach', icon:'📦', name:'第一次搬家', desc:'在大城市拥有了第一个属于自己的房间', check: g => g.flags.moveFirst },
+    { id:'move_frequent_v38_3_ach', icon:'🔄', name:'搬家达人', desc:'练就了一身搬家的本领', check: g => g.flags.moveFrequent },
+    { id:'move_find_v38_3_ach', icon:'🔍', name:'找房专家', desc:'在找房路上积累了丰富经验', check: g => g.flags.moveFind },
+    { id:'move_landlord_v38_3_ach', icon:'👔', name:'租客维权', desc:'经历了奇葩房东学会了保护自己', check: g => g.flags.moveLandlord },
+    { id:'move_alone_v38_3_ach', icon:'🚶', name:'独行侠', desc:'一个人完成了整次搬家', check: g => g.flags.moveAlone },
+    { id:'move_tired_v38_3_ach', icon:'😩', name:'搬家悖论', desc:'陷入了搬也花钱不搬也花钱的困境', check: g => g.flags.moveTired },
+    { id:'move_conflict_v38_3_ach', icon:'⚔️', name:'离别之痛', desc:'因为搬家和朋友产生了矛盾', check: g => g.flags.moveConflict },
+    { id:'move_stay_v38_3_ach', icon:'🤔', name:'去留之间', desc:'认真思考了要不要留在这座城市', check: g => g.flags.moveStay },
+    { id:'move_away_v38_3_ach', icon:'🚂', name:'离开一座城', desc:'勇敢地选择了一座新的城市', check: g => g.flags.moveAway },
+    { id:'move_home_v38_3_ach', icon:'🌟', name:'心安即家', desc:'终于理解了什么是真正的家', check: g => g.flags.moveHome },
 ];
 
 // === ENDINGS === (order matters: first match wins)
