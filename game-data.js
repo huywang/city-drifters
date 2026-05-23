@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v35.7
+// 都市浮生记 - 数据文件 v35.8
 // ============================================
 
 
@@ -20899,6 +20899,88 @@ const EVENTS = [
         { label:'把和宠物的故事写成了书', hint:'+💰 +✨', fn: g => { g.flags.petPhilosophy=true; g.flags.petWriter=true; return{money:8000,charm:15,intel:10}; }},
       ]},
 
+    // === v35.8 咖啡文化与第三空间 ===
+    { id:'coffee_first_v35_8', icon:'☕', title:'第一次去咖啡馆', category:'coffee',
+      body:'同事带你去了一家精品咖啡馆。你以前觉得咖啡就是速溶，没想到还有这么多门道。菜单上写着"埃塞俄比亚耶加雪菲"，你完全看不懂。',
+      cond: g => g.age >= 20 && g.age <= 35 && !g.flags.coffeeFirst && g.jobSalary > 0,
+      choices:[
+        { label:'点了一杯最贵的手冲', hint:'-💰 +😊 +🧠', fn: g => { g.flags.coffeeFirst=true; g.flags.coffeeCurious=true; return{money:-68,mood:8,intel:5}; }},
+        { label:'老实说看不懂菜单，让店员推荐', hint:'+😊', fn: g => { g.flags.coffeeFirst=true; return{mood:6,charm:3}; }},
+        { label:'觉得太贵了，回去买了罐雀巢', hint:'+💰', fn: g => { g.flags.coffeeFirst=true; g.flags.coffeePractical=true; return{money:-30,mood:2}; }},
+      ]},
+    { id:'coffee_pourover_v35_8', icon:'🫗', title:'手冲入门', category:'coffee',
+      body:'你在B站看了几十个手冲咖啡教程，入了手磨、滤杯、分享壶。第一次自己冲的咖啡又酸又涩，但你觉得这个过程有种仪式感。',
+      cond: g => g.age >= 22 && g.flags.coffeeFirst && !g.flags.coffeePourover && g.intel > 25,
+      choices:[
+        { label:'入了全套手冲装备，花了两千多', hint:'-💰 +🧠 +✨', fn: g => { g.flags.coffeePourover=true; g.flags.coffeeGear=true; return{money:-2500,intel:8,charm:5}; }},
+        { label:'只买了基础款，慢慢研究', hint:'-💰 +🧠', fn: g => { g.flags.coffeePourover=true; return{money:-800,intel:6,mood:5}; }},
+        { label:'看了教程就放弃了，太麻烦', hint:'+💰', fn: g => { return{money:0,mood:-3}; }},
+      ]},
+    { id:'coffee_work_v35_8', icon:'💻', title:'咖啡馆办公', category:'coffee',
+      body:'周末你带着电脑去咖啡馆加班。点一杯38块的美式坐了一下午，效率居然比在家高很多。旁边的人都在敲代码或写方案，氛围感拉满。',
+      cond: g => g.age >= 22 && g.flags.coffeeFirst && !g.flags.coffeeWork && g.jobSalary > 0,
+      choices:[
+        { label:'每周都去咖啡馆加班', hint:'-💰 +🧠 +😊', fn: g => { g.flags.coffeeWork=true; g.flags.coffeeRoutine=true; return{money:-150,intel:5,mood:3}; }},
+        { label:'偶尔去一次，毕竟咖啡不便宜', hint:'-💰 +🧠', fn: g => { g.flags.coffeeWork=true; return{money:-38,intel:3,mood:4}; }},
+        { label:'发现星巴克有插座更适合加班', hint:'-💰', fn: g => { g.flags.coffeeWork=true; g.flags.coffeeChain=true; return{money:-40,mood:2}; }},
+      ]},
+    { id:'coffee_indie_v35_8', icon:'🏠', title:'独立咖啡馆', category:'coffee',
+      body:'你发现了一家藏在巷子里的独立咖啡馆，老板是个从大厂辞职的程序员。店里只有六张桌子，放着你没听过的爵士乐，墙上挂着本地艺术家的画。',
+      cond: g => g.age >= 23 && g.flags.coffeeFirst && !g.flags.coffeeIndie && g.intel > 30,
+      choices:[
+        { label:'成了这家店的常客', hint:'-💰 +😊 +👥', fn: g => { g.flags.coffeeIndie=true; g.flags.coffeeRegular=true; return{money:-200,mood:8,social:5}; }},
+        { label:'和老板聊了聊他的创业故事', hint:'+🧠 +👥', fn: g => { g.flags.coffeeIndie=true; g.flags.coffeeStory=true; return{intel:6,social:6,charm:3}; }},
+        { label:'发了条朋友圈推荐这家店', hint:'+✨ +👥', fn: g => { g.flags.coffeeIndie=true; return{charm:5,social:3}; }},
+      ]},
+    { id:'coffee_social_v35_8', icon:'🤝', title:'咖啡社交', category:'coffee',
+      body:'朋友约你"喝杯咖啡聊聊"，原来是给你介绍一个行业内的大佬。在咖啡馆里你们聊了两个小时，对方给了你很多职业建议，还推了几个有用的人脉。',
+      cond: g => g.age >= 24 && g.flags.coffeeFirst && !g.flags.coffeeSocial && g.social > 25,
+      choices:[
+        { label:'主动加了微信，保持联系', hint:'+👥 +✨', fn: g => { g.flags.coffeeSocial=true; g.flags.coffeeNetwork=true; return{social:12,charm:8}; }},
+        { label:'聊完就散了，不太习惯社交', hint:'+🧠', fn: g => { g.flags.coffeeSocial=true; return{intel:5,mood:2}; }},
+        { label:'请对方喝了好几次咖啡', hint:'-💰 +👥 +👥', fn: g => { g.flags.coffeeSocial=true; g.flags.coffeeInvest=true; return{money:-300,social:15,charm:8}; }},
+      ]},
+    { id:'coffee_cost_v35_8', icon:'💸', title:'咖啡开销', category:'coffee',
+      body:'月底一算账，这个月光咖啡就花了一千多。每天一杯精品咖啡已经成了习惯，但你开始怀疑这是不是"中产消费陷阱"。同事说你现在说话都带咖啡味。',
+      cond: g => g.age >= 22 && (g.flags.coffeeWork || g.flags.coffeeRoutine) && !g.flags.coffeeCost && g.money < 30000,
+      choices:[
+        { label:'反思消费，改喝公司免费咖啡', hint:'+💰 -😊', fn: g => { g.flags.coffeeCost=true; g.flags.coffeeCut=true; return{money:500,mood:-5}; }},
+        { label:'觉得值，好咖啡就是值得花钱', hint:'-💰 +😊', fn: g => { g.flags.coffeeCost=true; return{money:-500,mood:5,charm:3}; }},
+        { label:'开始自己买豆子在家冲', hint:'+💰 +🧠', fn: g => { g.flags.coffeeCost=true; g.flags.coffeeHome=true; return{money:-300,intel:3,mood:3}; }},
+      ]},
+    { id:'coffee_addict_v35_8', icon:'🫠', title:'咖啡成瘾', category:'coffee',
+      body:'你发现自己一天不喝三杯咖啡就头疼，晚上还失眠。医生说你是咖啡因依赖加轻度焦虑，建议减少摄入。但你看了看手里的美式，觉得人生已经够苦了。',
+      cond: g => g.age >= 23 && (g.flags.coffeeRoutine || g.flags.coffeeWork) && !g.flags.coffeeAddict && g.health < 65,
+      choices:[
+        { label:'听医生的，每天只喝一杯', hint:'+❤️ -😊', fn: g => { g.flags.coffeeAddict=true; g.flags.coffeeReduce=true; return{health:5,mood:-5}; }},
+        { label:'换成低因咖啡', hint:'+❤️', fn: g => { g.flags.coffeeAddict=true; return{health:3,mood:-2}; }},
+        { label:'人生苦短，继续喝', hint:'-❤️ +😊', fn: g => { g.flags.coffeeAddict=true; g.flags.coffeeIgnore=true; return{health:-8,mood:5}; }},
+      ]},
+    { id:'coffee_learn_v35_8', icon:'🎓', title:'学做咖啡', category:'coffee',
+      body:'你报了一个咖啡师培训班，周末去学了两天。老师是个拿了国际比赛名次的咖啡师，教你怎么品鉴咖啡的风味、怎么拉花。虽然拉出来的花像一坨，但你很开心。',
+      cond: g => g.age >= 22 && g.flags.coffeePourover && !g.flags.coffeeLearn && g.money > 5000,
+      choices:[
+        { label:'认真学完拿到了初级证书', hint:'-💰 +🧠 +✨', fn: g => { g.flags.coffeeLearn=true; g.flags.coffeeCert=true; return{money:-3000,intel:10,charm:8}; }},
+        { label:'学了两天觉得太专业了，放弃', hint:'-💰 +🧠', fn: g => { g.flags.coffeeLearn=true; return{money:-3000,intel:5,mood:3}; }},
+        { label:'突然萌生了开咖啡馆的念头', hint:'-💰 +✨', fn: g => { g.flags.coffeeLearn=true; g.flags.coffeeDream=true; return{money:-3000,charm:5,mood:8}; }},
+      ]},
+    { id:'coffee_life_v35_8', icon:'🌿', title:'咖啡与人生', category:'coffee',
+      body:'你开始把咖啡当作一种生活态度。每天早上手冲一杯，看咖啡粉慢慢绽放，成了一天中最平静的时刻。朋友说你变了，变得不那么焦虑了。',
+      cond: g => g.age >= 25 && g.flags.coffeePourover && (g.flags.coffeeHome || g.flags.coffeeLearn) && !g.flags.coffeeLife && g.intel > 30,
+      choices:[
+        { label:'把咖啡当作每天的冥想', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.coffeeLife=true; g.flags.coffeeMindful=true; return{mood:12,health:5,intel:5}; }},
+        { label:'开始记录咖啡笔记，写了一年', hint:'+🧠 +✨', fn: g => { g.flags.coffeeLife=true; g.flags.coffeeJournal=true; return{intel:8,charm:8,mood:5}; }},
+        { label:'给常去的咖啡馆写了一篇长文', hint:'+✨ +👥', fn: g => { g.flags.coffeeLife=true; g.flags.coffeeWriter=true; return{charm:10,social:5}; }},
+      ]},
+    { id:'coffee_thirdspace_v35_8', icon:'🏙️', title:'第三空间', category:'coffee',
+      body:'你忽然理解了"第三空间"的含义——家是第一空间，公司是第二空间，而咖啡馆是你的第三空间。这里不属于任何人，你可以做你自己。大城市里每个人都需要这样一个角落。',
+      cond: g => g.age >= 26 && g.flags.coffeeLife && (g.flags.coffeeRegular || g.flags.coffeeMindful) && !g.flags.coffeeThirdSpace && g.intel > 35,
+      choices:[
+        { label:'在咖啡馆里写了一本关于城市的书', hint:'+💰 +✨ +🧠', fn: g => { g.flags.coffeeThirdSpace=true; g.flags.coffeeAuthor=true; return{money:5000,charm:15,intel:10}; }},
+        { label:'决定自己开一家社区咖啡馆', hint:'-💰 +✨ +👥', fn: g => { g.flags.coffeeThirdSpace=true; g.flags.coffeeOwner=true; return{money:-50000,charm:12,social:10,mood:10}; }},
+        { label:'只是安静地坐着，看窗外的人来人往', hint:'+😊 +🧠', fn: g => { g.flags.coffeeThirdSpace=true; return{mood:10,intel:8,charm:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -22964,6 +23046,18 @@ const ACHIEVEMENTS = [
     { id:'pet_holiday_v35_7_ach', icon:'🧳', name:'春节寄养大作战', desc:'为过年回家安顿宠物操碎了心', check: g => g.flags.petHoliday },
     { id:'pet_aging_v35_7_ach', icon:'🌅', name:'陪你慢慢变老', desc:'面对宠物衰老，学会了珍惜当下', check: g => g.flags.petAging },
     { id:'pet_philosophy_v35_7_ach', icon:'📖', name:'陪伴的意义', desc:'从宠物身上理解了什么是无条件的爱', check: g => g.flags.petPhilosophy },
+
+    // v35.8 咖啡文化与第三空间
+    { id:'coffee_first_v35_8_ach', icon:'☕', name:'咖啡入门', desc:'第一次走进精品咖啡馆', check: g => g.flags.coffeeFirst },
+    { id:'coffee_pourover_v35_8_ach', icon:'🫗', name:'手冲爱好者', desc:'入了手冲坑，装备比技术先到家', check: g => g.flags.coffeePourover },
+    { id:'coffee_work_v35_8_ach', icon:'💻', name:'咖啡馆打工人', desc:'在咖啡馆加了一下午班', check: g => g.flags.coffeeWork },
+    { id:'coffee_indie_v35_8_ach', icon:'🏠', name:'探店达人', desc:'找到了藏在巷子里的宝藏咖啡馆', check: g => g.flags.coffeeIndie },
+    { id:'coffee_social_v35_8_ach', icon:'🤝', name:'咖啡社交家', desc:'通过喝咖啡拓展了人脉', check: g => g.flags.coffeeSocial },
+    { id:'coffee_cost_v35_8_ach', icon:'💸', name:'咖啡账单惊人', desc:'发现每月咖啡开销超过了一千', check: g => g.flags.coffeeCost },
+    { id:'coffee_addict_v35_8_ach', icon:'🫠', name:'咖啡因依赖', desc:'一天不喝三杯就头疼', check: g => g.flags.coffeeAddict },
+    { id:'coffee_learn_v35_8_ach', icon:'🎓', name:'咖啡学员', desc:'上了咖啡师培训班', check: g => g.flags.coffeeLearn },
+    { id:'coffee_life_v35_8_ach', icon:'🌿', name:'咖啡生活家', desc:'把喝咖啡变成了一种生活态度', check: g => g.flags.coffeeLife },
+    { id:'coffee_thirdspace_v35_8_ach', icon:'🏙️', name:'第三空间', desc:'理解了每个人都需要一个属于自己的角落', check: g => g.flags.coffeeThirdSpace },
 ];
 
 // === ENDINGS === (order matters: first match wins)
