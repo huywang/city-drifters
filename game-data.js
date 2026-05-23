@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v38.7
+// 都市浮生记 - 数据文件 v38.8
 // ============================================
 
 
@@ -23373,6 +23373,89 @@ const EVENTS = [
         { label:'继续做一个珍惜每一趟车的乘客', hint:'+😊 +🧠 +❤️', fn: g => { g.flags.rideLife=true; return{mood:12,intel:5,social:5}; }},
       ]},
 
+    // === v38.8 小区物业与业主文化 ===
+    { id:'hoa_fee_v38_8', icon:'💰', title:'物业费涨价', category:'hoa',
+      body:'物业贴了公告：物业费从每平米2.5元涨到3.2元。业主群炸了锅："凭什么涨价？""服务没变为什么多收钱？""我们要看账目！"物业经理说："人工成本上涨了，绿化维护费用增加了。"你算了算，一年要多交将近一千块。"不交行不行？"有人问。"不交的话，你的车位可能会被锁。"群里顿时安静了。',
+      cond: g => !g.flags.hoaFee && g.age >= 25 && g.money > 5000,
+      choices:[
+        { label:'在业主群里支持合理涨价', hint:'+🤝 +🧠', fn: g => { g.flags.hoaFee=true; g.flags.hoaSupport=true; return{social:5,intel:3}; }},
+        { label:'联合其他业主要求公开账目', hint:'+🧠 +🤝', fn: g => { g.flags.hoaFee=true; g.flags.hoaAudit=true; return{intel:8,social:5}; }},
+        { label:'默默接受，多一事不如少一事', hint:'+😅 -💰', fn: g => { g.flags.hoaFee=true; return{mood:-3,money:-1000}; }},
+      ]},
+
+    { id:'hoa_parking_v38_8', icon:'🅿️', title:'停车位之争', category:'hoa',
+      body:'小区停车位不够用，你下班回来发现车位被占了。"这不是我的车位吗？"对方说："这是公共车位，先到先得。"你找了物业，物业说："我们也管不了，车位太紧张了。"你在业主群里发了火，引发了更激烈的讨论。原来小区里有一半业主没有车位，他们觉得这不公平。"有车的凭什么独占公共资源？"',
+      cond: g => g.flags.hoaFee && !g.flags.hoaParking && g.age >= 25,
+      choices:[
+        { label:'提议小区实行车位摇号制度', hint:'+🧠 +🤝', fn: g => { g.flags.hoaParking=true; g.flags.hoaLottery=true; return{intel:8,social:5}; }},
+        { label:'花钱租了一个固定车位', hint:'-💰 +😊', fn: g => { g.flags.hoaParking=true; return{money:-6000,mood:5}; }},
+      ]},
+
+    { id:'hoa_elevator_v38_8', icon:'🛗', title:'电梯又坏了', category:'hoa',
+      body:'你住在16楼，电梯已经坏了三天了。物业说："零件在等发货。"你每天爬16层楼，腿都快断了。"我们交了物业费就是为了爬楼梯？"你在群里说。17楼的大爷更惨，70多岁了，每次出门都要歇两次。"你们年轻人还能爬，我这把老骨头怎么办？"你帮他买了菜送上去，大爷握着你手说谢谢。',
+      cond: g => g.flags.hoaFee && !g.flags.hoaElevator && g.age >= 22,
+      choices:[
+        { label:'帮大爷买菜送上去', hint:'+❤️ +💪', fn: g => { g.flags.hoaElevator=true; g.flags.hoaHelp=true; return{mood:5,health:3,social:5}; }},
+        { label:'在群里@物业要求加快维修', hint:'+😤 +🧠', fn: g => { g.flags.hoaElevator=true; g.flags.hoaPush=true; return{mood:-3,intel:3}; }},
+      ]},
+
+    { id:'hoa_guard_v38_8', icon:'👮', title:'保安大叔', category:'hoa',
+      body:'小区保安老张每天笑眯眯地跟每个人打招呼。"上班啊？注意安全！""回来啦？今天辛苦了！"你发现他记得每个住户的名字和车牌号。有天你忘带门禁卡，老张帮你开门："没事，我认得你。"后来你听说他工资才三千块，还经常被业主投诉。"干这行就是挨骂的，"老张笑着说，"但总得有人干啊。"',
+      cond: g => g.flags.hoaFee && !g.flags.hoaGuard && g.age >= 20,
+      choices:[
+        { label:'每次路过都跟老张打个招呼', hint:'+🤝 +❤️', fn: g => { g.flags.hoaGuard=true; g.flags.hoaKind=true; return{social:5,mood:3}; }},
+        { label:'过年给老张包了个红包', hint:'-💰 +❤️', fn: g => { g.flags.hoaGuard=true; g.flags.hoaRedPacket=true; return{money:-200,mood:8}; }},
+      ]},
+
+    { id:'hoa_group_v38_8', icon:'📱', title:'业主群大战', category:'hoa',
+      body:'业主群又吵起来了。这次是因为有人在楼道里堆杂物、有人遛狗不牵绳、有人半夜唱歌。"这里是我家，我想怎样就怎样！""这是公共区域！""你不满意就搬走啊！"你看着消息一条接一条弹出来，头都大了。群主发了个公告："请大家文明讨论，互相尊重。"然后群里更炸了——"你算老几？凭什么管我们？"',
+      cond: g => g.flags.hoaFee && !g.flags.hoaGroup && g.social > 15,
+      choices:[
+        { label:'出来当和事佬，调解矛盾', hint:'+🤝 +🧠', fn: g => { g.flags.hoaGroup=true; g.flags.hoaMediator=true; return{social:8,intel:5}; }},
+        { label:'默默把群消息设为免打扰', hint:'+😅 +🧠', fn: g => { g.flags.hoaGroup=true; return{mood:3,intel:3}; }},
+      ]},
+
+    { id:'hoa_complaint_v38_8', icon:'📋', title:'投诉物业', category:'hoa',
+      body:'你实在忍不了了，向住建局投诉了物业。"小区绿化没人管、路灯坏了没人修、消防通道被堵了。"住建局回复："已转交相关部门处理。"等了一个月没动静。你又投诉了一次。"您反映的问题正在处理中。"朋友说："投诉物业就像向老天爷求雨——不知道什么时候来。"',
+      cond: g => g.flags.hoaFee && !g.flags.hoaComplaint && g.age >= 22,
+      choices:[
+        { label:'继续投诉，不放弃', hint:'+🧠 +💪', fn: g => { g.flags.hoaComplaint=true; g.flags.hoaPersist=true; return{intel:5,health:3}; }},
+        { label:'算了，自己想办法解决', hint:'+🧠 +😅', fn: g => { g.flags.hoaComplaint=true; return{intel:5,mood:-3}; }},
+      ]},
+
+    { id:'hoa_committee_v38_8', icon:'🏛️', title:'业委会选举', category:'hoa',
+      body:'小区要成立业主委员会了。有人提名你："你年轻有文化，懂法律，来当委员吧。"你犹豫了——当业委会委员没工资，还要花大量时间和物业周旋。但看着小区的问题没人管，你还是报了名。选举那天你做了个简短的演讲："我不是来当官的，我是来帮大家解决问题的。"你以第二高票当选了。',
+      cond: g => g.flags.hoaFee && !g.flags.hoaCommittee && g.age >= 25 && g.intel > 25 && g.social > 20,
+      choices:[
+        { label:'认真履职，推动小区改善', hint:'+🤝 +🧠 -😊', fn: g => { g.flags.hoaCommittee=true; g.flags.hoaActive=true; return{social:10,intel:5,mood:-3}; }},
+        { label:'当选了但保持低调', hint:'+🤝 +🧠', fn: g => { g.flags.hoaCommittee=true; return{social:5,intel:3}; }},
+      ]},
+
+    { id:'hoa_noise_v38_8', icon:'🔊', title:'邻里噪音', category:'hoa',
+      body:'楼上每天晚上十一点还在跳绳，你快崩溃了。你上楼敲门，开门的是个年轻妈妈："不好意思，孩子精力太旺盛了。"你理解她，但你的睡眠也很重要。你在门上贴了个纸条："亲爱的邻居，能否在九点后保持安静？谢谢！"第二天楼上的噪音小了很多，门上多了一张回复："不好意思，以后注意。——楼上的"',
+      cond: g => g.flags.hoaFee && !g.flags.hoaNoise && g.age >= 22,
+      choices:[
+        { label:'送楼上一些隔音脚垫', hint:'-💰 +🤝', fn: g => { g.flags.hoaNoise=true; g.flags.hoaGift=true; return{money:-100,social:8}; }},
+        { label:'自己买副好耳塞', hint:'-💰 +😅', fn: g => { g.flags.hoaNoise=true; return{money:-200,mood:3}; }},
+      ]},
+
+    { id:'hoa_package_v38_8', icon:'📦', title:'快递柜与代收', category:'hoa',
+      body:'小区门口的快递柜总是满的，你每次都要跑到两公里外的驿站取件。物业说："快递柜不够用，我们正在谈增加。"你发现一个问题：快递员不愿意送上门，直接把包裹扔在快递柜。"我这可是生鲜啊！"你投诉了快递公司，客服说："非常抱歉，我们会处理。"然后就没有然后了。你终于理解了什么叫"最后一公里"的难题。',
+      cond: g => g.flags.hoaFee && !g.flags.hoaPackage,
+      choices:[
+        { label:'和邻居一起向快递公司投诉', hint:'+🤝 +🧠', fn: g => { g.flags.hoaPackage=true; g.flags.hoaTogether=true; return{social:5,intel:5}; }},
+        { label:'习惯了去驿站取件', hint:'+😅 +💪', fn: g => { g.flags.hoaPackage=true; return{mood:-2,health:3}; }},
+      ]},
+
+    { id:'hoa_life_v38_8', icon:'🌟', title:'小区人生', category:'hoa',
+      body:'经历了这么多物业纠纷和邻里矛盾，你终于理解了：一个小区就是一个微型社会。物业费是税，业委会是政府，保安是军队，业主群是议会。每个人都在为自己的利益发声，但真正让小区变好的，不是谁嗓门大，而是谁愿意为公共利益让步。"好的小区不是物业管出来的，是业主一起建出来的。"你在业委会总结会上这么说。',
+      cond: g => g.age >= 30 && g.flags.hoaFee && (g.flags.hoaCommittee || g.flags.hoaGuard) && (g.flags.hoaNoise || g.flags.hoaParking) && !g.flags.hoaLife,
+      choices:[
+        { label:'牵头成立了一个小区互助基金', hint:'-💰 +❤️ +🤝', fn: g => { g.flags.hoaLife=true; g.flags.hoaFund=true; return{money:-5000,mood:15,social:12}; }},
+        { label:'写了一本《中国小区生存指南》', hint:'+✨ +🧠', fn: g => { g.flags.hoaLife=true; g.flags.hoaBook=true; return{charm:12,intel:8}; }},
+        { label:'继续做一个负责任的好邻居', hint:'+😊 +🤝 +❤️', fn: g => { g.flags.hoaLife=true; return{mood:12,social:8,health:3}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -25774,6 +25857,16 @@ const ACHIEVEMENTS = [
     { id:'ride_share_v38_7_ach', icon:'👥', name:'拼车奇遇', desc:'在拼车中遇到了意想不到的人', check: g => g.flags.rideShare },
     { id:'ride_parttime_v38_7_ach', icon:'🚕', name:'兼职司机', desc:'亲自体验了跑网约车的辛苦', check: g => g.flags.rideParttime },
     { id:'ride_life_v38_7_ach', icon:'🌟', name:'车轮人生', desc:'理解了每辆车背后都有一个努力生活的人', check: g => g.flags.rideLife },
+    { id:'hoa_fee_v38_8_ach', icon:'💰', name:'物业之争', desc:'经历了物业费涨价的风波', check: g => g.flags.hoaFee },
+    { id:'hoa_parking_v38_8_ach', icon:'🅿️', name:'抢车位', desc:'参与了小区停车位之争', check: g => g.flags.hoaParking },
+    { id:'hoa_elevator_v38_8_ach', icon:'🛗', name:'爬楼达人', desc:'在电梯坏了的日子里学会了爬16楼', check: g => g.flags.hoaElevator },
+    { id:'hoa_guard_v38_8_ach', icon:'👮', name:'保安之友', desc:'和小区保安成了朋友', check: g => g.flags.hoaGuard },
+    { id:'hoa_group_v38_8_ach', icon:'📱', name:'群聊幸存者', desc:'在业主群的大战中存活了下来', check: g => g.flags.hoaGroup },
+    { id:'hoa_complaint_v38_8_ach', icon:'📋', name:'维权先锋', desc:'向相关部门投诉了物业', check: g => g.flags.hoaComplaint },
+    { id:'hoa_committee_v38_8_ach', icon:'🏛️', name:'业委会委员', desc:'当选了小区业主委员会委员', check: g => g.flags.hoaCommittee },
+    { id:'hoa_noise_v38_8_ach', icon:'🔊', name:'睦邻之道', desc:'用智慧解决了邻里噪音问题', check: g => g.flags.hoaNoise },
+    { id:'hoa_package_v38_8_ach', icon:'📦', name:'最后一百米', desc:'经历了快递最后一百米的难题', check: g => g.flags.hoaPackage },
+    { id:'hoa_life_v38_8_ach', icon:'🌟', name:'小区人生', desc:'理解了好的小区是业主一起建出来的', check: g => g.flags.hoaLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
