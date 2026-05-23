@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v40.4
+// 都市浮生记 - 数据文件 v40.5
 // ============================================
 
 
@@ -24664,6 +24664,88 @@ const EVENTS = [
         { label:'感恩游戏带来的一切，继续热爱', hint:'+😊 +❤️', fn: g => { g.flags.esportLife=true; return{mood:12,social:8}; }},
       ]},
 
+    // === v40.5 奶茶与饮品文化 ===
+    { id:'milktea_first_v40_5', icon:'🧋', title:'第一杯奶茶', category:'milktea',
+      body:'同事拉你一起点奶茶，你犹豫了一下选了一杯"多肉葡萄"。第一口下去，酸酸甜甜的，上面还有奶盖，下面是Q弹的珍珠——你打开了新世界的大门。从那天起，你发现公司楼下那家奶茶店成了你每天必去的地方。同事说"秋天的第一杯奶茶"，你发了条朋友圈，收获了几十个点赞。',
+      cond: g => g.age >= 18 && g.age <= 35 && !g.flags.milkteaFirst,
+      choices:[
+        { label:'从此爱上奶茶，每周至少喝三杯', hint:'+😊 -💪', fn: g => { g.flags.milkteaFirst=true; g.flags.milkteaLove=true; return{mood:8,health:-3}; }},
+        { label:'偶尔喝一杯，当个奖励', hint:'+😊', fn: g => { g.flags.milkteaFirst=true; return{mood:5}; }},
+        { label:'太甜了，不太喜欢', hint:'+🧠', fn: g => { g.flags.milkteaFirst=true; g.flags.milkteaDislike=true; return{intel:2}; }},
+      ]},
+    { id:'milktea_addict_v40_5', icon:'🥤', title:'奶茶续命', category:'milktea',
+      body:'你已经完全离不开奶茶了。每天早上到公司第一件事是打开外卖APP点一杯，下午犯困的时候再来一杯"续命"。你的手机里装了五个奶茶品牌的APP，每个品牌的会员积分你都攒了好几万。你算了一下，一个月花在奶茶上的钱差不多一千块。你妈要是知道了肯定骂你："喝白水不行吗？"',
+      cond: g => g.flags.milkteaLove && !g.flags.milkteaAddict,
+      choices:[
+        { label:'快乐最重要，继续喝', hint:'+😊 -💰 -💪', fn: g => { g.flags.milkteaAddict=true; return{mood:8,money:-8000,health:-8}; }},
+        { label:'尝试减少频率，改成一周两杯', hint:'+💪 +💰', fn: g => { g.flags.milkteaAddict=true; g.flags.milkteaReduce=true; return{health:3,money:3000}; }},
+        { label:'开始自己做奶茶，省钱又健康', hint:'+🧠 +💰', fn: g => { g.flags.milkteaAddict=true; g.flags.milkteaDIY=true; return{intel:5,money:2000}; }},
+      ]},
+    { id:'milktea_social_v40_5', icon:'🫶', title:'奶茶社交', category:'milktea',
+      body:'你发现奶茶成了你社交的万能钥匙。新同事来了请喝奶茶表示欢迎，求同事帮忙先递一杯奶茶铺垫，和朋友闹别扭了用奶茶破冰。"请你喝杯奶茶"成了你最常说的社交暗号。你甚至建了一个"奶茶搭子群"，每天下午三点准时有人在群里问"今天喝什么"。奶茶不只是饮料，它是都市人最便宜的社交货币。',
+      cond: g => g.flags.milkteaFirst && !g.flags.milkteaSocial,
+      choices:[
+        { label:'成了办公室的"奶茶团长"', hint:'+❤️ +✨', fn: g => { g.flags.milkteaSocial=true; g.flags.milkteaLeader=true; return{social:12,charm:8}; }},
+        { label:'通过奶茶认识了好几个朋友', hint:'+❤️', fn: g => { g.flags.milkteaSocial=true; return{social:10}; }},
+        { label:'觉得这种社交方式挺好的', hint:'+😊', fn: g => { g.flags.milkteaSocial=true; return{mood:5,social:5}; }},
+      ]},
+    { id:'milktea_brand_v40_5', icon:'🏪', title:'奶茶品牌大战', category:'milktea',
+      body:'你发现自己不知不觉卷入了奶茶品牌大战。喜茶、奈雪、霸王茶姬、茶百道、蜜雪冰城……每家都在推新品、搞联名、发优惠券。你成了各大品牌的"品鉴师"，哪家茶底好喝、哪家小料给力、哪家性价比高你门儿清。看到两个奶茶品牌在社交媒体上互怼的时候你居然觉得很好笑——你什么时候变成了精神股东？',
+      cond: g => g.flags.milkteaSocial && !g.flags.milkteaBrand,
+      choices:[
+        { label:'每家都试了一遍，写了测评发小红书', hint:'+✨ +🧠', fn: g => { g.flags.milkteaBrand=true; g.flags.milkteaReviewer=true; return{charm:10,intel:5}; }},
+        { label:'认定一家一直喝', hint:'+😊', fn: g => { g.flags.milkteaBrand=true; return{mood:5}; }},
+        { label:'开始关注奶茶行业的商业模式', hint:'+🧠 +💰', fn: g => { g.flags.milkteaBrand=true; g.flags.milkteaBusiness=true; return{intel:8,money:2000}; }},
+      ]},
+    { id:'milktea_sugar_v40_5', icon:'🍬', title:'控糖焦虑', category:'milktea',
+      body:'体检报告上"血糖偏高"四个字让你慌了。你算了算自己这些年喝了多少杯奶茶，感觉血管里流的不是血而是糖浆。你开始关注奶茶的热量和含糖量，发现一杯全糖奶茶的热量等于两碗米饭。你改成了三分糖、无糖，甚至开始看配料表。但每次路过奶茶店闻到那股香味，你还是会动摇。健康和快乐之间，真的只能选一个吗？',
+      cond: g => g.flags.milkteaAddict && g.age >= 25 && !g.flags.milkteaSugar,
+      choices:[
+        { label:'彻底戒了奶茶，改喝白水', hint:'+💪 +😊', fn: g => { g.flags.milkteaSugar=true; g.flags.milkteaQuit=true; return{health:12,mood:5}; }},
+        { label:'改成无糖茶饮，健康又好喝', hint:'+💪 +🧠', fn: g => { g.flags.milkteaSugar=true; g.flags.milkteaTea=true; return{health:8,intel:3}; }},
+        { label:'该喝还是喝，人生苦短', hint:'+😊 -💪', fn: g => { g.flags.milkteaSugar=true; return{mood:8,health:-5}; }},
+      ]},
+    { id:'milktea_work_v40_5', icon:'🧑‍🍳', title:'奶茶店打工', category:'milktea',
+      body:'你决定去奶茶店打份工，既能免费喝奶茶又能赚点外快。但进去才发现完全不是那么回事——摇茶摇到手酸，做一杯要记十几个配方，高峰期排队排到店门口，顾客嫌做得慢还甩脸子。你终于理解了为什么每杯奶茶卖十五块——这里面每一分钱都是辛苦钱。打了三个月工，你看到奶茶就想吐。',
+      cond: g => g.flags.milkteaFirst && g.age <= 28 && g.money < 30000 && !g.flags.milkteaWork,
+      choices:[
+        { label:'坚持干了下来，学会了所有配方', hint:'+💰 +💪', fn: g => { g.flags.milkteaWork=true; g.flags.milkteaExpert=true; return{money:8000,health:-3}; }},
+        { label:'干了两个月实在受不了了', hint:'+💰 -💪', fn: g => { g.flags.milkteaWork=true; return{money:5000,health:-5}; }},
+        { label:'边打工边研究经营门道', hint:'+🧠 +💰', fn: g => { g.flags.milkteaWork=true; g.flags.milkteaBizPlan=true; return{intel:8,money:6000}; }},
+      ]},
+    { id:'milktea_open_v40_5', icon:'🏬', title:'开奶茶店', category:'milktea',
+      body:'你做了一个大胆的决定：自己开一家奶茶店。加盟费加装修加设备，前期投入三十万。你选了个好位置，设计了好看的杯子，研发了几款招牌饮品。开业第一天排队排了两个小时，你激动得差点哭了。但三个月后你发现：每天工作十四个小时，毛利只有百分之四十，旁边又开了三家竞争对手。你终于明白：卖奶茶是门好生意，但开奶茶店不一定是。',
+      cond: g => (g.flags.milkteaBizPlan || g.flags.milkteaBusiness) && g.money >= 50000 && !g.flags.milkteaOpen,
+      choices:[
+        { label:'努力经营，研发新品吸引顾客', hint:'+💰 +💪', fn: g => { g.flags.milkteaOpen=true; g.flags.milkteaSuccess=true; setJob(g,'奶茶店老板',10000); return{money:15000,health:-5}; }},
+        { label:'半年后亏本转让了', hint:'-💰 +🧠', fn: g => { g.flags.milkteaOpen=true; g.flags.milkteaFail=true; return{money:-80000,intel:10}; }},
+        { label:'请了店长代管，自己做甩手掌柜', hint:'+😊 +💰', fn: g => { g.flags.milkteaOpen=true; setJob(g,'奶茶店投资人',8000); return{mood:5,money:5000}; }},
+      ]},
+    { id:'milktea_coffee_v40_5', icon:'☕', title:'咖啡觉醒', category:'milktea',
+      body:'也许是年纪到了，也许是口味变了，你开始觉得奶茶太甜了。某天路过一家咖啡店，点了一杯美式——苦，但是回甘。你开始研究咖啡豆的产地、烘焙度、萃取方式。从速溶到手冲，从美式到拿铁，你发现自己进入了一个全新的饮品世界。同事说"你变了"，你端起咖啡杯说："我只是长大了。"',
+      cond: g => (g.flags.milkteaSugar || g.flags.milkteaReduce) && g.age >= 26 && !g.flags.milkteaCoffee,
+      choices:[
+        { label:'买了咖啡机在家自己做', hint:'-💰 +🧠', fn: g => { g.flags.milkteaCoffee=true; g.flags.coffeeMachine=true; return{money:-3000,intel:5}; }},
+        { label:'成了精品咖啡店的常客', hint:'-💰 +✨', fn: g => { g.flags.milkteaCoffee=true; return{money:-5000,charm:5}; }},
+        { label:'开始学咖啡拉花', hint:'+✨ +😊', fn: g => { g.flags.milkteaCoffee=true; g.flags.latteArt=true; return{charm:8,mood:5}; }},
+      ]},
+    { id:'milktea_trend_v40_5', icon:'📱', title:'饮品潮流', category:'milktea',
+      body:'饮品行业的变化快得让你眼花缭乱。从奶茶到咖啡，从果汁到气泡水，从养生茶到功能饮料。你看着那些网红饮品店从排队两小时到门可罗雀只用了半年。你开始思考：这些花里胡哨的饮品到底值不值得买？一杯水的成本不到一块钱，凭什么卖三十块？也许你买的不是饮品本身，而是一种生活方式的幻觉。',
+      cond: g => (g.flags.milkteaBrand || g.flags.milkteaCoffee) && !g.flags.milkteaTrend,
+      choices:[
+        { label:'开始研究饮品行业的投资逻辑', hint:'+🧠 +💰', fn: g => { g.flags.milkteaTrend=true; return{intel:10,money:3000}; }},
+        { label:'回归白水，觉得最简单的最好', hint:'+💪 +😊', fn: g => { g.flags.milkteaTrend=true; g.flags.drinkWater=true; return{health:8,mood:5}; }},
+        { label:'觉得这就是消费主义的缩影', hint:'+🧠', fn: g => { g.flags.milkteaTrend=true; g.flags.antiConsumer=true; return{intel:8}; }},
+      ]},
+    { id:'milktea_life_v40_5', icon:'🌟', title:'奶茶人生', category:'milktea',
+      body:'你翻看手机里的照片，发现有一半是和奶茶的合影。从大学时的蜜雪冰城，到工作后的喜茶霸王茶姬，再到后来的手冲咖啡——你的饮品选择记录了你人生的每个阶段。有人觉得奶茶是智商税，有人觉得它是当代年轻人的精神寄托。但你知道，那些和朋友一起点奶茶的下午，加班时靠一杯奶茶撑过去的夜晚，失恋时用奶茶安慰自己的时刻——这些小小的幸福，构成了你平凡而真实的人生。',
+      cond: g => (g.flags.milkteaTrend || g.flags.milkteaCoffee || g.flags.milkteaOpen) && g.age >= 28 && !g.flags.milkteaLife,
+      choices:[
+        { label:'开了一家自己的饮品工作室', hint:'+💰 +✨', fn: g => { g.flags.milkteaLife=true; g.flags.drinkStudio=true; setJob(g,'饮品研发师',12000); return{money:8000,charm:10}; }},
+        { label:'写了一本关于饮品文化的随笔集', hint:'+✨ +🧠', fn: g => { g.flags.milkteaLife=true; return{charm:12,intel:8}; }},
+        { label:'举起杯子，敬这杯叫做人生的奶茶', hint:'+😊 +❤️', fn: g => { g.flags.milkteaLife=true; return{mood:15,social:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -27248,6 +27330,16 @@ const ACHIEVEMENTS = [
     { id:'esport_quit_v40_4_ach', icon:'🚫', name:'戒游戏', desc:'放下鼠标，重新拥抱真实世界', check: g => g.flags.esportQuit },
     { id:'esport_nostalgia_v40_4_ach', icon:'💭', name:'游戏青春', desc:'那些年一起开黑的日子', check: g => g.flags.esportNostalgia },
     { id:'esport_life_v40_4_ach', icon:'🌟', name:'游戏人生', desc:'游戏也是认真活过的人生证据', check: g => g.flags.esportLife },
+    { id:'milktea_first_v40_5_ach', icon:'🧋', name:'第一杯奶茶', desc:'打开了奶茶世界的大门', check: g => g.flags.milkteaFirst },
+    { id:'milktea_addict_v40_5_ach', icon:'🥤', name:'奶茶续命', desc:'没有奶茶的下午是不完整的', check: g => g.flags.milkteaAddict },
+    { id:'milktea_social_v40_5_ach', icon:'🫶', name:'奶茶社交', desc:'用一杯奶茶打开了所有人的心门', check: g => g.flags.milkteaSocial },
+    { id:'milktea_brand_v40_5_ach', icon:'🏪', name:'奶茶品鉴师', desc:'喝遍了所有品牌，成了奶茶百科全书', check: g => g.flags.milkteaBrand },
+    { id:'milktea_sugar_v40_5_ach', icon:'🍬', name:'控糖焦虑', desc:'在甜蜜和健康之间艰难抉择', check: g => g.flags.milkteaSugar },
+    { id:'milktea_work_v40_5_ach', icon:'🧑‍🍳', name:'奶茶店打工', desc:'体验了摇茶摇到手酸的日子', check: g => g.flags.milkteaWork },
+    { id:'milktea_open_v40_5_ach', icon:'🏬', name:'开奶茶店', desc:'实现了开一家奶茶店的梦想', check: g => g.flags.milkteaOpen },
+    { id:'milktea_coffee_v40_5_ach', icon:'☕', name:'咖啡觉醒', desc:'从奶茶少年变成了咖啡大人', check: g => g.flags.milkteaCoffee },
+    { id:'milktea_trend_v40_5_ach', icon:'📱', name:'饮品潮流', desc:'看透了饮品行业的潮起潮落', check: g => g.flags.milkteaTrend },
+    { id:'milktea_life_v40_5_ach', icon:'🌟', name:'奶茶人生', desc:'那些和奶茶有关的日子，就是真实的人生', check: g => g.flags.milkteaLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
