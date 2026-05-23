@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v38.4
+// 都市浮生记 - 数据文件 v38.5
 // ============================================
 
 
@@ -23126,6 +23126,89 @@ const EVENTS = [
         { label:'继续做一个深夜烧烤的常客', hint:'+😊 +❤️ +🍢', fn: g => { g.flags.bbqLife=true; return{mood:12,social:5,health:3}; }},
       ]},
 
+    // === v38.5 相亲角与婚姻市场 ===
+    { id:'match_corner_v38_5', icon:'📋', title:'路过相亲角', category:'match',
+      body:'周末逛公园，看到一棵树上挂满了纸条。走近一看全是相亲信息："男，92年，本科，年薪30万，有房有车""女，95年，硕士，事业编，肤白貌美"。你惊呆了：这简直是人类交易市场。一个大妈拉住你："小伙子/小姑娘，单身吗？我儿子/女儿条件很好的。"你尴尬地笑了笑，快步走开了。',
+      cond: g => !g.flags.matchCorner && g.age >= 22,
+      choices:[
+        { label:'好奇地多看了几张纸条', hint:'+🧠 +😅', fn: g => { g.flags.matchCorner=true; return{intel:5,mood:3}; }},
+        { label:'赶紧走开，太尴尬了', hint:'+😅', fn: g => { g.flags.matchCorner=true; return{mood:-2}; }},
+      ]},
+
+    { id:'match_parents_v38_5', icon:'👨‍👩‍👦', title:'爸妈替你去相亲', category:'match',
+      body:'你妈偷偷去了相亲角，把你的信息挂在了树上。你接到一个陌生电话："你好，我是李阿姨，你妈妈把你的资料给我了。"你才知道你妈写了你的身高体重学历收入——像一份求职简历。"妈！你怎么不告诉我！"你妈说："你都这么大了还不着急，我不帮你谁帮你？"你无力反驳。',
+      cond: g => !g.flags.matchParents && g.age >= 25,
+      choices:[
+        { label:'算了，去见一面也无妨', hint:'+😊 +🤝', fn: g => { g.flags.matchParents=true; return{mood:3,social:5}; }},
+        { label:'坚决不去，自己的事自己做主', hint:'+🧠 -❤️', fn: g => { g.flags.matchParents=true; g.flags.matchRefuse=true; return{intel:5,mood:-3}; }},
+      ]},
+
+    { id:'match_resume_v38_5', icon:'📝', title:'婚姻简历', category:'match',
+      body:'你去了一次相亲角，发现每个人都在展示"婚姻简历"：身高、体重、学历、收入、房车、户口。你意识到：在这里，爱情被量化成了Excel表格。一个大爷看着你的"简历"摇头："你这个条件……有点难啊。"你不知道该生气还是该笑。原来在婚姻市场里，你不是一个人，你是一组数据。',
+      cond: g => g.flags.matchCorner && !g.flags.matchResume && g.age >= 25,
+      choices:[
+        { label:'不服气，把自己的条件好好包装了一下', hint:'+✨ +😤', fn: g => { g.flags.matchResume=true; return{charm:5,mood:3}; }},
+        { label:'突然觉得这种方式很荒诞', hint:'+🧠 +😅', fn: g => { g.flags.matchResume=true; return{intel:8,mood:-3}; }},
+      ]},
+
+    { id:'match_ghost_v38_5', icon:'👻', title:'相亲被放鸽子', category:'match',
+      body:'约好了在咖啡厅见面，你提前到了。等了半小时，对方发来消息："不好意思，临时有事。"又等了一小时，没有第二条消息。你喝完两杯咖啡，一个人走出了咖啡厅。"被放鸽子了。"你跟朋友吐槽。朋友说："相亲就是这样，成功率不到5%，大多数都是互相浪费时间。"你开始怀疑这种认识人的方式到底靠不靠谱。',
+      cond: g => g.flags.matchParents && !g.flags.matchGhost && g.age >= 24,
+      choices:[
+        { label:'虽然被鸽了但决定再试试', hint:'+💪 +😊', fn: g => { g.flags.matchGhost=true; return{health:3,mood:3}; }},
+        { label:'不想再相亲了，顺其自然', hint:'+🧠 +😊', fn: g => { g.flags.matchGhost=true; g.flags.matchNatural=true; return{intel:5,mood:5}; }},
+      ]},
+
+    { id:'match_app_v38_5', icon:'📱', title:'相亲APP', category:'match',
+      body:'你下载了一个相亲APP，每天收到几十条"打招呼"。"在吗""吃了吗""发张照片看看"——你感觉自己像在网购。你试着约了几个，见面后发现照片和真人差距太大。"这个APP上全是照骗，"你跟朋友吐槽。但你不得不承认，至少它让你认识了一些平时不会遇到的人。',
+      cond: g => g.flags.matchCorner && !g.flags.matchApp && g.age >= 22,
+      choices:[
+        { label:'认真经营相亲档案', hint:'+🤝 +✨', fn: g => { g.flags.matchApp=true; return{social:5,charm:5}; }},
+        { label:'当成消遣，不抱太大期望', hint:'+😊 +🧠', fn: g => { g.flags.matchApp=true; return{mood:3,intel:3}; }},
+      ]},
+
+    { id:'match_price_v38_5', icon:'💰', title:'相亲经济学', category:'match',
+      body:'你算了一笔账：相亲一个月花了多少钱。吃饭AA但你主动买单、看电影、送小礼物、打车去见面……一个月花了三千多。"我这不是在相亲，我是在做慈善。"你跟朋友吐槽。朋友说："相亲的成本和收益完全不成正比。"但你想到：如果真能找到对的人，这点钱算什么？问题是你还没找到。',
+      cond: g => g.flags.matchApp && !g.flags.matchPrice && g.money > 5000,
+      choices:[
+        { label:'降低相亲频率，把钱花在自我提升上', hint:'+🧠 +✨', fn: g => { g.flags.matchPrice=true; return{intel:8,charm:5}; }},
+        { label:'继续投资，相信总会遇到对的人', hint:'-💰 +💪', fn: g => { g.flags.matchPrice=true; return{money:-3000,health:3}; }},
+      ]},
+
+    { id:'match_pressure_v38_5', icon:'😰', title:'催婚压力', category:'match',
+      body:'过年回家，亲戚围一圈问："有对象了吗？""什么时候结婚？""你看隔壁老王的儿子都生二胎了。"你妈在旁边叹气："我都不好意思跟人说你还单身。"你说："我又不急。"你爸说："你不急我们急。"你突然理解了：催婚不是控制，是焦虑的传递。他们怕你孤独，怕你老了没人照顾，怕你错过"最好的年纪"。',
+      cond: g => !g.flags.matchPressure && g.age >= 27,
+      choices:[
+        { label:'耐心解释，让他们理解你的节奏', hint:'+🤝 +❤️', fn: g => { g.flags.matchPressure=true; return{social:5,mood:3}; }},
+        { label:'假装在交往，先应付过去', hint:'+😅 +🧠', fn: g => { g.flags.matchPressure=true; g.flags.matchFake=true; return{mood:-2,intel:3}; }},
+        { label:'态度坚定地表达不婚的想法', hint:'+🧠 -❤️', fn: g => { g.flags.matchPressure=true; g.flags.matchNoMarriage=true; return{intel:8,mood:-5}; }},
+      ]},
+
+    { id:'match_success_v38_5', icon:'💕', title:'相亲遇到对的人', category:'match',
+      body:'你本来不抱希望了，但这次相亲不一样。她/他不像照片里那么好看，但笑起来特别温暖。你们聊了三个小时，从工作到旅行到小时候的梦想。"你跟我之前见的人不一样，"她/他说。你心里一暖：也许相亲不全是交易，有时候只是换了一种相遇的方式。你们约了下周再见。',
+      cond: g => g.flags.matchApp && !g.flags.matchSuccess && g.age >= 25 && g.social > 20,
+      choices:[
+        { label:'认真对待这段关系', hint:'+❤️ +😊', fn: g => { g.flags.matchSuccess=true; g.flags.matchSerious=true; return{social:5,mood:12}; }},
+        { label:'先做朋友，慢慢来', hint:'+🤝 +😊', fn: g => { g.flags.matchSuccess=true; return{social:8,mood:5}; }},
+      ]},
+
+    { id:'match_market_v38_5', icon:'🏪', title:'婚姻市场的真相', category:'match',
+      body:'你去了一个高端婚介所，收费两万。"我们这里都是优质会员，"红娘说。你发现：30岁以上的女性被标注为"大龄"，35岁以上的男性如果没房直接被劝退。"婚姻市场是残酷的，"红娘说，"但规则就是这样。"你看着满墙的会员资料，突然觉得：这不是在找爱情，这是在找"最合适的合伙人"。',
+      cond: g => g.flags.matchApp && !g.flags.matchMarket && g.age >= 28 && g.money > 10000,
+      choices:[
+        { label:'拒绝这种物化的方式', hint:'+🧠 +✨', fn: g => { g.flags.matchMarket=true; return{intel:8,charm:5}; }},
+        { label:'虽然不认同但还是试了试', hint:'-💰 +🤝', fn: g => { g.flags.matchMarket=true; return{money:-20000,social:5}; }},
+      ]},
+
+    { id:'match_life_v38_5', icon:'🌟', title:'婚姻与人生', category:'match',
+      body:'经历了这么多相亲，你终于想明白了：婚姻不是人生的必选项，而是一种选择。相亲角的大爷大妈们用数据匹配幸福，但幸福从来不是一份简历能概括的。有人三十岁结婚过得很幸福，有人四十岁单身也过得很精彩。重要的不是"找到对的人"，而是"成为对的自己"。当你足够好的时候，对的人自然会出现——或者不出现也没关系。',
+      cond: g => g.age >= 30 && g.flags.matchCorner && (g.flags.matchPressure || g.flags.matchSuccess) && (g.flags.matchMarket || g.flags.matchGhost) && !g.flags.matchLife,
+      choices:[
+        { label:'写了一篇《相亲角里的中国式焦虑》', hint:'+✨ +🧠', fn: g => { g.flags.matchLife=true; g.flags.matchAuthor=true; return{charm:12,intel:8}; }},
+        { label:'不再焦虑，活出自己的节奏', hint:'+😊 +🧠 +❤️', fn: g => { g.flags.matchLife=true; return{mood:15,intel:5,social:5}; }},
+        { label:'帮身边的单身朋友牵线搭桥', hint:'+🤝 +❤️', fn: g => { g.flags.matchLife=true; g.flags.matchCupid=true; return{social:10,mood:8}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -25497,6 +25580,16 @@ const ACHIEVEMENTS = [
     { id:'bbq_solo_v38_4_ach', icon:'🍖', name:'独食之乐', desc:'一个人享受了深夜烧烤', check: g => g.flags.bbqSolo },
     { id:'bbq_dying_v38_4_ach', icon:'📉', name:'消失的摊位', desc:'见证了烧烤摊的消失', check: g => g.flags.bbqDying },
     { id:'bbq_life_v38_4_ach', icon:'🌟', name:'烟火人间', desc:'理解了烧烤是城市最温暖的人间烟火', check: g => g.flags.bbqLife },
+    { id:'match_corner_v38_5_ach', icon:'📋', name:'相亲角初见', desc:'第一次见识了公园里的相亲角', check: g => g.flags.matchCorner },
+    { id:'match_parents_v38_5_ach', icon:'👨‍👩‍👦', name:'父母代相亲', desc:'爸妈偷偷替你去相亲角挂了资料', check: g => g.flags.matchParents },
+    { id:'match_resume_v38_5_ach', icon:'📝', name:'婚姻简历', desc:'理解了相亲市场的量化标准', check: g => g.flags.matchResume },
+    { id:'match_ghost_v38_5_ach', icon:'👻', name:'鸽子之约', desc:'经历了相亲被放鸽子', check: g => g.flags.matchGhost },
+    { id:'match_app_v38_5_ach', icon:'📱', name:'线上相亲', desc:'开始使用相亲APP寻找另一半', check: g => g.flags.matchApp },
+    { id:'match_price_v38_5_ach', icon:'💰', name:'相亲成本学', desc:'计算了相亲的经济账', check: g => g.flags.matchPrice },
+    { id:'match_pressure_v38_5_ach', icon:'😰', name:'催婚风暴', desc:'承受了来自家庭的催婚压力', check: g => g.flags.matchPressure },
+    { id:'match_success_v38_5_ach', icon:'💕', name:'命中注定', desc:'在相亲中遇到了对的人', check: g => g.flags.matchSuccess },
+    { id:'match_market_v38_5_ach', icon:'🏪', name:'婚姻市场', desc:'看透了婚姻市场的残酷真相', check: g => g.flags.matchMarket },
+    { id:'match_life_v38_5_ach', icon:'🌟', name:'婚姻人生', desc:'悟出了婚姻不是人生的必选项', check: g => g.flags.matchLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
