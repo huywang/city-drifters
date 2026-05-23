@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v36.7
+// 都市浮生记 - 数据文件 v36.8
 // ============================================
 
 
@@ -21719,6 +21719,88 @@ const EVENTS = [
         { label:'把省下来的时间和钱用来体验生活', hint:'+😊 +✨', fn: g => { g.flags.deliveryLife=true; return{mood:8,charm:6}; }},
       ]},
 
+    // === v36.8 城市公园与绿地文化 ===
+    { id:'park_first_v36_8', icon:'🌳', title:'发现附近的公园', category:'park',
+      body:'你在地图上发现住所五百米外有个城市公园，之前居然从来没去过。走进去的瞬间，城市噪音一下子消失了。老人在打太极，孩子在追蝴蝶，你坐在长椅上发了会儿呆。',
+      cond: g => g.age >= 20 && !g.flags.parkFirst,
+      choices:[
+        { label:'决定以后经常来', hint:'+😊 +❤️', fn: g => { g.flags.parkFirst=true; g.flags.parkRegular=true; return{mood:8,health:3}; }},
+        { label:'拍了照发了个朋友圈', hint:'+✨', fn: g => { g.flags.parkFirst=true; return{charm:3,mood:3}; }},
+        { label:'坐在长椅上什么都不想，只是发呆', hint:'+😊 +❤️', fn: g => { g.flags.parkFirst=true; g.flags.parkZen=true; return{mood:6,health:2}; }},
+      ]},
+    { id:'park_morning_v36_8', icon:'🧓', title:'晨练大爷', category:'park',
+      body:'你周末早起去了公园，发现这里简直是老年人的天下。有打太极的、甩鞭子的、跳广场舞的、练书法的。一个大爷拉着你教太极，说你"年轻人要多运动"。',
+      cond: g => g.age >= 20 && g.flags.parkFirst && !g.flags.parkMorning && g.health < 70,
+      choices:[
+        { label:'跟着大爷学了一套太极拳', hint:'+❤️ +😊 +👥', fn: g => { g.flags.parkMorning=true; g.flags.parkTaiji=true; return{health:5,mood:5,social:3}; }},
+        { label:'在旁边看了半小时，挺有意思', hint:'+😊 +🧠', fn: g => { g.flags.parkMorning=true; return{mood:4,intel:2}; }},
+        { label:'觉得太早了起不来，下次再说', hint:'-😊', fn: g => { g.flags.parkMorning=true; return{mood:-2}; }},
+      ]},
+    { id:'park_picnic_v36_8', icon:'🧺', title:'公园野餐', category:'park',
+      body:'你和朋友约了周末在公园野餐。铺上野餐垫，带了三明治、水果和蓝牙音箱。阳光正好，微风不燥，你们聊了平时不会聊的话题。朋友说"这才是生活"。',
+      cond: g => g.age >= 22 && g.flags.parkFirst && !g.flags.parkPicnic && g.social > 20,
+      choices:[
+        { label:'把公园野餐变成了每月固定活动', hint:'+👥 +😊', fn: g => { g.flags.parkPicnic=true; g.flags.parkMonthly=true; return{social:8,mood:6}; }},
+        { label:'一次就好，享受当下的惬意', hint:'+😊 +❤️', fn: g => { g.flags.parkPicnic=true; return{mood:8,health:2}; }},
+        { label:'拍了超多好看的照片', hint:'+✨ +👥', fn: g => { g.flags.parkPicnic=true; return{charm:5,social:3}; }},
+      ]},
+    { id:'park_jog_v36_8', icon:'🏃‍♂️', title:'公园跑步', category:'park',
+      body:'你开始在公园的塑胶跑道上晨跑。五公里的环形跑道旁边是湖，跑完一圈刚好能看到日出。你发现同样的路，每个季节的风景都不一样。',
+      cond: g => g.age >= 22 && g.flags.parkRegular && !g.flags.parkJog && g.health > 40,
+      choices:[
+        { label:'每天来公园跑步', hint:'+❤️ +😊', fn: g => { g.flags.parkJog=true; g.flags.parkDaily=true; return{health:8,mood:6}; }},
+        { label:'周末来跑，工作日去健身房', hint:'+❤️', fn: g => { g.flags.parkJog=true; return{health:5,mood:3}; }},
+        { label:'跑了两次膝盖不太舒服', hint:'-❤️ +🧠', fn: g => { g.flags.parkJog=true; return{health:-3,intel:2}; }},
+      ]},
+    { id:'park_social_v36_8', icon:'👨‍👩‍👧‍👦', title:'公园社交', category:'park',
+      body:'你在公园认识了一群有趣的人——遛狗的阿姨、带娃的年轻爸爸、写生的美院学生、弹吉他的退休老师。公园就像一个小型社区，每个人都有自己的角落和故事。',
+      cond: g => g.age >= 23 && g.flags.parkRegular && !g.flags.parkSocial && g.social > 20,
+      choices:[
+        { label:'成了公园里的"熟人"', hint:'+👥 +😊', fn: g => { g.flags.parkSocial=true; g.flags.parkFamiliar=true; return{social:10,mood:5}; }},
+        { label:'和几个公园常客组成了小圈子', hint:'+👥 +✨', fn: g => { g.flags.parkSocial=true; g.flags.parkCircle=true; return{social:8,charm:3}; }},
+        { label:'更喜欢一个人待着看别人', hint:'+🧠 +😊', fn: g => { g.flags.parkSocial=true; return{intel:4,mood:3}; }},
+      ]},
+    { id:'park_seasons_v36_8', icon:'🍂', title:'公园四季', category:'park',
+      body:'你在公园待了一整年，见证了四季的变化：春天的樱花、夏天的荷花、秋天的银杏、冬天的梅花。你开始理解为什么古人那么爱写诗咏物——因为季节之美真的让人感动。',
+      cond: g => g.age >= 24 && g.flags.parkRegular && !g.flags.parkSeasons && g.intel > 25,
+      choices:[
+        { label:'开始拍公园四季的系列照片', hint:'+✨ +🧠', fn: g => { g.flags.parkSeasons=true; g.flags.parkPhoto=true; return{charm:6,intel:5}; }},
+        { label:'写了一篇关于公园四季的散文', hint:'+🧠 +✨', fn: g => { g.flags.parkSeasons=true; return{intel:8,charm:5}; }},
+        { label:'只是安静地感受每一天的不同', hint:'+😊 +❤️', fn: g => { g.flags.parkSeasons=true; return{mood:8,health:3}; }},
+      ]},
+    { id:'park_bench_v36_8', icon:'🪑', title:'长椅故事', category:'park',
+      body:'你有了自己最喜欢的那张长椅，在湖边的柳树下。每天傍晚你都坐在那里看人来人往。有天你在长椅背面发现了一行刻字："2019年，我在这里向她求婚"。你不知道他们后来怎样了。',
+      cond: g => g.age >= 25 && g.flags.parkRegular && !g.flags.parkBench && g.intel > 30,
+      choices:[
+        { label:'开始在长椅上写日记', hint:'+🧠 +😊', fn: g => { g.flags.parkBench=true; g.flags.parkJournal=true; return{intel:8,mood:5}; }},
+        { label:'想象每个坐在长椅上的人的故事', hint:'+🧠 +✨', fn: g => { g.flags.parkBench=true; return{intel:6,charm:4}; }},
+        { label:'只是安静地坐着，什么都不想', hint:'+❤️ +😊', fn: g => { g.flags.parkBench=true; return{health:3,mood:6}; }},
+      ]},
+    { id:'park_community_v36_8', icon:'🌻', title:'社区花园', category:'park',
+      body:'你发现公园角落有个社区花园，居民们各自认领一小块地种花种菜。你认领了一平米，种了西红柿和辣椒。看着自己种的东西一点点长大，有种在城市里扎根的感觉。',
+      cond: g => g.age >= 25 && g.flags.parkSocial && !g.flags.parkCommunity && g.social > 25,
+      choices:[
+        { label:'成了社区花园的积极分子', hint:'+👥 +😊 +❤️', fn: g => { g.flags.parkCommunity=true; g.flags.parkActive=true; return{social:8,mood:6,health:3}; }},
+        { label:'种了点菜就满足了', hint:'+😊 +❤️', fn: g => { g.flags.parkCommunity=true; return{mood:5,health:2}; }},
+        { label:'和蔬菜搭子交换种植经验', hint:'+👥 +🧠', fn: g => { g.flags.parkCommunity=true; return{social:5,intel:3}; }},
+      ]},
+    { id:'park_nature_v36_8', icon:'🦜', title:'城市绿洲', category:'park',
+      body:'你开始意识到公园对这座城市意味着什么。在高楼大厦之间，这一小片绿色不只是风景，而是城市的肺、居民的客厅、所有人的避风港。没有公园的城市，只是一堆混凝土。',
+      cond: g => g.age >= 26 && g.flags.parkSeasons && g.flags.parkBench && !g.flags.parkNature && g.intel > 35,
+      choices:[
+        { label:'参与了城市绿地保护的志愿者活动', hint:'+✨ +👥 +🧠', fn: g => { g.flags.parkNature=true; g.flags.parkVolunteer=true; return{charm:8,social:6,intel:5}; }},
+        { label:'写了篇关于城市绿地的调研报告', hint:'+🧠 +✨', fn: g => { g.flags.parkNature=true; return{intel:10,charm:5}; }},
+        { label:'只是更加珍惜身边的绿色', hint:'+❤️ +😊', fn: g => { g.flags.parkNature=true; return{health:3,mood:5}; }},
+      ]},
+    { id:'park_life_v36_8', icon:'🌍', title:'公园人生', category:'park',
+      body:'回望这几年的公园生活，你发现它已经成了你人生中不可缺少的一部分。在加班到崩溃的夜里、在和恋人吵架的午后、在想家的周末——你都会去公园坐坐。长椅不会评判你，大树不会催促你，这座城市最温柔的地方，就是为你留了一张长椅。',
+      cond: g => g.age >= 28 && g.flags.parkNature && (g.flags.parkVolunteer || g.flags.parkJournal) && !g.flags.parkLife && g.intel > 35,
+      choices:[
+        { label:'发起了"城市长椅计划"公益项目', hint:'+✨ +👥 +🧠', fn: g => { g.flags.parkLife=true; g.flags.parkCharity=true; return{charm:12,social:10,intel:8}; }},
+        { label:'写了一本《我的公园日记》', hint:'+💰 +✨ +🧠', fn: g => { g.flags.parkLife=true; g.flags.parkAuthor=true; return{money:5000,charm:10,intel:8}; }},
+        { label:'继续做那个每天去公园坐坐的人', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.parkLife=true; return{mood:12,health:8,intel:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -23904,6 +23986,18 @@ const ACHIEVEMENTS = [
     { id:'delivery_fail_v36_7_ach', icon:'❌', name:'快递丢了', desc:'经历了快递被签收却没收到的绝望', check: g => g.flags.deliveryFail },
     { id:'delivery_cook_v36_7_ach', icon:'🍳', name:'自己做饭', desc:'决定减少外卖开始学做饭', check: g => g.flags.deliveryCook2 },
     { id:'delivery_life_v36_7_ach', icon:'⚖️', name:'便利与代价', desc:'思考了城市便利生活背后的代价', check: g => g.flags.deliveryLife },
+
+    // v36.8 城市公园与绿地文化
+    { id:'park_first_v36_8_ach', icon:'🌳', name:'公园发现者', desc:'发现了住所附近的宝藏公园', check: g => g.flags.parkFirst },
+    { id:'park_morning_v36_8_ach', icon:'🧓', name:'晨练新人', desc:'跟着公园大爷学了太极', check: g => g.flags.parkMorning },
+    { id:'park_picnic_v36_8_ach', icon:'🧺', name:'公园野餐', desc:'和朋友在公园享受了一次野餐', check: g => g.flags.parkPicnic },
+    { id:'park_jog_v36_8_ach', icon:'🏃‍♂️', name:'公园跑者', desc:'在公园跑道上完成了晨跑', check: g => g.flags.parkJog },
+    { id:'park_social_v36_8_ach', icon:'👨‍👩‍👧‍👦', name:'公园社交', desc:'在公园认识了一群有趣的人', check: g => g.flags.parkSocial },
+    { id:'park_seasons_v36_8_ach', icon:'🍂', name:'四季观察者', desc:'见证了公园春夏秋冬的变化', check: g => g.flags.parkSeasons },
+    { id:'park_bench_v36_8_ach', icon:'🪑', name:'长椅常客', desc:'有了自己最喜欢的那张长椅', check: g => g.flags.parkBench },
+    { id:'park_community_v36_8_ach', icon:'🌻', name:'社区花园', desc:'在社区花园认领了一小块地', check: g => g.flags.parkCommunity },
+    { id:'park_nature_v36_8_ach', icon:'🦜', name:'城市绿洲守护者', desc:'开始关注城市绿地的保护', check: g => g.flags.parkNature },
+    { id:'park_life_v36_8_ach', icon:'🌍', name:'公园人生', desc:'公园成了你人生中最温柔的存在', check: g => g.flags.parkLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
