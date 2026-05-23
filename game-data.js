@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v37.6
+// 都市浮生记 - 数据文件 v37.7
 // ============================================
 
 
@@ -22457,6 +22457,90 @@ const EVENTS = [
         { label:'继续做一个认真写信的人', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.letterLife=true; return{mood:12,health:5,intel:8}; }},
       ]},
 
+    // === v37.7 洗浴中心与澡堂文化 ===
+    { id:'bath_first_v37_7', icon:'🛁', title:'第一次去洗浴中心', category:'bath',
+      body:'北方的朋友带你去了洗浴中心。一进门你傻眼了：金碧辉煌的大厅、自助餐、KTV包房、电影院、游戏厅……"这是澡堂？"朋友笑了："在北方，洗浴中心是第二客厅。"你换上了浴服，发现这里的人比商场还多。',
+      cond: g => !g.flags.bathFirst && g.age >= 18,
+      choices:[
+        { label:'入乡随俗，大胆体验', hint:'+😊 +🤝', fn: g => { g.flags.bathFirst=true; return{mood:8,social:5}; }},
+        { label:'全程裹着浴巾不敢动', hint:'+😅', fn: g => { g.flags.bathFirst=true; return{mood:3}; }},
+      ]},
+
+    { id:'bath_northsouth_v37_7', icon:'🗺️', title:'南北洗浴差异', category:'bath',
+      body:'你是南方人，第一次在北方洗澡堂。搓澡大爷一边搓你一边聊天："你这身上泥不多啊，是不是南方人？"你点头。大爷说："南方人冲凉，北方人泡澡，这是文化差异。"你被搓完后照镜子，觉得自己白了两个色号。旁边的大哥说："走，上楼吃自助餐去。"',
+      cond: g => g.flags.bathFirst && !g.flags.bathNorthSouth,
+      choices:[
+        { label:'体验全套搓澡服务', hint:'+😊 +💪', fn: g => { g.flags.bathNorthSouth=true; g.flags.bathScrub=true; return{mood:8,health:3}; }},
+        { label:'"大爷您轻点……"', hint:'+😅', fn: g => { g.flags.bathNorthSouth=true; return{mood:5}; }},
+      ]},
+
+    { id:'bath_business_v37_7', icon:'💼', title:'洗浴中心谈生意', category:'bath',
+      body:'同事告诉你一个秘密：很多生意是在洗浴中心谈成的。"比饭局管用，大家坦诚相见，防备心都放下了。"你跟客户约了一次，果然，泡完澡喝完茶，合同就签了。客户拍着你说："能一起泡澡的人，才是一起做事的人。"',
+      cond: g => g.flags.bathFirst && g.salary > 0 && !g.flags.bathBusiness,
+      choices:[
+        { label:'把洗浴中心当第二办公室', hint:'+💰 +🤝', fn: g => { g.flags.bathBusiness=true; return{money:5000,social:8}; }},
+        { label:'总觉得不太适应这种社交方式', hint:'+🧠', fn: g => { g.flags.bathBusiness=true; return{intel:5}; }},
+      ]},
+
+    { id:'bath_family_v37_7', icon:'👨‍👩‍👦', title:'带爸妈去洗浴中心', category:'bath',
+      body:'你请爸妈去了一趟高档洗浴中心。你妈一边泡温泉一边说："这比我年轻时的大众浴池好多了。"你爸则对自助餐情有独钟，吃了三盘虾。"你爸难得这么放松。"你妈偷偷跟你说。你看着他们笑的样子，突然觉得：花钱请父母享受一次，比买什么礼物都好。',
+      cond: g => g.flags.bathFirst && g.age >= 25 && g.money > 8000 && !g.flags.bathFamily,
+      choices:[
+        { label:'给爸妈办了张洗浴中心年卡', hint:'-💰 +❤️ +😊', fn: g => { g.flags.bathFamily=true; return{money:-6000,mood:10,social:5}; }},
+        { label:'约定每个月带他们来一次', hint:'-💰 +❤️', fn: g => { g.flags.bathFamily=true; return{money:-1500,mood:8}; }},
+      ]},
+
+    { id:'bath_overnight_v37_7', icon:'🌙', title:'洗浴中心过夜', category:'bath',
+      body:'加班到凌晨两点，不想回家也不想住酒店。同事说："去洗浴中心啊，泡个澡睡一觉，比酒店便宜还舒服。"你躺在休息大厅的躺椅上，看着天花板的星空投影。旁边鼾声此起彼伏。一个大哥凌晨三点还在看手机，你问他为什么不回家，他说："老婆出差了，一个人回去也是空荡荡的。"',
+      cond: g => g.flags.bathFirst && !g.flags.bathOvernight,
+      choices:[
+        { label:'从此成了洗浴中心的常客', hint:'-💰 +😊 +💤', fn: g => { g.flags.bathOvernight=true; return{money:-300,mood:5,health:3}; }},
+        { label:'虽然舒服但还是想回家', hint:'+🧠', fn: g => { g.flags.bathOvernight=true; return{intel:3}; }},
+      ]},
+
+    { id:'bath_scrubmaster_v37_7', icon:'💪', title:'搓澡师傅的故事', category:'bath',
+      body:'给你搓澡的王师傅话不多，但手法极好。聊开了才知道，他老家东北，干了二十年搓澡，供出了两个大学生。"我搓的不是泥，是生活。"他笑着说。"有些客人一搓就是十年了，他们换工作、结婚、生孩子，我全知道。"你突然觉得，搓澡师傅是这个城市最了解人情的职业。',
+      cond: g => g.flags.bathFirst && !g.flags.bathScrubMaster && g.age >= 20,
+      choices:[
+        { label:'每次来都找王师傅搓', hint:'+🤝 +😊', fn: g => { g.flags.bathScrubMaster=true; g.flags.bathRegular=true; return{social:5,mood:5}; }},
+        { label:'给王师傅的儿子辅导功课', hint:'+❤️ +🧠', fn: g => { g.flags.bathScrubMaster=true; return{social:8,intel:3}; }},
+      ]},
+
+    { id:'bath_sauna_v37_7', icon:'♨️', title:'汗蒸房里的社交', category:'bath',
+      body:'汗蒸房里热气腾腾，大家都穿着统一的浴服，没了西装革履的差别。一个做房地产的大哥和一个送外卖的小哥聊得火热，讨论哪种茶叶最好喝。你突然意识到：在这里，人人平等——至少在流汗这件事上。大哥临走时给小哥递了张名片："兄弟，有急事找我。"',
+      cond: g => g.flags.bathFirst && !g.flags.bathSauna && g.social > 20,
+      choices:[
+        { label:'主动加入聊天，认识新朋友', hint:'+🤝 +😊', fn: g => { g.flags.bathSauna=true; return{social:8,mood:5}; }},
+        { label:'安静享受热气，放空大脑', hint:'+😊 +💪', fn: g => { g.flags.bathSauna=true; return{mood:8,health:3}; }},
+      ]},
+
+    { id:'bath_membership_v37_7', icon:'💳', title:'洗浴中心会员卡', category:'bath',
+      body:'洗浴中心的推销员很热情："充5000送3000，相当于打了六折。您要是每周来一次，一年能省好几千。"你算了算确实划算。但朋友提醒你："洗浴中心充卡跑路的也不少，我同事充了两万，店就没了。"你看着金碧辉煌的大厅，犹豫了。',
+      cond: g => g.flags.bathFirst && g.money > 5000 && !g.flags.bathMembership,
+      choices:[
+        { label:'充卡！每周来一次犒劳自己', hint:'-💰 +😊 +💪', fn: g => { g.flags.bathMembership=true; return{money:-5000,mood:8,health:5}; }},
+        { label:'算了，单次消费更安心', hint:'+🧠', fn: g => { g.flags.bathMembership=true; g.flags.bathCautious=true; return{intel:3}; }},
+        { label:'先充个小额的试试水', hint:'-💰 +😊', fn: g => { g.flags.bathMembership=true; return{money:-1000,mood:5}; }},
+      ]},
+
+    { id:'bath_old_v37_7', icon:'🏚️', title:'消失的老澡堂', category:'bath',
+      body:'胡同口的老澡堂要拆了。门口贴着告示："因城市规划，本浴室将于月底停止营业。"你走进去最后一次，瓷砖墙上还挂着八十年代的宣传画。泡澡的老大爷们唏嘘不已："在这泡了三十年了，以后去哪？"搓澡师傅老张说："新开的洗浴中心太贵了，我们这些老客人泡不起了。"',
+      cond: g => g.flags.bathFirst && !g.flags.bathOld && g.age >= 22,
+      choices:[
+        { label:'给老澡堂拍一组照片留念', hint:'+✨ +🧠', fn: g => { g.flags.bathOld=true; g.flags.bathPhoto=true; return{charm:5,intel:5}; }},
+        { label:'帮老张联系新的工作机会', hint:'+❤️ +🤝', fn: g => { g.flags.bathOld=true; g.flags.bathHelp=true; return{social:8,mood:5}; }},
+        { label:'在老澡堂最后泡一次', hint:'+😊 -💰', fn: g => { g.flags.bathOld=true; return{mood:10,money:-30}; }},
+      ]},
+
+    { id:'bath_life_v37_7', icon:'🌟', title:'洗浴人生', category:'bath',
+      body:'你渐渐理解了洗浴中心对中国人的意义。它不只是洗澡的地方——它是疲惫生活的解药，是坦诚相见的社交场，是暂时放下身份和面具的空间。在这里，老板和打工人都穿着同样的浴服，流着同样的汗。人生就像泡澡：有时候太热了要出来凉凉，有时候太冷了想进去暖暖。关键是找到适合自己的温度。',
+      cond: g => g.age >= 28 && g.flags.bathFirst && (g.flags.bathRegular || g.flags.bathScrubMaster) && (g.flags.bathOld || g.flags.bathBusiness) && !g.flags.bathLife,
+      choices:[
+        { label:'开了一家社区平价澡堂', hint:'-💰 +❤️ +💰', fn: g => { g.flags.bathLife=true; g.flags.bathOwner=true; return{money:-30000,mood:15,social:10}; }},
+        { label:'写了一篇《中国洗浴文化考》', hint:'+✨ +🧠', fn: g => { g.flags.bathLife=true; g.flags.bathWriter=true; return{charm:10,intel:8}; }},
+        { label:'继续做一个懂生活的泡澡人', hint:'+😊 +💪 +🧠', fn: g => { g.flags.bathLife=true; return{mood:12,health:5,intel:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -24748,6 +24832,16 @@ const ACHIEVEMENTS = [
     { id:'letter_digital_v37_6_ach', icon:'💻', name:'数字时代手艺人', desc:'在数字时代坚持手写信的人', check: g => g.flags.letterDigital },
     { id:'letter_time_v37_6_ach', icon:'⏳', name:'给未来的信', desc:'给未来的自己写了一封信', check: g => g.flags.letterTime },
     { id:'letter_life_v37_6_ach', icon:'🌟', name:'文字的温度', desc:'理解了文字比屏幕更有温度', check: g => g.flags.letterLife },
+    { id:'bath_first_v37_7_ach', icon:'🛁', name:'初泡汤池', desc:'第一次走进洗浴中心', check: g => g.flags.bathFirst },
+    { id:'bath_northsouth_v37_7_ach', icon:'🗺️', name:'南北搓澡', desc:'体验了南北洗浴文化的碰撞', check: g => g.flags.bathNorthSouth },
+    { id:'bath_business_v37_7_ach', icon:'💼', name:'坦诚相见', desc:'在洗浴中心谈成了生意', check: g => g.flags.bathBusiness },
+    { id:'bath_family_v37_7_ach', icon:'👨‍👩‍👦', name:'全家泡汤', desc:'带爸妈享受了一次洗浴中心', check: g => g.flags.bathFamily },
+    { id:'bath_overnight_v37_7_ach', icon:'🌙', name:'深夜浴客', desc:'在洗浴中心睡了一夜', check: g => g.flags.bathOvernight },
+    { id:'bath_scrubmaster_v37_7_ach', icon:'💪', name:'搓澡之交', desc:'认识了一位有故事的搓澡师傅', check: g => g.flags.bathScrubMaster },
+    { id:'bath_sauna_v37_7_ach', icon:'♨️', name:'汗蒸社交', desc:'在汗蒸房里人人平等', check: g => g.flags.bathSauna },
+    { id:'bath_membership_v37_7_ach', icon:'💳', name:'泡澡会员', desc:'成了洗浴中心的会员', check: g => g.flags.bathMembership },
+    { id:'bath_old_v37_7_ach', icon:'🏚️', name:'最后的澡堂', desc:'见证了老澡堂的最后时光', check: g => g.flags.bathOld },
+    { id:'bath_life_v37_7_ach', icon:'🌟', name:'洗浴人生', desc:'理解了泡澡也是一种生活哲学', check: g => g.flags.bathLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
