@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v39.0
+// 都市浮生记 - 数据文件 v39.1
 // ============================================
 
 
@@ -23613,6 +23613,80 @@ const EVENTS = [
         { label:'感恩那段从零开始的经历', hint:'+😊 +🧠', fn: g => { g.flags.drivingSchoolLife=true; return{mood:8,intel:8}; }},
       ]},
 
+    // ═══ v39.1 菜市场与市井烟火 ═══
+    { id:'market_morning_v39_1', icon:'🌅', title:'早市赶早', category:'market',
+      body:'室友说周末要带你去体验一下真正的早市。你们六点半就到了，菜市场已经热闹得不像话。大爷大妈们拉着小推车穿梭其间，摊贩的吆喝声此起彼伏：新鲜的黄瓜两块钱一斤！排骨排骨，今天刚杀的！鱼还是活的，现杀！你被这股生活气息震住了——原来在你睡懒觉的时候，这座城市已经在热气腾腾地运转了。',
+      cond: g => g.age >= 20 && !g.flags.marketMorning,
+      choices:[
+        { label:'被早市的活力感染了', hint:'+😊 +🧠', fn: g => { g.flags.marketMorning=true; return{mood:8,intel:3}; }},
+        { label:'太早了，下次还是睡到自然醒吧', hint:'-😊', fn: g => { g.flags.marketMorning=true; return{mood:-3}; }},
+      ]},
+    { id:'market_bargain_v39_1', icon:'🗣️', title:'讨价还价', category:'market',
+      body:'你在一个蔬菜摊前停下来，问西红柿多少钱。摊主说四块。旁边的大妈插嘴了：小伙子，三块五就能买到，你别被宰了。摊主不高兴了：我这西红柿是有机种植的！大妈冷笑：什么有机，就是普通大棚的。你夹在中间不知道怎么办。最后三块五一斤成交了，摊主多送了你两根葱。大妈拍拍你的肩膀：以后买菜带上我，保你不吃亏。',
+      cond: g => g.flags.marketMorning && !g.flags.marketBargain,
+      choices:[
+        { label:'跟大妈学了几招砍价技巧', hint:'+🧠 +✨', fn: g => { g.flags.marketBargain=true; return{intel:5,charm:3}; }},
+        { label:'觉得为几毛钱争来争去没必要', hint:'+😊', fn: g => { g.flags.marketBargain=true; return{mood:3}; }},
+      ]},
+    { id:'market_regular_v39_1', icon:'🤝', title:'菜市场常客', category:'market',
+      body:'你开始每周都去同一个菜市场。渐渐地，你成了某些摊位的常客。卖豆腐的阿姨每次见你就说：老样子？两块豆腐一块豆皮？卖肉的大叔会主动给你留最好的排骨。卖水果的小哥让你先尝后买：这个季节的芒果特别甜，不甜不要钱。你发现了一个规律——在菜市场，关系比价格更重要。熟了之后，不光价格便宜，份量还多。这就是中国式的人情买卖。',
+      cond: g => g.flags.marketBargain && !g.flags.marketRegular,
+      choices:[
+        { label:'享受这种熟人社会的温暖', hint:'+❤️ +😊', fn: g => { g.flags.marketRegular=true; return{social:8,mood:5}; }},
+        { label:'开始理解什么叫市井人情', hint:'+🧠', fn: g => { g.flags.marketRegular=true; return{intel:8}; }},
+      ]},
+    { id:'market_pick_v39_1', icon:'🥬', title:'挑菜学问', category:'market',
+      body:'逛了一年菜市场，你终于学会了挑菜。西红柿要选带蒂的、颜色均匀的；黄瓜要选带刺的、顶花带刺的才新鲜；鸡蛋拿起来对着光照一下，透光的好；西瓜拍一拍，声音清脆的甜。卖鱼的大叔教你看鱼鳃，鲜红的才新鲜。这些知识，学校里不教，网上搜不全，只有在菜市场里，通过一次次实践才能掌握。你觉得自己在修炼一门叫做生活的学问。',
+      cond: g => g.flags.marketRegular && !g.flags.marketPick,
+      choices:[
+        { label:'成了朋友圈里的挑菜专家', hint:'+✨ +🧠', fn: g => { g.flags.marketPick=true; return{charm:5,intel:8}; }},
+        { label:'生活技能又涨了一级', hint:'+💪', fn: g => { g.flags.marketPick=true; return{health:5}; }},
+      ]},
+    { id:'market_social_v39_1', icon:'💬', title:'菜市场社交', category:'market',
+      body:'你发现菜市场是一个神奇的社交场所。排队买烧鸡的时候，前面的阿姨跟你聊起了哪家医院的骨科好。等切肉的时候，旁边的大爷推荐了一个修水管的师傅，便宜又靠谱。在调料摊前，你认识了一个同样爱吃辣的邻居，后来成了好朋友。菜市场不只是买菜的地方——它是这个社区的信息中心、社交枢纽、情感纽带。在这里，每个人都不是陌生人。',
+      cond: g => g.flags.marketRegular && !g.flags.marketSocial,
+      choices:[
+        { label:'在菜市场交到了新朋友', hint:'+❤️ +😊', fn: g => { g.flags.marketSocial=true; return{social:10,mood:5}; }},
+        { label:'发现了一个靠谱的修理工', hint:'+💰', fn: g => { g.flags.marketSocial=true; g.flags.marketRepair=true; return{money:200}; }},
+      ]},
+    { id:'market_seasonal_v39_1', icon:'🍑', title:'时令鲜货', category:'market',
+      body:'菜市场是最好的季节日历。春天有春笋、荠菜、香椿；夏天有西瓜、莲蓬、杨梅；秋天有螃蟹、柿子、板栗；冬天有腊肉、白菜、萝卜。每到一种时令食材上市，整个菜市场都在庆祝。卖菜的大妈会跟你说：香椿就这几天，过了就老了！你开始跟着菜市场的节奏过日子，比看天气预报还准。原来中国人的二十四节气，就藏在菜市场的摊位上。',
+      cond: g => g.flags.marketPick && !g.flags.marketSeasonal,
+      choices:[
+        { label:'跟着时令做饭，身体变好了', hint:'+💪 +😊', fn: g => { g.flags.marketSeasonal=true; return{health:8,mood:5}; }},
+        { label:'拍了一组菜市场四季的照片', hint:'+✨', fn: g => { g.flags.marketSeasonal=true; g.flags.marketPhotos=true; return{charm:8}; }},
+      ]},
+    { id:'market_change_v39_1', icon:'🏗️', title:'菜市场变迁', category:'market',
+      body:'你常去的那个菜市场要改造了。听说要变成智慧菜市场，装空调、统一装修、线上配送。老摊贩们忧心忡忡：改造后租金肯定涨，不知道还能不能继续干。你最后一次去老菜市场，卖豆腐的阿姨多给了你一块：以后可能不在这里卖了。改造完成后，菜市场确实干净了、明亮了，但那些吆喝声、讨价还价声、熟人之间的寒暄，少了很多。有些东西，改造着改造着就没了。',
+      cond: g => g.flags.marketSocial && !g.flags.marketChange,
+      choices:[
+        { label:'写了一篇关于老菜市场消失的文章', hint:'+✨ +🧠', fn: g => { g.flags.marketChange=true; return{charm:8,intel:5}; }},
+        { label:'默默接受了变化，继续逛新菜市场', hint:'+💪', fn: g => { g.flags.marketChange=true; return{mood:-3,intel:5}; }},
+        { label:'帮老摊贩们在社交媒体上做了宣传', hint:'+❤️ +✨', fn: g => { g.flags.marketChange=true; g.flags.marketHelp=true; return{social:8,charm:5}; }},
+      ]},
+    { id:'market_mom_v39_1', icon:'👩', title:'妈妈逛菜场', category:'market',
+      body:'过年回家，你跟妈妈去逛菜市场。你终于理解了妈妈为什么每次逛菜场都要那么久——她几乎每个摊位都要聊两句，张家长李家短，谁家孩子结婚了，谁家老人住院了。你发现妈妈在菜市场里完全是另一个人：精明、健谈、八面玲珑。她买了满满一推车菜，花了不到一百块。你默默算了一下，自己在超市买同样的东西至少要两百。原来这就是妈妈的生活智慧。',
+      cond: g => g.flags.marketMorning && g.age >= 25 && !g.flags.marketMom,
+      choices:[
+        { label:'被妈妈的生活智慧折服了', hint:'+❤️ +🧠', fn: g => { g.flags.marketMom=true; return{social:5,intel:8}; }},
+        { label:'偷偷把妈妈多付的钱塞了回去', hint:'+❤️ +💰', fn: g => { g.flags.marketMom=true; return{mood:5,money:-50}; }},
+      ]},
+    { id:'market_convert_v39_1', icon:'🔄', title:'从不去到天天去', category:'market',
+      body:'回想刚来这座城市的时候，你只点外卖和去超市，觉得菜市场又脏又吵。不知道从什么时候开始，你变成了菜市场的常客。也许是第一次自己做饭的那个周末，也许是被室友拉去的那个早市，也许是某次被大妈教挑西瓜的下午。你发现自己变了——不再嫌菜市场吵，反而觉得那是一种热闹；不再觉得讨价还价丢人，反而觉得那是一种乐趣。你终于成了一个会逛菜市场的大人。',
+      cond: g => g.flags.marketRegular && g.flags.marketPick && g.age >= 26 && !g.flags.marketConvert,
+      choices:[
+        { label:'菜市场改变了你的生活方式', hint:'+😊 +💪', fn: g => { g.flags.marketConvert=true; return{mood:10,health:5}; }},
+        { label:'推荐所有朋友都去逛菜市场', hint:'+❤️', fn: g => { g.flags.marketConvert=true; return{social:8,mood:3}; }},
+      ]},
+    { id:'market_life_v39_1', icon:'🌟', title:'菜市场人生', category:'market',
+      body:'有人说，想了解一个城市，就去它的菜市场。你觉得这话太对了。菜市场是这个城市最真实的样子——不是高楼大厦和霓虹灯，而是那些为生活精打细算的普通人，那些起早贪黑的小摊贩，那些热气腾腾的烟火气。你在菜市场里看到了生活的本来面目：辛苦的、热闹的、温暖的、真实的。每一把青菜、每一块肉、每一声吆喝，都是普通人对生活最朴素的热爱。你觉得，菜市场就是活着的人间。',
+      cond: g => g.flags.marketConvert && (g.flags.marketSeasonal || g.flags.marketChange) && !g.flags.marketLife,
+      choices:[
+        { label:'拍了一部关于菜市场的微纪录片', hint:'+✨ +🧠', fn: g => { g.flags.marketLife=true; return{charm:12,intel:8}; }},
+        { label:'写了一本《菜市场里的中国》', hint:'+✨ +🧠', fn: g => { g.flags.marketLife=true; g.flags.marketBook=true; return{charm:10,intel:10}; }},
+        { label:'继续做一个热爱生活的菜市场常客', hint:'+😊 +❤️', fn: g => { g.flags.marketLife=true; return{mood:10,social:5,health:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -26046,6 +26120,17 @@ const ACHIEVEMENTS = [
     { id:'driving_school_retry_v39_0_ach', icon:'💪', name:'越挫越勇', desc:'挂科后没有放弃，最终通关', check: g => g.flags.drivingSchoolRetry },
     { id:'driving_school_license_v39_0_ach', icon:'🪪', name:'有证一族', desc:'终于拿到了那本黑色小本本', check: g => g.flags.drivingSchoolLicense },
     { id:'driving_school_life_v39_0_ach', icon:'🌟', name:'驾校人生', desc:'明白学车只是开始，人生处处都是从零到一', check: g => g.flags.drivingSchoolLife },
+    // v39.1 菜市场与市井烟火
+    { id:'market_morning_v39_1_ach', icon:'🌅', name:'早市新手', desc:'第一次感受到了早市的活力', check: g => g.flags.marketMorning },
+    { id:'market_bargain_v39_1_ach', icon:'🗣️', name:'砍价学徒', desc:'在菜市场学会了讨价还价', check: g => g.flags.marketBargain },
+    { id:'market_regular_v39_1_ach', icon:'🤝', name:'菜市场常客', desc:'成了摊贩们认识的熟面孔', check: g => g.flags.marketRegular },
+    { id:'market_pick_v39_1_ach', icon:'🥬', name:'挑菜达人', desc:'掌握了在菜市场挑选食材的学问', check: g => g.flags.marketPick },
+    { id:'market_social_v39_1_ach', icon:'💬', name:'菜市场社交', desc:'发现菜市场是社区的社交枢纽', check: g => g.flags.marketSocial },
+    { id:'market_seasonal_v39_1_ach', icon:'🍑', name:'时令美食家', desc:'跟着菜市场的节奏感受四季', check: g => g.flags.marketSeasonal },
+    { id:'market_change_v39_1_ach', icon:'🏗️', name:'变迁见证者', desc:'见证了菜市场的改造与变迁', check: g => g.flags.marketChange },
+    { id:'market_mom_v39_1_ach', icon:'👩', name:'妈妈的生活智慧', desc:'被妈妈在菜市场里的精明折服了', check: g => g.flags.marketMom },
+    { id:'market_convert_v39_1_ach', icon:'🔄', name:'菜市场信徒', desc:'从不去菜市场变成了天天去', check: g => g.flags.marketConvert },
+    { id:'market_life_v39_1_ach', icon:'🌟', name:'菜市场人生', desc:'理解了菜市场就是活着的人间', check: g => g.flags.marketLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
