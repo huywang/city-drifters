@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v38.0
+// 都市浮生记 - 数据文件 v38.1
 // ============================================
 
 
@@ -22796,6 +22796,88 @@ const EVENTS = [
         { label:'开始研究软装和家居布置', hint:'-💰 +✨', fn: g => { g.flags.renoHome=true; g.flags.renoDecor=true; return{money:-3000,charm:8}; }},
       ]},
 
+    // === v38.1 KTV与唱歌文化 ===
+    { id:'ktv_first_v38_1', icon:'🎤', title:'第一次去KTV', category:'ktv',
+      body:'同事过生日，一帮人去了KTV。你一进门就被震住了：巨大的屏幕、炫目的灯光、满桌的啤酒零食。同事们轮番上阵鬼哭狼嚎，你缩在角落不敢点歌。"不唱不行！"有人把麦克风塞给你。你颤巍巍点了一首《后来》，唱到一半大家都在鼓掌——不是因为唱得好，是因为你敢唱。"KTV的规矩：不唱歌的人负责鼓掌和倒酒。"',
+      cond: g => !g.flags.ktvFirst && g.age >= 18,
+      choices:[
+        { label:'放开了嗓子唱了一晚上', hint:'+😊 +🤝', fn: g => { g.flags.ktvFirst=true; return{mood:10,social:5}; }},
+        { label:'全程当观众，负责鼓掌和切歌', hint:'+😅 +🤝', fn: g => { g.flags.ktvFirst=true; return{mood:5,social:3}; }},
+      ]},
+
+    { id:'ktv_birthday_v38_1', icon:'🎂', title:'KTV过生日', category:'ktv',
+      body:'你生日那天，朋友们在KTV给你订了个包间。灯一关，蛋糕一推出来，所有人唱着《生日快乐歌》——虽然跑调了但你很感动。"许个愿！"你闭上眼睛，想到的是：在这座陌生的城市里，有人记得你的生日，这就够了。凌晨两点散场的时候，你微醺着走在街上，觉得生活其实也没那么难。',
+      cond: g => g.flags.ktvFirst && !g.flags.ktvBirthday && g.age >= 19,
+      choices:[
+        { label:'感动得差点哭了', hint:'+😊 +❤️', fn: g => { g.flags.ktvBirthday=true; return{mood:12,social:5}; }},
+        { label:'开心地唱到天亮', hint:'+😊 +💪', fn: g => { g.flags.ktvBirthday=true; return{mood:10,health:-2}; }},
+      ]},
+
+    { id:'ktv_business_v38_1', icon:'💼', title:'KTV里的应酬', category:'ktv',
+      body:'领导带你去KTV应酬客户。"点一首客户喜欢的歌。"领导悄悄说。你手忙脚乱翻歌单，客户说："来首《朋友》吧。"你硬着头皮和客户合唱了一曲。客户拍着你肩膀说："唱得不错，年轻人有前途。"回去的路上领导说："KTV是第二战场，歌不重要，关系重要。"你突然理解了为什么有些人的歌单全是《朋友》和《兄弟》。',
+      cond: g => g.flags.ktvFirst && !g.flags.ktvBusiness && g.salary > 0 && g.social > 20,
+      choices:[
+        { label:'苦练了几首应酬必点歌曲', hint:'+🤝 +🧠', fn: g => { g.flags.ktvBusiness=true; return{social:8,intel:3}; }},
+        { label:'觉得这种应酬太虚伪了', hint:'+🧠 -🤝', fn: g => { g.flags.ktvBusiness=true; return{intel:5,social:-3}; }},
+      ]},
+
+    { id:'ktv_solo_v38_1', icon:'🎵', title:'一个人唱KTV', category:'ktv',
+      body:'心情不好的那天，你一个人去了KTV。开了个最小的包间，点了二十首歌，从《晴天》唱到《突然好想你》。没有观众，没有评价，只有你和歌词。唱着唱着，眼泪就下来了。服务员敲门送水的时候看到你红着眼，什么都没问。"一个人唱KTV不丢人，"你在大众点评上写道，"丢人的是，你居然需要一个人唱KTV。"',
+      cond: g => g.flags.ktvFirst && !g.flags.ktvSolo && g.age >= 20,
+      choices:[
+        { label:'唱完觉得心里舒服多了', hint:'+😊 +💪', fn: g => { g.flags.ktvSolo=true; return{mood:10,health:3}; }},
+        { label:'唱完更想哭了', hint:'-😊 +🧠', fn: g => { g.flags.ktvSolo=true; return{mood:-5,intel:5}; }},
+      ]},
+
+    { id:'ktv_latenight_v38_1', icon:'🌙', title:'通宵唱K', category:'ktv',
+      body:'毕业前夕，全宿舍决定通宵唱K。从晚上八点唱到早上六点，嗓子都哑了还在唱。"最后一首！"——这句话重复了二十遍。凌晨四点的时候，大家开始唱《同桌的你》，唱到"明天你是否会想起"，有人开始哭。十年后你再听那首歌，还是会想起那个通宵。那是青春最后的疯狂。',
+      cond: g => g.flags.ktvFirst && !g.flags.ktvLateNight && g.age >= 20 && g.age <= 30,
+      choices:[
+        { label:'和朋友们唱到天亮', hint:'+😊 +🤝 -💪', fn: g => { g.flags.ktvLateNight=true; return{mood:12,social:8,health:-3}; }},
+        { label:'三点就扛不住先走了', hint:'+😅 +💤', fn: g => { g.flags.ktvLateNight=true; return{mood:5,health:0}; }},
+      ]},
+
+    { id:'ktv_dying_v38_1', icon:'📉', title:'KTV的黄金时代过去了', category:'ktv',
+      body:'你常去的那家KTV关门了。门口贴着"因经营不善，即日起停止营业"。你推门进去看了一眼，空荡荡的走廊，落灰的麦克风，屏幕上定格着最后一首歌的歌单。老板说："现在年轻人都用手机唱歌了，谁还来KTV啊。"你在朋友圈发了张关门的照片，底下全是怀旧评论："我的青春结束了。"',
+      cond: g => g.flags.ktvFirst && !g.flags.ktvDying && g.age >= 25,
+      choices:[
+        { label:'在关门前最后一次去唱了一场', hint:'+😊 -💰', fn: g => { g.flags.ktvDying=true; g.flags.ktvLastSong=true; return{mood:10,money:-200}; }},
+        { label:'拍了组照片留作纪念', hint:'+✨ +🧠', fn: g => { g.flags.ktvDying=true; g.flags.ktvPhoto=true; return{charm:5,intel:3}; }},
+      ]},
+
+    { id:'ktv_mini_v38_1', icon:'📱', title:'迷你KTV', category:'ktv',
+      body:'商场里多了几个迷你KTV的玻璃亭子。你好奇地进去试了试：两平米的空间，两个麦克风，一个屏幕。"好像电话亭变成了KTV。"你戴着耳机唱了一下午，隔壁玻璃亭子里的人也在唱，你们隔着玻璃对视了一眼，尴尬地笑了。"时代变了，KTV也变了。"你想，"但想唱歌的心情没变。"',
+      cond: g => g.flags.ktvFirst && !g.flags.ktvMini,
+      choices:[
+        { label:'成了迷你KTV的常客', hint:'-💰 +😊', fn: g => { g.flags.ktvMini=true; g.flags.ktvMiniRegular=true; return{money:-500,mood:5}; }},
+        { label:'觉得没有传统KTV的氛围', hint:'+🧠', fn: g => { g.flags.ktvMini=true; return{intel:3}; }},
+      ]},
+
+    { id:'ktv_app_v38_1', icon:'📱', title:'手机K歌', category:'ktv',
+      body:'朋友推荐了一个手机K歌APP，你下载后一发不可收拾。在厕所唱、在被窝里唱、做饭的时候也唱。系统给你评了分，你的《红豆》居然拿了SSS。你发了朋友圈："原来我是隐藏的麦霸。"朋友评论："你那是K歌吗？你那是鬼叫。"但你的粉丝已经涨到了三位数。',
+      cond: g => g.flags.ktvFirst && !g.flags.ktvApp,
+      choices:[
+        { label:'认真经营K歌账号，粉丝破万', hint:'+✨ +😊', fn: g => { g.flags.ktvApp=true; g.flags.ktvFan=true; return{charm:10,mood:5}; }},
+        { label:'自娱自乐就好', hint:'+😊', fn: g => { g.flags.ktvApp=true; return{mood:5}; }},
+      ]},
+
+    { id:'ktv_reunion_v38_1', icon:'🍻', title:'KTV里的告别', category:'ktv',
+      body:'同事要离职回老家了，大家去KTV送别。平时最闹腾的人今晚特别安静，点了一首《送别》。唱到"长亭外，古道边"的时候，好几个人红了眼。"以后想你们了就唱这首歌。"同事举着酒杯说。你们碰了杯，谁都没说"常联系"——因为大家都知道，很多人，走着走着就散了。KTV的最后一首歌，往往是告别。',
+      cond: g => g.flags.ktvFirst && !g.flags.ktvReunion && g.age >= 22 && g.social > 15,
+      choices:[
+        { label:'唱了一首《朋友》送别', hint:'+😊 +❤️ -😊', fn: g => { g.flags.ktvReunion=true; return{mood:5,social:5}; }},
+        { label:'安静听完每一首歌', hint:'+🧠 +❤️', fn: g => { g.flags.ktvReunion=true; return{intel:5,mood:3}; }},
+      ]},
+
+    { id:'ktv_life_v38_1', icon:'🌟', title:'K歌人生', category:'ktv',
+      body:'你终于理解了KTV对中国人的意义。它不只是唱歌的地方——它是生日派对的舞台，是应酬社交的战场，是一个人疗伤的角落，是朋友告别的地方。从大包间到迷你亭，从实体KTV到手机APP，形式在变，但那个想唱歌、想被听见的心情没变。每个人的人生都有一首主题曲，而KTV，就是你给自己开的演唱会。',
+      cond: g => g.age >= 28 && g.flags.ktvFirst && (g.flags.ktvSolo || g.flags.ktvLateNight) && (g.flags.ktvDying || g.flags.ktvApp) && !g.flags.ktvLife,
+      choices:[
+        { label:'和朋友合伙开了一家怀旧KTV', hint:'-💰 +❤️ +🤝', fn: g => { g.flags.ktvLife=true; g.flags.ktvOwner=true; return{money:-50000,mood:15,social:10}; }},
+        { label:'做了一期关于KTV文化的播客', hint:'+✨ +🧠', fn: g => { g.flags.ktvLife=true; g.flags.ktvPodcast=true; return{charm:10,intel:8}; }},
+        { label:'继续做一个爱唱歌的普通人', hint:'+😊 +❤️ +🎵', fn: g => { g.flags.ktvLife=true; return{mood:12,social:5,charm:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -25127,6 +25209,16 @@ const ACHIEVEMENTS = [
     { id:'reno_neighbor_v38_0_ach', icon:'🏘️', name:'装修之交', desc:'因为装修认识了新邻居', check: g => g.flags.renoNeighbor },
     { id:'reno_fengshui_v38_0_ach', icon:'🧭', name:'风水先生', desc:'体验了装修中的风水哲学', check: g => g.flags.renoFengshui },
     { id:'reno_home_v38_0_ach', icon:'🏠', name:'新家落成', desc:'终于有了一个真正属于自己的家', check: g => g.flags.renoHome },
+    { id:'ktv_first_v38_1_ach', icon:'🎤', name:'初登舞台', desc:'第一次走进KTV唱歌', check: g => g.flags.ktvFirst },
+    { id:'ktv_birthday_v38_1_ach', icon:'🎂', name:'K歌生日', desc:'在KTV度过了一个难忘的生日', check: g => g.flags.ktvBirthday },
+    { id:'ktv_business_v38_1_ach', icon:'💼', name:'第二战场', desc:'在KTV应酬中拓展了人脉', check: g => g.flags.ktvBusiness },
+    { id:'ktv_solo_v38_1_ach', icon:'🎵', name:'一个人的演唱会', desc:'一个人去KTV唱歌疗伤', check: g => g.flags.ktvSolo },
+    { id:'ktv_latenight_v38_1_ach', icon:'🌙', name:'通宵麦霸', desc:'和朋友们通宵唱到天亮', check: g => g.flags.ktvLateNight },
+    { id:'ktv_dying_v38_1_ach', icon:'📉', name:'黄金时代', desc:'见证了KTV黄金时代的落幕', check: g => g.flags.ktvDying },
+    { id:'ktv_mini_v38_1_ach', icon:'📱', name:'迷你歌手', desc:'体验了商场里的迷你KTV', check: g => g.flags.ktvMini },
+    { id:'ktv_app_v38_1_ach', icon:'📱', name:'线上麦霸', desc:'在手机K歌APP上找到了新舞台', check: g => g.flags.ktvApp },
+    { id:'ktv_reunion_v38_1_ach', icon:'🍻', name:'曲终人散', desc:'在KTV里送别了重要的朋友', check: g => g.flags.ktvReunion },
+    { id:'ktv_life_v38_1_ach', icon:'🌟', name:'K歌人生', desc:'理解了唱歌不只是娱乐，更是一种表达', check: g => g.flags.ktvLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
