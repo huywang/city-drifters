@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v37.9
+// 都市浮生记 - 数据文件 v38.0
 // ============================================
 
 
@@ -22707,6 +22707,95 @@ const EVENTS = [
         { label:'继续做一个快乐的广场舞青年', hint:'+😊 +💪 +❤️', fn: g => { g.flags.squareLife=true; return{mood:12,health:5,social:8}; }},
       ]},
 
+    // === v38.0 装修与家居文化 ===
+    { id:'reno_first_v38_0', icon:'🏗️', title:'装修启蒙', category:'reno',
+      body:'你终于攒够了首付，买了一套小户型。还没来得及高兴，就面临了一个更大的问题：装修。朋友说："装修是一门玄学，花多少钱都可能不够。"你去网上搜了一圈，看到各种翻车案例：墙面开裂、瓷砖空鼓、柜子歪了、预算翻倍……你突然觉得，买房只是花钱的开始。',
+      cond: g => !g.flags.renoFirst && g.age >= 25 && g.money > 30000,
+      choices:[
+        { label:'开始疯狂研究装修攻略', hint:'+🧠 +😰', fn: g => { g.flags.renoFirst=true; return{intel:8,mood:-3}; }},
+        { label:'找朋友推荐的装修队', hint:'+🤝 +😊', fn: g => { g.flags.renoFirst=true; return{social:5,mood:3}; }},
+        { label:'先住毛坯房算了', hint:'+😅 +💰', fn: g => { g.flags.renoFirst=true; g.flags.renoBare=true; return{mood:-5,money:0}; }},
+      ]},
+
+    { id:'reno_worker_v38_0', icon:'👷', title:'找装修师傅', category:'reno',
+      body:'你联系了三家装修公司：报价从8万到20万不等。"为什么差这么多？"你问。朋友解释："8万的偷工减料，20万的赚你一半，12万的可能是实在人。"你最终选了一个口碑不错的工长刘师傅。他来看了房子后说："这房子结构还行，就是水电得全改。"你不太懂，但觉得他很专业。',
+      cond: g => g.flags.renoFirst && !g.flags.renoWorker,
+      choices:[
+        { label:'选口碑好的刘师傅，贵一点放心', hint:'-💰 +😊', fn: g => { g.flags.renoWorker=true; g.flags.renoGood=true; return{money:-15000,mood:5}; }},
+        { label:'选最便宜的那家', hint:'-💰 +😰', fn: g => { g.flags.renoWorker=true; g.flags.renoCheap=true; return{money:-8000,mood:-3}; }},
+        { label:'自己找工人，不找装修公司', hint:'-💰 +🧠', fn: g => { g.flags.renoWorker=true; g.flags.renoDIY=true; return{money:-10000,intel:5}; }},
+      ]},
+
+    { id:'reno_material_v38_0', icon:'🧱', title:'建材市场历险记', category:'reno',
+      body:'你去了建材市场，一进门就被各种"品牌""环保""零甲醛"搞晕了。卖瓷砖的说他的最好，卖地板的说他的最环保，卖涂料的说他的是进口的。你砍了半天价，从3000砍到2500，结果朋友告诉你这东西出厂价就800。"建材市场的水，比装修还深。"你终于理解了这句话。',
+      cond: g => g.flags.renoFirst && !g.flags.renoMaterial,
+      choices:[
+        { label:'带上懂行的朋友重新逛', hint:'+🤝 +🧠', fn: g => { g.flags.renoMaterial=true; return{social:5,intel:5}; }},
+        { label:'在网上比价，线下看实物', hint:'+🧠 +💰', fn: g => { g.flags.renoMaterial=true; g.flags.renoSmart=true; return{intel:8,money:2000}; }},
+        { label:'算了，让工长全包吧', hint:'-💰 +😊', fn: g => { g.flags.renoMaterial=true; return{money:-5000,mood:3}; }},
+      ]},
+
+    { id:'reno_noise_v38_0', icon:'🔨', title:'装修噪音投诉', category:'reno',
+      body:'装修开始了，电钻声从早响到晚。楼下邻居来敲门了："你们能不能控制一下时间？我家孩子要写作业。"你赔笑脸说好话，约定了施工时间。但工人不乐意了："我们按时间干就得多花钱。"你夹在邻居和工人之间，第一次理解了什么叫"装修是一场修行"。',
+      cond: g => g.flags.renoWorker && !g.flags.renoNoise,
+      choices:[
+        { label:'给邻居送水果赔礼，和工人商量时间', hint:'-💰 +🤝 +😊', fn: g => { g.flags.renoNoise=true; return{money:-200,social:5,mood:3}; }},
+        { label:'严格按照物业规定时间施工', hint:'+🧠', fn: g => { g.flags.renoNoise=true; return{intel:3}; }},
+      ]},
+
+    { id:'reno_budget_v38_0', icon:'💸', title:'预算超支', category:'reno',
+      body:'装修预算8万，现在花了12万还没完。"这个要加钱""那个要升级""不加钱没法做"。你看着账单想哭：水电改造加了5000，瓷砖升级加了3000，定制柜子比预算多了一倍。朋友安慰你："都这样，没有人装修不超预算的。"你看了看银行卡余额，开始考虑要不要借点钱。',
+      cond: g => g.flags.renoWorker && !g.flags.renoBudget && g.money > 5000,
+      choices:[
+        { label:'咬咬牙继续加，住得舒服最重要', hint:'-💰 +😊', fn: g => { g.flags.renoBudget=true; return{money:-8000,mood:3}; }},
+        { label:'剩下的能省则省，将就一下', hint:'+🧠 -😊', fn: g => { g.flags.renoBudget=true; g.flags.renoSave=true; return{intel:5,mood:-3}; }},
+        { label:'和工长谈价，看哪些能砍', hint:'+🧠 +🤝', fn: g => { g.flags.renoBudget=true; return{intel:3,social:3}; }},
+      ]},
+
+    { id:'reno_style_v38_0', icon:'🎨', title:'装修风格之争', category:'reno',
+      body:'你想装北欧风，你妈说"太素了像医院"要中式；你爸说"结实耐用最重要"；另一半说想要日式原木风。四个人四个意见，在建材市场差点吵起来。设计师小李说："其实现在流行混搭，把大家的想法融合一下。"最终方案出来：客厅北欧、卧室日式、厨房中式——"四不像"风格，但每个人都很满意。',
+      cond: g => g.flags.renoFirst && !g.flags.renoStyle && g.age >= 26,
+      choices:[
+        { label:'听设计师的，混搭就混搭', hint:'+😊 +🤝', fn: g => { g.flags.renoStyle=true; return{mood:5,social:5}; }},
+        { label:'坚持自己的风格', hint:'+✨ -🤝', fn: g => { g.flags.renoStyle=true; g.flags.renoInsist=true; return{charm:5,social:-3}; }},
+        { label:'算了，你们定就好', hint:'+😅', fn: g => { g.flags.renoStyle=true; return{mood:-2}; }},
+      ]},
+
+    { id:'reno_fail_v38_0', icon:'😱', title:'装修翻车现场', category:'reno',
+      body:'你去工地一看，差点晕过去：瓷砖贴反了颜色，插座位置完全不对，柜门关不严实。工长说："小问题，改改就好。"但你知道"改改"意味着更多的时间和钱。你发了条朋友圈："装修翻车第N天，我已经佛了。"底下全是同病相怜的评论。原来每个装修的人都有一把辛酸泪。',
+      cond: g => g.flags.renoWorker && !g.flags.renoFail,
+      choices:[
+        { label:'和工长据理力争，要求返工', hint:'+🧠 +😤', fn: g => { g.flags.renoFail=true; g.flags.renoFight=true; return{intel:5,mood:-5}; }},
+        { label:'自己学会了验收标准', hint:'+🧠 +✨', fn: g => { g.flags.renoFail=true; g.flags.renoLearn=true; return{intel:8,charm:3}; }},
+        { label:'认栽吧，能用就行', hint:'+😅 +😊', fn: g => { g.flags.renoFail=true; return{mood:-2,intel:3}; }},
+      ]},
+
+    { id:'reno_neighbor_v38_0', icon:'🏘️', title:'装修社交', category:'reno',
+      body:'装修让你认识了整栋楼的邻居。楼上的大哥也刚装修，你们交流经验成了朋友。"我家用的这个瓷砖特别好，给你推荐。""我家那个工长不靠谱，你千万别找他。"你们组了一个"装修交流群"，后来变成了"邻里互助群"。搬进去那天，大哥送了一盆绿萝："欢迎做邻居！"',
+      cond: g => g.flags.renoFirst && !g.flags.renoNeighbor && g.social > 15,
+      choices:[
+        { label:'搬进去后经常和邻居串门', hint:'+🤝 +😊', fn: g => { g.flags.renoNeighbor=true; return{social:8,mood:5}; }},
+        { label:'组织了第一次邻居聚餐', hint:'-💰 +🤝', fn: g => { g.flags.renoNeighbor=true; g.flags.renoParty=true; return{money:-500,social:10}; }},
+      ]},
+
+    { id:'reno_fengshui_v38_0', icon:'🧭', title:'风水与装修', category:'reno',
+      body:'你妈请了个风水先生来看房子。"门对门不好，要加个玄关""床头不能朝西""厨房不能在西北角"。你觉得是迷信，但你妈说："信则有不信则无，图个安心。"风水先生还建议你在客厅放一棵发财树、门口放个鞋柜挡煞。你不知道有没有用，但你妈很开心——这也许就是风水的意义。',
+      cond: g => g.flags.renoFirst && !g.flags.renoFengshui && g.age >= 25,
+      choices:[
+        { label:'按风水先生的建议调整了布局', hint:'-💰 +❤️', fn: g => { g.flags.renoFengshui=true; return{money:-2000,mood:3,social:3}; }},
+        { label:'不信风水，按自己的喜好来', hint:'+✨ +🧠', fn: g => { g.flags.renoFengshui=true; g.flags.renoModern=true; return{charm:5,intel:3}; }},
+        { label:'两边都照顾到，折中处理', hint:'+🤝 +😊', fn: g => { g.flags.renoFengshui=true; g.flags.renoBalance=true; return{social:5,mood:5}; }},
+      ]},
+
+    { id:'reno_home_v38_0', icon:'🏠', title:'新家落成', category:'reno',
+      body:'历时四个月，装修终于完成了。你站在新家的客厅里，看着自己选的每一块瓷砖、每一盏灯、每一个把手。虽然有些地方不完美——瓷砖色差、柜子缝隙、墙面有个小坑——但这是你的家。朋友来温居时说："不错啊，有家的感觉了。"你煮了一碗面，坐在新餐桌前，突然有点想哭。在大城市漂泊了这么多年，终于有了一个真正属于自己的地方。',
+      cond: g => g.age >= 27 && g.flags.renoFirst && g.flags.renoWorker && (g.flags.renoBudget || g.flags.renoFail) && (g.flags.renoStyle || g.flags.renoNeighbor) && !g.flags.renoHome,
+      choices:[
+        { label:'办了一场温馨的温居派对', hint:'-💰 +🤝 +😊', fn: g => { g.flags.renoHome=true; g.flags.renoPartyBig=true; return{money:-2000,social:10,mood:15}; }},
+        { label:'一个人安安静静享受新家', hint:'+😊 +❤️', fn: g => { g.flags.renoHome=true; return{mood:15,health:5}; }},
+        { label:'开始研究软装和家居布置', hint:'-💰 +✨', fn: g => { g.flags.renoHome=true; g.flags.renoDecor=true; return{money:-3000,charm:8}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -25028,6 +25117,16 @@ const ACHIEVEMENTS = [
     { id:'square_young_v37_9_ach', icon:'👫', name:'青春舞步', desc:'让更多年轻人加入了广场舞', check: g => g.flags.squareYoung },
     { id:'square_space_v37_9_ach', icon:'🏗️', name:'守护广场', desc:'为阿姨们守住了跳舞的场地', check: g => g.flags.squareSpace },
     { id:'square_life_v37_9_ach', icon:'🌟', name:'广场舞人生', desc:'在广场舞中找到了归属感', check: g => g.flags.squareLife },
+    { id:'reno_first_v38_0_ach', icon:'🏗️', name:'装修启蒙', desc:'开始了人生第一次装修', check: g => g.flags.renoFirst },
+    { id:'reno_worker_v38_0_ach', icon:'👷', name:'找对人', desc:'找到了靠谱的装修师傅', check: g => g.flags.renoWorker },
+    { id:'reno_material_v38_0_ach', icon:'🧱', name:'建材达人', desc:'在建材市场里摸爬滚打', check: g => g.flags.renoMaterial },
+    { id:'reno_noise_v38_0_ach', icon:'🔨', name:'邻里之道', desc:'学会了处理装修噪音纠纷', check: g => g.flags.renoNoise },
+    { id:'reno_budget_v38_0_ach', icon:'💸', name:'预算之战', desc:'经历了装修预算超支的洗礼', check: g => g.flags.renoBudget },
+    { id:'reno_style_v38_0_ach', icon:'🎨', name:'风格之争', desc:'在家人的审美碰撞中找到平衡', check: g => g.flags.renoStyle },
+    { id:'reno_fail_v38_0_ach', icon:'😱', name:'翻车现场', desc:'经历了装修翻车并学会了维权', check: g => g.flags.renoFail },
+    { id:'reno_neighbor_v38_0_ach', icon:'🏘️', name:'装修之交', desc:'因为装修认识了新邻居', check: g => g.flags.renoNeighbor },
+    { id:'reno_fengshui_v38_0_ach', icon:'🧭', name:'风水先生', desc:'体验了装修中的风水哲学', check: g => g.flags.renoFengshui },
+    { id:'reno_home_v38_0_ach', icon:'🏠', name:'新家落成', desc:'终于有了一个真正属于自己的家', check: g => g.flags.renoHome },
 ];
 
 // === ENDINGS === (order matters: first match wins)
