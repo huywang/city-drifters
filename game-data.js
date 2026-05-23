@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v40.6
+// 都市浮生记 - 数据文件 v40.7
 // ============================================
 
 
@@ -24828,6 +24828,88 @@ const EVENTS = [
         { label:'感恩那段让你成长的经历', hint:'+😊 +💪', fn: g => { g.flags.loanLife=true; return{mood:12,health:5}; }},
       ]},
 
+    // === v40.7 盲盒与潮玩文化 ===
+    { id:'blindbox_first_v40_7', icon:'🎁', title:'第一个盲盒', category:'blindbox',
+      body:'逛街的时候路过泡泡玛特，橱窗里那些精致的小人偶让你走不动路。你挑了一个MOLLY系列的盲盒，59块钱。拆开的那一刻，心跳加速——是一个你不认识的角色，但莫名觉得可爱。你把这个小东西放在了工位上，每次加班看到它都会笑一下。你不懂什么叫"潮玩"，但你觉得这个东西让你心情变好了。',
+      cond: g => g.age >= 18 && g.age <= 35 && !g.flags.blindboxFirst,
+      choices:[
+        { label:'觉得挺有意思，又买了三个', hint:'+😊 -💰', fn: g => { g.flags.blindboxFirst=true; g.flags.blindboxLike=true; return{mood:8,money:-180}; }},
+        { label:'就买一个，当个桌面摆件', hint:'+😊', fn: g => { g.flags.blindboxFirst=true; return{mood:5}; }},
+        { label:'觉得花59买个塑料玩具不值', hint:'+🧠', fn: g => { g.flags.blindboxFirst=true; g.flags.blindboxSkeptic=true; return{intel:3}; }},
+      ]},
+    { id:'blindbox_addict_v40_7', icon:'🎲', title:'拆盒上瘾', category:'blindbox',
+      body:'你开始一发不可收拾。每次路过泡泡玛特都要进去"看看"，每次"看看"都要"顺手"买一个。你开始端盒（一整套买），开始追新系列，开始关注发售日历。你的书架上、电脑旁、床头柜上全是盲盒小人。你算了一下，今年在盲盒上花了将近一万块。你妈来你家看了一眼说："你都多大了还玩玩具？"',
+      cond: g => g.flags.blindboxLike && !g.flags.blindboxAddict,
+      choices:[
+        { label:'继续收集，这就是我的快乐', hint:'+😊 -💰', fn: g => { g.flags.blindboxAddict=true; g.flags.blindboxCollector=true; return{mood:10,money:-10000}; }},
+        { label:'开始控制自己，每个月只买一个', hint:'+💪 +🧠', fn: g => { g.flags.blindboxAddict=true; g.flags.blindboxControl=true; return{health:3,intel:5}; }},
+        { label:'突然觉得自己在被消费主义洗脑', hint:'+🧠 -😊', fn: g => { g.flags.blindboxAddict=true; g.flags.blindboxAwaken=true; return{intel:8,mood:-5}; }},
+      ]},
+    { id:'blindbox_hidden_v40_7', icon:'⭐', title:'隐藏款', category:'blindbox',
+      body:'你拆到了隐藏款！那个概率只有1/144的小人偶，居然被你拆到了！你激动得在办公室叫了出来，同事们围过来看。你发到小红书，瞬间收获了上千个赞。有人私信问你能不能卖，出价五百。你看着这个成本59块的塑料小人，突然理解了什么叫"稀缺性溢价"。你开始认真思考：这些小东西，也许不只是玩具。',
+      cond: g => (g.flags.blindboxCollector || g.flags.blindboxLike) && !g.flags.blindboxHidden,
+      choices:[
+        { label:'五百块？不卖！这是我的幸运物', hint:'+😊', fn: g => { g.flags.blindboxHidden=true; return{mood:15}; }},
+        { label:'卖了！然后买了更多盲盒', hint:'+💰 -😊', fn: g => { g.flags.blindboxHidden=true; g.flags.blindboxSell=true; return{money:500,mood:5}; }},
+        { label:'开始研究盲盒的二级市场', hint:'+🧠 +💰', fn: g => { g.flags.blindboxHidden=true; g.flags.blindboxMarket=true; return{intel:8,money:300}; }},
+      ]},
+    { id:'blindbox_trade_v40_7', icon:'🔄', title:'潮玩交易', category:'blindbox',
+      body:'你打开了闲鱼，发现盲盒居然有一个庞大的二手交易市场。有人专门收隐藏款，有人整套出不想要的普通款，有人用三个普通款换一个稀有款。你开始在上面买卖盲盒，低买高卖赚差价。你发现有些人靠这个月入过万，有些人因为囤货亏了几十万。你忽然觉得这跟炒股也没什么区别——只不过炒的是塑料小人。',
+      cond: g => g.flags.blindboxMarket && !g.flags.blindboxTrade,
+      choices:[
+        { label:'成了闲鱼上的盲盒倒爷', hint:'+💰 +🧠', fn: g => { g.flags.blindboxTrade=true; g.flags.blindboxDealer=true; return{money:8000,intel:5}; }},
+        { label:'只交易自己喜欢的款', hint:'+😊 +❤️', fn: g => { g.flags.blindboxTrade=true; return{mood:8,social:5}; }},
+        { label:'觉得炒作太疯狂了，退出了交易', hint:'+🧠 +💪', fn: g => { g.flags.blindboxTrade=true; return{intel:5,health:3}; }},
+      ]},
+    { id:'blindbox_community_v40_7', icon:'👥', title:'潮玩社群', category:'blindbox',
+      body:'你加入了一个潮玩爱好者群，发现这里的人来自各行各业——有程序员、有设计师、有大学生、有全职妈妈。大家因为共同的爱好聚在一起，每天晒新拆的盲盒、分享改造作品、讨论下一期新品。你在群里认识了几个特别好的朋友，还一起去了潮玩展。你发现：盲盒不只是一个小玩具，它是一个连接人与人的桥梁。',
+      cond: g => (g.flags.blindboxCollector || g.flags.blindboxTrade) && !g.flags.blindboxCommunity,
+      choices:[
+        { label:'成了群里的活跃分子和意见领袖', hint:'+❤️ +✨', fn: g => { g.flags.blindboxCommunity=true; g.flags.blindboxInfluencer=true; return{social:12,charm:8}; }},
+        { label:'交到了几个志同道合的好朋友', hint:'+❤️', fn: g => { g.flags.blindboxCommunity=true; return{social:10,mood:5}; }},
+        { label:'在社群里学到了潮玩文化知识', hint:'+🧠', fn: g => { g.flags.blindboxCommunity=true; return{intel:5,social:5}; }},
+      ]},
+    { id:'blindbox_popmart_v40_7', icon:'🏬', title:'泡泡玛特朝圣', category:'blindbox',
+      body:'你专程去了一趟泡泡玛特的旗舰店。两层楼的展示柜里摆满了各种系列，有的限量款你连名字都叫不出来。你看到一个女生站在MEGA系列面前哭了——她攒了半年工资就为了买那个大号。你在店里逛了三个小时，最后花了三千块买了限定款和联名款。走出店门的时候你看了看银行卡余额，觉得心在滴血——但手里拎着袋子的时候又觉得很幸福。',
+      cond: g => g.flags.blindboxCommunity && !g.flags.blindboxPopmart,
+      choices:[
+        { label:'开始收集限定款和联名款', hint:'-💰 +✨', fn: g => { g.flags.blindboxPopmart=true; g.flags.blindboxLimited=true; return{money:-15000,charm:10}; }},
+        { label:'体验了一把就够了，理性回归', hint:'+🧠 +😊', fn: g => { g.flags.blindboxPopmart=true; return{intel:5,mood:8}; }},
+        { label:'认识了店里的店员，聊了很多行业内幕', hint:'+🧠 +❤️', fn: g => { g.flags.blindboxPopmart=true; g.flags.blindboxInsider=true; return{intel:8,social:5}; }},
+      ]},
+    { id:'blindbox_invest_v40_7', icon:'📈', title:'潮玩投资', category:'blindbox',
+      body:'你发现有些限量版潮玩的价格比股票涨得还快。一个发售价999的MEGA，二手市场炒到了一万多。你开始把买盲盒当成"投资"——买两套，一套拆来自留，一套封着等升值。你关注了潮玩市场的数据网站，开始分析价格走势。你觉得自己在做"另类资产配置"，但你的朋友说："你就是在给自己的消费行为找借口。"',
+      cond: g => (g.flags.blindboxMarket || g.flags.blindboxLimited) && !g.flags.blindboxInvest,
+      choices:[
+        { label:'大量囤货等升值，投入了五万块', hint:'+💰 -💪', fn: g => { g.flags.blindboxInvest=true; g.flags.blindboxHoard=true; return{money:-50000,intel:3}; }},
+        { label:'小额试水，理性投资', hint:'+💰 +🧠', fn: g => { g.flags.blindboxInvest=true; g.flags.blindboxSmartInvest=true; return{money:8000,intel:8}; }},
+        { label:'觉得泡沫太大，不敢投', hint:'+🧠 +💪', fn: g => { g.flags.blindboxInvest=true; return{intel:10,health:3}; }},
+      ]},
+    { id:'blindbox_disillusion_v40_7', icon:'💫', title:'幻灭时刻', category:'blindbox',
+      body:'泡泡玛特股价暴跌的消息传来，你囤的那些"限量版"价格也开始跳水。你花两千块收的隐藏款，现在闲鱼上挂八百都没人问。你看着满屋子的塑料小人，突然觉得它们就是一堆塑料而已。你算了一下自己在潮玩上花的钱，够付一年房租了。你把几个最贵的挂上了闲鱼，标题写着："退坑出，价格好商量。"',
+      cond: g => (g.flags.blindboxHoard || g.flags.blindboxAddict) && !g.flags.blindboxDisillusion,
+      choices:[
+        { label:'亏本卖了大部分收藏', hint:'-💰 +💪', fn: g => { g.flags.blindboxDisillusion=true; return{money:-20000,health:5}; }},
+        { label:'留着吧，至少曾经开心过', hint:'+😊', fn: g => { g.flags.blindboxDisillusion=true; g.flags.blindboxKeep=true; return{mood:5}; }},
+        { label:'深刻反思了自己的消费观', hint:'+🧠 +💪', fn: g => { g.flags.blindboxDisillusion=true; g.flags.blindboxReflect=true; return{intel:12,health:5}; }},
+      ]},
+    { id:'blindbox_meaning_v40_7', icon:'💝', title:'收藏的意义', category:'blindbox',
+      body:'整理房间的时候，你翻出了那些盲盒。每一个都让你想起一段记忆——这个是在加班到深夜后给自己买的奖励，那个是和好朋友一起拆的，这个隐藏款是生日那天的惊喜。你忽然明白：收藏的意义不在于东西值多少钱，而在于它们承载的那些瞬间。你把最喜欢的几个摆回了架子上，其他的放进了收纳箱。',
+      cond: g => (g.flags.blindboxDisillusion || g.flags.blindboxControl) && !g.flags.blindboxMeaning,
+      choices:[
+        { label:'开始用盲盒做手工改造', hint:'+✨ +🧠', fn: g => { g.flags.blindboxMeaning=true; g.flags.blindboxDIY=true; return{charm:10,intel:5}; }},
+        { label:'把一部分送给了喜欢的朋友', hint:'+❤️ +😊', fn: g => { g.flags.blindboxMeaning=true; return{social:10,mood:8}; }},
+        { label:'写了一篇"我的盲盒往事"', hint:'+✨ +🧠', fn: g => { g.flags.blindboxMeaning=true; g.flags.blindboxWriter=true; return{charm:8,intel:5}; }},
+      ]},
+    { id:'blindbox_life_v40_7', icon:'🌟', title:'潮玩人生', category:'blindbox',
+      body:'多年后你回头看盲盒这段经历，觉得它就像一面镜子，照出了你这代人的很多特质——愿意为快乐买单，追求个性表达，容易被社交媒体影响，但也懂得反思和成长。你不后悔那些花出去的钱，因为每一分钱都买了当时的快乐。你也不后悔后来的反思，因为它让你更懂得什么是真正重要的东西。人生就像拆盲盒——你永远不知道下一个是什么，但每一个都值得被珍惜。',
+      cond: g => (g.flags.blindboxMeaning || g.flags.blindboxReflect) && g.age >= 28 && !g.flags.blindboxLife,
+      choices:[
+        { label:'开了一个潮玩主题的小店', hint:'+💰 +✨', fn: g => { g.flags.blindboxLife=true; g.flags.blindboxShop=true; setJob(g,'潮玩店主',10000); return{money:8000,charm:10}; }},
+        { label:'成了潮玩文化的研究者', hint:'+🧠 +✨', fn: g => { g.flags.blindboxLife=true; return{intel:12,charm:8}; }},
+        { label:'笑着对这段经历说：值了', hint:'+😊 +❤️', fn: g => { g.flags.blindboxLife=true; return{mood:15,social:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -27432,6 +27514,16 @@ const ACHIEVEMENTS = [
     { id:'loan_lesson_v40_6_ach', icon:'📖', name:'债务教训', desc:'用真金白银买了人生最贵的一课', check: g => g.flags.loanLesson },
     { id:'loan_credit_v40_6_ach', icon:'📊', name:'信用修复', desc:'明白了信用比金钱更重要', check: g => g.flags.loanCredit },
     { id:'loan_life_v40_6_ach', icon:'🌟', name:'财务人生', desc:'从债务泥潭中走出来，学会了真正的财务自由', check: g => g.flags.loanLife },
+    { id:'blindbox_first_v40_7_ach', icon:'🎁', name:'第一个盲盒', desc:'拆开了人生中第一个盲盒', check: g => g.flags.blindboxFirst },
+    { id:'blindbox_addict_v40_7_ach', icon:'🎲', name:'拆盒上瘾', desc:'体验了停不下来的快乐', check: g => g.flags.blindboxAddict },
+    { id:'blindbox_hidden_v40_7_ach', icon:'⭐', name:'隐藏款', desc:'幸运地拆到了1/144的隐藏款', check: g => g.flags.blindboxHidden },
+    { id:'blindbox_trade_v40_7_ach', icon:'🔄', name:'潮玩交易', desc:'在闲鱼上完成了第一笔潮玩交易', check: g => g.flags.blindboxTrade },
+    { id:'blindbox_community_v40_7_ach', icon:'👥', name:'潮玩社群', desc:'找到了志同道合的潮玩爱好者', check: g => g.flags.blindboxCommunity },
+    { id:'blindbox_popmart_v40_7_ach', icon:'🏬', name:'泡泡玛特朝圣', desc:'去了一次泡泡玛特旗舰店', check: g => g.flags.blindboxPopmart },
+    { id:'blindbox_invest_v40_7_ach', icon:'📈', name:'潮玩投资', desc:'把买盲盒当成了一种投资', check: g => g.flags.blindboxInvest },
+    { id:'blindbox_disillusion_v40_7_ach', icon:'💫', name:'幻灭时刻', desc:'看清了塑料小人的真实价值', check: g => g.flags.blindboxDisillusion },
+    { id:'blindbox_meaning_v40_7_ach', icon:'💝', name:'收藏的意义', desc:'理解了收藏承载的是记忆而不是价格', check: g => g.flags.blindboxMeaning },
+    { id:'blindbox_life_v40_7_ach', icon:'🌟', name:'潮玩人生', desc:'人生就像拆盲盒，每一个都值得珍惜', check: g => g.flags.blindboxLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
