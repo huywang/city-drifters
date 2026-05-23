@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v38.3
+// 都市浮生记 - 数据文件 v38.4
 // ============================================
 
 
@@ -23044,6 +23044,88 @@ const EVENTS = [
         { label:'继续做一个快乐的漂泊者', hint:'+😊 +💪 +🧠', fn: g => { g.flags.moveHome=true; return{mood:12,health:5,intel:5}; }},
       ]},
 
+    // === v38.4 烧烤与夜宵文化 ===
+    { id:'bbq_first_v38_4', icon:'🍢', title:'深夜烧烤摊', category:'bbq',
+      body:'加班到十一点，饥肠辘辘地走在回家的路上。街角的烧烤摊还亮着灯，烟气缭绕中老板喊着："来十串羊肉串！"你坐下来点了几串，老板一边烤一边跟你聊天："小伙子加班到现在啊？"你说："是。"他多给你加了两串："辛苦了，送你。"你吃着热腾腾的烤串，觉得这座城市的深夜也有温度。',
+      cond: g => !g.flags.bbqFirst && g.age >= 18,
+      choices:[
+        { label:'吃得心满意足，决定常来', hint:'+😊 +💪', fn: g => { g.flags.bbqFirst=true; return{mood:10,health:3}; }},
+        { label:'打包带回出租屋慢慢吃', hint:'+😊', fn: g => { g.flags.bbqFirst=true; return{mood:5}; }},
+      ]},
+
+    { id:'bbq_regular_v38_4', icon:'🌙', title:'夜宵常客', category:'bbq',
+      body:'你成了烧烤摊的常客。老板记住了你的名字和你爱吃的东西："老样子？十串羊肉五串韭菜？"你发现深夜吃烧烤的人都有故事：刚加完班的程序员、刚吵完架的情侣、刚送完单的外卖员。大家坐在塑料凳上，喝着啤酒，聊着各自的生活。"白天是给老板打工，晚上才是自己的时间。"',
+      cond: g => g.flags.bbqFirst && !g.flags.bbqRegular,
+      choices:[
+        { label:'和烧烤摊老板成了朋友', hint:'+🤝 +😊', fn: g => { g.flags.bbqRegular=true; g.flags.bbqFriend=true; return{social:8,mood:5}; }},
+        { label:'每次来都点同样的东西', hint:'+😊', fn: g => { g.flags.bbqRegular=true; return{mood:5}; }},
+      ]},
+
+    { id:'bbq_social_v38_4', icon:'🍺', title:'深夜酒局', category:'bbq',
+      body:'朋友失恋了，凌晨两点拉你去吃烧烤。"喝！"他举起啤酒瓶。你们吃了五十串烤串、喝了十二瓶啤酒。他哭了一场，你陪他坐到天亮。"谢谢你陪我。"他说。你说："不用谢，烤串你请就行。"结账的时候他抢着付了："今晚的烤串，是我这段时间吃过最好吃的。"有些友情，是在深夜烧烤摊上锻造出来的。',
+      cond: g => g.flags.bbqFirst && !g.flags.bbqSocial && g.age >= 20 && g.social > 15,
+      choices:[
+        { label:'陪朋友坐到天亮', hint:'+❤️ +🤝 -💪', fn: g => { g.flags.bbqSocial=true; return{social:8,mood:5,health:-3}; }},
+        { label:'安慰完朋友早点回去', hint:'+😊 +💤', fn: g => { g.flags.bbqSocial=true; return{mood:5,health:0}; }},
+      ]},
+
+    { id:'bbq_vendor_v38_4', icon:'👨‍🍳', title:'烧烤摊老板的故事', category:'bbq',
+      body:'烧烤摊老板老李跟你熟了以后，开始讲他的故事。他老家河南，十年前带着老婆来这座城市摆摊。"最开始城管天天追，现在有了固定摊位。"他每天下午三点开始准备，凌晨三点收摊。"一年到头就过年歇几天。供两个孩子读书，老大已经上大学了。"你看着他被烟熏黑的脸，突然觉得：这个城市最了不起的人，就是这些摆摊的人。',
+      cond: g => g.flags.bbqRegular && !g.flags.bbqVendor && g.age >= 20,
+      choices:[
+        { label:'经常带朋友来照顾生意', hint:'+🤝 +❤️', fn: g => { g.flags.bbqVendor=true; return{social:5,mood:5}; }},
+        { label:'帮老李的孩子辅导功课', hint:'+❤️ +🧠', fn: g => { g.flags.bbqVendor=true; g.flags.bbqTutor=true; return{social:8,intel:5}; }},
+      ]},
+
+    { id:'bbq_health_v38_4', icon:'🏥', title:'夜宵的代价', category:'bbq',
+      body:'连续吃了一个月夜宵，你的体重涨了五斤，脸上冒了好几颗痘。体检报告上"尿酸偏高"三个字让你心慌。医生说："年轻人要控制饮食，烧烤啤酒要少吃。"你看着报告单，想起了那句话："年轻时拿命换钱，老了拿钱换命。"你决定减少夜宵频率——但今晚最后一顿。',
+      cond: g => g.flags.bbqRegular && !g.flags.bbqHealth,
+      choices:[
+        { label:'真的开始控制饮食了', hint:'+💪 +🧠', fn: g => { g.flags.bbqHealth=true; g.flags.bbqDiet=true; return{health:5,intel:5}; }},
+        { label:'嘴上说减少但身体很诚实', hint:'+😅 -💪', fn: g => { g.flags.bbqHealth=true; return{mood:3,health:-3}; }},
+      ]},
+
+    { id:'bbq_chengguan_v38_4', icon:'🚨', title:'城管来了', category:'bbq',
+      body:'你正在吃烧烤，突然有人喊："城管来了！"老李飞快地收摊，你帮他搬了两箱啤酒。等城管走了，老李回来继续摆。"习惯了，"他说，"这些年跑城管比跑步还快。"你问他为什么不租个店面，他说："租金太贵了，摆摊虽然辛苦但赚得多。"你看着他被汗水浸透的衣服，沉默了很久。',
+      cond: g => g.flags.bbqRegular && !g.flags.bbqChengguan && g.age >= 20,
+      choices:[
+        { label:'帮老李在网上查了合法经营的途径', hint:'+🧠 +❤️', fn: g => { g.flags.bbqChengguan=true; g.flags.bbqHelp=true; return{intel:5,social:5}; }},
+        { label:'在社交媒体上为夜市摊贩发声', hint:'+✨ +🤝', fn: g => { g.flags.bbqChengguan=true; g.flags.bbqVoice=true; return{charm:5,social:5}; }},
+      ]},
+
+    { id:'bbq_friends_v38_4', icon:'👫', title:'深夜食堂', category:'bbq',
+      body:'你和几个朋友把烧烤摊当成了"深夜食堂"。每周五晚上下班后固定聚一次，不聊工作，只聊人生。有人讲创业故事，有人吐槽相亲，有人说准备辞职去旅行。"在外面吃饭不如在这里，"朋友说，"因为只有在这里，才能说真心话。"老李听了笑着说："你们比我老婆还准时。"',
+      cond: g => g.flags.bbqRegular && !g.flags.bbqFriends && g.social > 20,
+      choices:[
+        { label:'把深夜食堂变成了固定传统', hint:'+🤝 +😊', fn: g => { g.flags.bbqFriends=true; g.flags.bbqTradition=true; return{social:10,mood:8}; }},
+        { label:'偶尔参加，保持神秘感', hint:'+😊', fn: g => { g.flags.bbqFriends=true; return{mood:5,social:5}; }},
+      ]},
+
+    { id:'bbq_solo_v38_4', icon:'🍖', title:'一个人吃烧烤', category:'bbq',
+      body:'一个人坐在烧烤摊前，点了二十串烤串和一瓶啤酒。没有朋友陪，没有应酬，就是单纯想吃了。老板问："今天就你一个人？"你说："一个人吃得自在。"你慢慢吃着，看着来来往往的人。有时候一个人吃饭不是孤独，是一种奢侈——奢侈到可以只面对自己的味蕾和思绪。',
+      cond: g => g.flags.bbqFirst && !g.flags.bbqSolo && g.age >= 20,
+      choices:[
+        { label:'享受独处的味道', hint:'+😊 +🧠', fn: g => { g.flags.bbqSolo=true; return{mood:8,intel:5}; }},
+        { label:'给远方的朋友发了张烤串照片', hint:'+🤝 +❤️', fn: g => { g.flags.bbqSolo=true; return{social:5,mood:5}; }},
+      ]},
+
+    { id:'bbq_dying_v38_4', icon:'📉', title:'烧烤摊不见了', category:'bbq',
+      body:'你路过那个街角，发现烧烤摊不在了。问了隔壁便利店才知道："这条街要改造，所有摊贩都得搬走。"你打电话问老李，他说要去另一个区重新找地方。"可能远了点，你有空来啊。"你站在空荡荡的街角，闻不到熟悉的烟火气了。城市的每一次"升级"，都会有一些温暖的角落消失。',
+      cond: g => g.flags.bbqRegular && !g.flags.bbqDying && g.age >= 22,
+      choices:[
+        { label:'特意跑到新区去找老李', hint:'+❤️ +🤝', fn: g => { g.flags.bbqDying=true; g.flags.bbqLoyal=true; return{social:5,mood:5}; }},
+        { label:'写了一篇关于夜市消失的文章', hint:'+✨ +🧠', fn: g => { g.flags.bbqDying=true; g.flags.bbqWrite=true; return{charm:8,intel:5}; }},
+      ]},
+
+    { id:'bbq_life_v38_4', icon:'🌟', title:'烟火人间', category:'bbq',
+      body:'你终于理解了烧烤对中国人的意义。它不只是一顿饭——它是加班后的慰藉，是友情的熔炉，是深夜里的社交场。在这个烟火缭绕的小摊上，没有KPI、没有房贷、没有催婚，只有滋滋冒油的烤串和最真实的人间。大城市有无数家米其林餐厅，但最让你想念的，永远是街角那个冒着油烟的烧烤摊。',
+      cond: g => g.age >= 28 && g.flags.bbqRegular && (g.flags.bbqSocial || g.flags.bbqFriends) && (g.flags.bbqDying || g.flags.bbqVendor) && !g.flags.bbqLife,
+      choices:[
+        { label:'和老李合伙开了一家烧烤店', hint:'-💰 +❤️ +💰', fn: g => { g.flags.bbqLife=true; g.flags.bbqOwner=true; return{money:-30000,mood:15,social:10}; }},
+        { label:'做了一期《城市深夜食堂》纪录短片', hint:'+✨ +🧠', fn: g => { g.flags.bbqLife=true; g.flags.bbqFilm=true; return{charm:12,intel:8}; }},
+        { label:'继续做一个深夜烧烤的常客', hint:'+😊 +❤️ +🍢', fn: g => { g.flags.bbqLife=true; return{mood:12,social:5,health:3}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -25405,6 +25487,16 @@ const ACHIEVEMENTS = [
     { id:'move_stay_v38_3_ach', icon:'🤔', name:'去留之间', desc:'认真思考了要不要留在这座城市', check: g => g.flags.moveStay },
     { id:'move_away_v38_3_ach', icon:'🚂', name:'离开一座城', desc:'勇敢地选择了一座新的城市', check: g => g.flags.moveAway },
     { id:'move_home_v38_3_ach', icon:'🌟', name:'心安即家', desc:'终于理解了什么是真正的家', check: g => g.flags.moveHome },
+    { id:'bbq_first_v38_4_ach', icon:'🍢', name:'深夜觅食', desc:'第一次在深夜吃了烧烤', check: g => g.flags.bbqFirst },
+    { id:'bbq_regular_v38_4_ach', icon:'🌙', name:'夜宵常客', desc:'成了烧烤摊的常客', check: g => g.flags.bbqRegular },
+    { id:'bbq_social_v38_4_ach', icon:'🍺', name:'深夜酒友', desc:'在烧烤摊陪朋友度过了难熬的夜晚', check: g => g.flags.bbqSocial },
+    { id:'bbq_vendor_v38_4_ach', icon:'👨‍🍳', name:'摊贩之交', desc:'认识了烧烤摊老板的故事', check: g => g.flags.bbqVendor },
+    { id:'bbq_health_v38_4_ach', icon:'🏥', name:'夜宵代价', desc:'因为夜宵开始关注健康', check: g => g.flags.bbqHealth },
+    { id:'bbq_chengguan_v38_4_ach', icon:'🚨', name:'城管来了', desc:'见证了夜市摊贩的生存不易', check: g => g.flags.bbqChengguan },
+    { id:'bbq_friends_v38_4_ach', icon:'👫', name:'深夜食堂', desc:'和朋友建立了固定的深夜聚会', check: g => g.flags.bbqFriends },
+    { id:'bbq_solo_v38_4_ach', icon:'🍖', name:'独食之乐', desc:'一个人享受了深夜烧烤', check: g => g.flags.bbqSolo },
+    { id:'bbq_dying_v38_4_ach', icon:'📉', name:'消失的摊位', desc:'见证了烧烤摊的消失', check: g => g.flags.bbqDying },
+    { id:'bbq_life_v38_4_ach', icon:'🌟', name:'烟火人间', desc:'理解了烧烤是城市最温暖的人间烟火', check: g => g.flags.bbqLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
