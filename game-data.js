@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v34.8
+// 都市浮生记 - 数据文件 v34.9
 // ============================================
 
 
@@ -20080,6 +20080,98 @@ const EVENTS = [
         { label:'其实挺孤独的', hint:'', fn: g => { g.flags.concertSolo=true; return{mood:-5,money:-800}; }},
       ]},
 
+    // ===== 寺庙经济与佛系生活 (v34.9) =====
+
+    { id:'temple_first_v34_9', icon:'🏛️', title:'第一次去寺庙', category:'temple',
+      body:'你最近特别焦虑。工作压力大，感情不顺，爸妈又催你回家考公务员。\n\n刷小红书看到有人说：「心情不好的时候就去寺庙吧。」\n\n你半信半疑地去了雍和宫（或你所在城市最有名的寺庙）。\n\n门票25元。你买了三炷香（10元），在佛前许了个愿。\n\n你不知道该许什么愿。想了半天，你许了：「希望一切都会好起来。」\n\n出了大殿，你坐在院子里的石凳上。阳光透过树叶照下来，有只猫在打盹。\n\n你突然觉得：好像没那么焦虑了。\n\n不是佛真的灵验，而是你终于让自己慢下来了。',
+      cond: g => g.age >= 20 && g.mood < 50 && !g.flags.templeFirst,
+      choices:[
+        { label:'找到了内心的平静', hint:'+😊 +🧠', fn: g => { g.flags.templeFirst=true; g.flags.templePeace=true; return{mood:12,intel:5}; }},
+        { label:'拍了很多照发朋友圈', hint:'+✨', fn: g => { g.flags.templeFirst=true; return{mood:5,charm:3}; }},
+        { label:'没什么感觉，就当旅游了', hint:'', fn: g => { g.flags.templeFirst=true; return{mood:2}; }},
+      ]},
+
+    { id:'temple_bracelet_v34_9', icon:'📿', title:'手串经济', category:'temple',
+      body:'你去寺庙的时候发现一个现象：所有人都在买手串。\n\n寺庙法物流通处排着长队。最便宜的手串100元，最贵的要几千。\n\n你旁边的小姐姐一口气买了5条：「一条求事业，一条求姻缘，一条求健康，一条求财运，一条求平安。」\n\n你看了看价格：280元一条。不便宜，但好像也没贵到买不起。\n\n你犹豫了：\n- 理性告诉你：这就是一串木头珠子\n- 感性告诉你：万一真的有用呢？\n- 你的钱包告诉你：你已经月光了\n\n最终你买了一条「事业手串」。\n\n你妈看到后说：「你还信这个？」\n\n你说：「我不信，但我愿意花280块买一个心理安慰。」',
+      cond: g => g.age >= 20 && g.flags.templeFirst && g.money >= 500 && !g.flags.templeBracelet,
+      choices:[
+        { label:'买了手串，开始收集法物', hint:'+😊 -💰', fn: g => { g.flags.templeBracelet=true; g.flags.braceletCollector=true; return{mood:8,money:-280,charm:3}; }},
+        { label:'太贵了，在淘宝买了个平替', hint:'+😊', fn: g => { g.flags.templeBracelet=true; g.flags.fakeBracelet=true; return{mood:5,money:-30}; }},
+        { label:'觉得是智商税，没买', hint:'+🧠', fn: g => { g.flags.templeBracelet=true; g.flags.rationalTemple=true; return{intel:5}; }},
+      ]},
+
+    { id:'temple_vegan_v34_9', icon:'🥬', title:'寺庙素食', category:'temple',
+      body:'你听说很多寺庙有素斋，而且很便宜。\n\n你去了法源寺的素斋馆。菜单上写着：\n- 素面：15元\n- 素包：8元/4个\n- 罗汉斋：25元\n\n你点了一碗素面。面条是手擀的，汤底是菌菇汤，上面放着几片青菜和豆腐。\n\n你吃了第一口——出乎意料地好吃。\n\n你平时吃的外卖都是重油重盐的。这一碗素面让你的胃和心都安静了下来。\n\n旁边坐着一对老夫妻，他们每个周末都来吃素斋。老太太说：「不是为了信佛，就是为了这口清淡。」\n\n你开始理解：寺庙经济不只有香火和法物，还有「清净」这个最大的奢侈品。\n\n在大城市，花15块钱吃一碗安静的面，已经是很难得的体验了。',
+      cond: g => g.age >= 20 && g.flags.templeFirst && !g.flags.templeVegan,
+      choices:[
+        { label:'成了素斋常客', hint:'+🏥 +😊', fn: g => { g.flags.templeVegan=true; g.flags.veganFan=true; return{health:8,mood:8}; }},
+        { label:'偶尔来吃，调节一下', hint:'+🏥', fn: g => { g.flags.templeVegan=true; return{health:5,mood:5}; }},
+        { label:'太素了，还是想吃肉', hint:'', fn: g => { g.flags.templeVegan=true; return{mood:-2}; }},
+      ]},
+
+    { id:'temple_fortune_v34_9', icon:'🔮', title:'求签与算命', category:'temple',
+      body:'你在寺庙里看到有人求签。你好奇地也求了一支。\n\n摇签筒的时候你心里默念：「我的事业会好起来吗？」\n\n签掉出来了——中平签。\n\n签文写着：「守旧待时，不宜妄动。静水流深，自有花开。」\n\n你不太懂，让解签的师傅帮你看看。\n\n师傅说：「你现在不要急着换工作/做决定。等到合适的时候，自然会有转机。」\n\n你花了50元解签费。出了寺庙你想了想——其实这些话你自己也知道。只是需要一个「权威」来告诉你而已。\n\n你开始反思：人为什么需要算命？\n\n也许不是真的想知道未来，而是需要有人告诉你：「没事的，一切都会好的。」',
+      cond: g => g.age >= 20 && g.flags.templeFirst && !g.flags.templeFortune,
+      choices:[
+        { label:'信了，开始按签文行事', hint:'+😊', fn: g => { g.flags.templeFortune=true; g.flags.fortuneFollower=true; return{mood:10,money:-50,intel:-3}; }},
+        { label:'当个参考，不完全信', hint:'+🧠', fn: g => { g.flags.templeFortune=true; return{mood:5,intel:3,money:-50}; }},
+        { label:'纯粹好奇，不信这些', hint:'+🧠', fn: g => { g.flags.templeFortune=true; g.flags.rationalTemple=true; return{intel:5,money:-50}; }},
+      ]},
+
+    { id:'temple_retreat_v34_9', icon:'🧘', title:'禅修体验', category:'temple',
+      body:'你在朋友圈看到有人发了禅修营的报名链接：「三天两夜禅修，远离手机，找回自己。费用随喜。」\n\n你犹豫了一下，报了名。\n\n禅修营在郊外的一个寺庙里。到了之后你交了手机，换上了僧服。\n\n第一天：打坐。你坐了15分钟就腿麻了。禅师说：「痛就对了，痛说明你还在。」\n\n第二天：行禅。你跟着禅师在院子里慢慢走。每一步都要感受脚底接触地面的感觉。你发现自己已经很久没有这样「慢」下来了。\n\n第三天：分享。每个人说说自己的感受。一个互联网大厂的女生哭了：「我已经3年没有好好休息过了。」\n\n禅修结束后你拿回手机。300多条微信消息。你突然觉得：其实也没那么重要。\n\n「随喜」的时候你捐了500元。你觉得这是今年花得最值的500元。',
+      cond: g => g.age >= 22 && g.flags.templeFirst && g.mood < 40 && !g.flags.templeRetreat,
+      choices:[
+        { label:'找到了内心的平静', hint:'+😊 +🏥', fn: g => { g.flags.templeRetreat=true; g.flags.zenFan=true; return{mood:20,health:10,money:-500}; }},
+        { label:'体验不错，但回到日常还是焦虑', hint:'+😊', fn: g => { g.flags.templeRetreat=true; return{mood:10,money:-500}; }},
+        { label:'太无聊了，不适合我', hint:'', fn: g => { g.flags.templeRetreat=true; return{mood:-5,money:-500}; }},
+      ]},
+
+    { id:'temple_burn_incense_v34_9', icon:'🕯️', title:'烧香拜佛', category:'temple',
+      body:'你发现自己开始频繁去寺庙了。\n\n不是信佛，就是觉得寺庙里有一种城市里没有的「安静」。\n\n每个月初一十五你都会去烧一炷香。你在小红书上看「烧香攻略」：\n- 先拜哪个殿\n- 怎么拿香\n- 怎么许愿\n- 先迈左脚还是右脚\n\n你的同事发现了：「你什么时候变得这么迷信了？」\n\n你说：「我不是迷信，我是仪式感。」\n\n你妈发现了：「你是不是有什么事瞒着我？」\n\n你说：「没有，我就是求个心安。」\n\n你朋友发现了：「你是不是失恋了？」\n\n你说：「没有……好吧有一点点。」\n\n也许烧香拜佛的本质就是：在不确定的世界里，做一件「确定」的事。\n\n至少你确定：每次从寺庙出来，心情都会好一点。',
+      cond: g => g.age >= 20 && g.flags.templeFirst && g.flags.templeBracelet && !g.flags.templeBurnIncense,
+      choices:[
+        { label:'成了固定的「香客」', hint:'+😊 +✨', fn: g => { g.flags.templeBurnIncense=true; g.flags.regularWorshipper=true; return{mood:12,charm:5}; }},
+        { label:'偶尔去，不固定', hint:'+😊', fn: g => { g.flags.templeBurnIncense=true; return{mood:8}; }},
+        { label:'觉得太迷信了，减少了频率', hint:'+🧠', fn: g => { g.flags.templeBurnIncense=true; return{intel:5,mood:-3}; }},
+      ]},
+
+    { id:'temple_tour_v34_9', icon:'🗺️', title:'寺庙打卡', category:'temple',
+      body:'你发现了一个新爱好：打卡全国各地的寺庙。\n\n你的打卡清单：\n- 北京：雍和宫（求事业）、潭柘寺（求平安）\n- 杭州：灵隐寺（求姻缘）、法喜寺（求子）\n- 成都：文殊院（求学业）、大慈寺（求健康）\n- 南京：鸡鸣寺（求桃花）、栖霞寺（求平安）\n\n你已经去了8座寺庙，每次去都会买一条手串、烧一炷香、吃一碗素面。\n\n你在小红书上发了寺庙打卡攻略，获得了2000个赞。评论区有人问：「你信佛吗？」\n\n你回复：「不信。但我信平静。」\n\n你开始理解「寺庙经济」为什么这么火：\n不是因为年轻人变迷信了，而是因为年轻人太累了。寺庙是他们在城市里唯一能「慢下来」的地方。',
+      cond: g => g.age >= 22 && g.flags.templeFirst && g.money >= 5000 && !g.flags.templeTour,
+      choices:[
+        { label:'继续打卡，目标100座寺庙', hint:'+😊 +✨ -💰', fn: g => { g.flags.templeTour=true; g.flags.templeCollector=true; return{mood:15,charm:10,money:-3000}; }},
+        { label:'去了几座就够了', hint:'+😊', fn: g => { g.flags.templeTour=true; return{mood:10,money:-1500}; }},
+        { label:'开始研究佛教文化', hint:'+🧠', fn: g => { g.flags.templeTour=true; g.flags.buddhismStudent=true; return{intel:12,mood:8,money:-1500}; }},
+      ]},
+
+    { id:'temple_buddha_v34_9', icon:'🧑‍💼', title:'佛系上班', category:'temple',
+      body:'你开始把「佛系」心态带到工作中了。\n\n领导又PUA你：「你这个月KPI没完成啊。」\n\n你心想：「众生皆苦，KPI也是苦的一种。我不执着于KPI，也不执着于不执着。」\n\n同事卷到晚上10点。你6点准时下班，去寺庙旁边的公园散步。\n\n同事说：「你不怕被裁吗？」\n\n你说：「一切有为法，如梦幻泡影。裁就裁吧。」\n\n你觉得自己的心态好了很多。不再为加班焦虑，不再为升职失眠。\n\n但你发现了一个问题：你的绩效评分下降了。领导找你谈话：「你最近状态不太好。」\n\n你开始反思：「佛系」到底是好事还是坏事？\n\n也许真正的「佛系」不是躺平，而是「做好该做的事，但不执着于结果」。',
+      cond: g => g.age >= 22 && g.flags.templeFirst && g.jobSalary > 0 && !g.flags.templeBuddha,
+      choices:[
+        { label:'找到了工作和修行的平衡', hint:'+😊 +🧠', fn: g => { g.flags.templeBuddha=true; g.flags.balancedLife=true; return{mood:12,intel:8}; }},
+        { label:'太佛了，绩效下降了', hint:'-💰', fn: g => { g.flags.templeBuddha=true; g.flags.tooBuddha=true; return{mood:5,money:-2000}; }},
+        { label:'佛系归佛系，该卷还是要卷', hint:'+💰', fn: g => { g.flags.templeBuddha=true; return{mood:-3,money:1000}; }},
+      ]},
+
+    { id:'temple_online_v34_9', icon:'📱', title:'电子木鱼', category:'temple',
+      body:'你发现了一个App：电子木鱼。\n\n点一下屏幕，就会发出「咚」的声音，屏幕上还会出现「功德+1」。\n\n你觉得很傻。但你还是下载了。\n\n然后你就停不下来了。\n\n每天睡前你敲100下电子木鱼。同事问你在干嘛，你说：「积功德。」\n\n你甚至还买了个蓝牙木鱼（199元），可以在办公室偷偷敲。\n\n你发现一个有趣的现象：你的同事也开始敲了。整个办公室午休时间都在「咚咚咚」。\n\n老板进来了：「你们在干嘛？」\n\n你们说：「冥想。」\n\n老板看了看你们的屏幕：「……功德+1？」\n\n你开始思考：这到底是信仰、减压、还是一种新型的社交货币？\n\n也许三者都是。',
+      cond: g => g.age >= 18 && !g.flags.templeOnline,
+      choices:[
+        { label:'成了电子木鱼重度用户', hint:'+😊', fn: g => { g.flags.templeOnline=true; g.flags.digitalMonk=true; return{mood:8,money:-199}; }},
+        { label:'玩玩而已，没太认真', hint:'+😊', fn: g => { g.flags.templeOnline=true; return{mood:5}; }},
+        { label:'觉得太荒诞了，删了', hint:'', fn: g => { g.flags.templeOnline=true; return{mood:-2}; }},
+      ]},
+
+    { id:'temple_philosophy_v34_9', icon:'☯️', title:'佛系的真谛', category:'temple',
+      body:'你回顾自己和「佛」的关系。\n\n从第一次去寺庙的焦虑，到买手串的心理安慰，到禅修的短暂平静，到电子木鱼的日常减压……\n\n你开始理解：「佛系」不是消极，而是一种自我保护。\n\n在这个996、内卷、焦虑的时代，年轻人需要一个「出口」。\n\n有人选择了酒精，有人选择了游戏，有人选择了购物。而你选择了——寺庙。\n\n你不确定自己是不是真的信佛。但你知道：\n- 寺庙里的安静让你平静\n- 禅修让你学会了和自己独处\n- 「随缘」让你不再执着于控制一切\n\n你想起一句佛经：「应无所住而生其心。」\n\n你不确定这句话是什么意思。但你觉得：不懂也没关系。\n\n人生很多事情，不需要都搞懂。有时候，「不懂」本身就是一种智慧。',
+      cond: g => g.age >= 23 && g.flags.templeFirst && (g.flags.templeRetreat || g.flags.templeTour) && g.intel > 35,
+      choices:[
+        { label:'找到了属于自己的修行方式', hint:'+😊 +🧠 +✨', fn: g => { g.flags.templePhilosophy=true; return{mood:18,intel:15,charm:10}; }},
+        { label:'开始读佛经和哲学书', hint:'+🧠', fn: g => { g.flags.templePhilosophy=true; g.flags.philosophyReader=true; return{intel:20,mood:10}; }},
+        { label:'把佛系心态融入生活', hint:'+😊 +🏥', fn: g => { g.flags.templePhilosophy=true; g.flags.balancedLife=true; return{mood:15,health:10}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -22046,6 +22138,17 @@ const ACHIEVEMENTS = [
     { id:'concert_festival_v34_8_ach', icon:'🎪', name:'音乐节达人', desc:'在音乐节上找到了自由', check: g => g.flags.concertFestival },
     { id:'concert_philosophy_v34_8_ach', icon:'🎶', name:'音乐与人生', desc:'理解了音乐对人生的意义', check: g => g.flags.concertPhilosophy },
     { id:'concert_solo_v34_8_ach', icon:'🎧', name:'一个人的演唱会', desc:'独自享受了一场音乐盛宴', check: g => g.flags.concertSolo },
+    // v34.9 寺庙经济与佛系生活
+    { id:'temple_first_v34_9_ach', icon:'🏛️', name:'第一次去寺庙', desc:'在寺庙里找到了片刻宁静', check: g => g.flags.templeFirst },
+    { id:'temple_bracelet_v34_9_ach', icon:'📿', name:'手串经济', desc:'买了一条寺庙手串求心安', check: g => g.flags.templeBracelet },
+    { id:'temple_vegan_v34_9_ach', icon:'🥬', name:'寺庙素斋', desc:'体验了一碗素面的清净', check: g => g.flags.templeVegan },
+    { id:'temple_fortune_v34_9_ach', icon:'🔮', name:'求签问卦', desc:'在寺庙里求了一支签', check: g => g.flags.templeFortune },
+    { id:'temple_retreat_v34_9_ach', icon:'🧘', name:'禅修体验', desc:'参加了三天禅修营', check: g => g.flags.templeRetreat },
+    { id:'temple_burn_v34_9_ach', icon:'🕯️', name:'定期烧香', desc:'成了寺庙的固定香客', check: g => g.flags.templeBurnIncense },
+    { id:'temple_tour_v34_9_ach', icon:'🗺️', name:'寺庙打卡达人', desc:'打卡了多座名寺古刹', check: g => g.flags.templeTour },
+    { id:'temple_buddha_v34_9_ach', icon:'🧑‍💼', name:'佛系上班族', desc:'用佛系心态面对工作', check: g => g.flags.templeBuddha },
+    { id:'temple_online_v34_9_ach', icon:'📱', name:'电子木鱼', desc:'开始敲电子木鱼积功德', check: g => g.flags.templeOnline },
+    { id:'temple_philosophy_v34_9_ach', icon:'☯️', name:'佛系的真谛', desc:'理解了佛系生活的真正含义', check: g => g.flags.templePhilosophy },
 ];
 
 // === ENDINGS === (order matters: first match wins)
