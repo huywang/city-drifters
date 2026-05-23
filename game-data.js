@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v40.0
+// 都市浮生记 - 数据文件 v40.1
 // ============================================
 
 
@@ -24354,6 +24354,79 @@ const EVENTS = [
         { label:'继续做一个和孩子一起成长的父母', hint:'+😊 +❤️', fn: g => { g.flags.parentingLife=true; return{mood:12,social:5}; }},
       ]},
 
+    // ═══ v40.1 房产中介与买房文化 ═══
+    { id:'realestate_first_v40_1', icon:'🏠', title:'第一次看房', category:'realestate',
+      body:'你终于攒够了首付的钱，决定开始看房。你约了一个中介，他开着一辆银色的车带你看了三套房。第一套太小，第二套太旧，第三套太远。中介说：完美的房子不存在，你得有取舍。你觉得他说得有道理，但心里还是不甘心。回家路上你算了一下：按照现在的工资，还完房贷每月只剩三千块生活费。买房这件事，比你想的要沉重得多。',
+      cond: g => g.age >= 25 && g.money >= 50000 && !g.flags.realestateFirst,
+      choices:[
+        { label:'继续看，总会找到合适的', hint:'+💪 +🧠', fn: g => { g.flags.realestateFirst=true; return{intel:5}; }},
+        { label:'觉得买房压力太大了，先租房吧', hint:'+😊', fn: g => { g.flags.realestateFirst=true; g.flags.realestateWait=true; return{mood:3}; }},
+      ]},
+    { id:'realestate_agent_v40_1', icon:'🤵', title:'中介套路', category:'realestate',
+      body:'你发现房产中介有一套完整的话术。他们会说：这套房子今天有三组客户在看，再不定就没了。他们会故意先带你看不好的房子，最后再带你看目标房源，让你觉得最后一套特别好。他们会强调学区、地铁、商圈，但绝口不提物业差、采光不好、噪音大。你被一个中介忽悠着交了诚意金，后来发现那套房子挂了半年都没卖出去。你终于明白：中介的嘴，骗人的鬼。',
+      cond: g => g.flags.realestateFirst && !g.flags.realestateAgent,
+      choices:[
+        { label:'被中介的套路气得不行', hint:'-😊 +🧠', fn: g => { g.flags.realestateAgent=true; return{mood:-5,intel:8}; }},
+        { label:'学聪明了，开始自己研究房源信息', hint:'+🧠 +💪', fn: g => { g.flags.realestateAgent=true; return{intel:10}; }},
+      ]},
+    { id:'realestate_loan_v40_1', icon:'🏦', title:'首付与贷款', category:'realestate',
+      body:'你开始算账了。一套两百万的房子，首付百分之三十要六十万，贷款一百四十万，三十年月供七千多。你算了算自己的工资，刚好能覆盖月供和生活费，但基本月光了。你在等额本息和等额本金之间纠结了很久——前者月供固定但总利息多，后者前期压力大但省利息。你还了解了公积金贷款和商业贷款的区别。你发现买房不只是一次消费，更是一次三十年的人生承诺。',
+      cond: g => g.flags.realestateFirst && g.money >= 80000 && !g.flags.realestateLoan,
+      choices:[
+        { label:'选择了公积金贷款，月供低一些', hint:'+🧠', fn: g => { g.flags.realestateLoan=true; return{intel:5}; }},
+        { label:'找爸妈借了一些首付，压力小了一点', hint:'+❤️ -💰', fn: g => { g.flags.realestateLoan=true; g.flags.parentsLoan=true; return{social:3,money:50000}; }},
+      ]},
+    { id:'realestate_showroom_v40_1', icon:'🏗️', title:'售楼处', category:'realestate',
+      body:'你去看了一个新楼盘的售楼处。装修得像五星级酒店，沙盘模型上绿树成荫、湖水荡漾。售楼小姐笑容甜美：我们项目绿化率百分之四十，人车分流，自带商业配套。你被说心动了，差点当场签约。后来你去实地一看——所谓的湖是一个小水坑，所谓的商业配套还在规划中，绿化率是加上了屋顶绿化。你感叹：售楼处是这个城市最大的造梦工厂。',
+      cond: g => g.flags.realestateFirst && !g.flags.realestateShowroom,
+      choices:[
+        { label:'差点冲动下单，最后冷静了下来', hint:'+🧠', fn: g => { g.flags.realestateShowroom=true; return{intel:8}; }},
+        { label:'被售楼处的氛围感染，交了定金', hint:'-💰', fn: g => { g.flags.realestateShowroom=true; g.flags.realestateDeposit=true; return{money:-50000,mood:5}; }},
+      ]},
+    { id:'realestate_location_v40_1', icon:'📍', title:'地段选择', category:'realestate',
+      body:'买房最重要的是什么？地段、地段、还是地段。但好地段的房子你买不起，买得起的地段又太偏。你在地铁沿线找了半天，发现每远一站便宜十万。你开始研究城市规划——哪条地铁在建，哪个区域要开发，哪个学区在涨。你发现买房本质上是在赌一个城市的未来。你选了 compromise 的方案：离公司远一点，但附近有在建的地铁站。',
+      cond: g => g.flags.realestateLoan && !g.flags.realestateLocation,
+      choices:[
+        { label:'选了远一点但有地铁规划的区域', hint:'+🧠', fn: g => { g.flags.realestateLocation=true; return{intel:5}; }},
+        { label:'选了市区的老破小，通勤方便', hint:'+💪', fn: g => { g.flags.realestateLocation=true; return{health:-3}; }},
+      ]},
+    { id:'realestate_new_old_v40_1', icon:'🔄', title:'新房还是二手房', category:'realestate',
+      body:'你在新房和二手房之间纠结了很久。新房的好处是全新的、有保障、税费少；坏处是期房要等两三年、可能烂尾、位置偏远。二手房的好处是即买即住、配套成熟、可以看到实物；坏处是房子旧、税费高、可能有产权问题。你看了十套新房和二十套二手房，最后选了一套房龄十年的二手房——虽然旧了点，但胜在交通便利、学区不错。没有完美的选择，只有适合的选择。',
+      cond: g => g.flags.realestateLocation && !g.flags.realestateNewOld,
+      choices:[
+        { label:'选了新房，愿意等', hint:'+😊', fn: g => { g.flags.realestateNewOld=true; g.flags.realestateNewHouse=true; return{mood:5}; }},
+        { label:'选了二手房，即买即住', hint:'+🧠', fn: g => { g.flags.realestateNewOld=true; return{intel:3}; }},
+      ]},
+    { id:'realestate_bid_v40_1', icon:'🔥', title:'抢房大战', category:'realestate',
+      body:'你看中了一套二手房，出价两百三十万。结果第二天中介告诉你：有人出了两百四十万。你加到两百四十五万，对方又加了。你觉得这不像买房，像拍卖。最后你出了两百五十万，对方终于放弃了。签约那天你手都在抖——这是你这辈子签过的最大一笔合同。你觉得买房的过程就像一场战争：跟卖家斗、跟中介斗、跟其他买家斗，最后还要跟自己的钱包斗。',
+      cond: g => g.flags.realestateNewOld && !g.flags.realestateBid,
+      choices:[
+        { label:'咬牙拿下了，虽然超了预算', hint:'-💰 +💪', fn: g => { g.flags.realestateBid=true; return{money:-200000,mood:5}; }},
+        { label:'放弃了这套，继续找下一套', hint:'+🧠', fn: g => { g.flags.realestateBid=true; return{intel:5,mood:-5}; }},
+      ]},
+    { id:'realestate_stress_v40_1', icon:'😰', title:'买房焦虑', category:'realestate',
+      body:'买了房之后你并没有想象中那么开心。每天看着还款短信，心里沉甸甸的。三十年的房贷像一条无形的锁链，绑住了你的自由。你不敢辞职，不敢生病，不敢大手大脚花钱。同事说你成了房奴，你苦笑：有房可奴也是一种幸福吧。但你也知道，在大城市有套自己的房子，是很多人的梦想。你只是不确定，这个梦想值不值得用三十年去还。',
+      cond: g => g.flags.realestateBid && !g.flags.realestateStress,
+      choices:[
+        { label:'学会了和房贷焦虑共处', hint:'+🧠 +💪', fn: g => { g.flags.realestateStress=true; return{intel:8,health:3}; }},
+        { label:'开始想办法增加收入', hint:'+💰', fn: g => { g.flags.realestateStress=true; g.flags.sideHustle=true; return{money:2000}; }},
+      ]},
+    { id:'realestate_keys_v40_1', icon:'🔑', title:'交房拿钥匙', category:'realestate',
+      body:'等了很久，终于到了交房的日子。你拿着钥匙走进那间属于你的房子——虽然现在还是毛坯，但在你的想象中，这里已经摆满了家具。你站在阳台上往外看，这就是你以后每天要看的风景了。你在客厅里转了一圈又一圈，心里五味杂陈：开心、紧张、压力、满足。你终于在这个城市有了一个属于自己的角落，不用再担心房东涨房租，不用再搬家了。',
+      cond: g => g.flags.realestateBid && !g.flags.realestateKeys,
+      choices:[
+        { label:'在空房子里站了很久，觉得很踏实', hint:'+😊 +💪', fn: g => { g.flags.realestateKeys=true; g.flags.hasHouse=true; return{mood:15}; }},
+        { label:'马上开始规划装修方案', hint:'+🧠 +✨', fn: g => { g.flags.realestateKeys=true; g.flags.hasHouse=true; return{intel:5,charm:3}; }},
+      ]},
+    { id:'realestate_life_v40_1', icon:'🌟', title:'买房人生', category:'realestate',
+      body:'你终于理解了房子对中国人的意义。它不只是一堆钢筋和水泥——它是安全感，是归属感，是一个人在这个城市扎根的证明。当然，买房也有很多让人无奈的地方：高房价、中介套路、三十年房贷。但你更在意的是，终于有了一个属于自己的家。你可以在墙上钉任何你想钉的钉子，可以把阳台种满花草，可以在深夜不用戴耳机看剧。你明白了：房子是租来的还是买来的不重要，重要的是里面住着一个认真生活的人。',
+      cond: g => g.flags.realestateKeys && (g.flags.realestateStress || g.flags.realestateShowroom) && !g.flags.realestateLife,
+      choices:[
+        { label:'成了一个房产自媒体博主', hint:'+✨ +🧠', fn: g => { g.flags.realestateLife=true; return{charm:12,intel:8}; }},
+        { label:'写了一篇《大城市买房指南》', hint:'+✨ +🧠', fn: g => { g.flags.realestateLife=true; g.flags.realestateGuide=true; return{charm:10,intel:10}; }},
+        { label:'在自己的小家里认真生活', hint:'+😊 +❤️', fn: g => { g.flags.realestateLife=true; return{mood:12,social:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -26897,6 +26970,17 @@ const ACHIEVEMENTS = [
     { id:'parenting_homework_v40_0_ach', icon:'📚', name:'辅导作业', desc:'体验了辅导作业的崩溃与和解', check: g => g.flags.parentingHomework },
     { id:'parenting_reflect_v40_0_ach', icon:'💭', name:'育儿觉醒', desc:'反思了自己的育儿方式并做出改变', check: g => g.flags.parentingReflect },
     { id:'parenting_life_v40_0_ach', icon:'🌟', name:'育儿人生', desc:'理解了育儿的本质是和孩子一起成长', check: g => g.flags.parentingLife },
+    // v40.1 房产中介与买房文化
+    { id:'realestate_first_v40_1_ach', icon:'🏠', name:'看房新手', desc:'第一次跟着中介去看了房子', check: g => g.flags.realestateFirst },
+    { id:'realestate_agent_v40_1_ach', icon:'🤵', name:'中介博弈', desc:'识破了房产中介的各种套路', check: g => g.flags.realestateAgent },
+    { id:'realestate_loan_v40_1_ach', icon:'🏦', name:'房贷计算器', desc:'搞明白了首付、贷款和月供的关系', check: g => g.flags.realestateLoan },
+    { id:'realestate_showroom_v40_1_ach', icon:'🏗️', name:'售楼处真相', desc:'看清了售楼处华丽外表下的真相', check: g => g.flags.realestateShowroom },
+    { id:'realestate_location_v40_1_ach', icon:'📍', name:'地段专家', desc:'学会了在城市中找到性价比最高的地段', check: g => g.flags.realestateLocation },
+    { id:'realestate_new_old_v40_1_ach', icon:'🔄', name:'新房还是二手', desc:'在新房和二手房之间做出了选择', check: g => g.flags.realestateNewOld },
+    { id:'realestate_bid_v40_1_ach', icon:'🔥', name:'抢房大战', desc:'经历了买房的竞价博弈', check: g => g.flags.realestateBid },
+    { id:'realestate_stress_v40_1_ach', icon:'😰', name:'房贷焦虑', desc:'感受到了三十年房贷的压力', check: g => g.flags.realestateStress },
+    { id:'realestate_keys_v40_1_ach', icon:'🔑', name:'终于有家了', desc:'拿到了属于自己的房子钥匙', check: g => g.flags.realestateKeys },
+    { id:'realestate_life_v40_1_ach', icon:'🌟', name:'买房人生', desc:'理解了房子是安全感，更是归属感', check: g => g.flags.realestateLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
