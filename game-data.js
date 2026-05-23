@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v39.2
+// 都市浮生记 - 数据文件 v39.3
 // ============================================
 
 
@@ -23766,6 +23766,80 @@ const EVENTS = [
         { label:'用保险思维重新规划了人生', hint:'+🧠 +😊', fn: g => { g.flags.insuranceLife=true; return{intel:10,mood:5}; }},
       ]},
 
+    // ═══ v39.3 城管与小贩文化 ═══
+    { id:'vendor_street_v39_3', icon:'🍢', title:'路边摊', category:'vendor',
+      body:'你加班到深夜，肚子饿得咕咕叫。楼下那条街上，几个小摊还在营业。一个卖煎饼的老阿姨，一个烤冷面的大叔，还有一个推三轮车卖炒饭的小伙子。你买了一份煎饼加两个蛋，站在路边吃。老阿姨说：小伙子又加班啊？你们这些年轻人，别把身体搞坏了。你吃着热乎乎的煎饼，觉得深夜的路边摊是这座城市最后的温柔。',
+      cond: g => g.age >= 20 && g.jobSalary >= 2000 && !g.flags.vendorStreet,
+      choices:[
+        { label:'成了这个路边摊的常客', hint:'+😊 +❤️', fn: g => { g.flags.vendorStreet=true; return{mood:5,social:3}; }},
+        { label:'和摊主聊了一会儿', hint:'+🧠', fn: g => { g.flags.vendorStreet=true; g.flags.vendorChat=true; return{intel:3}; }},
+      ]},
+    { id:'vendor_chase_v39_3', icon:'🏃', title:'城管来了', category:'vendor',
+      body:'你正在路边摊等炒饭，突然有人喊了一声：城管来了！整条街瞬间沸腾。摊贩们以惊人的速度收拾东西，有人推着三轮车飞奔，有人直接把桌子折叠扛起来跑。你也跟着跑了几步——虽然你只是顾客，但那股紧张感让你肾上腺素飙升。两分钟后，城管的车开过去了，大家又慢慢走了回来，重新摆摊。大叔擦了擦汗说：每天都这样，习惯了。',
+      cond: g => g.flags.vendorStreet && !g.flags.vendorChase,
+      choices:[
+        { label:'被小贩们的生存智慧震撼了', hint:'+🧠', fn: g => { g.flags.vendorChase=true; return{intel:5}; }},
+        { label:'帮大叔收拾了被打翻的调料', hint:'+❤️', fn: g => { g.flags.vendorChase=true; return{social:5,mood:3}; }},
+      ]},
+    { id:'vendor_guerrilla_v39_3', icon:'🎯', title:'游击战', category:'vendor',
+      body:'你后来才知道，小贩和城管之间有一套完整的博弈规则。城管有固定的巡逻时间，小贩们掌握了规律，提前十分钟收摊，巡逻车过了再出来。有的小贩还建了微信群，互相通风报信：A路口有城管！快撤！B路口安全，可以出摊。你不得不佩服这种民间智慧——在没有合法摊位的情况下，人们自己创造了一套生存系统。',
+      cond: g => g.flags.vendorChase && !g.flags.vendorGuerrilla,
+      choices:[
+        { label:'加入了小贩们的信息群', hint:'+🧠 +❤️', fn: g => { g.flags.vendorGuerrilla=true; return{intel:5,social:5}; }},
+        { label:'觉得这种生活方式太心酸了', hint:'-😊 +🧠', fn: g => { g.flags.vendorGuerrilla=true; return{mood:-3,intel:5}; }},
+      ]},
+    { id:'vendor_business_v39_3', icon:'💼', title:'摆摊创业', category:'vendor',
+      body:'公司裁员了，你失业了。存款只够撑三个月。室友说：要不你也去摆摊试试？你犹豫了一周，最终在二手市场买了一辆折叠桌，批发了一批手机壳和数据线，在地铁口摆起了摊。第一天晚上，你紧张得不敢抬头。但一个小时的收入竟然有八十块！你算了一下，如果每天出摊六小时，月收入能跟之前打工差不多。原来摆摊也是一种创业。',
+      cond: g => g.age >= 22 && !g.jobName && g.money >= 1000 && !g.flags.vendorBusiness,
+      choices:[
+        { label:'认真做起了摆摊生意', hint:'+💰 +💪', fn: g => { g.flags.vendorBusiness=true; setJob(g,'地摊创业者',3500); return{mood:5}; }},
+        { label:'只是过渡一下，继续找工作', hint:'+🧠', fn: g => { g.flags.vendorBusiness=true; return{intel:3}; }},
+      ]},
+    { id:'vendor_night_v39_3', icon:'🌙', title:'夜市的繁华', category:'vendor',
+      body:'周末你去逛了城里有名的夜市。几百米的街道上，密密麻麻挤着几百个摊位。烤串的烟火气、臭豆腐的味道、各种叫卖声混在一起，形成了一种独特的城市交响乐。你看到了卖手工饰品的文艺青年、卖糖画的老手艺人、做手机贴膜的90后、还有带着孩子一起摆摊的年轻妈妈。每个人都在这条街上拼命活着，每个人都有自己的故事。',
+      cond: g => (g.flags.vendorStreet || g.flags.vendorBusiness) && !g.flags.vendorNight,
+      choices:[
+        { label:'被夜市的活力深深吸引', hint:'+😊', fn: g => { g.flags.vendorNight=true; return{mood:8}; }},
+        { label:'和几个摊主聊了他们的故事', hint:'+🧠 +❤️', fn: g => { g.flags.vendorNight=true; g.flags.vendorStories=true; return{intel:5,social:5}; }},
+      ]},
+    { id:'vendor_sympathy_v39_3', icon:'🤝', title:'城管也无奈', category:'vendor',
+      body:'你偶然认识了一个年轻的城管队员。他说：你以为我们愿意天天追着人跑吗？上面有考核指标，不管就是失职。但我们也知道这些人不容易，很多都是为了养家糊口。有时候看到了也就假装没看见。但被投诉了就必须去处理。他也矛盾：一边是城市管理的职责，一边是对底层人的同情。你突然觉得，这个问题没有简单的对错。',
+      cond: g => g.flags.vendorChase && g.age >= 24 && !g.flags.vendorSympathy,
+      choices:[
+        { label:'理解了城市管理的难处', hint:'+🧠', fn: g => { g.flags.vendorSympathy=true; return{intel:8}; }},
+        { label:'觉得体制内的人也不容易', hint:'+❤️', fn: g => { g.flags.vendorSympathy=true; return{social:5}; }},
+      ]},
+    { id:'vendor_wisdom_v39_3', icon:'💡', title:'小贩的智慧', category:'vendor',
+      body:'卖煎饼的老阿姨干了十五年了。她告诉你她的经营哲学：第一，位置最重要，她这个摊位占了五年才稳定下来；第二，回头客是命脉，她记得每个常客的口味；第三，卫生是底线，她的煎饼从来没出过问题；第四，和气生财，跟旁边的摊贩打好关系，跟城管保持距离但不敌对。你觉得这些道理，放到任何行业都适用。一个路边摊，就是一门生意经。',
+      cond: g => (g.flags.vendorGuerrilla || g.flags.vendorBusiness) && !g.flags.vendorWisdom,
+      choices:[
+        { label:'把老阿姨的智慧用到了自己的工作里', hint:'+🧠 +💪', fn: g => { g.flags.vendorWisdom=true; return{intel:10,health:3}; }},
+        { label:'写了一篇关于路边摊经营学的文章', hint:'+✨', fn: g => { g.flags.vendorWisdom=true; g.flags.vendorArticle=true; return{charm:8}; }},
+      ]},
+    { id:'vendor_economy_v39_3', icon:'📈', title:'地摊经济', category:'vendor',
+      body:'有一年政府鼓励地摊经济，突然之间路边摊合法了。你发现街上多了很多新面孔——有白领下班后出来摆摊卖咖啡的，有大学生卖手工的，还有退休大妈卖自制咸菜的。但好景不长，几个月后政策收紧，又开始管了。那些投入了几千块买设备的新手摊贩，又面临城管追赶的命运。你意识到，政策的风向变了又变，但底层人民的生存需求从来没变过。',
+      cond: g => g.flags.vendorNight && g.age >= 23 && !g.flags.vendorEconomy,
+      choices:[
+        { label:'见证了地摊经济从火爆到冷清', hint:'+🧠', fn: g => { g.flags.vendorEconomy=true; return{intel:8}; }},
+        { label:'帮新手摊贩们分享了经验', hint:'+❤️ +✨', fn: g => { g.flags.vendorEconomy=true; return{social:8,charm:3}; }},
+      ]},
+    { id:'vendor_confiscate_v39_3', icon:'😢', title:'被没收的教训', category:'vendor',
+      body:'你认识的一个摊贩大哥，三轮车和全部家当被城管没收了。那辆车是他花了两千块买的，加上车上的货物，是他全部的家产。大哥蹲在路边抽了一包烟，眼眶红红的。他说：我老家还有个孩子在上学，不出来挣钱怎么办？你帮他凑了点钱重新置办了一套设备。后来大哥换了个地方继续摆摊，比以前更小心了。生活给了他重击，但他没有倒下。',
+      cond: g => g.flags.vendorGuerrilla && g.money >= 2000 && !g.flags.vendorConfiscate,
+      choices:[
+        { label:'掏钱帮大哥重新置办设备', hint:'-💰 +❤️', fn: g => { g.flags.vendorConfiscate=true; return{money:-1000,social:10,mood:5}; }},
+        { label:'帮大哥在网上发起了募捐', hint:'+✨ +❤️', fn: g => { g.flags.vendorConfiscate=true; g.flags.vendorDonate=true; return{charm:8,social:5}; }},
+        { label:'感到无力，但默默记住了这件事', hint:'+🧠', fn: g => { g.flags.vendorConfiscate=true; return{intel:5,mood:-3}; }},
+      ]},
+    { id:'vendor_life_v39_3', icon:'🌟', title:'路边摊人生', category:'vendor',
+      body:'你终于理解了路边摊对这座城市的意义。它们不是脏乱差的代名词，而是无数普通人生存的方式。每一个摊位背后都是一个家庭，每一次出摊都是对生活的抗争。城管和小贩的故事，本质上是一个城市发展与社会公平的故事。城市需要秩序，但秩序不应该以牺牲最底层人民的生计为代价。你希望有一天，每个小贩都能安安心心地出摊，不用再跑，不用再躲，堂堂正正地靠自己的双手活着。',
+      cond: g => (g.flags.vendorWisdom || g.flags.vendorEconomy) && (g.flags.vendorConfiscate || g.flags.vendorSympathy) && !g.flags.vendorLife,
+      choices:[
+        { label:'写了一本《城市边缘的烟火》', hint:'+✨ +🧠', fn: g => { g.flags.vendorLife=true; g.flags.vendorBook=true; return{charm:12,intel:8}; }},
+        { label:'帮助推动了社区合法摊位的设立', hint:'+❤️ +✨', fn: g => { g.flags.vendorLife=true; g.flags.vendorAdvocate=true; return{social:12,charm:8}; }},
+        { label:'继续做一个关心底层普通人的城市人', hint:'+😊 +❤️', fn: g => { g.flags.vendorLife=true; return{mood:8,social:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -26221,6 +26295,17 @@ const ACHIEVEMENTS = [
     { id:'insurance_pension_v39_2_ach', icon:'👴', name:'养老焦虑', desc:'开始为退休后的生活担忧了', check: g => g.flags.insurancePension },
     { id:'insurance_need_v39_2_ach', icon:'🛡️', name:'有保险真好', desc:'在关键时刻体会到了保险的价值', check: g => g.flags.insuranceNeed },
     { id:'insurance_life_v39_2_ach', icon:'🌟', name:'保险人生', desc:'学会用保险给自己和家人兜底', check: g => g.flags.insuranceLife },
+    // v39.3 城管与小贩文化
+    { id:'vendor_street_v39_3_ach', icon:'🍢', name:'深夜路边摊', desc:'在深夜的路边摊感受到了城市的温度', check: g => g.flags.vendorStreet },
+    { id:'vendor_chase_v39_3_ach', icon:'🏃', name:'城管来了', desc:'亲眼目睹了小贩与城猫的追逐战', check: g => g.flags.vendorChase },
+    { id:'vendor_guerrilla_v39_3_ach', icon:'🎯', name:'游击战士', desc:'了解了小贩们的生存游击战术', check: g => g.flags.vendorGuerrilla },
+    { id:'vendor_business_v39_3_ach', icon:'💼', name:'摆摊创业', desc:'亲身体验了摆摊做生意的感觉', check: g => g.flags.vendorBusiness },
+    { id:'vendor_night_v39_3_ach', icon:'🌙', name:'夜市繁华', desc:'在热闹的夜市里看到了百态人生', check: g => g.flags.vendorNight },
+    { id:'vendor_sympathy_v39_3_ach', icon:'🤝', name:'城管也无奈', desc:'理解了城市管理者的两难处境', check: g => g.flags.vendorSympathy },
+    { id:'vendor_wisdom_v39_3_ach', icon:'💡', name:'路边摊哲学', desc:'从小贩身上学到了朴素的生意经', check: g => g.flags.vendorWisdom },
+    { id:'vendor_economy_v39_3_ach', icon:'📈', name:'地摊经济', desc:'见证了地摊经济从火爆到冷清', check: g => g.flags.vendorEconomy },
+    { id:'vendor_confiscate_v39_3_ach', icon:'😢', name:'底层之痛', desc:'目睹了摊贩被没收家当的心酸', check: g => g.flags.vendorConfiscate },
+    { id:'vendor_life_v39_3_ach', icon:'🌟', name:'路边摊人生', desc:'理解了每个摊位背后都是一个家庭的生存抗争', check: g => g.flags.vendorLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
