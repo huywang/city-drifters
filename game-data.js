@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v36.5
+// 都市浮生记 - 数据文件 v36.6
 // ============================================
 
 
@@ -21555,6 +21555,88 @@ const EVENTS = [
         { label:'继续做一个热爱植物的普通人', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.plantLife=true; return{mood:12,health:8,intel:5}; }},
       ]},
 
+    // === v36.6 理发与形象管理 ===
+    { id:'hair_first_v36_6', icon:'💇', title:'办了张理发卡', category:'hair',
+      body:'小区楼下新开了家理发店，办卡充500送200。你想着反正每个月都要剪头发，就办了张卡。理发师Tony说"以后你就是我的VIP了"。',
+      cond: g => g.age >= 18 && !g.flags.hairFirst && g.money > 500,
+      choices:[
+        { label:'充了500，每次来都找Tony', hint:'-💰 +✨', fn: g => { g.flags.hairFirst=true; g.flags.hairTony=true; return{money:-500,charm:3}; }},
+        { label:'只剪了个最简单的', hint:'-💰', fn: g => { g.flags.hairFirst=true; return{money:-30}; }},
+        { label:'Tony推荐了个烫染套餐，你心动了', hint:'-💰 +✨', fn: g => { g.flags.hairFirst=true; g.flags.hairPerm=true; return{money:-800,charm:5}; }},
+      ]},
+    { id:'hair_fail_v36_6', icon:'😱', title:'翻车了', category:'hair',
+      body:'你拿了张明星照片给Tony看，说"就照这个剪"。剪完一看镜子，你觉得人生都灰暗了。Tony说"你的脸型和照片上不太一样"，你差点当场哭出来。',
+      cond: g => g.age >= 18 && g.flags.hairFirst && !g.flags.hairFail,
+      choices:[
+        { label:'让Tony修了修，勉强能看', hint:'-😊', fn: g => { g.flags.hairFail=true; return{mood:-5,charm:-3}; }},
+        { label:'去另一家店补救', hint:'-💰 -😊', fn: g => { g.flags.hairFail=true; g.flags.hairFix=true; return{money:-200,mood:-3}; }},
+        { label:'戴了两周帽子等头发长回来', hint:'-😊 +🧠', fn: g => { g.flags.hairFail=true; return{mood:-5,intel:2}; }},
+      ]},
+    { id:'hair_expensive_v36_6', icon:'💎', title:'高端理发店', category:'hair',
+      body:'同事带你去了一家高端salon，理发师叫Kevin，剪一次头发要三百八。Kevin一边剪一边跟你聊时尚趋势，你觉得自己像在拍都市剧。剪完确实好看，但钱包在哭泣。',
+      cond: g => g.age >= 23 && g.flags.hairFirst && !g.flags.hairExpensive && g.money > 3000,
+      choices:[
+        { label:'从此只去高端店', hint:'-💰 +✨ +✨', fn: g => { g.flags.hairExpensive=true; g.flags.hairVIP=true; return{money:-380,charm:8}; }},
+        { label:'体验一次就好，还是回去找Tony', hint:'+🧠', fn: g => { g.flags.hairExpensive=true; return{money:-380,intel:2}; }},
+        { label:'办了高端店的会员卡', hint:'-💰 +✨', fn: g => { g.flags.hairExpensive=true; g.flags.hairSalon=true; return{money:-2000,charm:6}; }},
+      ]},
+    { id:'hair_dye_v36_6', icon:'🎨', title:'染发了', category:'hair',
+      body:'你想换个心情，决定染个头发。在色板前犹豫了半天，最后选了个"雾霾蓝"。染完走在街上回头率暴增，同事说"你今天好不一样"。你不知道这是夸奖还是惊吓。',
+      cond: g => g.age >= 20 && g.age <= 40 && g.flags.hairFirst && !g.flags.hairDye && g.charm > 15,
+      choices:[
+        { label:'从此爱上了染发，每两个月换一次色', hint:'-💰 +✨', fn: g => { g.flags.hairDye=true; g.flags.hairColor=true; return{money:-600,charm:6}; }},
+        { label:'染了一次觉得还是黑发好', hint:'+🧠', fn: g => { g.flags.hairDye=true; return{intel:2,mood:3}; }},
+        { label:'被领导说了，要求染回黑色', hint:'-😊 -✨', fn: g => { g.flags.hairDye=true; g.flags.hairBoss=true; return{mood:-5,charm:-3}; }},
+      ]},
+    { id:'hair_social_v36_6', icon:'🤝', title:'理发师朋友', category:'hair',
+      body:'你和Tony越来越熟，他给你讲他的北漂故事——从河南小县城来北京学美发，从学徒到发型师用了五年。你们从客户关系变成了朋友，偶尔一起吃个饭。',
+      cond: g => g.age >= 22 && g.flags.hairTony && !g.flags.hairSocial && g.social > 20,
+      choices:[
+        { label:'帮Tony在朋友圈宣传他的店', hint:'+👥 +✨', fn: g => { g.flags.hairSocial=true; return{social:5,charm:3}; }},
+        { label:'成了他的忠实客户和朋友', hint:'+👥 +😊', fn: g => { g.flags.hairSocial=true; g.flags.hairLoyal=true; return{social:6,mood:4}; }},
+        { label:'偶尔聊聊就好，保持距离', hint:'+🧠', fn: g => { g.flags.hairSocial=true; return{intel:2}; }},
+      ]},
+    { id:'hair_cost_v36_6', icon:'💸', title:'形象开销', category:'hair',
+      body:'你算了算今年在形象上花了多少钱：理发三千、护肤品两千、衣服五千、健身卡两千……加起来一万多。你开始思考这是"投资自己"还是"消费主义陷阱"。',
+      cond: g => g.age >= 24 && (g.flags.hairExpensive || g.flags.hairColor) && !g.flags.hairCost && g.money < 30000,
+      choices:[
+        { label:'精简形象管理，只保留必要的', hint:'+💰 +🧠', fn: g => { g.flags.hairCost=true; g.flags.hairMinimal=true; return{money:3000,intel:3}; }},
+        { label:'形象就是竞争力，值得投资', hint:'+✨ +🧠', fn: g => { g.flags.hairCost=true; return{charm:5,intel:2}; }},
+        { label:'开始研究平价替代方案', hint:'+💰 +🧠', fn: g => { g.flags.hairCost=true; g.flags.hairBudget=true; return{money:1500,intel:3}; }},
+      ]},
+    { id:'hair_style_v36_6', icon:'✂️', title:'换发型', category:'hair',
+      body:'你决定彻底换个形象——从长发剪成短发（或者反过来）。看着镜子里全新的自己，你忽然有种重新开始的感觉。同事说"你变了个人"，你觉得也许你真的变了。',
+      cond: g => g.age >= 22 && g.flags.hairFirst && !g.flags.hairStyle && (g.mood < 55 || g.charm > 30),
+      choices:[
+        { label:'新发型带来自信，整个人都精神了', hint:'+✨ +😊', fn: g => { g.flags.hairStyle=true; g.flags.hairConfident=true; return{charm:8,mood:8}; }},
+        { label:'换完后悔了，但只能等长回来', hint:'-😊 +🧠', fn: g => { g.flags.hairStyle=true; return{mood:-3,intel:2}; }},
+        { label:'意外收获了好评，被夸了一周', hint:'+✨ +👥', fn: g => { g.flags.hairStyle=true; return{charm:6,social:4}; }},
+      ]},
+    { id:'hair_image_v36_6', icon:'🪞', title:'形象焦虑', category:'hair',
+      body:'你发现自己越来越在意别人的眼光。每次出门前要花半小时照镜子，看到白发就焦虑，看到发际线后退就心慌。你开始理解为什么有人三十岁就去植发了。',
+      cond: g => g.age >= 28 && (g.flags.hairStyle || g.flags.hairColor) && !g.flags.hairImage && g.charm > 25,
+      choices:[
+        { label:'开始研究植发和养发', hint:'-💰 +🧠', fn: g => { g.flags.hairImage=true; g.flags.hairResearch=true; return{money:-3000,intel:3}; }},
+        { label:'学会接受自然衰老', hint:'+🧠 +😊 +❤️', fn: g => { g.flags.hairImage=true; g.flags.hairAccept=true; return{intel:5,mood:5,health:3}; }},
+        { label:'焦虑归焦虑，该照镜子还是照', hint:'-😊', fn: g => { g.flags.hairImage=true; return{mood:-3}; }},
+      ]},
+    { id:'hair_change_v36_6', icon:'🔄', title:'形象改变', category:'hair',
+      body:'你花了一整年认真管理自己的形象——合适的发型、得体的穿搭、好的皮肤状态。你发现不只是外表变了，别人对你的态度也变了，你自己的心态也变了。',
+      cond: g => g.age >= 26 && g.flags.hairStyle && (g.flags.hairConfident || g.flags.hairAccept) && !g.flags.hairChange,
+      choices:[
+        { label:'被公司选为品牌大使', hint:'+💰 +✨ +👥', fn: g => { g.flags.hairChange=true; g.flags.hairAmbassador=true; return{money:5000,charm:10,social:8}; }},
+        { label:'开始做穿搭博主', hint:'+✨ +💰', fn: g => { g.flags.hairChange=true; g.flags.hairBlogger=true; return{charm:8,money:2000}; }},
+        { label:'从内到外都变得自信了', hint:'+😊 +✨ +❤️', fn: g => { g.flags.hairChange=true; return{mood:10,charm:8,health:3}; }},
+      ]},
+    { id:'hair_life_v36_6', icon:'💫', title:'面子工程', category:'hair',
+      body:'你开始理解，形象管理不只是"面子工程"。你怎么打理自己，其实反映了你怎么对待生活。从当年那个随便剪个头的毛头小子，到现在懂得什么适合自己——这个过程中你学会的不只是穿搭，更是自我认知。',
+      cond: g => g.age >= 28 && g.flags.hairChange && !g.flags.hairLife && g.intel > 35,
+      choices:[
+        { label:'开了个人形象咨询公司', hint:'-💰 +✨ +💰', fn: g => { g.flags.hairLife=true; g.flags.hairConsult=true; g.jobName='形象顾问'; g.jobSalary=15000; return{money:-20000,charm:12}; }},
+        { label:'写了本《都市青年形象指南》', hint:'+💰 +✨ +🧠', fn: g => { g.flags.hairLife=true; g.flags.hairBook=true; return{money:5000,charm:10,intel:8}; }},
+        { label:'找到适合自己的风格就足够了', hint:'+😊 +✨ +🧠', fn: g => { g.flags.hairLife=true; return{mood:10,charm:8,intel:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -23716,6 +23798,18 @@ const ACHIEVEMENTS = [
     { id:'plant_balcony_v36_5_ach', icon:'🏡', name:'阳台花园', desc:'把阳台改造成了一个秘密花园', check: g => g.flags.plantBalcony },
     { id:'plant_heal_v36_5_ach', icon:'💚', name:'植物疗愈', desc:'在最难的时候被植物治愈了', check: g => g.flags.plantHeal },
     { id:'plant_life_v36_5_ach', icon:'🌳', name:'植物人生', desc:'从植物身上学会了人生的道理', check: g => g.flags.plantLife },
+
+    // v36.6 理发与形象管理
+    { id:'hair_first_v36_6_ach', icon:'💇', name:'理发常客', desc:'办了张理发卡', check: g => g.flags.hairFirst },
+    { id:'hair_fail_v36_6_ach', icon:'😱', name:'理发翻车', desc:'经历了剪完想哭的翻车现场', check: g => g.flags.hairFail },
+    { id:'hair_expensive_v36_6_ach', icon:'💎', name:'高端salon', desc:'体验了三百八一剪的高端理发', check: g => g.flags.hairExpensive },
+    { id:'hair_dye_v36_6_ach', icon:'🎨', name:'染发达人', desc:'给头发换了个颜色', check: g => g.flags.hairDye },
+    { id:'hair_social_v36_6_ach', icon:'🤝', name:'Tony的朋友', desc:'和理发师从客户变成了朋友', check: g => g.flags.hairSocial },
+    { id:'hair_cost_v36_6_ach', icon:'💸', name:'形象账单', desc:'认真算了算在形象上花了多少钱', check: g => g.flags.hairCost },
+    { id:'hair_style_v36_6_ach', icon:'✂️', name:'换发型', desc:'彻底换了一个新发型', check: g => g.flags.hairStyle },
+    { id:'hair_image_v36_6_ach', icon:'🪞', name:'形象焦虑', desc:'开始在意发际线和白发', check: g => g.flags.hairImage },
+    { id:'hair_change_v36_6_ach', icon:'🔄', name:'形象蜕变', desc:'认真管理形象一年后整个人都变了', check: g => g.flags.hairChange },
+    { id:'hair_life_v36_6_ach', icon:'💫', name:'面子工程', desc:'学会了形象管理其实是自我认知', check: g => g.flags.hairLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
