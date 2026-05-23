@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v36.9
+// 都市浮生记 - 数据文件 v37.0
 // ============================================
 
 
@@ -21883,6 +21883,88 @@ const EVENTS = [
         { label:'继续做那个会说三种话的漂泊者', hint:'+😊 +🧠 +❤️', fn: g => { g.flags.dialectLife=true; return{mood:10,intel:8,health:5}; }},
       ]},
 
+    // === v37.0 城市更新与拆迁记忆 ===
+    { id:'renewal_old_v37_0', icon:'🏚️', title:'老街区', category:'renewal',
+      body:'你租住的房子在一条老街上，两旁是几十年的老房子。街角的理发店开了二十年，对面的早餐摊有最好吃的豆浆油条。你喜欢这条街，它有种大城市里难得的烟火气。',
+      cond: g => g.age >= 20 && !g.flags.renewalOld,
+      choices:[
+        { label:'经常和老街坊们聊天', hint:'+👥 +😊', fn: g => { g.flags.renewalOld=true; g.flags.renewalNeighbor=true; return{social:6,mood:5}; }},
+        { label:'只是路过，没太在意', hint:'+🧠', fn: g => { g.flags.renewalOld=true; return{intel:2}; }},
+        { label:'拍了很多老街区的生活照片', hint:'+✨ +🧠', fn: g => { g.flags.renewalOld=true; g.flags.renewalPhoto=true; return{charm:4,intel:3}; }},
+      ]},
+    { id:'renewal_demolish_v37_0', icon:'🚧', title:'要拆了', category:'renewal',
+      body:'有天你看到老街上贴了拆迁通知。整条街明年要拆掉，建商业综合体。房东通知你三个月内搬走。理发店的老板说"二十年咯，说拆就拆"。你看着墙上"拆"字上的红圈，有种说不出的感觉。',
+      cond: g => g.age >= 22 && g.flags.renewalOld && !g.flags.renewalDemolish,
+      choices:[
+        { label:'开始找新住处，心里很不舍', hint:'-😊 +🧠', fn: g => { g.flags.renewalDemolish=true; g.flags.renewalSad=true; return{mood:-5,intel:3}; }},
+        { label:'趁没拆多拍些照片留纪念', hint:'+✨ +😊', fn: g => { g.flags.renewalDemolish=true; g.flags.renewalDocument=true; return{charm:5,mood:3}; }},
+        { label:'反正迟早要拆，早点搬也好', hint:'+🧠', fn: g => { g.flags.renewalDemolish=true; return{intel:2}; }},
+      ]},
+    { id:'renewal_memory_v37_0', icon:'📷', title:'最后的照片', category:'renewal',
+      body:'搬家前的最后一天，你走了一遍老街。给每个熟悉的角落拍了照：理发店的转椅、早餐摊的大铁锅、巷子口的老槐树、墙上褪色的广告。这些照片可能是它们留在这个世界上的最后影像。',
+      cond: g => g.age >= 22 && g.flags.renewalDemolish && !g.flags.renewalMemory,
+      choices:[
+        { label:'做了一本老街的纪念相册', hint:'+✨ +🧠 +😊', fn: g => { g.flags.renewalMemory=true; g.flags.renewalAlbum=true; return{charm:8,intel:5,mood:5}; }},
+        { label:'发了条长长的朋友圈告别', hint:'+✨ +👥', fn: g => { g.flags.renewalMemory=true; return{charm:5,social:4}; }},
+        { label:'把照片存在手机里，偶尔翻翻', hint:'+😊 +🧠', fn: g => { g.flags.renewalMemory=true; return{mood:3,intel:3}; }},
+      ]},
+    { id:'renewal_new_v37_0', icon:'🏗️', title:'新城来了', category:'renewal',
+      body:'一年后你路过老街的旧址，发现已经变成了一片工地。再过一年，一栋崭新的商业综合体拔地而起。里面有星巴克、优衣库和各种你没见过的网红店。一切都更新了，但你觉得少了些什么。',
+      cond: g => g.age >= 24 && g.flags.renewalDemolish && !g.flags.renewalNew && g.intel > 25,
+      choices:[
+        { label:'在新商场逛了逛，体验还不错', hint:'+😊 +🧠', fn: g => { g.flags.renewalNew=true; return{mood:3,intel:2}; }},
+        { label:'站在原地理发店的位置发了会呆', hint:'+😊 +🧠', fn: g => { g.flags.renewalNew=true; g.flags.renewalNostalgia=true; return{mood:5,intel:4}; }},
+        { label:'写了一篇《我的老街》发在网上', hint:'+✨ +🧠', fn: g => { g.flags.renewalNew=true; g.flags.renewalWrite=true; return{charm:6,intel:5}; }},
+      ]},
+    { id:'renewal_resist_v37_0', icon:'✊', title:'不想搬', category:'renewal',
+      body:'老街的一些住户不愿意搬，觉得补偿太少。有个在这里住了四十年的老奶奶说"我的根在这里"。你在新闻上看到他们拉了横幅，但最后还是被"妥善安置"了。',
+      cond: g => g.age >= 24 && g.flags.renewalDemolish && !g.flags.renewalResist && g.social > 25,
+      choices:[
+        { label:'帮老街坊们联系了法律援助', hint:'+👥 +✨ +🧠', fn: g => { g.flags.renewalResist=true; g.flags.renewalHelp=true; return{social:8,charm:5,intel:5}; }},
+        { label:'在社交媒体上关注了这件事', hint:'+✨ +🧠', fn: g => { g.flags.renewalResist=true; return{charm:3,intel:3}; }},
+        { label:'觉得这是城市发展不可避免的', hint:'+🧠', fn: g => { g.flags.renewalResist=true; return{intel:3,mood:-2}; }},
+      ]},
+    { id:'renewal_gentrify_v37_0', icon:'🏙️', title:'士绅化', category:'renewal',
+      body:'你搬到了另一个老社区，发现这里正在经历"城市更新"——老房子被翻新，小商铺变成了咖啡馆和画廊，房租涨了一倍。你忽然明白：你就是推动士绅化的那个人。',
+      cond: g => g.age >= 26 && g.flags.renewalNew && !g.flags.renewalGentrify && g.intel > 30,
+      choices:[
+        { label:'开始反思城市更新中的公平问题', hint:'+🧠 +✨', fn: g => { g.flags.renewalGentrify=true; g.flags.renewalReflect=true; return{intel:8,charm:5}; }},
+        { label:'尽量支持本地的老店', hint:'+👥 +💰', fn: g => { g.flags.renewalGentrify=true; g.flags.renewalSupport=true; return{social:5,money:-300}; }},
+        { label:'享受更新后的便利生活', hint:'+😊', fn: g => { g.flags.renewalGentrify=true; return{mood:4}; }},
+      ]},
+    { id:'renewal_cost_v37_0', icon:'💰', title:'城市更新的代价', category:'renewal',
+      body:'你发现你在这个城市已经搬了四次家了，每次都是因为旧社区被拆或房租涨价。你的城市记忆在不断被"更新"。你开始想：如果城市一直在变，那什么才是你在这座城市的"根"？',
+      cond: g => g.age >= 27 && g.flags.renewalGentrify && !g.flags.renewalCost && g.intel > 35,
+      choices:[
+        { label:'开始研究城市规划和住房政策', hint:'+🧠 +✨', fn: g => { g.flags.renewalCost=true; g.flags.renewalPolicy=true; return{intel:10,charm:3}; }},
+        { label:'觉得"根"在人不在地', hint:'+🧠 +😊', fn: g => { g.flags.renewalCost=true; return{intel:5,mood:5}; }},
+        { label:'下定决心要在这座城市买房扎根', hint:'-💰 +✨', fn: g => { g.flags.renewalCost=true; g.flags.renewalBuy=true; return{money:-5000,charm:5}; }},
+      ]},
+    { id:'renewal_social_v37_0', icon:'🤝', title:'老街坊', category:'renewal',
+      body:'你在社交媒体上找到了几个以前的老街坊。大家建了个群，偶尔聊聊以前的事。有人说"最想念巷口的炸酱面"，有人说"再也找不到那么便宜的房租了"。你们约了一次聚餐，在一家新开的商场里。',
+      cond: g => g.age >= 26 && g.flags.renewalMemory && !g.flags.renewalSocial && g.social > 25,
+      choices:[
+        { label:'成了老街坊群的组织者', hint:'+👥 +😊', fn: g => { g.flags.renewalSocial=true; g.flags.renewalOrganize=true; return{social:10,mood:6}; }},
+        { label:'参加了聚餐，叙旧很开心', hint:'+👥 +😊 -💰', fn: g => { g.flags.renewalSocial=true; return{social:6,mood:5,money:-200}; }},
+        { label:'加了群但很少说话', hint:'+👥', fn: g => { g.flags.renewalSocial=true; return{social:3}; }},
+      ]},
+    { id:'renewal_document_v37_0', icon:'🎥', title:'记录者', category:'renewal',
+      body:'你开始有意识地记录这座城市的变迁。每条即将拆迁的老街、每个消失的小店、每个被改变的社区——你用照片、文字和视频记录下它们的最后时光。有人说你是"城市记忆的守护者"。',
+      cond: g => g.age >= 28 && g.flags.renewalSocial && (g.flags.renewalAlbum || g.flags.renewalWrite) && !g.flags.renewalDocument && g.intel > 35,
+      choices:[
+        { label:'做了个关于城市变迁的纪录片', hint:'-💰 +✨ +🧠', fn: g => { g.flags.renewalDocument=true; g.flags.renewalFilm=true; return{money:-5000,charm:12,intel:8}; }},
+        { label:'开了个"城市记忆"公众号', hint:'+✨ +💰', fn: g => { g.flags.renewalDocument=true; g.flags.renewalBlog=true; return{charm:8,money:2000}; }},
+        { label:'只是默默记录，发在个人主页', hint:'+🧠 +✨', fn: g => { g.flags.renewalDocument=true; return{intel:6,charm:5}; }},
+      ]},
+    { id:'renewal_life_v37_0', icon:'🌆', title:'城市记忆', category:'renewal',
+      body:'你终于理解了，城市不是一成不变的混凝土，它是活的——它在生长、在更新、也在遗忘。你见证了老街的消失、新城的崛起、老街坊的散落和重聚。这些记忆不会被拆迁推倒，它们已经刻进了你的生命里。每一座城市都有无数人的故事，你的故事也是这座城市的一部分。',
+      cond: g => g.age >= 30 && g.flags.renewalDocument && (g.flags.renewalFilm || g.flags.renewalBlog) && !g.flags.renewalLife && g.intel > 40,
+      choices:[
+        { label:'办了一场"城市记忆"主题摄影展', hint:'+✨ +👥 +💰', fn: g => { g.flags.renewalLife=true; g.flags.renewalExhibit=true; return{charm:15,social:10,money:3000}; }},
+        { label:'写了一本《城市浮生记》', hint:'+💰 +✨ +🧠', fn: g => { g.flags.renewalLife=true; g.flags.renewalBook=true; return{money:8000,charm:12,intel:10}; }},
+        { label:'继续生活在这座不断变化的城市里', hint:'+😊 +🧠 +❤️', fn: g => { g.flags.renewalLife=true; return{mood:12,intel:8,health:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -24092,6 +24174,18 @@ const ACHIEVEMENTS = [
     { id:'dialect_media_v36_9_ach', icon:'🎬', name:'方言内容创作者', desc:'被方言文化内容打动并开始创作', check: g => g.flags.dialectMedia },
     { id:'dialect_kids_v36_9_ach', icon:'👶', name:'方言传承', desc:'开始思考下一代与方言的关系', check: g => g.flags.dialectKids },
     { id:'dialect_life_v36_9_ach', icon:'🌏', name:'语言与根', desc:'理解了方言是一个人最深的根', check: g => g.flags.dialectLife },
+
+    // v37.0 城市更新与拆迁记忆
+    { id:'renewal_old_v37_0_ach', icon:'🏚️', name:'老街区', desc:'在一条有烟火气的老街生活过', check: g => g.flags.renewalOld },
+    { id:'renewal_demolish_v37_0_ach', icon:'🚧', name:'拆迁通知', desc:'看到了老街墙上的拆字', check: g => g.flags.renewalDemolish },
+    { id:'renewal_memory_v37_0_ach', icon:'📷', name:'最后的照片', desc:'为即将消失的老街留下了影像', check: g => g.flags.renewalMemory },
+    { id:'renewal_new_v37_0_ach', icon:'🏗️', name:'新城崛起', desc:'见证了老街变成商业综合体', check: g => g.flags.renewalNew },
+    { id:'renewal_resist_v37_0_ach', icon:'✊', name:'不想搬', desc:'关注了不愿搬迁的老住户的故事', check: g => g.flags.renewalResist },
+    { id:'renewal_gentrify_v37_0_ach', icon:'🏙️', name:'士绅化', desc:'意识到自己也是推动城市更新的一份子', check: g => g.flags.renewalGentrify },
+    { id:'renewal_cost_v37_0_ach', icon:'💰', name:'更新的代价', desc:'思考了城市不断变迁背后的代价', check: g => g.flags.renewalCost },
+    { id:'renewal_social_v37_0_ach', icon:'🤝', name:'老街坊重聚', desc:'和以前的老街坊重新联系上了', check: g => g.flags.renewalSocial },
+    { id:'renewal_document_v37_0_ach', icon:'🎥', name:'城市记录者', desc:'开始系统记录城市的变迁', check: g => g.flags.renewalDocument },
+    { id:'renewal_life_v37_0_ach', icon:'🌆', name:'城市记忆', desc:'理解了你的故事也是这座城市的一部分', check: g => g.flags.renewalLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
