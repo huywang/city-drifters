@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v37.2
+// 都市浮生记 - 数据文件 v37.3
 // ============================================
 
 
@@ -22129,6 +22129,88 @@ const EVENTS = [
         { label:'继续用鼻子感受这座城市的每一天', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.smellLife=true; return{mood:12,health:5,intel:8}; }},
       ]},
 
+    // === v37.3 城市天气与气候文化 ===
+    { id:'weather_heat_v37_3', icon:'🌡️', title:'高温40度', category:'weather',
+      body:'气象台发了高温红色预警，室外温度超过40度。你走在路上觉得自己在蒸桑拿，柏油路软得能踩出印子。你的外卖小哥说"今天跑了三十单，衣服湿透了五次"。',
+      cond: g => g.age >= 20 && !g.flags.weatherHeat,
+      choices:[
+        { label:'买了个小冰箱专门冻冰棍', hint:'-💰 +😊', fn: g => { g.flags.weatherHeat=true; g.flags.weatherIce=true; return{money:-800,mood:5}; }},
+        { label:'每天蹭公司空调到最晚才走', hint:'+💰 +😊', fn: g => { g.flags.weatherHeat=true; return{money:50,mood:3}; }},
+        { label:'高温津贴发了五百块，勉强回血', hint:'+💰', fn: g => { g.flags.weatherHeat=true; return{money:500}; }},
+      ]},
+    { id:'weather_rain_v37_3', icon:'⛈️', title:'暴雨来袭', category:'weather',
+      body:'突如其来的暴雨让整条街变成了河。你的鞋子灌满了水，裤腿湿到大腿。地铁因积水停运了，你被困在公司三个小时。朋友圈里全是各种"海景房"的段子。',
+      cond: g => g.age >= 20 && !g.flags.weatherRain,
+      choices:[
+        { label:'买了双雨靴和防水包', hint:'-💰 +🧠', fn: g => { g.flags.weatherRain=true; g.flags.weatherPrepared=true; return{money:-300,intel:2}; }},
+        { label:'和同事在公司打了一晚上牌', hint:'+👥 +😊', fn: g => { g.flags.weatherRain=true; return{social:5,mood:5}; }},
+        { label:'拍了个"城市看海"的视频火了', hint:'+✨ +💰', fn: g => { g.flags.weatherRain=true; g.flags.weatherViral=true; return{charm:5,money:500}; }},
+      ]},
+    { id:'weather_snow_v37_3', icon:'❄️', title:'城市下雪', category:'weather',
+      body:'南方城市的你居然看到了下雪！整栋楼的人都趴在窗口看，朋友圈瞬间被雪景刷屏。你冲下楼在雪地里写了个"拆"字（划掉）写了个"福"字，感觉自己像回到了童年。',
+      cond: g => g.age >= 20 && !g.flags.weatherSnow,
+      choices:[
+        { label:'和邻居们一起堆了个雪人', hint:'+👥 +😊', fn: g => { g.flags.weatherSnow=true; g.flags.weatherPlay=true; return{social:6,mood:10}; }},
+        { label:'拍了无数雪景照片', hint:'+✨ +😊', fn: g => { g.flags.weatherSnow=true; return{charm:4,mood:6}; }},
+        { label:'第二天雪化了，路上全是冰', hint:'-❤️ +🧠', fn: g => { g.flags.weatherSnow=true; return{health:-3,intel:2}; }},
+      ]},
+    { id:'weather_fog_v37_3', icon:'🌫️', title:'雾霾天', category:'weather',
+      body:'早上出门发现世界一片灰白，PM2.5爆表了。你戴着口罩走在路上，十米外的建筑都看不清。同事说"今天的空气闻起来像烧烤味"。你打开手机一看，空气质量指数500。',
+      cond: g => g.age >= 22 && !g.flags.weatherFog && g.health < 75,
+      choices:[
+        { label:'买了台空气净化器', hint:'-💰 +❤️', fn: g => { g.flags.weatherFog=true; g.flags.weatherPurifier=true; return{money:-2000,health:3}; }},
+        { label:'雾霾天不出门，在家宅一天', hint:'+❤️ +😊', fn: g => { g.flags.weatherFog=true; return{health:2,mood:3}; }},
+        { label:'开始关注环保和空气质量议题', hint:'+🧠 +✨', fn: g => { g.flags.weatherFog=true; g.flags.weatherEco=true; return{intel:5,charm:3}; }},
+      ]},
+    { id:'weather_typhoon_v37_3', icon:'🌀', title:'台风来了', category:'weather',
+      body:'台风预警升级到了橙色，全市停工停课。你把窗户都用胶带贴了十字，冰箱塞满了食物。台风登陆那天晚上，你在家里听着外面的呼呼风声，感觉像在看灾难片。',
+      cond: g => g.age >= 22 && !g.flags.weatherTyphoon,
+      choices:[
+        { label:'在家看了一整天电影，意外放松', hint:'+😊 +❤️', fn: g => { g.flags.weatherTyphoon=true; return{mood:6,health:2}; }},
+        { label:'台风过后去做了志愿者', hint:'+👥 +✨', fn: g => { g.flags.weatherTyphoon=true; g.flags.weatherVolunteer=true; return{social:8,charm:5}; }},
+        { label:'窗户还是被吹开了，屋里一片狼藉', hint:'-💰 -😊', fn: g => { g.flags.weatherTyphoon=true; return{money:-500,mood:-5}; }},
+      ]},
+    { id:'weather_dry_v37_3', icon:'🏜️', title:'干燥季', category:'weather',
+      body:'北方的冬天干燥到让你怀疑人生。嘴唇开裂、皮肤起皮、静电打到你不敢碰门把手。你买了加湿器、润唇膏、身体乳，觉得自己在做"冬季护肤全套"。',
+      cond: g => g.age >= 22 && !g.flags.weatherDry && g.health < 70,
+      choices:[
+        { label:'入了全套保湿装备', hint:'-💰 +❤️', fn: g => { g.flags.weatherDry=true; return{money:-500,health:3}; }},
+        { label:'多喝水，靠内在调节', hint:'+❤️ +🧠', fn: g => { g.flags.weatherDry=true; return{health:2,intel:2}; }},
+        { label:'开始考虑搬到湿润的南方', hint:'+🧠', fn: g => { g.flags.weatherDry=true; g.flags.weatherMove=true; return{intel:3}; }},
+      ]},
+    { id:'weather_social_v37_3', icon:'🌈', title:'天气社交', category:'weather',
+      body:'你发现天气是最好的社交话题。"今天好热啊""明天要下雨记得带伞""周末天气好出去走走？"——天气把陌生人联系在一起，因为它影响着每个人。',
+      cond: g => g.age >= 23 && (g.flags.weatherHeat || g.flags.weatherRain) && !g.flags.weatherSocial && g.social > 20,
+      choices:[
+        { label:'在朋友圈每天发天气预报', hint:'+👥 +✨', fn: g => { g.flags.weatherSocial=true; g.flags.weatherForecast=true; return{social:6,charm:3}; }},
+        { label:'天气好就约朋友出门', hint:'+👥 +😊', fn: g => { g.flags.weatherSocial=true; return{social:5,mood:4}; }},
+        { label:'觉得天气话题太无聊了', hint:'+🧠', fn: g => { g.flags.weatherSocial=true; return{intel:2}; }},
+      ]},
+    { id:'weather_mood_v37_3', icon:'😔', title:'天气与心情', category:'weather',
+      body:'你发现自己的心情和天气高度绑定：晴天活力满满，阴天就容易emo，雨天特别想家。你开始理解为什么北欧国家有"季节性情绪障碍"这个诊断。',
+      cond: g => g.age >= 25 && g.flags.weatherSocial && !g.flags.weatherMood && g.intel > 25,
+      choices:[
+        { label:'开始记录天气和心情的关系', hint:'+🧠 +✨', fn: g => { g.flags.weatherMood=true; g.flags.weatherTrack=true; return{intel:6,charm:3}; }},
+        { label:'阴天就刻意做让自己开心的事', hint:'+😊 +🧠', fn: g => { g.flags.weatherMood=true; return{mood:5,intel:3}; }},
+        { label:'接受天气对情绪的影响，不强求', hint:'+❤️ +🧠', fn: g => { g.flags.weatherMood=true; return{health:3,intel:4}; }},
+      ]},
+    { id:'weather_change_v37_3', icon:'🌍', title:'气候变化', category:'weather',
+      body:'你开始注意到这几年的天气越来越极端了——夏天更热、暴雨更猛、冬天忽冷忽热。你想起小时候的四季分明，忽然觉得"气候变化"不再是新闻里的遥远话题。',
+      cond: g => g.age >= 27 && g.flags.weatherMood && !g.flags.weatherChange && g.intel > 30,
+      choices:[
+        { label:'开始践行低碳生活', hint:'+🧠 +✨', fn: g => { g.flags.weatherChange=true; g.flags.weatherLowCarbon=true; return{intel:6,charm:5}; }},
+        { label:'参加了环保公益活动', hint:'+👥 +✨', fn: g => { g.flags.weatherChange=true; return{social:5,charm:4}; }},
+        { label:'觉得个人力量太小了', hint:'+🧠 -😊', fn: g => { g.flags.weatherChange=true; return{intel:3,mood:-2}; }},
+      ]},
+    { id:'weather_life_v37_3', icon:'☀️', title:'天气人生', category:'weather',
+      body:'你终于学会了和城市的天气和平共处。不再抱怨高温、不再害怕暴雨、不再被阴天影响心情。你理解了，天气就像人生——有晴天也有雨季，重要的是学会在每种天气里都找到属于自己的节奏。',
+      cond: g => g.age >= 28 && g.flags.weatherChange && (g.flags.weatherLowCarbon || g.flags.weatherTrack) && !g.flags.weatherLife && g.intel > 35,
+      choices:[
+        { label:'做了一个"城市天气日记"自媒体', hint:'+✨ +💰 +🧠', fn: g => { g.flags.weatherLife=true; g.flags.weatherMedia=true; return{charm:10,money:3000,intel:5}; }},
+        { label:'写了一本关于城市气候的科普书', hint:'+💰 +✨ +🧠', fn: g => { g.flags.weatherLife=true; g.flags.weatherAuthor=true; return{money:5000,charm:8,intel:10}; }},
+        { label:'享受每一天的天气，晴雨皆是风景', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.weatherLife=true; return{mood:12,health:5,intel:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -24374,6 +24456,18 @@ const ACHIEVEMENTS = [
     { id:'smell_memory_v37_2_ach', icon:'💭', name:'嗅觉记忆', desc:'理解了气味是最强的记忆触发器', check: g => g.flags.smellMemory },
     { id:'smell_create_v37_2_ach', icon:'🧪', name:'气味创作者', desc:'尝试调制了一款属于城市的香水', check: g => g.flags.smellCreate },
     { id:'smell_life_v37_2_ach', icon:'🌍', name:'城市之味', desc:'你的人生就是这座城市所有味道的总和', check: g => g.flags.smellLife },
+
+    // v37.3 城市天气与气候文化
+    { id:'weather_heat_v37_3_ach', icon:'🌡️', name:'高温生存者', desc:'在40度的城市里活了下来', check: g => g.flags.weatherHeat },
+    { id:'weather_rain_v37_3_ach', icon:'⛈️', name:'暴雨亲历者', desc:'经历了让街道变成河的暴雨', check: g => g.flags.weatherRain },
+    { id:'weather_snow_v37_3_ach', icon:'❄️', name:'城市看雪人', desc:'在南方城市看到了下雪', check: g => g.flags.weatherSnow },
+    { id:'weather_fog_v37_3_ach', icon:'🌫️', name:'雾霾幸存者', desc:'在PM2.5爆表的日子活了下来', check: g => g.flags.weatherFog },
+    { id:'weather_typhoon_v37_3_ach', icon:'🌀', name:'台风过境', desc:'经历了城市台风的洗礼', check: g => g.flags.weatherTyphoon },
+    { id:'weather_dry_v37_3_ach', icon:'🏜️', name:'干燥季', desc:'在北方冬天的干燥中存活', check: g => g.flags.weatherDry },
+    { id:'weather_social_v37_3_ach', icon:'🌈', name:'天气社交', desc:'发现天气是最好的社交话题', check: g => g.flags.weatherSocial },
+    { id:'weather_mood_v37_3_ach', icon:'😔', name:'天气心情', desc:'发现心情和天气高度绑定', check: g => g.flags.weatherMood },
+    { id:'weather_change_v37_3_ach', icon:'🌍', name:'气候关注者', desc:'开始关注气候变化的现实影响', check: g => g.flags.weatherChange },
+    { id:'weather_life_v37_3_ach', icon:'☀️', name:'天气人生', desc:'学会了在每种天气里找到自己的节奏', check: g => g.flags.weatherLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
