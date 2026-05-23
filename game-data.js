@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v34.6
+// 都市浮生记 - 数据文件 v34.7
 // ============================================
 
 
@@ -19896,6 +19896,98 @@ const EVENTS = [
         { label:'开始教别人做自媒体', hint:'+👥 +✨', fn: g => { g.flags.selfmediaPhilosophy=true; g.flags.creatorMentor=true; return{social:12,charm:12,money:5000}; }},
       ]},
 
+    // ===== 搭子文化与新型社交 (v34.7) =====
+
+    { id:'dazi_meal_v34_7', icon:'🍜', title:'饭搭子', category:'dazi',
+      body:'一个人吃饭太无聊了。你在社交App上发了条帖子：「找饭搭子，要求：不尬聊，能AA，能吃辣。」\n\n没想到回复还挺多的。你约了一个叫小周的人，在一家湘菜馆见面。\n\n小周是个程序员，和你差不多大。你们点了剁椒鱼头、农家小炒肉、酸豆角炒肉末。\n\n吃饭的时候你们没怎么说话——因为菜太好吃了，没空说话。\n\n吃完你们加了微信。小周说：「下次去吃火锅？」\n\n你突然觉得：一个人吃饭是生存，两个人吃饭才是生活。',
+      cond: g => g.age >= 20 && g.social < 50 && !g.flags.daziMeal,
+      choices:[
+        { label:'成了固定饭搭子', hint:'+😊 +👥', fn: g => { g.flags.daziMeal=true; g.flags.daziFriend=true; return{mood:8,social:8}; }},
+        { label:'偶尔约一次，保持距离', hint:'+😊', fn: g => { g.flags.daziMeal=true; return{mood:5,social:3}; }},
+        { label:'觉得尴尬，没再约了', hint:'', fn: g => { g.flags.daziMeal=true; return{mood:-3}; }},
+      ]},
+
+    { id:'dazi_sports_v34_7', icon:'🏸', title:'运动搭子', category:'dazi',
+      body:'你办了张羽毛球馆的卡，但找不到人一起打。\n\n在小红书上搜「同城羽毛球搭子」，发现一个群。群里有50个人，都是附近的上班族。\n\n你第一次去的时候有点紧张。但一上场就顾不了那么多了——对手太菜了，你轻松赢了。\n\n打完球大家一起去吃了个夜宵。有人提议建个小群：「以后每周三晚上固定打球。」\n\n你发现：运动搭子的好处是——你们不需要聊天，只需要打球。沉默也不尴尬。\n\n而且你发现你的球技在进步，你的社交能力也在不知不觉中提升。',
+      cond: g => g.age >= 20 && g.health > 30 && !g.flags.daziSports,
+      choices:[
+        { label:'加入了固定打球群', hint:'+🏥 +👥', fn: g => { g.flags.daziSports=true; g.flags.sportsDaziGroup=true; return{health:10,social:8}; }},
+        { label:'偶尔去一次，不固定', hint:'+🏥', fn: g => { g.flags.daziSports=true; return{health:5,social:3}; }},
+        { label:'水平太差了，换个群', hint:'', fn: g => { g.flags.daziSports=true; return{health:3,mood:-2}; }},
+      ]},
+
+    { id:'dazi_study_v34_7', icon:'📚', title:'学习搭子', category:'dazi',
+      body:'你在考CPA（或准备考研、学编程），但一个人学太容易放弃了。\n\n你在豆瓣小组里发了个帖子：「找学习搭子，互相监督，每天打卡。」\n\n一个在北京工作的女生回复了你。她也在考CPA，每天下班后学2小时。\n\n你们约定：每天晚上9点在学习App上互相打卡。如果谁没打卡，就发10元红包。\n\n效果出奇地好。你不再敢偷懒了——因为偷懒要花钱。\n\n三个月后，你们都通过了两科。她说：「谢谢你，没有你监督我，我早就放弃了。」\n\n你说：「我也是。」\n\n你们从未见过面，但她是这一年里你最稳定的「朋友」。',
+      cond: g => g.age >= 20 && g.intel > 30 && !g.flags.daziStudy,
+      choices:[
+        { label:'继续互相监督，一起考试', hint:'+🧠 +👥', fn: g => { g.flags.daziStudy=true; g.flags.studyBuddy=true; return{intel:12,social:5,mood:5}; }},
+        { label:'考完试就不再联系了', hint:'+🧠', fn: g => { g.flags.daziStudy=true; return{intel:8}; }},
+        { label:'约出来见一面', hint:'+👥 +😊', fn: g => { g.flags.daziStudy=true; g.flags.studyBuddy=true; return{intel:5,social:10,mood:8}; }},
+      ]},
+
+    { id:'dazi_travel_v34_7', icon:'✈️', title:'旅游搭子', category:'dazi',
+      body:'你想去云南旅行，但朋友们都没时间。\n\n你在马蜂窝上发了个帖子：「一个人去大理+丽江，求旅游搭子，会拍照优先。」\n\n一个叫阿杰的男生回复了你。他是摄影师，正好想去拍大理的苍山洱海。\n\n你们约好了时间，在大理古城见面。\n\n第一天：阿杰拍照，你当模特。你发现他拍的照片真好看——你的朋友圈素材够发一个月了。\n\n第二天：你们一起骑车环洱海。他帮你拍了很多照片，你帮他扛了器材。\n\n第三天：你们在丽江古城的小酒馆喝酒聊天。他讲了他在西藏搭车的经历，你讲了你在城市打拼的故事。\n\n旅行结束后，你们回到各自的城市。偶尔在朋友圈互相点赞。\n\n有些友情，不需要长期经营，一段旅程就够了。',
+      cond: g => g.age >= 22 && g.money >= 5000 && !g.flags.daziTravel,
+      choices:[
+        { label:'成了旅行好友，计划下次旅行', hint:'+😊 +👥', fn: g => { g.flags.daziTravel=true; g.flags.travelBuddy=true; return{mood:15,social:10,money:-3000}; }},
+        { label:'旅途愉快，回来就没联系了', hint:'+😊', fn: g => { g.flags.daziTravel=true; return{mood:10,social:3,money:-3000}; }},
+        { label:'发现旅行习惯不合，途中就分开了', hint:'', fn: g => { g.flags.daziTravel=true; return{mood:-5,money:-2000}; }},
+      ]},
+
+    { id:'dazi_temp_v34_7', icon:'🤝', title:'临时搭子', category:'dazi',
+      body:'你需要去看一个艺术展，但不想一个人去。\n\n你在小程序上找了个「看展搭子」——一个叫小林的文艺青年。\n\n你们约在美术馆门口见面。小林很专业，每幅画都能讲出故事来。\n\n「这幅画是画家在妻子去世后画的，你看这个蓝色——是悲伤的颜色。」\n\n你以前看画展就是拍照发朋友圈。但这次，你居然看懂了一些东西。\n\n看完展你们喝了杯咖啡。小林说：「我每周都看展，下次一起？」\n\n你说好。但你知道——你们大概率不会再见面了。\n\n这就是临时搭子的美妙之处：一段限时的、无负担的陪伴。结束了就结束，不需要维系。\n\n在这个城市，「一次性友情」也是一种温暖。',
+      cond: g => g.age >= 20 && !g.flags.daziTemp,
+      choices:[
+        { label:'享受这种一次性陪伴', hint:'+😊', fn: g => { g.flags.daziTemp=true; g.flags.tempDaziFan=true; return{mood:8,charm:5}; }},
+        { label:'加了微信，偶尔联系', hint:'+👥', fn: g => { g.flags.daziTemp=true; return{social:5,mood:5}; }},
+        { label:'觉得太功利了，不喜欢', hint:'', fn: g => { g.flags.daziTemp=true; return{mood:-3}; }},
+      ]},
+
+    { id:'dazi_commute_v34_7', icon:'🚇', title:'通勤搭子', category:'dazi',
+      body:'你每天早上7:30坐地铁上班。你发现，总有一个女生和你坐同一班车，在同一站下车。\n\n你们互相看了一眼。又看了一眼。然后有一天，她先开口了：\n\n「你是不是在XX站上车？」\n\n「对，你也是？」\n\n「对，我注意到你好几次了。」\n\n你们开始每天早上在地铁站碰面，一起坐车，一起走路到公司。你们发现公司在同一个园区。\n\n通勤路上你们会聊天——但不聊工作，只聊些轻松的话题。今天吃了什么，昨晚看了什么剧。\n\n你本来觉得通勤是一天中最无聊的30分钟。但现在，它变成了你最放松的时间。\n\n你甚至开始期待早上了。',
+      cond: g => g.age >= 22 && g.jobSalary > 0 && !g.flags.daziCommute,
+      choices:[
+        { label:'每天一起通勤，成了好朋友', hint:'+😊 +👥', fn: g => { g.flags.daziCommute=true; g.flags.commuteBuddy=true; return{mood:10,social:8}; }},
+        { label:'偶尔一起走，保持点头之交', hint:'+😊', fn: g => { g.flags.daziCommute=true; return{mood:5,social:3}; }},
+        { label:'后来她换了路线，就没再见了', hint:'', fn: g => { g.flags.daziCommute=true; return{mood:-2}; }},
+      ]},
+
+    { id:'dazi_game_v34_7', icon:'🎮', title:'游戏搭子', category:'dazi',
+      body:'你最近迷上了一款手游，但路人队友太坑了。\n\n你在游戏公屏发了句：「找个稳定搭子，不喷人，能配合。」\n\n一个叫「深夜食堂」的玩家加了你。你们配合得很好——他打辅助你打输出。\n\n你们每天晚上下班后打两小时。一边打一边语音聊天。\n\n你知道了他叫阿明，在深圳做设计师，最近加班到凌晨。他知道了你在北京，工作也不太顺。\n\n有一天他打游戏时突然说：「兄弟，我今天被裁了。」\n\n你不知道说什么，就陪他打了一晚上。\n\n后来他找到了新工作，请你喝了杯奶茶（远程下单）。\n\n你们从未见过面，但他是你在这个城市最铁的「战友」。',
+      cond: g => g.age >= 18 && g.age < 40 && !g.flags.daziGame,
+      choices:[
+        { label:'成了固定游戏搭子', hint:'+😊 +👥', fn: g => { g.flags.daziGame=true; g.flags.gameBuddy=true; return{mood:10,social:8}; }},
+        { label:'偶尔一起玩，不固定', hint:'+😊', fn: g => { g.flags.daziGame=true; return{mood:5,social:3}; }},
+        { label:'他退坑了，你也不玩了', hint:'', fn: g => { g.flags.daziGame=true; return{mood:-3}; }},
+      ]},
+
+    { id:'dazi_lost_v34_7', icon:'💔', title:'搭子散了', category:'dazi',
+      body:'你发现一个残酷的事实：你所有的搭子，都在一个一个消失。\n\n饭搭子小周——搬去了另一个城市。\n运动搭子群——人越来越少，最后只剩3个人。\n学习搭子——考完试就不回消息了。\n游戏搭子阿明——说要戒游戏，不登录了。\n\n你翻看微信通讯录，发现自己有300个好友，但没有一个可以随时打电话的。\n\n搭子文化的本质是什么？是轻量化社交。好处是无负担，坏处是无根基。\n\n你开始反思：是不是我太习惯「用完即走」的社交方式了？\n\n你在朋友圈发了条：「有没有人想当一辈子搭子？」\n\n只有你妈点了赞。',
+      cond: g => g.age >= 22 && (g.flags.daziMeal || g.flags.daziSports || g.flags.daziStudy) && g.social < 40,
+      choices:[
+        { label:'主动联系老朋友，重建深度关系', hint:'+👥 +😊', fn: g => { g.flags.daziLost=true; g.flags.deepConnection=true; return{social:12,mood:10}; }},
+        { label:'接受搭子来了又走的事实', hint:'+🧠', fn: g => { g.flags.daziLost=true; g.flags.daziAcceptance=true; return{intel:8,mood:3}; }},
+        { label:'一个人也挺好，不需要搭子', hint:'', fn: g => { g.flags.daziLost=true; g.flags.soloLife=true; return{mood:-5,social:-5}; }},
+      ]},
+
+    { id:'dazi_economy_v34_7', icon:'💰', title:'搭子经济', category:'dazi',
+      body:'你发现了一个商机：搭子不只是社交，还是一门生意。\n\n有个App叫「搭搭」，提供付费搭子服务：\n- 陪看病：200元/次\n- 陪逛街：150元/小时\n- 陪吃饭：100元/次\n- 陪拍照：300元/组\n\n你试着注册成了「陪逛搭子」——反正你周末也没事做。\n\n第一个客户是个从外地来的女生，想逛SKP但一个人不好意思。你带她逛了2小时，帮她挑了件衣服，还帮她拍了照。\n\n她给了你五星好评：「太专业了，比自己闺蜜还贴心。」\n\n你一个月做了15单，赚了2250元。\n\n你开始思考：在这个孤独的城市，陪伴也是一种商品。但问题是——你愿意为陪伴付费吗？还是你愿意出售陪伴？',
+      cond: g => g.age >= 20 && g.charm > 30 && !g.flags.daziEconomy,
+      choices:[
+        { label:'继续做付费搭子，赚零花钱', hint:'+💰 +👥', fn: g => { g.flags.daziEconomy=true; g.flags.paidDazi=true; return{money:2250,social:8,charm:5}; }},
+        { label:'觉得太商业化了，不做了', hint:'', fn: g => { g.flags.daziEconomy=true; return{mood:-3}; }},
+        { label:'自己开发一个搭子App', hint:'+🧠 +💰', fn: g => { g.flags.daziEconomy=true; g.flags.daziStartup=true; return{intel:10,money:-10000}; }},
+      ]},
+
+    { id:'dazi_philosophy_v34_7', icon:'🤔', title:'搭子的意义', category:'dazi',
+      body:'你回顾自己这一年的「搭子生涯」。\n\n你有过饭搭子、运动搭子、学习搭子、旅行搭子、游戏搭子、通勤搭子……\n\n你的搭子名单有20个人。但深夜失眠的时候，你不知道该打给谁。\n\n搭子文化的本质是什么？\n\n有人说是「社恐的解药」——不用经营深度关系，没有社交压力。\n有人说是「城市的产物」——大家都很忙，没时间维护友情。\n有人说是「孤独的妥协」——不是不想交真朋友，是交不到。\n\n你想到一句话：「搭子是城市的止痛药。治不了病，但能让你好受一点。」\n\n但你也想到了另一句话：「也许每一个搭子，都是一段真正友情的开始。就看你愿不愿意迈出那一步。」\n\n你决定给所有搭子发一条消息：「最近怎么样？有空出来吃个饭？」\n\n有3个人回复了你。其中一个说：「好啊，好久不见。」',
+      cond: g => g.age >= 22 && g.flags.daziMeal && g.flags.daziLost && g.intel > 40,
+      choices:[
+        { label:'开始把搭子变成真朋友', hint:'+👥 +😊 +✨', fn: g => { g.flags.daziPhilosophy=true; return{social:15,mood:15,charm:8}; }},
+        { label:'接受搭子就是搭子，不奢求更多', hint:'+🧠', fn: g => { g.flags.daziPhilosophy=true; g.flags.daziAcceptance=true; return{intel:12,mood:5}; }},
+        { label:'写了一篇关于搭子文化的文章', hint:'+🧠 +✨', fn: g => { g.flags.daziPhilosophy=true; g.flags.daziWriter=true; return{intel:15,charm:12,money:2000}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -21840,6 +21932,17 @@ const ACHIEVEMENTS = [
     { id:'data_anxiety_v34_6_ach', icon:'📊', name:'数据焦虑', desc:'开始为播放量和粉丝数焦虑', check: g => g.flags.dataAnxiety },
     { id:'brand_collab_v34_6_ach', icon:'🤝', name:'品牌合作', desc:'接到了第一个品牌合作', check: g => g.flags.brandCollab },
     { id:'selfmedia_philosophy_v34_6_ach', icon:'🌟', name:'自媒体的意义', desc:'找到了自己做自媒体的真正意义', check: g => g.flags.selfmediaPhilosophy },
+    // v34.7 搭子文化与新型社交
+    { id:'dazi_meal_v34_7_ach', icon:'🍜', name:'饭搭子', desc:'找到了一个能一起吃饭的人', check: g => g.flags.daziMeal },
+    { id:'dazi_sports_v34_7_ach', icon:'🏸', name:'运动搭子', desc:'找到了志同道合的运动伙伴', check: g => g.flags.daziSports },
+    { id:'dazi_study_v34_7_ach', icon:'📚', name:'学习搭子', desc:'找到了互相监督的学习伙伴', check: g => g.flags.daziStudy },
+    { id:'dazi_travel_v34_7_ach', icon:'✈️', name:'旅游搭子', desc:'和陌生人一起踏上旅途', check: g => g.flags.daziTravel },
+    { id:'dazi_temp_v34_7_ach', icon:'🤝', name:'临时搭子', desc:'体验了一次性的限时陪伴', check: g => g.flags.daziTemp },
+    { id:'dazi_commute_v34_7_ach', icon:'🚇', name:'通勤搭子', desc:'每天一起通勤的陌生人成了朋友', check: g => g.flags.daziCommute },
+    { id:'dazi_game_v34_7_ach', icon:'🎮', name:'游戏搭子', desc:'找到了最默契的游戏战友', check: g => g.flags.daziGame },
+    { id:'dazi_lost_v34_7_ach', icon:'💔', name:'搭子散了', desc:'发现搭子们一个一个消失了', check: g => g.flags.daziLost },
+    { id:'dazi_economy_v34_7_ach', icon:'💰', name:'搭子经济', desc:'发现了陪伴也能成为一门生意', check: g => g.flags.daziEconomy },
+    { id:'dazi_philosophy_v34_7_ach', icon:'🤔', name:'搭子的意义', desc:'思考了搭子文化的深层含义', check: g => g.flags.daziPhilosophy },
 ];
 
 // === ENDINGS === (order matters: first match wins)
