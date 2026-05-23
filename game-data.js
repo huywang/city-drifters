@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v34.1
+// 都市浮生记 - 数据文件 v34.2
 // ============================================
 
 
@@ -19436,6 +19436,98 @@ const EVENTS = [
         { label:'给朋友推荐了改变你人生的播客', hint:'+👥 +😊', fn: g => { g.flags.audioLife=true; g.flags.audioEvangelist=true; return{social:10,mood:8}; }},
       ]},
 
+    // ===== 收藏文化与谷子经济 (v34.2) =====
+
+    { id:'blindbox_v34_2', icon:'🎁', title:'盲盒入坑', category:'collect',
+      body:'你路过一家泡泡玛特，本来只是看看，结果出来的时候手里多了三个盲盒。\n\n你选了最火的那个系列——Molly的太空主题。第一个拆开：是个普通款。第二个：还是普通款。第三个——\n\n隐藏款！！！\n\n你激动得差点在店里跳起来。店员看了你一眼，淡定地说：「恭喜。」好像这种事每天都在发生（也确实每天都在发生）。\n\n你把隐藏款摆在了工位上，同事过来问：「这玩意多少钱？」你沉默了。\n\n从那以后，你每次路过泡泡玛特都要进去「看看」。每次「看看」都要买一两个。你的柜子里已经有了三十多个盲盒。\n\n你算了一下：花了将近五千块。但如果有人问你「值不值」，你会说：「拆盒那一刻的快乐，是无价的。」',
+      cond: g => g.age >= 18 && g.age <= 35 && g.money > 3000,
+      choices:[
+        { label:'继续买，集齐整个系列', hint:'+😊 -💰', fn: g => { g.flags.blindbox=true; return{mood:10,money:-3000}; }},
+        { label:'觉得太费钱了，开始出二手', hint:'+🧠 +💰', fn: g => { g.flags.blindbox=true; return{intel:5,money:1500}; }},
+        { label:'开始研究盲盒投资和限量款', hint:'+🧠 +✨', fn: g => { g.flags.blindbox=true; g.flags.blindboxInvest=true; return{intel:8,charm:5}; }},
+      ]},
+
+    { id:'guzi_v34_2', icon:'🃏', title:'谷子经济', category:'collect',
+      body:'你入坑了一部动漫，然后掉进了「谷子」的坑。\n\n谷子（goods的谐音）就是动漫周边：吧唧（徽章）、立牌、色纸、明信片、文件夹……你以为只是买个周边，结果发现这是一个无底洞。\n\n一个吧唧（徽章）官方售价15元，但限量版在闲鱼上炒到了800元。一个立牌50元，但绝版的能卖到2000元。\n\n你开始理解「谷圈」的规矩：拼团、排谷、换谷、出谷、收谷……你加了好几个谷子群，学会了各种黑话。\n\n你妈看到你的柜子说：「你花这么多钱买这些小铁片，以后能当饭吃？」\n\n你不能告诉你妈，你最喜欢的那个吧唧，现在在闲鱼上值5000块——比你当年买的那台微波炉还贵。\n\n当然，你不会卖的。因为它上面有你最喜欢的角色在笑。',
+      cond: g => g.age >= 16 && g.age <= 30,
+      choices:[
+        { label:'成了资深谷圈人', hint:'+😊 +👥 -💰', fn: g => { g.flags.guziCollect=true; return{mood:10,social:8,money:-5000}; }},
+        { label:'理性消费，只收最喜欢的', hint:'+🧠 +😊', fn: g => { g.flags.guziCollect=true; return{intel:8,mood:5,money:-1000}; }},
+        { label:'开始在闲鱼倒卖谷子赚钱', hint:'+💰 +🧠', fn: g => { g.flags.guziCollect=true; g.flags.guziTrader=true; return{money:8000,intel:8}; }},
+      ]},
+
+    { id:'fridge_magnet_v34_2', icon:'🧲', title:'冰箱贴收藏', category:'collect',
+      body:'不知道从什么时候开始，你每去一个城市旅游都要买一个冰箱贴。\n\n你家冰箱上已经贴了三十多个：北京的故宫、上海的外滩、西安的兵马俑、长沙的茶颜悦色、成都的大熊猫、大理的洱海、厦门的鼓浪屿。\n\n每一个冰箱贴都是一段记忆。看到故宫那个，你就想起在角楼等日落的那个傍晚。看到茶颜悦色那个，你就想起在长沙排队两小时只为一杯幽兰拿铁。\n\n朋友来你家，第一个注意到的不是你的沙发或电视，而是你的冰箱。\n\n「你这冰箱贴也太壮观了吧！」\n\n你笑了：「这些加起来的钱，可能还不够买一个包。但它们承载的记忆，比任何奢侈品都值钱。」\n\n你开始计划下一个旅行目的地——不是为了打卡，而是为了冰箱上多一个小铁片。',
+      cond: g => g.age >= 20 && g.money > 2000,
+      choices:[
+        { label:'为了冰箱贴开始计划更多旅行', hint:'+😊 +✨ -💰', fn: g => { g.flags.fridgeMagnet=true; return{mood:12,charm:8,money:-2000}; }},
+        { label:'开始做冰箱贴地图标记', hint:'+✨ +🧠', fn: g => { g.flags.fridgeMagnet=true; g.flags.travelMap=true; return{charm:10,intel:5}; }},
+        { label:'在网上分享冰箱贴收藏', hint:'+👥 +✨', fn: g => { g.flags.fridgeMagnet=true; return{social:8,charm:8}; }},
+      ]},
+
+    { id:'vinyl_record_v34_2', icon:'💿', title:'黑胶唱片', category:'collect',
+      body:'你在一家旧货市场看到了一台老式黑胶唱片机，旁边摆着一摞唱片。\n\n你随手翻了几张：披头士、Pink Floyd、邓丽君、张国荣。你挑了一张张国荣的《风继续吹》，花了180块。\n\n回到家，你把唱片放在唱机上，轻轻放下唱针——\n\n嘶嘶的底噪之后，张国荣的声音从音箱里流出来。不是数字音乐那种干净的声音，而是一种温暖的、有颗粒感的、仿佛他在你面前唱歌的声音。\n\n你坐在那里听了整张唱片，一首都没跳。\n\n从那天起，你开始收集黑胶唱片。你发现这是一个很烧钱的爱好：一张原版黑胶动辄两三百，限量版上千。但你不在乎。\n\n你的房间角落里已经有了一个小唱片架，上面摆了二十多张。每一张都有故事。\n\n朋友问你：「现在都数字音乐了，你干嘛还买这些？」\n\n你说：「因为翻面这个动作，是数字音乐给不了的仪式感。」',
+      cond: g => g.age >= 22 && g.intel > 35 && g.money > 5000,
+      choices:[
+        { label:'开始认真收藏黑胶', hint:'+✨ +😊 -💰', fn: g => { g.flags.vinylRecord=true; return{charm:12,mood:10,money:-3000}; }},
+        { label:'听了几张就没再继续', hint:'+🧠 +😊', fn: g => { g.flags.vinylRecord=true; return{intel:5,mood:5}; }},
+        { label:'开始研究唱片文化和音乐史', hint:'+🧠 +✨', fn: g => { g.flags.vinylRecord=true; g.flags.musicHistorian=true; return{intel:15,charm:8}; }},
+      ]},
+
+    { id:'sneaker_v34_2', icon:'👟', title:'球鞋收藏', category:'collect',
+      body:'你开始收藏球鞋了。\n\n起因是一双AJ1的复刻版。你在SNKRS上抽签，居然中了！原价1299，你高兴得睡不着觉。\n\n然后你发现，这双鞋在得物上已经炒到了2800。你犹豫了：穿还是不穿？\n\n你选择了穿。毕竟鞋是用来穿的，不是用来供的。\n\n但你的室友不这么想。他买了一双Yeezy，从来不穿，放在鞋盒里，每周打开看看，像对待一件艺术品。\n\n你开始了解球鞋文化：每一双经典球鞋背后都有一个故事。AJ1是乔丹的起点，Air Max是建筑师的灵感，Converse是朋克的标志。\n\n你的鞋柜已经有了十五双球鞋。最贵的一双花了4500。你妈要是知道了大概会昏过去。\n\n但你觉得，这不是在买鞋，是在收藏一种文化。',
+      cond: g => g.age >= 18 && g.age <= 35 && g.money > 5000,
+      choices:[
+        { label:'成了球鞋收藏家', hint:'+✨ +😊 -💰', fn: g => { g.flags.sneakerCollect=true; return{charm:10,mood:8,money:-5000}; }},
+        { label:'只买自己喜欢的，不追限量', hint:'+🧠 +😊', fn: g => { g.flags.sneakerCollect=true; return{intel:5,mood:8,money:-2000}; }},
+        { label:'开始在得物上卖鞋赚钱', hint:'+💰 +🧠', fn: g => { g.flags.sneakerCollect=true; g.flags.sneakerResell=true; return{money:8000,intel:5}; }},
+      ]},
+
+    { id:'designer_toy_v34_2', icon:'🧸', title:'潮玩收藏', category:'collect',
+      body:'你入了潮玩的坑。\n\n不是盲盒那种小玩意，是正经的潮玩——KAWS、Be@rbrick、Molly Mega、Dimoo World。一个Be@rbrick 1000%要五六千块，放在客厅里比任何家具都抢眼。\n\n你花了一个月工资买了一个KAWS的COMPANION。朋友来你家，第一眼看到的就是它——一个双手捂住脸的灰色玩偶，坐在你书架最高层。\n\n「这什么？看着好丧。」\n\n「KAWS。艺术家。」\n\n「多少钱？」\n\n你沉默了。\n\n但你开始理解潮玩的魅力：它们不是玩具，是「大人的艺术品」。每一个设计都有理念，每一个配色都有故事。你开始关注潮玩设计师，了解他们的创作灵感。\n\n你的客厅已经有了七八个潮玩。你把它们当作家居装饰，每一个都精心摆放。\n\n你觉得，在一个租来的小房子里，这些潮玩让你觉得这里是「你的家」。',
+      cond: g => g.age >= 22 && g.money > 8000 && g.charm > 30,
+      choices:[
+        { label:'继续收集，客厅变展厅', hint:'+✨ +😊 -💰', fn: g => { g.flags.designerToy=true; return{charm:12,mood:10,money:-8000}; }},
+        { label:'精选几个当装饰', hint:'+✨ +🧠', fn: g => { g.flags.designerToy=true; return{charm:8,intel:3,money:-3000}; }},
+        { label:'开始关注潮玩设计和艺术', hint:'+🧠 +✨', fn: g => { g.flags.designerToy=true; g.flags.toyDesigner=true; return{intel:12,charm:10}; }},
+      ]},
+
+    { id:'postcard_v34_2', icon:'🏤', title:'明信片交换', category:'collect',
+      body:'你在网上发现了一个明信片交换社区——Postcrossing。\n\n规则很简单：你寄一张明信片给一个随机的陌生人，就会收到来自世界另一个角落的明信片。\n\n你寄出了第一张，上面画着北京的胡同。两周后，你收到了一张来自芬兰赫尔辛基的明信片。上面画着北极光，手写着一段话：\n\n「Dear friend, the northern lights were beautiful last night. I hope this card brings a little magic to your day.」\n\n你被感动了。一个你永远不会见面的芬兰人，在北欧的寒夜里，给你写了一张明信片。\n\n从那以后，你开始认真写每一张明信片。你写中国的城市、你的生活、你的心情。你收到了来自四十多个国家的明信片：冰岛、巴西、日本、肯尼亚、新西兰……\n\n你把它们贴满了你的墙。朋友来你家说：「你这墙比任何旅行杂志都好看。」',
+      cond: g => g.age >= 18 && g.intel > 30,
+      choices:[
+        { label:'坚持写了一年明信片', hint:'+👥 +✨ +😊', fn: g => { g.flags.postcardExchange=true; return{social:10,charm:10,mood:8,money:-300}; }},
+        { label:'寄了几张就忘了', hint:'+🧠', fn: g => { g.flags.postcardExchange=true; return{intel:3}; }},
+        { label:'开始自己设计明信片', hint:'+✨ +🧠', fn: g => { g.flags.postcardExchange=true; g.flags.postcardDesigner=true; return{charm:12,intel:8,money:2000}; }},
+      ]},
+
+    { id:'tcard_v34_2', icon:'🎴', title:'小卡收集', category:'collect',
+      body:'你追了一个偶像团体，然后开始了「小卡」收集。\n\n小卡就是偶像专辑里附赠的成员照片卡片，大概信用卡大小。你以为是赠品，结果发现——\n\n一个团体12个成员，每张专辑随机附赠1张。要集齐12张，你至少要买12张专辑。一张专辑128块。\n\n但这还不算完。每个成员还有不同版本的小卡：打歌服版、日常版、特别版、签名版……一个成员可能有20多种不同的小卡。\n\n你开始在粉丝群里换卡。「出XX打歌服版，求XX日常版！」每天群里都是这种消息。\n\n三个月后，你终于集齐了所有成员的所有版本。你花了将近一万块。\n\n你把小卡整整齐齐地摆在卡册里，翻着看的时候觉得特别满足。\n\n你朋友说：「你不觉得这就是在交智商税吗？」\n\n你说：「你花一万块吃火锅的时候，也没人说你交智商税啊。」',
+      cond: g => g.age >= 16 && g.age <= 28 && g.money > 5000,
+      choices:[
+        { label:'集齐了所有小卡', hint:'+😊 +✨ -💰', fn: g => { g.flags.tcardCollect=true; return{mood:12,charm:5,money:-8000}; }},
+        { label:'只收了最喜欢的成员', hint:'+🧠 +😊', fn: g => { g.flags.tcardCollect=true; return{intel:5,mood:5,money:-2000}; }},
+        { label:'开始在粉丝群里做小卡交易', hint:'+💰 +👥', fn: g => { g.flags.tcardCollect=true; g.flags.tcardTrader=true; return{money:5000,social:8}; }},
+      ]},
+
+    { id:'stamp_v34_2', icon:'📮', title:'集邮新爱好', category:'collect',
+      body:'你整理爷爷遗物的时候，发现了一本集邮册。\n\n里面整整齐齐地摆着几百张邮票，从六十年代到九十年代。有毛主席像、有祖国山河、有航天成就、有十二生肖。\n\n每一张邮票旁边，爷爷都用小字写了备注：「1980年猴票，购于北京西单邮局」「1984年国庆阅兵，当日购买」。\n\n你翻着翻着，鼻子一酸。这不只是一本邮票册，这是爷爷的一生。\n\n你把集邮册带回了家，开始了解集邮文化。你发现集邮是世界上最古老的收藏爱好之一，每一张邮票都是一段历史的缩影。\n\n你开始收集当代的纪念邮票。虽然现在的邮票已经没有实用价值了（谁还写信啊），但你觉得它们在记录这个时代。\n\n你在集邮册第一页放了一张2024年的生肖龙票，旁边写了一句话：「从爷爷到我。」',
+      cond: g => g.age >= 25 && g.intel > 35,
+      choices:[
+        { label:'继承了爷爷的集邮爱好', hint:'+😊 +🧠 +✨', fn: g => { g.flags.stampCollect=true; return{mood:12,intel:8,charm:8}; }},
+        { label:'把集邮册珍藏起来', hint:'+😊 +🧠', fn: g => { g.flags.stampCollect=true; return{mood:8,intel:5}; }},
+        { label:'开始研究邮票的历史和价值', hint:'+🧠 +✨', fn: g => { g.flags.stampCollect=true; g.flags.stampExpert=true; return{intel:15,charm:5}; }},
+      ]},
+
+    { id:'collect_philosophy_v34_2', icon:'🏛️', title:'收藏的意义', category:'collect',
+      body:'一个深夜，你坐在你的收藏品前面，开始思考一个问题：\n\n「我为什么要收藏？」\n\n你的柜子里有盲盒、有潮玩、有黑胶、有明信片、有球鞋。加起来花了好几万块。\n\n是投资吗？有些确实升值了，但大部分并没有。是炫耀吗？你从来不发朋友圈晒收藏。是上瘾吗？你好像确实停不下来。\n\n你想了很久，终于找到了答案：\n\n收藏是一种对抗遗忘的方式。\n\n每一张明信片是你去过的地方。每一张唱片是你听过的音乐。每一个冰箱贴是你走过的路。每一张小卡是你追过的星光。\n\n在一个一切都在加速消失的时代——照片被存在手机里再也翻不出来，聊天记录被覆盖，朋友圈被时间线淹没——只有实体收藏品会一直在那里，提醒你：你活过，你爱过，你经历过。\n\n你把最喜欢的一件收藏品拿在手里，摸了摸。\n\n它不贵，但它承载的记忆，无价。',
+      cond: g => g.age >= 22 && (g.flags.blindbox || g.flags.guziCollect || g.flags.vinylRecord || g.flags.sneakerCollect || g.flags.designerToy || g.flags.fridgeMagnet) && g.intel > 40,
+      choices:[
+        { label:'找到了收藏的真正意义', hint:'+😊 +🧠 +✨', fn: g => { g.flags.collectPhilosophy=true; return{mood:15,intel:12,charm:10}; }},
+        { label:'决定精简收藏，只留最珍贵的', hint:'+🧠 +✨', fn: g => { g.flags.collectPhilosophy=true; g.flags.minimalCollect=true; return{intel:12,charm:8,money:3000}; }},
+        { label:'开始写一篇关于收藏文化的文章', hint:'+✨ +👥', fn: g => { g.flags.collectPhilosophy=true; g.flags.collectWriter=true; return{charm:12,social:8}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -21325,6 +21417,17 @@ const ACHIEVEMENTS = [
     { id:'standup_comedy_v34_1_ach', icon:'🎤', name:'开放麦', desc:'现场感受了脱口秀的笑声', check: g => g.flags.standupComedy },
     { id:'sound_walk_v34_1_ach', icon:'🎶', name:'声音漫步', desc:'用耳朵重新认识了城市', check: g => g.flags.soundWalk },
     { id:'audio_life_v34_1_ach', icon:'🎵', name:'声音生活', desc:'声音改变了你的生活方式', check: g => g.flags.audioLife },
+    // --- 收藏文化与谷子经济 (v34.2) ---
+    { id:'blindbox_v34_2_ach', icon:'🎁', name:'盲盒玩家', desc:'入了盲盒的坑', check: g => g.flags.blindbox },
+    { id:'guzi_v34_2_ach', icon:'🃏', name:'谷圈人', desc:'开始了谷子收藏', check: g => g.flags.guziCollect },
+    { id:'fridge_magnet_v34_2_ach', icon:'🧲', name:'冰箱贴地图', desc:'用冰箱贴记录了去过的城市', check: g => g.flags.fridgeMagnet },
+    { id:'vinyl_record_v34_2_ach', icon:'💿', name:'黑胶复兴', desc:'开始收藏黑胶唱片', check: g => g.flags.vinylRecord },
+    { id:'sneaker_v34_2_ach', icon:'👟', name:'球鞋收藏家', desc:'开始收藏球鞋', check: g => g.flags.sneakerCollect },
+    { id:'designer_toy_v34_2_ach', icon:'🧸', name:'潮玩达人', desc:'收藏了设计师潮玩', check: g => g.flags.designerToy },
+    { id:'postcard_v34_2_ach', icon:'🏤', name:'明信片交换', desc:'参与了全球明信片交换', check: g => g.flags.postcardExchange },
+    { id:'tcard_v34_2_ach', icon:'🎴', name:'小卡猎人', desc:'集齐了偶像小卡', check: g => g.flags.tcardCollect },
+    { id:'stamp_v34_2_ach', icon:'📮', name:'集邮传承', desc:'继承了爷爷的集邮爱好', check: g => g.flags.stampCollect },
+    { id:'collect_philosophy_v34_2_ach', icon:'🏛️', name:'收藏人生', desc:'找到了收藏的真正意义', check: g => g.flags.collectPhilosophy },
 ];
 
 // === ENDINGS === (order matters: first match wins)
