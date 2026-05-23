@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v37.8
+// 都市浮生记 - 数据文件 v37.9
 // ============================================
 
 
@@ -22624,6 +22624,89 @@ const EVENTS = [
         { label:'继续做一个享受牌局的普通人', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.mahjongLife=true; return{mood:12,social:5,intel:5}; }},
       ]},
 
+    // === v37.9 广场舞与社区文化 ===
+    { id:'square_first_v37_9', icon:'💃', title:'路过广场舞', category:'square',
+      body:'晚饭后散步，小区广场上大妈们已经开始跳广场舞了。音箱里放着《最炫民族风》，几十个阿姨整齐划一地跳着。你本来想绕道走，但一个阿姨热情地招手："小伙子/小姑娘，来一起跳啊！简单得很！"你不好意思拒绝，站到了最后一排。虽然动作完全跟不上，但你发现自己居然笑了。',
+      cond: g => !g.flags.squareFirst && g.age >= 18,
+      choices:[
+        { label:'跟着跳了一整首', hint:'+😊 +💪', fn: g => { g.flags.squareFirst=true; return{mood:8,health:3}; }},
+        { label:'跳了两步就溜了', hint:'+😅', fn: g => { g.flags.squareFirst=true; return{mood:3}; }},
+      ]},
+
+    { id:'square_learn_v37_9', icon:'📝', title:'学广场舞', category:'square',
+      body:'你妈发来一个视频链接："这个广场舞教程特别好，你学学，对身体好。"你本来想敷衍过去，但那天加班到脖子疼，突然想起楼下大妈们跳得很欢乐。你下载了教程，跟着视频学了一晚上。第二天去广场上实战，大妈们纷纷夸你："年轻人学得快！跳得比我们好！"你被选到了第二排。',
+      cond: g => g.flags.squareFirst && !g.flags.squareLearn,
+      choices:[
+        { label:'认真学了一整套动作', hint:'+💪 +😊', fn: g => { g.flags.squareLearn=true; return{health:5,mood:5}; }},
+        { label:'学了几个基本步就够用了', hint:'+😊', fn: g => { g.flags.squareLearn=true; return{mood:5,health:3}; }},
+      ]},
+
+    { id:'square_noise_v37_9', icon:'🔊', title:'广场舞噪音之争', category:'square',
+      body:'你加班到深夜回家，楼下广场舞的音乐震耳欲聋。你在群里发了条消息："能不能小点声？明天还要上班。"群里瞬间炸了：大妈说"我们跳舞是锻炼身体"，另一个年轻人说"支持你"，有人提议"戴耳机跳"。物业介入调解，最终约定了时间和音量。你突然理解了什么叫"公共空间的博弈"。',
+      cond: g => g.flags.squareFirst && !g.flags.squareNoise && g.age >= 20,
+      choices:[
+        { label:'和跳舞的大妈坐下来好好谈', hint:'+🤝 +🧠', fn: g => { g.flags.squareNoise=true; g.flags.squareMediate=true; return{social:5,intel:5}; }},
+        { label:'买了一副降噪耳机', hint:'-💰 +😊', fn: g => { g.flags.squareNoise=true; return{money:-500,mood:3}; }},
+        { label:'在业主群里发起联名投诉', hint:'+😤 -🤝', fn: g => { g.flags.squareNoise=true; g.flags.squareComplain=true; return{mood:-3,social:-5}; }},
+      ]},
+
+    { id:'square_team_v37_9', icon:'👯', title:'广场舞队的新队员', category:'square',
+      body:'跳了几个月广场舞，你成了队里唯一的年轻人。领舞的王阿姨特别照顾你，每次都给你占位置。"我们队要参加区里的广场舞比赛，你年轻跳得好，必须参加！"你本来想拒绝，但看到阿姨们认真排练的样子，突然觉得这是一件很有仪式感的事。比赛那天你穿了统一的红色运动服，紧张得手心冒汗。',
+      cond: g => g.flags.squareLearn && !g.flags.squareTeam && g.age >= 22,
+      choices:[
+        { label:'全力备赛，为队伍争光', hint:'+💪 +🤝 +😊', fn: g => { g.flags.squareTeam=true; return{health:5,social:8,mood:8}; }},
+        { label:'参加就好，重在参与', hint:'+😊 +🤝', fn: g => { g.flags.squareTeam=true; return{mood:5,social:5}; }},
+      ]},
+
+    { id:'square_generation_v37_9', icon:'🔄', title:'代际和解', category:'square',
+      body:'你和跳广场舞的大妈们越来越熟。张阿姨跟你说："我儿子跟你差不多大，在北京三年没回来了。"李阿姨说："我闺女嫌我跳舞丢人，从来不来看我。"你突然有点心酸。那天你在朋友圈发了一张和阿姨们的合影，配文："我的广场舞姐妹团。"你妈在底下评论："你什么时候跟我一起跳？"',
+      cond: g => g.flags.squareTeam && !g.flags.squareGeneration && g.age >= 22,
+      choices:[
+        { label:'教你妈跳了新学的广场舞', hint:'+❤️ +😊', fn: g => { g.flags.squareGeneration=true; return{mood:10,social:5}; }},
+        { label:'拍了一个关于广场舞的纪录短片', hint:'+✨ +🧠', fn: g => { g.flags.squareGeneration=true; g.flags.squareDoc=true; return{charm:8,intel:5}; }},
+      ]},
+
+    { id:'square_battle_v37_9', icon:'⚔️', title:'广场舞地盘之争', category:'square',
+      body:'广场舞圈子也不太平。隔壁小区的队伍要来"抢地盘"——你们的广场不够大，两支队伍撞音乐。双方阿姨剑拔弩张，差点吵起来。你作为唯一的年轻人被推出来"谈判"。你提议："一三五你们跳，二四六我们跳，周末一起跳。"对方领队犹豫了一下："行，就按你说的来。"',
+      cond: g => g.flags.squareTeam && !g.flags.squareBattle && g.social > 20,
+      choices:[
+        { label:'成了两个队伍之间的调解人', hint:'+🤝 +🧠', fn: g => { g.flags.squareBattle=true; g.flags.squareDiplomat=true; return{social:10,intel:5}; }},
+        { label:'提议两个队合并成一个大队', hint:'+🤝 +😊', fn: g => { g.flags.squareBattle=true; g.flags.squareMerge=true; return{social:8,mood:5}; }},
+      ]},
+
+    { id:'square_music_v37_9', icon:'🎵', title:'广场舞歌单', category:'square',
+      body:'你发现广场舞的歌单是个学问。太快了跟不上，太慢了没气氛。王阿姨让你当"DJ"——负责选歌和排舞。你偷偷加了几首年轻人喜欢的歌，没想到阿姨们特别喜欢。"这个节奏好！比那个凤凰传奇好听！"你在B站看到一个视频：年轻人把广场舞音乐混音成了电音，播放量破了百万。',
+      cond: g => g.flags.squareTeam && !g.flags.squareMusic && g.intel > 20,
+      choices:[
+        { label:'给队伍编排了全新的舞蹈和歌单', hint:'+✨ +😊', fn: g => { g.flags.squareMusic=true; g.flags.squareDJ=true; return{charm:8,mood:5}; }},
+        { label:'做了一个广场舞音乐混音视频', hint:'+✨ +💰', fn: g => { g.flags.squareMusic=true; g.flags.squareRemix=true; return{charm:5,mood:5}; }},
+      ]},
+
+    { id:'square_young_v37_9', icon:'👫', title:'年轻人跳广场舞', category:'square',
+      body:'你在小红书发了一条跳广场舞的视频，没想到火了。评论区里很多年轻人留言："我也想跳但不敢""在哪个广场""求教程"。渐渐地，你们队伍来了几个年轻人。阿姨们特别高兴："我们队终于有年轻人了！"一个95后说："我加班到十点，回来跳半小时广场舞，比健身房解压多了。"',
+      cond: g => g.flags.squareTeam && !g.flags.squareYoung && g.age >= 20 && g.age <= 35,
+      choices:[
+        { label:'组织了一个"青年广场舞联盟"', hint:'+🤝 +✨', fn: g => { g.flags.squareYoung=true; g.flags.squareAlliance=true; return{social:10,charm:8}; }},
+        { label:'在社交平台分享广场舞教程', hint:'+✨ +😊', fn: g => { g.flags.squareYoung=true; g.flags.squareInfluencer=true; return{charm:8,mood:5}; }},
+      ]},
+
+    { id:'square_space_v37_9', icon:'🏗️', title:'消失的广场', category:'square',
+      body:'小区旁边的广场要改建成商业停车场了。阿姨们急了："我们去哪跳？"你在社区群里发起请愿，找了记者采访，还在政务平台提交了意见。社区书记出面协调，最终在新建的社区公园里划了一块专用场地。搬过去那天，阿姨们在新场地上跳了一支特别的舞，名字叫《家》。',
+      cond: g => g.flags.squareTeam && !g.flags.squareSpace && g.age >= 22,
+      choices:[
+        { label:'成了社区的"居民代表"', hint:'+🤝 +🧠', fn: g => { g.flags.squareSpace=true; g.flags.squareRepresent=true; return{social:10,intel:5}; }},
+        { label:'帮阿姨们拍了请愿视频', hint:'+✨ +❤️', fn: g => { g.flags.squareSpace=true; return{charm:5,mood:8}; }},
+      ]},
+
+    { id:'square_life_v37_9', icon:'🌟', title:'广场舞人生', category:'square',
+      body:'你终于理解了广场舞为什么能火遍中国。它不只是锻炼——它是退休后的社交，是孤独时的陪伴，是被子女忽略后的自我价值。那些阿姨们跳的不是舞，是对生活的热爱。而你，一个在大城市漂泊的年轻人，在广场舞里找到了意想不到的归属感。"跳舞嘛，开心就好。"王阿姨说得对，人生最重要的事，不过就是有人一起跳舞。',
+      cond: g => g.age >= 28 && g.flags.squareTeam && (g.flags.squareGeneration || g.flags.squareYoung) && (g.flags.squareSpace || g.flags.squareBattle) && !g.flags.squareLife,
+      choices:[
+        { label:'创办了一个"代际共舞"社区项目', hint:'-💰 +❤️ +🤝', fn: g => { g.flags.squareLife=true; g.flags.squareProject=true; return{money:-3000,mood:15,social:12}; }},
+        { label:'出了一本书《广场舞里的中国》', hint:'+✨ +🧠', fn: g => { g.flags.squareLife=true; g.flags.squareBook=true; return{charm:12,intel:8}; }},
+        { label:'继续做一个快乐的广场舞青年', hint:'+😊 +💪 +❤️', fn: g => { g.flags.squareLife=true; return{mood:12,health:5,social:8}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -24935,6 +25018,16 @@ const ACHIEVEMENTS = [
     { id:'mahjong_online_v37_8_ach', icon:'📱', name:'指尖麻将', desc:'体验了线上麻将的世界', check: g => g.flags.mahjongOnline },
     { id:'mahjong_culture_v37_8_ach', icon:'📖', name:'麻将学者', desc:'理解了麻将背后的文化哲学', check: g => g.flags.mahjongCulture },
     { id:'mahjong_life_v37_8_ach', icon:'🌟', name:'麻将人生', desc:'悟出了人生如牌局的道理', check: g => g.flags.mahjongLife },
+    { id:'square_first_v37_9_ach', icon:'💃', name:'初涉舞池', desc:'第一次跳了广场舞', check: g => g.flags.squareFirst },
+    { id:'square_learn_v37_9_ach', icon:'📝', name:'勤学苦练', desc:'学会了一整套广场舞动作', check: g => g.flags.squareLearn },
+    { id:'square_noise_v37_9_ach', icon:'🔊', name:'邻里博弈', desc:'经历了广场舞噪音的纷争', check: g => g.flags.squareNoise },
+    { id:'square_team_v37_9_ach', icon:'👯', name:'正式队员', desc:'成了广场舞队的正式成员', check: g => g.flags.squareTeam },
+    { id:'square_generation_v37_9_ach', icon:'🔄', name:'代际之桥', desc:'用广场舞连接了两代人的心', check: g => g.flags.squareGeneration },
+    { id:'square_battle_v37_9_ach', icon:'⚔️', name:'和平使者', desc:'化解了广场舞地盘之争', check: g => g.flags.squareBattle },
+    { id:'square_music_v37_9_ach', icon:'🎵', name:'广场舞DJ', desc:'为广场舞队编排了全新的歌单', check: g => g.flags.squareMusic },
+    { id:'square_young_v37_9_ach', icon:'👫', name:'青春舞步', desc:'让更多年轻人加入了广场舞', check: g => g.flags.squareYoung },
+    { id:'square_space_v37_9_ach', icon:'🏗️', name:'守护广场', desc:'为阿姨们守住了跳舞的场地', check: g => g.flags.squareSpace },
+    { id:'square_life_v37_9_ach', icon:'🌟', name:'广场舞人生', desc:'在广场舞中找到了归属感', check: g => g.flags.squareLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
