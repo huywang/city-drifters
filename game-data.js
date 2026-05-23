@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v35.5
+// 都市浮生记 - 数据文件 v35.6
 // ============================================
 
 
@@ -20724,6 +20724,89 @@ const EVENTS = [
         { label:'开始享受每一次旅途', hint:'+😊 +🏥', fn: g => { g.flags.licensePhilosophy=true; g.flags.journeyLover=true; return{mood:18,health:8}; }},
       ]},
 
+    // ===== 城市租房与安家故事 (v35.6) =====
+
+    { id:'rent_first_v35_6', icon:'🏠', title:'第一次租房', category:'rent',
+      body:'你刚到这座城市，需要找一个住的地方。\n\n你在网上看了几百个房源。预算：2500元/月。需求：离地铁近、有独立卫生间、不要太旧。\n\n现实告诉你：2500元在这座城市只能租到——\n- 一间10平米的隔断房（没有窗户）\n- 一间20平米的老小区合租房（隔壁住着一对情侣）\n- 一间30平米的城中村单间（楼下是烧烤摊）\n\n你选了那间隔断房。至少它有空调。\n\n搬进去的第一天，你把行李箱打开。房间小到行李箱都打不开。\n\n你坐在床上，看着四周的白墙。这是你在大城市的第一个「家」。\n\n虽然它很小，虽然它很简陋——但它是你在这座城市唯一的避风港。',
+      cond: g => g.age >= 18 && !g.flags.rentFirst,
+      choices:[
+        { label:'努力适应，把小房间收拾得很温馨', hint:'+😊 +✨', fn: g => { g.flags.rentFirst=true; g.flags.tidyRenter=true; return{mood:5,charm:5,money:-2500}; }},
+        { label:'觉得太憋屈了，开始攒钱换房', hint:'+💰', fn: g => { g.flags.rentFirst=true; g.flags.ambitiousRenter=true; return{mood:-5,money:-2500}; }},
+        { label:'想家了，想回老家', hint:'', fn: g => { g.flags.rentFirst=true; g.flags.homesick=true; return{mood:-10,money:-2500}; }},
+      ]},
+
+    { id:'rent_upgrade_v35_6', icon:'🏡', title:'换个好点的房子', category:'rent',
+      body:'你涨工资了。你决定换个好点的房子。\n\n你的新预算：4000元/月。你找了一个月，终于找到了一间——\n\n35平米的一居室，有独立厨房和卫生间。窗户对着小区的花园。阳光很好。\n\n搬进去的那天你哭了。不是因为感动，是因为——\n\n你终于有了一个可以叫「家」的地方。\n\n你买了一盆绿植放在窗台上。你买了一套好看的餐具。你在墙上挂了一幅画。\n\n你妈视频通话的时候看到了：「你住的地方不错嘛，多少钱一个月？」\n\n你说：「4000。」\n\n你妈：「太贵了！我们这2000能租到三室一厅。」\n\n你笑了笑，没说话。因为你知道：在这座城市，4000块买到的是「尊严」。',
+      cond: g => g.age >= 20 && g.flags.rentFirst && g.jobSalary >= 8000 && !g.flags.rentUpgrade,
+      choices:[
+        { label:'开始认真布置自己的小家', hint:'+😊 +✨', fn: g => { g.flags.rentUpgrade=true; g.flags.homeDecor=true; return{mood:15,charm:8,money:-4000}; }},
+        { label:'虽然好多了但还是觉得贵', hint:'', fn: g => { g.flags.rentUpgrade=true; return{mood:5,money:-4000}; }},
+        { label:'觉得租房不划算，开始存钱买房', hint:'+💰 +🧠', fn: g => { g.flags.rentUpgrade=true; g.flags.saveForHouse=true; return{intel:5,money:-4000}; }},
+      ]},
+
+    { id:'rent_dream_v35_6', icon:'💭', title:'租房白日梦', category:'rent',
+      body:'你在网上看了一圈房价。\n\n你所在区域的小户型（60平米）：均价300万。\n\n你算了算：首付30% = 90万。月供（30年）= 约12000元/月。\n\n你的存款：5万。\n你需要的年数（不吃不喝）：17年。\n\n你关掉网页。\n\n然后你又打开了。看了一些「梦想住宅」的图片：\n- 带落地窗的loft公寓\n- 有天台花园的小洋房\n- 面朝大海的海景房\n\n你知道你这辈子可能都买不起这些房子。但你可以做白日梦。\n\n你在朋友圈发了条：「梦想的房子 vs 现实的出租屋。」配图是一张豪宅图和一张你房间角落的对比。\n\n获得了200个赞。评论区全是：「同感。」\n\n你开始理解：在大城市，房子不只是住所，它是一个关于「归属感」的隐喻。',
+      cond: g => g.age >= 22 && g.flags.rentFirst && !g.flags.rentDream,
+      choices:[
+        { label:'接受现实，把出租屋也当自己家', hint:'+😊 +🧠', fn: g => { g.flags.rentDream=true; g.flags.acceptRent=true; return{mood:8,intel:8}; }},
+        { label:'被刺激到了，开始拼命存钱', hint:'+💰', fn: g => { g.flags.rentDream=true; g.flags.saveForHouse=true; return{money:5000,mood:-5}; }},
+        { label:'考虑回老家买房', hint:'+🧠', fn: g => { g.flags.rentDream=true; g.flags.considerHometown=true; return{intel:5,mood:-3}; }},
+      ]},
+
+    { id:'rent_neighbors_v35_6', icon:'🏘️', title:'邻里关系', category:'rent',
+      body:'你搬进新房子后开始和邻居打交道。\n\n楼上住着一个独居老太太。她每天早上6点开始拖地，声音很大。你想投诉但不好意思。\n\n对门住着一对年轻夫妻。他们经常在半夜吵架，你能听到每一个字。\n\n楼下住着一个加班到凌晨的程序员。他每天凌晨2点回家，拖鞋声「啪啪啪」的。\n\n你开始理解：租房不只是租一个房间，而是和一群陌生人共享一栋楼。\n\n有一天你出门的时候碰到了楼上老太太。她笑着递给你一袋苹果：「小伙子/小姑娘，我自己种的，你尝尝。」\n\n你接过来。苹果很甜。\n\n你突然觉得：虽然邻居们有点吵，但这栋楼有了「人味」。',
+      cond: g => g.age >= 20 && g.flags.rentFirst && !g.flags.rentNeighbors,
+      choices:[
+        { label:'和邻居们建立了良好的关系', hint:'+👥 +😊', fn: g => { g.flags.rentNeighbors=true; g.flags.goodNeighbor=true; return{social:12,mood:10}; }},
+        { label:'偶尔打招呼，保持距离', hint:'+👥', fn: g => { g.flags.rentNeighbors=true; return{social:5,mood:3}; }},
+        { label:'受不了噪音，考虑搬家', hint:'', fn: g => { g.flags.rentNeighbors=true; return{mood:-8}; }},
+      ]},
+
+    { id:'rent_home_v35_6', icon:'🏡', title:'什么是家', category:'rent',
+      body:'你搬了很多次家。每一次搬家你都会想：「到底什么是家？」\n\n你问过朋友们的答案：\n- 「有爱的人的地方就是家。」（浪漫派）\n- 「有房产证的地方才是家。」（现实派）\n- 「有WiFi和空调的地方就是家。」（实用派）\n- 「回家不用假装坚强的地方就是家。」（感性派）\n\n你看着自己的出租屋。墙上挂着照片，书架上摆着书，窗台上的植物已经长出了新叶子。\n\n你的猫（如果你有猫的话）趴在沙发上等你回家。\n\n你开始理解：「家」不是一个地址，而是一种感觉。\n\n是下班回来推开门的那一刻，是洗完热水澡躺在床上的那一刻，是周末睡到自然醒的那一刻。\n\n在这些时刻里，你不需要扮演任何人。你只需要做你自己。\n\n这就是家。',
+      cond: g => g.age >= 22 && g.flags.rentFirst && (g.flags.rentUpgrade || g.flags.rentDream) && !g.flags.rentHome,
+      choices:[
+        { label:'在出租屋里找到了家的感觉', hint:'+😊 +✨', fn: g => { g.flags.rentHome=true; g.flags.homeFound=true; return{mood:18,charm:8}; }},
+        { label:'还是觉得没有房子就没有家', hint:'', fn: g => { g.flags.rentHome=true; g.flags.houseAnxiety=true; return{mood:-5,money:3000}; }},
+        { label:'开始存钱准备买房', hint:'+💰 +🧠', fn: g => { g.flags.rentHome=true; g.flags.saveForHouse=true; return{intel:8,money:5000}; }},
+      ]},
+
+    { id:'rent_buy_v35_6', icon:'🔑', title:'买房了', category:'rent',
+      body:'经过几年的努力，你终于攒够了首付。\n\n你在郊区买了一套60平米的小两居。总价200万，首付60万，月供8000元，30年。\n\n签合同的时候你的手在抖。60万，是你所有的积蓄加上爸妈的支持。\n\n拿到钥匙的那天，你一个人走进了空荡荡的新房。\n\n你站在客厅中间，慢慢转了一圈。这是你的房子。你的家。\n\n你打了电话给妈妈：「妈，我买房了。」\n\n你妈在电话那头哭了：「终于有自己家了……」\n\n你坐在地上，看着窗外的夕阳。你知道：接下来30年你要还房贷，你不能轻易换工作了，你要省吃俭用了。\n\n但你也知道：在这个城市漂泊了这么多年，你终于有了一个真正属于自己的角落。\n\n你在新家的第一晚，你失眠了。不是因为焦虑，而是因为太开心了。',
+      cond: g => g.age >= 25 && g.money >= 60000 && g.jobSalary >= 15000 && !g.flags.buyHouse,
+      choices:[
+        { label:'开始装修自己的新家', hint:'+😊 +✨ -💰', fn: g => { g.flags.buyHouse=true; g.flags.homeOwner=true; return{mood:25,charm:12,money:-80000}; }},
+        { label:'虽然开心但压力也很大', hint:'+😊 -💰', fn: g => { g.flags.buyHouse=true; g.flags.mortgageStress=true; return{mood:10,money:-80000}; }},
+        { label:'请所有朋友来暖房', hint:'+👥 +😊 -💰', fn: g => { g.flags.buyHouse=true; g.flags.houseWarming=true; return{mood:20,social:15,money:-85000}; }},
+      ]},
+
+    { id:'rent_decorate_v35_6', icon:'🎨', title:'装修之路', category:'rent',
+      body:'你开始装修了。\n\n你以为装修很简单：选个风格、找个师傅、等几个月就好了。\n\n现实告诉你：装修是「人生最让人崩溃的事」前三名。\n\n- 工人说三天完工，结果用了两周\n- 瓷砖颜色和图片不一样（「色差」）\n- 柜子尺寸做错了，要重新做\n- 水电改造比预算多了2万\n- 你和装修公司吵了3次\n\n你每天下班都要去工地看看。你成了半个装修专家。\n\n3个月后终于完工了。总花费：15万（预算8万）。\n\n但当你走进装修好的新家时——你觉得一切都值了。\n\n客厅是你喜欢的风格，厨房有你想要的灶台，卫生间有你梦想的浴缸。\n\n你坐在沙发上，环顾四周。这是你第一次觉得：「这就是我的家。」',
+      cond: g => g.age >= 25 && g.flags.buyHouse && !g.flags.rentDecorate,
+      choices:[
+        { label:'爱上了自己的新家', hint:'+😊 +✨', fn: g => { g.flags.rentDecorate=true; g.flags.homeLove=true; return{mood:20,charm:15,money:-150000}; }},
+        { label:'装修太累了，短期内不想再装了', hint:'+😊', fn: g => { g.flags.rentDecorate=true; return{mood:10,health:-8,money:-150000}; }},
+        { label:'发现很多不满意的地方', hint:'', fn: g => { g.flags.rentDecorate=true; return{mood:-5,money:-150000}; }},
+      ]},
+
+    { id:'rent_community_v35_6', icon:'🏢', title:'小区生活', category:'rent',
+      body:'你搬进了自己的房子，开始了「小区生活」。\n\n小区里有：\n- 一个广场舞团（每天早上7点到9点）\n- 一个业主群（每天都有人吵架）\n- 一个快递柜（永远满的）\n- 一只小区猫（所有人都喜欢它）\n- 一个物业（永远在修水管）\n\n你在业主群里看到了各种消息：\n- 「3号楼谁家的狗半夜叫？」\n- 「地下车库的灯坏了，什么时候修？」\n- 「小区门口新开了个菜市场，好方便！」\n- 「有人要团购水果吗？」\n\n你参加了水果团购。5斤芒果只要25元。\n\n你发现：小区生活虽然琐碎，但它让你有了一种「根」的感觉。\n\n你不再是一个「漂泊者」了。你是一个「业主」。你有邻居，你有物业，你有一只小区猫。',
+      cond: g => g.age >= 25 && g.flags.buyHouse && !g.flags.rentCommunity,
+      choices:[
+        { label:'成了小区活跃分子', hint:'+👥 +😊', fn: g => { g.flags.rentCommunity=true; g.flags.communityActive=true; return{social:12,mood:10}; }},
+        { label:'安安静静过自己的日子', hint:'+😊', fn: g => { g.flags.rentCommunity=true; return{mood:8}; }},
+        { label:'觉得业主群太吵了，静音了', hint:'', fn: g => { g.flags.rentCommunity=true; return{mood:-3,social:-3}; }},
+      ]},
+
+    { id:'rent_philosophy_v35_6', icon:'🏗️', title:'房子的意义', category:'rent',
+      body:'你回顾自己和房子的故事。\n\n从10平米的隔断房，到35平米的一居室，到60平米的小两居……\n\n每一次搬家都是一次成长。\n\n你开始思考：房子对你来说到底意味着什么？\n\n有人说：房子是「安全感」。有了房子就不怕被房东赶走。\n有人说：房子是「社会地位」。有房子的人才有资格谈婚论嫁。\n有人说：房子是「投资」。买了就赚了。\n有人说：房子是「枷锁」。30年房贷让你不敢辞职不敢生病。\n\n你觉得以上都对，但也都不全对。\n\n对你来说，房子是——\n\n「在这座城市打拼了这么多年，我终于有了一个地方，可以放下所有的面具，做回我自己。」\n\n你在朋友圈写了一段话：\n\n「房子不大，但装得下我的梦想。房贷很重，但压不垮我的脊梁。\n在这个城市，我可能永远是个普通人。但至少，我是一个有家的普通人。」',
+      cond: g => g.age >= 26 && (g.flags.buyHouse || g.flags.rentHome) && g.intel > 40,
+      choices:[
+        { label:'房子是家，不是商品', hint:'+😊 +🧠', fn: g => { g.flags.rentPhilosophy=true; return{mood:18,intel:12}; }},
+        { label:'开始考虑投资第二套房', hint:'+💰', fn: g => { g.flags.rentPhilosophy=true; g.flags.investHouse=true; return{intel:10,money:-100000}; }},
+        { label:'写了篇关于城市居住的文章', hint:'+🧠 +💰', fn: g => { g.flags.rentPhilosophy=true; g.flags.housingWriter=true; return{intel:15,money:5000,charm:12}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -22767,6 +22850,16 @@ const ACHIEVEMENTS = [
     { id:'roadtrip_v35_5_ach', icon:'🗺️', name:'自驾游', desc:'和朋友一起开车去旅行', check: g => g.flags.roadTripDrive },
     { id:'ev_v35_5_ach', icon:'🔋', name:'电车时代', desc:'思考了电动车与传统车的选择', check: g => g.flags.evConsider },
     { id:'license_philosophy_v35_5_ach', icon:'🛤️', name:'驾驶的意义', desc:'理解了开车对人生的意义', check: g => g.flags.licensePhilosophy },
+    // v35.6 城市租房与安家故事
+    { id:'rent_first_v35_6_ach', icon:'🏠', name:'第一次租房', desc:'在大城市找到了第一个住所', check: g => g.flags.rentFirst },
+    { id:'rent_upgrade_v35_6_ach', icon:'🏡', name:'换个好房子', desc:'升级了居住条件', check: g => g.flags.rentUpgrade },
+    { id:'rent_dream_v35_6_ach', icon:'💭', name:'租房白日梦', desc:'幻想过拥有自己的房子', check: g => g.flags.rentDream },
+    { id:'rent_neighbors_v35_6_ach', icon:'🏘️', name:'邻里关系', desc:'和邻居们建立了联系', check: g => g.flags.rentNeighbors },
+    { id:'rent_home_v35_6_ach', icon:'🏡', name:'什么是家', desc:'在出租屋里找到了家的感觉', check: g => g.flags.rentHome },
+    { id:'buy_house_v35_6_ach', icon:'🔑', name:'买房了', desc:'终于拥有了自己的房子', check: g => g.flags.buyHouse },
+    { id:'rent_decorate_v35_6_ach', icon:'🎨', name:'装修之路', desc:'经历了装修的酸甜苦辣', check: g => g.flags.rentDecorate },
+    { id:'rent_community_v35_6_ach', icon:'🏢', name:'小区生活', desc:'融入了小区的日常', check: g => g.flags.rentCommunity },
+    { id:'rent_philosophy_v35_6_ach', icon:'🏗️', name:'房子的意义', desc:'理解了房子对漂泊者的深层含义', check: g => g.flags.rentPhilosophy },
 ];
 
 // === ENDINGS === (order matters: first match wins)
