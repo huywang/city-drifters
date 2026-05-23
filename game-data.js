@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v38.9
+// 都市浮生记 - 数据文件 v39.0
 // ============================================
 
 
@@ -23538,6 +23538,81 @@ const EVENTS = [
         { label:'继续做一个珍惜每段旅程的旅人', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.stationLife=true; return{mood:12,social:5,intel:5}; }},
       ]},
 
+    // ═══ v39.0 驾校与学车文化 ═══
+    { id:'driving_school_enroll_v39_0', icon:'📝', title:'驾校报名', category:'driving_school',
+      body:'大学室友拉你去报名驾校：趁着年轻赶紧把驾照考了！你交了三千八百块报名费，开始了漫长的学车之路。报名那天驾校人山人海，有刚高考完的学生，有被老婆逼来的中年男人，还有六七十岁的老大爷。教练看了一眼你的资料：又一个大学生，好，从明天开始练车。你的人生新技能之旅，就这样开始了。',
+      cond: g => g.age >= 18 && g.age <= 35 && !g.flags.drivingSchoolEnroll,
+      choices:[
+        { label:'信心满满地开始了', hint:'+😊', fn: g => { g.flags.drivingSchoolEnroll=true; return{mood:5}; }},
+        { label:'有点紧张但硬着头皮上了', hint:'+🧠', fn: g => { g.flags.drivingSchoolEnroll=true; return{intel:3}; }},
+      ]},
+    { id:'driving_school_exam1_v39_0', icon:'📱', title:'科目一刷题', category:'driving_school',
+      body:'科目一的题库有一千多道题，你天天抱着手机刷题。红灯停绿灯行这种常识还好，但那些数字题让你崩溃——限速多少、距离多少、罚款多少。室友说有个技巧：三长一短选最短，三短一长选最长，长短不一选B。你半信半疑地走进了考场。交卷那一刻，屏幕上显示98分——你过了！唯一错的那道题是：遇到行人应该怎么做？你选了按喇叭。',
+      cond: g => g.flags.drivingSchoolEnroll && !g.flags.drivingSchoolExam1,
+      choices:[
+        { label:'98分！一次通过', hint:'+😊 +🧠', fn: g => { g.flags.drivingSchoolExam1=true; return{mood:8,intel:5}; }},
+        { label:'第一次没过，补考才过', hint:'+💪', fn: g => { g.flags.drivingSchoolExam1=true; g.flags.exam1Retry=true; return{health:-3}; }},
+      ]},
+    { id:'driving_school_exam2_v39_0', icon:'🚗', title:'科目二的噩梦', category:'driving_school',
+      body:'倒车入库、侧方停车、S弯、直角转弯、坡道起步——科目二的五个项目成了你的噩梦。教练坐在副驾驶上，一边抽烟一边骂：方向盘往哪打呢？眼睛看后视镜！离合器慢点抬！你在训练场上练了一个月，每天被晒得黑黑的，手上全是茧子。考试那天，你紧张得手心出汗，上车后大脑一片空白。倒车入库的时候，你听到了那句最可怕的话：考试不合格。',
+      cond: g => g.flags.drivingSchoolExam1 && !g.flags.drivingSchoolExam2,
+      choices:[
+        { label:'咬着牙继续练，第二次终于过了', hint:'+💪 +😊', fn: g => { g.flags.drivingSchoolExam2=true; g.flags.exam2Retry=true; return{health:-5,mood:5}; }},
+        { label:'第一次就一把过，天赋异禀', hint:'+😊 +✨', fn: g => { g.flags.drivingSchoolExam2=true; return{mood:12,charm:5}; }},
+        { label:'挂了两次，想放弃了', hint:'-😊', fn: g => { g.flags.drivingSchoolExam2=true; g.flags.exam2Multiple=true; return{mood:-8}; }},
+      ]},
+    { id:'driving_school_exam3_v39_0', icon:'🛣️', title:'科目三路考', category:'driving_school',
+      body:'科目三要上路考试了。教练说这是最简单的一科，但你心里没底。练车的时候你第一次真正开上了马路，旁边的车呼呼地过，你紧张得方向盘都在抖。教练说：你这样上路，别人还以为你是酒驾呢。考试那天，安全员坐在旁边，你系好安全带，打转向灯，起步。一切都很顺利，直到最后靠边停车的时候，你忘了拉手刹。还好安全员帮你拉了，算你过了。',
+      cond: g => g.flags.drivingSchoolExam2 && !g.flags.drivingSchoolExam3,
+      choices:[
+        { label:'有惊无险地通过了', hint:'+😊 +💪', fn: g => { g.flags.drivingSchoolExam3=true; return{mood:8,health:3}; }},
+        { label:'路考也挂了，补考才过', hint:'-😊', fn: g => { g.flags.drivingSchoolExam3=true; g.flags.exam3Retry=true; return{mood:-5,money:-500}; }},
+      ]},
+    { id:'driving_school_coach_v39_0', icon:'😤', title:'驾校教练', category:'driving_school',
+      body:'你的教练是个四十多岁的中年男人，皮肤黝黑，嗓门巨大。他的经典语录你都能背下来了：你踩的是刹车还是我的脚？方向盘上挂块肉，狗都比你开得好！我教了二十年车，没见过你这么笨的！但有一次你练得特别好，他难得夸了你一句：还行，有点感觉了。那一刻你觉得比拿了奖金还开心。后来听说教练因为骂学员被投诉了，但他其实人不坏，就是脾气急。',
+      cond: g => g.flags.drivingSchoolEnroll && (g.flags.drivingSchoolExam2 || g.flags.exam2Retry) && !g.flags.drivingSchoolCoach,
+      choices:[
+        { label:'和教练成了朋友，毕业后还请他吃饭', hint:'+❤️ +😊', fn: g => { g.flags.drivingSchoolCoach=true; return{social:8,mood:5,money:-200}; }},
+        { label:'默默忍受，毕业后再也不想见他', hint:'+💪', fn: g => { g.flags.drivingSchoolCoach=true; return{health:-3}; }},
+        { label:'投诉了教练的态度', hint:'+✨', fn: g => { g.flags.drivingSchoolCoach=true; g.flags.coachComplaint=true; return{charm:3}; }},
+      ]},
+    { id:'driving_school_partner_v39_0', icon:'👫', title:'学车搭子', category:'driving_school',
+      body:'和你一起练车的是个叫小王的姑娘，她也是大学生，暑假来学车的。她比你先报名，技术比你好，倒车入库一把就能进。每次你被教练骂，她都偷偷给你递纸巾。你们在训练场等了无数个无聊的下午，一起吐槽教练，一起分享零食，一起为考试紧张。考完科目三那天，她主动加了你微信：以后一起练车啊。后来你们偶尔约着一起开车出去玩，那段学车时光反而成了美好的回忆。',
+      cond: g => g.flags.drivingSchoolEnroll && !g.flags.drivingSchoolPartner,
+      choices:[
+        { label:'成为了很好的朋友', hint:'+❤️ +😊', fn: g => { g.flags.drivingSchoolPartner=true; return{social:8,mood:8}; }},
+        { label:'只是点头之交，毕业后就没联系了', hint:'+🧠', fn: g => { g.flags.drivingSchoolPartner=true; return{intel:3}; }},
+      ]},
+    { id:'driving_school_funny_v39_0', icon:'😂', title:'驾校那些事', category:'driving_school',
+      body:'驾校里每天都有好笑的事。有个大哥练坡道起步，车往后溜了五米，吓得后面的人全跑了。有个阿姨分不清左右，教练让她往左打方向盘，她往右看了三秒然后往右打。有个小伙子上车就把安全带插到了副驾驶的安全扣里，教练问他是不是要保护旁边的空气。最绝的是一个老大爷，练完车非要请教练喝酒，教练说不了我还要接下一批学员，大爷说那你把酒带上，晚上我去你家。',
+      cond: g => g.flags.drivingSchoolEnroll && !g.flags.drivingSchoolFunny,
+      choices:[
+        { label:'笑得肚子疼，驾校是段子生产基地', hint:'+😊', fn: g => { g.flags.drivingSchoolFunny=true; return{mood:10}; }},
+        { label:'把这些趣事拍成了短视频', hint:'+✨', fn: g => { g.flags.drivingSchoolFunny=true; g.flags.drivingVideo=true; return{charm:8}; }},
+      ]},
+    { id:'driving_school_retry_v39_0', icon:'😰', title:'挂科重考', category:'driving_school',
+      body:'驾校里流传着一句话：不挂科的学车人生是不完整的。但挂科的滋味真的不好受。你要重新交补考费，重新预约，重新练车，重新面对教练那张铁青的脸。最惨的是你的同学已经拿到驾照开始自驾游了，你还在和倒车入库较劲。你一度怀疑自己是不是不适合开车。但教练说了一句让你释然的话：我当年也挂过，科目二挂了三次。原来老司机也有黑历史。',
+      cond: g => (g.flags.exam2Retry || g.flags.exam2Multiple || g.flags.exam3Retry) && !g.flags.drivingSchoolRetry,
+      choices:[
+        { label:'越挫越勇，终于全部通过了', hint:'+💪 +😊', fn: g => { g.flags.drivingSchoolRetry=true; return{health:5,mood:8}; }},
+        { label:'开始怀疑人生，但硬着头皮继续', hint:'+🧠', fn: g => { g.flags.drivingSchoolRetry=true; return{intel:5}; }},
+      ]},
+    { id:'driving_school_license_v39_0', icon:'🪪', title:'拿证时刻', category:'driving_school',
+      body:'当你在车管所拿到那本黑色小本本的时候，你激动得差点哭出来。翻开来，上面是你的照片和名字，还有一行字：准驾车型C1。你发了条朋友圈：终于有证了！下面一堆点赞和评论：恭喜恭喜！借我开开！你敢上路吗？你拿着驾照翻来覆去看了好几遍，感觉这几个月的辛苦都值了。但你也知道，拿到驾照和真正会开车，完全是两码事。',
+      cond: g => g.flags.drivingSchoolExam3 && !g.flags.drivingSchoolLicense,
+      choices:[
+        { label:'发朋友圈炫耀，感觉自己终于成了大人', hint:'+😊 +✨', fn: g => { g.flags.drivingSchoolLicense=true; return{mood:15,charm:5}; }},
+        { label:'默默收好，这只是开始', hint:'+🧠', fn: g => { g.flags.drivingSchoolLicense=true; return{intel:8}; }},
+      ]},
+    { id:'driving_school_life_v39_0', icon:'🌟', title:'驾校人生', category:'driving_school',
+      body:'很多年后你回忆起来，驾校竟然是人生中一段特别的经历。那时候你什么都没有，只有一腔热血和一本驾照。你第一次摸方向盘的紧张，第一次倒车入库成功的喜悦，第一次上路被教练骂的委屈，都变成了笑谈。驾校教给你的不只是开车的技术——它教会你，面对一件完全陌生的事情，从零开始，一步步克服困难，最终拿到属于自己的那张通行证。人生很多事，和学车一样：一开始都不会，但坚持就能学会。',
+      cond: g => g.flags.drivingSchoolLicense && g.age >= 25 && !g.flags.drivingSchoolLife,
+      choices:[
+        { label:'自驾游成了你最大的爱好', hint:'+😊 +❤️', fn: g => { g.flags.drivingSchoolLife=true; return{mood:12,social:5}; }},
+        { label:'写了一篇关于驾校的回忆文章', hint:'+✨ +🧠', fn: g => { g.flags.drivingSchoolLife=true; return{charm:10,intel:5}; }},
+        { label:'感恩那段从零开始的经历', hint:'+😊 +🧠', fn: g => { g.flags.drivingSchoolLife=true; return{mood:8,intel:8}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -25960,6 +26035,17 @@ const ACHIEVEMENTS = [
     { id:'station_arrive_v38_9_ach', icon:'🏁', name:'到站了', desc:'终于回到了魂牵梦萦的家乡', check: g => g.flags.stationArrive },
     { id:'station_meet_v38_9_ach', icon:'🫂', name:'久别重逢', desc:'在出站口等到了想见的人', check: g => g.flags.stationMeet },
     { id:'station_life_v38_9_ach', icon:'🌟', name:'站台人生', desc:'明白人生就是一趟列车，有人上有人下', check: g => g.flags.stationLife },
+    // v39.0 驾校与学车文化
+    { id:'driving_school_enroll_v39_0_ach', icon:'📝', name:'驾校新生', desc:'报名开始了学车之路', check: g => g.flags.drivingSchoolEnroll },
+    { id:'driving_school_exam1_v39_0_ach', icon:'📱', name:'刷题达人', desc:'科目一一次通过', check: g => g.flags.drivingSchoolExam1 && !g.flags.exam1Retry },
+    { id:'driving_school_exam2_v39_0_ach', icon:'🚗', name:'倒车入库', desc:'征服了科目二的五个项目', check: g => g.flags.drivingSchoolExam2 },
+    { id:'driving_school_exam3_v39_0_ach', icon:'🛣️', name:'上路新手', desc:'科目三路考顺利通过', check: g => g.flags.drivingSchoolExam3 && !g.flags.exam3Retry },
+    { id:'driving_school_coach_v39_0_ach', icon:'😤', name:'教练的噩梦', desc:'经历了驾校教练的毒舌洗礼', check: g => g.flags.drivingSchoolCoach },
+    { id:'driving_school_partner_v39_0_ach', icon:'👫', name:'学车搭子', desc:'在驾校交到了好朋友', check: g => g.flags.drivingSchoolPartner },
+    { id:'driving_school_funny_v39_0_ach', icon:'😂', name:'段子手驾校', desc:'收集了驾校里最好笑的段子', check: g => g.flags.drivingSchoolFunny },
+    { id:'driving_school_retry_v39_0_ach', icon:'💪', name:'越挫越勇', desc:'挂科后没有放弃，最终通关', check: g => g.flags.drivingSchoolRetry },
+    { id:'driving_school_license_v39_0_ach', icon:'🪪', name:'有证一族', desc:'终于拿到了那本黑色小本本', check: g => g.flags.drivingSchoolLicense },
+    { id:'driving_school_life_v39_0_ach', icon:'🌟', name:'驾校人生', desc:'明白学车只是开始，人生处处都是从零到一', check: g => g.flags.drivingSchoolLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
