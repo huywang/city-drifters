@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v35.8
+// 都市浮生记 - 数据文件 v35.9
 // ============================================
 
 
@@ -20981,6 +20981,88 @@ const EVENTS = [
         { label:'只是安静地坐着，看窗外的人来人往', hint:'+😊 +🧠', fn: g => { g.flags.coffeeThirdSpace=true; return{mood:10,intel:8,charm:5}; }},
       ]},
 
+    // === v35.9 健身与运动文化 ===
+    { id:'fitness_gym_v35_9', icon:'🏋️', title:'办了张健身卡', category:'fitness',
+      body:'新年flag之一就是健身。你在公司附近的健身房办了张年卡，花了两千多。教练热情地带你参观，说"三个月出效果"。你看着满屋子的器械，信心满满。',
+      cond: g => g.age >= 20 && g.age <= 45 && !g.flags.fitnessGym && g.money > 3000 && g.health < 70,
+      choices:[
+        { label:'还请了私教，花了一万多', hint:'-💰 +❤️ +✨', fn: g => { g.flags.fitnessGym=true; g.flags.fitnessTrainer=true; return{money:-12000,health:5,charm:3}; }},
+        { label:'自己摸索着练', hint:'-💰 +❤️', fn: g => { g.flags.fitnessGym=true; return{money:-2400,health:3}; }},
+        { label:'只办了卡，去了三次就没再去', hint:'-💰', fn: g => { g.flags.fitnessGym=true; g.flags.fitnessQuit=true; return{money:-2400,mood:-3}; }},
+      ]},
+    { id:'fitness_run_v35_9', icon:'🏃', title:'开始跑步', category:'fitness',
+      body:'同事说跑步是最便宜的运动。你买了双跑鞋，晚上下班后在小区里跑了三公里，累得半死。但洗完澡之后那种通透感，让你觉得好像还挺爽的。',
+      cond: g => g.age >= 20 && !g.flags.fitnessRun && g.health < 75,
+      choices:[
+        { label:'每天坚持跑五公里', hint:'+❤️ +😊', fn: g => { g.flags.fitnessRun=true; g.flags.fitnessDaily=true; return{health:8,mood:6}; }},
+        { label:'隔天跑三公里，慢慢来', hint:'+❤️', fn: g => { g.flags.fitnessRun=true; return{health:5,mood:3}; }},
+        { label:'跑了一周就放弃了，太累', hint:'-😊', fn: g => { g.flags.fitnessRun=true; g.flags.fitnessGaveUp=true; return{mood:-3}; }},
+      ]},
+    { id:'fitness_yoga_v35_9', icon:'🧘', title:'瑜伽入门', category:'fitness',
+      body:'朋友拉你去上了一节瑜伽体验课。老师的声音很温柔，但你发现自己硬得像个木板，连弯腰摸脚都做不到。课后浑身酸痛，但睡眠质量出奇的好。',
+      cond: g => g.age >= 22 && !g.flags.fitnessYoga && (g.mood < 60 || g.health < 65),
+      choices:[
+        { label:'报了瑜伽年卡，每周去三次', hint:'-💰 +❤️ +😊', fn: g => { g.flags.fitnessYoga=true; g.flags.fitnessYogaFan=true; return{money:-5000,health:6,mood:8}; }},
+        { label:'偶尔去体验一下', hint:'-💰 +😊', fn: g => { g.flags.fitnessYoga=true; return{money:-200,mood:4,health:2}; }},
+        { label:'在家跟着视频练', hint:'+❤️', fn: g => { g.flags.fitnessYoga=true; g.flags.fitnessHome=true; return{health:3,mood:3}; }},
+      ]},
+    { id:'fitness_meal_v35_9', icon:'🥗', title:'健身餐', category:'fitness',
+      body:'健身教练说"三分练七分吃"。你开始研究营养搭配，每天吃水煮鸡胸肉和西兰花。第三天的时候你看着同事的麻辣烫，差点哭了。',
+      cond: g => g.age >= 22 && (g.flags.fitnessGym || g.flags.fitnessRun) && !g.flags.fitnessMeal && g.health < 70,
+      choices:[
+        { label:'严格执行健身餐计划', hint:'+❤️ -😊 -💰', fn: g => { g.flags.fitnessMeal=true; g.flags.fitnessDiet=true; return{health:8,mood:-5,money:-500}; }},
+        { label:'大体健康饮食，偶尔放纵', hint:'+❤️ +😊', fn: g => { g.flags.fitnessMeal=true; return{health:5,mood:3}; }},
+        { label:'吃了一周就放弃了，人生不能没有火锅', hint:'+😊 -❤️', fn: g => { g.flags.fitnessMeal=true; g.flags.fitnessCheat=true; return{mood:5,health:-2}; }},
+      ]},
+    { id:'fitness_group_v35_9', icon:'👟', title:'加入跑团', category:'fitness',
+      body:'你在keep上找到本地跑团，周末一起刷了个十公里。跑完大家一起吃早午餐，聊工作聊生活。你发现跑步不只是运动，更是一种社交方式。',
+      cond: g => g.age >= 22 && g.flags.fitnessRun && !g.flags.fitnessGroup && g.social > 20,
+      choices:[
+        { label:'成了跑团的活跃成员', hint:'+👥 +❤️ +😊', fn: g => { g.flags.fitnessGroup=true; g.flags.fitnessActive=true; return{social:10,health:5,mood:6}; }},
+        { label:'参加了几次活动，认识了新朋友', hint:'+👥 +😊', fn: g => { g.flags.fitnessGroup=true; return{social:6,mood:4}; }},
+        { label:'觉得人太多了，还是喜欢一个人跑', hint:'+❤️', fn: g => { g.flags.fitnessGroup=true; g.flags.fitnessSolo=true; return{health:3,mood:2}; }},
+      ]},
+    { id:'fitness_social_v35_9', icon:'📱', title:'运动社交', category:'fitness',
+      body:'你开始在朋友圈晒跑步数据和健身照片，收获了不少点赞。有人私信你请教跑步技巧，有人约你一起晨跑。你从一个社恐变成了运动圈里的小网红。',
+      cond: g => g.age >= 22 && (g.flags.fitnessGroup || g.flags.fitnessDaily) && !g.flags.fitnessSocial && g.charm > 20,
+      choices:[
+        { label:'开了个运动博主账号', hint:'+✨ +👥 +💰', fn: g => { g.flags.fitnessSocial=true; g.flags.fitnessInfluencer=true; return{charm:10,social:8,money:2000}; }},
+        { label:'只是和朋友分享运动日常', hint:'+👥 +😊', fn: g => { g.flags.fitnessSocial=true; return{social:6,mood:4}; }},
+        { label:'被运动品牌邀请做产品体验', hint:'+💰 +✨', fn: g => { g.flags.fitnessSocial=true; g.flags.fitnessSponsor=true; return{money:3000,charm:8}; }},
+      ]},
+    { id:'fitness_addict_v35_9', icon:'💪', title:'健身成瘾', category:'fitness',
+      body:'你发现自己不练就不舒服，一周要练六天。朋友说你太拼了，但你享受每次突破的感觉。只是膝盖开始隐隐作痛，健身教练建议你适当休息。',
+      cond: g => g.age >= 23 && (g.flags.fitnessDaily || g.flags.fitnessTrainer) && !g.flags.fitnessAddict && g.health > 60,
+      choices:[
+        { label:'听教练的话，调整训练计划', hint:'+❤️ +🧠', fn: g => { g.flags.fitnessAddict=true; g.flags.fitnessBalance=true; return{health:5,intel:3}; }},
+        { label:'膝盖疼也继续练，不能停', hint:'-❤️ +✨', fn: g => { g.flags.fitnessAddict=true; g.flags.fitnessInjury=true; return{health:-8,charm:5}; }},
+        { label:'转做低强度运动，游泳和瑜伽', hint:'+❤️ +😊', fn: g => { g.flags.fitnessAddict=true; g.flags.fitnessSwitch=true; return{health:3,mood:5}; }},
+      ]},
+    { id:'fitness_marathon_v35_9', icon:'🏅', title:'跑马拉松', category:'fitness',
+      body:'你报名了城市马拉松的半马项目。训练了三个月，比赛那天凌晨四点就起来了。跑到15公里的时候腿像灌了铅，但终点线前你忍不住加速冲了过去。',
+      cond: g => g.age >= 24 && g.flags.fitnessRun && (g.flags.fitnessGroup || g.flags.fitnessDaily) && !g.flags.fitnessMarathon && g.health > 65,
+      choices:[
+        { label:'以2小时完赛，激动得哭了', hint:'+❤️ +😊 +✨', fn: g => { g.flags.fitnessMarathon=true; g.flags.fitnessFinisher=true; return{health:5,mood:15,charm:10}; }},
+        { label:'跑跑走走完赛，重在参与', hint:'+❤️ +😊', fn: g => { g.flags.fitnessMarathon=true; return{health:3,mood:8}; }},
+        { label:'跑到一半受伤退赛了', hint:'-❤️ -😊', fn: g => { g.flags.fitnessMarathon=true; g.flags.fitnessDNF=true; return{health:-10,mood:-5}; }},
+      ]},
+    { id:'fitness_life_v35_9', icon:'🌟', title:'运动改变人生', category:'fitness',
+      body:'坚持运动一年后，你发现自己不只身体变好了，整个人都变得积极了。工作效率提高了，社交也更自信了。运动成了你生活中不可缺少的一部分。',
+      cond: g => g.age >= 25 && g.flags.fitnessMarathon && (g.flags.fitnessBalance || g.flags.fitnessFinisher) && !g.flags.fitnessLife && g.health > 70,
+      choices:[
+        { label:'考了健身教练证，想转行', hint:'-💰 +✨ +🧠', fn: g => { g.flags.fitnessLife=true; g.flags.fitnessCoach=true; return{money:-5000,charm:10,intel:8}; }},
+        { label:'开始带朋友一起运动', hint:'+👥 +😊', fn: g => { g.flags.fitnessLife=true; g.flags.fitnessLeader=true; return{social:10,mood:8}; }},
+        { label:'把运动当作一辈子的习惯', hint:'+❤️ +😊 +✨', fn: g => { g.flags.fitnessLife=true; return{health:10,mood:10,charm:8}; }},
+      ]},
+    { id:'fitness_body_v35_9', icon:'⚖️', title:'身体管理', category:'fitness',
+      body:'体检报告出来了，各项指标都比去年好很多。医生说你的身体年龄比实际年龄小五岁。你看着镜子里的自己，第一次觉得"自律给我自由"这句话不是鸡汤。',
+      cond: g => g.age >= 26 && g.flags.fitnessLife && !g.flags.fitnessBody && g.health > 75,
+      choices:[
+        { label:'开始系统学习运动科学', hint:'+🧠 +✨', fn: g => { g.flags.fitnessBody=true; g.flags.fitnessScience=true; return{intel:12,charm:5}; }},
+        { label:'在社交媒体分享健身前后对比', hint:'+✨ +👥', fn: g => { g.flags.fitnessBody=true; g.flags.fitnessShare=true; return{charm:10,social:8,mood:5}; }},
+        { label:'觉得健康就好，不追求极致', hint:'+😊 +❤️', fn: g => { g.flags.fitnessBody=true; g.flags.fitnessWisdom=true; return{mood:8,health:5,intel:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -23058,6 +23140,18 @@ const ACHIEVEMENTS = [
     { id:'coffee_learn_v35_8_ach', icon:'🎓', name:'咖啡学员', desc:'上了咖啡师培训班', check: g => g.flags.coffeeLearn },
     { id:'coffee_life_v35_8_ach', icon:'🌿', name:'咖啡生活家', desc:'把喝咖啡变成了一种生活态度', check: g => g.flags.coffeeLife },
     { id:'coffee_thirdspace_v35_8_ach', icon:'🏙️', name:'第三空间', desc:'理解了每个人都需要一个属于自己的角落', check: g => g.flags.coffeeThirdSpace },
+
+    // v35.9 健身与运动文化
+    { id:'fitness_gym_v35_9_ach', icon:'🏋️', name:'健身房新人', desc:'办了人生第一张健身卡', check: g => g.flags.fitnessGym },
+    { id:'fitness_run_v35_9_ach', icon:'🏃', name:'跑者诞生', desc:'穿上了跑鞋迈出了第一步', check: g => g.flags.fitnessRun },
+    { id:'fitness_yoga_v35_9_ach', icon:'🧘', name:'瑜伽小白', desc:'第一次在瑜伽垫上弯下了腰', check: g => g.flags.fitnessYoga },
+    { id:'fitness_meal_v35_9_ach', icon:'🥗', name:'健身餐达人', desc:'学会了看营养标签和计算卡路里', check: g => g.flags.fitnessMeal },
+    { id:'fitness_group_v35_9_ach', icon:'👟', name:'跑团一份子', desc:'加入了本地跑团，找到了组织', check: g => g.flags.fitnessGroup },
+    { id:'fitness_social_v35_9_ach', icon:'📱', name:'运动社交达人', desc:'在运动圈里成了小有名气的人', check: g => g.flags.fitnessSocial },
+    { id:'fitness_addict_v35_9_ach', icon:'💪', name:'健身狂人', desc:'不练就浑身不舒服', check: g => g.flags.fitnessAddict },
+    { id:'fitness_marathon_v35_9_ach', icon:'🏅', name:'马拉松完赛', desc:'冲过了马拉松的终点线', check: g => g.flags.fitnessMarathon },
+    { id:'fitness_life_v35_9_ach', icon:'🌟', name:'运动改变人生', desc:'运动彻底改变了你的生活状态', check: g => g.flags.fitnessLife },
+    { id:'fitness_body_v35_9_ach', icon:'⚖️', name:'身体管理者', desc:'体检报告比实际年龄年轻五岁', check: g => g.flags.fitnessBody },
 ];
 
 // === ENDINGS === (order matters: first match wins)
