@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v37.1
+// 都市浮生记 - 数据文件 v37.2
 // ============================================
 
 
@@ -22047,6 +22047,88 @@ const EVENTS = [
         { label:'继续做一个善于倾听的城市人', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.soundLife=true; return{mood:12,health:8,intel:5}; }},
       ]},
 
+    // === v37.2 城市气味与嗅觉记忆 ===
+    { id:'smell_food_v37_2', icon:'🍜', title:'街边美食的味道', category:'smell',
+      body:'下班路过巷口，一股熟悉的炒河粉香味飘来。你顺着味道找到了一个不起眼的小摊，吃了一口，忽然觉得眼眶有点湿——这个味道，太像小时候学校门口的那个摊了。',
+      cond: g => g.age >= 20 && !g.flags.smellFood,
+      choices:[
+        { label:'成了这家小摊的常客', hint:'-💰 +😊 +😊', fn: g => { g.flags.smellFood=true; g.flags.smellRegular=true; return{money:-100,mood:8}; }},
+        { label:'和老板聊了聊他的故事', hint:'+🧠 +👥', fn: g => { g.flags.smellFood=true; return{intel:4,social:3}; }},
+        { label:'拍了照发了条感性的朋友圈', hint:'+✨', fn: g => { g.flags.smellFood=true; return{charm:3,mood:3}; }},
+      ]},
+    { id:'smell_rain_v37_2', icon:'🌧️', title:'雨后的气味', category:'smell',
+      body:'夏天的暴雨过后，空气里有一种特别的味道——泥土、湿润的柏油路、和远处飘来的桂花香混在一起。你站在路边深吸了一口气，觉得整座城市都被洗干净了。',
+      cond: g => g.age >= 20 && !g.flags.smellRain,
+      choices:[
+        { label:'开始在雨天出门散步', hint:'+😊 +❤️', fn: g => { g.flags.smellRain=true; g.flags.smellWalk=true; return{mood:6,health:2}; }},
+        { label:'打开窗户享受雨后的空气', hint:'+❤️ +😊', fn: g => { g.flags.smellRain=true; return{health:3,mood:4}; }},
+        { label:'想起了小时候在老家淋雨的日子', hint:'+😊 +🧠', fn: g => { g.flags.smellRain=true; g.flags.smellNostalgia=true; return{mood:5,intel:3}; }},
+      ]},
+    { id:'smell_hometown_v37_2', icon:'🏠', title:'家乡的味道', category:'smell',
+      body:'你在超市偶然闻到了一种辣椒酱的味道，和家里妈妈做的一模一样。你拿起来闻了好久，然后一口气买了三瓶。回到出租屋打开瓶盖的那一瞬间，好像回到了家里的厨房。',
+      cond: g => g.age >= 22 && !g.flags.smellHometown,
+      choices:[
+        { label:'打电话给妈妈说想家了', hint:'+👥 +😊', fn: g => { g.flags.smellHometown=true; return{social:5,mood:5}; }},
+        { label:'用这个辣椒酱做了一顿家乡菜', hint:'+😊 +❤️', fn: g => { g.flags.smellHometown=true; g.flags.smellCook=true; return{mood:8,health:2}; }},
+        { label:'默默吃完了一整瓶', hint:'+😊 -😊', fn: g => { g.flags.smellHometown=true; return{mood:3}; }},
+      ]},
+    { id:'smell_subway_v37_2', icon:'🚇', title:'地铁的味道', category:'smell',
+      body:'你开始注意到地铁里有各种各样的味道：早高峰的包子味、午后的香水味、深夜的疲惫味。你甚至能通过闻味道判断现在是几点。地铁不只是交通工具，还是一个移动的气味博物馆。',
+      cond: g => g.age >= 22 && g.flags.transitSubway && !g.flags.smellSubway,
+      choices:[
+        { label:'开始留意身边人的气味', hint:'+🧠 +✨', fn: g => { g.flags.smellSubway=true; g.flags.smellObserve=true; return{intel:4,charm:2}; }},
+        { label:'买了瓶好闻的香水通勤用', hint:'-💰 +✨', fn: g => { g.flags.smellSubway=true; return{money:-300,charm:4}; }},
+        { label:'戴口罩隔绝一切', hint:'+❤️', fn: g => { g.flags.smellSubway=true; return{health:1}; }},
+      ]},
+    { id:'smell_season_v37_2', icon:'🌸', title:'季节的气味', category:'smell',
+      body:'你开始留意到城市的季节气味：春天的花香、夏天的雨后泥土、秋天的桂花、冬天烤红薯的甜香。每个季节都有它独特的味道，而你已经在这座城市闻过了四个春夏秋冬。',
+      cond: g => g.age >= 24 && (g.flags.smellRain || g.flags.smellFood) && !g.flags.smellSeason && g.intel > 25,
+      choices:[
+        { label:'开始记录"城市季节气味日记"', hint:'+🧠 +✨', fn: g => { g.flags.smellSeason=true; g.flags.smellJournal=true; return{intel:6,charm:4}; }},
+        { label:'每个季节都去同一个地方闻不同的味道', hint:'+😊 +🧠', fn: g => { g.flags.smellSeason=true; return{mood:5,intel:4}; }},
+        { label:'觉得城市也有了自己的"味道年轮"', hint:'+🧠 +😊', fn: g => { g.flags.smellSeason=true; return{intel:5,mood:3}; }},
+      ]},
+    { id:'smell_cook_v37_2', icon:'🍳', title:'做饭的味道', category:'smell',
+      body:'你开始学做几道拿手菜。当蒜蓉在锅里爆香的那一刻，整间出租屋都弥漫着家的味道。邻居敲门问你"在做什么这么香"，你第一次觉得做饭不只是填饱肚子。',
+      cond: g => g.age >= 23 && (g.flags.smellCook || g.flags.deliveryCook2) && !g.flags.smellCookSelf,
+      choices:[
+        { label:'研究各种菜系的调味秘诀', hint:'+🧠 +✨', fn: g => { g.flags.smellCookSelf=true; g.flags.smellSpice=true; return{intel:6,charm:4}; }},
+        { label:'请邻居吃了顿饭', hint:'+👥 +😊', fn: g => { g.flags.smellCookSelf=true; return{social:6,mood:5}; }},
+        { label:'做饭时满屋飘香就是最好的治愈', hint:'+😊 +❤️', fn: g => { g.flags.smellCookSelf=true; return{mood:6,health:3}; }},
+      ]},
+    { id:'smell_social_v37_2', icon:'👃', title:'气味社交', category:'smell',
+      body:'你发现自己能通过气味记住一个人。某个同事的咖啡味、某个朋友的洗衣液味、某个路人身上的香水味。你开始理解为什么有人说"气味是最强的记忆触发器"。',
+      cond: g => g.age >= 25 && g.flags.smellSeason && !g.flags.smellSocial && g.social > 25,
+      choices:[
+        { label:'开始研究气味心理学', hint:'+🧠 +✨', fn: g => { g.flags.smellSocial=true; g.flags.smellPsych=true; return{intel:8,charm:3}; }},
+        { label:'给朋友推荐了适合他们的香水', hint:'+👥 +✨', fn: g => { g.flags.smellSocial=true; return{social:5,charm:4}; }},
+        { label:'只是默默享受识别每个人独特气味的乐趣', hint:'+😊 +🧠', fn: g => { g.flags.smellSocial=true; return{mood:4,intel:3}; }},
+      ]},
+    { id:'smell_memory_v37_2', icon:'💭', title:'嗅觉记忆', category:'smell',
+      body:'你在路上闻到了某种洗衣液的味道，瞬间想起了大学宿舍。嗅觉记忆比其他任何记忆都更鲜活、更直接。你开始刻意收集那些"有故事的味道"。',
+      cond: g => g.age >= 26 && g.flags.smellSocial && !g.flags.smellMemory && g.intel > 30,
+      choices:[
+        { label:'开始写"气味回忆录"', hint:'+🧠 +✨', fn: g => { g.flags.smellMemory=true; g.flags.smellMemoir=true; return{intel:8,charm:6}; }},
+        { label:'收集了各种能触发记忆的味道', hint:'+🧠 +😊', fn: g => { g.flags.smellMemory=true; return{intel:6,mood:5}; }},
+        { label:'明白了为什么普鲁斯特要写玛德琳蛋糕', hint:'+🧠 +🧠', fn: g => { g.flags.smellMemory=true; return{intel:10}; }},
+      ]},
+    { id:'smell_create_v37_2', icon:'🧪', title:'气味创作', category:'smell',
+      body:'你报了一个调香体验课，尝试调制一款属于"你在的城市"的香水。前调是早餐摊的豆浆味，中调是雨后泥土的气息，后调是深夜烧烤的烟熏味。老师说这味道很"接地气"。',
+      cond: g => g.age >= 27 && g.flags.smellMemory && !g.flags.smellCreate && g.intel > 35 && g.money > 3000,
+      choices:[
+        { label:'开始认真学调香', hint:'-💰 +✨ +🧠', fn: g => { g.flags.smellCreate=true; g.flags.smellPerfume=true; return{money:-3000,charm:8,intel:6}; }},
+        { label:'把自制的"城市香水"送给了朋友', hint:'+👥 +✨', fn: g => { g.flags.smellCreate=true; return{social:6,charm:5}; }},
+        { label:'只是一次有趣的体验', hint:'+😊 +🧠', fn: g => { g.flags.smellCreate=true; return{mood:5,intel:3}; }},
+      ]},
+    { id:'smell_life_v37_2', icon:'🌍', title:'城市之味', category:'smell',
+      body:'你终于理解了，每座城市都有它独特的味道。北京的涮羊肉、上海的生煎、深圳的椰子鸡、杭州的龙井茶香、广州的早茶、成都的火锅味。而你在这些味道之间穿行，每一种味道都是一段记忆，每一段记忆都是一个故事。你的人生，就是这座城市所有味道的总和。',
+      cond: g => g.age >= 28 && g.flags.smellCreate && (g.flags.smellPerfume || g.flags.smellMemoir) && !g.flags.smellLife && g.intel > 35,
+      choices:[
+        { label:'写了一本《城市气味地图》', hint:'+💰 +✨ +🧠', fn: g => { g.flags.smellLife=true; g.flags.smellAuthor=true; return{money:6000,charm:12,intel:8}; }},
+        { label:'开了一家"城市味道"主题小店', hint:'-💰 +✨ +💰', fn: g => { g.flags.smellLife=true; g.flags.smellShop=true; return{money:-20000,charm:10,money:5000}; }},
+        { label:'继续用鼻子感受这座城市的每一天', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.smellLife=true; return{mood:12,health:5,intel:8}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -24280,6 +24362,18 @@ const ACHIEVEMENTS = [
     { id:'sound_record_v37_1_ach', icon:'🎙️', name:'声音记录者', desc:'录下了城市里的各种声音', check: g => g.flags.soundCapture },
     { id:'sound_heal_v37_1_ach', icon:'💆', name:'声音疗愈', desc:'发现了声音的疗愈力量', check: g => g.flags.soundHeal },
     { id:'sound_life_v37_1_ach', icon:'🎶', name:'城市之声', desc:'学会了聆听城市的交响曲', check: g => g.flags.soundLife },
+
+    // v37.2 城市气味与嗅觉记忆
+    { id:'smell_food_v37_2_ach', icon:'🍜', name:'街边美食味', desc:'被一股熟悉的味道勾起了回忆', check: g => g.flags.smellFood },
+    { id:'smell_rain_v37_2_ach', icon:'🌧️', name:'雨后气息', desc:'深呼吸了暴雨后城市的味道', check: g => g.flags.smellRain },
+    { id:'smell_hometown_v37_2_ach', icon:'🏠', name:'家乡的味道', desc:'在超市闻到了和妈妈做的一样的味道', check: g => g.flags.smellHometown },
+    { id:'smell_subway_v37_2_ach', icon:'🚇', name:'地铁气味博物馆', desc:'能通过闻味道判断地铁里是几点', check: g => g.flags.smellSubway },
+    { id:'smell_season_v37_2_ach', icon:'🌸', name:'季节气味', desc:'感受到了城市每个季节独特的气息', check: g => g.flags.smellSeason },
+    { id:'smell_cook_v37_2_ach', icon:'🍳', name:'做饭的味道', desc:'让整间出租屋弥漫着家的味道', check: g => g.flags.smellCookSelf },
+    { id:'smell_social_v37_2_ach', icon:'👃', name:'气味社交', desc:'通过气味记住了身边的每个人', check: g => g.flags.smellSocial },
+    { id:'smell_memory_v37_2_ach', icon:'💭', name:'嗅觉记忆', desc:'理解了气味是最强的记忆触发器', check: g => g.flags.smellMemory },
+    { id:'smell_create_v37_2_ach', icon:'🧪', name:'气味创作者', desc:'尝试调制了一款属于城市的香水', check: g => g.flags.smellCreate },
+    { id:'smell_life_v37_2_ach', icon:'🌍', name:'城市之味', desc:'你的人生就是这座城市所有味道的总和', check: g => g.flags.smellLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
