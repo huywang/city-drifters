@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v35.4
+// 都市浮生记 - 数据文件 v35.5
 // ============================================
 
 
@@ -20632,6 +20632,98 @@ const EVENTS = [
         { label:'开了自己的二手小店', hint:'+💰 +👥', fn: g => { g.flags.xianyuPhilosophy=true; g.flags.xianyuShop=true; return{money:-5000,social:15,charm:10}; }},
       ]},
 
+    // ===== 考驾照与驾驶人生 (v35.5) =====
+
+    { id:'license_start_v35_5', icon:'🚗', title:'报名学车', category:'license',
+      body:'你终于决定考驾照了。\n\n你在家附近找了一家驾校。报名费：4800元。教练说：「快的话3个月拿证。」\n\n你以为3个月就够了。但你不知道的是——这3个月将成为你人生中最「屈辱」的时光。\n\n第一天去驾校。教练是个50岁的大叔，烟不离手，脾气暴躁。\n\n教练：「你以前摸过车吗？」\n你：「没有。」\n教练：「好，那从今天开始你就知道什么叫「痛苦」了。」\n\n你上了车。教练说：「先调座椅、调后视镜、系安全带。」\n\n你手忙脚乱地做了。教练叹了口气：「就这，你至少得学半年。」\n\n你在心里默默发誓：一定要3个月拿到证。',
+      cond: g => g.age >= 18 && g.money >= 5000 && !g.flags.licenseStart,
+      choices:[
+        { label:'每天去练车，全力以赴', hint:'+🧠 -💰', fn: g => { g.flags.licenseStart=true; g.flags.licenseHardcore=true; return{intel:5,money:-4800}; }},
+        { label:'周末去练，不影响工作', hint:'-💰', fn: g => { g.flags.licenseStart=true; return{mood:-3,money:-4800}; }},
+        { label:'报完名就鸽了（拖延症）', hint:'-💰', fn: g => { g.flags.licenseStart=true; g.flags.licenseProcrastinator=true; return{mood:-5,money:-4800}; }},
+      ]},
+
+    { id:'license_subject2_v35_5', icon:'🅿️', title:'科目二噩梦', category:'license',
+      body:'科目二——所有学车人的噩梦。\n\n五项：倒车入库、侧方停车、曲线行驶、直角转弯、坡道起步。\n\n你练了一个月倒车入库。教练说：「你倒得还可以，但考试的时候你一定会挂。」\n\n你问：「为什么？」\n教练：「因为你太紧张了。紧张就会犯错，犯错就挂。」\n\n考试那天你确实很紧张。你的手在抖，脚在抖，方向盘也在抖（其实是你在抖）。\n\n第一项：倒车入库——过了！\n第二项：侧方停车——过了！\n第三项：曲线行驶——过了！\n第四项：直角转弯——过了！\n第五项：坡道起步——\n\n你松离合的时候，车往后溜了一下。\n\n系统播报：「考试不合格。」\n\n你呆住了。教练在车外摇了摇头。',
+      cond: g => g.age >= 18 && g.flags.licenseStart && !g.flags.licenseSubject2,
+      choices:[
+        { label:'补考过了', hint:'+😊 +🧠', fn: g => { g.flags.licenseSubject2=true; g.flags.subject2Passed=true; return{mood:15,intel:5,money:-200}; }},
+        { label:'补考又挂了', hint:'', fn: g => { g.flags.licenseSubject2=true; g.flags.subject2Failed=true; return{mood:-15,money:-400}; }},
+        { label:'第三次终于过了', hint:'+😊', fn: g => { g.flags.licenseSubject2=true; return{mood:10,money:-600}; }},
+      ]},
+
+    { id:'license_subject3_v35_5', icon:'🛣️', title:'科目三路考', category:'license',
+      body:'科目三——真正上路了。\n\n你坐在驾驶座上，旁边是考官。后面是真正的马路，有行人、有电动车、有大货车。\n\n你发动了车。考官说：「起步。」\n\n你打了转向灯，看了后视镜，慢慢松离合——车动了！\n\n前面有个路口。考官说：「左转。」\n你打了转向灯，开始转弯。突然一辆电动车从你右边冲出来。你急刹车——考官差点撞到挡风玻璃。\n\n考官：「你看到那辆电动车了吗？」\n你：「看到了……但是它太快了。」\n考官：「在路上，没人管谁快谁慢。你让着点。」\n\n后面的路程你开得小心翼翼。最后考官说：「靠边停车。」\n\n系统播报：「考试合格。」\n\n你差点跳起来庆祝。',
+      cond: g => g.age >= 18 && g.flags.licenseSubject2 && !g.flags.licenseSubject3,
+      choices:[
+        { label:'一次就过了！太爽了', hint:'+😊 +✨', fn: g => { g.flags.licenseSubject3=true; g.flags.subject3FirstTry=true; return{mood:20,charm:5}; }},
+        { label:'挂了一次，补考过了', hint:'+😊', fn: g => { g.flags.licenseSubject3=true; return{mood:10,money:-200}; }},
+        { label:'觉得上路太可怕了，想放弃', hint:'', fn: g => { g.flags.licenseSubject3=true; g.flags.drivingFear=true; return{mood:-10}; }},
+      ]},
+
+    { id:'license_get_v35_5', icon:'🎉', title:'拿到驾照', category:'license',
+      body:'你拿到驾照了！\n\n你看着那张小卡片——上面是你的照片（拍得很丑），你的名字，和「准驾车型：C1」。\n\n你发了条朋友圈：「历时X个月，终于拿到驾照了！从今天起，我是有证的人了！」\n\n收获了100个赞。评论区：\n- 「恭喜恭喜！」\n- 「什么时候买车？」\n- 「什么时候带我兜风？」\n- 「马路杀手出没请注意！」\n\n你妈打了个电话来：「拿到证了？好，但你先别开车。你爸说等你攒够钱买车再说。」\n\n你看着驾照笑了。虽然你现在没有车，但你觉得：你多了一项技能，多了一种自由。\n\n至少你可以自豪地说：「我会开车。」',
+      cond: g => g.age >= 18 && g.flags.licenseSubject3 && !g.flags.licenseGet,
+      choices:[
+        { label:'开始计划买车', hint:'+💰 +😊', fn: g => { g.flags.licenseGet=true; g.flags.planBuyCar=true; return{mood:15,charm:8}; }},
+        { label:'拿到证就放在抽屉里了', hint:'+😊', fn: g => { g.flags.licenseGet=true; g.flags.licenseDusty=true; return{mood:10}; }},
+        { label:'赶紧找朋友借车练练手', hint:'+😊', fn: g => { g.flags.licenseGet=true; g.flags.practiceDriving=true; return{mood:12,social:5}; }},
+      ]},
+
+    { id:'license_first_drive_v35_5', icon:'🏎️', title:'第一次独自开车', category:'license',
+      body:'你借了朋友的车（或租了一辆车），第一次独自上路。\n\n没有教练在旁边，你反而更紧张了。\n\n你开着车在空旷的路上慢慢走。速度：30km/h。后面的车不停按喇叭。\n\n你深呼吸。告诉自己：「别紧张，你会开的。」\n\n你慢慢加速到50km/h。然后60km/h。风从窗户吹进来，你的头发被吹乱了。\n\n你突然觉得：开车的感觉真好。自由的感觉。\n\n你开到了海边（或城市的高处）。你停下车，看着远处的风景。\n\n你拿出手机拍了一张照。配文：「人生第一次独自开车。目的地：自由。」\n\n虽然你开得还很慢，虽然你的停车技术还很差——但你在路上了。\n\n这就够了。',
+      cond: g => g.age >= 18 && g.flags.licenseGet && !g.flags.firstDrive,
+      choices:[
+        { label:'爱上了开车的感觉', hint:'+😊 +✨', fn: g => { g.flags.firstDrive=true; g.flags.drivingLover=true; return{mood:18,charm:10}; }},
+        { label:'还行，但还需要多练习', hint:'+😊', fn: g => { g.flags.firstDrive=true; return{mood:10,intel:5}; }},
+        { label:'太紧张了，以后不太敢开', hint:'', fn: g => { g.flags.firstDrive=true; g.flags.drivingFear=true; return{mood:-5}; }},
+      ]},
+
+    { id:'license_buy_car_v35_5', icon:'🚙', title:'买车了', category:'license',
+      body:'你终于攒够钱买车了。\n\n你犹豫了很久：买油车还是电车？国产还是合资？SUV还是轿车？\n\n你去了4S店试驾。销售热情地介绍：「这款XX，百公里油耗6L，配置齐全，现在买还送3年保养。」\n\n你最终选了一辆15万的国产新能源车。首付5万，月供3000。\n\n提车那天你兴奋得不行。你给车取了个名字（虽然你觉得有点傻）。\n\n你在车里坐了很久，摸着方向盘，闻着新车的气味。\n\n你给车拍了100张照片。发朋友圈的时候你写：「人生第一辆车。虽然不是什么好车，但它是我自己买的。」\n\n你妈评论：「注意安全。」\n你爸评论：「别开太快。」\n你朋友评论：「什么时候载我？」',
+      cond: g => g.age >= 22 && g.flags.licenseGet && g.money >= 50000 && g.jobSalary > 0 && !g.flags.buyCar,
+      choices:[
+        { label:'开始享受有车生活', hint:'+😊 +✨ -💰', fn: g => { g.flags.buyCar=true; g.flags.carLife=true; return{mood:20,charm:12,money:-50000}; }},
+        { label:'发现养车比想象中贵', hint:'-💰', fn: g => { g.flags.buyCar=true; g.flags.carCost=true; return{mood:5,money:-50000}; }},
+        { label:'周末开车去自驾游', hint:'+😊 +🏥', fn: g => { g.flags.buyCar=true; g.flags.roadTrip=true; return{mood:18,health:5,money:-52000}; }},
+      ]},
+
+    { id:'license_traffic_v35_5', icon:'🚦', title:'堵车人生', category:'license',
+      body:'你开车上班了。然后你堵在了路上。\n\n导航显示：预计到达时间40分钟。你看了看时间——你已经堵了30分钟，只走了3公里。\n\n你看着窗外的车流。几千辆车，一辆接一辆，像一条缓慢移动的蛇。\n\n你在车里听了3首歌、接了2个电话、吃了1个包子、发了5条微信。\n\n你旁边的车里，有人在化妆。后面车里，有人在吃泡面。再后面，有人在……接吻？\n\n你开始思考：堵车是城市人的「修行」。\n\n在堵车的30分钟里，你什么都做不了。你不能下车走路，不能飞过去，不能按喇叭让前面的车消失。\n\n你只能等。\n\n也许这就是城市教给你的最后一课：学会等待。',
+      cond: g => g.age >= 22 && g.flags.licenseGet && g.jobSalary > 0 && !g.flags.trafficJam,
+      choices:[
+        { label:'开始用堵车时间听播客/有声书', hint:'+🧠', fn: g => { g.flags.trafficJam=true; g.flags.carLearner=true; return{intel:10,mood:-3}; }},
+        { label:'决定改坐地铁上班', hint:'+💰 +🏥', fn: g => { g.flags.trafficJam=true; g.flags.subwayCommuter=true; return{mood:5,health:3,money:500}; }},
+        { label:'路怒症发作，骂了一路', hint:'', fn: g => { g.flags.trafficJam=true; g.flags.roadRage=true; return{mood:-15}; }},
+      ]},
+
+    { id:'license_roadtrip_v35_5', icon:'🗺️', title:'自驾游', category:'license',
+      body:'你和朋友计划了一次自驾游。目的地：300公里外的一个古镇。\n\n你们早上6点出发。你负责开车，朋友负责导航和选歌。\n\n高速上的风景和城市完全不同——田野、山丘、河流、小村庄。\n\n你开得很稳。速度：100km/h。风从窗户吹进来，音乐在耳边响起。\n\n朋友说：「你知道吗？我觉得自驾游比飞机旅行好。因为你可以看到路上的风景。」\n\n你深以为然。\n\n到了古镇后你们逛了一天，吃了很多当地小吃。傍晚你们坐在河边看日落。\n\n朋友说：「下次我们去更远的地方吧。」\n\n你说：「好。」\n\n回去的路上你开夜车。路上很黑，只有车灯照亮前方50米。\n\n但你不害怕。因为你知道——路在前方。',
+      cond: g => g.age >= 22 && (g.flags.buyCar || g.flags.practiceDriving) && g.money >= 2000 && !g.flags.roadTripDrive,
+      choices:[
+        { label:'爱上了自驾游', hint:'+😊 +✨', fn: g => { g.flags.roadTripDrive=true; g.flags.roadTripFan=true; return{mood:20,charm:8,money:-1500}; }},
+        { label:'旅途愉快，但开车太累了', hint:'+😊', fn: g => { g.flags.roadTripDrive=true; return{mood:12,health:-5,money:-1500}; }},
+        { label:'路上出了点小事故', hint:'-💰', fn: g => { g.flags.roadTripDrive=true; g.flags.minorAccident=true; return{mood:-10,money:-3000}; }},
+      ]},
+
+    { id:'license_ev_v35_5', icon:'🔋', title:'电车时代', category:'license',
+      body:'你开始考虑换电动车了。\n\n你的油车每个月油费要1500元。而电动车充电只需要200元。\n\n你去试驾了一辆国产电动车。体验让你震惊：\n- 加速：推背感很强，比油车快多了\n- 安静：几乎没有噪音\n- 智能：大屏导航、语音控制、自动泊车\n- 省钱：每公里电费只要1毛钱\n\n但你也看到了一些问题：\n- 续航焦虑：高速上找不到充电桩怎么办？\n- 保值率：3年后能卖多少钱？\n- 充电时间：充满要1小时（快充）\n\n你犹豫了很久。最终你决定：先开着油车，等电车技术更成熟了再换。\n\n你开始理解：每一次技术变革都会带来「选择焦虑」。而最聪明的做法是——不着急，等自己准备好了再做决定。',
+      cond: g => g.age >= 22 && g.flags.buyCar && g.intel > 35 && !g.flags.evConsider,
+      choices:[
+        { label:'换了电动车', hint:'+💰 +✨', fn: g => { g.flags.evConsider=true; g.flags.evOwner=true; return{mood:12,charm:8,money:-150000}; }},
+        { label:'继续开油车，观望中', hint:'+🧠', fn: g => { g.flags.evConsider=true; g.flags.waitAndSee=true; return{intel:5}; }},
+        { label:'决定卖掉车，改打车', hint:'+💰', fn: g => { g.flags.evConsider=true; g.flags.sellCar=true; return{money:80000,mood:-3}; }},
+      ]},
+
+    { id:'license_philosophy_v35_5', icon:'🛤️', title:'驾驶的意义', category:'license',
+      body:'你回顾自己和车的故事。\n\n从第一次被教练骂，到科目二挂了又补考，到独自上路时的紧张，到自驾游的自由……\n\n你开始理解：开车不只是「从A到B」的交通方式，它代表了：\n\n自由——你可以去任何你想去的地方，不需要等公交、不需要打车。\n责任——你手握方向盘，你需要对自己和别人的生命负责。\n成长——从不敢上车到自如地穿梭在城市中，你一直在进步。\n人生隐喻——有时候你需要加速，有时候你需要刹车，有时候你需要转弯，有时候你需要等待。\n\n你在车里放了一本小本子。每次开车有新的感悟就写一句话。\n\n最新一条是：\n\n「人生就像开车。你不需要看得很远，只需要看清前方50米就够了。然后一直往前开，总会到达目的地。」',
+      cond: g => g.age >= 24 && g.flags.licenseGet && (g.flags.buyCar || g.flags.roadTripDrive) && g.intel > 35,
+      choices:[
+        { label:'开车成了你的冥想方式', hint:'+😊 +🧠', fn: g => { g.flags.licensePhilosophy=true; return{mood:15,intel:12}; }},
+        { label:'把驾驶感悟写成了书', hint:'+💰 +✨', fn: g => { g.flags.licensePhilosophy=true; g.flags.drivingWriter=true; return{money:10000,charm:15,intel:10}; }},
+        { label:'开始享受每一次旅途', hint:'+😊 +🏥', fn: g => { g.flags.licensePhilosophy=true; g.flags.journeyLover=true; return{mood:18,health:8}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -22664,6 +22756,17 @@ const ACHIEVEMENTS = [
     { id:'xianyu_weird_v35_4_ach', icon:'🤣', name:'闲鱼段子手', desc:'在闲鱼上看到了各种奇葩商品', check: g => g.flags.xianyuWeird },
     { id:'xianyu_community_v35_4_ach', icon:'🏘️', name:'鱼塘社区', desc:'通过闲鱼认识了邻居们', check: g => g.flags.xianyuCommunity },
     { id:'xianyu_philosophy_v35_4_ach', icon:'♻️', name:'物品的第二次生命', desc:'理解了二手经济的深层意义', check: g => g.flags.xianyuPhilosophy },
+    // v35.5 考驾照与驾驶人生
+    { id:'license_start_v35_5_ach', icon:'🚗', name:'报名学车', desc:'开始了考驾照的旅程', check: g => g.flags.licenseStart },
+    { id:'license_subject2_v35_5_ach', icon:'🅿️', name:'科目二', desc:'经历了科目二的考验', check: g => g.flags.licenseSubject2 },
+    { id:'license_subject3_v35_5_ach', icon:'🛣️', name:'科目三', desc:'真正上了马路', check: g => g.flags.licenseSubject3 },
+    { id:'license_get_v35_5_ach', icon:'🎉', name:'拿到驾照', desc:'终于拿到了那本小卡片', check: g => g.flags.licenseGet },
+    { id:'first_drive_v35_5_ach', icon:'🏎️', name:'第一次独自开车', desc:'第一次独自驾驶在路上', check: g => g.flags.firstDrive },
+    { id:'buy_car_v35_5_ach', icon:'🚙', name:'买车了', desc:'拥有了人生第一辆车', check: g => g.flags.buyCar },
+    { id:'traffic_jam_v35_5_ach', icon:'🚦', name:'堵车人生', desc:'在城市车流中学会了等待', check: g => g.flags.trafficJam },
+    { id:'roadtrip_v35_5_ach', icon:'🗺️', name:'自驾游', desc:'和朋友一起开车去旅行', check: g => g.flags.roadTripDrive },
+    { id:'ev_v35_5_ach', icon:'🔋', name:'电车时代', desc:'思考了电动车与传统车的选择', check: g => g.flags.evConsider },
+    { id:'license_philosophy_v35_5_ach', icon:'🛤️', name:'驾驶的意义', desc:'理解了开车对人生的意义', check: g => g.flags.licensePhilosophy },
 ];
 
 // === ENDINGS === (order matters: first match wins)
