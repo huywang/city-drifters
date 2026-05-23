@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v36.1
+// 都市浮生记 - 数据文件 v36.2
 // ============================================
 
 
@@ -21227,6 +21227,88 @@ const EVENTS = [
         { label:'找到了城市与山野的平衡', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.campingLife=true; return{mood:12,health:8,intel:8}; }},
       ]},
 
+    // === v36.2 博物馆与文化艺术 ===
+    { id:'museum_first_v36_2', icon:'🏛️', title:'第一次去博物馆', category:'museum',
+      body:'周末你路过省博物馆，发现免费入场。走进去的那一刻，你被巨大的恐龙骨架震住了。虽然很多展品看不太懂，但你觉得这种"看不懂"本身也挺有意思的。',
+      cond: g => g.age >= 20 && !g.flags.museumFirst,
+      choices:[
+        { label:'每个展厅都认真看了一遍', hint:'+🧠 +😊', fn: g => { g.flags.museumFirst=true; g.flags.museumSerious=true; return{intel:8,mood:5}; }},
+        { label:'走马观花，拍照打卡', hint:'+✨', fn: g => { g.flags.museumFirst=true; return{charm:3,mood:3}; }},
+        { label:'在文创店买了好多纪念品', hint:'-💰 +😊', fn: g => { g.flags.museumFirst=true; g.flags.museumShop=true; return{money:-300,mood:6}; }},
+      ]},
+    { id:'museum_exhibit_v36_2', icon:'🖼️', title:'看展达人', category:'museum',
+      body:'你开始关注本地的美术馆和画廊，每周末都去看展。从古典油画到当代装置艺术，你发现自己越来越能"看懂"了。朋友说你现在说话越来越文艺了。',
+      cond: g => g.age >= 22 && g.flags.museumFirst && !g.flags.museumExhibit && g.intel > 25,
+      choices:[
+        { label:'办了美术馆年卡', hint:'-💰 +🧠 +✨', fn: g => { g.flags.museumExhibit=true; g.flags.museumMember=true; return{money:-1200,intel:8,charm:5}; }},
+        { label:'只看免费展，省钱又充实', hint:'+🧠 +😊', fn: g => { g.flags.museumExhibit=true; return{intel:5,mood:5}; }},
+        { label:'开始写看展笔记发在社交媒体', hint:'+✨ +👥', fn: g => { g.flags.museumExhibit=true; g.flags.museumBlogger=true; return{charm:6,social:4}; }},
+      ]},
+    { id:'museum_art_v36_2', icon:'🎨', title:'当代艺术', category:'museum',
+      body:'你去看了一场当代艺术展，有一个作品是一堆垃圾堆在展厅中央。你看了十分钟也没看懂，但旁边的解说写着"消费主义的废墟"。你不确定这是艺术还是智商税。',
+      cond: g => g.age >= 23 && g.flags.museumExhibit && !g.flags.museumArt && g.intel > 30,
+      choices:[
+        { label:'认真研究了当代艺术的脉络', hint:'+🧠 +🧠', fn: g => { g.flags.museumArt=true; g.flags.museumStudy=true; return{intel:12,charm:3}; }},
+        { label:'承认看不懂，但保持开放心态', hint:'+🧠 +😊', fn: g => { g.flags.museumArt=true; return{intel:5,mood:3}; }},
+        { label:'觉得当代艺术就是骗钱的', hint:'-🧠', fn: g => { g.flags.museumArt=true; g.flags.museumSkeptic=true; return{intel:-2,mood:-2}; }},
+      ]},
+    { id:'museum_history_v36_2', icon:'📜', title:'历史感悟', category:'museum',
+      body:'你在历史博物馆看到了一个关于城市百年变迁的展览。你发现你住的那条街在一百年前是一片稻田，五十年前是工厂，现在是写字楼。你忽然觉得人真的很渺小。',
+      cond: g => g.age >= 25 && g.flags.museumExhibit && !g.flags.museumHistory && g.intel > 35,
+      choices:[
+        { label:'开始研究所在城市的历史', hint:'+🧠 +✨', fn: g => { g.flags.museumHistory=true; g.flags.museumResearch=true; return{intel:10,charm:5}; }},
+        { label:'去老城区寻找历史痕迹', hint:'+🧠 +😊', fn: g => { g.flags.museumHistory=true; return{intel:6,mood:5}; }},
+        { label:'感慨完就回去继续上班了', hint:'+🧠', fn: g => { g.flags.museumHistory=true; return{intel:3}; }},
+      ]},
+    { id:'museum_volunteer_v36_2', icon:'🙋', title:'博物馆志愿者', category:'museum',
+      body:'你报名成为了博物馆的周末讲解志愿者。培训了两周后，你第一次站在展厅里给游客讲解。虽然紧张得声音发抖，但有个小朋友认真地问你"恐龙为什么灭绝了"，你觉得自己做的事很有意义。',
+      cond: g => g.age >= 22 && g.flags.museumExhibit && !g.flags.museumVolunteer && g.social > 25,
+      choices:[
+        { label:'坚持做了半年志愿者', hint:'+👥 +✨ +🧠', fn: g => { g.flags.museumVolunteer=true; g.flags.museumDedicated=true; return{social:10,charm:8,intel:5}; }},
+        { label:'做了几次觉得不太适合', hint:'+🧠', fn: g => { g.flags.museumVolunteer=true; return{intel:3,social:3}; }},
+        { label:'因为太受欢迎被请去做付费讲解', hint:'+💰 +✨', fn: g => { g.flags.museumVolunteer=true; g.flags.museumPaid=true; return{money:2000,charm:6}; }},
+      ]},
+    { id:'museum_social_v36_2', icon:'👩‍🎨', title:'文化社交', category:'museum',
+      body:'你在看展的时候认识了一个学艺术的女生，你们从莫奈聊到村上隆，从传统水墨聊到数字艺术。她说你是她见过的"最有想法的非专业人士"，你们开始经常约着一起看展。',
+      cond: g => g.age >= 23 && g.flags.museumArt && !g.flags.museumSocial && g.charm > 25,
+      choices:[
+        { label:'一起策划了一个小型艺术沙龙', hint:'+👥 +✨ +🧠', fn: g => { g.flags.museumSocial=true; g.flags.museumSalon=true; return{social:10,charm:8,intel:5}; }},
+        { label:'交了个文艺圈的朋友', hint:'+👥 +😊', fn: g => { g.flags.museumSocial=true; return{social:8,mood:5}; }},
+        { label:'只是偶尔一起看展', hint:'+🧠 +😊', fn: g => { g.flags.museumSocial=true; return{intel:4,mood:3}; }},
+      ]},
+    { id:'museum_collect_v36_2', icon:'🎁', title:'文创收集', category:'museum',
+      body:'你开始收集各大博物馆的文创产品——故宫的胶带、国博的书签、上海博物馆的冰箱贴。家里已经有一整面墙的文创收藏了，朋友说你家像个小型博物馆。',
+      cond: g => g.age >= 22 && g.flags.museumExhibit && !g.flags.museumCollect && g.money > 5000,
+      choices:[
+        { label:'专门去不同城市的博物馆收集', hint:'-💰 +✨ +🧠', fn: g => { g.flags.museumCollect=true; g.flags.museumTravel=true; return{money:-5000,charm:8,intel:5}; }},
+        { label:'只在本地博物馆买', hint:'-💰 +😊', fn: g => { g.flags.museumCollect=true; return{money:-1500,mood:5}; }},
+        { label:'开了个文创测评账号', hint:'+✨ +💰', fn: g => { g.flags.museumCollect=true; g.flags.museumReview=true; return{charm:6,money:1000}; }},
+      ]},
+    { id:'museum_deep_v36_2', icon:'🔍', title:'深度看展', category:'museum',
+      body:'你不再满足于"打卡式"看展，开始认真研究每个展览的背景。你会提前读策展人的文章，在展厅里待三四个小时，写几千字的看展笔记。朋友说你现在比很多艺术专业的学生还专业。',
+      cond: g => g.age >= 26 && g.flags.museumSocial && g.flags.museumStudy && !g.flags.museumDeep && g.intel > 40,
+      choices:[
+        { label:'开始在艺术杂志发表文章', hint:'+💰 +✨ +🧠', fn: g => { g.flags.museumDeep=true; g.flags.museumCritic=true; return{money:3000,charm:10,intel:8}; }},
+        { label:'考了一个艺术品鉴赏师证书', hint:'-💰 +✨ +🧠', fn: g => { g.flags.museumDeep=true; g.flags.museumCert=true; return{money:-8000,charm:8,intel:10}; }},
+        { label:'纯粹享受看展的过程', hint:'+😊 +🧠', fn: g => { g.flags.museumDeep=true; return{mood:8,intel:6}; }},
+      ]},
+    { id:'museum_create_v36_2', icon:'✏️', title:'艺术创作', category:'museum',
+      body:'看了这么多展览之后，你开始有了创作的冲动。你报了个油画班，第一幅画画的是你窗外的大城市夜景。老师说你有"独特的视角"，虽然技法还很生涩。',
+      cond: g => g.age >= 25 && g.flags.museumDeep && !g.flags.museumCreate && g.intel > 35,
+      choices:[
+        { label:'认真学画，每周画一幅', hint:'-💰 +✨ +🧠', fn: g => { g.flags.museumCreate=true; g.flags.museumArtist=true; return{money:-3000,charm:10,intel:8}; }},
+        { label:'尝试了各种艺术形式：雕塑、版画、摄影', hint:'-💰 +🧠 +😊', fn: g => { g.flags.museumCreate=true; return{money:-2000,intel:6,mood:5}; }},
+        { label:'发现自己更喜欢当观众', hint:'+🧠', fn: g => { g.flags.museumCreate=true; return{intel:3,mood:2}; }},
+      ]},
+    { id:'museum_life_v36_2', icon:'🌟', title:'文化人生', category:'museum',
+      body:'你意识到博物馆和文化艺术已经成了你生活中不可缺少的一部分。从当年那个看不懂的门外汉，到现在能写评论、做讲解、甚至创作——文化艺术给了你另一种看世界的方式。在大城市的钢筋水泥里，你找到了属于自己的精神角落。',
+      cond: g => g.age >= 28 && g.flags.museumCreate && (g.flags.museumCritic || g.flags.museumArtist) && !g.flags.museumLife && g.intel > 45,
+      choices:[
+        { label:'策划了自己的第一个艺术展览', hint:'+✨ +👥 +💰', fn: g => { g.flags.museumLife=true; g.flags.museumCurator=true; return{charm:15,social:10,money:5000}; }},
+        { label:'成了博物馆的特约撰稿人', hint:'+💰 +✨ +🧠', fn: g => { g.flags.museumLife=true; return{money:5000,charm:12,intel:8}; }},
+        { label:'只是继续做一个热爱文化的人', hint:'+😊 +🧠 +❤️', fn: g => { g.flags.museumLife=true; return{mood:12,intel:10,health:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -23340,6 +23422,18 @@ const ACHIEVEMENTS = [
     { id:'camping_nature_v36_1_ach', icon:'🌲', name:'自然观察者', desc:'学会了认识大自然的语言', check: g => g.flags.campingNature },
     { id:'camping_escape_v36_1_ach', icon:'🏔️', name:'逃离城市', desc:'在山野中找到了内心的平静', check: g => g.flags.campingEscape },
     { id:'camping_life_v36_1_ach', icon:'🌄', name:'户外人生', desc:'找到了城市与山野的平衡', check: g => g.flags.campingLife },
+
+    // v36.2 博物馆与文化艺术
+    { id:'museum_first_v36_2_ach', icon:'🏛️', name:'博物馆初探', desc:'第一次走进了博物馆的大门', check: g => g.flags.museumFirst },
+    { id:'museum_exhibit_v36_2_ach', icon:'🖼️', name:'看展达人', desc:'养成了每周末看展的习惯', check: g => g.flags.museumExhibit },
+    { id:'museum_art_v36_2_ach', icon:'🎨', name:'当代艺术入门', desc:'开始尝试理解当代艺术', check: g => g.flags.museumArt },
+    { id:'museum_history_v36_2_ach', icon:'📜', name:'历史感悟者', desc:'在博物馆里感受到了时间的重量', check: g => g.flags.museumHistory },
+    { id:'museum_volunteer_v36_2_ach', icon:'🙋', name:'文化志愿者', desc:'成为了博物馆的讲解志愿者', check: g => g.flags.museumVolunteer },
+    { id:'museum_social_v36_2_ach', icon:'👩‍🎨', name:'文化社交', desc:'在艺术圈交到了志同道合的朋友', check: g => g.flags.museumSocial },
+    { id:'museum_collect_v36_2_ach', icon:'🎁', name:'文创收集家', desc:'收集了各大博物馆的文创产品', check: g => g.flags.museumCollect },
+    { id:'museum_deep_v36_2_ach', icon:'🔍', name:'深度观展者', desc:'从打卡式看展进化到了深度研究', check: g => g.flags.museumDeep },
+    { id:'museum_create_v36_2_ach', icon:'✏️', name:'艺术创作者', desc:'从观众变成了创作者', check: g => g.flags.museumCreate },
+    { id:'museum_life_v36_2_ach', icon:'🌟', name:'文化人生', desc:'在大城市找到了属于自己的精神角落', check: g => g.flags.museumLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
