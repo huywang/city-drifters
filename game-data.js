@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v36.8
+// 都市浮生记 - 数据文件 v36.9
 // ============================================
 
 
@@ -21801,6 +21801,88 @@ const EVENTS = [
         { label:'继续做那个每天去公园坐坐的人', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.parkLife=true; return{mood:12,health:8,intel:5}; }},
       ]},
 
+    // === v36.9 方言与口音文化 ===
+    { id:'dialect_first_v36_9', icon:'🗣️', title:'听不懂', category:'dialect',
+      body:'刚来这座城市的时候，你在菜市场买菜，大妈用方言说了一长串，你一个字都没听懂。你只能用普通话比划着说"这个多少钱"，大妈看了你一眼，用蹩脚的普通话重复了一遍。',
+      cond: g => g.age >= 18 && g.age <= 28 && !g.flags.dialectFirst,
+      choices:[
+        { label:'开始认真学本地话', hint:'+🧠 +👥', fn: g => { g.flags.dialectFirst=true; g.flags.dialectLearn=true; return{intel:5,social:3}; }},
+        { label:'坚持说普通话，不想学', hint:'+🧠', fn: g => { g.flags.dialectFirst=true; g.flags.dialectMandarin=true; return{intel:2}; }},
+        { label:'用手机翻译APP帮忙沟通', hint:'+🧠 +😊', fn: g => { g.flags.dialectFirst=true; return{intel:3,mood:2}; }},
+      ]},
+    { id:'dialect_learn_v36_9', icon:'📖', title:'学方言', category:'dialect',
+      body:'你找了个本地同事当"方言老师"，每周学几个常用词。三个月后你能听懂大概三成，说出来的发音总是怪怪的，同事笑你是"塑料本地话"。但菜场大妈已经能听懂你了。',
+      cond: g => g.age >= 20 && g.flags.dialectLearn && !g.flags.dialectStudy && g.intel > 20,
+      choices:[
+        { label:'每天听方言广播练习', hint:'+🧠 +🧠', fn: g => { g.flags.dialectStudy=true; g.flags.dialectDaily=true; return{intel:8,charm:3}; }},
+        { label:'学到能买菜就够了', hint:'+🧠 +😊', fn: g => { g.flags.dialectStudy=true; return{intel:4,mood:3}; }},
+        { label:'太难了，发音完全不对', hint:'-😊', fn: g => { g.flags.dialectStudy=true; g.flags.dialectHard=true; return{mood:-3,intel:2}; }},
+      ]},
+    { id:'dialect_hometown_v36_9', icon:'🏠', title:'家乡话', category:'dialect',
+      body:'过年回家的时候，你发现自己说家乡话开始"卡壳"了。有些词想不起来怎么说，不自觉地蹦出普通话。奶奶说"你怎么出去几年连话都不会说了"。你忽然有点心酸。',
+      cond: g => g.age >= 22 && g.flags.dialectFirst && !g.flags.dialectHometown,
+      choices:[
+        { label:'刻意在家多说方言', hint:'+😊 +👥', fn: g => { g.flags.dialectHometown=true; g.flags.dialectKeep=true; return{mood:6,social:5}; }},
+        { label:'觉得语言变化是正常的', hint:'+🧠', fn: g => { g.flags.dialectHometown=true; return{intel:4,mood:2}; }},
+        { label:'开始录音保存家里的方言', hint:'+🧠 +✨', fn: g => { g.flags.dialectHometown=true; g.flags.dialectRecord=true; return{intel:5,charm:3}; }},
+      ]},
+    { id:'dialect_work_v36_9', icon:'💼', title:'职场口音', category:'dialect',
+      body:'开会的时侯你发现，有些人说话带口音会被认为"不够专业"。你开始刻意模仿标准的普通话，压低自己的口音。有天你突然想：为什么"标准"的只有一种？',
+      cond: g => g.age >= 24 && g.flags.dialectFirst && !g.flags.dialectWork && g.jobSalary > 0,
+      choices:[
+        { label:'继续练标准普通话，职场需要', hint:'+✨ +🧠', fn: g => { g.flags.dialectWork=true; g.flags.dialectPolish=true; return{charm:5,intel:3}; }},
+        { label:'做真实的自己，口音是身份的一部分', hint:'+😊 +✨', fn: g => { g.flags.dialectWork=true; g.flags.dialectAuthentic=true; return{mood:6,charm:3}; }},
+        { label:'在不同场合切换不同说话方式', hint:'+🧠 +✨', fn: g => { g.flags.dialectWork=true; g.flags.dialectCodeSwitch=true; return{intel:5,charm:4}; }},
+      ]},
+    { id:'dialect_social_v36_9', icon:'🤝', title:'方言社交', category:'dialect',
+      body:'你在公司茶水间听到两个同事在说方言，你认出了那种熟悉的乡音，忍不住插了一句。三个人顿时热络起来——原来你们来自同一个省。方言成了大城市里最快拉近距离的密码。',
+      cond: g => g.age >= 23 && g.flags.dialectFirst && !g.flags.dialectSocial && g.social > 20,
+      choices:[
+        { label:'和老乡们组成了方言互助小组', hint:'+👥 +😊', fn: g => { g.flags.dialectSocial=true; g.flags.dialectGroup=true; return{social:10,mood:6}; }},
+        { label:'聊了几句就散了', hint:'+👥', fn: g => { g.flags.dialectSocial=true; return{social:4}; }},
+        { label:'加了老乡群，经常一起吃饭', hint:'+👥 +😊 -💰', fn: g => { g.flags.dialectSocial=true; g.flags.dialectCrew=true; return{social:8,mood:5,money:-200}; }},
+      ]},
+    { id:'dialect_switch_v36_9', icon:'🔄', title:'切换模式', category:'dialect',
+      body:'你发现自己可以在普通话和本地话之间自由切换了。和客户说标准普通话，和菜场大妈说本地话，打电话回家说家乡话。你好像拥有了三种人格。',
+      cond: g => g.age >= 25 && g.flags.dialectStudy && g.flags.dialectCodeSwitch && !g.flags.dialectSwitch && g.intel > 30,
+      choices:[
+        { label:'开始研究方言背后的文化', hint:'+🧠 +✨', fn: g => { g.flags.dialectSwitch=true; g.flags.dialectResearch=true; return{intel:10,charm:5}; }},
+        { label:'享受这种语言自由', hint:'+😊 +✨', fn: g => { g.flags.dialectSwitch=true; return{mood:8,charm:5}; }},
+        { label:'有时候会突然不知道该说哪种', hint:'+🧠 -😊', fn: g => { g.flags.dialectSwitch=true; return{intel:3,mood:-2}; }},
+      ]},
+    { id:'dialect_lose_v36_9', icon:'😢', title:'忘了怎么说', category:'dialect',
+      body:'你给家里打电话，想说一个方言词但怎么都想不起来。你用普通话代替了，电话那头沉默了一秒。你忽然意识到，有些东西正在悄悄消失，而你甚至不知道是什么时候开始的。',
+      cond: g => g.age >= 28 && g.flags.dialectHometown && !g.flags.dialectLose && g.intel > 30,
+      choices:[
+        { label:'开始系统记录家乡的方言词汇', hint:'+🧠 +✨', fn: g => { g.flags.dialectLose=true; g.flags.dialectDocument=true; return{intel:8,charm:5}; }},
+        { label:'接受语言会随着生活变化', hint:'+🧠 +😊', fn: g => { g.flags.dialectLose=true; return{intel:5,mood:3}; }},
+        { label:'决定多回家，多和老人说话', hint:'+👥 +😊', fn: g => { g.flags.dialectLose=true; g.flags.dialectVisit=true; return{social:5,mood:5}; }},
+      ]},
+    { id:'dialect_media_v36_9', icon:'🎬', title:'方言内容', category:'dialect',
+      body:'你在B站看到一个用方言拍的短片，讲述城市打工人的故事。弹幕里全是"太真实了""笑着笑着就哭了"。你发现方言有一种普通话没有的力量——它带着泥土味和烟火气，直击人心。',
+      cond: g => g.age >= 24 && g.flags.dialectSwitch && !g.flags.dialectMedia && g.intel > 30,
+      choices:[
+        { label:'开始用方言做短视频', hint:'+✨ +💰', fn: g => { g.flags.dialectMedia=true; g.flags.dialectCreator=true; return{charm:8,money:2000}; }},
+        { label:'写了一篇关于方言文化的文章', hint:'+🧠 +✨', fn: g => { g.flags.dialectMedia=true; return{intel:8,charm:5}; }},
+        { label:'只是默默看了很多方言相关的纪录片', hint:'+🧠 +😊', fn: g => { g.flags.dialectMedia=true; return{intel:5,mood:5}; }},
+      ]},
+    { id:'dialect_kids_v36_9', icon:'👶', title:'下一代', category:'dialect',
+      body:'你的亲戚带着孩子来城市玩，小孩只会说普通话，完全听不懂方言。你问他还记不记得奶奶说的方言，他摇摇头。你看着这个在大城市长大的孩子，觉得方言的传承正在断裂。',
+      cond: g => g.age >= 30 && g.flags.dialectLose && !g.flags.dialectKids && g.intel > 35,
+      choices:[
+        { label:'开始教孩子说方言', hint:'+👥 +🧠 +✨', fn: g => { g.flags.dialectKids=true; g.flags.dialectTeach=true; return{social:5,intel:5,charm:5}; }},
+        { label:'觉得顺其自然就好', hint:'+🧠', fn: g => { g.flags.dialectKids=true; return{intel:3}; }},
+        { label:'录了很多方言故事给孩子听', hint:'+✨ +🧠', fn: g => { g.flags.dialectKids=true; g.flags.dialectStory=true; return{charm:6,intel:4}; }},
+      ]},
+    { id:'dialect_life_v36_9', icon:'🌏', title:'语言与根', category:'dialect',
+      body:'你终于理解了，方言不只是一门语言，它是一个人的根。你在城市里学了标准普通话，但真正让你感到温暖的，还是电话那头奶奶用方言说的那句"吃饱了没"。大城市里每个人都有自己的口音，每种口音背后都有一个离家的故事。',
+      cond: g => g.age >= 30 && g.flags.dialectKids && (g.flags.dialectDocument || g.flags.dialectCreator) && !g.flags.dialectLife && g.intel > 40,
+      choices:[
+        { label:'发起方言保护公益项目', hint:'+✨ +👥 +🧠', fn: g => { g.flags.dialectLife=true; g.flags.dialectProtect=true; return{charm:12,social:10,intel:8}; }},
+        { label:'写了一本《城市里的方言地图》', hint:'+💰 +✨ +🧠', fn: g => { g.flags.dialectLife=true; g.flags.dialectAuthor=true; return{money:6000,charm:10,intel:10}; }},
+        { label:'继续做那个会说三种话的漂泊者', hint:'+😊 +🧠 +❤️', fn: g => { g.flags.dialectLife=true; return{mood:10,intel:8,health:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -23998,6 +24080,18 @@ const ACHIEVEMENTS = [
     { id:'park_community_v36_8_ach', icon:'🌻', name:'社区花园', desc:'在社区花园认领了一小块地', check: g => g.flags.parkCommunity },
     { id:'park_nature_v36_8_ach', icon:'🦜', name:'城市绿洲守护者', desc:'开始关注城市绿地的保护', check: g => g.flags.parkNature },
     { id:'park_life_v36_8_ach', icon:'🌍', name:'公园人生', desc:'公园成了你人生中最温柔的存在', check: g => g.flags.parkLife },
+
+    // v36.9 方言与口音文化
+    { id:'dialect_first_v36_9_ach', icon:'🗣️', name:'语言障碍', desc:'第一次听不懂本地话', check: g => g.flags.dialectFirst },
+    { id:'dialect_learn_v36_9_ach', icon:'📖', name:'方言学徒', desc:'开始学习本地话', check: g => g.flags.dialectStudy },
+    { id:'dialect_hometown_v36_9_ach', icon:'🏠', name:'乡音渐远', desc:'发现自己说家乡话开始卡壳', check: g => g.flags.dialectHometown },
+    { id:'dialect_work_v36_9_ach', icon:'💼', name:'职场口音', desc:'在职场里思考口音与专业的关系', check: g => g.flags.dialectWork },
+    { id:'dialect_social_v36_9_ach', icon:'🤝', name:'方言社交', desc:'在大城市里用方言找到了同乡', check: g => g.flags.dialectSocial },
+    { id:'dialect_switch_v36_9_ach', icon:'🔄', name:'语言切换者', desc:'可以在不同语言间自由切换', check: g => g.flags.dialectSwitch },
+    { id:'dialect_lose_v36_9_ach', icon:'😢', name:'遗忘的方言', desc:'意识到方言正在从记忆中消失', check: g => g.flags.dialectLose },
+    { id:'dialect_media_v36_9_ach', icon:'🎬', name:'方言内容创作者', desc:'被方言文化内容打动并开始创作', check: g => g.flags.dialectMedia },
+    { id:'dialect_kids_v36_9_ach', icon:'👶', name:'方言传承', desc:'开始思考下一代与方言的关系', check: g => g.flags.dialectKids },
+    { id:'dialect_life_v36_9_ach', icon:'🌏', name:'语言与根', desc:'理解了方言是一个人最深的根', check: g => g.flags.dialectLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
