@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v34.2
+// 都市浮生记 - 数据文件 v34.3
 // ============================================
 
 
@@ -19528,6 +19528,98 @@ const EVENTS = [
         { label:'开始写一篇关于收藏文化的文章', hint:'+✨ +👥', fn: g => { g.flags.collectPhilosophy=true; g.flags.collectWriter=true; return{charm:12,social:8}; }},
       ]},
 
+    // ===== 独立书店与阅读空间 (v34.3) =====
+
+    { id:'indie_bookstore_v34_3', icon:'📚', title:'发现独立书店', category:'bookstore',
+      body:'你在一条小巷子里发现了一家独立书店。\n\n没有招牌，只有一扇木门和门口的一盆绿萝。推门进去，铃铛叮当响了一声。\n\n书店不大，大概只有三十平米，但塞满了书。从地板到天花板，每一面墙都是书架。有新书，也有旧书，还有店主自己印的小册子。\n\n店主是个四十多岁的女人，以前在大出版社做编辑，辞职后开了这家店。她说：「大书店卖畅销书，我卖我觉得值得读的书。」\n\n你在角落里找到了一本绝版的诗集，扉页上有前主人写的一行字：「给20岁的自己——别怕走弯路。」\n\n你买了一杯店里的手冲咖啡，坐在那个角落读了一下午。\n\n走的时候你买了那本诗集和三本店主推荐的书。她给你盖了一个书店的章——一只猫趴在一摞书上。\n\n你觉得这个下午比任何旅行都有意义。',
+      cond: g => g.age >= 20 && g.intel > 35,
+      choices:[
+        { label:'成了这家书店的常客', hint:'+🧠 +😊', fn: g => { g.flags.indieBookstore=true; return{intel:12,mood:8}; }},
+        { label:'买了书就走了，没再来过', hint:'+🧠', fn: g => { g.flags.indieBookstore=true; return{intel:5}; }},
+        { label:'和店主成了朋友', hint:'+👥 +✨', fn: g => { g.flags.indieBookstore=true; g.flags.bookstoreFriend=true; return{social:10,charm:8}; }},
+      ]},
+
+    { id:'reading_club_v34_3', icon:'📖', title:'读书会', category:'bookstore',
+      body:'你参加了一个读书会。\n\n这期读的书是余华的《活着》。十几个人围坐在书店的长桌旁，每人分享五分钟自己的感受。\n\n一个程序员说：「福贵失去了一切，但他还活着。我在大城市打拼，有时候也问自己——我到底在活什么？」\n\n一个刚离婚的女生说：「我以前觉得活着要有意义，现在觉得活着本身就是意义。」\n\n一个七十岁的老爷爷说：「我活了七十年，这本书里的每一件事我都经历过。」\n\n你听着听着，发现自己也在重新思考「活着」的含义。你以为你在大城市是为了赚钱、买房、结婚，但也许你只是为了——活着。认真地活着。\n\n读书会结束后，你在回家的路上给妈妈打了个电话。没什么特别的，就是想听听她的声音。',
+      cond: g => g.age >= 20 && g.intel > 30,
+      choices:[
+        { label:'成了读书会固定成员', hint:'+👥 +🧠', fn: g => { g.flags.readingClub=true; return{social:10,intel:10}; }},
+        { label:'去了一次，觉得太学术了', hint:'+🧠', fn: g => { g.flags.readingClub=true; return{intel:5}; }},
+        { label:'开始自己组织读书会', hint:'+✨ +👥', fn: g => { g.flags.readingClub=true; g.flags.bookClubHost=true; return{charm:12,social:12}; }},
+      ]},
+
+    { id:'24h_bookstore_v34_3', icon:'🌙', title:'24小时书店', category:'bookstore',
+      body:'凌晨一点，你失眠了。\n\n你穿上外套出了门，走到了那家24小时营业的书店。\n\n推门进去，暖黄色的灯光让你瞬间安心了。店里还有七八个人：有人在角落看书，有人趴在桌上睡着了，有人戴着耳机在写东西。\n\n你挑了一本村上春树的《挪威的森林》，找了一个靠窗的位置坐下来。\n\n窗外是空旷的街道，偶尔有一辆出租车经过。窗内是书页翻动的沙沙声和远处咖啡机嗡嗡的声音。\n\n你读着读着，困意慢慢袭来。你在凌晨三点的时候合上了书，在便利贴上写了一句话，贴在了书的扉页上：\n\n「致下一个在凌晨翻开这本书的人：你不是一个人。」\n\n你把书放回书架，走出书店。夜风有点凉，但你的心是暖的。',
+      cond: g => g.age >= 18 && g.health < 60,
+      choices:[
+        { label:'成了深夜书店的常客', hint:'+😊 +🧠', fn: g => { g.flags.nightBookstore=true; return{mood:10,intel:8}; }},
+        { label:'去了一次，还是回家睡觉吧', hint:'+🧠', fn: g => { g.flags.nightBookstore=true; return{intel:3}; }},
+        { label:'开始在书店写深夜日记', hint:'+✨ +🧠', fn: g => { g.flags.nightBookstore=true; g.flags.nightDiary=true; return{charm:10,intel:8}; }},
+      ]},
+
+    { id:'book_recommend_v34_3', icon:'💡', title:'书店老板的推荐', category:'bookstore',
+      body:'你跟书店老板聊了起来。\n\n她说：「我可以给你推荐一本书，但你要先回答我一个问题——你现在最困惑的是什么？」\n\n你想了想说：「我不知道自己在这个城市坚持的意义是什么。」\n\n她沉默了一会儿，从书架上抽出一本书递给你：史铁生的《我与地坛》。\n\n「读读这个。一个双腿瘫痪的人，在地坛公园里坐了十五年，想明白了什么是活着。」\n\n你回去读了一周。读完的那天晚上，你哭了。不是因为悲伤，而是因为释然。\n\n史铁生说：「死是一件不必急于求成的事，死是一个必然会降临的节日。」\n\n你突然觉得，那些让你焦虑的事情——工资、房子、对象——在生与死面前，都没那么重要了。重要的是你今天有没有好好活。\n\n你回去书店，跟老板说：「谢谢你。这本书救了我。」\n\n她笑了：「不是我推荐得好，是你准备好了被救。」',
+      cond: g => g.flags.indieBookstore && g.age >= 22 && (g.mood < 50 || g.intel > 40),
+      choices:[
+        { label:'开始认真读以前不会读的书', hint:'+🧠 +😊', fn: g => { g.flags.bookRecommend=true; return{intel:15,mood:10}; }},
+        { label:'觉得鸡汤，不太受用', hint:'+🧠', fn: g => { g.flags.bookRecommend=true; return{intel:3}; }},
+        { label:'开始给其他人推荐书', hint:'+👥 +✨', fn: g => { g.flags.bookRecommend=true; g.flags.bookRecommender=true; return{social:10,charm:10}; }},
+      ]},
+
+    { id:'bookstore_cat_v34_3', icon:'🐱', title:'书店猫', category:'bookstore',
+      body:'你发现书店有一只猫。\n\n一只橘猫，胖得像个球，每天趴在收银台旁边的窗台上晒太阳。它不亲人，但也不躲人。你伸手摸它，它会看你一眼，然后继续闭目养神。\n\n店主说它叫「书签」，是五年前在书店门口捡的流浪猫。\n\n你开始每次去书店都会带一小袋猫粮。书签从最初的警惕，到后来会在你脚边蹭来蹭去。\n\n有一天你在看书，书签突然跳到你腿上，蜷成一团，开始打呼噜。你不敢动，怕吵醒它。你就那么保持一个姿势看了两个小时的书。\n\n那是你看书最专注的两个小时。\n\n你在朋友圈发了一张书签趴在你腿上的照片，配文：「在书店交到了最安静的朋友。」\n\n获得了120个赞。评论区全是：「我也要去！」',
+      cond: g => g.flags.indieBookstore && g.age >= 18,
+      choices:[
+        { label:'成了书签的「编外铲屎官」', hint:'+😊 +👥', fn: g => { g.flags.bookstoreCat=true; return{mood:12,social:5}; }},
+        { label:'觉得有猫的书店更有灵魂', hint:'+✨ +😊', fn: g => { g.flags.bookstoreCat=true; return{charm:5,mood:8}; }},
+        { label:'开始给书签画肖像画', hint:'+✨ +🧠', fn: g => { g.flags.bookstoreCat=true; g.flags.catArtist=true; return{charm:12,intel:5}; }},
+      ]},
+
+    { id:'zine_v34_3', icon:'📰', title:'独立出版物', category:'bookstore',
+      body:'你在书店发现了一本奇怪的小册子。\n\n它不是出版社出的，而是一个人自己排版、自己打印、自己装订的。叫做「zine」——独立出版物。\n\n那本zine的主题是「在北京租房的100个瞬间」，每一页都是一个小故事配一张手绘插图：\n\n「第3个瞬间：第一次被房东放鸽子，在零下五度的大街上拖着行李箱等了一个小时。」\n「第47个瞬间：在出租屋的墙上发现了前任租客画的一幅画。」\n「第89个瞬间：第N次搬家，发现自己在这座城市的所有家当，一辆面包车就装完了。」\n\n你笑了，又心酸了。因为这些故事也是你的故事。\n\n你找到了zine的作者——一个在广告公司上班的插画师。她说：「我出不起书，但我可以出zine。15块钱一本，印了200本。」\n\n你买了两本。一本自己留着，一本寄给了在外地的朋友。',
+      cond: g => g.flags.indieBookstore && g.age >= 20 && g.intel > 35,
+      choices:[
+        { label:'开始收集各种zine', hint:'+✨ +🧠', fn: g => { g.flags.zineCollect=true; return{charm:10,intel:8}; }},
+        { label:'觉得有趣但没有更多行动', hint:'+🧠 +😊', fn: g => { g.flags.zineCollect=true; return{intel:5,mood:3}; }},
+        { label:'开始做自己的zine', hint:'+✨ +👥', fn: g => { g.flags.zineCollect=true; g.flags.zineCreator=true; return{charm:15,social:8}; }},
+      ]},
+
+    { id:'reading_habit_v34_3', icon:'📕', title:'阅读习惯养成', category:'bookstore',
+      body:'你决定养成每天阅读的习惯。\n\n规则很简单：每天至少读30分钟，不管多忙。你下载了一个阅读打卡App，设定了目标：一年读50本书。\n\n第一周你做到了。第二周你加班到凌晨，只在地铁上读了15分钟。第三周你出差，带了两本书，只读了一本。\n\n但你没有放弃。你发现了一个秘密：阅读不需要「找时间」，它需要的是「替换」。把刷短视频的15分钟换成读书，把等外卖的10分钟换成读书，把睡前的半小时换成读书。\n\n半年后，你读了28本书。你的思维方式变了——你开始能看懂以前觉得晦涩的书，你的表达能力提高了，你甚至开始写日记了。\n\n最神奇的是，你变得更有耐心了。以前你等五分钟就会烦躁，现在你可以在任何等待的时候掏出一本书。\n\n世界没有变快，是你学会了在快中找到慢的空间。',
+      cond: g => g.age >= 20 && g.intel > 30,
+      choices:[
+        { label:'坚持了一年，读了52本书', hint:'+🧠 +✨ +😊', fn: g => { g.flags.readingHabit=true; return{intel:18,charm:8,mood:10}; }},
+        { label:'坚持了几个月，没能全年做到', hint:'+🧠 +😊', fn: g => { g.flags.readingHabit=true; return{intel:10,mood:5}; }},
+        { label:'开始写读书笔记和书评', hint:'+✨ +🧠', fn: g => { g.flags.readingHabit=true; g.flags.bookReviewer=true; return{charm:12,intel:12}; }},
+      ]},
+
+    { id:'author_event_v34_3', icon:'✍️', title:'作家签售会', category:'bookstore',
+      body:'你最喜欢的作家来你的城市做新书分享会了。\n\n你提前一小时到了书店，发现已经排了几十个人。你找了个靠前的位置坐下来，手里攥着那本你读了三遍的书。\n\n作家来了。比你想象的矮，比你想象的温和。她坐下来，先讲了写这本书的故事：\n\n「这本书写了三年，中间我差点放弃了。因为我觉得没有人会看。但后来有个读者给我发了一封邮件，说我的上一本书陪她度过了抑郁症最严重的时期。我决定继续写。」\n\n你的鼻子一酸。\n\n签名的时候，你紧张得说不出话。作家看着你的眼睛说：「谢谢你一直在读。」\n\n你终于说了一句：「谢谢你一直在写。」\n\n回家的路上，你把签名页拍了一张照。你决定也开始写点什么——不一定是书，也许只是日记，也许只是给自己看的文字。\n\n但你知道，有些东西，写下来就不会消失。',
+      cond: g => g.flags.readingHabit && g.age >= 20,
+      choices:[
+        { label:'受到了巨大鼓舞', hint:'+😊 +✨ +🧠', fn: g => { g.flags.authorEvent=true; return{mood:15,charm:10,intel:8}; }},
+        { label:'觉得追星的感觉不太对', hint:'+🧠', fn: g => { g.flags.authorEvent=true; return{intel:3}; }},
+        { label:'开始认真写作', hint:'+✨ +🧠', fn: g => { g.flags.authorEvent=true; g.flags.seriousWriter=true; return{charm:15,intel:10}; }},
+      ]},
+
+    { id:'bookstore_closing_v34_3', icon:'💔', title:'书店要关了', category:'bookstore',
+      body:'你收到了店主的消息：书店下个月要关了。\n\n房租涨了50%，她撑不住了。\n\n你去书店看她。她正在一本一本地把书从书架上拿下来，装进纸箱里。书签（那只猫）蹲在窗台上，好像也感觉到了什么。\n\n「对不起，」她说，「我知道你们很多人把这里当成第二个家。」\n\n你说不出话。\n\n最后一天，书店里挤满了人。有人带了蛋糕，有人带了花。大家轮流说自己在书店的故事：\n\n「我在这里遇到了我现在的男朋友。」「我在这里读了改变我人生的那本书。」「我在这里度过了离婚后最难熬的那个冬天。」\n\n店主最后说了一句话：「书店关了，但阅读不会停。你们每一个人，都是一本活着的书。」\n\n你拍了一张空书架的照片。后来你把它打印出来，挂在了你家的墙上。\n\n上面写了一行字：「献给所有关门的书店——你们的灯灭过，但你们点亮的光还在。」',
+      cond: g => g.flags.indieBookstore && g.flags.bookstoreFriend && g.age >= 22,
+      choices:[
+        { label:'帮店主发起了众筹', hint:'+👥 +✨', fn: g => { g.flags.bookstoreClosing=true; return{social:12,charm:10}; }},
+        { label:'默默买了一堆书作为告别', hint:'+😊 +🧠 -💰', fn: g => { g.flags.bookstoreClosing=true; return{mood:8,intel:8,money:-1000}; }},
+        { label:'写了一篇文章纪念这家书店', hint:'+✨ +🧠', fn: g => { g.flags.bookstoreClosing=true; g.flags.bookstoreWriter=true; return{charm:15,intel:10}; }},
+      ]},
+
+    { id:'reading_philosophy_v34_3', icon:'🌅', title:'阅读重塑了我', category:'bookstore',
+      body:'一年后，你回望这段与书相伴的日子，发现自己变了很多。\n\n你的词汇量变大了——你开始能用更精确的词语描述自己的感受。以前你只会说「不开心」，现在你会说「怅然若失」「百感交集」「物是人非」。\n\n你的同理心变强了——通过阅读不同人的故事，你理解了那些你以前不理解的人。你不再轻易评判别人。\n\n你的焦虑减少了——当你读到那些经历过更大苦难的人的故事，你的那些烦恼变得没那么可怕了。\n\n你开始觉得，阅读是这个时代最被低估的超能力。它不需要花钱（图书馆免费），不需要天赋（只需要认字），不需要时间（只需要把刷手机的时间换一下）。\n\n你在朋友圈写了一段话：\n\n「读书不是为了变成更好的人，而是为了理解——自己本来就不是一个「不够好」的人。」\n\n你获得了88个赞。但最让你开心的，是那家已经关门的书店老板转发了你的朋友圈，配文：「这就是我开书店的意义。」',
+      cond: g => g.age >= 23 && g.flags.readingHabit && (g.flags.indieBookstore || g.flags.readingClub) && g.intel > 45,
+      choices:[
+        { label:'阅读成了你生命的底色', hint:'+🧠 +😊 +✨', fn: g => { g.flags.readingPhilosophy=true; return{intel:18,mood:15,charm:12}; }},
+        { label:'开始做阅读推广志愿者', hint:'+👥 +✨', fn: g => { g.flags.readingPhilosophy=true; g.flags.readingVolunteer=true; return{social:12,charm:12}; }},
+        { label:'开始写自己的第一本书', hint:'+✨ +🧠', fn: g => { g.flags.readingPhilosophy=true; g.flags.firstBook=true; return{charm:15,intel:15,money:5000}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -21428,6 +21520,17 @@ const ACHIEVEMENTS = [
     { id:'tcard_v34_2_ach', icon:'🎴', name:'小卡猎人', desc:'集齐了偶像小卡', check: g => g.flags.tcardCollect },
     { id:'stamp_v34_2_ach', icon:'📮', name:'集邮传承', desc:'继承了爷爷的集邮爱好', check: g => g.flags.stampCollect },
     { id:'collect_philosophy_v34_2_ach', icon:'🏛️', name:'收藏人生', desc:'找到了收藏的真正意义', check: g => g.flags.collectPhilosophy },
+    // --- 独立书店与阅读空间 (v34.3) ---
+    { id:'indie_bookstore_v34_3_ach', icon:'📚', name:'独立书店', desc:'发现了一家宝藏独立书店', check: g => g.flags.indieBookstore },
+    { id:'reading_club_v34_3_ach', icon:'📖', name:'读书会', desc:'参加了读书会分享阅读感受', check: g => g.flags.readingClub },
+    { id:'24h_bookstore_v34_3_ach', icon:'🌙', name:'深夜书店', desc:'在凌晨的书店里找到了安宁', check: g => g.flags.nightBookstore },
+    { id:'book_recommend_v34_3_ach', icon:'💡', name:'一书救命', desc:'被书店老板推荐了一本改变人生的书', check: g => g.flags.bookRecommend },
+    { id:'bookstore_cat_v34_3_ach', icon:'🐱', name:'书店猫', desc:'和书店的猫成了好朋友', check: g => g.flags.bookstoreCat },
+    { id:'zine_v34_3_ach', icon:'📰', name:'独立出版', desc:'发现了zine独立出版物的世界', check: g => g.flags.zineCollect },
+    { id:'reading_habit_v34_3_ach', icon:'📕', name:'阅读习惯', desc:'养成了每天阅读的习惯', check: g => g.flags.readingHabit },
+    { id:'author_event_v34_3_ach', icon:'✍️', name:'作家签售', desc:'参加了最喜欢的作家的签售会', check: g => g.flags.authorEvent },
+    { id:'bookstore_closing_v34_3_ach', icon:'💔', name:'书店告别', desc:'见证了心爱的书店关门', check: g => g.flags.bookstoreClosing },
+    { id:'reading_philosophy_v34_3_ach', icon:'🌅', name:'阅读重塑', desc:'阅读重塑了你对世界的理解', check: g => g.flags.readingPhilosophy },
 ];
 
 // === ENDINGS === (order matters: first match wins)
