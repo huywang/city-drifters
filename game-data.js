@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v38.5
+// 都市浮生记 - 数据文件 v38.6
 // ============================================
 
 
@@ -23209,6 +23209,88 @@ const EVENTS = [
         { label:'帮身边的单身朋友牵线搭桥', hint:'+🤝 +❤️', fn: g => { g.flags.matchLife=true; g.flags.matchCupid=true; return{social:10,mood:8}; }},
       ]},
 
+    // === v38.6 旧货市场与跳蚤市场 ===
+    { id:'flea_first_v38_6', icon:'🏪', title:'逛旧货市场', category:'flea',
+      body:'周末路过一个旧货市场，好奇心驱使你走了进去。各种摊位上摆满了旧书、老唱片、二手电器、旧家具、古董杂货……一个摊主喊："走过路过不要错过！五块钱买不了吃亏买不了上当！"你随手翻了翻，发现了一本八十年代的《读者文摘》和一套完整的小人书。旧货市场就像一个时光机，每件东西都有故事。',
+      cond: g => !g.flags.fleaFirst && g.age >= 18,
+      choices:[
+        { label:'买了几件有趣的小东西', hint:'-💰 +😊', fn: g => { g.flags.fleaFirst=true; return{money:-50,mood:8}; }},
+        { label:'只看不买，纯粹逛逛', hint:'+🧠 +😊', fn: g => { g.flags.fleaFirst=true; return{intel:5,mood:5}; }},
+      ]},
+
+    { id:'flea_treasure_v38_6', icon:'💎', title:'淘到宝贝', category:'flea',
+      body:'你在一个不起眼的摊位上发现了一台老式海鸥相机，摊主要价80块。你拿起来看了看，发现还能用。"这是八十年代的货，"摊主说，"现在很少见了。"你买回去在网上查了查，同款在二手平台卖800。"你赚到了！"朋友羡慕地说。你突然理解了什么叫"捡漏"的快乐。',
+      cond: g => g.flags.fleaFirst && !g.flags.fleaTreasure,
+      choices:[
+        { label:'自己留着收藏', hint:'+😊 +✨', fn: g => { g.flags.fleaTreasure=true; g.flags.fleaKeep=true; return{mood:10,charm:5}; }},
+        { label:'挂到二手平台卖了', hint:'+💰 +🧠', fn: g => { g.flags.fleaTreasure=true; g.flags.fleaSell=true; return{money:720,intel:3}; }},
+      ]},
+
+    { id:'flea_haggle_v38_6', icon:'🤝', title:'砍价艺术', category:'flea',
+      body:'你看上了一个老式收音机，摊主开价300。你说："150行不行？"摊主："兄弟你这砍价太狠了，250拿走。"你："180，多了不要了。"摊主假装思考了十秒钟："行行行，交个朋友，200拿走。"你得意地抱着收音机走了。后来朋友告诉你这种收音机新的也就200块。"砍价砍了个寂寞。"',
+      cond: g => g.flags.fleaFirst && !g.flags.fleaHaggle && g.intel > 15,
+      choices:[
+        { label:'回去找摊主理论', hint:'+😤 -🤝', fn: g => { g.flags.fleaHaggle=true; return{mood:-3,social:-3}; }},
+        { label:'算了，花钱买了个教训', hint:'+🧠 +😅', fn: g => { g.flags.fleaHaggle=true; return{intel:5,mood:3}; }},
+      ]},
+
+    { id:'flea_boss_v38_6', icon:'👴', title:'摊位老板的故事', category:'flea',
+      body:'旧货市场最有趣的摊位属于一个七十岁的老头——大家都叫他"老物件王"。他的摊位上全是七八十年代的东西：搪瓷杯、暖水瓶、收音机、旧报纸。"这些都是我的收藏，"他说，"现在年纪大了，摆出来让更多人看看那个年代。"他拿起一台收音机："这是我爸留下的，现在还能放出声来。"你听了一段滋滋的老歌，仿佛穿越了时空。',
+      cond: g => g.flags.fleaFirst && !g.flags.fleaBoss && g.age >= 20,
+      choices:[
+        { label:'每周去听老王讲过去的故事', hint:'+🧠 +❤️', fn: g => { g.flags.fleaBoss=true; g.flags.fleaRegular=true; return{intel:8,mood:5}; }},
+        { label:'买了一件老王最珍贵的藏品', hint:'-💰 +✨', fn: g => { g.flags.fleaBoss=true; g.flags.fleaPrecious=true; return{money:-500,charm:8}; }},
+      ]},
+
+    { id:'flea_weekend_v38_6', icon:'📅', title:'周末集市', category:'flea',
+      body:'你发现旧货市场每周六开市，成了你的固定活动。渐渐地你认识了大部分摊主，也认识了一些同好。"你也喜欢收老唱片啊？"一个叫阿杰的年轻人主动搭话。你们交换了微信，约好下次一起去淘宝。旧货市场不只是买卖的地方，更是一个有温度的社区——一群喜欢旧物的人，在这里找到了彼此。',
+      cond: g => g.flags.fleaBoss && !g.flags.fleaWeekend && g.social > 15,
+      choices:[
+        { label:'和阿杰成了旧货搭子', hint:'+🤝 +😊', fn: g => { g.flags.fleaWeekend=true; g.flags.fleaBuddy=true; return{social:8,mood:5}; }},
+        { label:'独自享受淘宝的乐趣', hint:'+😊 +🧠', fn: g => { g.flags.fleaWeekend=true; return{mood:8,intel:3}; }},
+      ]},
+
+    { id:'flea_vintage_v38_6', icon:'🎸', title:'复古潮流', category:'flea',
+      body:'你在旧货市场淘到了一件七十年代的军绿色夹克，穿出去被朋友疯狂夸："这也太好看了吧！在哪买的？"你发现"复古风"正在年轻人中流行——旧货市场的东西比快时尚更有味道。你开始在社交平台分享旧货市场淘来的穿搭，意外收获了不少粉丝。"旧物不代表过时，"你写道，"它代表的是经过时间考验的美。"',
+      cond: g => g.flags.fleaFirst && !g.flags.fleaVintage && g.age >= 20 && g.charm > 20,
+      choices:[
+        { label:'成了旧货市场的穿搭博主', hint:'+✨ +💰', fn: g => { g.flags.fleaVintage=true; g.flags.fleaBlogger=true; return{charm:10,money:2000}; }},
+        { label:'纯粹自己喜欢就好', hint:'+😊 +✨', fn: g => { g.flags.fleaVintage=true; return{mood:5,charm:5}; }},
+      ]},
+
+    { id:'flea_find_v38_6', icon:'📖', title:'旧书里的秘密', category:'flea',
+      body:'你在旧书摊淘到一本二手的《围城》，翻了几页发现里面夹着一封信。信是1985年写的，是一个大学生写给暗恋对象的。"如果你看到这封信，说明我终究没有勇气寄出去。"你看完信后沉默了很久。你不知道那个大学生后来怎样了，但那封信让你觉得：旧物最珍贵的不是物件本身，而是附着在上面的记忆。',
+      cond: g => g.flags.fleaFirst && !g.flags.fleaFind && g.intel > 20,
+      choices:[
+        { label:'把信夹回去，让它继续流浪', hint:'+🧠 +❤️', fn: g => { g.flags.fleaFind=true; return{intel:8,mood:5}; }},
+        { label:'在网上发帖寻找写信人', hint:'+✨ +🧠', fn: g => { g.flags.fleaFind=true; g.flags.fleaSearch=true; return{charm:5,intel:5}; }},
+      ]},
+
+    { id:'flea_fake_v38_6', icon:'🚫', title:'假货风波', category:'flea',
+      body:'你花500块买了一个"古董花瓶"，拿回家给朋友一看——"这是做旧的，你看底下的标签，是激光打印的。"你气冲冲地回去找摊主，对方已经不在了。"旧货市场水深，"老王跟你说，"我在这四十年了，也有看走眼的时候。关键是要多看少买。"你看着那个假花瓶，决定把它当成正面教材。',
+      cond: g => g.flags.fleaFirst && !g.flags.fleaFake && g.money > 1000,
+      choices:[
+        { label:'吃一堑长一智，开始研究鉴定', hint:'+🧠 +✨', fn: g => { g.flags.fleaFake=true; g.flags.fleaAppraise=true; return{intel:10,charm:3}; }},
+        { label:'把假花瓶摆在书架上自嘲', hint:'+😊 +🧠', fn: g => { g.flags.fleaFake=true; return{mood:5,intel:5}; }},
+      ]},
+
+    { id:'flea_dying_v38_6', icon:'📉', title:'旧货市场要拆了', category:'flea',
+      body:'你收到了消息：旧货市场因为城市更新要被拆除了，改成商业综合体。"这里开了二十年了，"老王说，"比我儿子的年纪都大。"最后一个开市日，所有摊主都来了，大家互相拍照留念。老王把他的搪瓷杯送给你："拿着，以后想我了就看看。"你站在即将消失的市场里，突然觉得：城市在不断变新，但有些旧的东西，一旦没了就再也找不回来了。',
+      cond: g => g.flags.fleaBoss && !g.flags.fleaDying && g.age >= 22,
+      choices:[
+        { label:'帮老王联系新的摆摊地点', hint:'+❤️ +🤝', fn: g => { g.flags.fleaDying=true; g.flags.fleaHelpBoss=true; return{social:8,mood:5}; }},
+        { label:'拍了一组旧货市场的纪录照片', hint:'+✨ +🧠', fn: g => { g.flags.fleaDying=true; g.flags.fleaPhoto=true; return{charm:8,intel:5}; }},
+      ]},
+
+    { id:'flea_life_v38_6', icon:'🌟', title:'旧物人生', category:'flea',
+      body:'你终于理解了旧货市场的哲学。在一个什么都在快速更新的时代，旧物是一种对抗遗忘的方式。每件旧东西都承载着一段记忆，连接着过去和现在。你不需要拥有最新的手机、最潮的衣服——有时候，一件旧夹克、一本旧书、一台老相机，反而比新东西更有温度。人生也是这样：不是越新越好，而是越有故事越好。',
+      cond: g => g.age >= 28 && g.flags.fleaFirst && (g.flags.fleaBoss || g.flags.fleaWeekend) && (g.flags.fleaDying || g.flags.fleaVintage) && !g.flags.fleaLife,
+      choices:[
+        { label:'开了一家复古旧物店', hint:'-💰 +❤️ +💰', fn: g => { g.flags.fleaLife=true; g.flags.fleaShop=true; return{money:-15000,mood:15,charm:10}; }},
+        { label:'做了一期《旧物里的人生》播客', hint:'+✨ +🧠', fn: g => { g.flags.fleaLife=true; g.flags.fleaPodcast=true; return{charm:10,intel:8}; }},
+        { label:'继续做一个享受旧物的生活家', hint:'+😊 +✨ +🧠', fn: g => { g.flags.fleaLife=true; return{mood:12,charm:5,intel:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -25590,6 +25672,16 @@ const ACHIEVEMENTS = [
     { id:'match_success_v38_5_ach', icon:'💕', name:'命中注定', desc:'在相亲中遇到了对的人', check: g => g.flags.matchSuccess },
     { id:'match_market_v38_5_ach', icon:'🏪', name:'婚姻市场', desc:'看透了婚姻市场的残酷真相', check: g => g.flags.matchMarket },
     { id:'match_life_v38_5_ach', icon:'🌟', name:'婚姻人生', desc:'悟出了婚姻不是人生的必选项', check: g => g.flags.matchLife },
+    { id:'flea_first_v38_6_ach', icon:'🏪', name:'初入旧货', desc:'第一次走进了旧货市场', check: g => g.flags.fleaFirst },
+    { id:'flea_treasure_v38_6_ach', icon:'💎', name:'捡漏高手', desc:'在旧货市场淘到了宝贝', check: g => g.flags.fleaTreasure },
+    { id:'flea_haggle_v38_6_ach', icon:'🤝', name:'砍价新手', desc:'体验了旧货市场的砍价艺术', check: g => g.flags.fleaHaggle },
+    { id:'flea_boss_v38_6_ach', icon:'👴', name:'老物件王', desc:'认识了旧货市场最有故事的摊主', check: g => g.flags.fleaBoss },
+    { id:'flea_weekend_v38_6_ach', icon:'📅', name:'周末常客', desc:'成了旧货市场的周末常客', check: g => g.flags.fleaWeekend },
+    { id:'flea_vintage_v38_6_ach', icon:'🎸', name:'复古先锋', desc:'用旧物引领了复古潮流', check: g => g.flags.fleaVintage },
+    { id:'flea_find_v38_6_ach', icon:'📖', name:'旧物秘密', desc:'在旧书里发现了一段尘封的记忆', check: g => g.flags.fleaFind },
+    { id:'flea_fake_v38_6_ach', icon:'🚫', name:'火眼金睛', desc:'经历了假货风波学会了鉴定', check: g => g.flags.fleaFake },
+    { id:'flea_dying_v38_6_ach', icon:'📉', name:'最后集市', desc:'见证了旧货市场的最后时光', check: g => g.flags.fleaDying },
+    { id:'flea_life_v38_6_ach', icon:'🌟', name:'旧物人生', desc:'理解了旧物是对抗遗忘的方式', check: g => g.flags.fleaLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
