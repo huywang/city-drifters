@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v39.6
+// 都市浮生记 - 数据文件 v39.7
 // ============================================
 
 
@@ -24061,6 +24061,79 @@ const EVENTS = [
         { label:'平静地接受生死，好好过好每一天', hint:'+😊 +💪', fn: g => { g.flags.funeralLife=true; return{mood:12,health:8}; }},
       ]},
 
+    // ═══ v39.7 医院陪护文化 ═══
+    { id:'hospital_register_v39_7', icon:'🏥', title:'医院挂号', category:'hospital',
+      body:'家人生病了，需要去大医院看病。你六点就到医院排队挂号，结果前面已经排了五十多人。等了两个小时终于挂上了号，又等了三个小时才轮到看诊。医生看了五分钟，开了一堆检查单。你觉得在大医院看病就像闯关：挂号是第一关，候诊是第二关，检查是第三关，取药是第四关。每一关都需要耐心和体力。你不禁感叹：在中国，看病比上班还累。',
+      cond: g => g.age >= 22 && !g.flags.hospitalRegister,
+      choices:[
+        { label:'全程陪护，一天都在医院里耗着', hint:'+❤️ -💪', fn: g => { g.flags.hospitalRegister=true; return{social:5,health:-3}; }},
+        { label:'学会了网上预约挂号', hint:'+🧠', fn: g => { g.flags.hospitalRegister=true; return{intel:5}; }},
+      ]},
+    { id:'hospital_care_v39_7', icon:'😰', title:'陪护焦虑', category:'hospital',
+      body:'家人住院了，你开始了陪护生活。白天要上班，晚上要守在医院。折叠床打开来不到一米宽，睡到半夜腰酸背痛。每隔两个小时要起来帮病人翻身，护士叫你去拿药你就得跑。最煎熬的不是身体的累，而是心里的焦虑——检查结果什么时候出来？病情会不会恶化？手术能不能成功？你在病房走廊里来回踱步，觉得时间过得特别慢。',
+      cond: g => g.flags.hospitalRegister && !g.flags.hospitalCare,
+      choices:[
+        { label:'白天上班晚上陪护，硬撑了一个月', hint:'+❤️ -💪', fn: g => { g.flags.hospitalCare=true; return{health:-10,mood:-5,social:5}; }},
+        { label:'和家人轮班陪护，互相支持', hint:'+❤️ +💪', fn: g => { g.flags.hospitalCare=true; return{social:8}; }},
+      ]},
+    { id:'hospital_nurse_v39_7', icon:'👩‍⚕️', title:'请护工', category:'hospital',
+      body:'实在撑不住了，你决定请一个护工。医院门口有很多护工中介，价格从每天一百五到三百不等。你找了一个五十多岁的阿姨，她干这行十五年了，手法熟练，人也细心。她告诉你，她照顾过几百个病人，有康复出院的，也有没能挺过来的。她说最辛苦的不是照顾病人，是面对家属的焦虑和坏脾气。你觉得护工是医院里最被忽视但最不可或缺的人。',
+      cond: g => g.flags.hospitalCare && !g.flags.hospitalNurse,
+      choices:[
+        { label:'对护工阿姨充满了感激', hint:'+❤️ +🧠', fn: g => { g.flags.hospitalNurse=true; return{social:5,money:-5000,intel:3}; }},
+        { label:'了解到护工行业的酸甜苦辣', hint:'+🧠', fn: g => { g.flags.hospitalNurse=true; return{intel:8,money:-5000}; }},
+      ]},
+    { id:'hospital_canteen_v39_7', icon:'🍱', title:'医院食堂', category:'hospital',
+      body:'在医院陪护的这段时间，你几乎把医院食堂吃了个遍。食堂的菜不贵但味道一般，病号餐更是清淡得没味道。但你发现了一个秘密——医院负一楼有个小卖部，里面的泡面和卤蛋是陪护人员的深夜救星。凌晨三点，你在走廊里吃着泡面，旁边还有其他陪护的人。大家交换了一个心照不宣的眼神：都是在医院里熬着的人。',
+      cond: g => g.flags.hospitalCare && !g.flags.hospitalCanteen,
+      choices:[
+        { label:'在食堂认识了其他陪护的人', hint:'+❤️', fn: g => { g.flags.hospitalCanteen=true; return{social:8}; }},
+        { label:'学会了在医院的生存法则', hint:'+🧠', fn: g => { g.flags.hospitalCanteen=true; return{intel:5}; }},
+      ]},
+    { id:'hospital_ward_v39_7', icon:'🛏️', title:'病房社交', category:'hospital',
+      body:'病房是一个奇特的社交空间。四张床，四个病人，加上各自的陪护家属，十几个人挤在一个二十平米的房间里。白天大家互相聊天解闷，晚上互相忍受打呼噜。有的病友很乐观，天天讲笑话逗大家开心；有的很沉默，总是看着窗外发呆。你发现，在医院里，人们会放下所有的伪装——没有人再关心你是谁、挣多少钱、住多大房子。在疾病面前，人人平等。',
+      cond: g => g.flags.hospitalCare && !g.flags.hospitalWard,
+      choices:[
+        { label:'和病友们成了朋友', hint:'+❤️ +😊', fn: g => { g.flags.hospitalWard=true; return{social:10,mood:5}; }},
+        { label:'在医院里看透了很多人生道理', hint:'+🧠', fn: g => { g.flags.hospitalWard=true; return{intel:8}; }},
+      ]},
+    { id:'hospital_emergency_v39_7', icon:'🚑', title:'急诊室', category:'hospital',
+      body:'半夜两点，家人的病情突然加重了。你手忙脚乱地叫了急救车，十五分钟后被推进了急诊室。急诊室里灯火通明，有人在哭，有人在喊，有人安静地等着。你看着医生护士们忙碌的身影，突然觉得他们是这个世界上最辛苦也最伟大的人。凌晨五点，医生说暂时稳定了。你瘫坐在走廊的椅子上，浑身发软。你觉得活着真好。',
+      cond: g => g.flags.hospitalCare && g.age >= 24 && !g.flags.hospitalEmergency,
+      choices:[
+        { label:'那一刻深刻感受到了生命的脆弱', hint:'+🧠 +❤️', fn: g => { g.flags.hospitalEmergency=true; return{intel:8,mood:-5}; }},
+        { label:'发誓以后要更加珍惜健康', hint:'+💪 +😊', fn: g => { g.flags.hospitalEmergency=true; return{health:5}; }},
+      ]},
+    { id:'hospital_surgery_v39_7', icon:'⏳', title:'手术等待', category:'hospital',
+      body:'家人要做大手术了。你在手术同意书上签了字，手一直在抖。手术预计四个小时，你坐在手术室外的椅子上，看着那盏红色的手术灯。四个小时像四年那么漫长。你不敢看手机，不敢闭眼，就盯着那扇门。中间护士出来拿了一次东西，你的心提到了嗓子眼。终于，灯灭了，医生出来说：手术很成功。你蹲在地上哭了出来。这几个小时的煎熬，你一辈子都忘不了。',
+      cond: g => g.flags.hospitalEmergency && !g.flags.hospitalSurgery,
+      choices:[
+        { label:'手术成功，感觉重生了一次', hint:'+😊 +💪', fn: g => { g.flags.hospitalSurgery=true; return{mood:15,health:3}; }},
+        { label:'等待的过程让你变得更加坚强', hint:'+💪 +🧠', fn: g => { g.flags.hospitalSurgery=true; return{health:5,intel:5}; }},
+      ]},
+    { id:'hospital_discharge_v39_7', icon:'🎉', title:'出院', category:'hospital',
+      body:'住了二十多天，家人终于要出院了。办出院手续又是一个漫长的过程——等医生写病历、等护士核对、去药房取药、去收费处结账。前前后后花了大半天。但当走出医院大门的那一刻，阳光照在脸上的感觉特别好。你回头看了一眼那栋白色的大楼，心里默默说：希望再也不用来这里了。但你心里也清楚，生老病死是人生必经的路，医院只是这条路上的一个驿站。',
+      cond: g => g.flags.hospitalSurgery && !g.flags.hospitalDischarge,
+      choices:[
+        { label:'出院那天感觉世界都变亮了', hint:'+😊 +💪', fn: g => { g.flags.hospitalDischarge=true; return{mood:12,health:5}; }},
+        { label:'开始认真关注全家人的健康', hint:'+❤️ +💪', fn: g => { g.flags.hospitalDischarge=true; return{social:5,health:3}; }},
+      ]},
+    { id:'hospital_companion_v39_7', icon:'🤝', title:'陪诊师', category:'hospital',
+      body:'你听说了一个新职业——陪诊师。专门帮不熟悉医院流程的人挂号、排队、取报告、拿药。你帮一个独居老人约了一个陪诊师，是个年轻姑娘，全程陪着老人看病，帮忙翻译医生说的话，还帮老人记下了所有注意事项。老人特别感动：比我自己孩子还细心。你觉得这个职业填补了一个空白——在一个老龄化社会里，太多人需要有人陪着去看病了。',
+      cond: g => g.flags.hospitalDischarge && !g.flags.hospitalCompanion,
+      choices:[
+        { label:'考虑转行做陪诊师', hint:'+✨ +🧠', fn: g => { g.flags.hospitalCompanion=true; return{charm:8,intel:5}; }},
+        { label:'推荐给了更多需要的人', hint:'+❤️', fn: g => { g.flags.hospitalCompanion=true; return{social:8}; }},
+      ]},
+    { id:'hospital_life_v39_7', icon:'🌟', title:'医院人生', category:'hospital',
+      body:'在医院陪护的这段经历，改变了你对很多事的看法。你明白了健康是最大的财富，陪伴是最好的孝顺，平安是最朴素的幸福。医院是一个浓缩了人间百态的地方——有新生有死亡，有希望有绝望，有欢笑有泪水。在医院里，你能看到人性最真实的一面：有人倾家荡产也要救亲人，有人在病床前争夺遗产；有人对护工感恩戴德，有人对医生恶语相向。你希望每个人都能被温柔以待，也希望自己永远不需要再走进那扇大门。',
+      cond: g => g.flags.hospitalDischarge && (g.flags.hospitalWard || g.flags.hospitalCompanion) && !g.flags.hospitalLife,
+      choices:[
+        { label:'写了一本《我在医院陪护的日子》', hint:'+✨ +🧠', fn: g => { g.flags.hospitalLife=true; return{charm:12,intel:8}; }},
+        { label:'成了一个医院志愿者', hint:'+❤️ +✨', fn: g => { g.flags.hospitalLife=true; g.flags.hospitalVolunteer=true; return{social:12,charm:5}; }},
+        { label:'更加珍惜健康和身边的每一个人', hint:'+😊 +❤️ +💪', fn: g => { g.flags.hospitalLife=true; return{mood:10,social:5,health:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -26560,6 +26633,17 @@ const ACHIEVEMENTS = [
     { id:'funeral_philosophy_v39_6_ach', icon:'💭', name:'向死而生', desc:'建立了自己的生死观', check: g => g.flags.funeralPhilosophy },
     { id:'funeral_live_v39_6_ach', icon:'🌱', name:'好好活着', desc:'开始珍惜当下的每一天', check: g => g.flags.funeralLive },
     { id:'funeral_life_v39_6_ach', icon:'🌟', name:'生死人生', desc:'理解了正因为有终点，旅程才珍贵', check: g => g.flags.funeralLife },
+    // v39.7 医院陪护文化
+    { id:'hospital_register_v39_7_ach', icon:'🏥', name:'排队挂号', desc:'体验了大医院挂号的艰难', check: g => g.flags.hospitalRegister },
+    { id:'hospital_care_v39_7_ach', icon:'😰', name:'陪护之路', desc:'开始了辛苦的医院陪护生活', check: g => g.flags.hospitalCare },
+    { id:'hospital_nurse_v39_7_ach', icon:'👩‍⚕️', name:'护工阿姨', desc:'请了一位经验丰富的护工', check: g => g.flags.hospitalNurse },
+    { id:'hospital_canteen_v39_7_ach', icon:'🍱', name:'医院食堂', desc:'在医院的食堂和小卖部里找到了慰藉', check: g => g.flags.hospitalCanteen },
+    { id:'hospital_ward_v39_7_ach', icon:'🛏️', name:'病房故事', desc:'在病房里见证了人间百态', check: g => g.flags.hospitalWard },
+    { id:'hospital_emergency_v39_7_ach', icon:'🚑', name:'急诊之夜', desc:'经历了深夜急诊的惊心动魄', check: g => g.flags.hospitalEmergency },
+    { id:'hospital_surgery_v39_7_ach', icon:'⏳', name:'手术等待', desc:'在手术室外熬过了最漫长的几小时', check: g => g.flags.hospitalSurgery },
+    { id:'hospital_discharge_v39_7_ach', icon:'🎉', name:'终于出院', desc:'迎来了家人康复出院的那一天', check: g => g.flags.hospitalDischarge },
+    { id:'hospital_companion_v39_7_ach', icon:'🤝', name:'陪诊师', desc:'了解了一个温暖的新兴职业', check: g => g.flags.hospitalCompanion },
+    { id:'hospital_life_v39_7_ach', icon:'🌟', name:'医院人生', desc:'在医院里看到了人性最真实的一面', check: g => g.flags.hospitalLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
