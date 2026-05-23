@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v40.5
+// 都市浮生记 - 数据文件 v40.6
 // ============================================
 
 
@@ -24746,6 +24746,88 @@ const EVENTS = [
         { label:'举起杯子，敬这杯叫做人生的奶茶', hint:'+😊 +❤️', fn: g => { g.flags.milkteaLife=true; return{mood:15,social:5}; }},
       ]},
 
+    // === v40.6 网络贷款与消费贷 ===
+    { id:'loan_first_v40_6', icon:'💳', title:'第一次借贷', category:'loan',
+      body:'双十一到了，购物车里躺着一堆东西，但工资还没发。你看到了花呗的提示："先消费，后付款，免息30天。"你犹豫了一下，点了确认。第一次用借来的钱买东西的感觉很奇妙——东西到手了，钱还没出去，好像什么都没发生一样。你觉得这东西真方便，下个月发了工资还上就行了。但你不知道，这是一个 slippery slope 的开始。',
+      cond: g => g.age >= 18 && g.age <= 35 && g.money < 20000 && !g.flags.loanFirst,
+      choices:[
+        { label:'觉得挺方便的，开始经常使用', hint:'+😊 -💰', fn: g => { g.flags.loanFirst=true; g.flags.loanFrequent=true; return{mood:5,money:-3000}; }},
+        { label:'只用了这一次，下个月立刻还清', hint:'+🧠', fn: g => { g.flags.loanFirst=true; g.flags.loanCareful=true; return{intel:3}; }},
+        { label:'还完之后决定以后不再借了', hint:'+💪 +🧠', fn: g => { g.flags.loanFirst=true; g.flags.loanAnti=true; return{intel:5,health:2}; }},
+      ]},
+    { id:'loan_huabei_v40_6', icon:'📱', title:'花呗依赖', category:'loan',
+      body:'你已经习惯了"先买后付"的生活方式。吃饭用花呗、打车用花呗、买衣服用花呗、甚至充话费也用花呗。你的花呗额度从三千涨到了一万五，你觉得这是"信用好"的证明。但你仔细算了一下，每个月光是还花呗就要花掉工资的三分之一。你以为自己在消费，其实是在给未来的自己挖坑。',
+      cond: g => g.flags.loanFrequent && !g.flags.loanHuabei,
+      choices:[
+        { label:'继续这样生活，反正每个月都还得起最低还款', hint:'+😊 -💰', fn: g => { g.flags.loanHuabei=true; g.flags.loanMinimum=true; return{mood:3,money:-5000}; }},
+        { label:'开始记账，控制消费', hint:'+🧠 +💪', fn: g => { g.flags.loanHuabei=true; g.flags.loanBudget=true; return{intel:8,health:3}; }},
+        { label:'关掉了花呗，改用微信支付', hint:'+💪', fn: g => { g.flags.loanHuabei=true; g.flags.loanClose=true; return{health:5}; }},
+      ]},
+    { id:'loan_overspend_v40_6', icon:'🛍️', title:'超前消费', category:'loan',
+      body:'你开始用借呗和白条了。花呗只是"延迟付款"，但借呗是"真借钱"。你借了两万块买了一台最新款iPhone和一双限量球鞋。朋友说你"活得精致"，你觉得自己配得上好东西。但你没算过：借呗年化利率15%，两万块一年光利息就要三千。你在小红书上看到一句话："二十岁的年纪，四十岁的消费观，六十岁的负债。"你笑着点了个赞，心里却有点慌。',
+      cond: g => (g.flags.loanHuabei || g.flags.loanFrequent) && !g.flags.loanOverspend,
+      choices:[
+        { label:'又借了一笔钱去旅游', hint:'+😊 -💰', fn: g => { g.flags.loanOverspend=true; g.flags.loanTravel=true; return{mood:10,money:-25000}; }},
+        { label:'意识到花太多了，开始省吃俭用', hint:'+💪 -😊', fn: g => { g.flags.loanOverspend=true; g.flags.loanFrugal=true; return{health:3,mood:-8}; }},
+        { label:'开始研究理财，学习控制负债', hint:'+🧠', fn: g => { g.flags.loanOverspend=true; g.flags.loanStudy=true; return{intel:10}; }},
+      ]},
+    { id:'loan_debt_v40_6', icon:'❄️', title:'债务雪球', category:'loan',
+      body:'你发现自己陷入了一个怪圈：这个月的钱还了上个月的债，然后这个月的消费又要靠下个月来还。你的花呗、借呗、白条、信用卡加在一起，欠了八万多。每天打开APP都能看到红色的还款提醒，你开始害怕看手机。晚上躺在床上算来算去，怎么也算不清什么时候能还清。你终于理解了什么叫"拆东墙补西墙"。',
+      cond: g => (g.flags.loanOverspend || g.flags.loanMinimum) && !g.flags.loanDebt,
+      choices:[
+        { label:'不敢告诉家人，自己扛着', hint:'-😊 -💪', fn: g => { g.flags.loanDebt=true; g.flags.loanHide=true; return{mood:-15,health:-8}; }},
+        { label:'鼓起勇气跟父母坦白', hint:'+❤️ -😊', fn: g => { g.flags.loanDebt=true; g.flags.loanConfess=true; return{social:5,mood:-5,money:30000}; }},
+        { label:'下定决心，制定还款计划', hint:'+💪 +🧠', fn: g => { g.flags.loanDebt=true; g.flags.loanPlan=true; return{health:3,intel:5}; }},
+      ]},
+    { id:'loan_cycle_v40_6', icon:'🔄', title:'以贷养贷', category:'loan',
+      body:'这是你最黑暗的时刻。花呗还不上就借借呗，借呗还不上就刷信用卡，信用卡还不上就找网贷。你同时用着七八个借贷APP，每个还款日都是一场噩梦。你甚至开始算"日息"而不是"年化利率"——日息万分之五听起来好像不多？但那换算成年化是18%。你终于明白：所有的"方便"和"快捷"，都是精心设计的陷阱。',
+      cond: g => g.flags.loanDebt && !g.flags.loanCycle,
+      choices:[
+        { label:'越陷越深，开始失眠', hint:'-😊 -💪', fn: g => { g.flags.loanCycle=true; return{mood:-20,health:-12}; }},
+        { label:'痛定思痛，删掉所有借贷APP', hint:'+💪 +🧠', fn: g => { g.flags.loanCycle=true; g.flags.loanDeleteApps=true; return{health:5,intel:8}; }},
+        { label:'找了份兼职加速还款', hint:'+💰 +💪 -😊', fn: g => { g.flags.loanCycle=true; g.flags.loanSideJob=true; return{money:5000,health:-5}; }},
+      ]},
+    { id:'loan_collect_v40_6', icon:'📞', title:'催收噩梦', category:'loan',
+      body:'凌晨两点，手机响了。一个陌生号码，你不敢接。第二天，你的通讯录好友都收到了一条短信："请问你知道XXX的联系方式吗？"你的同事、朋友、甚至你妈都接到了催收电话。你在公司抬不起头，你妈打电话来哭着问你出了什么事。那一刻你觉得天都塌了。你看着手机，想着要不要关机跑路。但你知道，逃是逃不掉的。',
+      cond: g => g.flags.loanCycle && !g.flags.loanCollect,
+      choices:[
+        { label:'跟所有催收协商还款计划', hint:'+💪 -😊', fn: g => { g.flags.loanCollect=true; g.flags.loanNegotiate=true; return{health:-3,mood:-5}; }},
+        { label:'找家人借了一笔钱先把最紧急的还了', hint:'+❤️ -💰', fn: g => { g.flags.loanCollect=true; g.flags.loanFamilyHelp=true; return{social:5,money:20000}; }},
+        { label:'开始学法律，了解自己的权利', hint:'+🧠 +💪', fn: g => { g.flags.loanCollect=true; g.flags.loanLegal=true; return{intel:10,health:3}; }},
+      ]},
+    { id:'loan_repay_v40_6', icon:'🏊', title:'上岸计划', category:'loan',
+      body:'你制定了严格的还款计划：每个月工资到账第一件事是还债，只留最基本的生活费。你退了租的房子搬到更便宜的地方，不再点外卖改为自己做饭，衣服破了补补继续穿。你把还款进度做成了一个表格，每还完一笔就划掉一行。看着数字一点点减少，你第一次觉得自己在掌控人生。半年后，最后一个平台的欠款终于清零了。你看着那个"0"，哭了。',
+      cond: g => (g.flags.loanCollect || g.flags.loanPlan) && !g.flags.loanRepay,
+      choices:[
+        { label:'上岸后开始疯狂存钱', hint:'+💰 +💪', fn: g => { g.flags.loanRepay=true; g.flags.loanSaver=true; return{money:10000,health:5}; }},
+        { label:'写了一篇"我的上岸经历"发网上', hint:'+✨ +🧠', fn: g => { g.flags.loanRepay=true; g.flags.loanBlogger=true; return{charm:10,intel:5}; }},
+        { label:'发誓再也不碰任何借贷产品', hint:'+💪 +😊', fn: g => { g.flags.loanRepay=true; g.flags.loanNeverAgain=true; return{health:8,mood:10}; }},
+      ]},
+    { id:'loan_lesson_v40_6', icon:'📖', title:'债务教训', category:'loan',
+      body:'还清债务后，你开始反思这段经历。你发现自己当年对钱完全没有概念，不知道什么是年化利率，不知道复利有多可怕，不知道"最低还款"其实是最大的陷阱。你开始读理财入门书、看财经博主的视频、学习记账。你跟朋友说："我这辈子交过最贵的学费，就是那些年付的利息。"但你也知道，这段经历让你比同龄人更早学会了什么是真正的"财务自由"。',
+      cond: g => g.flags.loanRepay && !g.flags.loanLesson,
+      choices:[
+        { label:'考了个理财规划师证书', hint:'+🧠 +💰', fn: g => { g.flags.loanLesson=true; g.flags.loanCert=true; return{intel:12,money:5000}; }},
+        { label:'开始投资基金，让钱生钱', hint:'+💰 +🧠', fn: g => { g.flags.loanLesson=true; g.flags.loanInvest=true; return{money:8000,intel:8}; }},
+        { label:'把自己的经历分享给了更多年轻人', hint:'+❤️ +✨', fn: g => { g.flags.loanLesson=true; return{social:10,charm:8}; }},
+      ]},
+    { id:'loan_credit_v40_6', icon:'📊', title:'信用修复', category:'loan',
+      body:'你想贷款买个东西的时候发现被拒了——征信报告上那些逾期记录还在。你查了查，发现不良记录要保留五年才能消除。五年，你因为年轻时的糊涂，给自己买了五年的"信用惩罚"。你开始按时还每一张信用卡，每个月都全额还款，就是为了慢慢修复信用。你终于明白：信用就像一面镜子，碎了可以粘起来，但裂痕永远都在。',
+      cond: g => g.flags.loanLesson && !g.flags.loanCredit,
+      choices:[
+        { label:'坚持了两年按时还款，信用分终于回来了', hint:'+💪 +🧠', fn: g => { g.flags.loanCredit=true; return{health:5,intel:8}; }},
+        { label:'开始研究个人征信系统', hint:'+🧠', fn: g => { g.flags.loanCredit=true; g.flags.loanCreditExpert=true; return{intel:10}; }},
+        { label:'终于又能正常贷款了', hint:'+😊 +💰', fn: g => { g.flags.loanCredit=true; return{mood:10,money:3000}; }},
+      ]},
+    { id:'loan_life_v40_6', icon:'🌟', title:'财务人生', category:'loan',
+      body:'多年后你已经是一个"理财达人"了。你有稳定的储蓄习惯，有合理的投资组合，最重要的是——你没有任何债务。有人问你怎么变得这么"抠"，你说："不是抠，是知道每一分钱的重量。"你曾经以为花钱是快乐的源泉，现在你知道安全感才是。那些年的债务不是人生的污点，而是你最珍贵的人生课堂。你终于明白：真正的自由不是想买什么就买什么，而是不想做什么就可以不做什么。',
+      cond: g => (g.flags.loanCredit || g.flags.loanNeverAgain) && g.age >= 30 && !g.flags.loanLife,
+      choices:[
+        { label:'成了朋友们的"理财顾问"', hint:'+❤️ +✨', fn: g => { g.flags.loanLife=true; g.flags.loanAdvisor=true; return{social:12,charm:10}; }},
+        { label:'写了一本关于年轻人理财的书', hint:'+✨ +🧠', fn: g => { g.flags.loanLife=true; return{charm:15,intel:10}; }},
+        { label:'感恩那段让你成长的经历', hint:'+😊 +💪', fn: g => { g.flags.loanLife=true; return{mood:12,health:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -27340,6 +27422,16 @@ const ACHIEVEMENTS = [
     { id:'milktea_coffee_v40_5_ach', icon:'☕', name:'咖啡觉醒', desc:'从奶茶少年变成了咖啡大人', check: g => g.flags.milkteaCoffee },
     { id:'milktea_trend_v40_5_ach', icon:'📱', name:'饮品潮流', desc:'看透了饮品行业的潮起潮落', check: g => g.flags.milkteaTrend },
     { id:'milktea_life_v40_5_ach', icon:'🌟', name:'奶茶人生', desc:'那些和奶茶有关的日子，就是真实的人生', check: g => g.flags.milkteaLife },
+    { id:'loan_first_v40_6_ach', icon:'💳', name:'第一次借贷', desc:'点下了那个改变消费习惯的确认键', check: g => g.flags.loanFirst },
+    { id:'loan_huabei_v40_6_ach', icon:'📱', name:'花呗依赖', desc:'不知不觉养成了先买后付的习惯', check: g => g.flags.loanHuabei },
+    { id:'loan_overspend_v40_6_ach', icon:'🛍️', name:'超前消费', desc:'用明天的钱圆今天的梦', check: g => g.flags.loanOverspend },
+    { id:'loan_debt_v40_6_ach', icon:'❄️', name:'债务雪球', desc:'体会到了拆东墙补西墙的绝望', check: g => g.flags.loanDebt },
+    { id:'loan_cycle_v40_6_ach', icon:'🔄', name:'以贷养贷', desc:'陷入了越借越多的恶性循环', check: g => g.flags.loanCycle },
+    { id:'loan_collect_v40_6_ach', icon:'📞', name:'催收噩梦', desc:'经历了人生最黑暗的时刻', check: g => g.flags.loanCollect },
+    { id:'loan_repay_v40_6_ach', icon:'🏊', name:'上岸', desc:'终于还清了所有债务', check: g => g.flags.loanRepay },
+    { id:'loan_lesson_v40_6_ach', icon:'📖', name:'债务教训', desc:'用真金白银买了人生最贵的一课', check: g => g.flags.loanLesson },
+    { id:'loan_credit_v40_6_ach', icon:'📊', name:'信用修复', desc:'明白了信用比金钱更重要', check: g => g.flags.loanCredit },
+    { id:'loan_life_v40_6_ach', icon:'🌟', name:'财务人生', desc:'从债务泥潭中走出来，学会了真正的财务自由', check: g => g.flags.loanLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
