@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v39.9
+// 都市浮生记 - 数据文件 v40.0
 // ============================================
 
 
@@ -24280,6 +24280,80 @@ const EVENTS = [
         { label:'珍惜每一次相聚的机会', hint:'+😊 +❤️', fn: g => { g.flags.reunionLife=true; return{mood:10,social:5}; }},
       ]},
 
+    // ═══ v40.0 育儿与带娃文化（大版本） ═══
+    { id:'parenting_pregnant_v40_0', icon:'🤰', title:'怀孕消息', category:'parenting',
+      body:'验孕棒上出现了两条杠。你愣了三秒，然后开始傻笑。你给另一半看了结果，两个人抱着跳了半天。然后你开始慌了——房贷还没还完，存款不够看，工作还不确定。但看着那两条杠，你觉得一切都值了。你发了条朋友圈：我们要当爸妈了！下面一百多个赞，评论区全是恭喜。你突然觉得，原来幸福就是这么简单的一件事。',
+      cond: g => g.age >= 25 && g.money >= 5000 && !g.flags.parentingPregnant,
+      choices:[
+        { label:'激动得一夜没睡', hint:'+😊', fn: g => { g.flags.parentingPregnant=true; return{mood:15}; }},
+        { label:'开始疯狂学习育儿知识', hint:'+🧠', fn: g => { g.flags.parentingPregnant=true; g.flags.parentingStudy=true; return{intel:8}; }},
+      ]},
+    { id:'parenting_checkup_v40_0', icon:'🏥', title:'产检焦虑', category:'parenting',
+      body:'怀孕期间要做十几次产检。每次拿到报告单的时候，你都紧张得手心出汗——NT正常吗？唐筛过了吗？四维有没有问题？医生说一切都好，你才能松一口气。你在孕妈群里看到有人因为一项指标不正常，担心了整整一个月。你觉得怀孕是对心理素质的最大考验——十个月的等待，每一天都在担心和期待之间反复横跳。',
+      cond: g => g.flags.parentingPregnant && !g.flags.parentingCheckup,
+      choices:[
+        { label:'每次产检都全程陪同', hint:'+❤️ -💪', fn: g => { g.flags.parentingCheckup=true; return{social:5,health:-3}; }},
+        { label:'学会了用科学心态面对产检', hint:'+🧠 +💪', fn: g => { g.flags.parentingCheckup=true; return{intel:5,health:3}; }},
+      ]},
+    { id:'parenting_newborn_v40_0', icon:'👶', title:'新手爸妈', category:'parenting',
+      body:'孩子出生了。当你第一次抱起那个皱巴巴的小生命时，你的眼泪不受控制地流了下来。三公斤多点，五十厘米，哭起来嗓门特大。你手忙脚乱地学换尿布、学冲奶粉、学拍嗝。每天只睡三个小时，黑眼圈比熊猫还深。但每当孩子对着你笑的时候，你觉得所有的辛苦都值了。原来世界上最治愈的东西，就是一个婴儿的微笑。',
+      cond: g => g.flags.parentingCheckup && !g.flags.parentingNewborn,
+      choices:[
+        { label:'辞了工作全职带娃', hint:'-💰 +❤️', fn: g => { g.flags.parentingNewborn=true; setJob(g,'全职家长',0); return{mood:5,social:-3}; }},
+        { label:'请了产假，爸妈来帮忙', hint:'+❤️ +💪', fn: g => { g.flags.parentingNewborn=true; return{mood:8,social:5}; }},
+      ]},
+    { id:'parenting_yuezi_v40_0', icon:'🍲', title:'月子里的战争', category:'parenting',
+      body:'坐月子成了家庭矛盾的高发期。你妈说要喝鸡汤，婆婆说要喝鲫鱼汤；你妈说不能洗澡，婆婆说不能吹风；你妈说孩子要穿多点，婆婆说穿太多会捂出病。两代人的育儿观念碰撞在一起，火星四溅。你夹在中间左右为难。最后你们请了一个月嫂，专业的人做专业的事，家庭矛盾一下子少了很多。你明白了：有些事，花钱能解决就别吵架。',
+      cond: g => g.flags.parentingNewborn && !g.flags.parentingYuezi,
+      choices:[
+        { label:'请了月嫂，家庭和睦了', hint:'-💰 +😊', fn: g => { g.flags.parentingYuezi=true; return{money:-15000,mood:8}; }},
+        { label:'自己扛过来了，虽然累但学到了很多', hint:'+💪 +🧠', fn: g => { g.flags.parentingYuezi=true; return{health:-5,intel:8}; }},
+      ]},
+    { id:'parenting_firstword_v40_0', icon:'🗣️', title:'第一次叫爸妈', category:'parenting',
+      body:'孩子十个月大的时候，突然开口叫了一声爸爸或妈妈。那一刻你的心脏差点跳出来。你激动得录了十遍视频，发给了所有亲朋好友。你让孩子再叫一遍，但他不配合了，只是对着你流口水。你觉得这是人生中最有成就感的时刻——比升职加薪、比买房买车都让你开心。原来一个人最大的满足，就是被一个小小的生命需要着。',
+      cond: g => g.flags.parentingNewborn && !g.flags.parentingFirstWord,
+      choices:[
+        { label:'感动得哭了出来', hint:'+❤️ +😊', fn: g => { g.flags.parentingFirstWord=true; return{mood:15,social:3}; }},
+        { label:'把这一刻永远记在了心里', hint:'+🧠 +❤️', fn: g => { g.flags.parentingFirstWord=true; return{intel:5,mood:8}; }},
+      ]},
+    { id:'parenting_kindergarten_v40_0', icon:'🏫', title:'幼儿园大战', category:'parenting',
+      body:'孩子三岁了，要上幼儿园了。你才发现选幼儿园比选大学还难——公立幼儿园便宜但要排队摇号，私立幼儿园贵得离谱但设施好。你跑了五家幼儿园，比较了价格、师资、伙食、离家距离。最后摇号没摇上心仪的公立，只能选了第二志愿。送孩子去幼儿园的第一天，你在门口偷偷看了一个小时。你觉得从这一刻开始，你正式加入了中国家长的焦虑大军。',
+      cond: g => g.flags.parentingFirstWord && g.age >= 28 && !g.flags.parentingKinder,
+      choices:[
+        { label:'花大价钱送了最好的私立幼儿园', hint:'-💰 +😊', fn: g => { g.flags.parentingKinder=true; return{money:-20000,mood:5}; }},
+        { label:'接受现实，在普通幼儿园里用心陪伴', hint:'+❤️ +🧠', fn: g => { g.flags.parentingKinder=true; return{social:5,intel:3}; }},
+      ]},
+    { id:'parenting_classes_v40_0', icon:'🎹', title:'兴趣班焦虑', category:'parenting',
+      body:'孩子上大班了，周围的同学都在报兴趣班：钢琴、画画、舞蹈、英语、编程。你不报怕孩子输在起跑线上，报了又怕孩子太累。你给孩子试了五六个班，发现他最喜欢的是搭积木——但这个好像没什么用。后来你想通了：与其让孩子学一堆不喜欢的东西，不如让他快乐地玩。但你心里还是有一丝焦虑：别人家的孩子都在学，你不学会不会被落下？',
+      cond: g => g.flags.parentingKinder && !g.flags.parentingClasses,
+      choices:[
+        { label:'给孩子报了三个兴趣班', hint:'-💰 -😊', fn: g => { g.flags.parentingClasses=true; return{money:-8000,mood:-3}; }},
+        { label:'只选了一个孩子最喜欢的', hint:'+😊 +❤️', fn: g => { g.flags.parentingClasses=true; return{mood:5,social:3}; }},
+        { label:'不报兴趣班，自己陪孩子玩', hint:'+❤️ +🧠', fn: g => { g.flags.parentingClasses=true; return{social:8,intel:3}; }},
+      ]},
+    { id:'parenting_homework_v40_0', icon:'📚', title:'辅导作业', category:'parenting',
+      body:'孩子上小学了，辅导作业成了你每天最大的噩梦。一道数学题讲了三遍，孩子还是一脸茫然。你气得拍桌子：这么简单的题都不会！孩子哇的一声哭了。你后悔了，抱着孩子道歉。后来你在网上看到一句话：不辅导作业母慈子孝，一辅导作业鸡飞狗跳。你深深地点了个赞。你开始理解为什么有人说辅导作业是检验亲子关系的终极考验。',
+      cond: g => g.flags.parentingKinder && g.age >= 30 && !g.flags.parentingHomework,
+      choices:[
+        { label:'学会了耐心，不再对孩子发火', hint:'+🧠 +❤️', fn: g => { g.flags.parentingHomework=true; return{intel:8,social:5}; }},
+        { label:'请了家教，解放了自己', hint:'-💰 +😊', fn: g => { g.flags.parentingHomework=true; return{money:-5000,mood:5}; }},
+      ]},
+    { id:'parenting_reflect_v40_0', icon:'💭', title:'育儿反思', category:'parenting',
+      body:'有一天孩子对你说：爸爸妈妈，你能不能不要总是看手机，陪我玩一会儿？这句话像一巴掌打醒了你。你反思自己的育儿方式——是不是陪孩子太少了？是不是要求太高了？是不是把自己的焦虑转嫁给了孩子？你开始调整：每天放下手机陪孩子玩一个小时，不再拿孩子跟别人比，不再因为成绩发脾气。你发现，孩子需要的不是一个完美的父母，而是一个愿意陪他一起成长的人。',
+      cond: g => g.flags.parentingHomework && !g.flags.parentingReflect,
+      choices:[
+        { label:'改变了育儿方式，亲子关系变好了', hint:'+❤️ +😊', fn: g => { g.flags.parentingReflect=true; return{social:10,mood:8}; }},
+        { label:'写了一篇育儿反思日记', hint:'+✨ +🧠', fn: g => { g.flags.parentingReflect=true; g.flags.parentingDiary=true; return{charm:8,intel:5}; }},
+      ]},
+    { id:'parenting_life_v40_0', icon:'🌟', title:'育儿人生', category:'parenting',
+      body:'你终于理解了父母当年养育你的不容易。养一个孩子，不只是花钱，更是花时间、花精力、花耐心。你在孩子身上看到了自己的影子——他的倔强像你了，他的善良像你了，他的焦虑也像你了。你希望孩子能过得比你好，但你更希望他能成为他自己。育儿的本质不是培养一个完美的孩子，而是和孩子一起经历成长的酸甜苦辣。你在这段旅程中学到的，比你在学校里学到的还多。',
+      cond: g => g.flags.parentingReflect && (g.flags.parentingClasses || g.flags.parentingFirstWord) && !g.flags.parentingLife,
+      choices:[
+        { label:'成了一个育儿博主，帮助更多新手爸妈', hint:'+✨ +🧠', fn: g => { g.flags.parentingLife=true; return{charm:12,intel:8}; }},
+        { label:'写了一本《我和孩子一起长大》', hint:'+✨ +❤️', fn: g => { g.flags.parentingLife=true; g.flags.parentingBook=true; return{charm:10,social:8}; }},
+        { label:'继续做一个和孩子一起成长的父母', hint:'+😊 +❤️', fn: g => { g.flags.parentingLife=true; return{mood:12,social:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -26812,6 +26886,17 @@ const ACHIEVEMENTS = [
     { id:'reunion_reconnect_v39_9_ach', icon:'🤝', name:'旧友重逢', desc:'在同学会上找回了失联多年的好友', check: g => g.flags.reunionReconnect },
     { id:'reunion_moments_v39_9_ach', icon:'📷', name:'朋友圈百态', desc:'通过朋友圈看到了同学们的真实生活', check: g => g.flags.reunionMoments },
     { id:'reunion_life_v39_9_ach', icon:'🌟', name:'同学会人生', desc:'理解了友谊不需要天天联系，只需要重逢时一切如旧', check: g => g.flags.reunionLife },
+    // v40.0 育儿与带娃文化
+    { id:'parenting_pregnant_v40_0_ach', icon:'🤰', name:'两条杠', desc:'迎来了人生中最惊喜的消息', check: g => g.flags.parentingPregnant },
+    { id:'parenting_checkup_v40_0_ach', icon:'🏥', name:'产检过关', desc:'经历了十个月的产检焦虑', check: g => g.flags.parentingCheckup },
+    { id:'parenting_newborn_v40_0_ach', icon:'👶', name:'新手爸妈', desc:'第一次抱起了自己的宝宝', check: g => g.flags.parentingNewborn },
+    { id:'parenting_yuezi_v40_0_ach', icon:'🍲', name:'月子之战', desc:'经历了坐月子期间的家庭观念碰撞', check: g => g.flags.parentingYuezi },
+    { id:'parenting_firstword_v40_0_ach', icon:'🗣️', name:'第一声爸妈', desc:'听到了孩子叫出第一声爸妈', check: g => g.flags.parentingFirstWord },
+    { id:'parenting_kinder_v40_0_ach', icon:'🏫', name:'幼儿园择校', desc:'体验了选幼儿园比选大学还难的焦虑', check: g => g.flags.parentingKinder },
+    { id:'parenting_classes_v40_0_ach', icon:'🎹', name:'兴趣班焦虑', desc:'在报不报兴趣班之间纠结了很久', check: g => g.flags.parentingClasses },
+    { id:'parenting_homework_v40_0_ach', icon:'📚', name:'辅导作业', desc:'体验了辅导作业的崩溃与和解', check: g => g.flags.parentingHomework },
+    { id:'parenting_reflect_v40_0_ach', icon:'💭', name:'育儿觉醒', desc:'反思了自己的育儿方式并做出改变', check: g => g.flags.parentingReflect },
+    { id:'parenting_life_v40_0_ach', icon:'🌟', name:'育儿人生', desc:'理解了育儿的本质是和孩子一起成长', check: g => g.flags.parentingLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
