@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v37.5
+// 都市浮生记 - 数据文件 v37.6
 // ============================================
 
 
@@ -22375,6 +22375,88 @@ const EVENTS = [
         { label:'继续做一个认真对待生活的匠人', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.artisanLife=true; return{mood:12,health:5,intel:8}; }},
       ]},
 
+    // === v37.6 手写信与慢递文化 ===
+    { id:'letter_first_v37_6', icon:'✉️', title:'收到手写信', category:'letter',
+      body:'你在信箱里发现了一封手写信。在这个快递和外卖的时代，一封真正的信显得如此珍贵。是奶奶寄来的，字歪歪扭扭但每个字都认真，信里说"想你了，有空回来看看"。你看着信，眼眶热了。',
+      cond: g => g.age >= 20 && !g.flags.letterFirst,
+      choices:[
+        { label:'认真地写了一封回信', hint:'+👥 +😊 +✨', fn: g => { g.flags.letterFirst=true; g.flags.letterReply=true; return{social:5,mood:6,charm:3}; }},
+        { label:'打电话给奶奶说收到信了', hint:'+👥 +😊', fn: g => { g.flags.letterFirst=true; return{social:4,mood:5}; }},
+        { label:'把信收好，放在抽屉最深处', hint:'+😊', fn: g => { g.flags.letterFirst=true; return{mood:4}; }},
+      ]},
+    { id:'letter_write_v37_6', icon:'🖊️', title:'写一封信', category:'letter',
+      body:'你决定给朋友手写一封信。买了信纸和信封，坐在桌前想了很久该写什么。写到第三行的时候，你发现手写比打字更能表达内心——那些在微信里说不出口的话，写在纸上就自然了。',
+      cond: g => g.age >= 22 && g.flags.letterFirst && !g.flags.letterWrite,
+      choices:[
+        { label:'写了满满三页纸', hint:'+😊 +👥 +✨', fn: g => { g.flags.letterWrite=true; g.flags.letterDeep=true; return{mood:6,social:5,charm:4}; }},
+        { label:'写了半页就词穷了', hint:'+🧠 +😊', fn: g => { g.flags.letterWrite=true; return{intel:2,mood:3}; }},
+        { label:'附了一张自己拍的照片', hint:'+✨ +👥', fn: g => { g.flags.letterWrite=true; return{charm:4,social:3}; }},
+      ]},
+    { id:'letter_slowmail_v37_6', icon:'📮', title:'慢递服务', category:'letter',
+      body:'你发现了一家"慢递邮局"——你可以写一封信，指定一年后再寄给收信人。你写了一封给一年后的自己：希望那时候你已经不再焦虑了，希望那时候你还在坚持画画。',
+      cond: g => g.age >= 22 && g.flags.letterWrite && !g.flags.letterSlowMail && g.intel > 25,
+      choices:[
+        { label:'给自己和三个朋友都写了慢递信', hint:'-💰 +😊 +👥', fn: g => { g.flags.letterSlowMail=true; g.flags.letterMulti=true; return{money:-50,mood:6,social:4}; }},
+        { label:'只给自己写了一封', hint:'+🧠 +😊', fn: g => { g.flags.letterSlowMail=true; return{intel:4,mood:4}; }},
+        { label:'写的时候哭了出来', hint:'+😊 +❤️', fn: g => { g.flags.letterSlowMail=true; g.flags.letterCry=true; return{mood:5,health:2}; }},
+      ]},
+    { id:'letter_postcard_v37_6', icon:'🏔️', title:'寄明信片', category:'letter',
+      body:'出差到一个新城市，你在景点买了几张明信片。在旅店的桌上给朋友们写，每张都写了不同的话。你想象着他们收到明信片时的表情——在这个即时通讯的时代，等待本身就是一种浪漫。',
+      cond: g => g.age >= 23 && g.flags.letterWrite && !g.flags.letterPostcard,
+      choices:[
+        { label:'给每个重要的朋友都寄了一张', hint:'-💰 +👥 +😊', fn: g => { g.flags.letterPostcard=true; return{money:-100,social:6,mood:5}; }},
+        { label:'给自己也寄了一张', hint:'+🧠 +😊', fn: g => { g.flags.letterPostcard=true; g.flags.letterSelf=true; return{intel:3,mood:4}; }},
+        { label:'开始在每个去过的城市寄明信片', hint:'+✨ +😊', fn: g => { g.flags.letterPostcard=true; g.flags.letterTravel=true; return{charm:5,mood:3}; }},
+      ]},
+    { id:'letter_social_v37_6', icon:'📬', title:'笔友', category:'letter',
+      body:'你在一个手写信社区里认识了一个笔友，你们约定每个月互寄一封信。她的字很好看，信里总是画着小插图。你们从未见面，但你觉得比很多微信好友都更了解彼此。',
+      cond: g => g.age >= 24 && g.flags.letterPostcard && !g.flags.letterPenpal && g.social > 25,
+      choices:[
+        { label:'坚持了一年，互寄了12封信', hint:'+👥 +😊 +✨', fn: g => { g.flags.letterPenpal=true; g.flags.letterYear=true; return{social:10,mood:6,charm:5}; }},
+        { label:'偶尔通信，没有强求频率', hint:'+👥 +😊', fn: g => { g.flags.letterPenpal=true; return{social:5,mood:4}; }},
+        { label:'约了见面，成了现实中的好朋友', hint:'+👥 +😊 +👥', fn: g => { g.flags.letterPenpal=true; g.flags.letterMeet=true; return{social:8,mood:8}; }},
+      ]},
+    { id:'letter_collection_v37_6', icon:'📚', title:'信件收藏', category:'letter',
+      body:'你整理抽屉的时候发现了从小到大的所有信件——同学录、情书、家书、明信片。每一封信都是一段记忆的入口。你一封封读过去，好像在重走自己的人生路。',
+      cond: g => g.age >= 26 && g.flags.letterPenpal && !g.flags.letterCollection && g.intel > 30,
+      choices:[
+        { label:'把所有信件按年份整理成册', hint:'+🧠 +✨ +😊', fn: g => { g.flags.letterCollection=true; g.flags.letterOrganize=true; return{intel:6,charm:5,mood:5}; }},
+        { label:'把信里的金句抄在了笔记本上', hint:'+🧠 +✨', fn: g => { g.flags.letterCollection=true; return{intel:5,charm:4}; }},
+        { label:'读完后默默收好，有些记忆不需要分享', hint:'+🧠 +❤️', fn: g => { g.flags.letterCollection=true; return{intel:4,health:2}; }},
+      ]},
+    { id:'letter_dying_v37_6', icon:'🏤', title:'邮局要关了', category:'letter',
+      body:'你常去的那家邮局要关门了。邮递员说现在寄信的人太少了，一个月收不到几封。你最后一次去买了些邮票，邮递员说"你是我们最后一个常客了"。你觉得什么东西在消失。',
+      cond: g => g.age >= 27 && g.flags.letterCollection && !g.flags.letterDying && g.intel > 30,
+      choices:[
+        { label:'写了一篇关于消失的邮局的文章', hint:'+✨ +🧠', fn: g => { g.flags.letterDying=true; g.flags.letterArticle=true; return{charm:6,intel:5}; }},
+        { label:'买了最后一批邮票珍藏', hint:'-💰 +✨', fn: g => { g.flags.letterDying=true; return{money:-200,charm:3}; }},
+        { label:'觉得这是时代发展的必然', hint:'+🧠', fn: g => { g.flags.letterDying=true; return{intel:3,mood:-2}; }},
+      ]},
+    { id:'letter_digital_v37_6', icon:'📱', title:'数字时代的手写信', category:'letter',
+      body:'你在社交媒体上发起了一个"每周一信"的活动，鼓励大家每周手写一封信。没想到很多人响应，有人说"写信让我重新找到了表达的感觉"。你发现人们渴望的不是信件本身，而是慢下来的机会。',
+      cond: g => g.age >= 27 && g.flags.letterDying && !g.flags.letterDigital && g.social > 30,
+      choices:[
+        { label:'把"每周一信"做成了品牌活动', hint:'+✨ +💰 +👥', fn: g => { g.flags.letterDigital=true; g.flags.letterBrand=true; return{charm:8,money:2000,social:6}; }},
+        { label:'开了一个手写信工作坊', hint:'+✨ +💰', fn: g => { g.flags.letterDigital=true; g.flags.letterWorkshop=true; return{charm:6,money:1000}; }},
+        { label:'只是默默坚持写信', hint:'+🧠 +😊', fn: g => { g.flags.letterDigital=true; return{intel:5,mood:5}; }},
+      ]},
+    { id:'letter_time_v37_6', icon:'⏳', title:'给未来的自己', category:'letter',
+      body:'一年前写的慢递信到了。你拆开信封，看着一年前的自己写给自己的话："希望你现在不那么焦虑了。"你笑了——你确实好了一些，虽然还是有新的烦恼。但你知道，一年后的自己又会给未来的自己写些什么。',
+      cond: g => g.age >= 28 && g.flags.letterSlowMail && g.flags.letterDigital && !g.flags.letterTime && g.intel > 35,
+      choices:[
+        { label:'又给自己写了一封，五年后寄', hint:'+🧠 +😊 +✨', fn: g => { g.flags.letterTime=true; g.flags.letterFuture=true; return{intel:6,mood:6,charm:4}; }},
+        { label:'把收到慢递信的感受写成了一篇长文', hint:'+✨ +🧠', fn: g => { g.flags.letterTime=true; return{charm:6,intel:5}; }},
+        { label:'觉得这种和时间的对话很珍贵', hint:'+❤️ +🧠', fn: g => { g.flags.letterTime=true; return{health:3,intel:5}; }},
+      ]},
+    { id:'letter_life_v37_6', icon:'💌', title:'文字的温度', category:'letter',
+      body:'你终于理解了手写信的意义。在一个什么都能即时发送的时代，手写信是一种奢侈——奢侈地花时间想清楚要说什么，奢侈地用笔迹传递温度，奢侈地等待。正是这种"慢"和"奢侈"，让文字有了重量，让思念有了形状。你的人生，也可以是一封慢慢写就的信。',
+      cond: g => g.age >= 30 && g.flags.letterTime && (g.flags.letterBrand || g.flags.letterWorkshop) && !g.flags.letterLife && g.intel > 40,
+      choices:[
+        { label:'出版了《一封信的距离》散文集', hint:'+💰 +✨ +🧠', fn: g => { g.flags.letterLife=true; g.flags.letterAuthor=true; return{money:6000,charm:12,intel:8}; }},
+        { label:'开了一家"手写信主题"文具店', hint:'-💰 +✨ +💰', fn: g => { g.flags.letterLife=true; g.flags.letterShop=true; return{money:-15000,charm:10,money:3000}; }},
+        { label:'继续做一个认真写信的人', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.letterLife=true; return{mood:12,health:5,intel:8}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -24656,6 +24738,16 @@ const ACHIEVEMENTS = [
     { id:'artisan_digital_v37_5_ach', icon:'📱', name:'数字匠人', desc:'在数字时代践行了匠人精神', check: g => g.flags.artisanDigital },
     { id:'artisan_community_v37_5_ach', icon:'🏘️', name:'手艺人社区', desc:'建立了一个城市手艺人网络', check: g => g.flags.artisanCommunity },
     { id:'artisan_life_v37_5_ach', icon:'🌟', name:'匠人人生', desc:'理解了认真做事的人都是匠人', check: g => g.flags.artisanLife },
+    { id:'letter_first_v37_6_ach', icon:'✉️', name:'见字如面', desc:'收到了人生中第一封手写信', check: g => g.flags.letterFirst },
+    { id:'letter_write_v37_6_ach', icon:'🖊️', name:'笔墨传情', desc:'亲手写了一封信寄出去', check: g => g.flags.letterWrite },
+    { id:'letter_slowmail_v37_6_ach', icon:'🐌', name:'慢递时光', desc:'体验了慢递服务，学会等待', check: g => g.flags.letterSlowMail },
+    { id:'letter_postcard_v37_6_ach', icon:'🏞️', name:'明信片旅行', desc:'从远方寄出一张明信片', check: g => g.flags.letterPostcard },
+    { id:'letter_penpal_v37_6_ach', icon:'🤝', name:'笔友情深', desc:'交了一个笔友，用文字建立友谊', check: g => g.flags.letterPenpal },
+    { id:'letter_collection_v37_6_ach', icon:'📚', name:'信件收藏家', desc:'收藏了一整盒珍贵的信件', check: g => g.flags.letterCollection },
+    { id:'letter_dying_v37_6_ach', icon:'🏤', name:'最后的邮局', desc:'见证了老邮局的最后一天', check: g => g.flags.letterDying },
+    { id:'letter_digital_v37_6_ach', icon:'💻', name:'数字时代手艺人', desc:'在数字时代坚持手写信的人', check: g => g.flags.letterDigital },
+    { id:'letter_time_v37_6_ach', icon:'⏳', name:'给未来的信', desc:'给未来的自己写了一封信', check: g => g.flags.letterTime },
+    { id:'letter_life_v37_6_ach', icon:'🌟', name:'文字的温度', desc:'理解了文字比屏幕更有温度', check: g => g.flags.letterLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
