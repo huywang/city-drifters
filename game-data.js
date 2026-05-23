@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v34.3
+// 都市浮生记 - 数据文件 v34.4
 // ============================================
 
 
@@ -19620,6 +19620,98 @@ const EVENTS = [
         { label:'开始写自己的第一本书', hint:'+✨ +🧠', fn: g => { g.flags.readingPhilosophy=true; g.flags.firstBook=true; return{charm:15,intel:15,money:5000}; }},
       ]},
 
+    // ===== 考公热与体制内生活 (v34.4) =====
+
+    { id:'civil_exam_v34_4', icon:'📝', title:'考公务员', category:'civilservant',
+      body:'你决定考公务员了。\n\n起因是你妈的一句话：「你在外面打工能打到什么时候？三十岁被裁了怎么办？考个编制，一辈子稳当。」\n\n你买了三本教材：行测、申论、公共基础知识。你开始每天早上六点起床背书，晚上刷题到十二点。\n\n你辞了职，全职备考。存款在一天天减少，焦虑在一天天增加。\n\n第一次考试，你差了5分没进面试。第二次，你进了面试但被刷了。第三次——\n\n你考上了。一个区级的事业单位，月薪6500，比你之前少了一半。\n\n但你妈高兴得像中了彩票：「我儿子/女儿有编制了！铁饭碗！」\n\n你看着那份录用通知书，心情复杂：这是你想要的吗？还是你妈想要的？',
+      cond: g => g.age >= 22 && g.age <= 35 && g.intel > 40 && !g.flags.hasGovJob,
+      choices:[
+        { label:'入职了，开始了体制内生活', hint:'+💰 +😊', fn: g => { g.flags.hasGovJob=true; g.flags.civilServant=true; setJob(g,'科员',6500); return{mood:8,money:2000}; }},
+        { label:'考上了但不想去，继续在企业', hint:'+🧠 +✨', fn: g => { g.flags.civilServant=true; return{intel:8,charm:5}; }},
+        { label:'决定再考一次，目标更好的岗位', hint:'+🧠', fn: g => { g.flags.civilServant=true; return{intel:10}; }},
+      ]},
+
+    { id:'gov_life_v34_4', icon:'🏛️', title:'体制内日常', category:'civilservant',
+      body:'你在体制内工作了半年，发现了很多跟想象中不一样的事情。\n\n你以为体制内很闲——确实有些部门很闲，但你的部门忙得要死。每天加班到八点，周末也经常来。\n\n你以为体制内关系户多——确实有一些，但大部分同事都是考进来的普通人，跟你一样。\n\n你以为体制内工资高——不高，但五险一金是顶格交的，公积金一个月三千多。食堂两块钱一顿，还管早饭。\n\n最让你意外的是「开会」。你参加了一个四小时的会，内容是传达上级精神。你坐在那里听了四个小时，什么也没记住，但你的领导说这叫「提高政治站位」。\n\n你开始理解体制内的规则：做事不是最重要的，让领导看到你在做事才是最重要的。\n\n你不知道这是不是你想过的生活，但至少——你不用担心被裁员了。',
+      cond: g => g.flags.hasGovJob && g.age >= 22,
+      choices:[
+        { label:'适应得还不错', hint:'+😊 +🧠', fn: g => { g.flags.govLife=true; return{mood:8,intel:5}; }},
+        { label:'觉得很压抑，开始怀疑人生', hint:'+🧠', fn: g => { g.flags.govLife=true; return{intel:8,mood:-5}; }},
+        { label:'开始研究体制内的晋升规则', hint:'+🧠 +✨', fn: g => { g.flags.govLife=true; g.flags.govStrategy=true; return{intel:12,charm:5}; }},
+      ]},
+
+    { id:'gov_writing_v34_4', icon:'📋', title:'体制内写材料', category:'civilservant',
+      body:'你被分配了一个新任务：写领导讲话稿。\n\n你以为写东西是你的强项，结果你被打回来了七次。\n\n「这个措辞不够严谨。」「这段逻辑不对。」「这个提法跟上级文件不一致。」「这里要加个「进一步」。」「那里的「和」改成「以及」。」\n\n你崩溃了。你以前写公众号文章十万字都没问题，现在写个三千字的讲话稿，每个字都像在走钢丝。\n\n老同事跟你说：「体制内的文字工作，核心不是写得好，而是写得「对」。每一个用词都有政治含义，每一个句式都有规矩。」\n\n你花了一个月终于写出了一篇让领导满意的稿子。领导看了一眼说：「不错。」\n\n就这两个字，让你开心了一整天。\n\n你开始觉得，体制内的写作是一种特殊的技能——它不追求文采，追求的是精确和安全。',
+      cond: g => g.flags.hasGovJob && g.intel > 40,
+      choices:[
+        { label:'成了单位的笔杆子', hint:'+✨ +🧠', fn: g => { g.flags.govWriting=true; return{charm:10,intel:8}; }},
+        { label:'觉得很枯燥，不想一直写', hint:'+🧠', fn: g => { g.flags.govWriting=true; return{intel:3}; }},
+        { label:'利用写材料的机会了解了政策', hint:'+🧠 +✨', fn: g => { g.flags.govWriting=true; g.flags.policyExpert=true; return{intel:15,charm:5}; }},
+      ]},
+
+    { id:'gov_social_v34_4', icon:'🍻', title:'体制内社交', category:'civilservant',
+      body:'你被同事拉去参加了单位的饭局。\n\n你以为是朋友聚餐，结果发现这是一场「社交表演」。\n\n谁坐哪个位置有讲究，谁先敬酒有讲究，说什么话有讲究，喝多少酒有讲究。你一个刚入职的新人，被安排坐在最靠门的位置（最末位）。\n\n领导说：「小X，来，给张处长敬杯酒。」你端起酒杯，说了句「张处长好」，一口干了。张处长笑了笑，没喝。\n\n你旁边的老同事悄悄跟你说：「领导没喝你就放下，别傻站着。」\n\n饭局结束后你头晕脑胀，不是因为酒，而是因为这场社交让你筋疲力尽。\n\n你回家跟朋友吐槽：「体制内的饭局太累了。」\n\n朋友说：「你以为你在企业就不累？只不过企业的累是KPI，体制内的累是人情世故。」',
+      cond: g => g.flags.hasGovJob && g.age >= 22,
+      choices:[
+        { label:'慢慢学会了体制内的社交规则', hint:'+👥 +🧠', fn: g => { g.flags.govSocial=true; return{social:8,intel:5}; }},
+        { label:'拒绝参加不必要的饭局', hint:'+✨ +🧠', fn: g => { g.flags.govSocial=true; g.flags.govBoundary=true; return{charm:8,intel:8}; }},
+        { label:'觉得这种文化太落后了', hint:'+🧠', fn: g => { g.flags.govSocial=true; return{intel:5,mood:-3}; }},
+      ]},
+
+    { id:'gov_promotion_v34_4', icon:'📈', title:'晋升之路', category:'civilservant',
+      body:'你在体制内干了三年，到了该晋升的时候了。\n\n你原以为晋升看能力，结果发现看的是「资历+关系+机遇」。\n\n你的同事小王，比你早来一年，领导关系处得好，这次被提拔了。你的能力公认比他强，但——\n\n「你还年轻，再等等。」领导跟你说。\n\n你有点不服气。但你查了查数据：体制内从科员到副科，平均要7年。从副科到正科，平均要10年。很多人一辈子就到科级了。\n\n你开始思考：你到底想不想在这条路上走到黑？\n\n一个已经做到副处的老同事跟你说：「体制内的好处是稳定，坏处是——太稳定了。你二十年后什么样，现在基本就能看到了。」\n\n你不知道这是安慰还是恐吓。',
+      cond: g => g.flags.hasGovJob && g.age >= 25 && g.flags.govLife,
+      choices:[
+        { label:'接受现实，慢慢熬资历', hint:'+🧠 +😊', fn: g => { g.flags.govPromotion=true; return{intel:8,mood:5}; }},
+        { label:'开始准备遴选考试——往更高的平台走', hint:'+🧠 +✨', fn: g => { g.flags.govPromotion=true; g.flags.govLinxuan=true; return{intel:15,charm:5}; }},
+        { label:'开始考虑离开体制', hint:'+🧠 +✨', fn: g => { g.flags.govPromotion=true; g.flags.govExit=true; return{intel:10,charm:8}; }},
+      ]},
+
+    { id:'gov_vs_private_v34_4', icon:'⚖️', title:'体制内外对比', category:'civilservant',
+      body:'同学聚会上，你和在企业工作的同学聊了起来。\n\n同学A在互联网大厂，月薪三万，但996是常态，最近公司裁员他差点被优化。他说：「赚得多但焦虑，总觉得35岁就完了。」\n\n同学B在创业，收入不稳定，但他说每天都很充实：「虽然辛苦，但我在做自己相信的事。」\n\n你看了看自己：月薪七千（含补贴），朝九晚五，五险一金齐全，不用担心裁员。但你也觉得自己在慢慢变成一颗螺丝钉。\n\n你们三个人互相看着对方，都觉得对方的生活有好有坏。\n\n同学A说：「有时候真羡慕你的稳定。」\n\n同学B说：「有时候真羡慕你的保障。」\n\n你说：「有时候真羡慕你们的自由。」\n\n你们笑了。原来每个人的围城都不一样。',
+      cond: g => g.flags.hasGovJob && g.age >= 25,
+      choices:[
+        { label:'觉得体制内适合自己', hint:'+😊 +🧠', fn: g => { g.flags.govVsPrivate=true; return{mood:8,intel:5}; }},
+        { label:'开始认真考虑创业', hint:'+✨ +🧠', fn: g => { g.flags.govVsPrivate=true; g.flags.considerStartup=true; return{charm:8,intel:8}; }},
+        { label:'决定不管在哪都要保持学习', hint:'+🧠 +✨', fn: g => { g.flags.govVsPrivate=true; g.flags.keepLearning=true; return{intel:12,charm:5}; }},
+      ]},
+
+    { id:'gov_side_project_v34_4', icon:'🌙', title:'体制内副业', category:'civilservant',
+      body:'你发现体制内的同事很多都有「副业」。\n\n当然，不是那种公开的商业副业——体制内不允许经商。但大家都有各自的「第二身份」：\n\n老张下班后在B站做历史科普视频，粉丝十万。小李周末去培训机构当兼职老师（用的是假名）。王姐晚上在朋友圈卖自己做的蛋糕。\n\n你也心动了。你的专业是中文，你开始在网上写小说。用笔名，没有人知道你的真实身份。\n\n三个月后，你的小说在一个平台上签约了。第一个月的稿费：1200块。\n\n你高兴得像个孩子。这1200块的意义远超你七千块的工资——因为这是你「自己选择做的事」赚来的钱。\n\n你开始理解：体制内给你稳定，副业给你激情。也许这才是最适合你的组合。',
+      cond: g => g.flags.hasGovJob && g.age >= 23 && g.intel > 40,
+      choices:[
+        { label:'坚持写小说，成了签约作者', hint:'+✨ +💰', fn: g => { g.flags.govSideProject=true; return{charm:12,money:5000}; }},
+        { label:'觉得太累了，还是专注本职', hint:'+🧠 +😊', fn: g => { g.flags.govSideProject=true; return{intel:5,mood:5}; }},
+        { label:'开始做自媒体分享体制内生活', hint:'+✨ +👥', fn: g => { g.flags.govSideProject=true; g.flags.govBlogger=true; return{charm:10,social:8,money:3000}; }},
+      ]},
+
+    { id:'gov_reform_v34_4', icon:'🔄', title:'机构改革', category:'civilservant',
+      body:'你们单位要改革了。\n\n消息传来的那天，整个办公室的气氛都变了。改革意味着合并、精简、调岗。有些人可能会被分流到别的部门，有些人可能会被派到基层。\n\n你被调到了一个新的部门，工作内容完全变了。以前你写材料，现在你要做群众服务。\n\n你一开始不适应——以前你是坐在办公室里写文件，现在你要面对一个个活生生的人。来办事的大爷不会用自助机，你手把手教他。来投诉的大姐情绪激动，你耐心倾听。\n\n一个月后，你发现这个岗位比写材料有意思多了。你能直接看到自己的工作给别人带来的改变。\n\n一个办完事的老太太跟你说：「小伙子/小姑娘，你态度真好。」\n\n你笑了。也许体制内不全是开会和写材料，也有一些真正有意义的事。',
+      cond: g => g.flags.hasGovJob && g.age >= 24,
+      choices:[
+        { label:'在新岗位找到了意义', hint:'+😊 +✨', fn: g => { g.flags.govReform=true; return{mood:10,charm:8}; }},
+        { label:'觉得改革太折腾了', hint:'+🧠', fn: g => { g.flags.govReform=true; return{intel:3}; }},
+        { label:'开始思考公共服务的价值', hint:'+🧠 +✨', fn: g => { g.flags.govReform=true; g.flags.publicService=true; return{intel:12,charm:8}; }},
+      ]},
+
+    { id:'gov_quit_v34_4', icon:'🚪', title:'体制内辞职', category:'civilservant',
+      body:'你在体制内干了五年，终于决定辞职了。\n\n这个决定酝酿了两年。你越来越觉得，自己在一条不属于你的路上浪费时间。你有想法、有能力、有想做的事，但体制的规则让你施展不开。\n\n你递了辞职报告。领导找你谈话：「你想清楚了？出去可就没有回头路了。」\n\n你妈差点哭了：「你好不容易考上的编制，说辞就辞？」\n\n你爸倒是平静：「孩子大了，让他/她自己做决定。」\n\n离职那天，你走出单位大门，阳光照在脸上。你回头看了一眼那栋灰色的大楼，心里说：「谢谢你给了我五年的安全感。但我需要去看看外面的世界了。」\n\n你不知道未来会怎样，但你知道——至少你做了一个属于自己的选择。',
+      cond: g => g.flags.hasGovJob && g.age >= 25 && g.flags.govExit,
+      choices:[
+        { label:'辞职创业', hint:'+✨ +💰', fn: g => { g.flags.govQuit=true; g.flags.hasGovJob=false; setJob(g,'创业者',0); return{charm:12,mood:8,money:-20000}; }},
+        { label:'辞职去私企', hint:'+💰 +✨', fn: g => { g.flags.govQuit=true; g.flags.hasGovJob=false; setJob(g,'高级专员',15000); return{charm:8,money:5000}; }},
+        { label:'最后关头犹豫了，没有交辞呈', hint:'+🧠', fn: g => { g.flags.govQuit=true; return{intel:5}; }},
+      ]},
+
+    { id:'gov_philosophy_v34_4', icon:'🏛️', title:'体制的思考', category:'civilservant',
+      body:'不管你是否还在体制内，这段经历给了你一些独特的思考。\n\n你理解了什么是「制度的力量」——一个好的制度能让普通人做出及格的工作，一个坏的制度能让优秀的人也无能为力。\n\n你理解了什么是「稳定的价值」——不是不变化，而是在变化中有一个安全网。你在体制内的几年，没有经历过断供、裁员、倒闭，这些看似平淡的日子，其实是一种幸运。\n\n你也理解了什么是「围城心态」——体制内的人想出去，体制外的人想进来。没有人对，也没有人错，只是每个人的需求不同。\n\n你开始觉得，人生没有「最好的选择」，只有「最适合当下的选择」。考公不是逃避，辞职也不是勇敢——关键是你在做选择的时候，清不清楚自己想要什么。\n\n你在日记本上写了一句话：\n\n「无论在围城的哪一边，重要的是——你在认真活着。」',
+      cond: g => g.age >= 26 && g.flags.civilServant && (g.flags.govLife || g.flags.govQuit),
+      choices:[
+        { label:'对体制内外都有了更深的理解', hint:'+🧠 +😊 +✨', fn: g => { g.flags.govPhilosophy=true; return{intel:15,mood:12,charm:10}; }},
+        { label:'开始写一本关于体制内的书', hint:'+✨ +🧠', fn: g => { g.flags.govPhilosophy=true; g.flags.govWriter=true; return{charm:15,intel:10}; }},
+        { label:'给正在考公的朋友一些建议', hint:'+👥 +😊', fn: g => { g.flags.govPhilosophy=true; return{social:10,mood:8}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -21531,6 +21623,17 @@ const ACHIEVEMENTS = [
     { id:'author_event_v34_3_ach', icon:'✍️', name:'作家签售', desc:'参加了最喜欢的作家的签售会', check: g => g.flags.authorEvent },
     { id:'bookstore_closing_v34_3_ach', icon:'💔', name:'书店告别', desc:'见证了心爱的书店关门', check: g => g.flags.bookstoreClosing },
     { id:'reading_philosophy_v34_3_ach', icon:'🌅', name:'阅读重塑', desc:'阅读重塑了你对世界的理解', check: g => g.flags.readingPhilosophy },
+    // --- 考公热与体制内生活 (v34.4) ---
+    { id:'civil_exam_v34_4_ach', icon:'📝', name:'上岸', desc:'考上了公务员', check: g => g.flags.hasGovJob },
+    { id:'gov_life_v34_4_ach', icon:'🏛️', name:'体制内人', desc:'适应了体制内的生活节奏', check: g => g.flags.govLife },
+    { id:'gov_writing_v34_4_ach', icon:'📋', name:'笔杆子', desc:'成了单位的文字工作者', check: g => g.flags.govWriting },
+    { id:'gov_social_v34_4_ach', icon:'🍻', name:'人情世故', desc:'学会了体制内的社交规则', check: g => g.flags.govSocial },
+    { id:'gov_promotion_v34_4_ach', icon:'📈', name:'晋升之路', desc:'面对了体制内的晋升现实', check: g => g.flags.govPromotion },
+    { id:'gov_vs_private_v34_4_ach', icon:'⚖️', name:'围城心态', desc:'思考了体制内外的差异', check: g => g.flags.govVsPrivate },
+    { id:'gov_side_project_v34_4_ach', icon:'🌙', name:'体制内副业', desc:'在体制外找到了第二身份', check: g => g.flags.govSideProject },
+    { id:'gov_reform_v34_4_ach', icon:'🔄', name:'机构改革', desc:'经历了机构改革的风波', check: g => g.flags.govReform },
+    { id:'gov_quit_v34_4_ach', icon:'🚪', name:'走出围城', desc:'离开了体制', check: g => g.flags.govQuit },
+    { id:'gov_philosophy_v34_4_ach', icon:'🏛️', name:'体制思考', desc:'对体制内外都有了深刻理解', check: g => g.flags.govPhilosophy },
 ];
 
 // === ENDINGS === (order matters: first match wins)
