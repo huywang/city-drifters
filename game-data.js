@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v36.4
+// 都市浮生记 - 数据文件 v36.5
 // ============================================
 
 
@@ -21473,6 +21473,88 @@ const EVENTS = [
         { label:'享受用笑声连接每个人的感觉', hint:'+😊 +👥 +❤️', fn: g => { g.flags.comedyHumor=true; return{mood:10,social:10,health:5}; }},
       ]},
 
+    // === v36.5 花市与植物经济 ===
+    { id:'plant_first_v36_5', icon:'🪴', title:'买了第一盆植物', category:'plant',
+      body:'你在花市买了一盆绿萝，觉得放在出租屋里能增加点生气。卖花的大姐说"浇水就行，死不了"。你把它放在窗台上，每天早上第一件事就是看看它。',
+      cond: g => g.age >= 20 && !g.flags.plantFirst,
+      choices:[
+        { label:'精心照料，每天浇水', hint:'+😊 +❤️', fn: g => { g.flags.plantFirst=true; g.flags.plantCare=true; return{mood:5,health:2}; }},
+        { label:'想起来就浇一下', hint:'+😊', fn: g => { g.flags.plantFirst=true; return{mood:3}; }},
+        { label:'又买了花盆、营养土、喷壶', hint:'-💰 +😊', fn: g => { g.flags.plantFirst=true; g.flags.plantGear=true; return{money:-200,mood:5}; }},
+      ]},
+    { id:'plant_kill_v36_5', icon:'🥀', title:'养死了', category:'plant',
+      body:'你的绿萝黄了、蔫了，最后死了。你看着干枯的叶子有点难过——连盆花都养不好，是不是什么事都做不好？朋友安慰你说"绿萝杀手"是都市青年的标配称号。',
+      cond: g => g.age >= 20 && g.flags.plantFirst && !g.flags.plantKill,
+      choices:[
+        { label:'不服输，又买了一盆仙人掌', hint:'-💰 +✨', fn: g => { g.flags.plantKill=true; g.flags.plantRetry=true; return{money:-30,charm:2}; }},
+        { label:'认真研究了养花知识', hint:'+🧠', fn: g => { g.flags.plantKill=true; g.flags.plantStudy=true; return{intel:5}; }},
+        { label:'觉得自己不配养植物', hint:'-😊', fn: g => { g.flags.plantKill=true; g.flags.plantGiveUp=true; return{mood:-3}; }},
+      ]},
+    { id:'plant_market_v36_5', icon:'🌸', title:'逛花市', category:'plant',
+      body:'你去了本地最大的花卉市场，简直是个植物迷宫。多肉区、鲜切花区、盆栽区、资材区……你本来只想买盆薄荷，结果推着购物车出来时花了三百多。',
+      cond: g => g.age >= 22 && g.flags.plantFirst && !g.flags.plantMarket && g.money > 1000,
+      choices:[
+        { label:'疯狂采购，搬了七八盆回家', hint:'-💰 +😊 +😊', fn: g => { g.flags.plantMarket=true; g.flags.plantHoarder=true; return{money:-350,mood:10}; }},
+        { label:'只买了需要的，理性消费', hint:'-💰 +🧠', fn: g => { g.flags.plantMarket=true; return{money:-80,intel:2,mood:3}; }},
+        { label:'和花市老板聊了很久，学了好多', hint:'+🧠 +👥', fn: g => { g.flags.plantMarket=true; g.flags.plantMentor=true; return{intel:6,social:3}; }},
+      ]},
+    { id:'plant_addict_v36_5', icon:'🌿', title:'植物上瘾', category:'plant',
+      body:'你家已经有了二十多盆植物。从绿萝到龟背竹到琴叶榕，阳台快放不下了。你每天早上花半小时给它们浇水、擦叶子、检查有没有虫。同事说你家像个小型植物园。',
+      cond: g => g.age >= 23 && g.flags.plantMarket && !g.flags.plantAddict && g.money > 3000,
+      choices:[
+        { label:'把阳台改造成了热带雨林', hint:'-💰 +✨ +😊', fn: g => { g.flags.plantAddict=true; g.flags.plantJungle=true; return{money:-2000,charm:6,mood:8}; }},
+        { label:'控制住了购买欲，维持在二十盆', hint:'+🧠 +😊', fn: g => { g.flags.plantAddict=true; return{intel:3,mood:3}; }},
+        { label:'开始在网上卖自己繁殖的小苗', hint:'+💰 +✨', fn: g => { g.flags.plantAddict=true; g.flags.plantSell=true; return{money:500,charm:4}; }},
+      ]},
+    { id:'plant_social_v36_5', icon:'🤝', title:'植物社交', category:'plant',
+      body:'你加入了"都市植物人"微信群，里面有三百多个养花爱好者。大家交换插条、分享养护经验、互相鉴定品种。你发现养植物的人都有一个共同特点——在快节奏的城市里寻找慢生活。',
+      cond: g => g.age >= 23 && g.flags.plantAddict && !g.flags.plantSocial && g.social > 20,
+      choices:[
+        { label:'组织了一次线下换盆活动', hint:'+👥 +✨ +😊', fn: g => { g.flags.plantSocial=true; g.flags.plantOrganizer=true; return{social:10,charm:5,mood:5}; }},
+        { label:'在群里分享养护心得', hint:'+👥 +🧠', fn: g => { g.flags.plantSocial=true; return{social:6,intel:3}; }},
+        { label:'只是潜水看别人的植物', hint:'+🧠', fn: g => { g.flags.plantSocial=true; return{intel:3,mood:2}; }},
+      ]},
+    { id:'plant_rare_v36_5', icon:'🌺', title:'稀有植物', category:'plant',
+      body:'你在网上看到一盆斑叶龟背竹，标价两千八。你犹豫了很久，最后一咬牙买了。到货的那天你紧张地拆开包裹，看到完美的叶片时忍不住叫出了声。',
+      cond: g => g.age >= 24 && g.flags.plantAddict && !g.flags.plantRare && g.money > 5000,
+      choices:[
+        { label:'入了稀有植物的坑，越买越贵', hint:'-💰 +✨', fn: g => { g.flags.plantRare=true; g.flags.plantCollector=true; return{money:-5000,charm:5}; }},
+        { label:'只买这一盆，以后理性消费', hint:'-💰 +🧠', fn: g => { g.flags.plantRare=true; return{money:-2800,intel:2,mood:5}; }},
+        { label:'繁殖成功后卖掉赚了一笔', hint:'+💰 +✨ +🧠', fn: g => { g.flags.plantRare=true; g.flags.plantBreed=true; return{money:3000,charm:5,intel:3}; }},
+      ]},
+    { id:'plant_cost_v36_5', icon:'💰', title:'植物开销', category:'plant',
+      body:'你算了一下今年在植物上花了多少钱：买植物三千、花盆两千、营养土和肥料五百、补光灯八百……加起来六千多，比你的年度服装预算还高。',
+      cond: g => g.age >= 24 && g.flags.plantAddict && !g.flags.plantCost && g.money < 30000,
+      choices:[
+        { label:'开始做植物博主，把爱好变成收入', hint:'+💰 +✨', fn: g => { g.flags.plantCost=true; g.flags.plantInfluencer=true; return{money:2000,charm:6}; }},
+        { label:'减少购买频率，好好养现有的', hint:'+💰 +🧠', fn: g => { g.flags.plantCost=true; return{money:1000,intel:3}; }},
+        { label:'爱好无价，继续买', hint:'+😊 -💰', fn: g => { g.flags.plantCost=true; return{mood:5,money:-1000}; }},
+      ]},
+    { id:'plant_balcony_v36_5', icon:'🏡', title:'阳台花园', category:'plant',
+      body:'你把阳台彻底改造成了一个花园。装了花架、铺了防腐木地板、挂了串灯。下班回家坐在阳台上看植物发呆，配一杯茶，你觉得这比去任何咖啡馆都好。',
+      cond: g => g.age >= 25 && g.flags.plantJungle && !g.flags.plantBalcony && g.money > 5000,
+      choices:[
+        { label:'请朋友来阳台花园聚会', hint:'+👥 +😊 -💰', fn: g => { g.flags.plantBalcony=true; g.flags.plantHost=true; return{social:8,mood:8,money:-500}; }},
+        { label:'这是你独处的秘密花园', hint:'+😊 +❤️', fn: g => { g.flags.plantBalcony=true; return{mood:8,health:3}; }},
+        { label:'拍了照发小红书，意外火了', hint:'+✨ +💰', fn: g => { g.flags.plantBalcony=true; g.flags.plantFamous=true; return{charm:8,money:1500}; }},
+      ]},
+    { id:'plant_heal_v36_5', icon:'💚', title:'植物疗愈', category:'plant',
+      body:'在你人生最难的那段时间，是阳台上的植物让你每天有了起床的理由。看着它们抽新芽、开花、长新叶，你觉得生命本身就是一种力量。朋友说你现在整个人都变柔和了。',
+      cond: g => g.age >= 26 && g.flags.plantBalcony && !g.flags.plantHeal && (g.mood < 55 || g.health < 60),
+      choices:[
+        { label:'考了个园艺治疗师证书', hint:'-💰 +✨ +🧠', fn: g => { g.flags.plantHeal=true; g.flags.plantTherapy=true; return{money:-5000,charm:8,intel:8}; }},
+        { label:'开始送植物给身边需要治愈的朋友', hint:'+👥 +😊', fn: g => { g.flags.plantHeal=true; return{social:8,mood:6}; }},
+        { label:'只是安静地和植物待在一起', hint:'+😊 +❤️', fn: g => { g.flags.plantHeal=true; return{mood:10,health:5}; }},
+      ]},
+    { id:'plant_life_v36_5', icon:'🌳', title:'植物人生', category:'plant',
+      body:'你开始理解，养植物和人生其实很像——需要耐心、需要阳光、有时候需要放手。有些植物注定养不活，就像有些事情注定不会成功。但每一次新芽冒出来的时候，你都会觉得一切值得。',
+      cond: g => g.age >= 28 && g.flags.plantHeal && (g.flags.plantTherapy || g.flags.plantFamous) && !g.flags.plantLife && g.intel > 35,
+      choices:[
+        { label:'开了一家植物工作室', hint:'-💰 +✨ +💰', fn: g => { g.flags.plantLife=true; g.flags.plantShop=true; g.jobName='植物工作室主理人'; g.jobSalary=10000; return{money:-30000,charm:12}; }},
+        { label:'写了一本《城市养花指南》', hint:'+💰 +✨ +🧠', fn: g => { g.flags.plantLife=true; g.flags.plantAuthor=true; return{money:5000,charm:10,intel:8}; }},
+        { label:'继续做一个热爱植物的普通人', hint:'+😊 +❤️ +🧠', fn: g => { g.flags.plantLife=true; return{mood:12,health:8,intel:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -23622,6 +23704,18 @@ const ACHIEVEMENTS = [
     { id:'comedy_online_v36_4_ach', icon:'📱', name:'线上爆红', desc:'段子在网上火了', check: g => g.flags.comedyOnline },
     { id:'comedy_life_v36_4_ach', icon:'🌟', name:'喜剧人生', desc:'幽默成了你对抗生活的武器', check: g => g.flags.comedyLife },
     { id:'comedy_humor_v36_4_ach', icon:'💡', name:'幽默超能力', desc:'发现幽默感是一种被低估的超能力', check: g => g.flags.comedyHumor },
+
+    // v36.5 花市与植物经济
+    { id:'plant_first_v36_5_ach', icon:'🪴', name:'植物新人', desc:'买了人生中第一盆植物', check: g => g.flags.plantFirst },
+    { id:'plant_kill_v36_5_ach', icon:'🥀', name:'绿萝杀手', desc:'养死了第一盆植物', check: g => g.flags.plantKill },
+    { id:'plant_market_v36_5_ach', icon:'🌸', name:'花市常客', desc:'在花卉市场推着购物车出来', check: g => g.flags.plantMarket },
+    { id:'plant_addict_v36_5_ach', icon:'🌿', name:'植物上瘾者', desc:'家里已经有了二十多盆植物', check: g => g.flags.plantAddict },
+    { id:'plant_social_v36_5_ach', icon:'🤝', name:'植物社交', desc:'在植物圈找到了志同道合的人', check: g => g.flags.plantSocial },
+    { id:'plant_rare_v36_5_ach', icon:'🌺', name:'稀有收藏家', desc:'入了稀有植物的坑', check: g => g.flags.plantRare },
+    { id:'plant_cost_v36_5_ach', icon:'💰', name:'植物账单', desc:'发现养植物比买衣服还花钱', check: g => g.flags.plantCost },
+    { id:'plant_balcony_v36_5_ach', icon:'🏡', name:'阳台花园', desc:'把阳台改造成了一个秘密花园', check: g => g.flags.plantBalcony },
+    { id:'plant_heal_v36_5_ach', icon:'💚', name:'植物疗愈', desc:'在最难的时候被植物治愈了', check: g => g.flags.plantHeal },
+    { id:'plant_life_v36_5_ach', icon:'🌳', name:'植物人生', desc:'从植物身上学会了人生的道理', check: g => g.flags.plantLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
