@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - 数据文件 v38.1
+// 都市浮生记 - 数据文件 v38.2
 // ============================================
 
 
@@ -22878,6 +22878,88 @@ const EVENTS = [
         { label:'继续做一个爱唱歌的普通人', hint:'+😊 +❤️ +🎵', fn: g => { g.flags.ktvLife=true; return{mood:12,social:5,charm:5}; }},
       ]},
 
+    // === v38.2 台球厅与桌球社交 ===
+    { id:'billiard_first_v38_2', icon:'🎱', title:'第一次打台球', category:'billiard',
+      body:'朋友拉你去了台球厅。"会打吗？""不会。""没关系，我教你。"你拿起球杆，姿势别扭得像在扫地。第一杆直接把白球打飞了，全场大笑。朋友帮你摆了个简单局面，你一杆清台——虽然只进了两颗球。"有天赋！"朋友夸张地说。你知道他在骗你，但你确实觉得挺好玩。',
+      cond: g => !g.flags.billiardFirst && g.age >= 16,
+      choices:[
+        { label:'认真学了基本功', hint:'+🧠 +😊', fn: g => { g.flags.billiardFirst=true; return{intel:5,mood:5}; }},
+        { label:'瞎打一通图个开心', hint:'+😊', fn: g => { g.flags.billiardFirst=true; return{mood:8}; }},
+      ]},
+
+    { id:'billiard_friends_v38_2', icon:'🤝', title:'台球社交', category:'billiard',
+      body:'你发现台球是一种极好的社交方式。比喝酒健康，比聊天有趣，比KTV便宜。你和同事每周打两次，球桌上什么都聊——工作、生活、八卦。"打球的时候最容易说实话，"同事说，"因为你忙着瞄准，没空编瞎话。"你们从同事变成了球友，从球友变成了真朋友。',
+      cond: g => g.flags.billiardFirst && !g.flags.billiardFriends && g.salary > 0,
+      choices:[
+        { label:'组了一个固定的台球局', hint:'+🤝 +😊', fn: g => { g.flags.billiardFriends=true; g.flags.billiardRegular=true; return{social:8,mood:5}; }},
+        { label:'偶尔约打，保持轻松', hint:'+🤝', fn: g => { g.flags.billiardFriends=true; return{social:5}; }},
+      ]},
+
+    { id:'billiard_couple_v38_2', icon:'💕', title:'台球约会', category:'billiard',
+      body:'你约了喜欢的人去打台球。"你会打吗？""不太会，你教我。"你手把手教她握杆，她认真瞄准的样子让你心跳加速。她一杆进了一颗球，开心得跳了起来。"再来一局！"她主动说。你知道这局球打得值不值，不在于进了几颗球。台球桌上的约会，比任何餐厅都自然。',
+      cond: g => g.flags.billiardFirst && !g.flags.billiardCouple && g.age >= 20,
+      choices:[
+        { label:'每周约她打一次台球', hint:'+❤️ +🤝', fn: g => { g.flags.billiardCouple=true; return{social:5,mood:8}; }},
+        { label:'带她去参加了业余台球赛', hint:'+❤️ +✨', fn: g => { g.flags.billiardCouple=true; g.flags.billiardDateCom=true; return{social:3,charm:5}; }},
+      ]},
+
+    { id:'billiard_bet_v38_2', icon:'💰', title:'赌球', category:'billiard',
+      body:'台球厅里有人找你"玩两把"。"输了的请吃宵夜。"你觉得无所谓就答应了。没想到对方是高手，三局两胜你全输了。"宵夜钱大概200块，"对方笑着说。朋友说："别和他打了，他是专门在这里钓鱼的。"你看着那个人的背影，突然理解了台球厅的水有多深。',
+      cond: g => g.flags.billiardFirst && !g.flags.billiardBet && g.money > 3000,
+      choices:[
+        { label:'认栽请客，再也不赌了', hint:'+🧠 -💰', fn: g => { g.flags.billiardBet=true; g.flags.billiardWise=true; return{intel:8,money:-200}; }},
+        { label:'苦练球技，下次赢回来', hint:'+💪 +🧠', fn: g => { g.flags.billiardBet=true; g.flags.billiardTrain=true; return{health:3,intel:5}; }},
+      ]},
+
+    { id:'billiard_master_v38_2', icon:'👴', title:'台球厅里的扫地僧', category:'billiard',
+      body:'台球厅角落总坐着一个老大爷，从不和别人打。有一天你看到他一个人练球，走位精准到毫米。"大爷，您打多少年了？""四十多年了。"他说。"年轻时候打过全国赛，后来膝盖不行了。"他教了你几个高级技巧，你的球技突飞猛进。"台球不是比力气，是比脑子。"大爷说。',
+      cond: g => g.flags.billiardFirst && !g.flags.billiardMaster && g.age >= 20,
+      choices:[
+        { label:'每周去跟大爷学球', hint:'+🧠 +🤝', fn: g => { g.flags.billiardMaster=true; g.flags.billiardStudent=true; return{intel:8,social:5}; }},
+        { label:'请大爷吃饭听他讲当年的故事', hint:'+🧠 +❤️', fn: g => { g.flags.billiardMaster=true; return{intel:5,mood:5}; }},
+      ]},
+
+    { id:'billiard_contest_v38_2', icon:'🏆', title:'业余台球赛', category:'billiard',
+      body:'社区举办了业余台球比赛，你报了名。第一轮就遇到了高手，紧张得手都在抖。但你发挥出了平时的水平，居然一路打到了半决赛。虽然最后输了，但你认识了很多人。"打得不错啊！"对手和你握手，"下次再切磋。"你第一次觉得：输赢不重要，重要的是你站在了赛场上。',
+      cond: g => g.flags.billiardRegular && !g.flags.billiardContest && g.age >= 20,
+      choices:[
+        { label:'开始参加更多业余比赛', hint:'+✨ +🤝', fn: g => { g.flags.billiardContest=true; g.flags.billiardLeague=true; return{charm:8,social:5}; }},
+        { label:'开心就好，不追求名次', hint:'+😊', fn: g => { g.flags.billiardContest=true; return{mood:8}; }},
+      ]},
+
+    { id:'billiard_online_v38_2', icon:'📱', title:'手机台球', category:'billiard',
+      body:'你发现了一个手机台球游戏，物理引擎做得很逼真。通勤路上打、午休时打、睡前还要打两局。你和网上的对手打得不亦乐乎，段位一路升到了钻石。朋友说："你手机上的球技比现实中还厉害。"你说："现实中有重力干扰，手机里没有。"你知道这只是借口，但打得开心就好。',
+      cond: g => g.flags.billiardFirst && !g.flags.billiardOnline,
+      choices:[
+        { label:'参加了线上台球锦标赛', hint:'+🧠 +✨', fn: g => { g.flags.billiardOnline=true; g.flags.billiardOnlineRank=true; return{intel:5,charm:5}; }},
+        { label:'当消遣打着玩', hint:'+😊', fn: g => { g.flags.billiardOnline=true; return{mood:5}; }},
+      ]},
+
+    { id:'billiard_old_v38_2', icon:'🏚️', title:'老台球厅', category:'billiard',
+      body:'你常去的那家老台球厅要关门了。老板说租金涨了，赚不过来了。"开了十五年了，"老板摸着球台说，"这张台子打过多少人，每一杆都有故事。"你看着墙上贴满了的旧海报和签名球杆，想起了很多在这里度过的夜晚。最后一天，所有老顾客都来了，大家打了一场通宵告别赛。',
+      cond: g => g.flags.billiardFirst && !g.flags.billiardOld && g.age >= 22,
+      choices:[
+        { label:'买下了一张旧球台留作纪念', hint:'-💰 +❤️', fn: g => { g.flags.billiardOld=true; g.flags.billiardTable=true; return{money:-3000,mood:10}; }},
+        { label:'和老板合影发朋友圈', hint:'+❤️ +🤝', fn: g => { g.flags.billiardOld=true; return{mood:5,social:5}; }},
+      ]},
+
+    { id:'billiard_teach_v38_2', icon:'📚', title:'教别人打球', category:'billiard',
+      body:'你的球技进步了很多，开始有新手指点你教他们。"握杆要放松""瞄准要看假想球""走位要提前想三步"。你教得很认真，看到徒弟进步比你自己进球还开心。"你教得比网上教程好！"徒弟说。你突然理解了台球厅那个老大爷为什么愿意教你——传承本身就是快乐。',
+      cond: g => g.flags.billiardMaster && !g.flags.billiardTeach && g.age >= 24,
+      choices:[
+        { label:'在台球厅当了兼职教练', hint:'+💰 +🤝', fn: g => { g.flags.billiardTeach=true; g.flags.billiardCoach=true; return{money:2000,social:8}; }},
+        { label:'免费教朋友打球', hint:'+🤝 +😊', fn: g => { g.flags.billiardTeach=true; return{social:8,mood:5}; }},
+      ]},
+
+    { id:'billiard_life_v38_2', icon:'🌟', title:'台球人生', category:'billiard',
+      body:'你终于理解了台球的哲学。打球如做人——要稳、要准、要有大局观。不能只盯着眼前这一颗球，要提前想好下一杆走位。有时候一杆失误不代表全盘皆输，关键是调整心态打好下一杆。人生也是这样：走位不可能每次都完美，但每一杆都值得认真对待。你的人生，就是一张永远打不完的球桌。',
+      cond: g => g.age >= 28 && g.flags.billiardFirst && (g.flags.billiardMaster || g.flags.billiardContest) && (g.flags.billiardOld || g.flags.billiardTeach) && !g.flags.billiardLife,
+      choices:[
+        { label:'开了一家社区台球俱乐部', hint:'-💰 +❤️ +🤝', fn: g => { g.flags.billiardLife=true; g.flags.billiardClub=true; return{money:-20000,mood:15,social:12}; }},
+        { label:'成了一个台球文化博主', hint:'+✨ +🧠', fn: g => { g.flags.billiardLife=true; g.flags.billiardBlogger=true; return{charm:10,intel:8}; }},
+        { label:'继续做一个享受台球的普通人', hint:'+😊 +🧠 +❤️', fn: g => { g.flags.billiardLife=true; return{mood:12,intel:5,social:5}; }},
+      ]},
+
 ];
 
 const ACHIEVEMENTS = [
@@ -25219,6 +25301,16 @@ const ACHIEVEMENTS = [
     { id:'ktv_app_v38_1_ach', icon:'📱', name:'线上麦霸', desc:'在手机K歌APP上找到了新舞台', check: g => g.flags.ktvApp },
     { id:'ktv_reunion_v38_1_ach', icon:'🍻', name:'曲终人散', desc:'在KTV里送别了重要的朋友', check: g => g.flags.ktvReunion },
     { id:'ktv_life_v38_1_ach', icon:'🌟', name:'K歌人生', desc:'理解了唱歌不只是娱乐，更是一种表达', check: g => g.flags.ktvLife },
+    { id:'billiard_first_v38_2_ach', icon:'🎱', name:'初入球房', desc:'第一次走进台球厅打球', check: g => g.flags.billiardFirst },
+    { id:'billiard_friends_v38_2_ach', icon:'🤝', name:'球友之交', desc:'有了固定的台球球友', check: g => g.flags.billiardFriends },
+    { id:'billiard_couple_v38_2_ach', icon:'💕', name:'浪漫球局', desc:'用台球制造了一次特别的约会', check: g => g.flags.billiardCouple },
+    { id:'billiard_bet_v38_2_ach', icon:'💰', name:'赌球风波', desc:'经历了台球厅里的赌球陷阱', check: g => g.flags.billiardBet },
+    { id:'billiard_master_v38_2_ach', icon:'👴', name:'扫地僧', desc:'遇到了台球厅里的隐藏高手', check: g => g.flags.billiardMaster },
+    { id:'billiard_contest_v38_2_ach', icon:'🏆', name:'赛场新秀', desc:'参加了业余台球比赛', check: g => g.flags.billiardContest },
+    { id:'billiard_online_v38_2_ach', icon:'📱', name:'指尖球手', desc:'在手机上也打出了好成绩', check: g => g.flags.billiardOnline },
+    { id:'billiard_old_v38_2_ach', icon:'🏚️', name:'最后一杆', desc:'见证了老台球厅的最后时光', check: g => g.flags.billiardOld },
+    { id:'billiard_teach_v38_2_ach', icon:'📚', name:'球桌传承', desc:'开始教别人打台球', check: g => g.flags.billiardTeach },
+    { id:'billiard_life_v38_2_ach', icon:'🌟', name:'台球人生', desc:'悟出了打球如做人的道理', check: g => g.flags.billiardLife },
 ];
 
 // === ENDINGS === (order matters: first match wins)
