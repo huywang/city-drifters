@@ -1,0 +1,21 @@
+{
+    "name": "都市浮生记 - 漂泊人生模拟器",
+    "short_name": "都市浮生记",
+    "description": "一款关于中国大城市漂泊者的人生模拟游戏",
+    "start_url": "/city-drifters/",
+    "scope": "/city-drifters/",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#0c1018",
+    "theme_color": "#0c1018",
+    "lang": "zh-CN",
+    "categories": ["games", "entertainment"],
+    "icons": [
+        {
+            "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='64' fill='%230c1018'/><text x='256' y='300' text-anchor='middle' font-size='280' fill='white'>🏙️</text></svg>",
+            "sizes": "512x512",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        }
+    ]
+}

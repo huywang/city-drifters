@@ -8,6 +8,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="manifest.json">
     <title>都市浮生记 - 漂泊人生模拟器</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -62,7 +63,7 @@
                 </button>
             </nav>
             <div class="title-footer">
-                <span>v51.2</span> · <span>献给每一个在大城市奋斗的你</span>
+                <span>v51.3</span> · <span>献给每一个在大城市奋斗的你</span>
             </div>
         </div>
     </div>
@@ -618,5 +619,6 @@
 
     <script src="game-data.js" onload="document.getElementById('loading-bar').style.width='70%';document.getElementById('loading-text').textContent='加载引擎中...';"></script>
     <script src="game.js" onload="document.getElementById('loading-bar').style.width='100%';setTimeout(function(){var o=document.getElementById('loading-overlay');if(o){o.style.opacity='0';setTimeout(function(){o.style.display='none';},500);}},200);"></script>
+    <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}</script>
 </body>
 </html>

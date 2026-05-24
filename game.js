@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v51.2
+// 都市浮生记 - Game Engine v51.3
 // ============================================
 
 
@@ -1965,10 +1965,10 @@ function triggerEnding() {
     const ending = ENDINGS.find(e => e.cond(G)) || ENDINGS[ENDINGS.length-1];
 
     // Track ending for statistics
-    const endingsUnlocked = JSON.parse(localStorage.getItem('cityDrifters_endings') || '[]');
+    const endingsUnlocked = JSON.parse(safeGetItem('cityDrifters_endings') || '[]');
     if (!endingsUnlocked.includes(ending.id)) {
         endingsUnlocked.push(ending.id);
-        localStorage.setItem('cityDrifters_endings', JSON.stringify(endingsUnlocked));
+        safeSetItem('cityDrifters_endings', JSON.stringify(endingsUnlocked));
     }
 
     // v2.17: Update cross-playthrough statistics
@@ -2134,7 +2134,7 @@ function getEndingRarity(endingId) {
 
 // === ENDING GALLERY ===
 function showEndingGallery() {
-    const unlocked = JSON.parse(localStorage.getItem('cityDrifters_endings') || '[]');
+    const unlocked = JSON.parse(safeGetItem('cityDrifters_endings') || '[]');
     const grid = document.getElementById('gallery-grid');
     const progress = document.getElementById('gallery-progress');
 
@@ -2166,7 +2166,7 @@ function showEndingGallery() {
 
 // === TUTORIAL ===
 function showTutorial() {
-    const tutorialShown = localStorage.getItem('cityDrifters_tutorial');
+    const tutorialShown = safeGetItem('cityDrifters_tutorial');
     if (tutorialShown) return;
 
     setTimeout(() => {
@@ -2174,7 +2174,7 @@ function showTutorial() {
         setTimeout(() => {
             notify('💡 提示：按空格键前进到下个月');
         }, 4000);
-        localStorage.setItem('cityDrifters_tutorial', 'true');
+        safeSetItem('cityDrifters_tutorial', 'true');
     }, 2000);
 }
 
@@ -2200,11 +2200,11 @@ function showTimeline() {
 const LEGACY_KEY = 'cityDrifters_legacy';
 
 function getLegacy() {
-    return JSON.parse(localStorage.getItem(LEGACY_KEY) || '{"points":0,"totalEndings":[],"totalAchievements":[],"difficulty":"normal","playthroughs":0}');
+    return JSON.parse(safeGetItem(LEGACY_KEY) || '{"points":0,"totalEndings":[],"totalAchievements":[],"difficulty":"normal","playthroughs":0}');
 }
 
 function saveLegacy(data) {
-    localStorage.setItem(LEGACY_KEY, JSON.stringify(data));
+    safeSetItem(LEGACY_KEY, JSON.stringify(data));
 }
 
 function calculateLegacyReward(endingId) {
@@ -2309,16 +2309,16 @@ const SAVE_PREFIX = 'cityDrifters_save_';
 
 function saveGame(slot = 1) {
     const saveData = { ...G, savedAt: Date.now(), version: '10.2' };
-    localStorage.setItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
+    safeSetItem(SAVE_PREFIX + slot, JSON.stringify(saveData));
     notify(`💾 已保存到槽位 ${slot}！`);
     toggleMenu();
 }
 
 function loadGame(slot = 1) {
-    const s = localStorage.getItem(SAVE_PREFIX + slot);
+    const s = safeGetItem(SAVE_PREFIX + slot);
     if (!s) {
         // Fallback to old save format
-        const oldSave = localStorage.getItem('cityDrifters_save');
+        const oldSave = safeGetItem('cityDrifters_save');
         if (oldSave) {
             Object.assign(G, JSON.parse(oldSave));
             showScreen('screen-game');
@@ -2338,7 +2338,7 @@ function loadGame(slot = 1) {
 function getSaveSlots() {
     const slots = [];
     for (let i = 1; i <= MAX_SAVE_SLOTS; i++) {
-        const save = localStorage.getItem(SAVE_PREFIX + i);
+        const save = safeGetItem(SAVE_PREFIX + i);
         if (save) {
             const data = JSON.parse(save);
             slots.push({
@@ -2393,7 +2393,7 @@ function showSaveMenu() {
 
 function deleteSave(slot) {
     if (!confirm(`确定要删除槽位 ${slot} 的存档吗？`)) return;
-    localStorage.removeItem(SAVE_PREFIX + slot);
+    safeRemoveItem(SAVE_PREFIX + slot);
     notify(`🗑️ 槽位 ${slot} 已删除`);
     showSaveMenu();
 }
@@ -2547,12 +2547,31 @@ function getLowestStat() {
     return names[entries[0][0]];
 }
 
+// === STORAGE HELPER ===
+function safeGetItem(key) {
+    try { return safeGetItem(key); } catch(e) { return null; }
+}
+function safeSetItem(key, value) {
+    try { safeSetItem(key, value); return true; } catch(e) { return false; }
+}
+function safeRemoveItem(key) {
+    try { safeRemoveItem(key); return true; } catch(e) { return false; }
+}
+
 // === SOUND SYSTEM ===
-let soundEnabled = localStorage.getItem('cityDrifters_sound') !== 'false';
+let _audioCtx = null;
+function getAudioCtx() {
+    if (!_audioCtx) {
+        try { _audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) { return null; }
+    }
+    if (_audioCtx.state === 'suspended') _audioCtx.resume();
+    return _audioCtx;
+}
+let soundEnabled = safeGetItem('cityDrifters_sound') !== 'false';
 
 function toggleSound() {
     soundEnabled = !soundEnabled;
-    localStorage.setItem('cityDrifters_sound', soundEnabled);
+    safeSetItem('cityDrifters_sound', soundEnabled);
     notify(soundEnabled ? '🔊 音效已开启' : '🔇 音效已关闭');
     // Update UI
     const soundBtn = document.getElementById('toggle-sound');
@@ -2561,9 +2580,9 @@ function toggleSound() {
 
 function playSound(type) {
     if (!soundEnabled) return;
-    // Simple Web Audio API sounds
     try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const ctx = getAudioCtx();
+        if (!ctx) return;
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.connect(gain);
@@ -2749,9 +2768,14 @@ function resetGame() {
 // === PARTICLES ===
 function initParticles() {
     const canvas = document.getElementById('particles'), ctx = canvas.getContext('2d');
-    let particles = [];
+    let particles = [], paused = false;
     function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     resize(); window.addEventListener('resize', resize);
+
+    // 低端机检测：减少粒子数
+    const cores = navigator.hardwareConcurrency || 2;
+    const mem = navigator.deviceMemory || 4;
+    const count = (cores <= 2 || mem <= 2) ? 15 : (cores <= 4 ? 30 : 60);
 
     class P {
         constructor() { this.reset(); }
@@ -2759,8 +2783,11 @@ function initParticles() {
         update() { this.x+=this.sx; this.y+=this.sy; this.pulse+=0.01; if(this.x<0||this.x>canvas.width||this.y<0||this.y>canvas.height) this.reset(); }
         draw() { const a=this.opacity*(0.5+0.5*Math.sin(this.pulse)); ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fillStyle=`rgba(96,165,250,${a})`; ctx.fill(); }
     }
-    for(let i=0;i<60;i++) particles.push(new P());
-    (function animate() { ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach(p=>{p.update();p.draw()}); requestAnimationFrame(animate); })();
+    for(let i=0;i<count;i++) particles.push(new P());
+    (function animate() { if(!paused){ ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach(p=>{p.update();p.draw()}); } requestAnimationFrame(animate); })();
+
+    // 后台暂停粒子动画
+    document.addEventListener('visibilitychange', () => { paused = document.hidden; });
 }
 
 // === SETTINGS ===
@@ -2772,7 +2799,7 @@ function openSettings() {
 function setFontSize(size) {
     const sizes = { small: '14px', medium: '16px', large: '18px' };
     document.documentElement.style.fontSize = sizes[size];
-    localStorage.setItem('gameSettings_fontSize', size);
+    safeSetItem('gameSettings_fontSize', size);
     document.querySelectorAll('.settings-btn').forEach(btn => btn.classList.remove('active'));
     event.target.classList.add('active');
 }
@@ -2780,25 +2807,25 @@ function setFontSize(size) {
 function toggleHighContrast() {
     const enabled = document.getElementById('toggle-contrast').checked;
     document.body.classList.toggle('high-contrast', enabled);
-    localStorage.setItem('gameSettings_highContrast', enabled);
+    safeSetItem('gameSettings_highContrast', enabled);
 }
 
 function toggleReduceMotion() {
     const enabled = document.getElementById('toggle-motion').checked;
     document.body.classList.toggle('reduce-motion', enabled);
-    localStorage.setItem('gameSettings_reduceMotion', enabled);
+    safeSetItem('gameSettings_reduceMotion', enabled);
 }
 
 // v2.16: 主题切换
 function toggleTheme() {
     const isLight = document.getElementById('toggle-theme').checked;
     document.body.classList.toggle('light-theme', isLight);
-    localStorage.setItem('gameSettings_lightTheme', isLight);
+    safeSetItem('gameSettings_lightTheme', isLight);
     playSound('click');
 }
 
 function loadThemeSettings() {
-    const isLight = localStorage.getItem('gameSettings_lightTheme') === 'true';
+    const isLight = safeGetItem('gameSettings_lightTheme') === 'true';
     if (isLight) {
         document.body.classList.add('light-theme');
         const toggle = document.getElementById('toggle-theme');
@@ -2807,16 +2834,30 @@ function loadThemeSettings() {
 }
 
 function exportSave() {
-    const save = localStorage.getItem('cityDrifters_save');
-    if (!save) { notify('没有存档可导出'); return; }
-    const blob = new Blob([save], { type: 'application/json' });
+    // 导出所有槽位存档
+    const allSaves = {};
+    for (let i = 1; i <= MAX_SAVE_SLOTS; i++) {
+        const s = safeGetItem(SAVE_PREFIX + i);
+        if (s) allSaves['slot_' + i] = JSON.parse(s);
+    }
+    const legacy = safeGetItem('cityDrifters_save');
+    if (legacy) allSaves['legacy'] = JSON.parse(legacy);
+    const endings = safeGetItem('cityDrifters_endings');
+    if (endings) allSaves['endings'] = JSON.parse(endings);
+    const stats = safeGetItem('cityDrifters_stats');
+    if (stats) allSaves['stats'] = JSON.parse(stats);
+    const legacyData = safeGetItem('cityDrifters_legacy');
+    if (legacyData) allSaves['legacyData'] = JSON.parse(legacyData);
+
+    if (Object.keys(allSaves).length === 0) { notify('没有存档可导出'); return; }
+    const blob = new Blob([JSON.stringify(allSaves, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `都市浮生记_存档_${new Date().toISOString().slice(0,10)}.json`;
+    a.download = `都市浮生记_全部存档_${new Date().toISOString().slice(0,10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    notify('📤 存档已导出！');
+    notify('📤 全部存档已导出！');
 }
 
 function importSave() {
@@ -2830,7 +2871,18 @@ function importSave() {
         reader.onload = (event) => {
             try {
                 const data = JSON.parse(event.target.result);
-                localStorage.setItem('cityDrifters_save', JSON.stringify(data));
+                // 支持新格式（多槽位）和旧格式（单存档）
+                if (data.slot_1 || data.slot_2 || data.slot_3 || data.legacy) {
+                    for (let i = 1; i <= MAX_SAVE_SLOTS; i++) {
+                        if (data['slot_' + i]) safeSetItem(SAVE_PREFIX + i, JSON.stringify(data['slot_' + i]));
+                    }
+                    if (data.legacy) safeSetItem('cityDrifters_save', JSON.stringify(data.legacy));
+                    if (data.endings) safeSetItem('cityDrifters_endings', JSON.stringify(data.endings));
+                    if (data.stats) safeSetItem('cityDrifters_stats', JSON.stringify(data.stats));
+                    if (data.legacyData) safeSetItem('cityDrifters_legacy', JSON.stringify(data.legacyData));
+                } else {
+                    safeSetItem('cityDrifters_save', JSON.stringify(data));
+                }
                 notify('💾 存档已导入！刷新页面生效');
                 setTimeout(() => location.reload(), 1500);
             } catch (err) {
@@ -2844,14 +2896,14 @@ function importSave() {
 
 function clearSave() {
     if (!confirm('确定要清除存档吗？此操作不可恢复！')) return;
-    localStorage.removeItem('cityDrifters_save');
+    safeRemoveItem('cityDrifters_save');
     notify('🗑️ 存档已清除');
 }
 
 function loadSettingsUI() {
-    const fontSize = localStorage.getItem('gameSettings_fontSize') || 'medium';
-    const highContrast = localStorage.getItem('gameSettings_highContrast') === 'true';
-    const reduceMotion = localStorage.getItem('gameSettings_reduceMotion') === 'true';
+    const fontSize = safeGetItem('gameSettings_fontSize') || 'medium';
+    const highContrast = safeGetItem('gameSettings_highContrast') === 'true';
+    const reduceMotion = safeGetItem('gameSettings_reduceMotion') === 'true';
 
     document.querySelectorAll('.settings-btn').forEach(btn => {
         if (btn.textContent.includes(fontSize === 'small' ? '小' : fontSize === 'large' ? '大' : '中')) {
@@ -2863,9 +2915,9 @@ function loadSettingsUI() {
 }
 
 function loadSettings() {
-    const fontSize = localStorage.getItem('gameSettings_fontSize') || 'medium';
-    const highContrast = localStorage.getItem('gameSettings_highContrast') === 'true';
-    const reduceMotion = localStorage.getItem('gameSettings_reduceMotion') === 'true';
+    const fontSize = safeGetItem('gameSettings_fontSize') || 'medium';
+    const highContrast = safeGetItem('gameSettings_highContrast') === 'true';
+    const reduceMotion = safeGetItem('gameSettings_reduceMotion') === 'true';
 
     const sizes = { small: '14px', medium: '16px', large: '18px' };
     document.documentElement.style.fontSize = sizes[fontSize];
@@ -2905,11 +2957,11 @@ function checkDailyChallenge() {
         if (reward.charm) G.charm = clamp(G.charm + reward.charm, 0, 100);
 
         // 记录完成
-        const completed = JSON.parse(localStorage.getItem('cityDrifters_challenges') || '[]');
+        const completed = JSON.parse(safeGetItem('cityDrifters_challenges') || '[]');
         const today = new Date().toDateString();
         if (!completed.includes(today)) {
             completed.push(today);
-            localStorage.setItem('cityDrifters_challenges', JSON.stringify(completed));
+            safeSetItem('cityDrifters_challenges', JSON.stringify(completed));
         }
 
         notify(`🎯 每日挑战完成：${challenge.title}！`);
@@ -2920,7 +2972,7 @@ function checkDailyChallenge() {
 
 // === v2.17 CROSS-PLAYTHROUGH STATISTICS ===
 function updatePlaythroughStats(ending) {
-    const stats = JSON.parse(localStorage.getItem('cityDrifters_stats') || '{}');
+    const stats = JSON.parse(safeGetItem('cityDrifters_stats') || '{}');
     stats.totalPlaythroughs = (stats.totalPlaythroughs || 0) + 1;
     stats.totalMonths = (stats.totalMonths || 0) + G.months;
     stats.totalChoices = (stats.totalChoices || 0) + G.choices;
@@ -2941,11 +2993,11 @@ function updatePlaythroughStats(ending) {
     if (!stats.backgrounds) stats.backgrounds = {};
     stats.backgrounds[G.background] = (stats.backgrounds[G.background] || 0) + 1;
 
-    localStorage.setItem('cityDrifters_stats', JSON.stringify(stats));
+    safeSetItem('cityDrifters_stats', JSON.stringify(stats));
 }
 
 function showPlaythroughStats() {
-    const stats = JSON.parse(localStorage.getItem('cityDrifters_stats') || '{}');
+    const stats = JSON.parse(safeGetItem('cityDrifters_stats') || '{}');
     const modal = document.getElementById('modal-stats') || createStatsModal();
 
     const content = modal.querySelector('.stats-content');
@@ -3004,6 +3056,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initParticles();
     initMobileSwipe();
     initKeyboardShortcuts();
-    const hasAnySave = localStorage.getItem(SAVE_PREFIX + '1') || localStorage.getItem(SAVE_PREFIX + '2') || localStorage.getItem(SAVE_PREFIX + '3') || localStorage.getItem('cityDrifters_save');
+    const hasAnySave = safeGetItem(SAVE_PREFIX + '1') || safeGetItem(SAVE_PREFIX + '2') || safeGetItem(SAVE_PREFIX + '3') || safeGetItem('cityDrifters_save');
     if (!hasAnySave) document.getElementById('btn-continue').style.opacity = '0.4';
 });
