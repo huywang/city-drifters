@@ -1,7 +1,7 @@
 // ============================================
 // 都市浮生记 - Service Worker v51.2
 // ============================================
-const CACHE_NAME = 'city-drifters-v51.2';
+const CACHE_NAME = 'city-drifters-v51.4';
 const ASSETS = [
     './',
     './index.html',

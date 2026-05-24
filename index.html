@@ -63,7 +63,7 @@
                 </button>
             </nav>
             <div class="title-footer">
-                <span>v51.3</span> · <span>献给每一个在大城市奋斗的你</span>
+                <span>v51.4</span> · <span>献给每一个在大城市奋斗的你</span>
             </div>
         </div>
     </div>
@@ -323,7 +323,10 @@
             </div>
         </div>
 
-        <div class="stats-bar">
+        <button class="stats-bar-toggle" id="stats-toggle" onclick="toggleStatsBar()">
+            <span class="toggle-stats-summary" id="stats-summary">💰 ¥0 · ❤️ 80 · 😊 70 ▼</span>
+        </button>
+        <div class="stats-bar" id="stats-bar">
             <div class="stat-item" title="金钱">
                 <span class="stat-icon">💰</span>
                 <div class="stat-bar-wrap">
@@ -523,7 +526,7 @@
     </div>
 
     <!-- ===== 成就弹窗 ===== -->
-    <div class="modal" id="modal-achievements">
+    <div class="modal bottom-sheet" id="modal-achievements">
         <div class="modal-overlay" onclick="closeModal('modal-achievements')"></div>
         <div class="modal-content">
             <h2>🏆 成就列表</h2>
@@ -533,7 +536,7 @@
     </div>
 
     <!-- ===== 结局图鉴弹窗 ===== -->
-    <div class="modal" id="modal-gallery">
+    <div class="modal bottom-sheet" id="modal-gallery">
         <div class="modal-overlay" onclick="closeModal('modal-gallery')"></div>
         <div class="modal-content">
             <h2>🏆 结局图鉴</h2>
@@ -543,7 +546,7 @@
         </div>
     </div>
 
-    <div class="modal" id="modal-timeline">
+    <div class="modal bottom-sheet" id="modal-timeline">
         <div class="modal-overlay" onclick="closeModal('modal-timeline')"></div>
         <div class="modal-content">
             <h2>📜 人生轨迹</h2>
@@ -553,7 +556,7 @@
     </div>
 
     <!-- ===== 存档管理弹窗 ===== -->
-    <div class="modal" id="modal-save">
+    <div class="modal bottom-sheet" id="modal-save">
         <div class="modal-overlay" onclick="closeModal('modal-save')"></div>
         <div class="modal-content">
             <h2>💾 存档管理</h2>
@@ -563,7 +566,7 @@
     </div>
 
     <!-- ===== 设置弹窗 ===== -->
-    <div class="modal" id="modal-settings">
+    <div class="modal bottom-sheet" id="modal-settings">
         <div class="modal-overlay" onclick="closeModal('modal-settings')"></div>
         <div class="modal-content">
             <h2>⚙️ 设置</h2>
@@ -616,6 +619,25 @@
     </div>
 
     <div class="stat-change" id="stat-change"></div>
+
+    <!-- 横屏提示 -->
+    <div class="landscape-warning" id="landscape-warning">
+        <div class="rotate-icon">📱</div>
+        <div class="rotate-text">请竖屏使用以获得最佳体验</div>
+    </div>
+
+    <!-- 字号快捷按钮 -->
+    <button class="font-size-toggle" id="font-size-toggle" onclick="cycleFontSize()" title="调整字号">字</button>
+
+    <!-- PWA安装引导 -->
+    <div class="pwa-install-banner" id="pwa-install-banner">
+        <div class="pwa-install-info">
+            <div class="pwa-install-title">安装都市浮生记</div>
+            <div class="pwa-install-desc">添加到桌面，离线随时玩</div>
+        </div>
+        <button class="pwa-install-btn" id="pwa-install-btn" onclick="installPWA()">安装</button>
+        <button class="pwa-install-close" onclick="dismissInstall()">✕</button>
+    </div>
 
     <script src="game-data.js" onload="document.getElementById('loading-bar').style.width='70%';document.getElementById('loading-text').textContent='加载引擎中...';"></script>
     <script src="game.js" onload="document.getElementById('loading-bar').style.width='100%';setTimeout(function(){var o=document.getElementById('loading-overlay');if(o){o.style.opacity='0';setTimeout(function(){o.style.display='none';},500);}},200);"></script>

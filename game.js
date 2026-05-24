@@ -1,5 +1,5 @@
 // ============================================
-// 都市浮生记 - Game Engine v51.3
+// 都市浮生记 - Game Engine v51.4
 // ============================================
 
 
@@ -1493,6 +1493,9 @@ function updateHUD() {
     document.getElementById('play-months').textContent = G.months;
     document.getElementById('total-choices').textContent = G.choices;
     document.getElementById('total-events').textContent = G.eventsSeen;
+
+    // v51.3: 更新折叠状态栏摘要
+    updateStatsSummary();
 }
 
 // v7.8: 危机检测和警告系统
@@ -2400,45 +2403,36 @@ function deleteSave(slot) {
 
 // === MOBILE SWIPE NAVIGATION ===
 function initMobileSwipe() {
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let touchEndX = 0;
-    let touchEndY = 0;
+    let touchStartX = 0, touchStartY = 0, touchStartTime = 0;
 
     const gameScreen = document.getElementById('screen-game');
     if (!gameScreen) return;
 
     gameScreen.addEventListener('touchstart', (e) => {
-        touchStartX = e.changedTouches[0].screenX;
-        touchStartY = e.changedTouches[0].screenY;
+        touchStartX = e.changedTouches[0].clientX;
+        touchStartY = e.changedTouches[0].clientY;
+        touchStartTime = Date.now();
     }, { passive: true });
 
     gameScreen.addEventListener('touchend', (e) => {
-        touchEndX = e.changedTouches[0].screenX;
-        touchEndY = e.changedTouches[0].screenY;
-        handleSwipe();
-    }, { passive: true });
+        const dx = touchStartX - e.changedTouches[0].clientX;
+        const dy = Math.abs(touchStartY - e.changedTouches[0].clientY);
+        const dt = Date.now() - touchStartTime;
 
-    function handleSwipe() {
-        const swipeThreshold = 60;
-        const verticalThreshold = 40;
-        const diffX = touchStartX - touchEndX;
-        const diffY = Math.abs(touchStartY - touchEndY);
+        // 忽略慢滑动(>500ms)和垂直滚动
+        if (dt > 500) return;
+        if (dy > 50 && dy > Math.abs(dx)) return;
+        if (Math.abs(dx) < 80) return;
 
-        // Ignore if vertical movement is dominant (scrolling)
-        if (diffY > verticalThreshold && diffY > Math.abs(diffX)) return;
-        if (Math.abs(diffX) < swipeThreshold) return;
+        // 右滑开菜单时，排除从屏幕左边缘开始的滑动（避免与iOS返回手势冲突）
+        if (dx < 0 && touchStartX < 30) return;
 
-        if (diffX > 0) {
-            // Swipe left - next month
-            if (!document.getElementById('btn-advance').disabled) {
-                advanceMonth();
-            }
+        if (dx > 0) {
+            if (!document.getElementById('btn-advance').disabled) advanceMonth();
         } else {
-            // Swipe right - open menu
             toggleMenu();
         }
-    }
+    }, { passive: true });
 }
 
 // === KEYBOARD SHORTCUTS ===
@@ -2665,6 +2659,83 @@ function playSound(type) {
 // === MENU ===
 function toggleMenu() { document.getElementById('side-menu').classList.toggle('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// === COLLAPSIBLE STATS BAR ===
+let statsCollapsed = false;
+function toggleStatsBar() {
+    statsCollapsed = !statsCollapsed;
+    const bar = document.getElementById('stats-bar');
+    const toggle = document.getElementById('stats-toggle');
+    if (bar) bar.classList.toggle('collapsed', statsCollapsed);
+    updateStatsSummary();
+}
+function updateStatsSummary() {
+    const s = document.getElementById('stats-summary');
+    if (!s || typeof G === 'undefined') return;
+    const arrow = statsCollapsed ? '▼' : '▲';
+    s.textContent = `💰 ${fmtMoney(G.money)} · ❤️ ${G.health} · 😊 ${G.mood} ${arrow}`;
+}
+
+// === FONT SIZE QUICK TOGGLE ===
+const FONT_SIZES = ['small', 'medium', 'large'];
+function cycleFontSize() {
+    const current = safeGetItem('gameSettings_fontSize') || 'medium';
+    const idx = FONT_SIZES.indexOf(current);
+    const next = FONT_SIZES[(idx + 1) % FONT_SIZES.length];
+    const sizes = { small: '14px', medium: '16px', large: '18px' };
+    document.documentElement.style.fontSize = sizes[next];
+    safeSetItem('gameSettings_fontSize', next);
+    const labels = { small: '小', medium: '中', large: '大' };
+    notify(`🔤 字号：${labels[next]}`);
+    playSound('click');
+}
+
+// === PWA INSTALL PROMPT ===
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    // 如果用户未曾关闭过安装提示，显示横幅
+    if (safeGetItem('cityDrifters_pwa_dismissed') !== 'true') {
+        setTimeout(() => {
+            const banner = document.getElementById('pwa-install-banner');
+            if (banner) banner.classList.add('show');
+        }, 3000);
+    }
+});
+function installPWA() {
+    if (deferredInstallPrompt) {
+        deferredInstallPrompt.prompt();
+        deferredInstallPrompt.userChoice.then(result => {
+            if (result.outcome === 'accepted') notify('🎉 安装成功！');
+            deferredInstallPrompt = null;
+            dismissInstall();
+        });
+    }
+}
+function dismissInstall() {
+    const banner = document.getElementById('pwa-install-banner');
+    if (banner) banner.classList.remove('show');
+    safeSetItem('cityDrifters_pwa_dismissed', 'true');
+}
+// iOS安装提示（iOS不支持beforeinstallprompt）
+function showIOSInstallTip() {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    if (isIOS && !isStandalone && safeGetItem('cityDrifters_ios_tip') !== 'true') {
+        setTimeout(() => {
+            const banner = document.getElementById('pwa-install-banner');
+            if (banner) {
+                const desc = banner.querySelector('.pwa-install-desc');
+                if (desc) desc.textContent = '点击分享按钮 → 添加到主屏幕';
+                const btn = document.getElementById('pwa-install-btn');
+                if (btn) btn.textContent = '知道了';
+                if (btn) btn.onclick = () => { safeSetItem('cityDrifters_ios_tip', 'true'); dismissInstall(); };
+                banner.classList.add('show');
+            }
+        }, 5000);
+    }
+}
 
 // === NOTIFY ===
 function notify(text) {
@@ -3056,6 +3127,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initParticles();
     initMobileSwipe();
     initKeyboardShortcuts();
+    showIOSInstallTip();
     const hasAnySave = safeGetItem(SAVE_PREFIX + '1') || safeGetItem(SAVE_PREFIX + '2') || safeGetItem(SAVE_PREFIX + '3') || safeGetItem('cityDrifters_save');
     if (!hasAnySave) document.getElementById('btn-continue').style.opacity = '0.4';
 });
